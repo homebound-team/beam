@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { ReactElement, useCallback, useContext, useRef } from "react";
+import React, { ReactElement, useCallback, useContext, useRef } from "react";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -7,9 +7,12 @@ import {
   rowClickRenderFn,
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
+import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
+import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -44,6 +47,12 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  /* column resizers */
+  resizedWidths: ResizedWidths;
+  setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
+  disableColumnResizing: boolean;
+  calculatePreviewWidth: (columnId: string, newWidth: number, columnIndex: number) => number;
+  /* Drag handlers */
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
@@ -65,6 +74,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    resizedWidths,
+    setResizedWidth,
+    disableColumnResizing = true,
+    calculatePreviewWidth,
     onDragStart,
     onDragEnd,
     onDrop,
@@ -348,7 +361,60 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   ? rowClickRenderFn(as, api, currentColspan)
                   : defaultRenderFn(as, currentColspan);
 
-          return renderFn(columnIndex, cellCss, content, row, rowStyle, cellClassNames, cellOnClick, tooltip);
+          const cellElement = renderFn(
+            columnIndex,
+            cellCss,
+            content,
+            row,
+            rowStyle,
+            cellClassNames,
+            cellOnClick,
+            tooltip,
+          );
+
+          // Add resize handle for header rows when resizing is enabled
+          // Only add handle on the right border (not for the last column)
+          // Skip action columns (selectColumn, collapseColumn, actionColumn) as they should not be resizable
+          if (
+            !disableColumnResizing &&
+            isHeader &&
+            columnIndex < columns.length - 1 &&
+            currentColspan === 1 &&
+            !column.isAction
+          ) {
+            // Parse current width - if not in pixels, use a fallback or skip resize handle
+            const currentSizeStr = columnSizes[columnIndex];
+            const minWidthPx = column.mw ? parseInt(column.mw.replace("px", ""), 10) : 100;
+            // This fallback shouldn't happen in practice: columns are locked to pixel widths on first resize,
+            // and resizedWidths should always contain the current width after that point. However, we handle
+            // the edge case of initial render with percentage/calc() columns before any resize has occurred.
+            const currentWidthPx =
+              parseWidthToPx(currentSizeStr, undefined) ?? resizedWidths?.[column.id] ?? minWidthPx;
+
+            // Add resize handle to header cells by cloning the cell element and adding relative positioning
+            const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
+              css: {
+                ...((cellElement as React.ReactElement).props.css || {}),
+                ...Css.relative.$,
+              },
+              children: (
+                <>
+                  {(cellElement as React.ReactElement).props.children}
+                  <ColumnResizeHandle
+                    columnId={column.id}
+                    columnIndex={columnIndex}
+                    currentWidth={currentWidthPx}
+                    minWidth={minWidthPx}
+                    onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
+                    calculatePreviewWidth={calculatePreviewWidth}
+                  />
+                </>
+              ),
+            });
+            return cellElementWithHandle;
+          }
+
+          return cellElement;
         })
       )}
     </RowTag>

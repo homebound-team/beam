@@ -76,6 +76,7 @@ export type GridTableApi<R extends Kinded> = {
 
   getVisibleColumnIds(): string[];
   setVisibleColumns(ids: string[]): void;
+  resetColumnWidths(): void;
 
   /**
    * Triggers the table's current content to be downloaded as a CSV file.
@@ -107,6 +108,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   virtuosoRef: MutableRefObject<VirtuosoHandle | null> = { current: null };
   virtuosoRangeRef: MutableRefObject<ListRange | null> = { current: null };
   lookup!: GridRowLookup<R>;
+  resetColumnWidthsFn?: () => void;
 
   constructor() {
     // This instance gets spread into each row's GridRowApi, so bind the methods up-front
@@ -210,6 +212,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public getVisibleColumnIds() {
     return this.tableState.visibleColumnIds;
+  }
+
+  public resetColumnWidths(): void {
+    this.resetColumnWidthsFn?.();
   }
 
   public deleteRows(ids: string[]) {

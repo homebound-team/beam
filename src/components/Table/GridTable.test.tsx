@@ -3091,7 +3091,9 @@ describe("GridTable", () => {
       // And a table with setting the `visibleColumnsStorageKey`
       await render(<GridTable columns={columns} rows={rows} visibleColumnsStorageKey="testStorageKey" />);
       // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
-      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("testStorageKey", '["name"]');
+      expect(sessionStorage.setItem).toHaveBeenCalledWith("testStorageKey", '["name"]');
+      // And the column widths are also persisted using the same storage key
+      expect(sessionStorage.setItem).toHaveBeenCalledWith("columnWidths_testStorageKey", "{}");
     });
 
     it("respects setting inferSelectState to false", async () => {
