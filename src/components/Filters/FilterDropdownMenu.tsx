@@ -63,22 +63,20 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
   return (
     <>
-      <div>
-        <Button
-          label="Filter"
-          icon="filter"
-          size="md"
-          endAdornment={
-            <div css={Css.df.aic.gap1.$}>
-              {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
-              <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
-            </div>
-          }
-          variant="secondaryBlack"
-          onClick={() => setIsOpen(!isOpen)}
-          {...testId.button}
-        />
-      </div>
+      <Button
+        label="Filter"
+        icon="filter"
+        size="md"
+        endAdornment={
+          <div css={Css.df.aic.gap1.$}>
+            {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
+            <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
+          </div>
+        }
+        variant="secondaryBlack"
+        onClick={() => setIsOpen(!isOpen)}
+        {...testId.button}
+      />
 
       {/* When open, show all filter controls in a new row below */}
       {isOpen && (
