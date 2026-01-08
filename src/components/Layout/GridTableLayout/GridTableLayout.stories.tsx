@@ -469,13 +469,13 @@ function getManyFilterDefs() {
   };
 }
 
-function DetailPane({ value }: { value: number }) {
+function DetailPane() {
   const { closeRightPane } = useRightPane();
 
   return (
     <div css={Css.df.fdc.h100.$}>
       <div css={Css.df.jcsb.p2.aic.bb.$}>
-        <h2 css={Css.py2.$}>Detail Pane {value}</h2>
+        <h2 css={Css.py2.$}>Detail Pane</h2>
         <div>
           <IconButton icon={"x"} onClick={() => closeRightPane()} />
         </div>
@@ -543,8 +543,6 @@ function getColumns(showColor: boolean, openRightPane: (opts: OpenRightPaneOpts)
       content: <Button label={"Action"} onClick={() => openRightPane({ content: <DetailPane /> })} />,
       css: Css.if(showColor).bgPurple500.$,
     }),
-    // parent: () => ({ content: <div>Actions</div>, value: "", css: Css.if(showColor).bgPurple500.$ }),
-    // data: () => ({ content: <div>Actions</div>, css: Css.if(showColor).bgPurple500.$ }),
     clientSideSort: false,
     w: "100px",
     mw: "80px",

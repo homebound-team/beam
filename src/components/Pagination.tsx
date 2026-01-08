@@ -21,11 +21,11 @@ interface PaginationProps {
   page: readonly [PageNumberAndSize, Dispatch<PageNumberAndSize>] | readonly [OffsetAndLimit, Dispatch<OffsetAndLimit>];
   totalCount: number;
   pageSizes?: number[];
-  xss?: Pick<Properties, "padding" | "paddingTop" | "paddingBottom" | "paddingLeft" | "paddingRight">;
+  paddingXss?: Pick<Properties, "padding" | "paddingTop" | "paddingBottom" | "paddingLeft" | "paddingRight">;
 }
 
 export function Pagination(props: PaginationProps) {
-  const { totalCount, pageSizes = [100, 500, 1000], xss } = props;
+  const { totalCount, pageSizes = [100, 500, 1000], paddingXss } = props;
   const [page, setPage] = props.page;
   const { pageSize, pageNumber } = toPageNumberSize(page);
   const pageOptions = pageSizes.map((size) => ({ id: size, name: String(size) }));
@@ -49,7 +49,7 @@ export function Pagination(props: PaginationProps) {
 
   const tid = useTestIds(props, "pagination");
   return (
-    <div css={{ ...Css.df.bcGray200.bt.xs.gray500.px2.pt2.$, ...xss }} {...tid}>
+    <div css={{ ...Css.df.bcGray200.bt.xs.gray500.px2.pt2.$, ...paddingXss }} {...tid}>
       <div css={Css.df.mya.mr2.$} {...tid.pageSizeLabel}>
         Page size:
       </div>

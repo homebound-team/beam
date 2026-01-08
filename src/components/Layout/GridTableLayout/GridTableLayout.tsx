@@ -209,7 +209,7 @@ function GridTableLayoutComponent<
             )}
             {layoutState && totalCount !== undefined && (
               <Pagination
-                xss={Css.pb2.$}
+                paddingXss={Css.pb2.$}
                 page={[layoutState.page, layoutState._pagination.setPage]}
                 totalCount={totalCount}
                 pageSizes={layoutState._pagination.pageSizes}
