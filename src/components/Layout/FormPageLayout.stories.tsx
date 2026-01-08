@@ -15,7 +15,9 @@ import {
   Css,
   FormPageLayout as FormPageLayoutComponent,
   FormSectionConfig,
+  Icon,
   TextField,
+  Tooltip,
   useSnackbar,
   useToast,
 } from "src/index";
@@ -85,6 +87,51 @@ export function SingleColumn() {
       breadCrumb={[
         { label: "Breadcrumb A", href: "/breadcrumb-a" },
         { label: "Breadcrumb B", href: "/breadcrumb-b" },
+      ]}
+      formSections={singleColumnConfig}
+      formState={formState}
+      rightSideBar={[{ icon: "comment", render: () => <CommentComponent /> }]}
+    />
+  );
+}
+
+export function withCollapsibleBreadcrumbs() {
+  const formState = useFormState({
+    config: formConfig,
+    init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
+  });
+  const { showToast } = useToast();
+  const { triggerNotice } = useSnackbar();
+
+  return (
+    <FormPageLayoutComponent
+      pageTitle="Detail Title"
+      submitAction={{ label: "Save", onClick: noop }}
+      cancelAction={{
+        label: "Cancel",
+        onClick: () => showToast({ message: "Cancel Action Triggered", type: "warning" }),
+      }}
+      tertiaryAction={{
+        label: "Tertiary Test",
+        onClick: () => triggerNotice({ message: "Tertiary Action Triggered" }),
+      }}
+      breadCrumb={[
+        { label: "Breadcrumb A", href: "/breadcrumb-a" },
+        { label: "Breadcrumb B", href: "/breadcrumb-b" },
+        { label: "Breadcrumb C", href: "/breadcrumb-c" },
+        { label: "Breadcrumb D", href: "/breadcrumb-d" },
+        { label: "Breadcrumb E", href: "/breadcrumb-e" },
+        {
+          label: "Breadcrumb F",
+          href: "/breadcrumb-f",
+          right: (
+            <div css={Css.pl1.$}>
+              <Tooltip title="This can be used to display additional information" placement="bottom">
+                <Icon icon="infoCircle" inc={2} />
+              </Tooltip>
+            </div>
+          ),
+        },
       ]}
       formSections={singleColumnConfig}
       formState={formState}
