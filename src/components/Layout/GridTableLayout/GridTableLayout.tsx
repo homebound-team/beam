@@ -67,7 +67,7 @@ export type GridTableLayoutProps<
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
   totalCount?: number;
-  rightPaneProps?: RightPaneLayoutProps;
+  rightPaneProps?: Omit<RightPaneLayoutProps, "children">;
 };
 
 /**
@@ -137,6 +137,7 @@ function GridTableLayoutComponent<
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
+  const showPagination = layoutState && totalCount !== undefined;
 
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
@@ -183,7 +184,9 @@ function GridTableLayoutComponent<
           )}
         </TableActions>
       )}
-      <ScrollableContent omitBottomPadding virtualized={isVirtualized}>
+      {/* We omit padding here because ScrollableContent uses height to _simulate_ padding, not actually adding the style.
+      That extra height triggers a scrollbar w/in RightPaneLayout. We recreate the effect by adding padding to Pagination */}
+      <ScrollableContent omitBottomPadding={!showPagination ? true : undefined} virtualized={isVirtualized}>
         <RightPaneLayout {...rightPaneProps}>
           <>
             {isGridTableProps(tableProps) ? (
@@ -207,7 +210,7 @@ function GridTableLayoutComponent<
                 visibleColumnsStorageKey={visibleColumnsStorageKey}
               />
             )}
-            {layoutState && totalCount !== undefined && (
+            {showPagination && (
               <Pagination
                 paddingXss={Css.pb2.$}
                 page={[layoutState.page, layoutState._pagination.setPage]}
