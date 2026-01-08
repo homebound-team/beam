@@ -133,7 +133,6 @@ export function withCollapsibleBreadcrumbs() {
           ),
         },
       ]}
-      collapsibleBreadcrumbs={true}
       formSections={singleColumnConfig}
       formState={formState}
       rightSideBar={[{ icon: "comment", render: () => <CommentComponent /> }]}

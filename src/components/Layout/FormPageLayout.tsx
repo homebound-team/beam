@@ -32,8 +32,6 @@ type FormPageLayoutProps<F> = {
   cancelAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   rightSideBar?: SidebarContentProps[];
-  /**  Enables collapsing the breadcrumbs container when there are more than 3 items */
-  collapsibleBreadcrumbs?: boolean;
 };
 
 /** In order to make the multiple stacked sticky elements work (Header, then sidebar below) we need to set the header height.
@@ -87,8 +85,7 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
 export const FormPageLayout = React.memo(FormPageLayoutComponent) as typeof FormPageLayoutComponent;
 
 function PageHeader<F>(props: FormPageLayoutProps<F>) {
-  const { pageTitle, breadCrumb, collapsibleBreadcrumbs, submitAction, cancelAction, tertiaryAction, formState } =
-    props;
+  const { pageTitle, breadCrumb, submitAction, cancelAction, tertiaryAction, formState } = props;
   const { notice } = useToastContext();
   const tids = useTestIds(props);
 
@@ -97,7 +94,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
       <Toast />
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>
-          {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} collapsible={collapsibleBreadcrumbs} />}
+          {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
           <h1 css={Css.xl2.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>

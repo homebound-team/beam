@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, ReactNode, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -11,24 +11,12 @@ export type HeaderBreadcrumb = {
 
 type PageHeaderBreadcrumbsProps = {
   breadcrumb: HeaderBreadcrumb | HeaderBreadcrumb[];
-  collapsible?: boolean;
 };
 
-export function PageHeaderBreadcrumbs({ breadcrumb, collapsible }: PageHeaderBreadcrumbsProps) {
+export function PageHeaderBreadcrumbs({ breadcrumb }: PageHeaderBreadcrumbsProps) {
   const tids = useTestIds({}, "pageHeaderBreadcrumbs");
   const breadcrumbs = useMemo(() => (Array.isArray(breadcrumb) ? breadcrumb : [breadcrumb]), [breadcrumb]);
-  const [collapsed, setCollapsed] = useState(breadcrumbs.length > 3);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (breadcrumbs.length === 0 || !collapsible || collapsed) return;
-    // Collapse when clicking outside of the container
-    const onClick = (e: MouseEvent) =>
-      containerRef.current && !containerRef.current.contains(e.target as Node) && setCollapsed(true);
-    document.addEventListener("mousedown", onClick);
-    // Cleanup the event listener on component unmount
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [collapsed, collapsible, setCollapsed, breadcrumbs]);
+  const [collapsed, setCollapsed] = useState(true);
 
   function renderBreadcrumb(bc: HeaderBreadcrumb, index: number, hideDivisor?: boolean) {
     return (
@@ -44,7 +32,7 @@ export function PageHeaderBreadcrumbs({ breadcrumb, collapsible }: PageHeaderBre
   }
 
   return (
-    <div ref={containerRef} css={Css.df.aic.mbPx(4).$}>
+    <div css={Css.df.aic.mbPx(4).$}>
       {breadcrumbs.length > 3 && collapsed ? (
         <>
           {renderBreadcrumb(breadcrumbs[0], 0)}

@@ -166,7 +166,6 @@ export function QueryTableLayout() {
           { href: "/", label: "Sub Page D" },
           { href: "/", label: "Sub Page E" },
         ]}
-        collapsibleBreadcrumbs={true}
         layoutState={layoutState}
         tableProps={{
           columns,

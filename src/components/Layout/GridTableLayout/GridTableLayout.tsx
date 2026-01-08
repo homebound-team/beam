@@ -58,7 +58,6 @@ export type GridTableLayoutProps<
   pageTitle: string;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
-  collapsibleBreadcrumbs?: boolean;
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   /** Renders a ButtonMenu with "verticalDots" icon as trigger */
   actionMenu?: ActionButtonMenuProps;
@@ -106,7 +105,6 @@ function GridTableLayoutComponent<
   const {
     pageTitle,
     breadcrumb,
-    collapsibleBreadcrumbs,
     tableProps,
     layoutState,
     primaryAction,
@@ -150,7 +148,6 @@ function GridTableLayoutComponent<
       <Header
         pageTitle={pageTitle}
         breadcrumb={breadcrumb}
-        collapsibleBreadcrumbs={collapsibleBreadcrumbs}
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         tertiaryAction={tertiaryAction}
@@ -312,19 +309,17 @@ type HeaderProps = {
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   actionMenu?: ActionButtonMenuProps;
-  collapsibleBreadcrumbs?: boolean;
 };
 
 function Header(props: HeaderProps) {
-  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu, collapsibleBreadcrumbs } =
-    props;
+  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
   const tids = useTestIds(props);
 
   return (
     <FullBleed>
       <header css={{ ...Css.p3.mb3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
         <div>
-          {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} collapsible={collapsibleBreadcrumbs} />}
+          {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} />}
           <h1 css={Css.xl2.mt1.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>
