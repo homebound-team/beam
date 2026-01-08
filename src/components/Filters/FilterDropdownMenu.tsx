@@ -50,12 +50,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
     {
       isOpen,
       onClose: () => setIsOpen(false),
-      isDismissable: true,
-      shouldCloseOnInteractOutside: (element) => {
-        // Don't close if clicking the trigger button (it handles toggle itself)
-        if (buttonRef.current?.contains(element)) return false;
-        return true;
-      },
+      isDismissable: false,
     },
     filterContentRef,
   );
