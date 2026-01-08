@@ -3068,7 +3068,7 @@ describe("GridTable", () => {
 
       // Given some hide-able columns
       const columns: GridColumn<Row>[] = [
-        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initHidden: false },
         { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
         { id: "action", header: () => "Action", data: () => "action" },
       ];
@@ -3084,7 +3084,7 @@ describe("GridTable", () => {
 
       // Given some hide-able columns
       const columns: GridColumn<Row>[] = [
-        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initVisible: true },
+        { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initHidden: false },
         { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
       ];
 
@@ -3240,7 +3240,7 @@ describe("GridTable", () => {
         },
         {
           id: "myColumn2",
-          initVisible: false,
+          initHidden: true,
           initExpanded: true,
           canHide: true,
           header: "First",
@@ -3322,7 +3322,7 @@ describe("GridTable", () => {
               }),
               column<ExpandableRow>({
                 id: "columnB",
-                initVisible: false,
+                initHidden: true,
                 canHide: true,
                 expandableHeader: () => "Age",
                 header: emptyCell,

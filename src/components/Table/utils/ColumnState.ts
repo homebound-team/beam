@@ -23,8 +23,8 @@ export class ColumnState<R extends Kinded> {
     column: GridColumnWithId<R>,
   ) {
     this.column = column;
-    // If the user sets `canHide: true`, we default to hidden unless they set `initVisible: true`
-    this.visible = storage.wasVisible(column.id) ?? (column.canHide ? (column.initVisible ?? false) : true);
+    // If the user sets `canHide: true`, we default to hidden unless they set `initHidden: false`
+    this.visible = storage.wasVisible(column.id) ?? (column.canHide ? !(column.initHidden ?? true) : true);
     if (this.visible && (storage.wasExpanded(column.id) ?? column.initExpanded)) {
       this.expanded = true;
       // TODO: verify this eslint ignore
