@@ -3,7 +3,7 @@ import { PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
 
 describe("PageHeaderBreadcrumbs", () => {
   it("renders collapsible breadcrumbs", async () => {
-    // Given a PageHeaderBreadcrumbs with collapsible breadcrumbs enabled
+    // Given a PageHeaderBreadcrumbs with more than 3 items
     // When the component is rendered
     const r = await render(
       <PageHeaderBreadcrumbs
@@ -14,7 +14,6 @@ describe("PageHeaderBreadcrumbs", () => {
           { label: "Item D", href: "/d" },
           { label: "Item E", href: "/e" },
         ]}
-        collapsible={true}
       />,
       {},
     );
