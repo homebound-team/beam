@@ -89,8 +89,8 @@ export type GridColumn<R extends Kinded> = {
   name?: string;
   /** Flag that will allow to know which columns are hide-able */
   canHide?: boolean;
-  /** Flag that will allow to know which hide-able columns are visible on initial load */
-  initVisible?: boolean;
+  /** Flag that will allow hide-able columns to be hidden on initial load */
+  initHidden?: boolean;
   /** A list of columns that should only be shown when this column is "expanded" */
   expandColumns?: GridColumn<R>[] | (() => Promise<GridColumn<R>[]>);
   /** Determines whether the group should initially be expanded on load of the table */
@@ -123,7 +123,7 @@ export const nonKindGridColumnKeys = [
   "isAction",
   "id",
   "canHide",
-  "initVisible",
+  "initHidden",
   "expandColumns",
   "initExpanded",
   "hideOnExpand",
