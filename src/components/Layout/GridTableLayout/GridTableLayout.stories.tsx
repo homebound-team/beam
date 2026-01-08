@@ -1,6 +1,9 @@
 import { Meta } from "@storybook/react";
 import { useEffect, useMemo, useState } from "react";
+import { ScrollableContent, ScrollableParent } from "src/components";
+import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { IconButton } from "src/components/IconButton";
 import { GridDataRow } from "src/components/Table";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
@@ -8,6 +11,7 @@ import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "../Layout.stories";
+import { OpenRightPaneOpts, useRightPane } from "../RightPaneLayout";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
@@ -23,8 +27,9 @@ type DataRow = { kind: "data"; id: string; data: Data };
 type Row = HeaderRow | ParentRow | DataRow;
 
 export function GridTableLayout() {
+  const { openRightPane } = useRightPane();
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(false), []);
+  const columns = useMemo(() => getColumns(false, openRightPane), [openRightPane]);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -69,8 +74,9 @@ export function GridTableLayout() {
 }
 
 export function ManyFilters() {
+  const { openRightPane } = useRightPane();
   const filterDefs = useMemo(() => getManyFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false, openRightPane), [openRightPane]);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -101,8 +107,9 @@ export function ManyFilters() {
 }
 
 export function WithCheckboxFilter() {
+  const { openRightPane } = useRightPane();
   const filterDefs = useMemo(() => getCheckboxFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false, openRightPane), [openRightPane]);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -133,8 +140,9 @@ export function WithCheckboxFilter() {
 }
 
 export function QueryTableLayout() {
+  const { openRightPane } = useRightPane();
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(false), []);
+  const columns = useMemo(() => getColumns(false, openRightPane), [openRightPane]);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -180,8 +188,9 @@ export function QueryTableLayout() {
 }
 
 export function WithPagination() {
+  const { openRightPane } = useRightPane();
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
+  const columns = useMemo(() => getColumns(false, openRightPane), [openRightPane]);
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -217,8 +226,9 @@ export function WithPagination() {
 }
 
 export function GridTableLayoutWithColor() {
+  const { openRightPane } = useRightPane();
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(true), []);
+  const columns = useMemo(() => getColumns(true, openRightPane), [openRightPane]);
   const storageKey = "with-session-storage-test";
 
   const layoutState = useGridTableLayoutState({
@@ -459,7 +469,34 @@ function getManyFilterDefs() {
   };
 }
 
-function getColumns(showColor: boolean = false) {
+function DetailPane({ value }: { value: number }) {
+  const { closeRightPane } = useRightPane();
+
+  return (
+    <div css={Css.df.fdc.h100.$}>
+      <div css={Css.df.jcsb.p2.aic.bb.$}>
+        <h2 css={Css.py2.$}>Detail Pane {value}</h2>
+        <div>
+          <IconButton icon={"x"} onClick={() => closeRightPane()} />
+        </div>
+      </div>
+      <ScrollableParent>
+        <ScrollableContent virtualized={true}>
+          <nav>
+            <ul css={Css.listReset.df.fdc.gap5.mt2.p2.$}>
+              {zeroTo(20).map((i) => (
+                <li key={i}>scroll items</li>
+              ))}
+              <li>Bottom!</li>
+            </ul>
+          </nav>
+        </ScrollableContent>
+      </ScrollableParent>
+    </div>
+  );
+}
+
+function getColumns(showColor: boolean, openRightPane: (opts: OpenRightPaneOpts) => void) {
   const nameColumn = column<Row>({
     id: "name-col",
     name: "Name",
@@ -497,8 +534,17 @@ function getColumns(showColor: boolean = false) {
     id: "action-col",
     name: "Action",
     header: () => ({ content: "Action", css: Css.if(showColor).bgPurple500.$ }),
-    parent: () => ({ content: <div>Actions</div>, value: "", css: Css.if(showColor).bgPurple500.$ }),
-    data: () => ({ content: <div>Actions</div>, css: Css.if(showColor).bgPurple500.$ }),
+    parent: () => ({
+      content: <Button label={"Action"} onClick={() => openRightPane({ content: <DetailPane /> })} />,
+      value: "",
+      css: Css.if(showColor).bgPurple500.$,
+    }),
+    data: () => ({
+      content: <Button label={"Action"} onClick={() => openRightPane({ content: <DetailPane /> })} />,
+      css: Css.if(showColor).bgPurple500.$,
+    }),
+    // parent: () => ({ content: <div>Actions</div>, value: "", css: Css.if(showColor).bgPurple500.$ }),
+    // data: () => ({ content: <div>Actions</div>, css: Css.if(showColor).bgPurple500.$ }),
     clientSideSort: false,
     w: "100px",
     mw: "80px",
