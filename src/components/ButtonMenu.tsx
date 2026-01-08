@@ -30,7 +30,9 @@ interface SelectionButtonMenuProps extends ButtonMenuBaseProps {
   onChange: (key: string) => void;
 }
 
-export function ButtonMenu(props: ButtonMenuBaseProps | SelectionButtonMenuProps) {
+export type ButtonMenuProps = ButtonMenuBaseProps | SelectionButtonMenuProps;
+
+export function ButtonMenu(props: ButtonMenuProps) {
   const { defaultOpen, disabled, items, persistentItems, trigger, searchable, contrast = false } = props;
 
   let selectedItem, onChange;
