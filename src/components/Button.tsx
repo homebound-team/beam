@@ -28,6 +28,8 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
 
   /** Additional text to further customize button during an async request is in progress. */
   labelInFlight?: string;
+  /** Shows pressed/active styles (useful when a menu is open) */
+  active?: boolean;
 }
 
 export function Button(props: ButtonProps) {
@@ -41,6 +43,7 @@ export function Button(props: ButtonProps) {
     download,
     contrast = false,
     forceFocusStyles = false,
+    active = false,
     labelInFlight,
     ...otherProps
   } = props;
@@ -102,8 +105,8 @@ export function Button(props: ButtonProps) {
     css: {
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
-      ...(isHovered && !isPressed ? hoverStyles : {}),
-      ...(isPressed ? pressedStyles : {}),
+      ...(isHovered && !isPressed && !active ? hoverStyles : {}),
+      ...(isPressed || active ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
       ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
     },

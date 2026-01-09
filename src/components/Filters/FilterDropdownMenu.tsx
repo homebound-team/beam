@@ -75,6 +75,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
         }
         variant="secondaryBlack"
         onClick={() => setIsOpen(!isOpen)}
+        active={isOpen}
         {...testId.button}
       />
 

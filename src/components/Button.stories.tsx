@@ -29,12 +29,12 @@ const variants: ButtonVariant[] = [
 export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
   return (
     <div css={Css.if(contrast).white.$}>
-      <div css={Css.dg.gtc("repeat(4, max-content)").jifs.gap("8px 16px").$}>
+      <div css={Css.dg.gtc("repeat(5, max-content)").jifs.gap("8px 16px").$}>
         {variants.map((variant, idx) => {
           const variantName = capitalCase(variant);
           return (
             <div key={variantName} css={Css.display("contents").$}>
-              <h2 css={Css.xl.gc("1/5").if(idx !== 0).mt3.$}>{variantName}</h2>
+              <h2 css={Css.xl.gc("1/6").if(idx !== 0).mt3.$}>{variantName}</h2>
               {sizes.map((size) => (
                 <div key={size} css={Css.display("contents").$}>
                   <Button
@@ -49,6 +49,14 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
                     variant={variant}
                     disabled
                     label="Disabled"
+                    contrast={contrast}
+                    onClick={action("Clicked")}
+                  />
+                  <Button
+                    size={size}
+                    variant={variant}
+                    active
+                    label="Pressed"
                     contrast={contrast}
                     onClick={action("Clicked")}
                   />
