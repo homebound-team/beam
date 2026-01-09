@@ -268,33 +268,62 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           );
 
           const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
-          const iMadeItABoolean = Boolean(maybeSticky && columnSizes);
-          // console.log({ iMadeItABoolean });
-          if (iMadeItABoolean) {
-            console.log({ maybeSticky, columnSizes, column, columnIndex });
-          }
-          const maybeStickyColumnStyles = iMadeItABoolean
-            ? {
-                ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
-                ...(maybeSticky === "left"
-                  ? Css.left(
-                      columnIndex === 0 || columnIndex === 1
-                        ? 0
-                        : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`,
-                    ).$
-                  : {}),
-                ...(maybeSticky === "right"
-                  ? Css.right(
-                      columnIndex + 1 === columnSizes.length
-                        ? 0
-                        : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
-                    ).$
-                  : {}),
-              }
-            : {};
 
+          // Calculate sticky left offset by summing only previous sticky left columns
+          let stickyLeftOffset: string | number = 0;
+          if (maybeSticky === "left" && columnIndex > 0) {
+            const previousStickySizes: string[] = [];
+            for (let i = 0; i < columnIndex; i++) {
+              const prevColumn = columns[i];
+              const prevSticky = prevColumn.sticky;
+              // Only include previous columns that are also sticky left
+              if (prevSticky === "left") {
+                previousStickySizes.push(columnSizes[i]);
+              }
+            }
+            if (previousStickySizes.length > 0) {
+              stickyLeftOffset = `calc(${previousStickySizes.join(" + ")})`;
+            }
+          }
+
+          // Calculate sticky right offset by summing only following sticky right columns
+          let stickyRightOffset: string | number = 0;
+          if (maybeSticky === "right" && columnIndex < columns.length - 1) {
+            const followingStickySizes: string[] = [];
+            for (let i = columnIndex + 1; i < columns.length; i++) {
+              const nextColumn = columns[i];
+              const nextSticky = nextColumn.sticky;
+              // Only include following columns that are also sticky right
+              if (nextSticky === "right") {
+                followingStickySizes.push(columnSizes[i]);
+              }
+            }
+            if (followingStickySizes.length > 0) {
+              stickyRightOffset = `calc(${followingStickySizes.join(" + ")})`;
+            }
+          }
+
+          const maybeStickyColumnStyles =
+            maybeSticky && columnSizes
+              ? {
+                  ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
+                  ...(maybeSticky === "left" ? Css.left(stickyLeftOffset).$ : {}),
+                  ...(maybeSticky === "right" ? Css.right(stickyRightOffset).$ : {}),
+                }
+              : {};
+
+          // FIXME: I guess this is the issue? This is not longer true, but I'm not convinced.
           // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
-          minStickyLeftOffset += maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
+          // Only add to minStickyLeftOffset if it's a simple pixel value (not a calc expression)
+          if (maybeSticky === "left") {
+            const size = columnSizes[columnIndex];
+            if (size.endsWith("px") && !size.includes("calc")) {
+              const parsed = parseInt(size.replace("px", ""), 10);
+              if (!isNaN(parsed)) {
+                minStickyLeftOffset += parsed;
+              }
+            }
+          }
 
           const cellId = `${row.kind}_${row.id}_${column.id}`;
           const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
