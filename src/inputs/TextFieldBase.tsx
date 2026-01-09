@@ -182,18 +182,16 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
-      ...Css.w100.mw0.outline0.fg1.bgColor(bgColor).$,
+      ...Css.w100.mw0.outline0.fg1.bgTransparent.$,
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
       ...(contrast && !inputStylePalette && Css.addIn("&::selection", Css.bgGray800.$).$),
-      // Make the background transparent when highlighting the field on hover
-      ...(borderOnHover && Css.bgTransparent.$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$
         : Css.truncate.$),
     },
     hover: Css.bgColor(hoverBgColor).if(contrast).bcGray600.$,
-    focus: Css.bcBlue700.if(contrast).bcBlue500.if(borderOnHover).bgColor(hoverBgColor).bcBlue500.$,
+    focus: Css.bcBlue700.bgColor(hoverBgColor).if(contrast).bcBlue500.if(borderOnHover).bcBlue500.$,
     disabled: visuallyDisabled
       ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
       : Css.cursorNotAllowed.$,
