@@ -57,7 +57,7 @@ export function Button(props: ButtonProps) {
     // Default the icon based on other properties.
     icon = download ? "download" : showExternalLinkIcon ? "linkExternal" : undefined,
     variant = "primary",
-    size = "sm",
+    size = "md",
     buttonRef,
   } = ariaProps;
   const ref = useGetRef(buttonRef);
