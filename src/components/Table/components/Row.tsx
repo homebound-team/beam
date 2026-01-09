@@ -268,22 +268,30 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           );
 
           const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
-          const maybeStickyColumnStyles =
-            maybeSticky && columnSizes
-              ? {
-                  ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
-                  ...(maybeSticky === "left"
-                    ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
-                    : {}),
-                  ...(maybeSticky === "right"
-                    ? Css.right(
-                        columnIndex + 1 === columnSizes.length
-                          ? 0
-                          : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
-                      ).$
-                    : {}),
-                }
-              : {};
+          const iMadeItABoolean = Boolean(maybeSticky && columnSizes);
+          // console.log({ iMadeItABoolean });
+          if (iMadeItABoolean) {
+            console.log({ maybeSticky, columnSizes, column, columnIndex });
+          }
+          const maybeStickyColumnStyles = iMadeItABoolean
+            ? {
+                ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
+                ...(maybeSticky === "left"
+                  ? Css.left(
+                      columnIndex === 0 || columnIndex === 1
+                        ? 0
+                        : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`,
+                    ).$
+                  : {}),
+                ...(maybeSticky === "right"
+                  ? Css.right(
+                      columnIndex + 1 === columnSizes.length
+                        ? 0
+                        : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
+                    ).$
+                  : {}),
+              }
+            : {};
 
           // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
           minStickyLeftOffset += maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
@@ -305,7 +313,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
             ...Css.df.if(as === "table").dtc.$,
             // Apply sticky column/cell styles
-            ...maybeStickyColumnStyles,
+            ...maybeStickyColumnStyles, // FIXME:This is the problem, its left(calc whatever) is fucking up. Lord help deliver me from this.
             // Apply any static/all-cell styling
             ...style.cellCss,
             // Then override with first/last cell styling
@@ -419,6 +427,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       )}
     </RowTag>
   );
+  console.log({ columnSizes });
 
   return row.draggable ? (
     <div
