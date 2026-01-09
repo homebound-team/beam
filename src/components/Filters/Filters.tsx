@@ -55,7 +55,6 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
     <div>
       <SelectField
         label="Group by"
-        compact={!vertical}
         labelStyle={!vertical ? "inline" : "above"}
         sizeToContent={!vertical}
         options={groupBy.options}
