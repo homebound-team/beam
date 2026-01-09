@@ -273,8 +273,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             maybeSticky && columnSizes
               ? {
                   ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
-                  ...(maybeSticky === "left" ? Css.left(0).$ : {}),
-                  ...(maybeSticky === "right" ? Css.right(0).$ : {}),
+                  ...(maybeSticky === "left"
+                    ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
+                    : {}),
+                  ...(maybeSticky === "right"
+                    ? Css.right(
+                        columnIndex + 1 === columnSizes.length
+                          ? 0
+                          : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
+                      ).$
+                    : {}),
                 }
               : {};
 
@@ -388,7 +396,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
               css: {
                 ...((cellElement as React.ReactElement).props.css || {}),
-                ...Css.relative.$,
+                ...(!maybeSticky && Css.relative.$),
               },
               children: (
                 <>
