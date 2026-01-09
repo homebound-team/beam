@@ -393,7 +393,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               parseWidthToPx(currentSizeStr, undefined) ?? resizedWidths?.[column.id] ?? minWidthPx;
 
             // Add our absolute position resize handle to header cells by cloning the cell element and adding relative positioning
-            // if not already sticky since sticky behaves the same as relative until it "sticks" as a fixed element.
+            // if not already sticky since sticky behaves the same as relative until it "sticks" as a fixed element. If we override
+            // sticky we'll see gaps in our header
             const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
               css: {
                 ...((cellElement as React.ReactElement).props.css || {}),
