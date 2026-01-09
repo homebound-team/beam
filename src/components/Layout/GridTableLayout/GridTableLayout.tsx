@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
+import { ButtonGroup } from "src/components/ButtonGroup";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
@@ -25,6 +26,23 @@ import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
 type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
 type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
+
+export type GridTableLayoutViewType = "table" | "card";
+
+export type CardItem = {
+  id: string;
+  title: string;
+  description: string | ReactNode;
+  /** URL for the card image */
+  image: string;
+  onClick?: () => void;
+};
+
+type CardViewConfig = {
+  cards: CardItem[];
+  /** Optional content to be displayed on the right side of the cards */
+  sidePanel?: ReactNode;
+};
 
 type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
 
@@ -65,6 +83,7 @@ export type GridTableLayoutProps<
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
+  cardView?: CardViewConfig;
   totalCount?: number;
 };
 
@@ -112,17 +131,20 @@ function GridTableLayoutComponent<
     tertiaryAction,
     actionMenu,
     hideEditColumns = false,
+    cardView,
     totalCount,
   } = props;
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
-
   const hasHideableColumns = useMemo(() => {
     if (hideEditColumns) return false;
     validateColumns(columns);
     return columns.some((c) => c.canHide);
   }, [columns, hideEditColumns]);
+  // Render table view by default, enable view toggle when cardView is provided
+  const [viewType, setViewType] = useState<GridTableLayoutViewType>("table");
+  const isShowingCardView = viewType === "card";
 
   // Use user-provided API if available, otherwise create our own
   const api = useMemo<GridTableApiImpl<R>>(
@@ -130,7 +152,7 @@ function GridTableLayoutComponent<
     [tableProps.api],
   );
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || !!cardView;
   const isVirtualized = tableProps.as === "virtual";
 
   // Sync API changes back to persisted state when persistedColumns is provided
@@ -156,15 +178,37 @@ function GridTableLayoutComponent<
       {showTableActions && (
         <TableActions
           right={
-            hasHideableColumns && (
-              <EditColumnsButton
-                columns={columns}
-                api={api}
-                tooltip="Display columns"
-                trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
-                {...tid.editColumnsButton}
-              />
-            )
+            <div css={Css.df.gap1.$}>
+              {cardView && (
+                <ButtonGroup
+                  {...tid.viewToggle}
+                  size="sm"
+                  buttons={[
+                    {
+                      icon: "cards",
+                      active: viewType === "card",
+                      onClick: () => setViewType("card"),
+                      tooltip: "Cards",
+                    },
+                    {
+                      icon: "projects",
+                      active: viewType === "table",
+                      onClick: () => setViewType("table"),
+                      tooltip: "List",
+                    },
+                  ]}
+                />
+              )}
+              {hasHideableColumns && !isShowingCardView && (
+                <EditColumnsButton
+                  columns={columns}
+                  api={api}
+                  tooltip="Display columns"
+                  trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
+                  {...tid.editColumnsButton}
+                />
+              )}
+            </div>
           }
         >
           {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
@@ -178,8 +222,10 @@ function GridTableLayoutComponent<
           )}
         </TableActions>
       )}
-      <ScrollableContent virtualized={isVirtualized}>
-        {isGridTableProps(tableProps) ? (
+      <ScrollableContent virtualized={isVirtualized && !isShowingCardView}>
+        {cardView && isShowingCardView ? (
+          <CardGridView config={cardView} />
+        ) : isGridTableProps(tableProps) ? (
           <GridTable
             {...tableProps}
             api={api}
@@ -358,6 +404,48 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
         clearable
         startAdornment={<Icon icon="search" color={Palette.Gray700} />}
       />
+    </div>
+  );
+}
+
+interface CardGridViewProps {
+  config: CardViewConfig;
+}
+
+function CardGridView({ config }: CardGridViewProps) {
+  const tid = useTestIds({}, "cardGridView");
+  const { cards, sidePanel } = config;
+  return (
+    <div css={Css.df.h100.$}>
+      <div css={Css.fg1.df.fww.gap2.p2.oa.aifs.if(!!sidePanel).maxw50.$}>
+        {cards.map(({ id, image, title, description, onClick }) => (
+          <div
+            key={id}
+            {...tid.card}
+            css={
+              Css.wPx(276).hPx(396).bgWhite.df.fdc.gap2.p3.br8.bshBasic.onHover.bshHover.if(!!onClick).cursorPointer.$
+            }
+            onClick={onClick}
+          >
+            <div css={Css.wPx(228).hPx(184).oh.df.aic.jcc.$}>
+              <img {...tid.cardImage} src={image} alt={title} css={Css.maxw100.maxh100.objectContain.$} />
+            </div>
+            <div css={Css.df.fdc.gap1.fg1.$}>
+              <div {...tid.cardTitle} css={Css.xl.gray900.lineClamp2.$}>
+                {title}
+              </div>
+              <div {...tid.cardDescription} css={Css.sm.gray700.lineClamp4.$}>
+                {description}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {sidePanel && (
+        <div {...tid.sidePanel} css={Css.w50.h100.pl3.oa.$}>
+          {sidePanel}
+        </div>
+      )}
     </div>
   );
 }
