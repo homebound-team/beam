@@ -55,3 +55,36 @@ function DraggableItem({ item }: { item: GridItem }) {
 }
 
 type GridItem = { id: string; name: string; colSpan: number; rowSpan: number };
+
+/**
+ * This story reproduces a bug where dragged items would jump when the grid
+ * was offset from the viewport. The fix ensures the dragged element uses
+ * viewport coordinates (position: fixed) correctly.
+ *
+ * Before the fix: The dragged item would jump ~200px upward when drag started.
+ * After the fix: The dragged item stays in place and follows the cursor correctly.
+ */
+export function WithViewportOffset() {
+  const gridItems: GridItem[] = [
+    { id: "1", name: "1", colSpan: 1, rowSpan: 1 },
+    { id: "2", name: "2", colSpan: 1, rowSpan: 1 },
+    { id: "3", name: "3", colSpan: 1, rowSpan: 1 },
+    { id: "4", name: "4", colSpan: 1, rowSpan: 1 },
+  ];
+
+  return (
+    <div css={Css.mtPx(200).mlPx(100).$}>
+      <div css={Css.mb2.sm.$}>
+        Grid is offset 200px from top and 100px from left. Drag an item to verify it tracks the cursor correctly.
+      </div>
+      <DnDGrid
+        onReorder={(items) => console.log("onReorder:", { items })}
+        gridStyles={Css.gtc(`repeat(2, 200px)`).add("gridAutoRows", "120px").gap2.$}
+      >
+        {gridItems.map((item) => (
+          <DraggableItem key={item.id} item={item} />
+        ))}
+      </DnDGrid>
+    </div>
+  );
+}

@@ -135,12 +135,12 @@ export function DnDGrid(props: DnDGridProps) {
         initReorder();
 
         // Determine the position of the pointer relative to the element being dragged.
+        const gridRect = gridEl.current.getBoundingClientRect();
         const rect = dragEl.current.getBoundingClientRect();
         const clientX = "clientX" in e ? e.clientX : e.touches[0].clientX;
         const clientY = "clientY" in e ? e.clientY : e.touches[0].clientY;
-        // Use viewport coordinates since we're using position: fixed
-        const top = rect.top;
-        const left = rect.left;
+        const top = rect.top - gridRect.top;
+        const left = rect.left - gridRect.left;
 
         // Store the pointer's offset from the tile being moved to help correctly position the element as we drag it around.
         transformFrom.current = { x: clientX - left, y: clientY - top };
