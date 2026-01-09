@@ -2304,3 +2304,62 @@ export function HighlightFields() {
     </div>
   );
 }
+
+type MultipleStickyRow = SimpleHeaderAndData<{
+  colA: string;
+  colB: string;
+  colC: string;
+  colD: string;
+  colE: string;
+  colF: string;
+  colG: string;
+  colH: string;
+  colI: string;
+}>;
+
+export function MultipleStickyColumns() {
+  const colData = useMemo(
+    () => ({
+      colA: "AAA AAA AAA",
+      colB: "BBB BBB BBB",
+      colC: "CCC CCC CCC",
+      colD: "DDD DDD DDD",
+      colE: "EEE EEE EEE",
+      colF: "FFF FFF FFF",
+      colG: "GGG GGG GGG",
+      colH: "HHH HHH HHH",
+      colI: "III III III",
+    }),
+    [],
+  );
+  const rows: GridDataRow<MultipleStickyRow>[] = useMemo(
+    () => [
+      simpleHeader,
+      { kind: "data" as const, id: "1", data: colData },
+      { kind: "data" as const, id: "2", data: colData },
+      { kind: "data" as const, id: "3", data: colData },
+    ],
+    [colData],
+  );
+
+  const columns: GridColumn<MultipleStickyRow>[] = useMemo(
+    () => [
+      column<MultipleStickyRow>({ header: "Column A", data: (d) => d.colA, w: "100px", sticky: "left" }),
+      column<MultipleStickyRow>({ header: "Column B", data: (d) => d.colB, w: "100px", sticky: "left" }),
+      column<MultipleStickyRow>({ header: "Column C", data: (d) => d.colC, w: "100px", sticky: "left" }),
+      column<MultipleStickyRow>({ header: "Column D", data: (d) => d.colD, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Column E", data: (d) => d.colE, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Column F", data: (d) => d.colF, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Column G", data: (d) => d.colG, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Column H", data: (d) => d.colH, w: "100px", sticky: "right" }),
+      column<MultipleStickyRow>({ header: "Column I", data: (d) => d.colI, w: "100px", sticky: "right" }),
+    ],
+    [],
+  );
+
+  return (
+    <div css={Css.m2.wPx(800).add("overflow", "auto").$}>
+      <GridTable columns={columns} rows={rows} />
+    </div>
+  );
+}

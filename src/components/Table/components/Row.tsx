@@ -268,6 +268,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           );
 
           const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+
           const maybeStickyColumnStyles =
             maybeSticky && columnSizes
               ? {
@@ -391,11 +392,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             const currentWidthPx =
               parseWidthToPx(currentSizeStr, undefined) ?? resizedWidths?.[column.id] ?? minWidthPx;
 
-            // Add resize handle to header cells by cloning the cell element and adding relative positioning
+            // The resize handle uses position:absolute, which needs a positioning context (relative/sticky/fixed).
+            // Only add position:relative if the cell isn't already sticky, since sticky provides its own positioning context.
+            // Overriding sticky with relative would break the sticky behavior and cause gaps in the header.
             const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
               css: {
                 ...((cellElement as React.ReactElement).props.css || {}),
-                ...Css.relative.$,
+                ...(!maybeSticky && Css.relative.$),
               },
               children: (
                 <>
