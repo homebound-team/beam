@@ -273,8 +273,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             maybeSticky && columnSizes
               ? {
                   ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
-                  // For flex layouts, all sticky columns should have left/right: 0
-                  // The flex layout handles their adjacency based on their widths
                   ...(maybeSticky === "left" ? Css.left(0).$ : {}),
                   ...(maybeSticky === "right" ? Css.right(0).$ : {}),
                 }
