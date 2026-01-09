@@ -313,7 +313,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
             ...Css.df.if(as === "table").dtc.$,
             // Apply sticky column/cell styles
-            ...maybeStickyColumnStyles, // FIXME:This is the problem, its left(calc whatever) is fucking up. Lord help deliver me from this.
+            ...maybeStickyColumnStyles, // FIXME:This is the problem, its left(calc whatever) is messing up
             // Apply any static/all-cell styling
             ...style.cellCss,
             // Then override with first/last cell styling
