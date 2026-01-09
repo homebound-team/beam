@@ -2335,21 +2335,9 @@ export function MultipleStickyColumns() {
   const rows: GridDataRow<MultipleStickyRow>[] = useMemo(
     () => [
       simpleHeader,
-      {
-        kind: "data" as const,
-        id: "1",
-        data: colData,
-      },
-      {
-        kind: "data" as const,
-        id: "2",
-        data: colData,
-      },
-      {
-        kind: "data" as const,
-        id: "3",
-        data: colData,
-      },
+      { kind: "data" as const, id: "1", data: colData },
+      { kind: "data" as const, id: "2", data: colData },
+      { kind: "data" as const, id: "3", data: colData },
     ],
     [colData],
   );
