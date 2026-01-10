@@ -5,6 +5,7 @@ import { noop } from "src/utils";
 import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
 import { QueryParamProvider } from "use-query-params";
 import {
+  CardItem,
   GridTableLayout as GridTableLayoutComponent,
   GridTableLayoutProps,
   useGridTableLayoutState,
@@ -244,6 +245,97 @@ describe("GridTableLayout", () => {
       );
 
       expect(r.pageTitle).toBeInTheDocument();
+    });
+  });
+
+  describe("Card View", () => {
+    const sampleCards: CardItem[] = [
+      { id: "card1", image: "image1.png", title: "Card 1", description: "Description 1" },
+      { id: "card2", image: "image2.png", title: "Card 2", description: "Description 2" },
+    ];
+
+    it("does not show view toggle when cardView is not provided", async () => {
+      // Given a GridTableLayout without cardView set
+      // When the component is rendered
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{ search: "client" }}
+            pageTitle="Test"
+            tableProps={{ columns, rows: [simpleHeader, ...rows] }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // Then the view toggle is not rendered
+      expect(r.query.viewToggle).not.toBeInTheDocument();
+    });
+
+    it("switches to card view when toggle is clicked", async () => {
+      // Given a GridTableLayout with cardView set
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            tableProps={{ columns, rows: [simpleHeader, ...rows] }}
+            cardView={{ cards: sampleCards }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // When clicking the card view button
+      click(r.viewToggle_cards);
+      // Then cards are rendered
+      expect(r.cardGridView_card_0).toBeInTheDocument();
+      expect(r.cardGridView_card_1).toBeInTheDocument();
+      // And the card content is visible
+      expect(r.cardGridView_cardTitle_0).toHaveTextContent("Card 1");
+      expect(r.cardGridView_cardDescription_0).toHaveTextContent("Description 1");
+    });
+
+    it("hides EditColumnsButton in card view", async () => {
+      // Given a GridTableLayout with cardView and hideable columns
+      const hideableColumns = columns.map((c) => ({ ...c, canHide: true }));
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            tableProps={{ columns: hideableColumns, rows: [simpleHeader, ...rows] }}
+            cardView={{ cards: sampleCards }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // Then EditColumnsButton is visible in table view
+      expect(r.editColumnsButton).toBeInTheDocument();
+      // When switching to card view
+      click(r.viewToggle_cards);
+      // Then EditColumnsButton is hidden
+      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+    });
+
+    it("renders side panel only in card view", async () => {
+      // Given a GridTableLayout with cardView and a side panel
+      const r = await render(
+        <QueryParamProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            tableProps={{ columns, rows: [simpleHeader, ...rows] }}
+            cardView={{ cards: sampleCards, sidePanel: <div>Side Panel Content</div> }}
+          />
+        </QueryParamProvider>,
+        withRouter(),
+      );
+      // Then the side panel is not visible in table view
+      expect(r.query.cardGridView_sidePanel).not.toBeInTheDocument();
+      // And when switching to card view
+      click(r.viewToggle_cards);
+      // Then the side panel is visible
+      expect(r.cardGridView_sidePanel).toBeInTheDocument();
+      expect(r.cardGridView_sidePanel).toHaveTextContent("Side Panel Content");
     });
   });
 
