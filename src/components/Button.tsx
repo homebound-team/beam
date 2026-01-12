@@ -28,6 +28,8 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
 
   /** Additional text to further customize button during an async request is in progress. */
   labelInFlight?: string;
+  /** Shows pressed/active styles (useful when a menu is open) */
+  active?: boolean;
 }
 
 export function Button(props: ButtonProps) {
@@ -41,6 +43,7 @@ export function Button(props: ButtonProps) {
     download,
     contrast = false,
     forceFocusStyles = false,
+    active = false,
     labelInFlight,
     ...otherProps
   } = props;
@@ -54,7 +57,7 @@ export function Button(props: ButtonProps) {
     // Default the icon based on other properties.
     icon = download ? "download" : showExternalLinkIcon ? "linkExternal" : undefined,
     variant = "primary",
-    size = "sm",
+    size = "md",
     buttonRef,
   } = ariaProps;
   const ref = useGetRef(buttonRef);
@@ -102,8 +105,8 @@ export function Button(props: ButtonProps) {
     css: {
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
-      ...(isHovered && !isPressed ? hoverStyles : {}),
-      ...(isPressed ? pressedStyles : {}),
+      ...(isHovered && !isPressed && !active ? hoverStyles : {}),
+      ...(isPressed || active ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
       ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
     },
@@ -159,7 +162,7 @@ const variantStyles: (contrast: boolean) => Record<
   secondaryBlack: {
     baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray900.$,
     hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.gray900.if(contrast).bgWhite.gray900.$,
+    pressedStyles: Css.bgGray100.gray900.if(contrast).bgWhite.gray900.$,
     disabledStyles: Css.gray400.if(contrast).gray700.$,
     focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
       .if(contrast)
@@ -229,7 +232,7 @@ const variantStyles: (contrast: boolean) => Record<
 
 const sizeStyles: Record<ButtonSize, Properties> = {
   sm: Css.hPx(32).pxPx(12).$,
-  md: Css.hPx(40).px1.$,
+  md: Css.hPx(40).px2.$,
   lg: Css.hPx(48).px3.$,
 };
 

@@ -42,7 +42,6 @@ class DateRangeFilter<O extends string>
       <>
         {vertical && <Label label={label} />}
         <DateRangeField
-          compact
           labelStyle="inline"
           isRangeFilterField
           placeholder={placeholderText}
