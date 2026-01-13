@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
@@ -18,6 +18,7 @@ import { useDebounce } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 import { FullBleed } from "../FullBleed";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
+import { RightPaneLayout, RightPaneLayoutProps } from "../RightPaneLayout";
 import { ScrollableContent } from "../ScrollableContent";
 import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
 
@@ -55,7 +56,7 @@ export type GridTableLayoutProps<
   X extends Only<GridTableXss, X>,
   QData,
 > = {
-  pageTitle: string;
+  pageTitle: ReactNode;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
@@ -66,6 +67,7 @@ export type GridTableLayoutProps<
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
   totalCount?: number;
+  rightPaneProps?: Omit<RightPaneLayoutProps, "children">;
 };
 
 /**
@@ -95,6 +97,8 @@ export type GridTableLayoutProps<
  * ```
  *
  * Pagination is rendered when `totalCount` is provided. Use `layoutState.page` for server query variables.
+ *
+ * Right pane is built in
  */
 function GridTableLayoutComponent<
   F extends Record<string, unknown>,
@@ -113,6 +117,7 @@ function GridTableLayoutComponent<
     actionMenu,
     hideEditColumns = false,
     totalCount,
+    rightPaneProps,
   } = props;
 
   const tid = useTestIds(props);
@@ -132,6 +137,7 @@ function GridTableLayoutComponent<
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
   const isVirtualized = tableProps.as === "virtual";
+  const showPagination = layoutState && totalCount !== undefined;
 
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
@@ -178,36 +184,43 @@ function GridTableLayoutComponent<
           )}
         </TableActions>
       )}
-      <ScrollableContent virtualized={isVirtualized}>
-        {isGridTableProps(tableProps) ? (
-          <GridTable
-            {...tableProps}
-            api={api}
-            filter={clientSearch}
-            style={{ allWhite: true }}
-            stickyHeader
-            disableColumnResizing={false}
-            visibleColumnsStorageKey={visibleColumnsStorageKey}
-          />
-        ) : (
-          <QueryTable
-            {...(tableProps as QueryTableProps<R, QData, X>)}
-            api={api}
-            filter={clientSearch}
-            style={{ allWhite: true }}
-            stickyHeader
-            disableColumnResizing={false}
-            visibleColumnsStorageKey={visibleColumnsStorageKey}
-          />
-        )}
-        {layoutState && totalCount !== undefined && (
-          <Pagination
-            page={[layoutState.page, layoutState._pagination.setPage]}
-            totalCount={totalCount}
-            pageSizes={layoutState._pagination.pageSizes}
-            {...tid.pagination}
-          />
-        )}
+      {/* We omit padding here because ScrollableContent uses height to _simulate_ padding, not actually adding the style.
+      That extra height triggers a scrollbar w/in RightPaneLayout. We recreate the effect by adding padding to Pagination */}
+      <ScrollableContent omitBottomPadding={!showPagination ? true : undefined} virtualized={isVirtualized}>
+        <RightPaneLayout {...rightPaneProps}>
+          <>
+            {isGridTableProps(tableProps) ? (
+              <GridTable
+                {...tableProps}
+                api={api}
+                filter={clientSearch}
+                style={{ allWhite: true }}
+                stickyHeader
+                disableColumnResizing={false}
+                visibleColumnsStorageKey={visibleColumnsStorageKey}
+              />
+            ) : (
+              <QueryTable
+                {...(tableProps as QueryTableProps<R, QData, X>)}
+                api={api}
+                filter={clientSearch}
+                style={{ allWhite: true }}
+                stickyHeader
+                disableColumnResizing={false}
+                visibleColumnsStorageKey={visibleColumnsStorageKey}
+              />
+            )}
+            {showPagination && (
+              <Pagination
+                paddingXss={Css.pb2.$}
+                page={[layoutState.page, layoutState._pagination.setPage]}
+                totalCount={totalCount}
+                pageSizes={layoutState._pagination.pageSizes}
+                {...tid.pagination}
+              />
+            )}
+          </>
+        </RightPaneLayout>
       </ScrollableContent>
     </>
   );
@@ -303,7 +316,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
 }
 
 type HeaderProps = {
-  pageTitle: string;
+  pageTitle: ReactNode;
   breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
