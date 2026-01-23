@@ -18,7 +18,7 @@ export class ScrollStorage {
     // Generate a unique key combining the URL pathname and table id
     this.storageKey = `scrollPosition_${window.location.pathname}_${tableId}`;
     const value = sessionStorage.getItem(this.storageKey);
-    return value === null ? undefined : parseInt(value);
+    return value === null ? undefined : parseInt(value, 10);
   }
 
   /** Saves the scroll position (startIndex) to sessionStorage. */
