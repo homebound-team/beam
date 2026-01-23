@@ -202,6 +202,7 @@ export function VirtualFiltering() {
 
 /** Demonstrates scroll position persistence - scroll to a position, reload the page, and the scroll position is restored. */
 export function VirtualWithScrollPersistence() {
+  const tableId = "scrollPersistenceDemo";
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
@@ -224,18 +225,20 @@ export function VirtualWithScrollPersistence() {
         <Button
           label="Clear saved position"
           onClick={() => {
-            sessionStorage.removeItem("storybook_scroll_persistence_demo");
+            // The storage key is automatically generated as: scrollPosition_{pathname}_{tableId}
+            sessionStorage.removeItem(`scrollPosition_${window.location.pathname}_${tableId}`);
             window.location.reload();
           }}
         />
       </div>
       <div css={Css.fg1.$}>
         <GridTable
+          id={tableId}
           as="virtual"
           columns={columns}
           stickyHeader={true}
           rows={rows}
-          persistScrollPosition="storybook_scroll_persistence_demo"
+          persistScrollPosition
         />
       </div>
     </div>

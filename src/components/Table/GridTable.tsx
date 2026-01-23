@@ -20,6 +20,7 @@ import {
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { ScrollStorage } from "src/components/Table/utils/RowStorage";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -142,12 +143,11 @@ export interface GridTableProps<R extends Kinded, X> {
    */
   persistCollapse?: string;
   /**
-   * If provided, scroll position persists when the page is reloaded (only applies to `as=virtual`).
+   * If true, scroll position persists when the page is reloaded (only applies to `as=virtual`).
    *
-   * This key should generally be unique to the page it's on, i.e. `specsTable_p:1_precon` would
-   * be the scroll position for project `p:1`'s precon stage specs & selections table.
+   * The storage key is automatically generated using the current URL pathname and the table's `id`.
    */
-  persistScrollPosition?: string;
+  persistScrollPosition?: boolean;
   xss?: X;
   /** Accepts the api, from `useGridTableApi`, that the caller wants to use for this table. */
   api?: GridTableApi<R>;
@@ -586,7 +586,7 @@ function renderDiv<R extends Kinded>(
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
   tableContainerRef?: MutableRefObject<HTMLElement | null>,
-  _persistScrollPosition?: string,
+  _persistScrollPosition?: boolean,
 ): ReactElement {
   return (
     <div
@@ -650,7 +650,7 @@ function renderTable<R extends Kinded>(
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
   tableContainerRef?: MutableRefObject<HTMLElement | null>,
-  _persistScrollPosition?: string,
+  _persistScrollPosition?: boolean,
 ): ReactElement {
   return (
     <table
@@ -721,7 +721,7 @@ function renderVirtual<R extends Kinded>(
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
   _tableContainerRef?: MutableRefObject<HTMLElement | null>,
-  persistScrollPosition?: string,
+  persistScrollPosition?: boolean,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -732,19 +732,15 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
-  // Load the initial scroll position from sessionStorage (only once on mount)
+  // Create a ScrollStorage instance and load the initial scroll position
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const initialScrollIndex = useMemo(() => {
-    if (!persistScrollPosition) return undefined;
-    return loadScrollPosition(persistScrollPosition);
-  }, [persistScrollPosition]);
-
-  // Callback to persist scroll position to sessionStorage
-  const saveScrollPosition = persistScrollPosition
-    ? (startIndex: number) => {
-        sessionStorage.setItem(persistScrollPosition, JSON.stringify(startIndex));
-      }
-    : undefined;
+  const { scrollStorage, initialScrollIndex } = useMemo(() => {
+    if (!persistScrollPosition) return { scrollStorage: undefined, initialScrollIndex: undefined };
+    const storage = new ScrollStorage();
+    // Use the table's id to generate a unique storage key (combined with URL path in ScrollStorage)
+    const index = storage.load(id);
+    return { scrollStorage: storage, initialScrollIndex: index };
+  }, [persistScrollPosition, id]);
 
   return (
     <Virtuoso
@@ -816,7 +812,7 @@ function renderVirtual<R extends Kinded>(
       rangeChanged={(newRange) => {
         virtuosoRangeRef.current = newRange;
         // Persist scroll position when scrolling (saves the index of the topmost visible item)
-        saveScrollPosition?.(newRange.startIndex);
+        scrollStorage?.save(newRange.startIndex);
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
@@ -894,17 +890,3 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
-
-/** Loads a scroll position (startIndex) from sessionStorage. */
-function loadScrollPosition(key: string): number | undefined {
-  try {
-    const value = sessionStorage.getItem(key);
-    if (value === null) return undefined;
-    const parsed = JSON.parse(value);
-    return typeof parsed === "number" && parsed >= 0 ? parsed : undefined;
-  } catch {
-    // If the stored value is invalid, remove it and return undefined
-    sessionStorage.removeItem(key);
-    return undefined;
-  }
-}
