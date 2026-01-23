@@ -200,6 +200,48 @@ export function VirtualFiltering() {
   );
 }
 
+/** Demonstrates scroll position persistence - scroll to a position, reload the page, and the scroll position is restored. */
+export function VirtualWithScrollPersistence() {
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `Row ${i}`, value: i } })),
+    ],
+    [],
+  );
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      { header: "Name", data: ({ name }) => name, w: "200px" },
+      { header: "Value", data: ({ value }) => value, w: "100px" },
+      { header: "Description", data: ({ value }) => `This is row number ${value}`, w: "2fr" },
+    ],
+    [],
+  );
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.p1.bgGray100.mb1.$}>
+        Scroll down, then reload the page. Your scroll position will be restored.
+        <Button
+          label="Clear saved position"
+          onClick={() => {
+            sessionStorage.removeItem("storybook_scroll_persistence_demo");
+            window.location.reload();
+          }}
+        />
+      </div>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="virtual"
+          columns={columns}
+          stickyHeader={true}
+          rows={rows}
+          persistScrollPosition="storybook_scroll_persistence_demo"
+        />
+      </div>
+    </div>
+  );
+}
+
 export function VirtualFilteringWithFilterablePin() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
