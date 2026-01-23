@@ -806,7 +806,7 @@ function renderVirtual<R extends Kinded>(
       rangeChanged={(newRange) => {
         virtuosoRangeRef.current = newRange;
         // Persist scroll position when scrolling (saves the index of the topmost visible item, plus the number of sticky rows)
-        scrollStorage?.save(newRange.startIndex + tableHeadRows.length + keptSelectedRows.length);
+        scrollStorage?.save(newRange.startIndex + tableHeadRows.length);
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
