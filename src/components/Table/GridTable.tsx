@@ -736,12 +736,13 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { scrollStorage, initialScrollIndex } = useScrollStorage(persistScrollPosition ?? true, id);
 
+  const topItemCount = stickyHeader ? tableHeadRows.length : 0;
   return (
     <Virtuoso
       overscan={5}
       ref={virtuosoRef}
       // Restore scroll position if available
-      {...(initialScrollIndex !== undefined ? { initialTopMostItemIndex: initialScrollIndex } : {})}
+      {...(initialScrollIndex !== undefined ? { initialTopMostItemIndex: initialScrollIndex + topItemCount } : {})}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
@@ -765,7 +766,7 @@ function renderVirtual<R extends Kinded>(
         },
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
-      topItemCount={stickyHeader ? tableHeadRows.length : 0}
+      topItemCount={topItemCount}
       itemContent={(index) => {
         // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `keptSelectedRows` we must determine which one to render.
 
@@ -805,8 +806,12 @@ function renderVirtual<R extends Kinded>(
       }}
       rangeChanged={(newRange) => {
         virtuosoRangeRef.current = newRange;
-        // Persist scroll position when scrolling (saves the index of the topmost visible item, plus the number of sticky rows)
-        scrollStorage?.save(newRange.startIndex + tableHeadRows.length);
+        // Don't persist scroll position for infinite scroll tables. On page refresh, the saved
+        // index may point to a row that hasn't been fetched yet (since data loads progressively),
+        // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
+        if (!infiniteScroll) {
+          scrollStorage?.save(newRange.startIndex + tableHeadRows.length);
+        }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
