@@ -232,14 +232,7 @@ export function VirtualWithScrollPersistence() {
         />
       </div>
       <div css={Css.fg1.$}>
-        <GridTable
-          id={tableId}
-          as="virtual"
-          columns={columns}
-          stickyHeader={true}
-          rows={rows}
-          persistScrollPosition
-        />
+        <GridTable id={tableId} as="virtual" columns={columns} stickyHeader={true} rows={rows} persistScrollPosition />
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ import {
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { ScrollStorage } from "src/components/Table/utils/RowStorage";
+import { useScrollStorage } from "src/components/Table/utils/ScrollStorage";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -732,15 +732,9 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
-  // Create a ScrollStorage instance and load the initial scroll position
+  // Enable scroll position persistence by default
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { scrollStorage, initialScrollIndex } = useMemo(() => {
-    if (!persistScrollPosition) return { scrollStorage: undefined, initialScrollIndex: undefined };
-    const storage = new ScrollStorage();
-    // Use the table's id to generate a unique storage key (combined with URL path in ScrollStorage)
-    const index = storage.load(id);
-    return { scrollStorage: storage, initialScrollIndex: index };
-  }, [persistScrollPosition, id]);
+  const { scrollStorage, initialScrollIndex } = useScrollStorage(persistScrollPosition ?? true, id);
 
   return (
     <Virtuoso
@@ -811,8 +805,8 @@ function renderVirtual<R extends Kinded>(
       }}
       rangeChanged={(newRange) => {
         virtuosoRangeRef.current = newRange;
-        // Persist scroll position when scrolling (saves the index of the topmost visible item)
-        scrollStorage?.save(newRange.startIndex);
+        // Persist scroll position when scrolling (saves the index of the topmost visible item, plus the number of sticky rows)
+        scrollStorage?.save(newRange.startIndex + tableHeadRows.length + keptSelectedRows.length);
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
