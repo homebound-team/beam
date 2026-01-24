@@ -40,7 +40,7 @@ export function TooltipDelays() {
   return (
     <div css={Css.w25.ml("25%").$}>
       {timings.map((timing, i) => (
-        <Tooltip title={`Delay: ${timing}ms, Close Delay: ${timing}ms`} delay={timing} closeDelay={timing} key={i}>
+        <Tooltip title={`Delay: ${timing}ms`} delay={timing} key={i}>
           <span css={Css.db.tac.my5.bgGray400.br4.$}>
             This tooltip is delayed by: <span css={Css.fwb.$}>{timing}</span>
           </span>

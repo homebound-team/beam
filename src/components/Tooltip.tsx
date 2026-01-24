@@ -25,19 +25,18 @@ interface TooltipProps {
    * @default 0
    */
   delay?: number;
-  /** The delay time for the tooltip to disappear.
-   * @default 500
-   */
-  closeDelay?: number;
   disabled?: boolean;
   bgColor?: Palette;
   xss?: TooltipXss;
 }
 
-export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0, closeDelay = 500, bgColor, xss } = props;
+// Small delay to allow mouse to cross the gap between trigger and tooltip
+const gapCrossingDelay = 100;
 
-  const state = useTooltipTriggerState({ delay, closeDelay, isDisabled: disabled });
+export function Tooltip(props: TooltipProps) {
+  const { placement, children, title, disabled, delay = 0, bgColor, xss } = props;
+
+  const state = useTooltipTriggerState({ delay, closeDelay: gapCrossingDelay, isDisabled: disabled });
   const triggerRef = useRef<HTMLElement>(null);
   const { triggerProps, tooltipProps: _tooltipProps } = useTooltipTrigger({ isDisabled: disabled }, state, triggerRef);
   const { tooltipProps } = useTooltip(_tooltipProps, state);
@@ -71,6 +70,8 @@ export function Tooltip(props: TooltipProps) {
           placement={placement}
           bgColor={bgColor}
           xss={xss}
+          onMouseEnter={() => state.open(true)}
+          onMouseLeave={() => state.close()}
         />
       )}
     </>
@@ -87,9 +88,19 @@ interface PopperProps {
   placement?: Placement;
   bgColor: Palette | undefined;
   xss?: TooltipXss;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
 
-function Popper({ triggerRef, content, placement = "auto", xss, bgColor = Palette.Gray900 }: PopperProps) {
+function Popper({
+  triggerRef,
+  content,
+  placement = "auto",
+  xss,
+  bgColor = Palette.Gray900,
+  onMouseEnter,
+  onMouseLeave,
+}: PopperProps) {
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
@@ -112,6 +123,8 @@ function Popper({ triggerRef, content, placement = "auto", xss, bgColor = Palett
       ref={popperRef}
       style={styles.popper}
       {...attributes.popper}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       css={{
         ...Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.z(999999).$,
         ...xss,
