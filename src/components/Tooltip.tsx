@@ -92,15 +92,8 @@ interface PopperProps {
   onMouseLeave: () => void;
 }
 
-function Popper({
-  triggerRef,
-  content,
-  placement = "auto",
-  xss,
-  bgColor = Palette.Gray900,
-  onMouseEnter,
-  onMouseLeave,
-}: PopperProps) {
+function Popper(props: PopperProps) {
+  const { triggerRef, content, placement = "auto", xss, bgColor = Palette.Gray900, onMouseEnter, onMouseLeave } = props;
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make
