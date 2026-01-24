@@ -34,18 +34,3 @@ export function TooltipDisabled() {
     </Tooltip>
   );
 }
-
-export function TooltipDelays() {
-  const timings: number[] = [0, 1500, 3000, 4000];
-  return (
-    <div css={Css.w25.ml("25%").$}>
-      {timings.map((timing, i) => (
-        <Tooltip title={`Delay: ${timing}ms`} delay={timing} key={i}>
-          <span css={Css.db.tac.my5.bgGray400.br4.$}>
-            This tooltip is delayed by: <span css={Css.fwb.$}>{timing}</span>
-          </span>
-        </Tooltip>
-      ))}
-    </div>
-  );
-}
