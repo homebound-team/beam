@@ -20,6 +20,7 @@ import {
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { useScrollStorage } from "src/components/Table/utils/ScrollStorage";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -141,6 +142,12 @@ export interface GridTableProps<R extends Kinded, X> {
    *  be the collapsed state for project `p:1`'s precon stage specs & selections table.
    */
   persistCollapse?: string;
+  /**
+   * If true, scroll position persists when the page is reloaded (only applies to `as=virtual`).
+   *
+   * The storage key is automatically generated using the current URL pathname and the table's `id`.
+   */
+  persistScrollPosition?: boolean;
   xss?: X;
   /** Accepts the api, from `useGridTableApi`, that the caller wants to use for this table. */
   api?: GridTableApi<R>;
@@ -220,6 +227,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     fallbackMessage = "No rows found.",
     infoMessage,
     persistCollapse,
+    persistScrollPosition,
     resizeTarget,
     activeRowId,
     activeCellId,
@@ -548,6 +556,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           stickyOffset,
           infiniteScroll,
           tableContainerRef,
+          persistScrollPosition,
         )}
       </PresentationProvider>
     </TableStateContext.Provider>
@@ -577,6 +586,7 @@ function renderDiv<R extends Kinded>(
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
   tableContainerRef?: MutableRefObject<HTMLElement | null>,
+  _persistScrollPosition?: boolean,
 ): ReactElement {
   return (
     <div
@@ -640,6 +650,7 @@ function renderTable<R extends Kinded>(
   stickyOffset: number,
   _infiniteScroll?: InfiniteScroll,
   tableContainerRef?: MutableRefObject<HTMLElement | null>,
+  _persistScrollPosition?: boolean,
 ): ReactElement {
   return (
     <table
@@ -710,6 +721,7 @@ function renderVirtual<R extends Kinded>(
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
   _tableContainerRef?: MutableRefObject<HTMLElement | null>,
+  persistScrollPosition?: boolean,
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -720,10 +732,17 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
+  // Enable scroll position persistence by default
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { scrollStorage, initialScrollIndex } = useScrollStorage(persistScrollPosition ?? true, id);
+
+  const topItemCount = stickyHeader ? tableHeadRows.length : 0;
   return (
     <Virtuoso
       overscan={5}
       ref={virtuosoRef}
+      // Restore scroll position if available
+      {...(initialScrollIndex !== undefined ? { initialTopMostItemIndex: initialScrollIndex + topItemCount } : {})}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
@@ -747,7 +766,7 @@ function renderVirtual<R extends Kinded>(
         },
       }}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
-      topItemCount={stickyHeader ? tableHeadRows.length : 0}
+      topItemCount={topItemCount}
       itemContent={(index) => {
         // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `keptSelectedRows` we must determine which one to render.
 
@@ -787,6 +806,12 @@ function renderVirtual<R extends Kinded>(
       }}
       rangeChanged={(newRange) => {
         virtuosoRangeRef.current = newRange;
+        // Don't persist scroll position for infinite scroll tables. On page refresh, the saved
+        // index may point to a row that hasn't been fetched yet (since data loads progressively),
+        // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
+        if (!infiniteScroll) {
+          scrollStorage?.save(newRange.startIndex + tableHeadRows.length);
+        }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
