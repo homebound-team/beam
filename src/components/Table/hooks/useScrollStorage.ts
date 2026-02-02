@@ -9,7 +9,7 @@ import { useMemo } from "react";
  * @param enabled - Disable reads; defaults to true.
  */
 export function useScrollStorage(tableId: string, enabled: boolean = true) {
-  const storageKey = useMemo(() => `scrollPosition_${window.location.pathname}_${tableId}`, [tableId]);
+  const storageKey = `scrollPosition_${window.location.pathname}_${tableId}`;
 
   return useMemo(
     () => ({
