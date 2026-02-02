@@ -7,6 +7,7 @@ import { DiscriminateUnion, GridRowKind } from "src/components/index";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useColumnResizeHandlers } from "src/components/Table/hooks/useColumnResizeHandlers";
+import { useScrollStorage } from "src/components/Table/hooks/useScrollStorage";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
 import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
 import {
@@ -20,7 +21,6 @@ import {
 } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { useScrollStorage } from "src/components/Table/utils/ScrollStorage";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -143,7 +143,7 @@ export interface GridTableProps<R extends Kinded, X> {
    */
   persistCollapse?: string;
   /**
-   * If true, scroll position persists when the page is reloaded (only applies to `as=virtual`).
+   * If true, scroll position persists when the page is reloaded (only applies to `as=virtual` without infinite scroll, where it defaults to true).
    *
    * The storage key is automatically generated using the current URL pathname and the table's `id`.
    */
@@ -721,7 +721,7 @@ function renderVirtual<R extends Kinded>(
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
   _tableContainerRef?: MutableRefObject<HTMLElement | null>,
-  persistScrollPosition?: boolean,
+  persistScrollPosition: boolean = true, // Enabled by default
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
@@ -732,10 +732,10 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
-  // Enable scroll position persistence by default
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { scrollStorage, initialScrollIndex } = useScrollStorage(persistScrollPosition ?? true, id);
+  const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
 
+  const initialScrollIndex = getScrollIndex();
   const topItemCount = stickyHeader ? tableHeadRows.length : 0;
   return (
     <Virtuoso
@@ -810,7 +810,7 @@ function renderVirtual<R extends Kinded>(
         // index may point to a row that hasn't been fetched yet (since data loads progressively),
         // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
         if (!infiniteScroll) {
-          scrollStorage?.save(newRange.startIndex + tableHeadRows.length);
+          setScrollIndex(newRange.startIndex + tableHeadRows.length);
         }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
