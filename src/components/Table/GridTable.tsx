@@ -735,7 +735,13 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
 
-  const initialScrollIndex = getScrollIndex();
+  // Only restore scroll position if data is loaded and the saved index is within bounds.
+  // This prevents "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist yet.
+  const savedScrollIndex = getScrollIndex();
+  const initialScrollIndex =
+    !!savedScrollIndex && visibleDataRows.length > 0 && savedScrollIndex < visibleDataRows.length
+      ? savedScrollIndex
+      : undefined;
   const topItemCount = stickyHeader ? tableHeadRows.length : 0;
   return (
     <Virtuoso
