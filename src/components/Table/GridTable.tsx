@@ -747,7 +747,7 @@ function renderVirtual<R extends Kinded>(
       key={virtuosoKey}
       overscan={5}
       ref={virtuosoRef}
-      {...(savedScrollIndex !== undefined ? { initialTopMostItemIndex: savedScrollIndex + topItemCount } : {})}
+      {...(savedScrollIndex !== undefined ? { initialTopMostItemIndex: savedScrollIndex } : {})}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
@@ -815,7 +815,7 @@ function renderVirtual<R extends Kinded>(
         // index may point to a row that hasn't been fetched yet (since data loads progressively),
         // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
         if (!infiniteScroll) {
-          setScrollIndex(newRange.startIndex + tableHeadRows.length);
+          setScrollIndex(newRange.startIndex + topItemCount);
         }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
