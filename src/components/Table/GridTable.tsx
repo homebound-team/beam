@@ -740,7 +740,7 @@ function renderVirtual<R extends Kinded>(
 
   // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
   // This prevents "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist.
-  const virtuosoKey = !!savedScrollIndex && visibleDataRows.length > 0 ? "with-data" : undefined;
+  const virtuosoKey = !!savedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
 
   return (
     <Virtuoso
