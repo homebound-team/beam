@@ -206,7 +206,10 @@ export function VirtualWithScrollPersistence() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
-      ...zeroTo(1_000).map((i) => ({ kind: "data" as const, id: String(i), data: { name: `Row ${i}`, value: i } })),
+      ...zeroTo(1_000).map((i) => {
+        const index = i + 1;
+        return { kind: "data" as const, id: String(index), data: { name: `Row ${index}`, value: index } };
+      }),
     ],
     [],
   );

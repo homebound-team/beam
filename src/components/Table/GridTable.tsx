@@ -735,20 +735,19 @@ function renderVirtual<R extends Kinded>(
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
 
-  // Only restore scroll position if data is loaded and the saved index is within bounds.
-  // This prevents "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist yet.
   const savedScrollIndex = getScrollIndex();
-  const initialScrollIndex =
-    !!savedScrollIndex && visibleDataRows.length > 0 && savedScrollIndex < visibleDataRows.length
-      ? savedScrollIndex
-      : undefined;
   const topItemCount = stickyHeader ? tableHeadRows.length : 0;
+
+  // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
+  // This prevents "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist.
+  const virtuosoKey = !!savedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
+
   return (
     <Virtuoso
+      key={virtuosoKey}
       overscan={5}
       ref={virtuosoRef}
-      // Restore scroll position if available
-      {...(initialScrollIndex !== undefined ? { initialTopMostItemIndex: initialScrollIndex + topItemCount } : {})}
+      {...(savedScrollIndex !== undefined ? { initialTopMostItemIndex: savedScrollIndex } : {})}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
@@ -816,7 +815,7 @@ function renderVirtual<R extends Kinded>(
         // index may point to a row that hasn't been fetched yet (since data loads progressively),
         // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
         if (!infiniteScroll) {
-          setScrollIndex(newRange.startIndex + tableHeadRows.length);
+          setScrollIndex(newRange.startIndex);
         }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
