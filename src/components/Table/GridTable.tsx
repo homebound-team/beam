@@ -815,7 +815,7 @@ function renderVirtual<R extends Kinded>(
         // index may point to a row that hasn't been fetched yet (since data loads progressively),
         // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
         if (!infiniteScroll) {
-          setScrollIndex(newRange.startIndex + topItemCount);
+          setScrollIndex(newRange.startIndex);
         }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
