@@ -203,7 +203,8 @@ export function VirtualFiltering() {
 /** Demonstrates scroll position persistence - scroll to a position, reload the page, and the scroll position is restored. */
 export function VirtualWithScrollPersistence() {
   const tableId = "scrollPersistenceDemo";
-  const rows: GridDataRow<Row>[] = useMemo(
+  const [filterEnabled, setFilterEnabled] = useState(false);
+  const allRows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
       ...zeroTo(1_000).map((i) => {
@@ -212,6 +213,11 @@ export function VirtualWithScrollPersistence() {
       }),
     ],
     [],
+  );
+  // When filter is enabled, only show first 50 rows to test bounds validation
+  const rows = useMemo(
+    () => (filterEnabled ? [allRows[0], ...allRows.slice(1, 51)] : allRows),
+    [allRows, filterEnabled],
   );
   const columns: GridColumn<Row>[] = useMemo(
     () => [
@@ -223,16 +229,29 @@ export function VirtualWithScrollPersistence() {
   );
   return (
     <div css={Css.df.fdc.vh100.$}>
-      <div css={Css.p1.bgGray100.mb1.$}>
-        Scroll down, then reload the page. Your scroll position will be restored.
+      <div css={Css.p1.bgGray100.mb1.df.gap1.aic.$}>
+        <span>Scroll down, then reload the page. Your scroll position will be restored.</span>
         <Button
           label="Clear saved position"
           onClick={() => {
-            // The storage key is automatically generated as: scrollPosition_{pathname}_{tableId}
-            sessionStorage.removeItem(`scrollPosition_${window.location.pathname}_${tableId}`);
+            // Clear all scroll positions for this table (any query param combination)
+            const prefix = `scrollPosition_${window.location.pathname}`;
+            const suffix = `_${tableId}`;
+            Object.keys(sessionStorage)
+              .filter((key) => key.startsWith(prefix) && key.endsWith(suffix))
+              .forEach((key) => sessionStorage.removeItem(key));
             window.location.reload();
           }}
         />
+        <Button
+          label={filterEnabled ? "Show all 1000 rows" : "Filter to 50 rows"}
+          onClick={() => setFilterEnabled(!filterEnabled)}
+        />
+        <span css={Css.sm.$}>
+          {filterEnabled
+            ? "Filtered: 50 rows. If scroll was beyond row 50, it will reset to top."
+            : `Showing all ${allRows.length - 1} rows`}
+        </span>
       </div>
       <div css={Css.fg1.$}>
         <GridTable id={tableId} as="virtual" columns={columns} stickyHeader={true} rows={rows} persistScrollPosition />
