@@ -721,7 +721,7 @@ function renderVirtual<R extends Kinded>(
   _stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
   _tableContainerRef?: MutableRefObject<HTMLElement | null>,
-  persistScrollPosition: boolean = true, // Enabled by default
+  persistScrollPosition: boolean = infiniteScroll === undefined, // Enabled by default if infinite scroll is not enabled
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
