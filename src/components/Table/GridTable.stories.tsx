@@ -234,8 +234,12 @@ export function VirtualWithScrollPersistence() {
         <Button
           label="Clear saved position"
           onClick={() => {
-            // The storage key is automatically generated as: scrollPosition_{pathname}_{tableId}
-            sessionStorage.removeItem(`scrollPosition_${window.location.pathname}_${tableId}`);
+            // Clear all scroll positions for this table (any query param combination)
+            const prefix = `scrollPosition_${window.location.pathname}`;
+            const suffix = `_${tableId}`;
+            Object.keys(sessionStorage)
+              .filter((key) => key.startsWith(prefix) && key.endsWith(suffix))
+              .forEach((key) => sessionStorage.removeItem(key));
             window.location.reload();
           }}
         />

@@ -818,7 +818,7 @@ function renderVirtual<R extends Kinded>(
         // Don't persist scroll position for infinite scroll tables. On page refresh, the saved
         // index may point to a row that hasn't been fetched yet (since data loads progressively),
         // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
-        if (!infiniteScroll) {
+        if (!infiniteScroll && visibleDataRows.length > 0) {
           setScrollIndex(newRange.startIndex);
         }
       }}
