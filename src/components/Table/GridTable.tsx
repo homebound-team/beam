@@ -738,16 +738,20 @@ function renderVirtual<R extends Kinded>(
   const savedScrollIndex = getScrollIndex();
   const topItemCount = stickyHeader ? tableHeadRows.length : 0;
 
-  // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
-  // This prevents "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist.
-  const virtuosoKey = !!savedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
+  // Validate that saved scroll index is within bounds of current data.
+  // This handles cases where filters (via query params) reduce the data set,
+  // preventing "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist.
+  const validatedScrollIndex =
+    savedScrollIndex !== undefined && savedScrollIndex < visibleDataRows.length ? savedScrollIndex : undefined;
 
+  // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
+  const virtuosoKey = !!validatedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
   return (
     <Virtuoso
       key={virtuosoKey}
       overscan={5}
       ref={virtuosoRef}
-      {...(savedScrollIndex !== undefined ? { initialTopMostItemIndex: savedScrollIndex } : {})}
+      {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
         TopItemList: React.forwardRef((props, ref) => (
