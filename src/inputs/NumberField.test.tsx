@@ -132,6 +132,37 @@ describe("NumberFieldTest", () => {
     expect(r.cost).toHaveValue("$12.00");
   });
 
+  it("updates displayed value when the value prop changes externally while focused", async () => {
+    // Given two dependent fields where Total = Cost + Markup
+    const onTotalChange = jest.fn<(v: number | undefined) => void>();
+
+    function DependentFields() {
+      const [cost, setCost] = useState<number | undefined>(100);
+      const markup = 20;
+      const total = cost !== undefined ? cost + markup : undefined;
+      return (
+        <>
+          <NumberField label="Cost" type="cents" value={cost} onChange={setCost} />
+          <NumberField label="Total" type="cents" value={total} onChange={onTotalChange} />
+        </>
+      );
+    }
+
+    const r = await render(<DependentFields />);
+    expect(r.total).toHaveValue("$1.20");
+
+    // When cost changes, total updates
+    change(r.cost, "2");
+    expect(r.total).toHaveValue("$2.20");
+
+    // When Total is focused and cost changes externally, Total should
+    // reflect the new derived value instead of showing the stale value
+    // that was captured by valueRef on focus.
+    focus(r.total);
+    change(r.cost, "5");
+    expect(r.total).toHaveValue("$5.20");
+  });
+
   it("can be read only", async () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} readOnly={true} />);
     expect(r.cost).toHaveTextContent("$12.00");
