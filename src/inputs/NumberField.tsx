@@ -139,6 +139,21 @@ export function NumberField(props: NumberFieldProps) {
   // So just keep them out of the loop on `value` changes while that is happening.
   type ValueRef = { wip: true; value: number | undefined } | { wip: false };
   const valueRef = useRef<ValueRef>({ wip: false });
+  // Tracks the last value we sent to the parent via onChange, so the render-time sync
+  // can distinguish "echo of user typing" from "genuinely external value change".
+  const lastSentRef = useRef<number | undefined>(undefined);
+
+  // Render-time sync: if the value prop changed externally while focused, update valueRef.
+  // We compare against lastSentRef to avoid reacting to echoes of our own onChange calls,
+  // which would cause react-aria to reformat the input and break cursor position.
+  const propValue = value === undefined ? Number.NaN : value / factor;
+  if (valueRef.current.wip && !Object.is(valueRef.current.value, propValue)) {
+    const lastSentInternal = lastSentRef.current === undefined ? Number.NaN : lastSentRef.current / factor;
+    if (!Object.is(propValue, lastSentInternal)) {
+      // Genuinely external change — update what react-aria sees
+      valueRef.current.value = propValue;
+    }
+  }
 
   // We can use this for both useNumberFieldState + useNumberField
   const useProps: NumberFieldStateOptions = {
@@ -151,9 +166,11 @@ export function NumberField(props: NumberFieldProps) {
     },
     onFocus: () => {
       valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
+      lastSentRef.current = value;
     },
     onBlur: () => {
       valueRef.current = { wip: false };
+      lastSentRef.current = undefined;
     },
     onKeyDown: (e) => {
       if (e.key === "Enter") {
@@ -192,7 +209,9 @@ export function NumberField(props: NumberFieldProps) {
       // This is called on each DOM change, to push the latest value into the field
       onChange={(rawInputValue) => {
         const parsedValue = numberParser.parse(rawInputValue || "");
-        onChange(formatValue(parsedValue, factor, numFractionDigits, numIntegerDigits, positiveOnly));
+        const formatted = formatValue(parsedValue, factor, numFractionDigits, numIntegerDigits, positiveOnly);
+        lastSentRef.current = formatted;
+        onChange(formatted);
       }}
       inputRef={inputRef}
       onBlur={onBlur}

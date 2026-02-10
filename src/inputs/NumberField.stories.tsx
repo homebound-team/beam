@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { Meta } from "@storybook/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { TextField } from "src/inputs";
 import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
@@ -96,6 +96,56 @@ export function NumberFieldReadOnly() {
       </div>
     </div>
   );
+}
+
+/**
+ * Demonstrates a "BufferedNumberField" pattern where onChange only fires on blur,
+ * common in table cells to avoid saving intermediate values (e.g. "1" when
+ * the user means "10000"). Includes dependent fields to exercise external
+ * value prop changes while a field is focused.
+ */
+export function BufferedNumberFields() {
+  const [costChange, setCostChange] = useState<number | undefined>(100);
+  const [markup, setMarkup] = useState<number | undefined>(20);
+  const proposedTotal = costChange !== undefined && markup !== undefined ? costChange + markup : undefined;
+
+  return (
+    <div css={Css.df.fdc.gap3.$}>
+      <h1 css={Css.lg.$}>Buffered NumberField — Dependent Fields</h1>
+      <p css={Css.sm.gray700.$}>
+        Each field only commits its value on blur. "Proposed Total" is derived from Cost + Markup. Edit "Cost Change",
+        then Tab through to verify dependent values update correctly.
+      </p>
+      <div css={Css.df.gap2.$}>
+        <BufferedNumberField label="Cost Change" type="cents" value={costChange} onChange={setCostChange} />
+        <BufferedNumberField label="Markup" type="cents" value={markup} onChange={setMarkup} />
+        <BufferedNumberField label="Proposed Total" type="cents" value={proposedTotal} onChange={() => {}} />
+      </div>
+      <div css={Css.df.fdc.gap1.sm.$}>
+        <span>
+          Committed state — Cost: {costChange}¢ | Markup: {markup}¢ | Total: {proposedTotal}¢
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * BufferedNumberField — wraps NumberField to only commit onChange on blur.
+ *
+ * This is a common pattern for editable table cells where intermediate values
+ * (e.g. "1" when the user means "10000") should not be saved. The local `wip`
+ * state tracks what the user is typing, and the committed `onChange` only fires
+ * when the field loses focus.
+ */
+function BufferedNumberField(props: NumberFieldProps) {
+  const { value, onChange, onBlur, ...rest } = props;
+  const [wip, setWip] = useState(props.value);
+  useEffect(() => {
+    setWip(props.value);
+  }, [props.value]);
+
+  return <NumberField {...rest} value={wip} onChange={setWip} onBlur={() => props.onChange(wip)} />;
 }
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange" | "onBlur" | "onFocus">) {
