@@ -147,14 +147,11 @@ describe("NumberFieldTest", () => {
         </>
       );
     }
-
     const r = await render(<DependentFields />);
     expect(r.total).toHaveValue("$1.20");
-
     // When cost changes, total updates
     change(r.cost, "2");
     expect(r.total).toHaveValue("$2.20");
-
     // When Total is focused and cost changes externally, Total should
     // reflect the new derived value instead of showing the stale value
     // that was captured by valueRef on focus.

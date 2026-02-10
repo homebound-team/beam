@@ -99,59 +99,31 @@ export function NumberFieldReadOnly() {
 }
 
 /**
- * Reproduction story for stale value on Tab between dependent NumberFields.
- *
- * This uses a "BufferedNumberField" pattern (only commits onChange on blur) which
- * is common for table cells where you don't want to save intermediate values.
- *
- * Steps to reproduce:
- * 1. Click "Cost Change" and type a new value (e.g. clear and type 200, i.e. $2.00)
- * 2. Press Tab to move to "Proposed Total"
- * 3. BUG: "Proposed Total" shows the OLD value ($1.20 = old cost $1.00 + markup $0.20)
- *    instead of the expected new value ($2.20 = new cost $2.00 + markup $0.20)
- * 4. Click outside "Proposed Total", then click back in — now it shows $2.20 correctly
- *
- * Root cause: Beam's NumberField valueRef.wip mechanism captures the stale value prop
- * on focus because React 18 batches the state update from the previous field's blur.
+ * Demonstrates a "BufferedNumberField" pattern where onChange only fires on blur,
+ * common in table cells to avoid saving intermediate values (e.g. "1" when
+ * the user means "10000"). Includes dependent fields to exercise external
+ * value prop changes while a field is focused.
  */
-export function StaleValueOnTab() {
-  // The parent holds the "committed" values (only updated on blur)
-  const [costChange, setCostChange] = useState<number | undefined>(100); // $1.00
-  const [markup, setMarkup] = useState<number | undefined>(20); // $0.20
-  // Derived value: both fields can be edited, but Proposed Total depends on Cost Change
+export function BufferedNumberFields() {
+  const [costChange, setCostChange] = useState<number | undefined>(100);
+  const [markup, setMarkup] = useState<number | undefined>(20);
   const proposedTotal = costChange !== undefined && markup !== undefined ? costChange + markup : undefined;
 
   return (
     <div css={Css.df.fdc.gap3.$}>
-      <h1 css={Css.lg.$}>Stale Value on Tab — BufferedNumberField Pattern</h1>
+      <h1 css={Css.lg.$}>Buffered NumberField — Dependent Fields</h1>
       <p css={Css.sm.gray700.$}>
-        This uses the BufferedNumberField pattern (onChange only fires on blur, not during typing). Type a new value in
-        "Cost Change", then press Tab. "Proposed Total" should update immediately but shows the stale value.
+        Each field only commits its value on blur. "Proposed Total" is derived from Cost + Markup. Edit "Cost Change",
+        then Tab through to verify dependent values update correctly.
       </p>
       <div css={Css.df.gap2.$}>
-        <BufferedNumberField
-          label="Cost Change"
-          type="cents"
-          value={costChange}
-          onChange={setCostChange}
-          displayDirection
-        />
-        <BufferedNumberField label="Markup" type="cents" value={markup} onChange={setMarkup} displayDirection />
-        <BufferedNumberField
-          label="Proposed Total"
-          type="cents"
-          value={proposedTotal}
-          onChange={() => {}}
-          displayDirection
-        />
+        <BufferedNumberField label="Cost Change" type="cents" value={costChange} onChange={setCostChange} />
+        <BufferedNumberField label="Markup" type="cents" value={markup} onChange={setMarkup} />
+        <BufferedNumberField label="Proposed Total" type="cents" value={proposedTotal} onChange={() => {}} />
       </div>
       <div css={Css.df.fdc.gap1.sm.$}>
         <span>
           Committed state — Cost: {costChange}¢ | Markup: {markup}¢ | Total: {proposedTotal}¢
-        </span>
-        <span css={Css.gray500.$}>
-          (Watch the committed state update on blur, and notice "Proposed Total" field shows the wrong value when
-          tabbing into it)
         </span>
       </div>
     </div>
