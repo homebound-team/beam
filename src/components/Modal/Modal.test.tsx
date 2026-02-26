@@ -27,6 +27,46 @@ describe("Modal", () => {
     expect(canClose).toBeCalledTimes(2);
   });
 
+  it("does not close when clicking inside a tooltip", async () => {
+    // Given an open modal
+    const r = await render(<TestModalApp content={<TestModalComponent />} />);
+    expect(r.modal).toBeTruthy();
+    // And a tooltip element rendered outside the modal (as tooltips use portals to document.body)
+    const tooltip = document.createElement("div");
+    tooltip.setAttribute("role", "tooltip");
+    tooltip.textContent = "Tooltip content";
+    document.body.appendChild(tooltip);
+    try {
+      // When clicking on the tooltip element
+      fireEvent.pointerDown(tooltip);
+      // Then the modal should remain open
+      expect(r.modal).toBeTruthy();
+    } finally {
+      document.body.removeChild(tooltip);
+    }
+  });
+
+  it("does not close when clicking inside a child of a tooltip", async () => {
+    // Given an open modal
+    const r = await render(<TestModalApp content={<TestModalComponent />} />);
+    expect(r.modal).toBeTruthy();
+    // And a tooltip with a nested child element rendered outside the modal
+    const tooltip = document.createElement("div");
+    tooltip.setAttribute("role", "tooltip");
+    const child = document.createElement("span");
+    child.textContent = "Nested tooltip content";
+    tooltip.appendChild(child);
+    document.body.appendChild(tooltip);
+    try {
+      // When clicking on the child inside the tooltip
+      fireEvent.pointerDown(child);
+      // Then the modal should remain open (closest("[role='tooltip']") matches the parent)
+      expect(r.modal).toBeTruthy();
+    } finally {
+      document.body.removeChild(tooltip);
+    }
+  });
+
   describe("ModalBody", () => {
     it("renders", async () => {
       // When rendered
