@@ -6,7 +6,7 @@ import { useTooltipTriggerState } from "react-stately";
 import { Css, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-// We combine react-popper and aria-tooltip to makeup the tooltip component for the following reasons:
+// We combine react-popper and aria-tooltip to make up the tooltip component for the following reasons:
 // Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect
 // Popper provides the functionality for positioning the tooltip wrt the trigger element
 
@@ -90,12 +90,19 @@ interface PopperProps {
   xss?: TooltipXss;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  // react-aria tooltip props (role, id, etc.) are forwarded via rest props
-  [key: string]: unknown;
 }
 
 function Popper(props: PopperProps) {
-  const { triggerRef, content, placement = "auto", xss, bgColor = Palette.Gray900, onMouseEnter, onMouseLeave, ...ariaProps } = props;
+  const {
+    triggerRef,
+    content,
+    placement = "auto",
+    xss,
+    bgColor = Palette.Gray900,
+    onMouseEnter,
+    onMouseLeave,
+    ...ariaProps
+  } = props;
   const popperRef = useRef(null);
   const [arrowRef, setArrowRef] = useState<HTMLDivElement | null>(null);
   // Since we use `display: contents;` on the `triggerRef`, then the element.offsetTop/Left/etc all equal `0`. This would make

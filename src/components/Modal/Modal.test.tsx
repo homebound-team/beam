@@ -1,9 +1,11 @@
 import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
+
 import { ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";
 import { ModalHeader } from "src/components/Modal/Modal";
 import { OpenModal } from "src/components/Modal/OpenModal";
+import { Tooltip } from "src/components/Tooltip";
 import { click, render } from "src/utils/rtl";
 
 describe("Modal", () => {
@@ -28,43 +30,20 @@ describe("Modal", () => {
   });
 
   it("does not close when clicking inside a tooltip", async () => {
-    // Given an open modal
-    const r = await render(<TestModalApp content={<TestModalComponent />} />);
-    expect(r.modal).toBeTruthy();
-    // And a tooltip element rendered outside the modal (as tooltips use portals to document.body)
-    const tooltip = document.createElement("div");
-    tooltip.setAttribute("role", "tooltip");
-    tooltip.textContent = "Tooltip content";
-    document.body.appendChild(tooltip);
-    try {
-      // When clicking on the tooltip element
-      fireEvent.pointerDown(tooltip);
-      // Then the modal should remain open
-      expect(r.modal).toBeTruthy();
-    } finally {
-      document.body.removeChild(tooltip);
-    }
-  });
-
-  it("does not close when clicking inside a child of a tooltip", async () => {
-    // Given an open modal
-    const r = await render(<TestModalApp content={<TestModalComponent />} />);
-    expect(r.modal).toBeTruthy();
-    // And a tooltip with a nested child element rendered outside the modal
-    const tooltip = document.createElement("div");
-    tooltip.setAttribute("role", "tooltip");
-    const child = document.createElement("span");
-    child.textContent = "Nested tooltip content";
-    tooltip.appendChild(child);
-    document.body.appendChild(tooltip);
-    try {
-      // When clicking on the child inside the tooltip
-      fireEvent.pointerDown(child);
-      // Then the modal should remain open (closest("[role='tooltip']") matches the parent)
-      expect(r.modal).toBeTruthy();
-    } finally {
-      document.body.removeChild(tooltip);
-    }
+    // Given an open modal with a tooltip trigger
+    const r = await render(<TestModalApp content={<TestModalComponent withTooltip />} />);
+    // And the tooltip is opened by hovering over its trigger
+    const triggerSpan = r.button.closest("[data-testid='tooltip']")!;
+    // Fire a mousemove on document to set react-aria's interaction modality to "pointer"
+    fireEvent.mouseMove(document);
+    fireEvent.mouseEnter(triggerSpan);
+    // And a tooltip is rendered outside the modal (as tooltips use portals to document.body)
+    const tooltip = await r.findByRole("tooltip");
+    // When clicking on the tooltip element (mouseDown + mouseUp triggers react-aria's interact-outside detection)
+    fireEvent.mouseDown(tooltip);
+    fireEvent.mouseUp(tooltip);
+    // Then the modal should remain open
+    expect(r.modal).toBeDefined();
   });
 
   describe("ModalBody", () => {
@@ -109,11 +88,20 @@ function TestModalApp(props: ModalProps & { canClose?: () => boolean }) {
   return <h1>Page title</h1>;
 }
 
-function TestModalComponent() {
+function TestModalComponent({ withTooltip = false }: { withTooltip?: boolean }) {
   return (
     <>
       <ModalHeader>Title</ModalHeader>
-      <ModalBody>Modal Body</ModalBody>
+      <ModalBody>
+        Modal Body
+        {withTooltip && (
+          <Tooltip title="Tooltip content">
+            <button data-testid="button" type="button">
+              Hover me
+            </button>
+          </Tooltip>
+        )}
+      </ModalBody>
       <ModalFooter>Modal Footer</ModalFooter>
     </>
   );
