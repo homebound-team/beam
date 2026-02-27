@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react";
 import { useEffect } from "react";
+import { Chip } from "src/components/Chip";
 import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import {
@@ -8,6 +9,8 @@ import {
   TestModalFilterTable,
   VirtualizedTable,
 } from "src/components/Modal/TestModalContent";
+import { Tooltip } from "src/components/Tooltip";
+import { Css } from "src/Css";
 import { FormStateApp } from "src/forms/FormStateApp";
 import { noop } from "src/utils/index";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
@@ -160,3 +163,28 @@ function ModalFilterTableExample({ size, forceScrolling }: Pick<ModalProps, "siz
 
   return <Button label="Open" onClick={open} />;
 }
+
+/** Demonstrates that clicking a tooltip rendered inside a modal does not close the modal. */
+export const WithTooltip = () => {
+  return (
+    <OpenModal>
+      <>
+        <ModalHeader>Modal with Tooltip</ModalHeader>
+        <ModalBody>
+          <div css={Css.df.fdc.gap2.$}>
+            <p>
+              Hover over the chip or the text below to see a tooltip. Clicking the tooltip should not close the modal.
+            </p>
+            <Chip text="Hover me for tooltip" title="This tooltip should not close the modal when clicked" />
+            <Tooltip title={<div css={Css.p1.$}>Click me — the modal should stay open</div>}>
+              <Button label="Hover for Tooltip" onClick={noop} />
+            </Tooltip>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button label="Done" onClick={noop} />
+        </ModalFooter>
+      </>
+    </OpenModal>
+  );
+};
