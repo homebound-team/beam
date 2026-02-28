@@ -1,6 +1,6 @@
 import { camelCase } from "change-case";
-import { HTMLAttributes, PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
-import { FocusScope, useFilter, useMenu } from "react-aria";
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
+import { AriaMenuOptions, FocusScope, useFilter, useMenu } from "react-aria";
 import { Item, Section, useTreeData, useTreeState } from "react-stately";
 import { MenuItem, MenuSection } from "src/components";
 import { MenuSectionImpl } from "src/components/internal/MenuSection";
@@ -9,7 +9,8 @@ import { MenuSearchField } from "src/inputs/internal/MenuSearchField";
 import { useTestIds } from "src/utils";
 
 interface MenuProps<T> {
-  ariaMenuProps: HTMLAttributes<HTMLElement>;
+  // react-aria v3.33+ changed AriaMenuOptions.autoFocus to accept FocusStrategy, widening beyond HTMLAttributes
+  ariaMenuProps: AriaMenuOptions<T>;
   onClose: VoidFunction;
   items: MenuItem[];
   searchable?: boolean;
@@ -40,7 +41,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
     const [itemsSection, persistentSection] = items;
 
     if (search) {
-      const filteredChildren = itemsSection.children.filter((item) => contains(item.value.label, search));
+      const filteredChildren = (itemsSection.children ?? []).filter((item) => contains(item.value.label, search));
       const { items, ...otherValues } = itemsSection.value;
       const filteredValue = items?.filter((item) => contains(item.label, search));
       return {

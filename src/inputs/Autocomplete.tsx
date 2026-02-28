@@ -10,7 +10,8 @@ import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { Value, valueToKey } from "src/inputs/Value";
 
 export interface AutocompleteProps<T>
-  extends Pick<PresentationFieldProps, "labelStyle">,
+  extends
+    Pick<PresentationFieldProps, "labelStyle">,
     Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth"> {
   onSelect: (item: T) => void;
   /** A function that returns how to render the an option in the menu. If not set, `getOptionLabel` will be used */
@@ -62,7 +63,10 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
         {getOptionMenuLabel ? getOptionMenuLabel(item) : getOptionLabel(item)}
       </Item>
     ),
-    onSelectionChange: (key: Key) => {
+    // react-aria >= 3.35 changed onSelectionChange to pass `Key | null` (null on deselection).
+    // See: https://react-spectrum.adobe.com/releases/2024-11-20.html
+    onSelectionChange: (key: Key | null) => {
+      if (key == null) return;
       const selectedItem = options.find((i) => getOptionValue(i) === key);
       if (selectedItem) {
         onInputChange(getOptionLabel(selectedItem));

@@ -15,8 +15,7 @@ import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface ButtonDatePickerProps
-  extends DatePickerProps,
-    Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
+  extends DatePickerProps, Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
   defaultOpen?: boolean;
 }
 
@@ -24,7 +23,11 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
   const { defaultOpen, disabled, trigger, onSelect, ...datePickerProps } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const { menuTriggerProps, menuProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
+  // react-aria v3.33+ widened menuProps.autoFocus to `boolean | FocusStrategy`; destructure non-DOM props
+  const {
+    menuTriggerProps,
+    menuProps: { autoFocus: _af, ...menuProps },
+  } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(
     props,
     isTextButton(trigger)

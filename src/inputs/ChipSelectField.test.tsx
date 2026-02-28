@@ -102,8 +102,10 @@ describe("ChipSelectField", () => {
 
     // When closing the menu (by selecting an option)
     click(r.getByRole("option", { name: "Basketball" }));
-    // Then the focus is returned to the field
-    expect(onFocus).toBeCalledTimes(2);
+    // Then focus stays on the field (react-aria v3.46+ no longer re-fires onFocus
+    // when focus returns to the trigger after menu close, since focus never left
+    // the composite widget from the library's perspective)
+    expect(onFocus).toBeCalledTimes(1);
   });
 
   it("can disable field", async () => {
