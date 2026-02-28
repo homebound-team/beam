@@ -1,15 +1,22 @@
-import React, { Key, MutableRefObject, useEffect, useRef, useState } from "react";
+import { Key as AriaKey } from "@react-types/shared";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
-import { SelectState } from "react-stately";
+import { ListState } from "react-stately";
 import { Css } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { ListBoxSection } from "src/inputs/internal/ListBoxSection";
 import { ListBoxToggleChip } from "src/inputs/internal/ListBoxToggleChip";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
 
-interface ListBoxProps<O, V extends Key> {
+// react-aria >= 3.35 split SelectState and ComboBoxState so they no longer share a common
+// "SelectState" type. ListBox only needs ListState (collection + selectionManager), which
+// is the shared base of both SelectState and ComboBoxState.
+// Also, react-aria's Key type is now `string | number` (no bigint), which differs from
+// React.Key. We use AriaKey here to stay aligned with react-aria's types.
+// See: https://react-spectrum.adobe.com/releases/2024-11-20.html
+interface ListBoxProps<O, V extends AriaKey> {
   listBoxRef: MutableRefObject<HTMLDivElement | null>;
-  state: SelectState<O>;
+  state: ListState<O>;
   selectedOptions?: O[];
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
@@ -23,7 +30,7 @@ interface ListBoxProps<O, V extends Key> {
 }
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
-export function ListBox<O, V extends Key>(props: ListBoxProps<O, V>) {
+export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
   const {
     state,
     listBoxRef,

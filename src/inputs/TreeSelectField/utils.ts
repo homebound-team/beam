@@ -1,5 +1,4 @@
-import { Node } from "@react-types/shared";
-import { Key } from "react";
+import { Key as AriaKey, Node } from "@react-types/shared";
 import { Value } from "src/inputs/Value";
 
 type FoundOption<O> = { option: NestedOption<O>; parents: NestedOption<O>[] };
@@ -12,7 +11,8 @@ export type LeveledOption<O> = [NestedOption<O>, number];
 export type TreeFieldState<O> = {
   inputValue: string;
   filteredOptions: LeveledOption<O>[];
-  selectedKeys: Key[];
+  // react-aria's Key type (string | number) diverged from React.Key (which includes bigint) in v3.33+
+  selectedKeys: AriaKey[];
   selectedOptions: NestedOption<O>[];
   /** These are the labels of the top-level selected values
    * (e.g. ["d1c1", "d1c1p1", "d2c2p1"] will be ["d1c1", "d2c2p1"]).
@@ -32,7 +32,7 @@ export type TreeSelectResponse<O, V extends Value> = {
 /** Finds first option by Key, and returns it + any parents. */
 export function findOption<O, V extends Value>(
   options: NestedOption<O>[],
-  key: Key,
+  key: AriaKey,
   getOptionValue: (o: O) => V,
 ): FoundOption<O> | undefined {
   // This is technically an array of "maybe FoundOption"
@@ -52,7 +52,7 @@ export function findOption<O, V extends Value>(
 /** Finds all options by Key, and returns it + any parents. */
 export function findOptions<O, V extends Value>(
   options: NestedOption<O>[],
-  key: Key,
+  key: AriaKey,
   getOptionValue: (o: O) => V,
 ): FoundOption<O>[] {
   // This is technically an array of "maybe FoundOption"

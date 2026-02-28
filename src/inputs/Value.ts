@@ -15,20 +15,28 @@ import { Key } from "react";
  */
 export type Value = string | number | null | undefined | boolean;
 
+// react-aria v3.33+ uses keys in element IDs (e.g. `${id}-option-${key}`) and
+// `data-key` attributes; colons in keys produce invalid CSS selectors in jsdom's
+// nwsapi when matching stylesheet rules. Use `--` as a separator instead.
+const VALUE_PREFIX = "__VALUE--";
+
 export function keyToValue<V extends Value>(key: Key): V {
   if (typeof key === "number") {
     // react-aria's selection manager always returns strings, so we probably
     // won't actually hit this line, but just in case.
     return key as V;
   } else if (typeof key === "string") {
-    if (key === "__VALUE:null") {
+    // Support both old (colon) and new (double-dash) separators for backward compatibility
+    if (key === `${VALUE_PREFIX}null` || key === "__VALUE:null") {
       return null as V;
-    } else if (key === "__VALUE:undefined") {
+    } else if (key === `${VALUE_PREFIX}undefined` || key === "__VALUE:undefined") {
       return undefined as V;
-    } else if (key.startsWith("__VALUE:boolean:")) {
-      return (key.split(":")[2] === "true") as V;
-    } else if (key.startsWith("__VALUE:number")) {
-      return Number(key.split(":")[2]) as V;
+    } else if (key.startsWith(`${VALUE_PREFIX}boolean--`) || key.startsWith("__VALUE:boolean:")) {
+      const parts = key.includes("--boolean--") ? key.split("--") : key.split(":");
+      return (parts[parts.length - 1] === "true") as V;
+    } else if (key.startsWith(`${VALUE_PREFIX}number--`) || key.startsWith("__VALUE:number:")) {
+      const parts = key.includes("--number--") ? key.split("--") : key.split(":");
+      return Number(parts[parts.length - 1]) as V;
     } else {
       return key as V;
     }
@@ -43,13 +51,13 @@ export function valueToKey(value: Value): string {
   } else if (typeof value === "number") {
     // Despite using the Key type, react-aria's select manager always returns strings,
     // so tag this value as really being a number.
-    return `__VALUE:number:${value}`;
+    return `${VALUE_PREFIX}number--${value}`;
   } else if (typeof value === "boolean") {
-    return `__VALUE:boolean:${value}`;
+    return `${VALUE_PREFIX}boolean--${value}`;
   } else if (value === null) {
-    return "__VALUE:null";
+    return `${VALUE_PREFIX}null`;
   } else if (value === undefined) {
-    return "__VALUE:undefined";
+    return `${VALUE_PREFIX}undefined`;
   } else {
     throw new Error(`Unsupported value ${value}`);
   }

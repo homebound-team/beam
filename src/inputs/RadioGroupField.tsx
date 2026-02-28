@@ -71,7 +71,6 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
       <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
         {options.map((option) => {
-          const isDisabled = state.isDisabled || !!option.disabled;
           return (
             <Fragment key={option.value}>
               {maybeTooltip({
@@ -81,7 +80,8 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
                   <Radio
                     parentId={name}
                     option={option}
-                    state={{ ...state, isDisabled }}
+                    state={state}
+                    isOptionDisabled={!!option.disabled}
                     {...otherProps}
                     {...tid[option.value]}
                   />
@@ -102,6 +102,11 @@ function Radio<K extends string>(props: {
   parentId: string;
   option: RadioFieldOption<K>;
   state: RadioGroupState;
+  // Per-option disabled flag, kept separate from state to avoid spreading RadioGroupState.
+  // react-aria >= 3.33 uses a WeakMap keyed by the state object identity to store radio group
+  // metadata (name, form, etc.), so spreading state into a new object breaks the lookup.
+  // See: https://github.com/adobe/react-spectrum/pull/5765
+  isOptionDisabled?: boolean;
   onBlur?: () => void;
   onFocus?: () => void;
 }) {
@@ -109,14 +114,21 @@ function Radio<K extends string>(props: {
     parentId,
     option: { description, label, value },
     state,
+    isOptionDisabled,
     ...others
   } = props;
-  const disabled = state.isDisabled;
 
   const labelId = `${parentId}-${value}-label`;
   const descriptionId = `${parentId}-${value}-description`;
   const ref = useRef<HTMLInputElement>(null);
-  const { inputProps } = useRadio({ value, "aria-labelledby": labelId }, state, ref);
+  // Pass per-option isDisabled via useRadio's props rather than overriding state.isDisabled.
+  // useRadio merges props.isDisabled with state.isDisabled internally (props.isDisabled || state.isDisabled).
+  const { inputProps, isDisabled } = useRadio(
+    { value, "aria-labelledby": labelId, isDisabled: isOptionDisabled },
+    state,
+    ref,
+  );
+  const disabled = isDisabled;
   const { focusProps, isFocusVisible } = useFocusRing();
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 

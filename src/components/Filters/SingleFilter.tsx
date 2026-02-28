@@ -1,4 +1,3 @@
-import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
@@ -10,14 +9,16 @@ export type SingleFilterProps<O, V extends Value> = Omit<SelectFieldProps<O, V>,
   label?: string;
 };
 
-export function singleFilter<O, V extends Key>(props: SingleFilterProps<O, V>): (key: string) => Filter<V> {
+// react-aria's Key type (string | number) diverged from React.Key (includes bigint) in v3.33+;
+// use Value (string | number | undefined) instead of React.Key to avoid bigint constraint errors
+export function singleFilter<O, V extends Value>(props: SingleFilterProps<O, V>): (key: string) => Filter<V> {
   return (key) => new SingleFilter(key, props);
 }
 
 // Make an option that we'll sneak into every select field
 const allOption = {} as any;
 
-class SingleFilter<O, V extends Key> extends BaseFilter<V, SingleFilterProps<O, V>> implements Filter<V> {
+class SingleFilter<O, V extends Value> extends BaseFilter<V, SingleFilterProps<O, V>> implements Filter<V> {
   render(
     value: V | undefined,
     setValue: (value: V | undefined) => void,

@@ -1,7 +1,7 @@
+import { Key as AriaKey } from "@react-types/shared";
 import React, {
   ChangeEvent,
   InputHTMLAttributes,
-  Key,
   LabelHTMLAttributes,
   MutableRefObject,
   ReactNode,
@@ -151,7 +151,10 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
             // We need to do some custom logic when using MultiSelect, as react-aria/stately Combobox doesn't support multiselect out of the box.
             if (isMultiSelect) {
               if (isTree) {
-                const item = state.collection.getItem(state.selectionManager.focusedKey);
+                // focusedKey can be null in react-aria v3.33+ when no item is focused
+                const focusedKey = state.selectionManager.focusedKey;
+                if (focusedKey == null) return;
+                const item = state.collection.getItem(focusedKey);
                 if (item && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
                   if (!isLeveledNode(item)) return;
                   const leveledOption = item.value;
@@ -163,9 +166,9 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
                   e.preventDefault();
                   if (option && option.children && option.children.length > 0) {
                     if (collapsedKeys.includes(item.key) && e.key === "ArrowRight") {
-                      setCollapsedKeys((prevKeys: Key[]) => prevKeys.filter((k) => k !== item.key));
+                      setCollapsedKeys((prevKeys: AriaKey[]) => prevKeys.filter((k) => k !== item.key));
                     } else if (!collapsedKeys.includes(item.key) && e.key === "ArrowLeft") {
-                      setCollapsedKeys((prevKeys: Key[]) => [...prevKeys, item.key]);
+                      setCollapsedKeys((prevKeys: AriaKey[]) => [...prevKeys, item.key]);
                     }
                   }
                   return;
@@ -179,7 +182,11 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
                   e.preventDefault();
                 }
 
-                state.selectionManager.toggleSelection(state.selectionManager.focusedKey);
+                // focusedKey can be null in react-aria v3.33+ when no item is focused
+                const focusedKey = state.selectionManager.focusedKey;
+                if (focusedKey != null) {
+                  state.selectionManager.toggleSelection(focusedKey);
+                }
                 return;
               }
 
@@ -267,5 +274,11 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
 }
 
 function SelectedOptionBullets({ labels = [] }: { labels: string[] | undefined }) {
-  return <div>{labels?.map((label) => <li key={label}>{label}</li>)}</div>;
+  return (
+    <div>
+      {labels?.map((label) => (
+        <li key={label}>{label}</li>
+      ))}
+    </div>
+  );
 }
