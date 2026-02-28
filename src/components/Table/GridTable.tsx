@@ -841,7 +841,7 @@ function renderVirtual<R extends Kinded>(
               const result = infiniteScroll.onEndReached(index);
               if (isPromise(result)) {
                 setFetchMoreInProgress(true);
-                result.finally(() => setFetchMoreInProgress(false));
+                void result.finally(() => setFetchMoreInProgress(false));
               }
             },
           }

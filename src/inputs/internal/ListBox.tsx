@@ -10,7 +10,7 @@ import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
 
 // ListBox uses ListState (collection + selectionManager) as its state type,
 // which is the shared base of both SelectState and ComboBoxState.
-interface ListBoxProps<O, V extends AriaKey> {
+type ListBoxProps<O, V extends AriaKey> = {
   listBoxRef: MutableRefObject<HTMLDivElement | null>;
   state: ListState<O>;
   selectedOptions?: O[];
@@ -23,7 +23,7 @@ interface ListBoxProps<O, V extends AriaKey> {
   disabledOptionsWithReasons?: Record<string, string | undefined>;
   isTree?: boolean;
   allowCollapsing?: boolean;
-}
+};
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
 export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {

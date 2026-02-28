@@ -24,27 +24,7 @@ import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/in
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-export interface TextFieldBaseProps<X>
-  extends Pick<
-      BeamTextFieldProps<X>,
-      | "label"
-      | "required"
-      | "errorMsg"
-      | "errorInTooltip"
-      | "onBlur"
-      | "onFocus"
-      | "helperText"
-      | "labelStyle"
-      | "placeholder"
-      | "compact"
-      | "borderless"
-      | "borderOnHover"
-      | "visuallyDisabled"
-      | "fullWidth"
-      | "xss"
-      | "inputStylePalette"
-    >,
-    Partial<Pick<BeamTextFieldProps<X>, "onChange">> {
+export type TextFieldBaseProps<X> = {
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>;
   inputProps: InputHTMLAttributes<HTMLInputElement> | TextareaHTMLAttributes<HTMLTextAreaElement>;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
@@ -66,7 +46,26 @@ export interface TextFieldBaseProps<X>
   unfocusedPlaceholder?: ReactNode;
   /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
-}
+} & Pick<
+  BeamTextFieldProps<X>,
+  | "label"
+  | "required"
+  | "errorMsg"
+  | "errorInTooltip"
+  | "onBlur"
+  | "onFocus"
+  | "helperText"
+  | "labelStyle"
+  | "placeholder"
+  | "compact"
+  | "borderless"
+  | "borderOnHover"
+  | "visuallyDisabled"
+  | "fullWidth"
+  | "xss"
+  | "inputStylePalette"
+> &
+  Partial<Pick<BeamTextFieldProps<X>, "onChange">>;
 
 // Used by both TextField and TextArea
 export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldBaseProps<X>) {

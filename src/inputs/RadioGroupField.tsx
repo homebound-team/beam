@@ -12,7 +12,7 @@ import { useTestIds } from "src/utils/useTestIds";
 
 let nextNameId = 0;
 
-export interface RadioFieldOption<K extends string> {
+export type RadioFieldOption<K extends string> = {
   // testId?: string;
   /** The label for a specific option, i.e. "Cheddar". */
   label: string;
@@ -22,9 +22,9 @@ export interface RadioFieldOption<K extends string> {
   value: K;
   /** Disable only specific option, with an optional reason */
   disabled?: boolean | ReactNode;
-}
+};
 
-export interface RadioGroupFieldProps<K extends string> extends Pick<PresentationFieldProps, "labelStyle"> {
+export type RadioGroupFieldProps<K extends string> = {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
   /** The currently selected option value (i.e. an id). */
@@ -38,7 +38,7 @@ export interface RadioGroupFieldProps<K extends string> extends Pick<Presentatio
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
-}
+} & Pick<PresentationFieldProps, "labelStyle">;
 
 /**
  * Provides a radio group with label.

@@ -4,8 +4,7 @@ import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/interna
 import { HasIdIsh, HasNameIsh, Optional } from "src/types";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
-export interface SelectFieldProps<O, V extends Value>
-  extends Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect"> {
+export type SelectFieldProps<O, V extends Value> = {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
   /**
@@ -14,7 +13,7 @@ export interface SelectFieldProps<O, V extends Value>
    * Ideally callers that didn't pass `unsetLabel` would not have to handle the ` | undefined` here.
    */
   onSelect: (value: V | undefined, opt: O | undefined) => void;
-}
+} & Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect">;
 
 /**
  * Provides a non-native select/dropdown widget.

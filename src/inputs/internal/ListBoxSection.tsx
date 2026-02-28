@@ -6,7 +6,7 @@ import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/interna
 import { Option } from "src/inputs/internal/Option";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
 
-interface ListBoxSectionProps<O> {
+type ListBoxSectionProps<O> = {
   section: Node<O>;
   state: ListState<O>;
   contrast: boolean;
@@ -14,7 +14,7 @@ interface ListBoxSectionProps<O> {
   popoverHeight: number;
   scrollOnFocus?: boolean;
   disabledOptionsWithReasons: Record<string, string | undefined>;
-}
+};
 
 // Creates a section of options within a ListBox.
 // Currently only expects two possible sections; 1. The list of options, and 2. A persistent action (in that order).
