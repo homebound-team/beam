@@ -7,7 +7,7 @@ import { Option } from "src/inputs/internal/Option";
 import { TreeOption } from "src/inputs/TreeSelectField/TreeOption";
 import { isLeveledNode, LeveledOption } from "src/inputs/TreeSelectField/utils";
 
-interface VirtualizedOptionsProps<O> {
+type VirtualizedOptionsProps<O> = {
   state: ListState<O>;
   items: Node<O>[] | Node<LeveledOption<O>>[];
   onListHeightChange: (height: number) => void;
@@ -19,7 +19,7 @@ interface VirtualizedOptionsProps<O> {
   disabledOptionsWithReasons: Record<string, string | undefined>;
   isTree?: boolean;
   allowCollapsing?: boolean;
-}
+};
 
 // Displays ListBox options in a virtualized container for performance reasons
 export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {

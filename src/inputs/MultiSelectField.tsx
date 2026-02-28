@@ -3,15 +3,14 @@ import { Value } from "src/inputs";
 import { ComboBoxBase, ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface MultiSelectFieldProps<O, V extends Value>
-  extends Exclude<ComboBoxBaseProps<O, V>, "unsetLabel" | "addNew"> {
+export type MultiSelectFieldProps<O, V extends Value> = {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */
   getOptionMenuLabel?: (opt: O) => string | ReactNode;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   values: V[];
   onSelect: (values: V[], opts: O[]) => void;
-}
+} & Exclude<ComboBoxBaseProps<O, V>, "unsetLabel" | "addNew">;
 
 /**
  * Provides a non-native multiselect/dropdown widget.

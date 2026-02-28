@@ -6,13 +6,12 @@ import { HasIdAndName, Optional } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-interface BoundChipSelectFieldProps<O, V extends Value>
-  extends Omit<ChipSelectFieldProps<O, V>, "onSelect" | "label" | "value"> {
+type BoundChipSelectFieldProps<O, V extends Value> = {
   // Allow `onSelect` to be overridden to do more than just `field.set`.
   onSelect?: (option: V | undefined) => void;
   field: FieldState<V | null | undefined>;
   label?: string;
-}
+} & Omit<ChipSelectFieldProps<O, V>, "onSelect" | "label" | "value">;
 
 export function BoundChipSelectField<O, V extends Value>(props: BoundChipSelectFieldProps<O, V>): JSX.Element;
 export function BoundChipSelectField<O extends HasIdAndName<V>, V extends Value>(

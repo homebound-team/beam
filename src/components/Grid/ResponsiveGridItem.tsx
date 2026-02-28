@@ -1,10 +1,9 @@
 import { PropsWithChildren } from "react";
 import { useResponsiveGridItem } from "src";
 
-export interface ResponsiveGridItemProps
-  extends PropsWithChildren<{
-    colSpan: number;
-  }> {}
+export type ResponsiveGridItemProps = PropsWithChildren<{
+  colSpan: number;
+}>;
 
 /** Helper component for generating grid items with the ResponsiveGrid */
 export function ResponsiveGridItem(props: ResponsiveGridItemProps) {

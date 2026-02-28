@@ -14,10 +14,10 @@ import {
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface ButtonDatePickerProps
-  extends DatePickerProps, Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
+type ButtonDatePickerProps = {
   defaultOpen?: boolean;
-}
+} & DatePickerProps &
+  Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip">;
 
 export function ButtonDatePicker(props: ButtonDatePickerProps) {
   const { defaultOpen, disabled, trigger, onSelect, ...datePickerProps } = props;

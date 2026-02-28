@@ -14,14 +14,13 @@ import { defaultTestId } from "src/utils/defaultTestId";
 import { ButtonVariant } from "./Button";
 import { ContextualModal } from "./internal/ContextualModal";
 
-export interface ButtonModalProps
-  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
+export type ButtonModalProps = {
   content: ReactNode | ((close: () => void) => ReactNode);
   title?: string;
   variant?: ButtonVariant;
   storybookDefaultOpen?: boolean;
   hideEndAdornment?: boolean;
-}
+} & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder">;
 
 export function ButtonModal(props: ButtonModalProps) {
   const { storybookDefaultOpen, trigger, disabled, content, title } = props;

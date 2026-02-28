@@ -14,7 +14,7 @@ import { BeamFocusableProps } from "src/interfaces";
 import { useDebounce } from "use-debounce";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
-export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
+export type ComboBoxBaseProps<O, V extends Value> = {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean, isAddNewOption?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -72,7 +72,8 @@ export interface ComboBoxBaseProps<O, V extends Value> extends BeamFocusableProp
    * Set to false to maintain the original order of options.
    */
   autoSort?: boolean;
-}
+} & BeamFocusableProps &
+  PresentationFieldProps;
 
 /**
  * Provides a non-native select/dropdown widget that allows the user to type to filter the options.

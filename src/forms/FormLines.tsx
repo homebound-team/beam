@@ -13,14 +13,13 @@ export type FormWidth =
   /** 100%, works well for showing full width fields, or deferring to the parent width. */
   | "full";
 
-export interface FormLinesProps
-  extends Pick<PresentationFieldProps, "labelStyle" | "labelLeftFieldWidth" | "labelSuffix" | "compact"> {
+export type FormLinesProps = {
   /** Let the user interleave group-less lines and grouped lines. */
   children: ReactNode;
   width?: FormWidth;
   /** Increment property (e.g. 1 = 8px). Defines space between form fields */
   gap?: number;
-}
+} & Pick<PresentationFieldProps, "labelStyle" | "labelLeftFieldWidth" | "labelSuffix" | "compact">;
 
 /**
  * Applies standard Form layout/size/spacing between lines.

@@ -35,7 +35,7 @@ import { keyToValue, valueToKey } from "src/inputs/Value";
 import { BeamFocusableProps } from "src/interfaces";
 import { HasIdAndName, Optional } from "src/types";
 
-export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableProps, PresentationFieldProps {
+export type TreeSelectFieldProps<O, V extends Value> = {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
   getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => string | ReactNode;
   getOptionValue: (opt: O) => V;
@@ -74,7 +74,8 @@ export interface TreeSelectFieldProps<O, V extends Value> extends BeamFocusableP
    * @default root */
   chipDisplay?: "all" | "leaf" | "root";
   disabledOptions?: V[];
-}
+} & BeamFocusableProps &
+  PresentationFieldProps;
 
 export function TreeSelectField<O, V extends Value>(props: TreeSelectFieldProps<O, V>): JSX.Element;
 export function TreeSelectField<O extends HasIdAndName<V>, V extends Value>(
@@ -137,11 +138,11 @@ export function useTreeSelectFieldProvider<O, V extends Value>() {
   return useContext(CollapsedContext);
 }
 
-interface CollapsedChildrenState<O, V extends Value> {
+type CollapsedChildrenState<O, V extends Value> = {
   collapsedKeys: AriaKey[];
   setCollapsedKeys: Dispatch<SetStateAction<AriaKey[]>>;
   getOptionValue: (opt: O) => V;
-}
+};
 // create the context to hold the collapsed state, default should be false
 export const CollapsedContext = React.createContext<CollapsedChildrenState<any, any>>({
   collapsedKeys: [],

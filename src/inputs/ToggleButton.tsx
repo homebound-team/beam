@@ -28,7 +28,7 @@ export function ToggleButton(props: ToggleButtonProps) {
       const result = onChange(e);
       if (isPromise(result)) {
         setAsyncInProgress(true);
-        result.finally(() => setAsyncInProgress(false));
+        void result.finally(() => setAsyncInProgress(false));
       }
       return result;
     },

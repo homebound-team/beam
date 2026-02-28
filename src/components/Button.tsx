@@ -71,7 +71,7 @@ export function Button(props: ButtonProps) {
             const result = onPress(e);
             if (isPromise(result)) {
               setAsyncInProgress(true);
-              result.finally(() => setAsyncInProgress(false));
+              void result.finally(() => setAsyncInProgress(false));
             }
             return result;
           },
