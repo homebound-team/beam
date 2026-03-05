@@ -18,13 +18,12 @@ import { Switch } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface EditColumnsButtonProps<R extends Kinded>
-  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip"> {
+type EditColumnsButtonProps<R extends Kinded> = {
   columns: GridColumn<R>[];
   api: GridTableApi<R>;
   // for storybook purposes
   defaultOpen?: boolean;
-}
+} & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip">;
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
   const { defaultOpen, disabled, columns, trigger, api } = props;

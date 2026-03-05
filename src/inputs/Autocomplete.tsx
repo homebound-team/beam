@@ -9,10 +9,7 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { Value, valueToKey } from "src/inputs/Value";
 
-export interface AutocompleteProps<T>
-  extends
-    Pick<PresentationFieldProps, "labelStyle">,
-    Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth"> {
+export type AutocompleteProps<T> = {
   onSelect: (item: T) => void;
   /** A function that returns how to render the an option in the menu. If not set, `getOptionLabel` will be used */
   getOptionMenuLabel?: (o: T) => ReactNode;
@@ -32,7 +29,8 @@ export interface AutocompleteProps<T>
   disabled?: boolean;
   /** A list of options that are disabled. Can be either the option itself or an object with the option and a reason why it is disabled */
   disabledOptions?: (Value | { value: Value; reason: string })[];
-}
+} & Pick<PresentationFieldProps, "labelStyle"> &
+  Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth">;
 
 export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
   const {

@@ -141,7 +141,9 @@
   },
   "resolutions": {
     "@types/react": "18.0.28",
-    "react-router": "5.3.4"
+    "react-router": "5.3.4",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0"
   },
   "imports": {
     "src/*": "./src/*"

@@ -14,21 +14,20 @@ import {
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface ButtonMenuBaseProps
-  extends Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder"> {
+type ButtonMenuBaseProps = {
   items: MenuItem[];
   persistentItems?: MenuItem[];
   searchable?: boolean;
   // for storybook purposes
   defaultOpen?: boolean;
   contrast?: boolean;
-}
+} & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder">;
 
-interface SelectionButtonMenuProps extends ButtonMenuBaseProps {
+type SelectionButtonMenuProps = {
   /** Display a menu item as selected based. Use the Menu Item's label to identify */
   selectedItem: string | undefined;
   onChange: (key: string) => void;
-}
+} & ButtonMenuBaseProps;
 
 export type ButtonMenuProps = ButtonMenuBaseProps | SelectionButtonMenuProps;
 

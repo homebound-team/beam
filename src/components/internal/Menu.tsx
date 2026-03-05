@@ -8,7 +8,7 @@ import { Css } from "src/Css";
 import { MenuSearchField } from "src/inputs/internal/MenuSearchField";
 import { useTestIds } from "src/utils";
 
-interface MenuProps<T> {
+type MenuProps<T> = {
   ariaMenuProps: AriaMenuOptions<T>;
   onClose: VoidFunction;
   items: MenuItem[];
@@ -17,7 +17,7 @@ interface MenuProps<T> {
   contrast: boolean;
   selectedItem: string | undefined;
   onChange: ((key: string) => void) | undefined;
-}
+};
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   const { ariaMenuProps, items, persistentItems, onClose, searchable, contrast, selectedItem, onChange } = props;

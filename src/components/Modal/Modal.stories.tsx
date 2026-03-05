@@ -116,9 +116,8 @@ export function ModalForm() {
   );
 }
 
-interface ModalExampleProps
-  extends Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder" | "allowClosing">,
-    TestModalContentProps {}
+type ModalExampleProps = Pick<ModalProps, "size" | "forceScrolling" | "drawHeaderBorder" | "allowClosing"> &
+  TestModalContentProps;
 
 function ModalExample(props: ModalExampleProps) {
   const {

@@ -19,7 +19,7 @@ import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils";
 
-interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps {
+type ComboBoxInputProps<O, V extends Value> = {
   buttonProps: any;
   buttonRef: MutableRefObject<HTMLButtonElement | null>;
   inputProps: InputHTMLAttributes<HTMLInputElement>;
@@ -48,7 +48,7 @@ interface ComboBoxInputProps<O, V extends Value> extends PresentationFieldProps 
   isTree?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
-}
+} & PresentationFieldProps;
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
   const {
