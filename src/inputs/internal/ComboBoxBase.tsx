@@ -262,6 +262,19 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
+  // Memoize the children callback to prevent infinite re-render loops.
+  // react-aria's useValueId does in-render state updates when selectedItems changes reference.
+  // Without memoization, each render creates a new children function → useCollection rebuilds →
+  // selectedItems gets a new reference → useValueId triggers re-render → infinite loop.
+  const comboBoxChildren = useCallback(
+    (item: any) => (
+      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
+        {getOptionMenuLabel(item)}
+      </Item>
+    ),
+    [getOptionValue, getOptionLabel, getOptionMenuLabel],
+  );
+
   const comboBoxProps = {
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
@@ -271,11 +284,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     isReadOnly,
     onInputChange,
     onOpenChange,
-    children: (item: any) => (
-      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
-        {getOptionMenuLabel(item)}
-      </Item>
-    ),
+    children: comboBoxChildren,
   };
 
   const state = useComboBoxState<any>({

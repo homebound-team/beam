@@ -388,26 +388,29 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     }
   }
 
-  // This is _always_ going to appear new. Maybe `useMemo`?
+  // Memoize the children callback to prevent infinite re-render loops with react-aria v3.33+.
+  // See ComboBoxBase.tsx for detailed explanation.
+  const comboBoxChildren = useCallback(
+    ([item]: LeveledOption<O>) => (
+      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
+        {getOptionMenuLabel(item)}
+      </Item>
+    ),
+    [getOptionValue, getOptionLabel, getOptionMenuLabel],
+  );
+
   const comboBoxProps = {
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     placeholder: !values || values.length === 0 ? placeholder : "",
     label: props.label,
     inputValue: fieldState.inputValue,
-    // where we might want to do flatmap and return diff kind of array (children ? add level prop) inside children callback - can put markup wrapper div adds padding
-    // so we're not doing it multiple places
     items: fieldState.filteredOptions,
     isDisabled,
     isReadOnly,
     onInputChange,
     onOpenChange,
-    children: ([item]: LeveledOption<O>) => (
-      // what we're telling it to render. look at padding here - don't have to pass down to tree option - filtered options is where we're flat mapping
-      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
-        {getOptionMenuLabel(item)}
-      </Item>
-    ),
+    children: comboBoxChildren,
   };
 
   const state = useComboBoxState<any>({
