@@ -1,6 +1,6 @@
 import { Node } from "@react-types/shared";
 import { useEffect, useRef } from "react";
-import { SelectState } from "react-stately";
+import { ListState } from "react-stately";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { Option } from "src/inputs/internal/Option";
@@ -8,7 +8,7 @@ import { TreeOption } from "src/inputs/TreeSelectField/TreeOption";
 import { isLeveledNode, LeveledOption } from "src/inputs/TreeSelectField/utils";
 
 interface VirtualizedOptionsProps<O> {
-  state: SelectState<O>;
+  state: ListState<O>;
   items: Node<O>[] | Node<LeveledOption<O>>[];
   onListHeightChange: (height: number) => void;
   contrast: boolean;
@@ -35,7 +35,8 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
     allowCollapsing,
   } = props;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
-  const focusedItem = state.collection.getItem(state.selectionManager.focusedKey);
+  const focusedKey = state.selectionManager.focusedKey;
+  const focusedItem = focusedKey != null ? state.collection.getItem(focusedKey) : null;
   const selectedItem =
     state.selectionManager.selectedKeys.size > 0
       ? state.collection.getItem([...state.selectionManager.selectedKeys.values()][0])

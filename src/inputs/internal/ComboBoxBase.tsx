@@ -1,5 +1,5 @@
-import { Selection } from "@react-types/shared";
-import React, { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Key as AriaKey, Selection } from "@react-types/shared";
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
 import { resolveTooltip } from "src/components";
@@ -262,6 +262,19 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
+  // Memoize the children callback to prevent infinite re-render loops.
+  // react-aria's useValueId does in-render state updates when selectedItems changes reference.
+  // Without memoization, each render creates a new children function → useCollection rebuilds →
+  // selectedItems gets a new reference → useValueId triggers re-render → infinite loop.
+  const comboBoxChildren = useCallback(
+    (item: any) => (
+      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
+        {getOptionMenuLabel(item)}
+      </Item>
+    ),
+    [getOptionValue, getOptionLabel, getOptionMenuLabel],
+  );
+
   const comboBoxProps = {
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
@@ -271,11 +284,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     isReadOnly,
     onInputChange,
     onOpenChange,
-    children: (item: any) => (
-      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
-        {getOptionMenuLabel(item)}
-      </Item>
-    ),
+    children: comboBoxChildren,
   };
 
   const state = useComboBoxState<any>({
@@ -290,7 +299,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       if (key) {
         const selectedKeys = state.selectionManager.selectedKeys;
         // Create the `newSelection` Set depending on the value type of SelectField.
-        const newSelection: Set<Key> = new Set(!multiselect ? [key] : [...selectedKeys, key]);
+        const newSelection: Set<AriaKey> = new Set(!multiselect ? [key] : [...selectedKeys, key]);
         // Use only the `multipleSelectionState` to manage selected keys
         state.selectionManager.setSelectedKeys(newSelection);
       }
@@ -300,13 +309,15 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const selectedKeys = useMemo(() => {
     return selectedOptions.map((o) => valueToKey(getOptionValue(o)));
   }, [selectedOptions, getOptionValue]);
-  // @ts-ignore - `selectionManager.state` exists, but not according to the types
+  // @ts-ignore - `selectionManager.state` exists, but not according to the types.
+  // We override the ComboBox's selection manager to support multi-select.
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: multiselect ? "multiple" : "single",
     // Do not allow an empty selection if single select mode
     disallowEmptySelection: !multiselect,
     selectedKeys,
     onSelectionChange,
+    disabledKeys: Object.keys(disabledOptionsWithReasons),
   });
 
   const [debouncedSearch] = useDebounce(searchValue, 300);

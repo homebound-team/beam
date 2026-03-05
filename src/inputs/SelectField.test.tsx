@@ -656,6 +656,41 @@ describe("SelectFieldTest", () => {
       </>
     );
   }
+
+  /**
+   * Regression test: react-aria v3.33+ introduced useValueId which does in-render state updates
+   * when it detects that state.selectedItems changed reference. If the children callback passed to
+   * useComboBoxState is not memoized, every render creates a new children function, which causes
+   * useCollection to rebuild the collection, which causes selectedItems to get a new array reference,
+   * which triggers useValueId to re-render, creating an infinite loop.
+   */
+  it("does not cause infinite re-renders when parent re-renders", async () => {
+    // Given a SelectField with a value set, wrapped in a component that can trigger re-renders
+    function TestReRender() {
+      const [, setCount] = useState(0);
+      return (
+        <>
+          <SelectField<HasIdAndName, string>
+            label="Age"
+            value={"1"}
+            options={options}
+            getOptionLabel={(o) => o.name}
+            getOptionValue={(o) => o.id}
+            onSelect={() => {}}
+          />
+          <button data-testid="rerender" onClick={() => setCount((c) => c + 1)} />
+        </>
+      );
+    }
+    // When rendering the component (this would throw "Too many re-renders" before the fix)
+    const r = await render(<TestReRender />);
+    // Then it renders without infinite loops
+    expect(r.age).toHaveValue("One");
+    // And when we trigger a parent re-render
+    click(r.getByTestId("rerender"));
+    // Then it still renders without infinite loops
+    expect(r.age).toHaveValue("One");
+  });
 });
 
 function TestMultipleSelectFieldOnSearch<O extends HasIdAndName, V extends Value>(

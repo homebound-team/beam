@@ -1,6 +1,6 @@
+import { Key as AriaKey } from "@react-types/shared";
 import React, {
   Dispatch,
-  Key,
   ReactNode,
   SetStateAction,
   useCallback,
@@ -93,7 +93,7 @@ export function TreeSelectField<O, V extends Value>(
     ...otherProps
   } = props;
 
-  const [collapsedKeys, setCollapsedKeys] = useState<Key[]>([]);
+  const [collapsedKeys, setCollapsedKeys] = useState<AriaKey[]>([]);
 
   useEffect(() => {
     setCollapsedKeys(
@@ -138,8 +138,8 @@ export function useTreeSelectFieldProvider<O, V extends Value>() {
 }
 
 interface CollapsedChildrenState<O, V extends Value> {
-  collapsedKeys: Key[];
-  setCollapsedKeys: Dispatch<SetStateAction<Key[]>>;
+  collapsedKeys: AriaKey[];
+  setCollapsedKeys: Dispatch<SetStateAction<AriaKey[]>>;
   getOptionValue: (opt: O) => V;
 }
 // create the context to hold the collapsed state, default should be false
@@ -190,7 +190,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     // 2. The `values` array could contain the values of the children, but not the parent. So the parent should be considered selected if all children are.
 
     // Create a list of all selected values - using a Set to immediately dedupe the list.
-    const selectedKeys: Set<Key> = new Set(
+    const selectedKeys: Set<AriaKey> = new Set(
       values?.flatMap((v) => {
         // Find the options that matches the value. These could be parents or a children.
         const foundOptions = findOptions(initialOptions, valueToKey(v), getOptionValue);
@@ -388,26 +388,29 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     }
   }
 
-  // This is _always_ going to appear new. Maybe `useMemo`?
+  // Memoize the children callback to prevent infinite re-render loops with react-aria v3.33+.
+  // See ComboBoxBase.tsx for detailed explanation.
+  const comboBoxChildren = useCallback(
+    ([item]: LeveledOption<O>) => (
+      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
+        {getOptionMenuLabel(item)}
+      </Item>
+    ),
+    [getOptionValue, getOptionLabel, getOptionMenuLabel],
+  );
+
   const comboBoxProps = {
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     placeholder: !values || values.length === 0 ? placeholder : "",
     label: props.label,
     inputValue: fieldState.inputValue,
-    // where we might want to do flatmap and return diff kind of array (children ? add level prop) inside children callback - can put markup wrapper div adds padding
-    // so we're not doing it multiple places
     items: fieldState.filteredOptions,
     isDisabled,
     isReadOnly,
     onInputChange,
     onOpenChange,
-    children: ([item]: LeveledOption<O>) => (
-      // what we're telling it to render. look at padding here - don't have to pass down to tree option - filtered options is where we're flat mapping
-      <Item key={valueToKey(getOptionValue(item))} textValue={getOptionLabel(item)}>
-        {getOptionMenuLabel(item)}
-      </Item>
-    ),
+    children: comboBoxChildren,
   };
 
   const state = useComboBoxState<any>({
@@ -420,6 +423,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: "multiple",
     selectedKeys: fieldState.selectedKeys,
+    disabledKeys: Object.keys(disabledOptionsWithReasons),
     onSelectionChange: (newKeys) => {
       if (newKeys === "all") {
         // We do not support an "All" option
@@ -684,7 +688,7 @@ function levelOptions<O, V extends Value>(
   o: NestedOption<O>,
   level: number,
   filtering: boolean,
-  collapsedKeys: Key[],
+  collapsedKeys: AriaKey[],
   getOptionValue: (o: O) => V,
 ): LeveledOption<O>[] {
   // If a user is filtering, then do not provide level to the options as the various paddings may look quite odd.
@@ -704,7 +708,7 @@ function levelOptions<O, V extends Value>(
 // This could be a parent of the option, or the option itself.
 function getTopLevelSelections<O, V extends Value>(
   o: NestedOption<O>,
-  selectedKeys: Set<Key>,
+  selectedKeys: Set<AriaKey>,
   getOptionValue: (o: O) => V,
 ): NestedOption<O>[] {
   // If this element is already selected, return early. Do not bother looking through children.

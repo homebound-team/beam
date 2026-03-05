@@ -1,6 +1,6 @@
 import { Node } from "@react-types/shared";
 import { useListBoxSection, useSeparator } from "react-aria";
-import { SelectState } from "react-stately";
+import { ListState } from "react-stately";
 import { Css } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { Option } from "src/inputs/internal/Option";
@@ -8,7 +8,7 @@ import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
 
 interface ListBoxSectionProps<O> {
   section: Node<O>;
-  state: SelectState<O>;
+  state: ListState<O>;
   contrast: boolean;
   onListHeightChange: (height: number) => void;
   popoverHeight: number;

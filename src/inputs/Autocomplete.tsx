@@ -1,4 +1,4 @@
-import { Key, ReactNode, useRef } from "react";
+import { Key, ReactNode, useCallback, useRef } from "react";
 import { useComboBox, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
 import { Icon } from "src/components";
@@ -10,7 +10,8 @@ import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { Value, valueToKey } from "src/inputs/Value";
 
 export interface AutocompleteProps<T>
-  extends Pick<PresentationFieldProps, "labelStyle">,
+  extends
+    Pick<PresentationFieldProps, "labelStyle">,
     Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth"> {
   onSelect: (item: T) => void;
   /** A function that returns how to render the an option in the menu. If not set, `getOptionLabel` will be used */
@@ -49,6 +50,17 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
 
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
+  // Memoize the children callback to prevent infinite re-render loops with react-aria v3.33+.
+  // See ComboBoxBase.tsx for detailed explanation.
+  const comboBoxChildren = useCallback(
+    (item: T) => (
+      <Item key={getOptionValue(item)} textValue={getOptionLabel(item)}>
+        {getOptionMenuLabel ? getOptionMenuLabel(item) : getOptionLabel(item)}
+      </Item>
+    ),
+    [getOptionValue, getOptionLabel, getOptionMenuLabel],
+  );
+
   const comboBoxProps = {
     isDisabled: !!disabled,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
@@ -57,12 +69,9 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     items: options,
     // Allow the user to type in a value that is not in the list. Allows for the text to stay in the input when the user clicks away
     allowsCustomValue: true,
-    children: (item: T) => (
-      <Item key={getOptionValue(item)} textValue={getOptionLabel(item)}>
-        {getOptionMenuLabel ? getOptionMenuLabel(item) : getOptionLabel(item)}
-      </Item>
-    ),
-    onSelectionChange: (key: Key) => {
+    children: comboBoxChildren,
+    onSelectionChange: (key: Key | null) => {
+      if (key == null) return;
       const selectedItem = options.find((i) => getOptionValue(i) === key);
       if (selectedItem) {
         onInputChange(getOptionLabel(selectedItem));

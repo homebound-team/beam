@@ -9,6 +9,7 @@ export function fail(message?: string): never {
 export function toToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
   return {
     isSelected,
+    defaultSelected: false,
     setSelected: onChange,
     toggle: () => onChange(!isSelected),
   };
@@ -21,6 +22,7 @@ export function toGroupState<T extends string>(values: T[], onChange: (value: T[
 
   return {
     value: values,
+    defaultValue: [],
     setValue: onChange,
     isSelected: (value: T) => values.includes(value),
     addValue,
@@ -31,6 +33,14 @@ export function toGroupState<T extends string>(values: T[], onChange: (value: T[
     // We do not use the validation state, as our Switch groups do not support error states. However, this field is required by the `CheckboxGroupState` so we need to include it.
     // If we ever update our SwitchGroup component to support error states, we'll need to update this.
     validationState: "valid",
+    isInvalid: false,
+    isRequired: false,
+    setInvalid: () => {},
+    realtimeValidation: { isInvalid: false, validationErrors: [], validationDetails: {} as ValidityState },
+    displayValidation: { isInvalid: false, validationErrors: [], validationDetails: {} as ValidityState },
+    updateValidation: () => {},
+    resetValidation: () => {},
+    commitValidation: () => {},
   };
 }
 

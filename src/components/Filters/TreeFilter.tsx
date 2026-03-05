@@ -1,4 +1,3 @@
-import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { TreeSelectField, TreeSelectFieldProps, Value } from "src/inputs";
@@ -15,7 +14,7 @@ export type TreeFilterProps<O, V extends Value> = Omit<TreeSelectFieldProps<O, V
 
 type TreeFilterBy = keyof TreeSelectResponse<any, any>;
 
-export function treeFilter<O, V extends Key>(props: TreeFilterProps<O, V>): (key: string) => Filter<V[]> {
+export function treeFilter<O, V extends Value>(props: TreeFilterProps<O, V>): (key: string) => Filter<V[]> {
   return (key) => new TreeFilter(key, props);
 }
 

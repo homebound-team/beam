@@ -1,4 +1,3 @@
-import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
@@ -17,7 +16,7 @@ export type DateFilterProps<O, V extends Value, DV extends DateFilterValue<V>> =
 
 export type DateFilterValue<V extends Value> = { op: V; value: Date };
 
-export function dateFilter<O, V extends Key>(
+export function dateFilter<O, V extends Value>(
   props: DateFilterProps<O, V, DateFilterValue<V>>,
 ): (key: string) => Filter<DateFilterValue<V>> {
   return (key) => new DateFilter(key, props);
@@ -26,7 +25,7 @@ export function dateFilter<O, V extends Key>(
 // Custom option that allows for not selecting an operation
 const anyOption = {} as any;
 
-class DateFilter<O, V extends Key, DV extends DateFilterValue<V>>
+class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
   extends BaseFilter<DV, DateFilterProps<O, V, DV>>
   implements Filter<DV>
 {

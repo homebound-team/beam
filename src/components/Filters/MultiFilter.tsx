@@ -1,4 +1,3 @@
-import { Key } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
@@ -16,7 +15,7 @@ export type MultiFilterProps<O, V extends Value> = Omit<
   label?: string;
 };
 
-export function multiFilter<O, V extends Key>(props: MultiFilterProps<O, V>): (key: string) => Filter<V[]> {
+export function multiFilter<O, V extends Value>(props: MultiFilterProps<O, V>): (key: string) => Filter<V[]> {
   return (key) => new MultiFilter(key, props);
 }
 

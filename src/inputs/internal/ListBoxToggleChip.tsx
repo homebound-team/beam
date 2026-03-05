@@ -1,10 +1,10 @@
-import { Key } from "react";
-import { SelectState } from "react-stately";
+import { Key as AriaKey } from "@react-types/shared";
+import { ListState } from "react-stately";
 import { ToggleChip } from "src/components";
 import { Css } from "src/Css";
 
-interface ListBoxToggleChipProps<O, V extends Key> {
-  state: SelectState<O>;
+interface ListBoxToggleChipProps<O, V extends AriaKey> {
+  state: ListState<O>;
   option: O;
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
@@ -12,7 +12,7 @@ interface ListBoxToggleChipProps<O, V extends Key> {
 }
 
 /** Chip used to display selections within ListBox when using the MultiSelectField */
-export function ListBoxToggleChip<O, V extends Key>(props: ListBoxToggleChipProps<O, V>) {
+export function ListBoxToggleChip<O, V extends AriaKey>(props: ListBoxToggleChipProps<O, V>) {
   const { state, option, getOptionLabel, getOptionValue, disabled = false } = props;
   return (
     <li css={Css.mr1.mb1.$}>
