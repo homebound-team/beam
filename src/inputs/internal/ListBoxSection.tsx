@@ -1,6 +1,5 @@
 import { Node } from "@react-types/shared";
 import { useListBoxSection, useSeparator } from "react-aria";
-// react-aria >= 3.35: Use ListState instead of SelectState as the shared base type.
 import { ListState } from "react-stately";
 import { Css } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";

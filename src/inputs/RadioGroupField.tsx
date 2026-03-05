@@ -103,9 +103,8 @@ function Radio<K extends string>(props: {
   option: RadioFieldOption<K>;
   state: RadioGroupState;
   // Per-option disabled flag, kept separate from state to avoid spreading RadioGroupState.
-  // react-aria >= 3.33 uses a WeakMap keyed by the state object identity to store radio group
-  // metadata (name, form, etc.), so spreading state into a new object breaks the lookup.
-  // See: https://github.com/adobe/react-spectrum/pull/5765
+  // react-aria uses a WeakMap keyed by the state object identity to store radio group
+  // metadata, so spreading state into a new object breaks the lookup.
   isOptionDisabled?: boolean;
   onBlur?: () => void;
   onFocus?: () => void;

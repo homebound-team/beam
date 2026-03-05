@@ -151,7 +151,6 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
             // We need to do some custom logic when using MultiSelect, as react-aria/stately Combobox doesn't support multiselect out of the box.
             if (isMultiSelect) {
               if (isTree) {
-                // focusedKey can be null in react-aria v3.33+ when no item is focused
                 const focusedKey = state.selectionManager.focusedKey;
                 if (focusedKey == null) return;
                 const item = state.collection.getItem(focusedKey);
@@ -182,7 +181,6 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
                   e.preventDefault();
                 }
 
-                // focusedKey can be null in react-aria v3.33+ when no item is focused
                 const focusedKey = state.selectionManager.focusedKey;
                 if (focusedKey != null) {
                   state.selectionManager.toggleSelection(focusedKey);

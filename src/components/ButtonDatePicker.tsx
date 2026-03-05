@@ -23,7 +23,7 @@ export function ButtonDatePicker(props: ButtonDatePickerProps) {
   const { defaultOpen, disabled, trigger, onSelect, ...datePickerProps } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
-  // react-aria v3.33+ widened menuProps.autoFocus to `boolean | FocusStrategy`; destructure non-DOM props
+  // Destructure autoFocus from menuProps since it's not a valid DOM attribute
   const {
     menuTriggerProps,
     menuProps: { autoFocus: _af, ...menuProps },

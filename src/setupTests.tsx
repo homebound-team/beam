@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import "jest-chain";
 import { configure } from "mobx";
 
-// Polyfill CSS.escape for jsdom — react-aria v3.33+ uses CSS.escape(key) in querySelector
+// Polyfill CSS.escape for jsdom — react-aria uses CSS.escape(key) in querySelector
 // for data-key attribute selectors, and jsdom doesn't provide it natively.
 if (typeof globalThis.CSS === "undefined") {
   (globalThis as any).CSS = { escape: (s: string) => s.replace(/([^\w-])/g, "\\$1") };
@@ -12,13 +12,10 @@ if (typeof globalThis.CSS === "undefined") {
 }
 
 // Patch getComputedStyle to handle nwsapi CSS selector parsing errors.
-// React 18's useId() generates IDs with colons (e.g. `:r1:`), and react-aria v3.33+ embeds
-// these in element IDs (e.g. `react-aria-:r1:-option-1`). When jsdom's getComputedStyle
-// iterates CSS stylesheets via nwsapi, compiled selector resolvers call querySelector on
-// child elements, hitting the non-VERBOSITY nwsapi instance which throws SyntaxError on
-// colons parsed as pseudo-classes. Catching the error and returning the original result is
-// safe — jsdom only resolves the `visibility` property (default "visible") so tests are
-// unaffected by falling back to the base computed style.
+// React 18's useId() generates IDs with colons (e.g. `:r1:`), and react-aria embeds
+// these in element IDs. When jsdom's getComputedStyle iterates CSS stylesheets via nwsapi,
+// it throws SyntaxError on colons parsed as pseudo-classes. Catching the error is safe —
+// jsdom only resolves the `visibility` property so tests are unaffected by the fallback.
 const _origGetComputedStyle = window.getComputedStyle.bind(window);
 window.getComputedStyle = ((elt: Element, pseudoElt?: string | null): CSSStyleDeclaration => {
   try {

@@ -102,9 +102,8 @@ describe("ChipSelectField", () => {
 
     // When closing the menu (by selecting an option)
     click(r.getByRole("option", { name: "Basketball" }));
-    // Then focus stays on the field (react-aria v3.46+ no longer re-fires onFocus
-    // when focus returns to the trigger after menu close, since focus never left
-    // the composite widget from the library's perspective)
+    // Then focus stays on the field (react-aria does not re-fire onFocus when focus
+    // returns to the trigger after menu close, since focus never left the composite widget)
     expect(onFocus).toBeCalledTimes(1);
   });
 

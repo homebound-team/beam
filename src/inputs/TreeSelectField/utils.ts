@@ -11,7 +11,6 @@ export type LeveledOption<O> = [NestedOption<O>, number];
 export type TreeFieldState<O> = {
   inputValue: string;
   filteredOptions: LeveledOption<O>[];
-  // react-aria's Key type (string | number) diverged from React.Key (which includes bigint) in v3.33+
   selectedKeys: AriaKey[];
   selectedOptions: NestedOption<O>[];
   /** These are the labels of the top-level selected values

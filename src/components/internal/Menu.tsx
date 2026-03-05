@@ -9,7 +9,6 @@ import { MenuSearchField } from "src/inputs/internal/MenuSearchField";
 import { useTestIds } from "src/utils";
 
 interface MenuProps<T> {
-  // react-aria v3.33+ changed AriaMenuOptions.autoFocus to accept FocusStrategy, widening beyond HTMLAttributes
   ariaMenuProps: AriaMenuOptions<T>;
   onClose: VoidFunction;
   items: MenuItem[];

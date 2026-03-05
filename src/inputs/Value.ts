@@ -15,9 +15,8 @@ import { Key } from "react";
  */
 export type Value = string | number | null | undefined | boolean;
 
-// react-aria v3.33+ uses keys in element IDs (e.g. `${id}-option-${key}`) and
-// `data-key` attributes; colons in keys produce invalid CSS selectors in jsdom's
-// nwsapi when matching stylesheet rules. Use `--` as a separator instead.
+// Keys are embedded in element IDs and `data-key` attributes; colons in keys
+// produce invalid CSS selectors in jsdom, so we use `--` as a separator.
 const VALUE_PREFIX = "__VALUE--";
 
 export function keyToValue<V extends Value>(key: Key): V {

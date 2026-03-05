@@ -16,8 +16,6 @@ export type DateFilterProps<O, V extends Value, DV extends DateFilterValue<V>> =
 
 export type DateFilterValue<V extends Value> = { op: V; value: Date };
 
-// react-aria's Key type (string | number) diverged from React.Key (includes bigint) in v3.33+;
-// use Value (string | number | undefined) instead of React.Key to avoid bigint constraint errors
 export function dateFilter<O, V extends Value>(
   props: DateFilterProps<O, V, DateFilterValue<V>>,
 ): (key: string) => Filter<DateFilterValue<V>> {

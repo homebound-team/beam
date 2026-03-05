@@ -190,7 +190,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     // 2. The `values` array could contain the values of the children, but not the parent. So the parent should be considered selected if all children are.
 
     // Create a list of all selected values - using a Set to immediately dedupe the list.
-    // react-aria's Key type (string | number) diverged from React.Key (which includes bigint) in v3.33+
     const selectedKeys: Set<AriaKey> = new Set(
       values?.flatMap((v) => {
         // Find the options that matches the value. These could be parents or a children.
@@ -421,7 +420,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   state.selectionManager.state = useMultipleSelectionState({
     selectionMode: "multiple",
     selectedKeys: fieldState.selectedKeys,
-    // Pass disabledKeys so SelectionManager.isDisabled(key) works correctly (required since react-stately v3.44+)
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     onSelectionChange: (newKeys) => {
       if (newKeys === "all") {

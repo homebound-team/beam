@@ -1,7 +1,5 @@
 import { Node } from "@react-types/shared";
 import { useEffect, useRef } from "react";
-// react-aria >= 3.35: Use ListState instead of SelectState, as it's the shared base type
-// for both ComboBoxState and SelectState. See ListBox.tsx for details.
 import { ListState } from "react-stately";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
@@ -37,7 +35,6 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
     allowCollapsing,
   } = props;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
-  // react-aria >= 3.35: focusedKey can now be `Key | null`; guard against null.
   const focusedKey = state.selectionManager.focusedKey;
   const focusedItem = focusedKey != null ? state.collection.getItem(focusedKey) : null;
   const selectedItem =

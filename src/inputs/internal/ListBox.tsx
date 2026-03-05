@@ -8,12 +8,8 @@ import { ListBoxSection } from "src/inputs/internal/ListBoxSection";
 import { ListBoxToggleChip } from "src/inputs/internal/ListBoxToggleChip";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
 
-// react-aria >= 3.35 split SelectState and ComboBoxState so they no longer share a common
-// "SelectState" type. ListBox only needs ListState (collection + selectionManager), which
-// is the shared base of both SelectState and ComboBoxState.
-// Also, react-aria's Key type is now `string | number` (no bigint), which differs from
-// React.Key. We use AriaKey here to stay aligned with react-aria's types.
-// See: https://react-spectrum.adobe.com/releases/2024-11-20.html
+// ListBox uses ListState (collection + selectionManager) as its state type,
+// which is the shared base of both SelectState and ComboBoxState.
 interface ListBoxProps<O, V extends AriaKey> {
   listBoxRef: MutableRefObject<HTMLDivElement | null>;
   state: ListState<O>;

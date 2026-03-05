@@ -1,6 +1,4 @@
 import { Key as AriaKey } from "@react-types/shared";
-// react-aria >= 3.35: Use ListState instead of SelectState as the shared base type.
-// Also use AriaKey (string | number) instead of React.Key (string | number | bigint).
 import { ListState } from "react-stately";
 import { ToggleChip } from "src/components";
 import { Css } from "src/Css";

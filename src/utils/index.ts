@@ -9,7 +9,6 @@ export function fail(message?: string): never {
 export function toToggleState(isSelected: boolean, onChange: (value: boolean) => void): ToggleState {
   return {
     isSelected,
-    // react-stately v3.44+ added defaultSelected to ToggleState
     defaultSelected: false,
     setSelected: onChange,
     toggle: () => onChange(!isSelected),
@@ -21,8 +20,6 @@ export function toGroupState<T extends string>(values: T[], onChange: (value: T[
   const addValue = (value: T) => onChange([...values, value]);
   const removeValue = (value: T) => onChange(values.filter((_value) => _value !== value));
 
-  // react-stately v3.44+ added several new required fields to CheckboxGroupState
-  // (defaultValue, isInvalid, isRequired, setInvalid, and FormValidationState methods)
   return {
     value: values,
     defaultValue: [],

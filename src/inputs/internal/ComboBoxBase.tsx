@@ -290,7 +290,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       if (key) {
         const selectedKeys = state.selectionManager.selectedKeys;
         // Create the `newSelection` Set depending on the value type of SelectField.
-        // react-aria's Key type (string | number) diverged from React.Key (which includes bigint) in v3.33+
         const newSelection: Set<AriaKey> = new Set(!multiselect ? [key] : [...selectedKeys, key]);
         // Use only the `multipleSelectionState` to manage selected keys
         state.selectionManager.setSelectedKeys(newSelection);
@@ -309,7 +308,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     disallowEmptySelection: !multiselect,
     selectedKeys,
     onSelectionChange,
-    // Pass disabledKeys so SelectionManager.isDisabled(key) works correctly (required since react-stately v3.44+)
     disabledKeys: Object.keys(disabledOptionsWithReasons),
   });
 
