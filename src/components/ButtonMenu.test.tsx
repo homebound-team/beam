@@ -145,6 +145,21 @@ describe("ButtonMenu", () => {
     expect(r.trigger_optionB).toHaveAttribute("aria-checked", "true");
     expect(r.trigger_optionB.querySelector("[data-icon='check']")).toBeTruthy();
   });
+
+  it("closes the menu when clicking the trigger again", async () => {
+    // Given a ButtonMenu
+    const r = await render(
+      <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Option A", onClick: noop }]} />,
+    );
+    // When opening the menu by clicking the trigger
+    click(r.trigger);
+    // Then the menu should be open
+    expect(r.trigger_optionA).toBeDefined();
+    // When clicking the trigger again to close the menu
+    click(r.trigger);
+    // Then the menu should be closed
+    expect(r.query.trigger_optionA).toBe(null);
+  });
 });
 
 function TestButtonMenu({ empty = false, searchable = false, ...others }: { empty?: boolean; searchable?: boolean }) {
