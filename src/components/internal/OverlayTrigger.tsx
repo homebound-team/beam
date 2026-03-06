@@ -1,6 +1,7 @@
 import { AriaButtonProps } from "@react-types/button";
 import type { Placement } from "@react-types/overlays";
-import { MutableRefObject, ReactElement, ReactNode, useRef } from "react";
+import type { PressEvent } from "@react-types/shared";
+import { MutableRefObject, ReactElement, ReactNode, useMemo, useRef } from "react";
 import { useOverlayPosition } from "react-aria";
 import { MenuTriggerState } from "react-stately";
 import { AvatarButton, AvatarButtonProps } from "src/components/Avatar/AvatarButton";
@@ -61,6 +62,25 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     showActiveBorder = false,
     contrast = false,
   } = props;
+  // react-aria v3.33+ changed useMenuTrigger so that mouse/virtual clicks call state.open() instead
+  // of state.toggle(), breaking click-to-close behavior (specifically for our rtl-utils `click(...)`
+  // helper which uses lighter-weight virtual events instead of real mouse events).
+  // Override onPressStart to restore the toggle-on-click behavior for all pointer types.
+  const wrappedMenuTriggerProps = useMemo<AriaButtonProps>(
+    () => ({
+      ...menuTriggerProps,
+      onPressStart: (e: PressEvent) => {
+        if (e.pointerType !== "touch" && e.pointerType !== "keyboard") {
+          // Mouse/virtual clicks should toggle, not just open
+          state.toggle(e.pointerType === "virtual" ? "first" : null);
+        } else {
+          menuTriggerProps.onPressStart?.(e);
+        }
+      },
+    }),
+    [menuTriggerProps, state],
+  );
+
   const popoverRef = useRef(null);
   const { overlayProps: positionProps } = useOverlayPosition({
     targetRef: buttonRef,
@@ -90,12 +110,12 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           variant={variant ? variant : "secondary"}
           contrast={contrast}
           {...trigger}
-          menuTriggerProps={menuTriggerProps}
+          menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
           endAdornment={!hideEndAdornment ? <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} /> : null}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={menuTriggerProps.onPress ?? noop}
+          onClick={wrappedMenuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
           {...tid}
         />
@@ -105,30 +125,30 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           label={trigger.navLabel}
           disabled={!!disabled}
           contrast={contrast}
-          menuTriggerProps={menuTriggerProps}
+          menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
           {...tid}
         />
       ) : isIconButton(trigger) ? (
         <IconButton
           {...trigger}
-          menuTriggerProps={menuTriggerProps}
+          menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
           {...tid}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={menuTriggerProps.onPress ?? noop}
+          onClick={wrappedMenuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
         />
       ) : (
         <AvatarButton
           {...trigger}
-          menuTriggerProps={menuTriggerProps}
+          menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
           {...tid}
           disabled={disabled}
           tooltip={tooltip}
-          onClick={menuTriggerProps.onPress ?? noop}
+          onClick={wrappedMenuTriggerProps.onPress ?? noop}
           forceFocusStyles={showActiveBorder && state.isOpen}
         />
       )}
