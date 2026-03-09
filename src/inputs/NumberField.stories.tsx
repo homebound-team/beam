@@ -1,9 +1,9 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useEffect, useMemo, useState } from "react";
 import { Css } from "src/Css";
 import { TextField } from "src/inputs";
 import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
+import { action } from "storybook/actions";
 
 export default {
   component: NumberField,

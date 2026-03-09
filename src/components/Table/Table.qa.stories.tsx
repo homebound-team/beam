@@ -1,5 +1,5 @@
 import { ObjectConfig, ObjectState, required, useFormStates } from "@homebound/form-state";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { camelCase } from "change-case";
 import { ReactNode, useMemo, useState } from "react";
 import { Button } from "src";

@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useCallback, useRef, useState } from "react";
 import {
   Button,

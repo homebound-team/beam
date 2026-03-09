@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Chips } from "src/components/Chips";
 import { FieldGroup, FormLines } from "src/forms/FormLines";
 import { StaticField as StaticFieldComponent } from "src/forms/StaticField";

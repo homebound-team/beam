@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { MultiLineSelectField, Value } from "src/inputs";
@@ -6,7 +6,11 @@ import { FormLines } from "..";
 
 export default {
   component: MultiLineSelectField,
-  parameters: { backgrounds: { default: "white" } },
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 type TestOption = {

@@ -1,4 +1,4 @@
-import { Preview } from "@storybook/react";
+import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
 import { CssReset } from "../src";
 import beamTheme from "./beamTheme";
@@ -16,14 +16,14 @@ const preview: Preview = {
     },
     // https://storybook.js.org/docs/react/essentials/backgrounds
     backgrounds: {
-      values: [
-        { name: "light", value: "#F8F8F8" },
+      options: {
+        light: { name: "light", value: "#F8F8F8" },
+
         // Adding this to help view with off-white hover states
-        { name: "white", value: "#FFF" },
-        { name: "dark", value: "rgba(53,53,53,1)" },
-      ],
-      // Defaulting to an off white to better see the color palette
-      default: "light",
+        white: { name: "white", value: "#FFF" },
+
+        dark: { name: "dark", value: "rgba(53,53,53,1)" },
+      },
     },
     chromatic: {
       // Delaying Chromatic to allow animations to run
@@ -48,6 +48,12 @@ const preview: Preview = {
       );
     },
   ],
+
+  initialGlobals: {
+    backgrounds: {
+      value: "light",
+    },
+  },
 };
 
 export default preview;

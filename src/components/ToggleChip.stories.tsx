@@ -1,8 +1,8 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
-import { userEvent, waitFor, within } from "@storybook/test";
+import { Meta } from "@storybook/react-vite";
 import { Css, PresentationProvider, ToggleChip } from "src/index";
 import { newStory } from "src/utils/sb";
+import { action } from "storybook/actions";
+import { userEvent, waitFor, within } from "storybook/test";
 
 export default {
   component: ToggleChip,

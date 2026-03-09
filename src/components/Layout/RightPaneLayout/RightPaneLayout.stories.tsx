@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useMemo } from "react";
 import { ChildrenOnly } from "src/types";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";

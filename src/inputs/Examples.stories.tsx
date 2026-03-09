@@ -1,11 +1,11 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { SuperDrawerContent, useSuperDrawer } from "src/components";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator } from "src/utils/sb";
+import { action } from "storybook/actions";
 import { SelectField } from "./SelectField";
 import { TextAreaField } from "./TextAreaField";
 import { TextField } from "./TextField";

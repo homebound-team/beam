@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { stageSingleFilter } from "src/components/Filters/testDomain";
 import { Filters } from "src/components/index";
 

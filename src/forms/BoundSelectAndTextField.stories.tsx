@@ -1,5 +1,5 @@
 import { ObjectConfig, required, useFormState } from "@homebound/form-state";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Observer } from "mobx-react";
 import { BoundSelectAndTextField } from "src";
 import { ScheduleTypes } from "src/components/Filters/testDomain";

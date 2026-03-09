@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { Placement, Tooltip } from "./Tooltip";
 

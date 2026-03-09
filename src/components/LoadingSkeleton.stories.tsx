@@ -48,4 +48,4 @@ export const Contrast = () => (
     <LoadingSkeleton rows={5} contrast />
   </div>
 );
-Contrast.parameters = { backgrounds: { default: "dark" } };
+Contrast.globals = { backgrounds: { value: "dark" } };

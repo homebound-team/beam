@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { StepperFormApp as StepperFormAppComponent } from "src/forms/StepperFormApp";
 
 export default {

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useCallback, useMemo, useState } from "react";
 import { Button, collapseColumn, column, GridColumn, GridDataRow, GridTable, simpleHeader } from "src/components";
 import { Css } from "src/Css";
@@ -6,8 +6,17 @@ import { withRouter, zeroTo } from "src/utils/sb";
 import { SelectField } from "../SelectField";
 
 export default {
-  parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
+  parameters: {
+    layout: "fullscreen",
+  },
+
   decorators: [withRouter()],
+
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 export function InVirtualizedTable() {

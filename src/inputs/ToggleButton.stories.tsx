@@ -1,8 +1,8 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { isPromise } from "src/utils";
+import { action } from "storybook/actions";
 import {
   ToggleButton as ToggleButtonComponent,
   ToggleButtonProps,
@@ -13,11 +13,17 @@ import {
 
 export default {
   component: ToggleButtonComponent,
+
   parameters: {
-    backgrounds: { default: "white" },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31580%3A99845",
+    },
+  },
+
+  globals: {
+    backgrounds: {
+      value: "white",
     },
   },
 } as Meta<ToggleButtonProps>;

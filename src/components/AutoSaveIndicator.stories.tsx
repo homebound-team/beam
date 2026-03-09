@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { AutoSaveStatus, AutoSaveStatusContext, AutoSaveStatusProvider } from ".";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 import { Button } from "./Button";

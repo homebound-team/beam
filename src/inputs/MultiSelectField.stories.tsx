@@ -1,5 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import type { IconKey } from "src/components";
 import { Icon } from "src/components";
@@ -7,6 +6,7 @@ import { Css } from "src/Css";
 import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { zeroTo } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: MultiSelectField,

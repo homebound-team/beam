@@ -1,5 +1,5 @@
 import { ObjectConfig, required, useFormState } from "@homebound/form-state";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import {
   boundCheckboxField,

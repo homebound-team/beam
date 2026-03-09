@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { IconCardGroup, IconCardGroupItemOption, IconCardGroupProps } from "./IconCardGroup";

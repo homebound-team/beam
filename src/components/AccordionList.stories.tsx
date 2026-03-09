@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Chip } from "src";
 import { Css } from "src/Css";
 import { AccordionProps } from "./Accordion";
@@ -6,7 +6,11 @@ import { AccordionList } from "./AccordionList";
 
 export default {
   component: AccordionList,
-  parameters: { backgrounds: { default: "white" } },
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 export function AccordionListWithMultipleSelections() {
