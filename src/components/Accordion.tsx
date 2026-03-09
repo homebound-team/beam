@@ -1,5 +1,5 @@
 import { useId, useResizeObserver } from "@react-aria/utils";
-import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Only, Padding, Palette, Xss } from "src/Css";
@@ -55,7 +55,12 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
   const id = useId();
   const [expanded, setExpanded] = useState(defaultExpanded && !disabled);
   const { isFocusVisible, focusProps } = useFocusRing();
-  const contentRef = useRef<HTMLDivElement>(null);
+  // Use a state-based ref so that useResizeObserver re-subscribes when the content div mounts/unmounts.
+  // In react-aria v3.33+, useResizeObserver wraps onResize in useEffectEvent, so only ref/box changes in the deps
+  // trigger re-subscription. A plain useRef never changes identity, so the observer would not be created when the
+  // conditionally-rendered content div appears.
+  const [contentEl, setContentEl] = useState<HTMLDivElement | null>(null);
+  const contentRef = useMemo(() => ({ current: contentEl }), [contentEl]);
   // On initial render, if the accordion is expanded, then set `height` to auto to avoid unnecessary animation on render.
   const [contentHeight, setContentHeight] = useState(expanded ? "auto" : "0");
 
@@ -67,18 +72,22 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     // When the `expanded` value changes - If true, it means the Accordion's content has been rendered, Otherwise, it's been hidden
     // Then when the content is displayed, the calculate its height so we can give this value to the container to animate height smoothly.
     // When content is removed, simply set the height back to 0
-    setContentHeight(expanded && contentRef.current ? `${contentRef.current.scrollHeight}px` : "0");
-  }, [expanded]);
+    setContentHeight(expanded && contentEl ? `${contentEl.scrollHeight}px` : "0");
+  }, [expanded, contentEl]);
 
   // Using a resizing observer to check if the content of the accordion changes (i.e. lazy loaded image, auto-sizing textarea, etc..),
   // If it does change, then we need to update the container's height accordingly. Only update the height if the accordion is expanded.
   // Note - This may result in two `setContentHeight` calls when the accordion opens: (1) via the above `useEffect` and (2) in `onResize`
   //        Both `setContentHeight` calls _should_ set the same value, so no unnecessary re-renders would be triggered, making this a harmless additional set call.
+  // Note - react-aria v3.33+ wraps onResize in useEffectEvent, so changes to onResize's identity
+  //        do NOT cause useResizeObserver to re-subscribe. Only `ref` changes trigger that (see
+  //        contentRef/useMemo above). The useCallback deps here still matter for closure freshness
+  //        (so the callback sees current values), just not for re-subscription.
   const onResize = useCallback(() => {
-    if (contentRef.current && expanded) {
-      setContentHeight(`${contentRef.current.scrollHeight}px`);
+    if (contentEl && expanded) {
+      setContentHeight(`${contentEl.scrollHeight}px`);
     }
-  }, [expanded, setContentHeight]);
+  }, [expanded, contentEl, setContentHeight]);
   useResizeObserver({ ref: contentRef, onResize });
 
   const toggle = useCallback(() => {
@@ -142,7 +151,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
         css={Css.oh.h(contentHeight).add("transition", "height 250ms ease-in-out").$}
       >
         {expanded && (
-          <div css={Css.px2.pb2.pt1.if(omitPadding).p0.$} ref={contentRef} {...tid.content}>
+          <div css={Css.px2.pb2.pt1.if(omitPadding).p0.$} ref={setContentEl} {...tid.content}>
             {children}
           </div>
         )}

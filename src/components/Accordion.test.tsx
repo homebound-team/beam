@@ -2,7 +2,34 @@ import { jest } from "@jest/globals";
 import { click, render } from "src/utils/rtl";
 import { Accordion } from "./Accordion";
 
-describe(Accordion, () => {
+describe("Accordion", () => {
+  it("subscribes ResizeObserver to content when expanded", async () => {
+    // Mock ResizeObserver so we can verify it's created when the accordion expands
+    const observeMock = jest.fn();
+    const unobserveMock = jest.fn();
+    const disconnectMock = jest.fn();
+    const origResizeObserver = window.ResizeObserver;
+    window.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe: observeMock,
+      unobserve: unobserveMock,
+      disconnect: disconnectMock,
+    })) as any;
+
+    try {
+      // Given a collapsed accordion
+      const r = await render(<Accordion title="Test title">Test description</Accordion>);
+      // ResizeObserver should not have been asked to observe anything yet
+      expect(observeMock).not.toHaveBeenCalled();
+      // When expanding the accordion
+      click(r.accordion_title);
+      // Then a ResizeObserver should be observing the content element
+      expect(observeMock).toHaveBeenCalledTimes(1);
+      expect(observeMock).toHaveBeenCalledWith(r.accordion_content, { box: undefined });
+    } finally {
+      window.ResizeObserver = origResizeObserver;
+    }
+  });
+
   it("displays the correct content", async () => {
     // Given an accordion component
     // When rendered
