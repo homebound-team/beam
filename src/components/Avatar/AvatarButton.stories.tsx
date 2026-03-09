@@ -1,7 +1,7 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { AvatarButton, AvatarButtonProps, hoverStyles, pressedStyles } from "src/components/Avatar/AvatarButton";
 import { Css } from "src/Css";
+import { action } from "storybook/actions";
 
 export default {
   component: AvatarButton,

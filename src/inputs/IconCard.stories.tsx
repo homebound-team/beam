@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Css, IconCard, IconCardProps } from "src";
 import { iconCardStylesHover } from "src/inputs/IconCard";
 

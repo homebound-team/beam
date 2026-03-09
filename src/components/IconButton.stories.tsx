@@ -1,5 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import {
   Css,
   IconButton,
@@ -12,24 +11,32 @@ import {
 } from "src";
 import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: IconButton,
   decorators: [withRouter()],
+
   args: {
     icon: "arrowBack",
     onClick: action("onPress"),
   },
+
   argTypes: {
     icon: { control: { type: "select", options: Object.keys(Icons) } },
     autoFocus: { control: false },
   },
+
   parameters: {
-    // To better view the hover state
-    backgrounds: { default: "white" },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31586%3A99884",
+    },
+  },
+
+  globals: {
+    backgrounds: {
+      value: "white",
     },
   },
 } as Meta<IconButtonProps>;

@@ -1,7 +1,7 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
+import { action } from "storybook/actions";
 import {
   Switch as SwitchComponent,
   switchFocusStyles,

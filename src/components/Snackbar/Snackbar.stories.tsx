@@ -1,11 +1,11 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useState } from "react";
 import { Button, ButtonVariant, useSnackbar } from "src/components";
 import { Offset, Snackbar } from "src/components/Snackbar/Snackbar";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
   actionLabel?: string;

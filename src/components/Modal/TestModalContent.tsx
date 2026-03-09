@@ -1,4 +1,3 @@
-import { action } from "@storybook/addon-actions";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { InternalUser } from "src/components/Filters/testDomain";
@@ -11,6 +10,7 @@ import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
 import { DateField, TextAreaField, TextField } from "src/inputs";
+import { action } from "storybook/actions";
 
 export interface TestModalContentProps {
   initNumSentences?: number;

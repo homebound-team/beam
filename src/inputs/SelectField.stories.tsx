@@ -1,6 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
-import { within } from "@storybook/test";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { InputStylePalette } from "src/components/PresentationContext";
@@ -10,6 +8,8 @@ import { Value } from "src/inputs/Value";
 import { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
 import { withDimensions, zeroTo } from "src/utils/sb";
+import { action } from "storybook/actions";
+import { within } from "storybook/test";
 
 export default {
   component: SelectField,

@@ -1,10 +1,10 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
-import { waitFor, within } from "@storybook/test";
+import { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { noop } from "src/utils";
 import { newStory } from "src/utils/sb";
+import { action } from "storybook/actions";
+import { waitFor, within } from "storybook/test";
 
 export default {
   component: ChipTextField,

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Avatar, AvatarSize } from "src/components/Avatar/Avatar";
 import { Css } from "src/Css";
 

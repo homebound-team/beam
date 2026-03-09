@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useRef } from "react";
 import { Css, DnDGridProps } from "src";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";

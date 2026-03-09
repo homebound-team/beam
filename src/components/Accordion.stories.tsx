@@ -1,11 +1,15 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Chip } from "src";
 import { Css } from "src/Css";
 import { Accordion } from "./Accordion";
 
 export default {
   component: Accordion,
-  parameters: { backgrounds: { default: "white" } },
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 export function AccordionVariations() {

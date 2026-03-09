@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { stageFilter, stageFilterDisabledOptions } from "src/components/Filters/testDomain";
 import { Filters, multiFilter } from "src/components/index";

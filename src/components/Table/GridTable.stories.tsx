@@ -1,5 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -38,11 +37,22 @@ import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: GridTable,
-  parameters: { layout: "fullscreen", backgrounds: { default: "white" } },
+
+  parameters: {
+    layout: "fullscreen",
+  },
+
   decorators: [withRouter()],
+
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 type Data = { name: string | undefined; value: number | undefined };

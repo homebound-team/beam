@@ -1,5 +1,4 @@
-import { Decorator, ReactRenderer } from "@storybook/react";
-import { type PlayFunction as PlayFunctionType } from "@storybook/types";
+import { type Decorator, type StoryObj } from "@storybook/react-vite";
 import { ReactNode } from "react";
 import { BeamProvider } from "src/components";
 import { Css, Properties } from "src/Css";
@@ -11,7 +10,7 @@ export function withRouter(url?: string): Decorator {
 
 /* Models our currently used parameters. */
 type StoryParameters = { chromatic?: { delay?: number }; mockData?: unknown };
-type PlayFunction = PlayFunctionType<ReactRenderer>;
+type PlayFunction = NonNullable<StoryObj["play"]>;
 
 /** A somewhat typesafe way to set `FooStory.story` metadata. */
 export function newStory(

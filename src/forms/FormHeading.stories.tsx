@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { FormHeading } from "src/forms/FormHeading";
 import { FormLines } from "src/forms/FormLines";
 import { TextField } from "src/inputs/TextField";

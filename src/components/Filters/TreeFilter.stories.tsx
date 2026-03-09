@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { treeFilter } from "src/components/Filters/TreeFilter";
 import { Filters } from "src/components/index";
 import { NestedOption } from "src/inputs";

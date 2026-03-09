@@ -4,7 +4,7 @@ import { mergeConfig } from "vite";
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.tsx"],
 
-  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "@storybook/addon-interactions"],
+  addons: ["@storybook/addon-links"],
 
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },

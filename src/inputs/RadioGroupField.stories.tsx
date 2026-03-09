@@ -1,5 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { ReactNode, useState } from "react";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms";
@@ -13,6 +12,7 @@ import {
   radioReset,
   radioUnchecked,
 } from "src/inputs/RadioGroupField";
+import { action } from "storybook/actions";
 
 export default {
   component: RadioGroupField,

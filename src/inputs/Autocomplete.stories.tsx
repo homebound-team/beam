@@ -1,10 +1,10 @@
-import { action } from "@storybook/addon-actions";
-import { Meta, StoryFn } from "@storybook/react";
-import { within } from "@storybook/test";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import { useState } from "react";
 import { useFilter } from "react-aria";
 import { Css } from "src/Css";
 import { Autocomplete, AutocompleteProps } from "src/inputs/Autocomplete";
+import { action } from "storybook/actions";
+import { within } from "storybook/test";
 
 export default {
   component: Autocomplete,

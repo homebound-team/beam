@@ -18,4 +18,4 @@ function Loaders(contrast: boolean = false) {
 
 export const Regular = () => Loaders();
 export const Contrast = () => Loaders(true);
-Contrast.parameters = { backgrounds: { default: "dark" } };
+Contrast.globals = { backgrounds: { value: "dark" } };

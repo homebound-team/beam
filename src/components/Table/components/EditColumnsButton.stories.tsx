@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";

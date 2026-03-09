@@ -1,5 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components";
 import { Css } from "src/Css";
@@ -7,6 +6,7 @@ import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs/index";
 import { noop } from "src/utils";
 import { samples, withDimensions } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: Button,

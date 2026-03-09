@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { taskDueFilter } from "src/components/Filters/testDomain";
 import { Filters } from "src/components/index";
 import { Css } from "src/Css";

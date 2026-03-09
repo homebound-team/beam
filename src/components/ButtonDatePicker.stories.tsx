@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { ButtonDatePicker } from "src";
 import { Css } from "src/Css";

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Fragment, useState } from "react";
 import { Route, useHistory, useLocation, useParams } from "react-router";
 import { Link } from "react-router-dom";
@@ -12,15 +12,21 @@ import { TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
   component: TabsWithContent,
+
   parameters: {
-    // To better view the icon hover state
-    backgrounds: { default: "white" },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36087%3A106217",
     },
   },
+
   decorators: [withRouter(), withBeamDecorator],
+
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 export function TabBaseStates() {

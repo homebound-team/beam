@@ -1,6 +1,4 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
-import { within } from "@storybook/test";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components";
 import { Css } from "src/Css";
@@ -9,6 +7,8 @@ import { TreeSelectField, TreeSelectFieldProps } from "src/inputs/TreeSelectFiel
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
 import { zeroTo } from "src/utils/sb";
+import { action } from "storybook/actions";
+import { within } from "storybook/test";
 
 export default {
   component: TreeSelectField,

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Fragment } from "react";
 import { navLink } from "src/components";
 import { Css } from "src/Css";
@@ -8,23 +8,31 @@ import { getNavLinkStyles, NavLink, NavLinkProps } from "./NavLink";
 
 export default {
   component: NavLink,
+
   args: {
     href: "",
     label: "Nav link",
     variant: "side",
   },
+
   argTypes: {
     icon: { control: { type: "select", options: Object.keys(Icons) } },
   },
+
   parameters: {
-    // To better view the hover state
-    backgrounds: { default: "white" },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36081%3A105832",
     },
   },
+
   decorators: [withRouter()],
+
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
+  },
 } as Meta;
 
 export function BaseStates() {

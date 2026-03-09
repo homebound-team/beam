@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { AvatarGroup, AvatarGroupProps } from "src/components/Avatar/AvatarGroup";
 import { Css } from "src/Css";
 

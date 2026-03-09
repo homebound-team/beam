@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { format } from "date-fns";
 import { useState } from "react";
 import { Css } from "src";

@@ -1,8 +1,8 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
+import { action } from "storybook/actions";
 import { RichTextField as RichTextFieldComponent } from "./RichTextField";
 
 export default {

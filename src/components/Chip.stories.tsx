@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { Chip, ChipTypes } from "src/components/Chip";
 import { Css } from "src/Css";
 

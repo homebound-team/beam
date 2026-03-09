@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react";
-import { userEvent, waitFor, within } from "@storybook/test";
-import { PlayFunction } from "@storybook/types";
+import { Meta } from "@storybook/react-vite";
 import { Css, Properties } from "src/Css";
 import { newStory } from "src/utils/sb";
+import { PlayFunction } from "storybook/internal/types";
+import { userEvent, waitFor, within } from "storybook/test";
 import { Card as CardComponent, CardProps } from "./Card";
 
 export default {

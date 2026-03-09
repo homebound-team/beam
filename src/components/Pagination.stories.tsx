@@ -1,16 +1,21 @@
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { FormLines, StaticField } from "..";
 import { Pagination } from "./Pagination";
 
 export default {
   component: Pagination,
+
   parameters: {
-    // To better view the icon hover state
-    backgrounds: { default: "white" },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=3214%3A10519",
+    },
+  },
+
+  globals: {
+    backgrounds: {
+      value: "white",
     },
   },
 } as Meta;

@@ -1,10 +1,10 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: ButtonMenu,

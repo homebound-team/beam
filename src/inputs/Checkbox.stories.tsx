@@ -1,8 +1,8 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
+import { action } from "storybook/actions";
 
 export default {
   component: Checkbox,

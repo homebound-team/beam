@@ -1,16 +1,17 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { capitalCase } from "change-case";
 import { Button, ButtonSize, ButtonVariant, Icon } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: Button,
   decorators: [withRouter()],
-  parameters: {
-    // To better view the hover state
-    backgrounds: { default: "white" },
+  globals: {
+    backgrounds: {
+      value: "white",
+    },
   },
 } as Meta;
 
@@ -115,7 +116,7 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
 export function ContrastVariations() {
   return <ButtonVariations contrast={true} />;
 }
-ContrastVariations.parameters = { backgrounds: { default: "dark" } };
+ContrastVariations.globals = { backgrounds: { value: "dark" } };
 
 export function ButtonLink() {
   return (
@@ -204,4 +205,4 @@ export function ConstrastAsyncButton() {
   );
 }
 
-ConstrastAsyncButton.parameters = { backgrounds: { default: "dark" } };
+ConstrastAsyncButton.globals = { backgrounds: { value: "dark" } };

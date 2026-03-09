@@ -1,5 +1,5 @@
 import { useFormState } from "@homebound/form-state";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { Button, SuperDrawerContent, useSuperDrawer } from "src/components";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";

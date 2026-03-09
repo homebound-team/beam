@@ -1,9 +1,9 @@
-import { action } from "@storybook/addon-actions";
-import { Meta } from "@storybook/react";
+import { Meta } from "@storybook/react-vite";
 import { capitalCase } from "change-case";
 import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { withBeamDecorator } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: SnackbarNotice,
