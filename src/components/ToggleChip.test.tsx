@@ -1,6 +1,6 @@
-import { jest } from "@jest/globals";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 import { ToggleChip } from "./ToggleChip";
 
 describe("ToggleChip", () => {
@@ -12,7 +12,7 @@ describe("ToggleChip", () => {
   });
 
   it("handles click events", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<ToggleChip text="Click me" onClick={onClick} />);
     click(r.chip);
 

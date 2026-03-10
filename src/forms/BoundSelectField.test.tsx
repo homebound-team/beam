@@ -1,9 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { BoundSelectField } from "src/forms/BoundSelectField";
 import { AuthorHeight, AuthorInput } from "src/forms/formStateDomain";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const sports = [
   { id: "s:1", name: "Football" },
@@ -93,7 +93,7 @@ describe("BoundSelectField", () => {
 
   it("has the latest value when onChange is triggered", async () => {
     // Given a FormState/ObjectState with an onBlur callback
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
       { favoriteSport: "s:1" },

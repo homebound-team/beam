@@ -1,11 +1,11 @@
 import { render, type } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { Only } from "src/Css";
 import { TextAreaField, TextAreaFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
 import { focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 let lastSet: any = undefined;
 
@@ -26,8 +26,8 @@ describe("TextAreaFieldTest", () => {
   });
 
   it("does not fire focus/blur when readOnly", async () => {
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(<TestTextAreaField value="foo" readOnly={true} onFocus={onFocus} onBlur={onBlur} />);
     fireEvent.focus(r.note);
     fireEvent.blur(r.note);
@@ -36,8 +36,8 @@ describe("TextAreaFieldTest", () => {
   });
 
   it("fires onEnter when preventNewLines is set and hitting the Enter key and blurs field", async () => {
-    const onEnter = jest.fn();
-    const onBlur = jest.fn();
+    const onEnter = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(<TestTextAreaField value="foo" onEnter={onEnter} onBlur={onBlur} preventNewLines />);
     focus(r.note);
     expect(r.note).toHaveFocus();

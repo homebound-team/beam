@@ -1,10 +1,10 @@
 import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { act, fireEvent } from "@testing-library/react";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { AuthorInput, jan1, jan2 } from "src/forms/formStateDomain";
 import { blur, click, focus, render } from "src/utils/rtl";
 import { setUseMockComponents } from "src/utils/withTestMock";
+import { vi } from "vitest";
 
 beforeAll(() => {
   setUseMockComponents(false);
@@ -12,8 +12,8 @@ beforeAll(() => {
 
 describe("BoundDateField", () => {
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundDateField with onFocus and onBlur methods
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundDateField field={author.birthday} onBlur={onBlur} onFocus={onFocus} />);
@@ -36,7 +36,7 @@ describe("BoundDateField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundDateField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
@@ -56,7 +56,7 @@ describe("BoundDateField", () => {
   });
 
   it("triggers 'maybeAutoSave' on enter", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundDateField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
@@ -74,7 +74,7 @@ describe("BoundDateField", () => {
   });
 
   it("respects form state's readonly property", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundDateField
     const author: ObjectState<AuthorInput> = createObjectState(formConfig, { birthday: jan2 });
     const r = await render(<BoundDateField field={author.birthday} />);

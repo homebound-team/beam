@@ -1,10 +1,10 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("BoundTextField", () => {
   it("shows the current value", async () => {
@@ -21,8 +21,8 @@ describe("BoundTextField", () => {
   });
 
   it("can blur onEnter and call onEnter callback", async () => {
-    const autoSave = jest.fn();
-    const onEnter = jest.fn();
+    const autoSave = vi.fn();
+    const onEnter = vi.fn();
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
       {},

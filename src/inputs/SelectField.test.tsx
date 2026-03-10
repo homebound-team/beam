@@ -1,17 +1,17 @@
 import { clickAndWait, typeAndWait } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { AuthorHeight } from "src/forms/formStateDomain";
 import { SelectField, SelectFieldProps, Value } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("SelectFieldTest", () => {
   it("can set a value", async () => {
     // Given a MultiSelectField
-    const onSelect = jest.fn();
-    const onBlur = jest.fn();
+    const onSelect = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <TestSelectField
         label="Age"
@@ -38,8 +38,8 @@ describe("SelectFieldTest", () => {
   });
 
   it("does not fire focus/blur when readOnly", async () => {
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <TestSelectField
         label="Age"
@@ -153,7 +153,7 @@ describe("SelectFieldTest", () => {
   });
 
   it("respects disabled options", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with a disabled option
     const r = await render(
       <SelectField
@@ -180,7 +180,7 @@ describe("SelectFieldTest", () => {
   });
 
   it("can disable options with tooltips", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with a disabled option
     const r = await render(
       <SelectField
@@ -320,7 +320,7 @@ describe("SelectFieldTest", () => {
   });
 
   it("can define and select 'unsetLabel' when options are an array", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with options that already available
     const r = await render(
       <TestSelectField
@@ -340,7 +340,7 @@ describe("SelectFieldTest", () => {
   });
 
   it("can define and select 'unsetLabel' when options are lazily loaded", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with options that are loaded lazily
     function Test() {
       const [loaded, setLoaded] = useState<HasLabelAndValue[]>([]);
@@ -427,7 +427,7 @@ describe("SelectFieldTest", () => {
 
   it("supports boolean values properly", async () => {
     // Given a select field with boolean and an undefined values
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     type Option = { id: undefined | boolean; name: string };
     function Test() {
       const [value, setValue] = useState<boolean | undefined>(true);
@@ -475,7 +475,7 @@ describe("SelectFieldTest", () => {
 
   it("allows to add a new option", async () => {
     // Given a SelectField
-    const onAddNew = jest.fn();
+    const onAddNew = vi.fn();
     const r = await render(
       <TestSelectField
         label="Age"
@@ -494,7 +494,7 @@ describe("SelectFieldTest", () => {
 
   it("calls onSearch when searching in a select field", async () => {
     // Given a mutliSelectField with options
-    const onSearchMock = jest.fn();
+    const onSearchMock = vi.fn();
     const selectedOption = options[0];
     const r = await render(
       <TestMultipleSelectFieldOnSearch

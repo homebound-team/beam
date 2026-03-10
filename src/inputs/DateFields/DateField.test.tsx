@@ -1,9 +1,9 @@
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { jan1, jan2 } from "src/forms/formStateDomain";
 import { DateFieldImpl as DateField } from "src/inputs/DateFields/DateField";
 import { noop } from "src/utils";
 import { blur, click, focus, render, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("DateField", () => {
   it("renders with date", async () => {
@@ -16,8 +16,8 @@ describe("DateField", () => {
 
   it("can select dates and calls onBlur", async () => {
     // Given a DateField with `jan2` as our date
-    const onChange = jest.fn() as any;
-    const onBlur = jest.fn() as any;
+    const onChange = vi.fn() as any;
+    const onBlur = vi.fn() as any;
     const r = await render(<DateField value={jan2} label="Date" onChange={onChange} onBlur={onBlur} />);
 
     // When clicking input element to trigger the date picker
@@ -41,7 +41,7 @@ describe("DateField", () => {
 
   it("resets to previous date if user enters invalid value", async () => {
     // Given a DateField with `jan2` as our date
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<DateField value={jan2} label="Date" onChange={onChange} />);
     // When changing the input value to an invalid date (`type` method will fire `blur` event after entering the value)
     type(r.date, "f");
@@ -51,7 +51,7 @@ describe("DateField", () => {
 
   it("fires onChange event when user types a valid date", async () => {
     // Given a DateField with `jan2` as our date
-    const onChange = jest.fn() as any;
+    const onChange = vi.fn() as any;
     const r = await render(<DateField value={jan2} label="Date" onChange={onChange} />);
     // When changing the input value to an valid date (`type` method will fire `blur` event after entering the value)
     type(r.date, "01/29/20");

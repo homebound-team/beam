@@ -1,5 +1,4 @@
-import { jest } from "@jest/globals";
-import { act } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
@@ -28,6 +27,7 @@ import {
   wait,
   withRouter,
 } from "src/utils/rtl";
+import { vi } from "vitest";
 import { GridCellContent } from "./components/cell";
 
 // Most of our tests use this simple Row and 2 columns
@@ -762,7 +762,7 @@ describe("GridTable", () => {
   describe("server-side sorting", () => {
     it("works", async () => {
       // Given the table is using server-side sorting
-      const onSort = jest.fn();
+      const onSort = vi.fn();
       const r = await render(
         <GridTable
           // And the 1st column has a sortValue callback
@@ -779,7 +779,8 @@ describe("GridTable", () => {
       // Then the callback was called
       expect(onSort).toHaveBeenCalledWith("name", "ASC");
       // And we show the sort toggle
-      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp");
+      expect(r.sortHeader_icon_0).toBeVisible();
       // And the data was not reordered (we defer to the server-side)
       expect(cell(r, 1, 0)).toHaveTextContent("foo");
 
@@ -788,7 +789,8 @@ describe("GridTable", () => {
       // Then it was called again but desc
       expect(onSort).toHaveBeenCalledWith("name", "DESC");
       // And we flip the sort toggle
-      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown");
+      expect(r.sortHeader_icon_0).toBeVisible();
 
       // And when we sort again
       click(r.sortHeader_0);
@@ -800,7 +802,7 @@ describe("GridTable", () => {
 
     it("doesn't sort columns w/o onSort", async () => {
       // Given the table is using server-side sorting
-      const onSort = jest.fn();
+      const onSort = vi.fn();
       const r = await render(
         <GridTable
           columns={[
@@ -819,7 +821,7 @@ describe("GridTable", () => {
 
     it("initializes with asc sorting", async () => {
       // Given the table is using server-side sorting
-      const onSort = jest.fn();
+      const onSort = vi.fn();
       const r = await render(
         <GridTable
           // And the 1st column has a sort key
@@ -834,12 +836,13 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted asc
-      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortUp");
+      expect(r.sortHeader_icon_0).toBeVisible();
     });
 
     it("initializes with desc sorting", async () => {
       // Given the table is using server-side sorting
-      const onSort = jest.fn();
+      const onSort = vi.fn();
       const r = await render(
         <GridTable
           // And the 1st column has a sort key
@@ -854,7 +857,8 @@ describe("GridTable", () => {
         />,
       );
       // Then it is shown as initially sorted desc
-      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown").toBeVisible();
+      expect(r.sortHeader_icon_0).toHaveAttribute("data-icon", "sortDown");
+      expect(r.sortHeader_icon_0).toBeVisible();
     });
 
     it("can pin rows first", async () => {
@@ -979,7 +983,7 @@ describe("GridTable", () => {
   });
 
   it("can handle onClick for rows", async () => {
-    const onClick = jest.fn() as any;
+    const onClick = vi.fn() as any;
     const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
     const r = await render(<GridTable {...{ columns, rows, rowStyles }} />);
     click(cell(r, 1, 0));
@@ -989,7 +993,7 @@ describe("GridTable", () => {
 
   it("can omit onClick for columns", async () => {
     // Given rowStyles that specify an action for each row
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
     // And a table where one columns omits wrapping the action
     const r = await render(
@@ -1021,7 +1025,7 @@ describe("GridTable", () => {
   });
 
   it("can handle onClick for GridCellContent", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     // Given a table with an onClick specified GridCellContent
     const nameColumn: GridColumn<Row> = {
       header: () => "Name",
@@ -2579,6 +2583,10 @@ describe("GridTable", () => {
 
     // When clicking the cell
     click(cell(r, 1, 1));
+    // Clear the hover state that jsdom applies after click, so the row's :hover > * rule
+    // doesn't override the cell's active background color
+    fireEvent.pointerLeave(cell(r, 1, 1));
+    fireEvent.mouseLeave(row(r, 1));
 
     // Then the first row/cell has the 'active' background color
     expect(cell(r, 1, 1)).toHaveStyle({ backgroundColor: Palette.Blue50 });
@@ -3064,7 +3072,7 @@ describe("GridTable", () => {
     });
 
     it("auto assigns 'visibleColumnsStorageKey'", async () => {
-      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
 
       // Given some hide-able columns
       const columns: GridColumn<Row>[] = [
@@ -3080,7 +3088,7 @@ describe("GridTable", () => {
     });
 
     it("accepts a specified 'visibleColumnsStorageKey'", async () => {
-      jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
 
       // Given some hide-able columns
       const columns: GridColumn<Row>[] = [

@@ -1,8 +1,8 @@
 import { click, render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { useState } from "react";
 import { MultiLineSelectField, MultiLineSelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
+import { vi } from "vitest";
 
 const options = [
   { id: "1", name: "Project one" },
@@ -11,7 +11,7 @@ const options = [
 ];
 
 describe("MultiLineSelectField", () => {
-  const onSelect = jest.fn();
+  const onSelect = vi.fn();
 
   it("has an empty select field by default", async () => {
     // Given a MultiLineSelectField with no selected values

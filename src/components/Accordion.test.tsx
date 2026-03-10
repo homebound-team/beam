@@ -1,19 +1,19 @@
-import { jest } from "@jest/globals";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 import { Accordion } from "./Accordion";
 
 describe("Accordion", () => {
   it("subscribes ResizeObserver to content when expanded", async () => {
     // Mock ResizeObserver so we can verify it's created when the accordion expands
-    const observeMock = jest.fn();
-    const unobserveMock = jest.fn();
-    const disconnectMock = jest.fn();
+    const observeMock = vi.fn();
+    const unobserveMock = vi.fn();
+    const disconnectMock = vi.fn();
     const origResizeObserver = window.ResizeObserver;
-    window.ResizeObserver = jest.fn().mockImplementation(() => ({
-      observe: observeMock,
-      unobserve: unobserveMock,
-      disconnect: disconnectMock,
-    })) as any;
+    window.ResizeObserver = vi.fn().mockImplementation(function (this: any) {
+      this.observe = observeMock;
+      this.unobserve = unobserveMock;
+      this.disconnect = disconnectMock;
+    }) as any;
 
     try {
       // Given a collapsed accordion
@@ -103,7 +103,7 @@ describe("Accordion", () => {
 
   it("calls the titleOnClick function when the title is clicked", async () => {
     // Given an accordion component with titleOnClick set
-    const titleOnClick = jest.fn();
+    const titleOnClick = vi.fn();
     // When rendered
     const r = await render(
       <Accordion title="Test title" titleOnClick={titleOnClick}>
@@ -118,7 +118,7 @@ describe("Accordion", () => {
 
   it("calls the onToggle function when the accordion is expanded/collapsed", async () => {
     // Given an accordion component with onToggle set
-    const onToggle = jest.fn();
+    const onToggle = vi.fn();
     // When rendered
     const r = await render(
       <Accordion title="Test title" titleOnClick={onToggle}>

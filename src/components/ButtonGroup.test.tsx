@@ -1,12 +1,12 @@
-import { jest } from "@jest/globals";
 import { ButtonGroup, ButtonGroupButton } from "src/components/ButtonGroup";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 import { Css } from "..";
 
 describe("ButtonGroup", () => {
   it("renders and fires callbacks", async () => {
-    const firstButtonOnClick = jest.fn();
-    const lastButtonOnClick = jest.fn();
+    const firstButtonOnClick = vi.fn();
+    const lastButtonOnClick = vi.fn();
     const textButtons: ButtonGroupButton[] = [
       { text: "First", onClick: firstButtonOnClick },
       { text: "Last", onClick: lastButtonOnClick },

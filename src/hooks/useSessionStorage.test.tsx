@@ -1,6 +1,6 @@
-import { jest } from "@jest/globals";
 import { TextField } from "src/inputs/TextField";
 import { render, type } from "src/utils/rtl";
+import { vi } from "vitest";
 import { useSessionStorage } from "./useSessionStorage";
 
 describe("useSessionStorage", () => {
@@ -21,7 +21,7 @@ describe("useSessionStorage", () => {
   });
 
   it("can set a value to session storage", async () => {
-    jest.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+    vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
     // Given a saved value in session storage
     sessionStorage.setItem("test", '{ "firstName": "saved" }');
     // Given a test component

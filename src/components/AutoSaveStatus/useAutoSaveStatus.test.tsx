@@ -1,12 +1,12 @@
-import { jest } from "@jest/globals";
 import { act, renderHook } from "@testing-library/react";
+import { vi } from "vitest";
 import { AutoSaveStatus, AutoSaveStatusProvider } from "./AutoSaveStatusProvider";
 import { useAutoSaveStatus } from "./useAutoSaveStatus";
 
 describe("useAutoSaveStatus", () => {
   /** The internal setTimeout running after tests is spamming the console, so cancel them all here */
   afterEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   it("renders without a provider", () => {
@@ -83,7 +83,7 @@ describe("useAutoSaveStatus", () => {
     expect(result.current.status).toBe(AutoSaveStatus.DONE);
     // But when the timer runs out
     act(() => {
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
     });
     // Then the status is reset to Idle
     expect(result.current.status).toBe(AutoSaveStatus.IDLE);
@@ -110,7 +110,7 @@ describe("useAutoSaveStatus", () => {
     act(() => result.current.triggerAutoSave());
     act(() => result.current.resolveAutoSave(new Error("Some error")));
     act(() => {
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
     });
 
     expect(result.current.status).toBe(AutoSaveStatus.ERROR);
@@ -126,7 +126,7 @@ describe("useAutoSaveStatus", () => {
     act(() => result.current.triggerAutoSave());
     act(() => result.current.resolveAutoSave(new Error("Some error")));
     act(() => {
-      jest.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
     });
     act(() => result.current.resetStatus());
 

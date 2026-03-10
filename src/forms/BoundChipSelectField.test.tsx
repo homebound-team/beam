@@ -1,9 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { BoundChipSelectField } from "src";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus, render, wait } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("BoundChipSelectField", () => {
   it("renders", async () => {
@@ -22,7 +22,7 @@ describe("BoundChipSelectField", () => {
 
   it("can select a value and fire auto save", async () => {
     // Given a BoundChipSelectField within a FormState without an existing value
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     const formState: ObjectState<AuthorInput> = createObjectState(
       formConfig,
       {},
@@ -42,7 +42,7 @@ describe("BoundChipSelectField", () => {
 
   it("fires auto save after `onCreateNew`", async () => {
     // Given a BoundChipSelectField within a FormState without an existing value
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     const formState: ObjectState<AuthorInput> = createObjectState(
       formConfig,
       {},
@@ -74,8 +74,8 @@ describe("BoundChipSelectField", () => {
 
   it("can fire callbacks", async () => {
     // Given a BoundChipSelectField within a FormState with explicit `onFocus` and `onBlur` callbacks
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const formState = createObjectState(formConfig, { favoriteSport: "s:2" });
     const r = await render(
       <BoundChipSelectField field={formState.favoriteSport} options={sports} onFocus={onFocus} onBlur={onBlur} />,

@@ -1,11 +1,11 @@
 import { blur, focus, render, type } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useRef, useState } from "react";
 import { Only } from "src/Css";
 import { TextField, TextFieldApi, TextFieldProps } from "src/inputs";
 import { TextFieldXss } from "src/interfaces";
 import { click } from "src/utils/rtl";
+import { vi } from "vitest";
 
 let lastSet: any = undefined;
 
@@ -41,8 +41,8 @@ describe("TextFieldTest", () => {
   });
 
   it("does not fire focus/blur when readOnly", async () => {
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(<TestTextField value="foo" readOnly={true} onBlur={onBlur} onFocus={onFocus} />);
     expect(r.name).toHaveAttribute("data-readonly");
     focus(r.name);
@@ -71,7 +71,7 @@ describe("TextFieldTest", () => {
   });
 
   it("can use TextFielApi to focus input", async () => {
-    const onFocus = jest.fn();
+    const onFocus = vi.fn();
     // Given a textfield
     const r = await render(<TestTextField value="foo" onFocus={onFocus} />);
     // With the field not in focus
@@ -85,8 +85,8 @@ describe("TextFieldTest", () => {
   });
 
   it("can trigger onEnter callback", async () => {
-    const onEnter = jest.fn();
-    const onBlur = jest.fn();
+    const onEnter = vi.fn();
+    const onBlur = vi.fn();
     // Given a Textfield
     const r = await render(<TestTextField value="foo" onEnter={onEnter} onBlur={onBlur} />);
     // With focus
@@ -101,7 +101,7 @@ describe("TextFieldTest", () => {
   });
 
   it("can bubble escape", async () => {
-    const onEscape = jest.fn();
+    const onEscape = vi.fn();
     // Given a TextField
     const r = await render(
       <div onKeyDown={onEscape}>

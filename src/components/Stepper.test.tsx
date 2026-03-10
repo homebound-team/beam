@@ -1,11 +1,11 @@
-import { jest } from "@jest/globals";
 import { Step, Stepper } from "src/components/Stepper";
 import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
+import { vi } from "vitest";
 
 describe("Stepper", () => {
   it("renders and invokes onChange", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     // Given the stepper with 3 steps. The first disabled and complete, the second incomplete, and the third in error state.
     const steps: Step[] = zeroTo(3).map((idx) => ({
       label: `Step ${idx === 0 ? "A" : idx === 1 ? "B" : "C"}`,
@@ -22,10 +22,14 @@ describe("Stepper", () => {
     expect(r.stepper_step_2).toHaveAttribute("aria-current", "false");
 
     // And the button elements for each step have the expected states
-    expect(r.stepper_stepButton_stepA).toBeDisabled().toHaveTextContent("Step A");
-    expect(r.stepper_stepButton_stepB).not.toBeDisabled().toHaveTextContent("Step B");
-    expect(r.stepper_stepButton_stepC).not.toBeDisabled().toHaveTextContent("Step C");
-    expect(r.stepper_stepButton_stepC).not.toBeDisabled().toHaveTextContent("Step C");
+    expect(r.stepper_stepButton_stepA).toBeDisabled();
+    expect(r.stepper_stepButton_stepA).toHaveTextContent("Step A");
+    expect(r.stepper_stepButton_stepB).not.toBeDisabled();
+    expect(r.stepper_stepButton_stepB).toHaveTextContent("Step B");
+    expect(r.stepper_stepButton_stepC).not.toBeDisabled();
+    expect(r.stepper_stepButton_stepC).toHaveTextContent("Step C");
+    expect(r.stepper_stepButton_stepC).not.toBeDisabled();
+    expect(r.stepper_stepButton_stepC).toHaveTextContent("Step C");
 
     // And when clicking Step 3
     click(r.stepper_stepButton_stepC);

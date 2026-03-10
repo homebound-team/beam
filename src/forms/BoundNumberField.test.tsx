@@ -1,11 +1,11 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { act, fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, focus, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("BoundNumberField", () => {
   it("shows the current value", async () => {
@@ -86,8 +86,8 @@ describe("BoundNumberField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundNumberField with onFocus and onBlur methods
     const author = createObjectState(formConfig, { heightInInches: 10 });
     const r = await render(<BoundNumberField field={author.heightInInches} onBlur={onBlur} onFocus={onFocus} />);
@@ -104,7 +104,7 @@ describe("BoundNumberField", () => {
   });
 
   it("triggers 'maybeAutoSave' on enter", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundNumberField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,

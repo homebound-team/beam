@@ -1,11 +1,11 @@
 import { clickAndWait } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { jan10, jan2 } from "src/forms/formStateDomain";
 import { DateFieldBase } from "src/inputs/DateFields/DateFieldBase";
 import { noop } from "src/utils";
 import { blur, click, focus, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe(DateFieldBase, () => {
   it("renders with placeholder", async () => {
@@ -14,7 +14,8 @@ describe(DateFieldBase, () => {
       <DateFieldBase mode="single" value={undefined} label="Date" onChange={noop} placeholder="Select a date" />,
     );
     // Then value should not be set and placeholder should be set.
-    expect(r.date).toHaveValue("").toHaveAttribute("placeholder", "Select a date");
+    expect(r.date).toHaveValue("");
+    expect(r.date).toHaveAttribute("placeholder", "Select a date");
   });
 
   it("renders with error message", async () => {
@@ -50,11 +51,12 @@ describe(DateFieldBase, () => {
     // Then the calendar icon isn't rendered
     expect(r.queryByTestId("date_calendarButton")).toBeNull();
     // And the placeholder is still there
-    expect(r.date).toHaveValue("").toHaveAttribute("placeholder", "Select a date");
+    expect(r.date).toHaveValue("");
+    expect(r.date).toHaveAttribute("placeholder", "Select a date");
   });
 
   it("clicking calendar button triggers date picker", async () => {
-    const onBlur = jest.fn();
+    const onBlur = vi.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
     // Given focus set on the input element.
     focus(r.date);
@@ -65,7 +67,7 @@ describe(DateFieldBase, () => {
   });
 
   it("does not call onBlur when changing focus to the calendar overlay", async () => {
-    const onBlur = jest.fn();
+    const onBlur = vi.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
     // When clicking input element to trigger the date picker
     click(r.date);
@@ -76,7 +78,7 @@ describe(DateFieldBase, () => {
   });
 
   it("calls onBlur once the calendar overlay closes and focus is not returned to the input field", async () => {
-    const onBlur = jest.fn();
+    const onBlur = vi.fn();
     const r = await render(<DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onBlur={onBlur} />);
     // When clicking input element to trigger the date picker
     click(r.date);
@@ -108,8 +110,8 @@ describe(DateFieldBase, () => {
 
   it("can fire onFocus and onBlur when interacting with the input field only", async () => {
     // Given a DateField with `onFocus` and `onBlur`
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     const r = await render(
       <DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onFocus={onFocus} onBlur={onBlur} />,
     );
@@ -129,8 +131,8 @@ describe(DateFieldBase, () => {
 
   it("fires onEnter and blurs field when pressing Enter key", async () => {
     // Given a DateField with `jan2` as our date
-    const onEnter = jest.fn();
-    const onBlur = jest.fn();
+    const onEnter = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <DateFieldBase mode="single" value={jan2} label="Date" onChange={noop} onEnter={onEnter} onBlur={onBlur} />,
     );

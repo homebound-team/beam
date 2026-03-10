@@ -1,8 +1,8 @@
-import { jest } from "@jest/globals";
 import { IconButton } from "src/components/IconButton";
 import { noop } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
+import { vi } from "vitest";
 
 describe("IconButton", () => {
   it("can add tooltips", async () => {
@@ -27,7 +27,7 @@ describe("IconButton", () => {
   });
 
   it("fires onClick method", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<IconButton icon="trash" onClick={onClick} />);
     expect(r.trash.tagName).toBe("BUTTON");
     click(r.trash);
@@ -37,24 +37,24 @@ describe("IconButton", () => {
   it("applies expected properties when rendering a link with an absolute url", async () => {
     const r = await render(<IconButton icon="trash" onClick="https://www.homebound.com" />, withRouter());
     expect(r.trash.tagName).toBe("A");
-    expect(r.trash)
-      .toHaveAttribute("href", "https://www.homebound.com")
-      .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener");
+    expect(r.trash).toHaveAttribute("href", "https://www.homebound.com");
+    expect(r.trash).toHaveAttribute("target", "_blank");
+    expect(r.trash).toHaveAttribute("rel", "noreferrer noopener");
   });
 
   it("applies expected properties when rendering a link with a relative url", async () => {
     const r = await render(<IconButton icon="trash" onClick="/testPath" />, withRouter());
     expect(r.trash.tagName).toBe("A");
-    expect(r.trash).toHaveAttribute("href", "/testPath").not.toHaveAttribute("target").not.toHaveAttribute("rel");
+    expect(r.trash).toHaveAttribute("href", "/testPath");
+    expect(r.trash).not.toHaveAttribute("target");
+    expect(r.trash).not.toHaveAttribute("rel");
   });
 
   it("applies expected properties when rendering a link with a relative url to open in new tab", async () => {
     const r = await render(<IconButton icon="trash" onClick="/testPath" openInNew />, withRouter());
     expect(r.trash.tagName).toBe("A");
-    expect(r.trash)
-      .toHaveAttribute("href", "/testPath")
-      .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener");
+    expect(r.trash).toHaveAttribute("href", "/testPath");
+    expect(r.trash).toHaveAttribute("target", "_blank");
+    expect(r.trash).toHaveAttribute("rel", "noreferrer noopener");
   });
 });

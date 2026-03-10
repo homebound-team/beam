@@ -5,7 +5,8 @@ describe(Avatar, () => {
   it("renders image", async () => {
     const src = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
     const r = await render(<Avatar src={src} name="Test" />);
-    expect(r.avatar).toHaveAttribute("src", src).toHaveAttribute("alt", "Test");
+    expect(r.avatar).toHaveAttribute("src", src);
+    expect(r.avatar).toHaveAttribute("alt", "Test");
   });
 
   it("renders fallback if undefined", async () => {

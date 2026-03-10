@@ -1,7 +1,7 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 import { BoundIconCardGroupField } from "./BoundIconCardGroupField";
 import { AuthorInput } from "./formStateDomain";
 
@@ -32,7 +32,7 @@ describe("BoundIconCardGroupField", () => {
     expect(r.favoriteGenres_label).toHaveTextContent("Favorite Genres");
   });
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundIconCardGroupField with auto save
     const author: ObjectState<NewAuthor> = createObjectState(
       formConfig,

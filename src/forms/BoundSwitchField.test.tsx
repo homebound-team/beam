@@ -1,8 +1,8 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { click, render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { BoundSwitchField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
+import { vi } from "vitest";
 
 describe("BoundSwitchField", () => {
   it("should be checked", async () => {
@@ -15,7 +15,7 @@ describe("BoundSwitchField", () => {
   });
 
   it("should uncheck when clicked", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a rendered checked BoundSwitchField
     const formState: ObjectState<AuthorInput> = createObjectState(
       formConfig,

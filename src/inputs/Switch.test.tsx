@@ -1,11 +1,11 @@
-import { jest } from "@jest/globals";
 import { useState } from "react";
 import { Switch as SwitchComponent, SwitchProps } from "src/inputs";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("Switch", () => {
   it("can change", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     // Given a switch
     const r = await render(<SwitchTest label="Age" onChange={onChange} />);
     // Then it defaults no checked

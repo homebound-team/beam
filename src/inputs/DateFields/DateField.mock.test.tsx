@@ -1,8 +1,8 @@
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { DateFieldMock as MockDateField } from "src/inputs/DateFields/DateField.mock";
 import { noop } from "src/utils";
 import { render, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("DateFieldMock", () => {
   it("formats date value when provided", async () => {
@@ -11,7 +11,7 @@ describe("DateFieldMock", () => {
   });
 
   it("fires onChange with selected date", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<MockDateField label="Start Date" value={undefined} onChange={onChange} />);
     // When we change the date
     type(r.date, "02/11/20");
@@ -22,8 +22,8 @@ describe("DateFieldMock", () => {
 
   it("fires onFocus and onBlur", async () => {
     // Given a mock DateField with onBlur and onFocus callbacks
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <MockDateField label="Start Date" value={undefined} onChange={noop} onFocus={onFocus} onBlur={onBlur} />,
     );

@@ -1,9 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { click, render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { BoundCheckboxField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value", rules: [required] },
@@ -35,8 +35,8 @@ describe("BoundCheckboxField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundCheckboxField with onFocus and onBlur methods
     const formState = createObjectState(formConfig, { isAvailable: true });
     const r = await render(<BoundCheckboxField field={formState.isAvailable} onBlur={onBlur} onFocus={onFocus} />);
@@ -51,7 +51,7 @@ describe("BoundCheckboxField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundCheckboxField with auto save
     const formState: ObjectState<AuthorInput> = createObjectState(
       formConfig,

@@ -1,7 +1,7 @@
-import { jest } from "@jest/globals";
 import { Checkbox } from "src/inputs/Checkbox";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("Checkbox", () => {
   it("can set default test ids", async () => {
@@ -21,7 +21,7 @@ describe("Checkbox", () => {
 
   it("treats indeterminate as false", async () => {
     // Given an indeterminate checkbox
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<Checkbox label="Test" selected="indeterminate" onChange={onChange} />);
     // When the user clicks it
     click(r.test);

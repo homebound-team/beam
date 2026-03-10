@@ -1,7 +1,7 @@
-import { jest } from "@jest/globals";
 import { SnackbarNotice } from "src/components/Snackbar/SnackbarNotice";
 import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("SnackbarNotice", () => {
   it("renders the default snackbar notice layout", async () => {
@@ -13,7 +13,7 @@ describe("SnackbarNotice", () => {
   });
 
   it("fires onClose callback", async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     const r = await render(<SnackbarNotice id="1" onClose={onClose} message="message" />);
     click(r.snackbar_close);
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -35,7 +35,7 @@ describe("SnackbarNotice", () => {
   });
 
   it("can render the action and fire the callback", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(
       <SnackbarNotice id="1" onClose={noop} message="message" action={{ label: "Action", onClick }} />,
     );

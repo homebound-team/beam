@@ -1,10 +1,10 @@
 import { render, type } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { jan1, jan10, jan19, jan2 } from "src/forms/formStateDomain";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { noop } from "src/utils";
 import { click, focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("DateRangeField", () => {
   it("renders with date", async () => {
@@ -16,8 +16,8 @@ describe("DateRangeField", () => {
   });
 
   it("should keep calendar open while selecting dates and calls on blur when overlay closes", async () => {
-    const onBlur = jest.fn() as any;
-    const onChange = jest.fn() as any;
+    const onBlur = vi.fn() as any;
+    const onChange = vi.fn() as any;
     // Given a DateRangeField with existing value
     const r = await render(
       <DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} onBlur={onBlur} />,
@@ -43,8 +43,8 @@ describe("DateRangeField", () => {
   });
 
   it("can unset the input value while selecting dates", async () => {
-    const onBlur = jest.fn();
-    const onChange = jest.fn();
+    const onBlur = vi.fn();
+    const onChange = vi.fn();
     // Given a DateRangeField with existing value
     const r = await render(
       <DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} onBlur={onBlur} />,
@@ -56,32 +56,36 @@ describe("DateRangeField", () => {
     // And clicking on a value in the date picker
     click(r.datePickerDay_0);
     // Then `onChange` should have been called once
-    expect(onChange).toBeCalledTimes(1).toBeCalledWith({ from: jan1, to: jan10 });
+    expect(onChange).toBeCalledTimes(1);
+    expect(onChange).toBeCalledWith({ from: jan1, to: jan10 });
     // And clicking the same date a second time to 'unset' the current range
     click(r.datePickerDay_0);
     // Then expect the input to have been cleared
     expect(r.date).toHaveValue("");
     // And `onChange` should be called with `undefined`
-    expect(onChange).toBeCalledTimes(2).toBeCalledWith(undefined);
+    expect(onChange).toBeCalledTimes(2);
+    expect(onChange).toBeCalledWith(undefined);
 
     // When selecting the start/'from' date
     click(r.datePickerDay_0);
     // Then the field is updated
     expect(r.date).toHaveValue("01/01/20 - ");
     // And `onChange` should be called with `undefined`
-    expect(onChange).toBeCalledTimes(3).toBeCalledWith(undefined);
+    expect(onChange).toBeCalledTimes(3);
+    expect(onChange).toBeCalledWith(undefined);
 
     // When selecting the end/'to' date
     click(r.datePickerDay_18);
     // Then the field should be updated with the proper values
     expect(r.date).toHaveValue("01/01/20 - 01/19/20");
     // And onChange should be called with the new range
-    expect(onChange).toBeCalledTimes(4).toBeCalledWith({ from: jan1, to: jan19 });
+    expect(onChange).toBeCalledTimes(4);
+    expect(onChange).toBeCalledWith({ from: jan1, to: jan19 });
   });
 
   it("resets to previous date if user enters invalid value", async () => {
     // Given a DateRangeField with `jan2` as our date
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} />);
     // When changing the input value to an invalid date (`type` method will fire `blur` event after entering the value)
     type(r.date, "f");
@@ -91,7 +95,7 @@ describe("DateRangeField", () => {
 
   it("fires onChange event when user types a valid date", async () => {
     // Given a DateRangeField with `jan2` as our date
-    const onChange = jest.fn() as any;
+    const onChange = vi.fn() as any;
     const r = await render(<DateRangeField value={{ from: jan2, to: jan10 }} label="Date" onChange={onChange} />);
     // When changing the input value to an valid date (`type` method will fire `blur` event after entering the value)
     type(r.date, "01/01/20 - 01/19/20");

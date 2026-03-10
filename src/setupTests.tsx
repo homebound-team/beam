@@ -1,7 +1,6 @@
-import { jest } from "@jest/globals";
-import "@testing-library/jest-dom";
-import "jest-chain";
+import "@testing-library/jest-dom/vitest";
 import { configure } from "mobx";
+import { vi } from "vitest";
 
 // Polyfill CSS.escape for jsdom — react-aria uses CSS.escape(key) in querySelector
 // for data-key attribute selectors, and jsdom doesn't provide it natively.
@@ -27,20 +26,19 @@ window.getComputedStyle = ((elt: Element, pseudoElt?: string | null): CSSStyleDe
 }) as typeof window.getComputedStyle;
 
 beforeEach(() => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   sessionStorage.clear();
 });
-afterEach(() => jest.useRealTimers());
+afterEach(() => vi.useRealTimers());
 
 // formState doesn't use actions
 configure({ enforceActions: "never" });
 
 // Make framer-motion animations happen immediately for easier testing
 // https://github.com/framer/motion/issues/285#issuecomment-1252290924
-jest.unstable_mockModule("framer-motion", () => {
-  const actual = jest.requireActual("framer-motion") as any;
+vi.mock("framer-motion", async () => {
+  const actual = await vi.importActual("framer-motion");
   return {
-    __esModule: true,
     ...actual,
     AnimatePresence: (props: any) => <div {...props} />,
   };
@@ -49,14 +47,14 @@ jest.unstable_mockModule("framer-motion", () => {
 // Adding a media matcher to avoid errors in tests
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
   })),
 });

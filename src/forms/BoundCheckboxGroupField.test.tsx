@@ -1,10 +1,10 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { BoundCheckboxGroupField } from "src/forms";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { CheckboxGroupItemOption } from "src/inputs";
 import { blur, click, focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const colors: CheckboxGroupItemOption[] = [
   { value: "c:1", label: "Blue" },
@@ -20,8 +20,8 @@ describe("BoundCheckboxGroupField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundCheckboxGroupField with onFocus and onBlur methods
     const author = createObjectState(formConfig, {});
     const r = await render(
@@ -40,7 +40,7 @@ describe("BoundCheckboxGroupField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundCheckboxField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,

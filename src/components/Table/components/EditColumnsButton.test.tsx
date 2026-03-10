@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import { MutableRefObject } from "react";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
@@ -7,6 +6,7 @@ import { GridColumn } from "src/components/Table/types";
 import { actionColumn, column } from "src/components/Table/utils/columns";
 import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("EditColumnsButton", () => {
   const columns: GridColumn<Row>[] = [
@@ -22,7 +22,7 @@ describe("EditColumnsButton", () => {
 
   it("should ignore columns that are missing ids and warn", async () => {
     // Given an edit columns button, where a column with canHide: true is missing the name property
-    const warnSpy = jest.spyOn(console, "warn");
+    const warnSpy = vi.spyOn(console, "warn");
     const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
     function Test() {
       const _api = useGridTableApi<Row>();
