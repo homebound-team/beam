@@ -1,3 +1,4 @@
+import { getInteractionModality } from "@react-aria/interactions";
 import { Node } from "@react-types/shared";
 import { useEffect, useRef } from "react";
 import { ListState } from "react-stately";
@@ -43,9 +44,12 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
       : undefined;
 
   // Handle scrolling to the item in focus when navigating options via Keyboard - this should only be applied when using a "virtual focus", such as a ComboBox where the browser's focus remains in the <input /> element.
+  // Only scroll for keyboard-initiated focus changes. Scrolling on pointer/mouse focus changes
+  // causes Virtuoso to recycle DOM nodes mid-press, which breaks React Aria's usePress lifecycle
+  // (the pointerup event is lost, so onPress/onSelect never fires).
   useEffect(
     () => {
-      if (scrollOnFocus && virtuosoRef.current && focusedItem?.index) {
+      if (!!scrollOnFocus && getInteractionModality() === "keyboard" && virtuosoRef.current && focusedItem?.index) {
         virtuosoRef.current.scrollToIndex({ index: focusedItem.index, align: "center" });
       }
     },
