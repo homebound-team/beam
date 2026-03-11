@@ -50,9 +50,7 @@ export function Tooltip(props: TooltipProps) {
         {...(!state.isOpen && typeof title === "string" ? { title } : {})}
         {...tid}
         // Add display contents to prevent the tooltip wrapping element from short-circuiting inherited styles (i.e. flex item positioning)
-        // Once the element is `:active`, allow pointer events (i.e. click events) to pass through to the children.
-        // Exception: Don't disable pointer events when wrapping anchor tags to preserve click functionality
-        css={Css.display("contents").addIn(":active:not(:has(a))", Css.add("pointerEvents", "none").$).$}
+        css={Css.display("contents").$}
         // Adding `draggable` as a hack to allow focus to continue through this element and into its children.
         // This is due to some code in React-Aria that prevents default due ot mobile browser inconsistencies,
         // and the only way they don't prevent default is if the element is draggable.

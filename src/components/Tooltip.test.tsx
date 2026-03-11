@@ -1,5 +1,6 @@
+import { jest } from "@jest/globals";
 import { resolveTooltip, Tooltip } from "src/components/Tooltip";
-import { render } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 
 describe("Tooltip", () => {
   it("can resolve tooltip text", () => {
@@ -31,5 +32,18 @@ describe("Tooltip", () => {
   it("renders with title prop", async () => {
     const r = await render(<Tooltip title="Test tooltip">Text</Tooltip>);
     expect(r.tooltip).toHaveAttribute("title", "Test tooltip");
+  });
+
+  it("does not block click events on wrapped children", async () => {
+    const onClick = jest.fn();
+    const r = await render(
+      <Tooltip title="Test tooltip">
+        <button data-testid="inner" onClick={onClick}>
+          Click me
+        </button>
+      </Tooltip>,
+    );
+    click(r.inner);
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
