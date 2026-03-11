@@ -70,6 +70,21 @@ describe("Button", () => {
       .not.toHaveAttribute("download");
   });
 
+  it("fires onClick on a Button with a tooltip", async () => {
+    const onClick = jest.fn();
+    const r = await render(<Button label="With tooltip" tooltip="Some tooltip text" onClick={onClick} />);
+    click(r.withTooltip);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("fires async onClick on a Button with a tooltip", async () => {
+    const onClick = jest.fn();
+    const r = await render(<Button label="With tooltip" tooltip="Some tooltip text" onClick={async () => onClick()} />);
+    click(r.withTooltip, { allowAsync: true });
+    await wait();
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
   it("applies expected properties when adding the 'download' prop", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" download />, {});
     expect(r.button.tagName).toBe("A");
