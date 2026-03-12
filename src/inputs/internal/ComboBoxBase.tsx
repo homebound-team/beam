@@ -1,7 +1,7 @@
-import { Key as AriaKey, Selection } from "@react-types/shared";
+import { Key as AriaKey } from "@react-types/shared";
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
-import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
+import { Item, useComboBoxState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
@@ -187,42 +187,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     setFieldState((prevState) => ({ ...prevState, searchValue: undefined }));
   }
 
-  function onSelectionChange(keys: Selection): void {
-    // We don't currently handle the "all" case
-    if (keys === "all") {
-      return;
-    }
-
-    // `onSelectionChange` may be called even if the selection's didn't change.
-    // For example, we trigger this `onBlur` of SelectFieldInput in order to reset the input's value.
-    // In those cases, we do not need to again call `onSelect` so let's avoid it if we can.
-    const selectionChanged = !(
-      keys.size === state.selectionManager.selectedKeys.size &&
-      [...keys].every((value) => state.selectionManager.selectedKeys.has(value))
-    );
-
-    if (multiselect && keys.size === 0) {
-      selectionChanged && onSelect([], []);
-      return;
-    }
-
-    const selectedKeys = [...keys.values()];
-    const selectedOptions = options.filter((o) => selectedKeys.includes(valueToKey(getOptionValue(o))));
-
-    if (!multiselect && selectedOptions[0] === addNewOption && onAddNew) {
-      onAddNew(fieldState.inputValue);
-      state.close();
-      return;
-    }
-
-    selectionChanged && onSelect(selectedKeys.map(keyToValue) as V[], selectedOptions);
-
-    if (!multiselect) {
-      // Close menu upon selection change only for Single selection mode
-      state.close();
-    }
-  }
-
   function onInputChange(value: string) {
     if (value !== fieldState.inputValue) {
       setFieldState((prevState) => ({ ...prevState, inputValue: value, searchValue: value }));
@@ -276,6 +240,10 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     [getOptionValue, getOptionLabel, getOptionMenuLabel],
   );
 
+  const selectedKeys = useMemo(() => {
+    return selectedOptions.map((o) => valueToKey(getOptionValue(o)));
+  }, [selectedOptions, getOptionValue]);
+
   const comboBoxProps = {
     ...otherProps,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
@@ -288,37 +256,38 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     children: comboBoxChildren,
   };
 
-  const state = useComboBoxState<any>({
+  const state = useComboBoxState<any, "single" | "multiple">({
     ...comboBoxProps,
     allowsEmptyCollection: true,
-    // We don't really allow custom values, as we reset the input value once a user `blur`s the input field.
-    // Though, setting `allowsCustomValue: true` prevents React-Aria/Stately from attempting to reset the input field's value when the menu closes.
-    allowsCustomValue: true,
-    // useComboBoxState.onSelectionChange will be executed if a keyboard interaction (Enter key) is used to select an item
-    onSelectionChange: (key) => {
-      // ignore undefined/null keys - `null` can happen if input field's value is completely deleted after having a value assigned.
-      if (key) {
-        const selectedKeys = state.selectionManager.selectedKeys;
-        // Create the `newSelection` Set depending on the value type of SelectField.
-        const newSelection: Set<AriaKey> = new Set(!multiselect ? [key] : [...selectedKeys, key]);
-        // Use only the `multipleSelectionState` to manage selected keys
-        state.selectionManager.setSelectedKeys(newSelection);
+    selectionMode: multiselect ? "multiple" : "single",
+    // For multi-select, disable close-on-blur to prevent `commitValue` from calling `onChange`
+    // with a stale `displayValue` (the controlled `value` prop before React re-renders).
+    // We handle menu close manually in ComboBoxInput's onBlur via `state.toggle()`.
+    ...(multiselect ? { shouldCloseOnBlur: false } : {}),
+    // Use the new value/onChange API for native multi-select support
+    value: multiselect ? selectedKeys : (selectedKeys[0] ?? null),
+    // Don't call state.close() inside onChange — `state.close` is mapped to `commitValue` which
+    // re-triggers onChange, causing an infinite loop. The native state handles menu close automatically
+    // for single-select (closes on value change) and multi-select (stays open).
+    onChange: (newValue: AriaKey | AriaKey[] | null) => {
+      if (multiselect) {
+        const keys = (newValue as AriaKey[]) ?? [];
+        const newSelectedOptions = options.filter((o) => keys.includes(valueToKey(getOptionValue(o))));
+        onSelect(keys.map(keyToValue) as V[], newSelectedOptions);
+      } else {
+        const key = newValue as AriaKey | null;
+        if (key === null || key === undefined) {
+          onSelect([], []);
+          return;
+        }
+        const selectedOption = options.find((o) => valueToKey(getOptionValue(o)) === key);
+        if (selectedOption === addNewOption && onAddNew) {
+          onAddNew(fieldState.inputValue);
+          return;
+        }
+        onSelect([keyToValue(key)] as V[], selectedOption ? [selectedOption] : []);
       }
     },
-  });
-
-  const selectedKeys = useMemo(() => {
-    return selectedOptions.map((o) => valueToKey(getOptionValue(o)));
-  }, [selectedOptions, getOptionValue]);
-  // @ts-ignore - `selectionManager.state` exists, but not according to the types.
-  // We override the ComboBox's selection manager to support multi-select.
-  state.selectionManager.state = useMultipleSelectionState({
-    selectionMode: multiselect ? "multiple" : "single",
-    // Do not allow an empty selection if single select mode
-    disallowEmptySelection: !multiselect,
-    selectedKeys,
-    onSelectionChange,
-    disabledKeys: Object.keys(disabledOptionsWithReasons),
   });
 
   const [debouncedSearch] = useDebounce(searchValue, 300);
@@ -382,7 +351,10 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     scrollRef: listBoxRef,
     shouldFlip: true,
     isOpen: state.isOpen,
-    onClose: state.close,
+    // For multi-select, use toggle() instead of close() to avoid commitValue(), which
+    // calls onChange(displayValue) with a potentially stale controlled value. For single-select,
+    // close() (i.e. commitValue) is correct — it commits the input text to the selected value.
+    onClose: multiselect ? () => state.toggle() : state.close,
     placement: "bottom left",
     offset: borderless ? 8 : 4,
   });
@@ -424,7 +396,8 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
           triggerRef={triggerRef}
           popoverRef={popoverRef}
           positionProps={positionProps}
-          onClose={() => state.close()}
+          // See useOverlayPosition onClose comment above for why toggle vs close.
+          onClose={() => (multiselect ? state.toggle() : state.close())}
           isOpen={state.isOpen}
           minWidth={200}
         >

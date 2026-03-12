@@ -148,61 +148,41 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
         // Not merging the following as we want them to overwrite existing events
         ...{
           onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
-            // We need to do some custom logic when using MultiSelect, as react-aria/stately Combobox doesn't support multiselect out of the box.
-            if (isMultiSelect) {
-              if (isTree) {
-                const focusedKey = state.selectionManager.focusedKey;
-                if (focusedKey == null) return;
-                const item = state.collection.getItem(focusedKey);
-                if (item && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
-                  if (!isLeveledNode(item)) return;
-                  const leveledOption = item.value;
+            // Tree-specific: ArrowLeft/ArrowRight to collapse/expand nodes
+            if (isMultiSelect && isTree) {
+              const focusedKey = state.selectionManager.focusedKey;
+              if (focusedKey == null) return;
+              const item = state.collection.getItem(focusedKey);
+              if (item && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+                if (!isLeveledNode(item)) return;
+                const leveledOption = item.value;
 
-                  if (!leveledOption) return;
-                  const [option] = leveledOption;
+                if (!leveledOption) return;
+                const [option] = leveledOption;
 
-                  e.stopPropagation();
-                  e.preventDefault();
-                  if (option && option.children && option.children.length > 0) {
-                    if (collapsedKeys.includes(item.key) && e.key === "ArrowRight") {
-                      setCollapsedKeys((prevKeys: AriaKey[]) => prevKeys.filter((k) => k !== item.key));
-                    } else if (!collapsedKeys.includes(item.key) && e.key === "ArrowLeft") {
-                      setCollapsedKeys((prevKeys: AriaKey[]) => [...prevKeys, item.key]);
-                    }
+                e.stopPropagation();
+                e.preventDefault();
+                if (option && option.children && option.children.length > 0) {
+                  if (collapsedKeys.includes(item.key) && e.key === "ArrowRight") {
+                    setCollapsedKeys((prevKeys: AriaKey[]) => prevKeys.filter((k) => k !== item.key));
+                  } else if (!collapsedKeys.includes(item.key) && e.key === "ArrowLeft") {
+                    setCollapsedKeys((prevKeys: AriaKey[]) => [...prevKeys, item.key]);
                   }
-                  return;
                 }
-              }
-
-              // Enter should toggle the focused item.
-              if (e.key === "Enter") {
-                // Prevent form submissions if menu is open.
-                if (state.isOpen) {
-                  e.preventDefault();
-                }
-
-                const focusedKey = state.selectionManager.focusedKey;
-                if (focusedKey != null) {
-                  state.selectionManager.toggleSelection(focusedKey);
-                }
-                return;
-              }
-
-              // By default, the Escape key would "revert" changes,
-              // but we just want to close the menu and leave the reset of the field state as is.
-              if (e.key === "Escape") {
-                state.close();
                 return;
               }
             }
 
-            // Handle single selection Escape key press
-            // When a user hits `Escape`, then react-aria calls `state.revert`, which uses `state.selectedKey` to
-            // reset the field to its previous value. However, because we use a the Multiple Selection State manager,
-            // then our `state.selectedKey` isn't set. So we need to properly reset the state ourselves.
-            if (e.key === "Escape") {
-              state.close();
-              resetField();
+            // Prevent form submissions when the menu is open and Enter is pressed.
+            if (e.key === "Enter" && state.isOpen) {
+              e.preventDefault();
+            }
+
+            // For multi-select Tab, don't pass to native handler. The native handler calls
+            // state.commit() → selectionManager.select(focusedKey) which toggles the focused
+            // item's selection, inadvertently deselecting it on Tab-out.
+            // Let the browser handle Tab navigation naturally; our onBlur handles menu close.
+            if (isMultiSelect && e.key === "Tab") {
               return;
             }
 
@@ -225,13 +205,15 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
               return;
             }
 
-            // We purposefully override onBlur here instead of using mergeProps, b/c inputProps.onBlur
-            // goes into useComboBox's onBlur, which calls setFocused(false), which in useComboBoxState
-            // detects a) there is no props.selectedKey (b/c we don't pass it), and b) there is an
-            // `inputValue`, so it thinks it needs to call `resetInputValue()`.
             setIsFocused(false);
             maybeCall(onBlur);
-            state.close();
+            state.setFocused(false);
+
+            // For multi-select, we use shouldCloseOnBlur: false to prevent `commitValue` from
+            // calling onChange with stale data. So we close the menu manually via toggle.
+            if (isMultiSelect && state.isOpen) {
+              state.toggle();
+            }
 
             // Always call `resetField` onBlur, this ensures the field's `input.value` resets
             // to what it should be in case it doesn't currently match.

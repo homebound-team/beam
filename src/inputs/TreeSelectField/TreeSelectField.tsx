@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
-import { Item, useComboBoxState, useMultipleSelectionState } from "react-stately";
+import { Item, useComboBoxState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
@@ -414,22 +414,16 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     children: comboBoxChildren,
   };
 
-  const state = useComboBoxState<any>({
+  const state = useComboBoxState<any, "multiple">({
     ...comboBoxProps,
     allowsEmptyCollection: true,
-    allowsCustomValue: true,
-  });
-
-  // @ts-ignore - `selectionManager.state` exists, but not according to the types. We are tricking the ComboBox state to support multiple selections.
-  state.selectionManager.state = useMultipleSelectionState({
     selectionMode: "multiple",
-    selectedKeys: fieldState.selectedKeys,
-    disabledKeys: Object.keys(disabledOptionsWithReasons),
-    onSelectionChange: (newKeys) => {
-      if (newKeys === "all") {
-        // We do not support an "All" option
-        return;
-      }
+    // Prevent commitValue from calling onChange with stale displayValue on blur.
+    // Menu close is handled manually in ComboBoxInput's onBlur via state.toggle().
+    shouldCloseOnBlur: false,
+    value: fieldState.selectedKeys,
+    onChange: (newValue: AriaKey[]) => {
+      const newKeys = new Set(newValue);
 
       // First figure out which keys changed so we can correctly determine which affiliated options may need to be updated as well.
       const existingKeys = state.selectionManager.selectedKeys;
@@ -454,7 +448,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           return;
         }
 
-        // `onSelectionChange` is only ever going to be adding or removing 1 key at a time.
+        // `onChange` is only ever going to be adding or removing 1 key at a time.
         // The below logic for adding/removing using a forEach loop is just to make TS happy.
         // This may look like a lot of logic, but in the execution it will only ever be adding/removing 1 key at a time, so it really isn't as bad as it looks.
 
@@ -617,7 +611,9 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     scrollRef: listBoxRef,
     shouldFlip: true,
     isOpen: state.isOpen,
-    onClose: state.close,
+    // Use toggle() instead of close() to avoid commitValue(), which calls onChange(displayValue)
+    // with a potentially stale controlled value. See ComboBoxBase.tsx for details.
+    onClose: () => state.toggle(),
     placement: "bottom left",
     offset: borderless ? 8 : 4,
   });
@@ -661,7 +657,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           triggerRef={triggerRef}
           popoverRef={popoverRef}
           positionProps={positionProps}
-          onClose={() => state.close()}
+          // See useOverlayPosition onClose comment above for why toggle vs close.
+          onClose={() => state.toggle()}
           isOpen={state.isOpen}
           minWidth={320}
         >
