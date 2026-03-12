@@ -1,5 +1,4 @@
 import { wait } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { booleanFilter, FilterDefs, Filters, multiFilter, singleFilter } from "src/components/Filters";
@@ -7,6 +6,7 @@ import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import { HasIdAndName } from "src/types";
 import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
+import { vi } from "vitest";
 import { MultiFilterProps } from "./MultiFilter";
 
 describe("Filters", () => {
@@ -53,7 +53,7 @@ describe("Filters", () => {
   });
 
   it("calls onSearch with the debounced value", async () => {
-    const onSearchMock = jest.fn();
+    const onSearchMock = vi.fn();
     // Given a stateful component that has initial values set
     const r = await render(<TestFilterSearch onSearch={onSearchMock} />);
 
@@ -70,7 +70,7 @@ describe("Filters", () => {
   });
 });
 
-function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>, onSelectMock = jest.fn()) {
+function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>, onSelectMock = vi.fn()) {
   const [, setSearch] = useState<string | undefined>("");
   const options: HasIdAndName[] = zeroTo(2).map((i) => ({
     id: `p:${i}`,

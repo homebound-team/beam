@@ -1,10 +1,10 @@
 import { createObjectState, ObjectConfig, required, useFormState } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundSelectAndTextField } from "src";
 import { ScheduleTypes } from "src/components/Filters/testDomain";
 import { click, render, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("BoundSelectAndTextField", () => {
   it("renders and updates values", async () => {
@@ -41,10 +41,10 @@ describe("BoundSelectAndTextField", () => {
   });
 
   it("can fire onBlur and onFocus for fields", async () => {
-    const selectOnBlur = jest.fn();
-    const selectOnFocus = jest.fn();
-    const textOnBlur = jest.fn();
-    const textOnFocus = jest.fn();
+    const selectOnBlur = vi.fn();
+    const selectOnFocus = vi.fn();
+    const textOnBlur = vi.fn();
+    const textOnFocus = vi.fn();
     // Given a BoundSelectAndTextField with the onBlur and onFocus callbacks and autoSave
     const formState = createObjectState(config, {});
     const types = [
@@ -72,7 +72,7 @@ describe("BoundSelectAndTextField", () => {
   });
 
   it("can fire auto save on select field change and text field enter", async () => {
-    const maybeAutoSave = jest.fn();
+    const maybeAutoSave = vi.fn();
     // Given a BoundSelectAndTextField with autoSave
     const formState = createObjectState(config, {}, { maybeAutoSave });
     const types = [

@@ -1,8 +1,8 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { click } from "src/utils/rtl";
+import { vi } from "vitest";
 import { BoundMultiLineSelectField } from "./BoundMultiLineSelectField";
 
 const shapes = [
@@ -25,7 +25,7 @@ describe("BoundMultiLineSelectField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundMultiLineSelectField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,

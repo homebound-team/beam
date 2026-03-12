@@ -36,7 +36,7 @@ describe("RightSidebar", () => {
 
     // TODO: fix this expect, it doesn't work with the current implementation
     // wait for transition to finish
-    // jest.advanceTimersByTime(1000);
+    // vi.advanceTimersByTime(1000);
     // expect(r.query.rightSidebar_content).not.toBeInTheDocument();
   });
 });

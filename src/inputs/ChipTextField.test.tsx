@@ -1,26 +1,25 @@
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { noop } from "src/utils";
 import { focus, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("ChipTextField", () => {
   it("renders", async () => {
     // Given the input
     const r = await render(<ChipTextField label="Test Label" value="Test value" required onChange={noop} />);
     // Then all fields should be properly set
-    expect(r.chipField)
-      .toHaveTextContent("Test value")
-      .toHaveAttribute("aria-label", "Test Label")
-      .toHaveAttribute("aria-required", "true");
+    expect(r.chipField).toHaveTextContent("Test value");
+    expect(r.chipField).toHaveAttribute("aria-label", "Test Label");
+    expect(r.chipField).toHaveAttribute("aria-required", "true");
   });
 
   it("fires callbacks", async () => {
     // Given the component with callback functions
-    const onChange = jest.fn();
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
-    const onEnter = jest.fn();
+    const onChange = vi.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
+    const onEnter = vi.fn();
     const r = await render(
       <ChipTextField label="Test Label" onChange={onChange} onBlur={onBlur} onFocus={onFocus} onEnter={onEnter} />,
     );
@@ -40,7 +39,7 @@ describe("ChipTextField", () => {
   });
 
   it("removes focus from input and calls onBlur when pressing escape", async () => {
-    const onBlur = jest.fn();
+    const onBlur = vi.fn();
     // Given the Chip Input
     const r = await render(<ChipTextField label="Test Label" onChange={noop} onBlur={onBlur} />);
     // With focus
@@ -55,7 +54,7 @@ describe("ChipTextField", () => {
   });
 
   it("does not removes focus or call onBlur from input when pressing escape disabled", async () => {
-    const onBlur = jest.fn();
+    const onBlur = vi.fn();
     // Given the Chip Input
     const r = await render(<ChipTextField label="Test Label" onChange={noop} blurOnEscape={false} onBlur={onBlur} />);
     // With focus

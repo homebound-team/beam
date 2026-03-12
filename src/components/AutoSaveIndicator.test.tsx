@@ -1,7 +1,7 @@
-import { jest } from "@jest/globals";
 import React from "react";
 import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
+import { vi } from "vitest";
 import { AutoSaveStatus, AutoSaveStatusContext } from ".";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 
@@ -35,7 +35,7 @@ describe(AutoSaveIndicator, () => {
   });
 
   it("resets on dismount", async () => {
-    const resetStatus = jest.fn();
+    const resetStatus = vi.fn();
 
     // GIVEN it renders
     const r = await render(
@@ -52,7 +52,7 @@ describe(AutoSaveIndicator, () => {
   });
 
   it("does not reset on rerender", async () => {
-    const resetStatus = jest.fn();
+    const resetStatus = vi.fn();
 
     // GIVEN we've rendered
     const r = await render(
@@ -74,7 +74,7 @@ describe(AutoSaveIndicator, () => {
   });
 
   it("avoids resetting when asked", async () => {
-    const resetStatus = jest.fn();
+    const resetStatus = vi.fn();
 
     // GIVEN we've told it to not reset
     // WHEN we render

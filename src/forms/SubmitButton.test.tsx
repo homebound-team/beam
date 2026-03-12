@@ -1,14 +1,14 @@
 import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
 import { click, render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { act } from "@testing-library/react";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { SubmitButton } from "src/forms/SubmitButton";
 import { clickAndWait } from "src/utils/rtlUtils";
+import { vi } from "vitest";
 
 describe("SubmitButton", () => {
   it("when editing, disables if the form is clean", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     // Given a submit button for an existing entity (id is set)
     const author = createObjectState(formConfig, { id: "a:1", firstName: "f1" });
     const r = await render(<SubmitButton form={author} onClick={onClick} />);
@@ -36,7 +36,7 @@ describe("SubmitButton", () => {
   });
 
   it("when creating, enables for initial click", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     // Given a submit button for a new entity (no id set)
     const author = createObjectState(formConfig, { firstName: "f1" });
     const r = await render(<SubmitButton form={author} onClick={onClick} />);
@@ -48,7 +48,7 @@ describe("SubmitButton", () => {
   });
 
   it("disables if the form is dirty but disabled via prop", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     // Given a form is dirty so saveable to formState
     const author = createObjectState(formConfig, { firstName: "f1" });
     act(() => author.firstName.set("f2"));

@@ -1,9 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { BoundMultiSelectField } from "src/forms/BoundMultiSelectField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const shapes = [
   { id: "sh:1", name: "Triangle" },
@@ -27,8 +27,8 @@ describe("BoundMultiSelectField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundMultiSelectField with onFocus and onBlur methods
     const author = createObjectState(formConfig, { favoriteShapes: ["sh:1"] });
     const r = await render(
@@ -47,7 +47,7 @@ describe("BoundMultiSelectField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundMultiSelectField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,

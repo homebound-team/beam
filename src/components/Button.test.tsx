@@ -1,8 +1,8 @@
-import { jest } from "@jest/globals";
 import { Button } from "src/components/Button";
 import { noop } from "src/utils";
 import { click, render, wait } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
+import { vi } from "vitest";
 
 describe("Button", () => {
   it("can have a data-testid", async () => {
@@ -27,7 +27,7 @@ describe("Button", () => {
   });
 
   it("renders and can fires onClick", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<Button label="Button" onClick={onClick} />);
     expect(r.button.tagName).toBe("BUTTON");
     expect(r.button).toHaveAttribute("type", "button");
@@ -43,31 +43,28 @@ describe("Button", () => {
   it("applies expected properties when rendering a link with an absolute url", async () => {
     const r = await render(<Button label="Button" onClick="https://www.homebound.com" />, {});
     expect(r.button.tagName).toBe("A");
-    expect(r.button)
-      .toHaveAttribute("href", "https://www.homebound.com")
-      .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener")
-      .not.toHaveAttribute("download");
+    expect(r.button).toHaveAttribute("href", "https://www.homebound.com");
+    expect(r.button).toHaveAttribute("target", "_blank");
+    expect(r.button).toHaveAttribute("rel", "noreferrer noopener");
+    expect(r.button).not.toHaveAttribute("download");
   });
 
   it("applies expected properties when rendering a link with a relative url", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" />, {});
     expect(r.button.tagName).toBe("A");
-    expect(r.button)
-      .toHaveAttribute("href", "/testPath")
-      .not.toHaveAttribute("target")
-      .not.toHaveAttribute("rel")
-      .not.toHaveAttribute("download");
+    expect(r.button).toHaveAttribute("href", "/testPath");
+    expect(r.button).not.toHaveAttribute("target");
+    expect(r.button).not.toHaveAttribute("rel");
+    expect(r.button).not.toHaveAttribute("download");
   });
 
   it("applies expected properties when rendering a link with a relative url to open in new tab", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" openInNew />, {});
     expect(r.button.tagName).toBe("A");
-    expect(r.button)
-      .toHaveAttribute("href", "/testPath")
-      .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener")
-      .not.toHaveAttribute("download");
+    expect(r.button).toHaveAttribute("href", "/testPath");
+    expect(r.button).toHaveAttribute("target", "_blank");
+    expect(r.button).toHaveAttribute("rel", "noreferrer noopener");
+    expect(r.button).not.toHaveAttribute("download");
   });
 
   it("fires onClick on a Button with a tooltip", async () => {
@@ -88,11 +85,10 @@ describe("Button", () => {
   it("applies expected properties when adding the 'download' prop", async () => {
     const r = await render(<Button label="Button" onClick="/testPath" download />, {});
     expect(r.button.tagName).toBe("A");
-    expect(r.button)
-      .toHaveAttribute("href", "/testPath")
-      .toHaveAttribute("download")
-      .not.toHaveAttribute("target", "_blank")
-      .not.toHaveAttribute("rel", "noreferrer noopener");
+    expect(r.button).toHaveAttribute("href", "/testPath");
+    expect(r.button).toHaveAttribute("download");
+    expect(r.button).not.toHaveAttribute("target", "_blank");
+    expect(r.button).not.toHaveAttribute("rel", "noreferrer noopener");
   });
 
   it("disables button while onClick is in flight and re-enables it after a successful promise", async () => {
@@ -104,7 +100,7 @@ describe("Button", () => {
   });
 
   it("disables button while onClick is in flight and re-enables it after a failed promise", async () => {
-    const onError = jest.fn();
+    const onError = vi.fn();
     const r = await render(
       <Button
         label="Button"

@@ -1,6 +1,6 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 import { BoundIconCardField } from "./BoundIconCardField";
 import { AuthorInput } from "./formStateDomain";
 
@@ -34,7 +34,7 @@ describe("BoundIconCardField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundCheckboxField with auto save
     const formState: ObjectState<AuthorInput> = createObjectState(
       formConfig,

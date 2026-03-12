@@ -1,7 +1,7 @@
-import { jest } from "@jest/globals";
 import { Autocomplete } from "src/inputs/Autocomplete";
 import { HasIdAndName } from "src/types";
 import { click, focus, render, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("Autocomplete", () => {
   it("renders", async () => {
@@ -39,8 +39,8 @@ describe("Autocomplete", () => {
 
   it("can fire onChange and onSelect callbacks", async () => {
     const options: HasIdAndName[] = [{ id: "u:1", name: "User 1" }];
-    const onChange = jest.fn();
-    const onSelect = jest.fn();
+    const onChange = vi.fn();
+    const onSelect = vi.fn();
     const r = await render(
       <Autocomplete
         label="Search"
@@ -87,7 +87,7 @@ describe("Autocomplete", () => {
   });
 
   it("can be cleared", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(
       <Autocomplete
         label="Search"

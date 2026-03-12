@@ -1,15 +1,15 @@
 import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { BoundDateRangeField } from "src/forms/BoundDateRangeField";
 import { AuthorInput, jan1, jan19, jan2 } from "src/forms/formStateDomain";
 import { blur, click, focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe(BoundDateRangeField, () => {
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundDateRangeField with onFocus and onBlur methods
     const author = createObjectState(formConfig, {});
     const r = await render(<BoundDateRangeField field={author.saleDates} onBlur={onBlur} onFocus={onFocus} />);
@@ -32,7 +32,7 @@ describe(BoundDateRangeField, () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundDateRangeField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
@@ -52,7 +52,7 @@ describe(BoundDateRangeField, () => {
   });
 
   it("triggers 'maybeAutoSave' on enter", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundDateRangeField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,
@@ -70,8 +70,8 @@ describe(BoundDateRangeField, () => {
   });
 
   it("reflects readOnly correctly", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundDateRangeField for a field marked as readOnly is rendered
     const author = createObjectState(formConfigReadOnly, {});
     const r = await render(<BoundDateRangeField field={author.saleDates} onBlur={onBlur} onFocus={onFocus} />);

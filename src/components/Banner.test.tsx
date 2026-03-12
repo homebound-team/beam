@@ -1,6 +1,6 @@
-import { jest } from "@jest/globals";
 import { Banner } from "src";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe(Banner, () => {
   it("should render", async () => {
@@ -13,7 +13,7 @@ describe(Banner, () => {
   });
 
   it("should trigger onClose", async () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     // Given the Banner with a message and an onClose callback
     const r = await render(<Banner type="warning" message="Banner message" onClose={onClose} />);
     // When clicking on the close button

@@ -1,17 +1,17 @@
-import { jest } from "@jest/globals";
 import { AvatarButton } from "src/components/Avatar/AvatarButton";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe(AvatarButton, () => {
   it("fires onClick callback", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<AvatarButton src="test" name="Test" onClick={onClick} />);
     click(r.test_button);
     expect(onClick).toBeCalledTimes(1);
   });
 
   it("disables button", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<AvatarButton src="test" name="Test" onClick={onClick} disabled />);
     expect(r.test_button).toBeDisabled();
     click(r.test_button);
@@ -27,15 +27,14 @@ describe(AvatarButton, () => {
   it("can render as an absolute link", async () => {
     const r = await render(<AvatarButton src="test" name="Test" onClick="https://www.homebound.com" />);
     expect(r.test_button.tagName).toBe("A");
-    expect(r.test_button)
-      .toHaveAttribute("href", "https://www.homebound.com")
-      .toHaveAttribute("target", "_blank")
-      .toHaveAttribute("rel", "noreferrer noopener");
+    expect(r.test_button).toHaveAttribute("href", "https://www.homebound.com");
+    expect(r.test_button).toHaveAttribute("target", "_blank");
+    expect(r.test_button).toHaveAttribute("rel", "noreferrer noopener");
   });
 
   it("can be interacted with when using tooltips", async () => {
     // Given an avatar button with a tooltip
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<AvatarButton src="test" name="Test" onClick={onClick} />);
     // When clicking the image, expecting the event to bubble up
     click(r.test);

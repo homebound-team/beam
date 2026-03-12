@@ -1,9 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { BoundRadioGroupField } from "src/forms/BoundRadioGroupField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const sports = [
   { value: "s:1", label: "Football" },
@@ -19,8 +19,8 @@ describe("BoundRadioGroupField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundRadioGroupField with onFocus and onBlur methods
     const author = createObjectState(formConfig, {});
     const r = await render(
@@ -39,7 +39,7 @@ describe("BoundRadioGroupField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundRadioGroupField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,

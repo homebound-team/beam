@@ -1,5 +1,5 @@
-import { jest } from "@jest/globals";
 import { click, render, wait } from "src/utils/rtl";
+import { vi } from "vitest";
 import { ToggleButton } from "./ToggleButton";
 
 describe("ToggleButton", () => {
@@ -20,7 +20,7 @@ describe("ToggleButton", () => {
 
   it("fires onChange", async () => {
     // Given a ToggleButton with a onChange callback
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<ToggleButton label={"Toggle button"} onChange={onChange} />);
     // When we click the toggle button
     click(r.toggleButton);
@@ -30,7 +30,7 @@ describe("ToggleButton", () => {
 
   it("does not fire onChange when disabled", async () => {
     // Given a disabled ToggleButton with a onChange callback
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<ToggleButton label={"Toggle button"} onChange={onChange} disabled />);
     // When we click the toggle button
     click(r.toggleButton);
@@ -49,7 +49,7 @@ describe("ToggleButton", () => {
   });
 
   it("disables button while onChange is in flight and re-enables it after a failed promise", async () => {
-    const onError = jest.fn();
+    const onError = vi.fn();
     const r = await render(
       <ToggleButton
         label={"Toggle button"}

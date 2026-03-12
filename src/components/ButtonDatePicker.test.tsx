@@ -1,11 +1,11 @@
-import { jest } from "@jest/globals";
 import { ButtonDatePicker } from "src/components/ButtonDatePicker";
 import { jan1, jan2 } from "src/forms/formStateDomain";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("ButtonDatePicker", () => {
   it("can render with date picker and select a date", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a ButtonDatePicker
     const r = await render(
       <ButtonDatePicker trigger={{ label: "Trigger" }} value={jan2} onSelect={(d) => onSelect(d.toDateString())} />,

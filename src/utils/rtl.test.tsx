@@ -1,12 +1,12 @@
-import { jest } from "@jest/globals";
 import { useState } from "react";
 import { MultiSelectField, NestedOption, SelectField, TreeSelectField } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { getOptions, getSelected, render, select, selectAndWait } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("rtl", () => {
   it("can use select helpers and select an option via value on SelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the SelectField
     function Test() {
       const [value, setValue] = useState<string | undefined>();
@@ -46,7 +46,7 @@ describe("rtl", () => {
   });
 
   it("can select options via label on SelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the SelectField
     function Test() {
       const [value, setValue] = useState<string | undefined>();
@@ -75,7 +75,7 @@ describe("rtl", () => {
   });
 
   it("fails when selecting disabled options", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a SelectField
     const r = await render(
       <SelectField
@@ -96,7 +96,7 @@ describe("rtl", () => {
   });
 
   it("can selectAndWait on SelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     async function asyncSelect(v: any, o: any) {
       await new Promise((resolve) => {
         resolve(v);
@@ -128,7 +128,7 @@ describe("rtl", () => {
   });
 
   it("can use select helpers and select an option via value on MultiSelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the MultiSelectField
     function Test() {
       const [values, setValues] = useState<string[]>([]);
@@ -173,7 +173,7 @@ describe("rtl", () => {
   });
 
   it("can select options via label on MultiSelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the MultiSelectField
     function Test() {
       const [values, setValues] = useState<string[]>([]);
@@ -208,7 +208,7 @@ describe("rtl", () => {
   });
 
   it("can selectAndWait on MultiSelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     async function asyncSelect(v: any, o: any) {
       await new Promise((resolve) => {
         resolve(v);
@@ -240,7 +240,7 @@ describe("rtl", () => {
   });
 
   it("can use select helpers and select an option via value on TreeSelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the TreeSelectField
     const r = await render(
       <TreeSelectField
@@ -273,7 +273,7 @@ describe("rtl", () => {
   });
 
   it("can select options via label on TreeSelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the TreeSelectField
     function Test() {
       const [values, setValues] = useState<string[]>([]);
@@ -308,7 +308,7 @@ describe("rtl", () => {
   });
 
   it("can selectAndWait on TreeSelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     async function asyncSelect(v: any) {
       await new Promise((resolve) => {
         resolve(v);
@@ -347,7 +347,7 @@ describe("rtl", () => {
   });
 
   it("can use select helpers on multiline SelectField", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given the SelectField is multline
     function Test() {
       const [value, setValue] = useState<string | undefined>();

@@ -1,9 +1,9 @@
 import { change, render, type } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
 import { focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 let lastSet: any = undefined;
 
@@ -38,7 +38,7 @@ describe("NumberFieldTest", () => {
   });
 
   it("calls onChange with expected value for percentage", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<NumberField label="Complete" type="percent" value={12} onChange={onChange} />);
     change(r.complete, "15");
     expect(onChange).toBeCalledWith(15);
@@ -54,7 +54,7 @@ describe("NumberFieldTest", () => {
   });
 
   it("calls onChange with expected value for basisPoints", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<NumberField label="Margin" type="basisPoints" value={1234} onChange={onChange} />);
     change(r.margin, "23.45");
     expect(onChange).toBeCalledWith(2345);
@@ -94,7 +94,7 @@ describe("NumberFieldTest", () => {
   });
 
   it("calls onChange with expected value for cents", async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const r = await render(<NumberField label="Cost" type="cents" value={1234} onChange={onChange} />);
     change(r.cost, "23.45");
     expect(onChange).toBeCalledWith(2345);
@@ -134,7 +134,7 @@ describe("NumberFieldTest", () => {
 
   it("updates displayed value when the value prop changes externally while focused", async () => {
     // Given two dependent fields where Total = Cost + Markup
-    const onTotalChange = jest.fn<(v: number | undefined) => void>();
+    const onTotalChange = vi.fn<(v: number | undefined) => void>();
 
     function DependentFields() {
       const [cost, setCost] = useState<number | undefined>(100);
@@ -214,8 +214,8 @@ describe("NumberFieldTest", () => {
   });
 
   it("fires onEnter and blurs field", async () => {
-    const onBlur = jest.fn();
-    const onEnter = jest.fn();
+    const onBlur = vi.fn();
+    const onEnter = vi.fn();
     // Given a numberfield
     const r = await render(<TestNumberField label="Age" value={10} onBlur={onBlur} onEnter={onEnter} />);
     // With focus

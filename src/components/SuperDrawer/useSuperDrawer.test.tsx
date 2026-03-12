@@ -1,8 +1,8 @@
-import { jest } from "@jest/globals";
 import { act, renderHook } from "@testing-library/react";
 import { ReactElement, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { render, withBeamRTL } from "src/utils/rtl";
+import { vi } from "vitest";
 import { useBeamContext } from "../BeamContext";
 import { useSuperDrawer } from "./index";
 
@@ -37,7 +37,7 @@ describe("useSuperDrawer", () => {
   const wrapper = ({ children }: { children: ReactElement }) => withBeamRTL.wrap(children);
 
   it("should add canCloseDrawerCheck when SuperDrawer is opened", () => {
-    const canCloseDrawerCheck = jest.fn(() => true);
+    const canCloseDrawerCheck = vi.fn(() => true);
 
     // Given the useSuperDrawer hook
     const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
@@ -67,7 +67,7 @@ describe("useSuperDrawer", () => {
   });
 
   it("should add canCloseDrawerCheckDetail when SuperDrawer details is opened", () => {
-    const canCloseDrawerDetailCheck = jest.fn(() => true);
+    const canCloseDrawerDetailCheck = vi.fn(() => true);
 
     // Given the useSuperDrawer hook
     const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;
@@ -133,7 +133,7 @@ describe("useSuperDrawer", () => {
   });
 
   it("calls onClose when closed", () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
 
     // Given the useSuperDrawer hook
     const hook = renderHook(useSuperDrawer, { wrapper: wrapper as any }).result.current;

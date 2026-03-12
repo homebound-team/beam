@@ -1,10 +1,10 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { BoundTextAreaField } from "src/forms/BoundTextAreaField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, focus, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("BoundTextAreaField", () => {
   it("shows the current value", async () => {
@@ -21,8 +21,8 @@ describe("BoundTextAreaField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundTextAreaField with onFocus and onBlur methods
     const formState = createObjectState(formConfig, {});
     const r = await render(<BoundTextAreaField field={formState.firstName} onBlur={onBlur} onFocus={onFocus} />);
@@ -39,7 +39,7 @@ describe("BoundTextAreaField", () => {
   });
 
   it("triggers 'maybeAutoSave' on enter", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundTextAreaField with auto save
     const formState: ObjectState<AuthorInput> = createObjectState(
       formConfig,

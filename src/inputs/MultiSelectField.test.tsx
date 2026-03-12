@@ -1,10 +1,10 @@
 import { click, render, RenderResult } from "@homebound/rtl-utils";
-import { jest } from "@jest/globals";
 import { act, fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
 import { HasIdAndName, Optional } from "src/types";
 import { focus } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const options = [
   { id: "1", name: "One" },
@@ -20,7 +20,7 @@ const unsortedOptions: HasIdAndName[] = [
 ];
 
 describe("MultiSelectFieldTest", () => {
-  const onSelect = jest.fn();
+  const onSelect = vi.fn();
 
   it("can set a value", async () => {
     // Given a MultiSelectField with 1 selected value
@@ -126,7 +126,7 @@ describe("MultiSelectFieldTest", () => {
   });
 
   it("respects disabled options", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with a disabled option
     const r = await render(
       <MultiSelectField
@@ -152,7 +152,7 @@ describe("MultiSelectFieldTest", () => {
   });
 
   it("sets chips to disabled for options that are already selected and disabled", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with a selected disabled option
     const r = await render(
       <MultiSelectField
@@ -178,7 +178,7 @@ describe("MultiSelectFieldTest", () => {
   });
 
   it("retains state of disabled options that are already selected", async () => {
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     // Given a Select Field with a disabled option that is a selected value
     const r = await render(
       <MultiSelectField

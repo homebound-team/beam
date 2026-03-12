@@ -33,7 +33,7 @@ describe("Card Component", () => {
     expect(r.query.verticalDots).not.toBeInTheDocument();
 
     // When the card is hovered
-    fireEvent.mouseOver(r.card);
+    fireEvent.pointerEnter(r.card);
 
     // Expect the vertical dots menu button to be in the document
     expect(r.verticalDots).toBeInTheDocument();

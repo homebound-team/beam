@@ -13,9 +13,10 @@ describe("DateFilter", () => {
 
     const r = await render(<TestFilters defs={{ date: taskDueFilter }} />);
     expect(r.filter_taskDue_dateOperation).toHaveValue("Any");
-    expect(r.filter_taskDue_dateField)
-      .toBeDisabled()
-      .toHaveValue(`${month < 10 ? `0${month}` : month}/${day < 10 ? `0${day}` : day}/${year}`);
+    expect(r.filter_taskDue_dateField).toBeDisabled();
+    expect(r.filter_taskDue_dateField).toHaveValue(
+      `${month < 10 ? `0${month}` : month}/${day < 10 ? `0${day}` : day}/${year}`,
+    );
   });
 
   it("can set and unset the date filter", async () => {

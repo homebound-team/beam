@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { ChipSelectField, ChipSelectFieldProps } from "src";
@@ -6,13 +5,15 @@ import { Value } from "src/inputs/Value";
 import { Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { click, focus, render, wait } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("ChipSelectField", () => {
   it("renders", async () => {
     // Given a ChipSelectField
     const r = await render(<TestComponent label="Test Label" value="s:2" options={sports} />);
     // Then the initial value should display
-    expect(r.chipSelectField).toHaveTextContent("Soccer").toHaveAttribute("title", "Soccer");
+    expect(r.chipSelectField).toHaveTextContent("Soccer");
+    expect(r.chipSelectField).toHaveAttribute("title", "Soccer");
     // And the label should display
     expect(r.chipSelectField_label).toHaveTextContent("Test Label");
   });
@@ -36,8 +37,8 @@ describe("ChipSelectField", () => {
 
   it("is clearable", async () => {
     // Given a ChipSelectField that is clearable
-    const onSelect = jest.fn();
-    const onBlur = jest.fn();
+    const onSelect = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <TestComponent label="Label" value="s:2" options={sports} clearable onSelect={onSelect} onBlur={onBlur} />,
     );
@@ -55,7 +56,7 @@ describe("ChipSelectField", () => {
 
   it("can select options", async () => {
     // Given a ChipSelectField
-    const onSelect = jest.fn();
+    const onSelect = vi.fn();
     const r = await render(<TestComponent label="Label" value="s:2" options={sports} onSelect={onSelect} />);
     // With an existing value
     expect(r.chipSelectField).toHaveTextContent("Soccer");
@@ -71,8 +72,8 @@ describe("ChipSelectField", () => {
 
   it("fires onFocus and onBlur events", async () => {
     // Given a ChipSelectField
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <TestComponent label="Label" value="s:2" options={sports} onFocus={onFocus} onBlur={onBlur} />,
     );
@@ -85,8 +86,8 @@ describe("ChipSelectField", () => {
 
   it("does not fire onBlur when opening menu and returns focus to the button upon selecting from menu", async () => {
     // Given a ChipSelectField
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
     const r = await render(
       <TestComponent label="Label" value="s:2" options={sports} onFocus={onFocus} onBlur={onBlur} />,
     );
@@ -115,8 +116,8 @@ describe("ChipSelectField", () => {
   it("handles onCreateNew flow", async () => {
     // Given a ChipSelectField with the onCreateNew prop
     const newOpt = { id: "s:100", name: "New Sport" };
-    const onCreateNew = jest.fn() as any;
-    const onBlur = jest.fn() as any;
+    const onCreateNew = vi.fn() as any;
+    const onBlur = vi.fn() as any;
     const r = await render(
       <TestComponent
         label="Label"

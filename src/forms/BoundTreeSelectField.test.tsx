@@ -1,11 +1,11 @@
 import { createObjectState, ObjectState } from "@homebound/form-state";
-import { jest } from "@jest/globals";
 import { BoundTreeSelectField } from "src/forms/BoundTreeSelectField";
 import { formConfig } from "src/forms/FormStateApp";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { NestedOption } from "src/inputs";
 import { HasIdAndName } from "src/types";
 import { blur, click, focus, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("BoundTreeSelectField", () => {
   it("shows the current value and label", async () => {
@@ -23,8 +23,8 @@ describe("BoundTreeSelectField", () => {
   });
 
   it("trigger onFocus and onBlur callbacks", async () => {
-    const onBlur = jest.fn();
-    const onFocus = jest.fn();
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
     // Given a BoundTreeSelectField with onFocus and onBlur methods
     const author = createObjectState(formConfig, { favoriteGenres: ["g:4"] });
     const r = await render(
@@ -43,7 +43,7 @@ describe("BoundTreeSelectField", () => {
   });
 
   it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = jest.fn();
+    const autoSave = vi.fn();
     // Given a BoundTreeSelectField with auto save
     const author: ObjectState<AuthorInput> = createObjectState(
       formConfig,

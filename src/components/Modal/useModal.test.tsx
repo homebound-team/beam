@@ -1,10 +1,10 @@
-import { jest } from "@jest/globals";
 import { act } from "@testing-library/react";
 import { useEffect } from "react";
 import { BeamContextState, useBeamContext } from "src/components/BeamContext";
 import { ModalProps } from "src/components/Modal/Modal";
 import { useModal, UseModalHook } from "src/components/Modal/useModal";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("useModal", () => {
   it("can open and close the modal", async () => {
@@ -49,7 +49,7 @@ describe("useModal", () => {
       addCanClose(canClose);
       return <div>Content</div>;
     }
-    const canClose = jest.fn().mockReturnValue(false);
+    const canClose = vi.fn().mockReturnValue(false);
     const modalProps = { title: "Test", content: <TestModalContent canClose={canClose as any} /> };
 
     const r = await render(<TestApp {...modalProps} />);
@@ -79,8 +79,8 @@ describe("useModal", () => {
       addCanClose(canClose);
       return <div>Content</div>;
     }
-    const canClose = jest.fn().mockReturnValue(true);
-    const onClose = jest.fn();
+    const canClose = vi.fn().mockReturnValue(true);
+    const onClose = vi.fn();
     const modalProps = { title: "Test", content: <TestModalContent canClose={canClose as any} />, onClose };
 
     const r = await render(<TestApp {...modalProps} />);
