@@ -220,6 +220,59 @@ describe("MultiSelectFieldTest", () => {
     expect(onSelect).toHaveBeenCalledWith([]);
   });
 
+  it("preserves selections after tab-blur", async () => {
+    const selectedRef: React.MutableRefObject<string[] | undefined> = { current: undefined };
+    // Given a MultiSelectField with no selected values
+    const r = await render(<TestMultiSelectField values={[]} options={options} selectedRef={selectedRef} />);
+    // When we select an option
+    selectOption(r, "One");
+    // Then onSelect was called with the new value
+    expect(onSelect).toHaveBeenCalledWith(["1"]);
+    onSelect.mockClear();
+
+    // When we Tab out of the field (Tab fires keydown then blur)
+    fireEvent.keyDown(r.age, { key: "Tab" });
+    fireEvent.blur(r.age);
+
+    // Then onSelect should NOT have been called again with reverted values
+    // (Bug: Tab → state.commit() → selectionManager.select(focusedKey) toggles the focused item off)
+    expect(onSelect).not.toHaveBeenCalledWith([]);
+
+    // And the component's internal selected state should still hold ["1"]
+    expect(selectedRef.current).toEqual(["1"]);
+
+    // And the selection should persist — chip for "One" should still be visible
+    const chips = r.queryAllByTestId("chip");
+    expect(chips).toHaveLength(1);
+    expect(chips[0]).toHaveTextContent("One");
+  });
+
+  it("preserves multiple selections after tab-blur", async () => {
+    const selectedRef: React.MutableRefObject<string[] | undefined> = { current: undefined };
+    // Given a MultiSelectField with no selected values
+    const r = await render(<TestMultiSelectField values={[]} options={options} selectedRef={selectedRef} />);
+    // When we select two options
+    selectOption(r, "One");
+    selectOption(r, "Two");
+    expect(onSelect).toHaveBeenLastCalledWith(["1", "2"]);
+    onSelect.mockClear();
+
+    // When we Tab out of the field
+    fireEvent.keyDown(r.age, { key: "Tab" });
+    fireEvent.blur(r.age);
+
+    // Then the selections should persist
+    expect(onSelect).not.toHaveBeenCalledWith([]);
+    expect(onSelect).not.toHaveBeenCalledWith(["1"]);
+
+    // And the component's internal selected state should still hold both values
+    expect(selectedRef.current).toEqual(["1", "2"]);
+
+    // And chips should reflect both selections
+    const chips = r.queryAllByTestId("chip");
+    expect(chips).toHaveLength(2);
+  });
+
   describe("autoSort", () => {
     it("sorts options alphabetically by default", async () => {
       // Given a MultiSelectField with unsorted options
@@ -260,15 +313,17 @@ describe("MultiSelectFieldTest", () => {
     props: Optional<
       MultiSelectFieldProps<HasIdAndName<string>, string>,
       "label" | "onSelect" | "getOptionLabel" | "getOptionValue"
-    >,
+    > & { selectedRef?: React.MutableRefObject<string[] | undefined> },
   ): JSX.Element {
-    const [selected, setSelected] = useState(props.values);
+    const { selectedRef, ...rest } = props;
+    const [selected, setSelected] = useState(rest.values);
+    if (selectedRef) selectedRef.current = selected;
     return (
       <MultiSelectField
         label="Age"
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => o.id}
-        {...props}
+        {...rest}
         values={selected}
         onSelect={(values) => {
           onSelect(values);
