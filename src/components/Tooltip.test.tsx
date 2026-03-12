@@ -1,6 +1,6 @@
-import { jest } from "@jest/globals";
 import { resolveTooltip, Tooltip } from "src/components/Tooltip";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("Tooltip", () => {
   it("can resolve tooltip text", () => {
@@ -35,7 +35,7 @@ describe("Tooltip", () => {
   });
 
   it("does not block click events on wrapped children", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(
       <Tooltip title="Test tooltip">
         <button data-testid="inner" onClick={onClick}>

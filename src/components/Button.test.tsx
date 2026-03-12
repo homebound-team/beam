@@ -68,14 +68,14 @@ describe("Button", () => {
   });
 
   it("fires onClick on a Button with a tooltip", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<Button label="With tooltip" tooltip="Some tooltip text" onClick={onClick} />);
     click(r.withTooltip);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it("fires async onClick on a Button with a tooltip", async () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const r = await render(<Button label="With tooltip" tooltip="Some tooltip text" onClick={async () => onClick()} />);
     click(r.withTooltip, { allowAsync: true });
     await wait();
