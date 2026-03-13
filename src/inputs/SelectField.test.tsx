@@ -59,30 +59,21 @@ describe("SelectFieldTest", () => {
   });
 
   it("does not fire onSelect on blur when value hasn't changed", async () => {
-    // Given two SelectFields where the first has a value
+    // Given a SelectField with a value
     const onSelect = vi.fn();
     const r = await render(
-      <>
-        <TestSelectField
-          label="Age"
-          value={"1"}
-          options={options}
-          getOptionLabel={(o) => o.name}
-          getOptionValue={(o) => o.id}
-          onSelect={onSelect}
-        />
-        <TestSelectField
-          label="Other"
-          value={undefined}
-          options={options}
-          getOptionLabel={(o) => o.name}
-          getOptionValue={(o) => o.id}
-        />
-      </>,
+      <TestSelectField
+        label="Age"
+        value={"1"}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onSelect={onSelect}
+      />,
     );
-    // When we focus the first field then click the second (blurring the first)
+    // When we focus and then blur the field
     focus(r.age);
-    click(r.other);
+    fireEvent.blur(r.age);
     // Then onSelect is not called since the value didn't change
     expect(onSelect).not.toHaveBeenCalled();
   });
