@@ -209,7 +209,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   }
 
   const onFocusChained = chain((e: FocusEvent<HTMLInputElement> | FocusEvent<HTMLTextAreaElement>) => {
-    if (selectOnFocus) e.target.select();
+    // Only select on real user focus events, not synthetic ones (e.g., react-aria's dispatchVirtualFocus).
+    if (selectOnFocus && e.isTrusted) e.target.select();
   }, onFocus);
 
   // Simulate clicking `ElementType` when using an unfocused placeholder
