@@ -58,6 +58,35 @@ describe("SelectFieldTest", () => {
     expect(onFocus).not.toHaveBeenCalled();
   });
 
+  it("does not fire onSelect on blur when value hasn't changed", async () => {
+    // Given two SelectFields where the first has a value
+    const onSelect = vi.fn();
+    const r = await render(
+      <>
+        <TestSelectField
+          label="Age"
+          value={"1"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onSelect={onSelect}
+        />
+        <TestSelectField
+          label="Other"
+          value={undefined}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />
+      </>,
+    );
+    // When we focus the first field then click the second (blurring the first)
+    focus(r.age);
+    click(r.other);
+    // Then onSelect is not called since the value didn't change
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   it("resets input value on blur if it does not match the selected option", async () => {
     // Given a Select Field without a selected option
     const r = await render(

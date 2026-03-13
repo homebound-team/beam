@@ -276,6 +276,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         onSelect(keys.map(keyToValue) as V[], newSelectedOptions);
       } else {
         const key = newValue as AriaKey | null;
+        if (key === selectedKeys[0]) return; // Skip if value hasn't changed
         if (key === null || key === undefined) {
           onSelect([], []);
           return;
