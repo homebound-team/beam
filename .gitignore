@@ -10,6 +10,7 @@ dist
 
 dist
 storybook-static
+.storyshots
 
 test.html
 

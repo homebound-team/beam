@@ -2347,8 +2347,9 @@ __metadata:
     mobx: ^6.15.0
     mobx-react: ^9.2.1
     mobx-utils: ^6.1.1
-    prettier: ^3.8.1
-    prettier-plugin-organize-imports: ^4.3.0
+    pixelmatch: ^7.1.0
+    playwright: ^1.58.2
+    pngjs: ^7.0.0
     react: ^18.3.1
     react-aria: ^3.47.0
     react-day-picker: 8.0.7
@@ -8949,12 +8950,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.3.2":
+  version: 2.3.2
+  resolution: "fsevents@npm:2.3.2"
+  dependencies:
+    node-gyp: latest
+  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:~2.3.2, fsevents@npm:~2.3.3":
   version: 2.3.3
   resolution: "fsevents@npm:2.3.3"
   dependencies:
     node-gyp: latest
   checksum: 11e6ea6fea15e42461fc55b4b0e4a0a3c654faa567f1877dbd353f39156f69def97a69936d1746619d656c4b93de2238bf731f6085a03a50cabf287c9d024317
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@2.3.2#~builtin<compat/fsevents>":
+  version: 2.3.2
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"
+  dependencies:
+    node-gyp: latest
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -12203,6 +12223,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pixelmatch@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "pixelmatch@npm:7.1.0"
+  dependencies:
+    pngjs: ^7.0.0
+  bin:
+    pixelmatch: bin/pixelmatch
+  checksum: 0ad2e863e0e87ae52289c4366860a4040712a30a1e19c606745b9750b3ecda6f587dc959ce452818c50c7753ef6916f23026c14ef4d5f6c3b13c8205d61b923d
+  languageName: node
+  linkType: hard
+
 "pkg-conf@npm:^2.1.0":
   version: 2.1.0
   resolution: "pkg-conf@npm:2.1.0"
@@ -12221,6 +12252,37 @@ __metadata:
     mlly: ^1.7.4
     pathe: ^2.0.1
   checksum: 4fa4edb2bb845646cdbd04c5c6bc43cdbc8f02ed4d1c28bfcafb6e65928aece789bcf1335e4cac5f65dfdc376e4bd7435bd509a35e9ec73ef2c076a1b88e289c
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.58.2":
+  version: 1.58.2
+  resolution: "playwright-core@npm:1.58.2"
+  bin:
+    playwright-core: cli.js
+  checksum: fd8c4c6658b80f5db90af36db9f560e7bf461f704d0ffe706e8858570af0321312fff9c44a5ee49552df3e3cce981e1f8dd9e8b09e6d7bdd62e094639b68bddd
+  languageName: node
+  linkType: hard
+
+"playwright@npm:^1.58.2":
+  version: 1.58.2
+  resolution: "playwright@npm:1.58.2"
+  dependencies:
+    fsevents: 2.3.2
+    playwright-core: 1.58.2
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: 3536138633135bdd62eb3aa63c653036b944fbb6fb2d57f4d936baaad9d706c11bde13ef11b307677fba061bad2f4ad68256f84978cc9280667437d1106d12e6
+  languageName: node
+  linkType: hard
+
+"pngjs@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "pngjs@npm:7.0.0"
+  checksum: b19a018930d27de26229c1b3ff250b3a25d09caa22cbb0b0459987d91eb0a560a18ab5d67da45a38ed7514140f26d1db58de83c31159ec101f2bb270a3c707f1
   languageName: node
   linkType: hard
 
@@ -12308,21 +12370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-plugin-organize-imports@npm:^4.3.0":
-  version: 4.3.0
-  resolution: "prettier-plugin-organize-imports@npm:4.3.0"
-  peerDependencies:
-    prettier: ">=2.0"
-    typescript: ">=2.9"
-    vue-tsc: ^2.1.0 || 3
-  peerDependenciesMeta:
-    vue-tsc:
-      optional: true
-  checksum: 0fcedc6eba82906e7c4004858313dcc6b8a6122fc169dac9911e884b322a38541dfe07ec56b6f9d17cef42aba78bb0280a87a1187723bf7ba63d86a9f522eea3
-  languageName: node
-  linkType: hard
-
-"prettier@npm:^3.3.2, prettier@npm:^3.8.1":
+"prettier@npm:^3.3.2":
   version: 3.8.1
   resolution: "prettier@npm:3.8.1"
   bin:
