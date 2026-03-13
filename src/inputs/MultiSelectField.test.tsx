@@ -273,6 +273,17 @@ describe("MultiSelectFieldTest", () => {
     expect(chips).toHaveLength(2);
   });
 
+  it("does not fire onSelect on blur when values haven't changed", async () => {
+    // Given a MultiSelectField with selected values
+    onSelect.mockClear();
+    const r = await render(<TestMultiSelectField values={["1", "2"] as string[]} options={options} />);
+    // When we focus and then blur the field
+    focus(r.age);
+    fireEvent.blur(r.age);
+    // Then onSelect is not called since the values didn't change
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   describe("autoSort", () => {
     it("sorts options alphabetically by default", async () => {
       // Given a MultiSelectField with unsorted options
