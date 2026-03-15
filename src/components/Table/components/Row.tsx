@@ -136,7 +136,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`> .${revealOnRowHoverClass} > *`]: Css.vh.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
-    ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
+    // keptLastRowCss is now applied per-cell in cellCss below
   };
 
   let currentColspan = 1;
@@ -340,6 +340,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+            // Apply kept last row styling per-cell
+            ...(isLastKeptRow && style.keptLastRowCss),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.
