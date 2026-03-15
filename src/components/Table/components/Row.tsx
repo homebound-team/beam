@@ -127,8 +127,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         ":hover": { ...style.nonHeaderRowHoverCss },
       }),
     ...(levelIndent && Css.mlPx(levelIndent).$),
-    // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `fn` to ensure they stay their defined widths
-    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.fn.$).$),
+    // For virtual tables use `display: flex` to keep all cells on the same row.
+    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
@@ -304,7 +304,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           // not Google spreadsheets" tables.
           const cellCss = {
             // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
-            ...Css.df.if(as === "table").dtc.$,
+            // For virtual tables (non-table), use `flex: none` to ensure cells stay their defined widths.
+            ...Css.df.if(as === "table").dtc.else.fn.$,
             // Apply sticky column/cell styles
             ...maybeStickyColumnStyles,
             // Apply any static/all-cell styling
