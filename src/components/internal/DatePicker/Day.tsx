@@ -51,11 +51,6 @@ export function Day(props: DayProps) {
           }),
         ...(!disabled && { "&:active > div": Css.bgGray400.gray900.$ }),
         "&:focus:not(:active) > div": Css.ba.bcBlue700.if(selected).bcBlue900.$,
-        ...(showRangeStyles &&
-          range_start &&
-          Css.addIn(":after", { ...rangeBaseStyles, ...Css.rightPx(-2).wPx(8).$ }).$),
-        ...(showRangeStyles && range_end && Css.addIn(":after", { ...rangeBaseStyles, ...Css.wPx(8).leftPx(-2).$ }).$),
-        ...(showRangeStyles && range_middle && Css.addIn(":after", { ...rangeBaseStyles, ...Css.leftPx(-2).$ }).$),
       }}
       {...tid}
     >
@@ -82,8 +77,12 @@ export function Day(props: DayProps) {
           />
         )}
       </div>
+      {/* Range indicator shown behind the selected day */}
+      {showRangeStyles && range_start && <span css={{ ...rangeBaseStyles, ...Css.rightPx(-2).wPx(8).$ }} />}
+      {showRangeStyles && range_end && <span css={{ ...rangeBaseStyles, ...Css.wPx(8).leftPx(-2).$ }} />}
+      {showRangeStyles && range_middle && <span css={{ ...rangeBaseStyles, ...Css.leftPx(-2).$ }} />}
     </button>
   );
 }
 
-const rangeBaseStyles = Css.absolute.topPx(2).contentEmpty.hPx(30).wPx(32).bgBlue100.$;
+const rangeBaseStyles = Css.absolute.topPx(2).hPx(30).wPx(32).bgBlue100.$;
