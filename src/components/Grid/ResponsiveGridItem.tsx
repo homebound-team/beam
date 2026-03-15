@@ -8,6 +8,10 @@ export type ResponsiveGridItemProps = PropsWithChildren<{
 /** Helper component for generating grid items with the ResponsiveGrid */
 export function ResponsiveGridItem(props: ResponsiveGridItemProps) {
   const { colSpan, children } = props;
-  const { gridItemProps } = useResponsiveGridItem({ colSpan });
-  return <div {...gridItemProps}>{children}</div>;
+  const { gridItemProps, gridItemStyles } = useResponsiveGridItem({ colSpan });
+  return (
+    <div {...gridItemProps} css={{ ...gridItemStyles }}>
+      {children}
+    </div>
+  );
 }
