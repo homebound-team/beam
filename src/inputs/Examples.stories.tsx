@@ -33,9 +33,7 @@ function DrawerWithInputs() {
         { label: "Save", onClick: noop },
       ]}
     >
-      <SuperDrawerHeader>
-        <h1>5304.01 - Counters</h1>
-      </SuperDrawerHeader>
+      <SuperDrawerHeader title="5304.01 - Counters" />
       <form css={{ ...Css.df.fdc.gap5.$, "& fieldset": Css.df.fdc.gap2.$, "& legend": Css.md.mb2.$ }}>
         <fieldset>
           <legend>Details</legend>

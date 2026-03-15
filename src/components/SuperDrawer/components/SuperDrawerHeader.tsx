@@ -32,7 +32,7 @@ export function SuperDrawerHeader(props: SuperDrawerHeaderProps | SuperDrawerHea
       {isStructuredProps(props) ? (
         <div css={Css.df.jcsb.aic.gap2.fg1.$}>
           <div css={Css.fg1.df.aic.gap2.$}>
-            {typeof props.title === "string" ? <h1>{props.title}</h1> : props.title}
+            <h1 css={Css.xl2.$}>{props.title}</h1>
             {props.left}
           </div>
           {props.right && <div css={Css.fs0.$}>{props.right}</div>}
