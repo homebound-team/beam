@@ -74,7 +74,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
       <div
         css={{
           ...xss,
-          ...Css.oa.fg1.addIn("&::-webkit-scrollbar", { display: "none" }).add("scrollbarWidth", "none").$,
+          ...Css.oa.fg1.add("scrollbarWidth", "none").$,
         }}
         onScroll={(e) => updateScrollProps(e.currentTarget)}
         ref={scrollRef}
