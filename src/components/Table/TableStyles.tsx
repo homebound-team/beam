@@ -198,6 +198,7 @@ export const getTableStyles = memoizedTableStyles();
 
 export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
+export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("pageBreakInside", "avoid").$;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type RowStyles<R extends Kinded> = {

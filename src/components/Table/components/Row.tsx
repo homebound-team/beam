@@ -10,7 +10,7 @@ import {
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
+import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
@@ -116,6 +116,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
+    ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
       // Even though backgroundColor is set on the cellCss, the hover target is the row.

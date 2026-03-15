@@ -9,7 +9,14 @@ import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableAp
 import { useColumnResizeHandlers } from "src/components/Table/hooks/useColumnResizeHandlers";
 import { useScrollStorage } from "src/components/Table/hooks/useScrollStorage";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
-import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
+import {
+  defaultStyle,
+  GridStyle,
+  GridStyleDef,
+  resolveStyles,
+  RowStyles,
+  tableRowPrintBreakCss,
+} from "src/components/Table/TableStyles";
 import {
   Direction,
   GridColumn,
@@ -657,7 +664,6 @@ function renderTable<R extends Kinded>(
       ref={tableContainerRef as MutableRefObject<HTMLTableElement | null>}
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
-        ...Css.addIn("& tr ", { pageBreakAfter: "auto", pageBreakInside: "avoid" }).$,
         ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
           // removes border between header and second row
           .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
@@ -674,7 +680,7 @@ function renderTable<R extends Kinded>(
         {keptSelectedRows}
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
-          <tr>
+          <tr css={tableRowPrintBreakCss}>
             <td colSpan={columns.length} css={{ ...style.firstRowMessageCss }}>
               {firstRowMessage}
             </td>
