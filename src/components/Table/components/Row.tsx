@@ -321,6 +321,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isTotals && hasExpandableHeader && Css.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$),
             // Then apply any expandable header specific override
             ...(isExpandableHeader && style.expandableHeaderCss),
+            // Add right border on expandable header cells except the last column
+            ...(isExpandableHeader && columns.length - 1 !== columnIndex && style.expandedHeaderNonLastColumnCss),
             // Conditionally apply the right border styling for the header or totals row when using expandable tables
             // Only apply if not the last column in the table AND when this column is the last column in the group of expandable column or not expanded AND
             ...(hasExpandableHeader &&
