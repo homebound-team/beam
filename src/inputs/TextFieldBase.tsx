@@ -182,6 +182,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     },
     input: {
       ...Css.w100.mw0.outline0.fg1.bgTransparent.$,
+      // Keep `addIn` for `::selection` until we finish the StyleX migration.
       // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
       ...(contrast && !inputStylePalette && Css.addIn("&::selection", Css.bgGray800.$).$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields

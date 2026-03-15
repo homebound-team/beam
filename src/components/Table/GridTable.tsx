@@ -623,7 +623,6 @@ function renderDiv<R extends Kinded>(
       {/* Table Body */}
       <div
         css={{
-          ...(style.betweenRowsCss ? Css.addIn(`& > div > *`, style.betweenRowsCss).$ : {}),
           ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type`, style.firstNonHeaderRowCss).$ : {}),
           ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
         }}
@@ -664,9 +663,8 @@ function renderTable<R extends Kinded>(
       ref={tableContainerRef as MutableRefObject<HTMLTableElement | null>}
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
-        ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
-          // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
+        // removes border between header and second row
+        ...(style.firstNonHeaderRowCss ? Css.addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss).$ : {}),
         ...Css.addIn("& > tbody > tr:last-of-type", style.lastRowCss).$,
         ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
@@ -681,7 +679,7 @@ function renderTable<R extends Kinded>(
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
           <tr css={tableRowPrintBreakCss}>
-            <td colSpan={columns.length} css={{ ...style.firstRowMessageCss }}>
+            <td colSpan={columns.length} css={{ ...style.betweenRowsCss, ...style.firstRowMessageCss }}>
               {firstRowMessage}
             </td>
           </tr>
@@ -883,8 +881,6 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
           ref={ref}
           style={{ ...style, ...{ minWidth: "fit-content" } }}
           css={{
-            // Add an extra `> div` due to Item + itemContent both having divs
-            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
             // Table list styles only
             ...(isHeader
               ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$

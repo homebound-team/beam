@@ -23,6 +23,7 @@ export function KeptGroupRow(props: KeptGroupRowProps) {
     <CellTag
       css={{
         ...style.cellCss,
+        ...style.betweenRowsCss,
         ...style.keptGroupRowCss,
         ...Css.pl0.w(`calc(${columnSizes.join(" + ")})`).$,
       }}

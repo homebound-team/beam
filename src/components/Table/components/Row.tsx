@@ -96,6 +96,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isTotals = row.kind === TOTALS;
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
   const isKeptGroupRow = row.kind === KEPT_GROUP;
+  const isBodyRow = !isHeader && !isTotals && !isExpandableHeader;
+  const isFirstHeadRow = isExpandableHeader || (!hasExpandableHeader && isHeader);
   const rowStyle = rowStyles?.[row.kind as R["kind"]];
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
@@ -311,8 +313,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...maybeStickyColumnStyles,
             // Apply any static/all-cell styling
             ...style.cellCss,
+            // Apply between-row cell styling for body rows.
+            ...(isBodyRow && style.betweenRowsCss),
+            ...(isFirstHeadRow && style.firstRowCellCss),
             // Then override with first/last cell styling
             ...getFirstOrLastCellCss(style, columnIndex, columns),
+            ...(columnIndex === 0 && isFirstHeadRow && style.firstRowFirstCellCss),
+            ...(columnIndex === columns.length - 1 && isFirstHeadRow && style.firstRowLastCellCss),
             // Then override with per-cell/per-row justification
             ...justificationCss,
             // Then apply any header-specific override
@@ -334,7 +341,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               currentExpandedColumnCount === 0 &&
               Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
             // Or level-specific styling
-            ...(!isHeader && !isTotals && !isExpandableHeader && levelStyle?.cellCss),
+            ...(isBodyRow && levelStyle?.cellCss),
             // Level specific styling for the first content column
             ...(applyFirstContentColumnStyles && levelStyle?.firstContentColumn),
             // The specific cell's css (if any from GridCellContent)

@@ -9,9 +9,13 @@ import { safeKeys } from "src/utils";
 export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
-  /** Applied with the owl operator between rows for rendering border lines. */
+  /**
+   * Applied as the base body-row cell styling (commonly used for row separators).
+   * This is applied to body rows broadly (including the last body row); use `lastRowCss`
+   * to adjust/cancel any final-row treatment.
+   */
   betweenRowsCss?: Properties;
-  /** Applied on the last row of the table. */
+  /** Applied on the last row of the table, typically to override/cancel `betweenRowsCss`. */
   lastRowCss?: Properties;
   /** Applied on the first row of the table (could be the Header or Totals row). */
   firstRowCss?: Properties;
@@ -40,6 +44,12 @@ export interface GridStyle {
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
+  /** Applied to every cell in the first table-head row (expandableHeader/header/totals). */
+  firstRowCellCss?: Properties;
+  /** Applied to the first cell in the first table-head row. */
+  firstRowFirstCellCss?: Properties;
+  /** Applied to the last cell in the first table-head row. */
+  firstRowLastCellCss?: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
@@ -163,20 +173,16 @@ function memoizedTableStyles() {
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
           ...(bordered && { "&:first-child": Css.bl.bcGray200.$, "&:last-child": Css.br.bcGray200.$ }),
         },
-        firstRowCss: {
-          ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
-            "& > *:last-of-type",
-            Css.borderRadius("0 8px 0 0").$,
-          ).$,
-          ...(bordered && Css.addIn("& > *", Css.bt.bcGray200.$).$),
-        },
+        firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
+        firstRowFirstCellCss: Css.borderRadius("8px 0 0 0 ").$,
+        firstRowLastCellCss: Css.borderRadius("0 8px 0 0").$,
         // Only apply border radius styles to the last row when using the `bordered` style table.
         lastRowCss: bordered
-          ? Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
-              "& > *:last-of-type",
-              Css.borderRadius("0 0 8px 0").$,
-            ).$
-          : Css.addIn("> *", Css.bsh0.$).$,
+          ? ({
+              "& > *:first-of-type": Css.borderRadius("0 0 0 8px").$,
+              "& > *:last-of-type": Css.borderRadius("0 0 8px 0").$,
+            } as Properties)
+          : ({ "& > *": Css.bsh0.$ } as Properties),
         presentationSettings: {
           borderless: true,
           typeScale: "xs",
