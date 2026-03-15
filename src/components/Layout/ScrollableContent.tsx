@@ -1,6 +1,6 @@
 import { ReactNode, ReactPortal, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { scrollContainerBottomPadding, useScrollableParent } from "src/components/Layout/ScrollableParent";
+import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { Css, Palette } from "src/Css";
 
 interface ScrollableContentProps {
@@ -36,15 +36,17 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
     return <>{children}</>;
   }
 
+  const showBottomSpacer = !omitBottomPadding && !virtualized;
+
   return createPortal(
     <div
       css={{
         ...Css.h100.pr(pr).pl(pl).if(virtualized).pr0.$,
         ...(bgColor && Css.bgColor(bgColor).$),
-        ...(!omitBottomPadding && !virtualized && scrollContainerBottomPadding),
       }}
     >
       {children}
+      {showBottomSpacer && <div css={Css.h2.$} />}
     </div>,
     scrollableEl,
   );
