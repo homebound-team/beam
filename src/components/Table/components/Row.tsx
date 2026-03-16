@@ -47,6 +47,7 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  isFirstBodyRow: boolean;
   isLastBodyRow: boolean;
   /* column resizers */
   resizedWidths: ResizedWidths;
@@ -75,6 +76,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    isFirstBodyRow,
     isLastBodyRow,
     resizedWidths,
     setResizedWidth,
@@ -120,6 +122,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
+    ...(isFirstBodyRow && style.firstNonHeaderRowCss),
     ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {

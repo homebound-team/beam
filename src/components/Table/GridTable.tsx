@@ -466,11 +466,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
     const bodyRowsCount = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind)).length;
     let bodyRowsSeen = 0;
+    let foundFirstBodyRow = false;
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
       const isBodyRow = ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      const isFirstBodyRow = isBodyRow && !foundFirstBodyRow;
       if (isBodyRow) bodyRowsSeen += 1;
+      if (isBodyRow) foundFirstBodyRow = true;
       const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount;
 
       const row = (
@@ -491,6 +494,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             hasExpandableHeader,
+            isFirstBodyRow,
             isLastBodyRow,
             resizedWidths,
             setResizedWidth: handleColumnResize,
@@ -635,16 +639,19 @@ function renderDiv<R extends Kinded>(
       </div>
 
       {/* Table Body */}
-      <div
-        css={{
-          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type`, style.firstNonHeaderRowCss).$ : {}),
-        }}
-      >
+      <div>
         {keptSelectedRows}
         {/* Show an info message if it's set. */}
         {firstRowMessage && (
           <div
-            css={{ ...style.firstRowMessageCss, ...(visibleDataRows.length === 0 && style.lastRowCss) }}
+            css={{
+              ...(keptSelectedRows.length === 0 && style.firstNonHeaderRowCss),
+              ...style.firstRowMessageCss,
+              ...(visibleDataRows.length === 0 && style.lastRowCss),
+              ...(visibleDataRows.length === 0 && style.lastRowCellCss),
+              ...(visibleDataRows.length === 0 && style.lastRowFirstCellCss),
+              ...(visibleDataRows.length === 0 && style.lastRowLastCellCss),
+            }}
             data-gridrow
           >
             {firstRowMessage}
@@ -679,8 +686,6 @@ function renderTable<R extends Kinded>(
       ref={tableContainerRef as MutableRefObject<HTMLTableElement | null>}
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
-        // removes border between header and second row
-        ...(style.firstNonHeaderRowCss ? Css.addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss).$ : {}),
         ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
@@ -693,7 +698,13 @@ function renderTable<R extends Kinded>(
         {keptSelectedRows}
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
-          <tr css={{ ...tableRowPrintBreakCss, ...(visibleDataRows.length === 0 && style.lastRowCss) }}>
+          <tr
+            css={{
+              ...tableRowPrintBreakCss,
+              ...(keptSelectedRows.length === 0 && style.firstNonHeaderRowCss),
+              ...(visibleDataRows.length === 0 && style.lastRowCss),
+            }}
+          >
             <td
               colSpan={columns.length}
               css={{
@@ -827,8 +838,23 @@ function renderVirtual<R extends Kinded>(
           if (index === 0) {
             return (
               // Ensure the fallback message is the same width as the table
-              <div css={getTableRefWidthStyles(true)}>
-                <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+              <div
+                css={{
+                  ...getTableRefWidthStyles(true),
+                  ...(keptSelectedRows.length === 0 && style.firstNonHeaderRowCss),
+                  ...(visibleDataRows.length === 0 && style.lastRowCss),
+                }}
+              >
+                <div
+                  css={{
+                    ...style.firstRowMessageCss,
+                    ...(visibleDataRows.length === 0 && style.lastRowCellCss),
+                    ...(visibleDataRows.length === 0 && style.lastRowFirstCellCss),
+                    ...(visibleDataRows.length === 0 && style.lastRowLastCellCss),
+                  }}
+                >
+                  {firstRowMessage}
+                </div>
               </div>
             );
           }
@@ -906,11 +932,7 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
           style={{ ...style, ...{ minWidth: "fit-content" } }}
           css={{
             // Table list styles only
-            ...(isHeader
-              ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$
-              : {
-                  ...Css.addIn("& > div:first-of-type", gs.firstNonHeaderRowCss).$,
-                }),
+            ...(isHeader ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$ : {}),
             ...gs.rootCss,
             ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
             ...xss,

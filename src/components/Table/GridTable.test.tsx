@@ -454,9 +454,10 @@ describe("GridTable", () => {
       click(r.sortHeader_0);
       // Then 'name: b' row is first
       expect(cell(r, 1, 0)).toHaveTextContent("b");
-      // And the rows were memoized so didn't re-render
-      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      // Rows that move into/out of the first-body-row slot can re-render as
+      // sorting changes which row receives first-row inline styling.
+      expect(row(r, 1).getAttribute("data-render")).toEqual("3");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("3");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
@@ -502,9 +503,10 @@ describe("GridTable", () => {
       click(r.sortHeader_0);
       // Then 'name: b' row is first
       expect(cell(r, 6, 0)).toHaveTextContent("d");
-      // And the rows were memoized so didn't re-render
-      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      // Rows that move into/out of the first-body-row slot can re-render as
+      // sorting changes which row receives first-row inline styling.
+      expect(row(r, 1).getAttribute("data-render")).toEqual("3");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("3");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
     });
 
@@ -694,12 +696,12 @@ describe("GridTable", () => {
 
       // And the header row re-rendered
       expect(row(r, 0).getAttribute("data-render")).toEqual("1");
-      // Data rows mostly stay memoized. The rows that transition into/out of the
-      // last-body-row slot re-render once for inline last-row styling updates.
-      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      // Data rows mostly stay memoized. Rows that transition into/out of the
+      // first/last body-row slots can re-render once for inline row-edge styling updates.
+      expect(row(r, 1).getAttribute("data-render")).toEqual("2");
       expect(row(r, 2).getAttribute("data-render")).toEqual("2");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 4).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 4).getAttribute("data-render")).toEqual("2");
       expect(row(r, 5).getAttribute("data-render")).toEqual("1");
       expect(row(r, 6).getAttribute("data-render")).toEqual("2");
 
@@ -707,12 +709,12 @@ describe("GridTable", () => {
       click(r.rerenderParent);
 
       // Then memoization did not break: the only extra renders remain the rows that
-      // changed last-row status, and parent rerenders do not fan out further.
+      // changed first/last-row status, and parent rerenders do not fan out further.
       expect(row(r, 0).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 1).getAttribute("data-render")).toEqual("2");
       expect(row(r, 2).getAttribute("data-render")).toEqual("2");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 4).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 4).getAttribute("data-render")).toEqual("2");
       expect(row(r, 5).getAttribute("data-render")).toEqual("1");
       expect(row(r, 6).getAttribute("data-render")).toEqual("2");
     });
