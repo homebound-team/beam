@@ -67,7 +67,7 @@
     "tributejs": "^5.1.3",
     "trix": "^1.3.1",
     "use-debounce": "^10.0.4",
-    "use-query-params": "^1.2.2"
+    "use-query-params": "^2.2.2"
   },
   "peerDependencies": {
     "@emotion/react": ">=11",
@@ -86,8 +86,8 @@
   "devDependencies": {
     "@emotion/react": "^11.14.0",
     "@homebound/eslint-config": "^1.10.2",
-    "@homebound/rtl-react-router-utils": "1.2.0",
-    "@homebound/rtl-utils": "^2.69.0",
+    "@homebound/rtl-react-router-utils": "1.3.0",
+    "@homebound/rtl-utils": "^2.70.0",
     "@homebound/truss": "^1.137.5",
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^7.0.3",
