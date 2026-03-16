@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { StringParam, useQueryParams } from "use-query-params";
+import { StringParam, useQueryParams } from "src/utils/useQueryParamsCompat";
 
 export type UseQueryState<V> = [V, (value: V) => void];
 

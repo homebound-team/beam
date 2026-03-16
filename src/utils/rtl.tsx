@@ -1,10 +1,22 @@
-import { withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
 import { RenderResult, render as rtlRender, Wrapper } from "@homebound/rtl-utils";
+import { createMemoryHistory } from "history";
 import { ReactElement } from "react";
+import { Router } from "react-router";
 import { BeamProvider } from "src";
+import { QueryParamProvider } from "src/utils/useQueryParamsCompat";
+import { ReactRouter5Adapter } from "use-query-params/adapters/react-router-5";
 
 export * from "./rtlUtils";
-export { _withRouter as withRouter };
+
+export function withRouter(url = "/") {
+  const history = createMemoryHistory({ initialEntries: [url] });
+  const wrap: Wrapper["wrap"] = (c) => (
+    <Router history={history}>
+      <QueryParamProvider adapter={ReactRouter5Adapter}>{c}</QueryParamProvider>
+    </Router>
+  );
+  return { history, wrap };
+}
 
 interface RenderOpts {
   at?: { url: string; route?: string };
@@ -35,7 +47,7 @@ export function render(
     wrappers = [
       ...otherWrappers,
       ...(!omitBeamContext ? [withBeamRTL] : []),
-      ...(at ? [_withRouter(at.url)] : [_withRouter()]),
+      ...(at ? [withRouter(at.url)] : [withRouter()]),
     ];
   } else {
     wrappers = [withBeamRTL];

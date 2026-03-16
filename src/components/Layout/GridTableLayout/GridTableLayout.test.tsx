@@ -3,7 +3,6 @@ import { actionColumn, column, numericColumn } from "src/components/Table/utils/
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
 import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
-import { QueryParamProvider } from "use-query-params";
 import {
   GridTableLayout as GridTableLayoutComponent,
   GridTableLayoutProps,
@@ -40,34 +39,32 @@ describe("GridTableLayout", () => {
   it("renders with static rows", async () => {
     // Given a GridTableLayout with static rows and search and filter config
     const r = await render(
-      <QueryParamProvider>
-        <TestWrapper
-          layoutStateProps={{
-            persistedFilter: {
-              filterDefs: {
-                needsRevision: checkboxFilter({
-                  label: "Needs Revision",
-                }),
-              },
-              storageKey: "test",
+      <TestWrapper
+        layoutStateProps={{
+          persistedFilter: {
+            filterDefs: {
+              needsRevision: checkboxFilter({
+                label: "Needs Revision",
+              }),
             },
-            search: "client",
-          }}
-          pageTitle="Grid Table Layout Example"
-          breadcrumb={[
-            { href: "/", label: "Home" },
-            { href: "/", label: "Sub Page" },
-          ]}
-          tableProps={{
-            columns,
-            rows: [simpleHeader, ...rows],
-          }}
-          totalCount={100}
-          primaryAction={{ label: "Primary Action", onClick: noop }}
-          secondaryAction={{ label: "Secondary Action", onClick: noop }}
-          tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
-        />
-      </QueryParamProvider>,
+            storageKey: "test",
+          },
+          search: "client",
+        }}
+        pageTitle="Grid Table Layout Example"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Sub Page" },
+        ]}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...rows],
+        }}
+        totalCount={100}
+        primaryAction={{ label: "Primary Action", onClick: noop }}
+        secondaryAction={{ label: "Secondary Action", onClick: noop }}
+        tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
+      />,
       withRouter(),
     );
 
@@ -98,42 +95,40 @@ describe("GridTableLayout", () => {
   it("renders with query table", async () => {
     // When the table is rendered with a query
     const r = await render(
-      <QueryParamProvider>
-        <TestWrapper
-          layoutStateProps={{
-            persistedFilter: {
-              filterDefs: {
-                needsRevision: checkboxFilter({
-                  label: "Needs Revision",
-                }),
-              },
-              storageKey: "test",
+      <TestWrapper
+        layoutStateProps={{
+          persistedFilter: {
+            filterDefs: {
+              needsRevision: checkboxFilter({
+                label: "Needs Revision",
+              }),
             },
-            // And no search config
-          }}
-          pageTitle="Query Table Layout Example"
-          breadcrumb={[
-            { href: "/", label: "Home" },
-            { href: "/", label: "Sub Page" },
-          ]}
-          tableProps={{
-            columns,
-            query: {
-              data: [
-                { id: "1", name: "Delta", value: 100 },
-                { id: "2", name: "Epsilon", value: 200 },
-              ],
-              loading: false,
-            },
-            createRows: (data) => [
-              simpleHeader,
-              ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
+            storageKey: "test",
+          },
+          // And no search config
+        }}
+        pageTitle="Query Table Layout Example"
+        breadcrumb={[
+          { href: "/", label: "Home" },
+          { href: "/", label: "Sub Page" },
+        ]}
+        tableProps={{
+          columns,
+          query: {
+            data: [
+              { id: "1", name: "Delta", value: 100 },
+              { id: "2", name: "Epsilon", value: 200 },
             ],
-          }}
-          totalCount={100}
-          primaryAction={{ label: "Primary Action", onClick: noop }}
-        />
-      </QueryParamProvider>,
+            loading: false,
+          },
+          createRows: (data) => [
+            simpleHeader,
+            ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
+          ],
+        }}
+        totalCount={100}
+        primaryAction={{ label: "Primary Action", onClick: noop }}
+      />,
       withRouter(),
     );
 
@@ -157,18 +152,16 @@ describe("GridTableLayout", () => {
     it("does not render EditColumnsButton when hideEditColumns is true", async () => {
       // Given GridTableLayout with hideEditColumns=true
       const r = await render(
-        <QueryParamProvider>
-          <TestWrapper
-            layoutStateProps={{}}
-            pageTitle="Test"
-            hideEditColumns={true}
-            totalCount={100}
-            tableProps={{
-              columns,
-              rows: [simpleHeader, ...rows],
-            }}
-          />
-        </QueryParamProvider>,
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          hideEditColumns={true}
+          totalCount={100}
+          tableProps={{
+            columns,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
         withRouter(),
       );
 
@@ -183,17 +176,15 @@ describe("GridTableLayout", () => {
       // Then it throws an error
       await expect(
         render(
-          <QueryParamProvider>
-            <TestWrapper
-              layoutStateProps={{}}
-              pageTitle="Test"
-              totalCount={100}
-              tableProps={{
-                columns: columnsWithoutId,
-                rows: [simpleHeader, ...rows],
-              }}
-            />
-          </QueryParamProvider>,
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            totalCount={100}
+            tableProps={{
+              columns: columnsWithoutId,
+              rows: [simpleHeader, ...rows],
+            }}
+          />,
           withRouter(),
         ),
       ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
@@ -206,17 +197,15 @@ describe("GridTableLayout", () => {
       // Then it throws an error
       await expect(
         render(
-          <QueryParamProvider>
-            <TestWrapper
-              layoutStateProps={{}}
-              pageTitle="Test"
-              totalCount={100}
-              tableProps={{
-                columns: columnsWithoutName,
-                rows: [simpleHeader, ...rows],
-              }}
-            />
-          </QueryParamProvider>,
+          <TestWrapper
+            layoutStateProps={{}}
+            pageTitle="Test"
+            totalCount={100}
+            tableProps={{
+              columns: columnsWithoutName,
+              rows: [simpleHeader, ...rows],
+            }}
+          />,
           withRouter(),
         ),
       ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
@@ -228,18 +217,16 @@ describe("GridTableLayout", () => {
 
       // Then it does not throw
       const r = await render(
-        <QueryParamProvider>
-          <TestWrapper
-            layoutStateProps={{}}
-            pageTitle="Test"
-            hideEditColumns={true}
-            totalCount={100}
-            tableProps={{
-              columns: columnsWithoutId,
-              rows: [simpleHeader, ...rows],
-            }}
-          />
-        </QueryParamProvider>,
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          hideEditColumns={true}
+          totalCount={100}
+          tableProps={{
+            columns: columnsWithoutId,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
         withRouter(),
       );
 
@@ -251,22 +238,20 @@ describe("GridTableLayout", () => {
     it("renders pagination when totalCount is provided", async () => {
       // Given a GridTableLayout with totalCount
       const r = await render(
-        <QueryParamProvider>
-          <TestWrapper
-            layoutStateProps={{
-              pagination: {
-                pageSizes: [100, 500, 1000],
-              },
-            }}
-            pageTitle="Test With Pagination"
-            hideEditColumns
-            totalCount={500}
-            tableProps={{
-              columns,
-              rows: [simpleHeader, ...rows],
-            }}
-          />
-        </QueryParamProvider>,
+        <TestWrapper
+          layoutStateProps={{
+            pagination: {
+              pageSizes: [100, 500, 1000],
+            },
+          }}
+          pageTitle="Test With Pagination"
+          hideEditColumns
+          totalCount={500}
+          tableProps={{
+            columns,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
         withRouter(),
       );
 
@@ -278,22 +263,20 @@ describe("GridTableLayout", () => {
     it("updates page state when clicking next", async () => {
       // Given a GridTableLayout with pagination
       const r = await render(
-        <QueryParamProvider>
-          <TestWrapper
-            layoutStateProps={{
-              pagination: {
-                pageSizes: [100, 500, 1000],
-              },
-            }}
-            pageTitle="Test Pagination Navigation"
-            hideEditColumns
-            totalCount={500}
-            tableProps={{
-              columns,
-              rows: [simpleHeader, ...rows],
-            }}
-          />
-        </QueryParamProvider>,
+        <TestWrapper
+          layoutStateProps={{
+            pagination: {
+              pageSizes: [100, 500, 1000],
+            },
+          }}
+          pageTitle="Test Pagination Navigation"
+          hideEditColumns
+          totalCount={500}
+          tableProps={{
+            columns,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
         withRouter(),
       );
 
@@ -310,22 +293,20 @@ describe("GridTableLayout", () => {
     it("updates page size when selecting a new size", async () => {
       // Given a GridTableLayout with pagination
       const r = await render(
-        <QueryParamProvider>
-          <TestWrapper
-            layoutStateProps={{
-              pagination: {
-                pageSizes: [100, 500, 1000],
-              },
-            }}
-            pageTitle="Test Page Size"
-            hideEditColumns
-            totalCount={500}
-            tableProps={{
-              columns,
-              rows: [simpleHeader, ...rows],
-            }}
-          />
-        </QueryParamProvider>,
+        <TestWrapper
+          layoutStateProps={{
+            pagination: {
+              pageSizes: [100, 500, 1000],
+            },
+          }}
+          pageTitle="Test Page Size"
+          hideEditColumns
+          totalCount={500}
+          tableProps={{
+            columns,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
         withRouter(),
       );
 
