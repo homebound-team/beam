@@ -11,10 +11,11 @@ interface KeptGroupRowProps {
   style: GridStyle;
   row: GridDataRow<any>;
   colSpan: number;
+  isLastBodyRow: boolean;
 }
 
 export function KeptGroupRow(props: KeptGroupRowProps) {
-  const { as, columnSizes, style, row, colSpan } = props;
+  const { as, columnSizes, style, row, colSpan, isLastBodyRow } = props;
   const CellTag = as === "table" ? "td" : "div";
   const { tableState } = useContext(TableStateContext);
   const numHiddenSelectedRows: number = useComputed(() => tableState.keptRows.length, [tableState]);
@@ -24,6 +25,9 @@ export function KeptGroupRow(props: KeptGroupRowProps) {
       css={{
         ...style.cellCss,
         ...style.betweenRowsCss,
+        ...(isLastBodyRow && style.lastRowCellCss),
+        ...(isLastBodyRow && style.lastRowFirstCellCss),
+        ...(isLastBodyRow && style.lastRowLastCellCss),
         ...style.keptGroupRowCss,
         ...Css.pl0.w(`calc(${columnSizes.join(" + ")})`).$,
       }}

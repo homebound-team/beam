@@ -47,6 +47,7 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  isLastBodyRow: boolean;
   /* column resizers */
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
@@ -74,6 +75,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    isLastBodyRow,
     resizedWidths,
     setResizedWidth,
     disableColumnResizing = true,
@@ -163,7 +165,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const RowContent = () => (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={BorderHoverParent}>
       {isKeptGroupRow ? (
-        <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
+        <KeptGroupRow
+          as={as}
+          style={style}
+          columnSizes={columnSizes}
+          row={row}
+          colSpan={columns.length}
+          isLastBodyRow={isLastBodyRow}
+        />
       ) : (
         columns.map((column, columnIndex) => {
           // If the expandable column was hidden, then we need to look at the previous column to format the `expandHeader` and 'header' kinds correctly.
@@ -316,10 +325,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Apply between-row cell styling for body rows.
             ...(isBodyRow && style.betweenRowsCss),
             ...(isFirstHeadRow && style.firstRowCellCss),
+            ...(isLastBodyRow && style.lastRowCellCss),
             // Then override with first/last cell styling
             ...getFirstOrLastCellCss(style, columnIndex, columns),
             ...(columnIndex === 0 && isFirstHeadRow && style.firstRowFirstCellCss),
             ...(columnIndex === columns.length - 1 && isFirstHeadRow && style.firstRowLastCellCss),
+            ...(columnIndex === 0 && isLastBodyRow && style.lastRowFirstCellCss),
+            ...(columnIndex === columns.length - 1 && isLastBodyRow && style.lastRowLastCellCss),
             // Then override with per-cell/per-row justification
             ...justificationCss,
             // Then apply any header-specific override

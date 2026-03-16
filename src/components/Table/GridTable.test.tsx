@@ -273,10 +273,12 @@ describe("GridTable", () => {
       // Then the `value: 1` row is first
       expect(cell(r, 1, 0)).toHaveTextContent("c");
 
-      // And the rows were memoized so didn't re-render
-      expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+      // Rows that move into/out of the last-body-row position re-render once,
+      // because last-row styling is now applied directly on row cells.
+      expect(row(r, 1).getAttribute("data-render")).toEqual("2");
+      // The middle row never becomes the last row, so it stays memoized.
       expect(row(r, 2).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 3).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 3).getAttribute("data-render")).toEqual("2");
     });
 
     it("can sort by other value", async () => {
@@ -692,25 +694,27 @@ describe("GridTable", () => {
 
       // And the header row re-rendered
       expect(row(r, 0).getAttribute("data-render")).toEqual("1");
-      // But the data rows did not
+      // Data rows mostly stay memoized. The rows that transition into/out of the
+      // last-body-row slot re-render once for inline last-row styling updates.
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("2");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
       expect(row(r, 4).getAttribute("data-render")).toEqual("1");
       expect(row(r, 5).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 6).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 6).getAttribute("data-render")).toEqual("2");
 
       // And the table re-renders for some other reason
       click(r.rerenderParent);
 
-      // Then memoization did not break
+      // Then memoization did not break: the only extra renders remain the rows that
+      // changed last-row status, and parent rerenders do not fan out further.
       expect(row(r, 0).getAttribute("data-render")).toEqual("1");
       expect(row(r, 1).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 2).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 2).getAttribute("data-render")).toEqual("2");
       expect(row(r, 3).getAttribute("data-render")).toEqual("1");
       expect(row(r, 4).getAttribute("data-render")).toEqual("1");
       expect(row(r, 5).getAttribute("data-render")).toEqual("1");
-      expect(row(r, 6).getAttribute("data-render")).toEqual("1");
+      expect(row(r, 6).getAttribute("data-render")).toEqual("2");
     });
 
     it("throws an error if a column value is not sortable", async () => {
@@ -1266,8 +1270,9 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
     // But not the grandchild
     expect(row(r, 2)).toBeUndefined();
-    // And nothing needed to re-render
-    expectRenderedRows();
+    // Only the child row re-renders because it becomes the last visible body row
+    // and receives inline last-row styling.
+    expectRenderedRows("p1c1");
   });
 
   it("can collapse all", async () => {
@@ -1339,8 +1344,9 @@ describe("GridTable", () => {
     expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
     // But not the grandchild
     expect(row(r, 2)).toBeUndefined();
-    // And nothing needed to re-render
-    expectRenderedRows();
+    // Only the child row re-renders because it becomes the last visible body row
+    // and receives inline last-row styling.
+    expectRenderedRows("p1c1");
   });
 
   it("can check if row is collapsed via api", async () => {
@@ -1374,8 +1380,9 @@ describe("GridTable", () => {
     act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then isCollapsed for this row should be true
     expect(api.current!.isCollapsedRow(rows[0].children![0].id)).toBeTruthy();
-    // And nothing needed to re-render
-    expectRenderedRows();
+    // Only the child row re-renders because it becomes the last visible body row
+    // and receives inline last-row styling.
+    expectRenderedRows("p1c1");
   });
 
   it("can access all visible rows", async () => {
@@ -2528,14 +2535,15 @@ describe("GridTable", () => {
     r.rerender(<GridTable columns={columns} rows={[header, row1, row2]} />);
     // Then the new row also rendered once
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
-    // And the original row did not need to re-render
-    expect(row(r, 1).getAttribute("data-render")).toEqual("1");
+    // The original row re-renders once because it is no longer the last body row,
+    // so inline last-row styles are removed from it.
+    expect(row(r, 1).getAttribute("data-render")).toEqual("2");
 
     // And when the original does actually change
     const row1_changed: GridDataRow<Row> = { kind: "data", id: row1.id, data: { name: "one", value: 3 } };
     r.rerender(<GridTable columns={columns} rows={[header, row1_changed, row2]} />);
-    // And the original row re-rendered
-    expect(row(r, 1).getAttribute("data-render")).toEqual("2");
+    // And the original row re-rendered again for the data change itself.
+    expect(row(r, 1).getAttribute("data-render")).toEqual("3");
     // But the 2nd added row did not
     expect(row(r, 2).getAttribute("data-render")).toEqual("1");
   });

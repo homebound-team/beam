@@ -29,7 +29,14 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
+import {
+  EXPANDABLE_HEADER,
+  HEADER,
+  isCursorBelowMidpoint,
+  KEPT_GROUP,
+  TOTALS,
+  zIndices,
+} from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -457,9 +464,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     const { visibleRows } = tableState;
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+    const bodyRowsCount = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind)).length;
+    let bodyRowsSeen = 0;
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
+      const isBodyRow = ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      if (isBodyRow) bodyRowsSeen += 1;
+      const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount;
+
       const row = (
         <Row
           key={rs.key}
@@ -478,6 +491,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             hasExpandableHeader,
+            isLastBodyRow,
             resizedWidths,
             setResizedWidth: handleColumnResize,
             disableColumnResizing,
@@ -679,7 +693,16 @@ function renderTable<R extends Kinded>(
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
           <tr css={tableRowPrintBreakCss}>
-            <td colSpan={columns.length} css={{ ...style.betweenRowsCss, ...style.firstRowMessageCss }}>
+            <td
+              colSpan={columns.length}
+              css={{
+                ...style.betweenRowsCss,
+                ...style.firstRowMessageCss,
+                ...(visibleDataRows.length === 0 && style.lastRowCellCss),
+                ...(visibleDataRows.length === 0 && style.lastRowFirstCellCss),
+                ...(visibleDataRows.length === 0 && style.lastRowLastCellCss),
+              }}
+            >
               {firstRowMessage}
             </td>
           </tr>

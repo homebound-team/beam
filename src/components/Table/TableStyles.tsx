@@ -11,8 +11,8 @@ export interface GridStyle {
   rootCss?: Properties;
   /**
    * Applied as the base body-row cell styling (commonly used for row separators).
-   * This is applied to body rows broadly (including the last body row); use `lastRowCss`
-   * to adjust/cancel any final-row treatment.
+   * This is applied to body rows broadly (including the last body row); use
+   * `lastRowCellCss`/`lastRowCss` to adjust/cancel any final-row treatment.
    */
   betweenRowsCss?: Properties;
   /** Applied on the last row of the table, typically to override/cancel `betweenRowsCss`. */
@@ -50,6 +50,12 @@ export interface GridStyle {
   firstRowFirstCellCss?: Properties;
   /** Applied to the last cell in the first table-head row. */
   firstRowLastCellCss?: Properties;
+  /** Applied to every cell in the last table-body row. */
+  lastRowCellCss?: Properties;
+  /** Applied to the first cell in the last table-body row. */
+  lastRowFirstCellCss?: Properties;
+  /** Applied to the last cell in the last table-body row. */
+  lastRowLastCellCss?: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
@@ -176,13 +182,11 @@ function memoizedTableStyles() {
         firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
         firstRowFirstCellCss: Css.borderRadius("8px 0 0 0 ").$,
         firstRowLastCellCss: Css.borderRadius("0 8px 0 0").$,
-        // Only apply border radius styles to the last row when using the `bordered` style table.
-        lastRowCss: bordered
-          ? ({
-              "& > *:first-of-type": Css.borderRadius("0 0 0 8px").$,
-              "& > *:last-of-type": Css.borderRadius("0 0 8px 0").$,
-            } as Properties)
-          : ({ "& > *": Css.bsh0.$ } as Properties),
+        // Keep `betweenRowsCss` on all body rows, but remove it for the final body row.
+        lastRowCellCss: !bordered ? Css.bsh0.$ : undefined,
+        // Only apply bottom corner radii to the final body-row cells when using `bordered`.
+        lastRowFirstCellCss: bordered ? Css.borderRadius("0 0 0 8px").$ : undefined,
+        lastRowLastCellCss: bordered ? Css.borderRadius("0 0 8px 0").$ : undefined,
         presentationSettings: {
           borderless: true,
           typeScale: "xs",
