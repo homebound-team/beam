@@ -106,7 +106,7 @@ export const rowClickRenderFn: (as: RenderAs, api: GridTableApi<any>, colSpan: n
     const Cell = as === "table" ? "td" : "div";
     return (
       <Cell
-        {...{ key }}
+        key={key}
         css={{ ...css }}
         className={classNames}
         onClick={(e) => {
