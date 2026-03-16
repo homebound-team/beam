@@ -134,6 +134,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(levelIndent && Css.mlPx(levelIndent).$),
     // For virtual tables use `display: flex` to keep all cells on the same row.
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
+    ...(isLastBodyRow && style.lastRowCss),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
