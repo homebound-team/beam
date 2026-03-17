@@ -1,12 +1,53 @@
 import { useContext, useMemo } from "react";
 import { Css, Properties } from "src";
-import { gridItemDataAttribute, ResponsiveGridContext } from "src/components/Grid/utils";
+import { gridItemDataAttribute, ResponsiveGridConfig, ResponsiveGridContext } from "src/components/Grid/utils";
 
-export function useResponsiveGridItem({ colSpan = 1 }: { colSpan?: number }): {
+interface UseResponsiveGridItemProps {
+  /** How many grid columns this item should span. Defaults to 1. */
+  colSpan?: number;
+  /**
+   * The grid configuration for computing container-query breakpoints.
+   *
+   * When items are rendered inside a `ResponsiveGrid` (or a manual
+   * `ResponsiveGridContext.Provider`), this is picked up from context
+   * automatically and can be omitted.
+   *
+   * When using the hooks directly (i.e. `useResponsiveGrid` +
+   * `useResponsiveGridItem` without a Provider), this **must** be supplied
+   * so the item can generate the correct `@container` query styles.
+   * Pass the same config object you gave to `useResponsiveGrid`:
+   *
+   * ```tsx
+   * const gridConfig = { minColumnWidth: 276, columns: 4, gap: 24 };
+   * const { gridStyles } = useResponsiveGrid(gridConfig);
+   * const { gridItemProps, gridItemStyles } = useResponsiveGridItem({ colSpan: 3, gridConfig });
+   * ```
+   */
+  gridConfig?: ResponsiveGridConfig;
+}
+
+/**
+ * Returns props and styles for a responsive grid item.
+ *
+ * - `gridItemProps` — a data attribute used to identify the item's requested
+ *   column span. Spread this onto the item's root element.
+ * - `gridItemStyles` — `@container` query CSS that gracefully reduces the
+ *   item's `grid-column` span as the grid container shrinks. Apply these to
+ *   the item's `css` prop.
+ *
+ * The container query breakpoints are derived from the grid config (see
+ * `UseResponsiveGridItemProps.gridConfig`). When `colSpan` is 1 or the
+ * config is unavailable, `gridItemStyles` will be an empty object.
+ */
+export function useResponsiveGridItem(props: UseResponsiveGridItemProps): {
   gridItemProps: Record<string, number>;
   gridItemStyles: Properties;
 } {
-  const config = useContext(ResponsiveGridContext);
+  const { colSpan = 1, gridConfig } = props;
+  const contextConfig = useContext(ResponsiveGridContext);
+  // Prefer explicitly passed config over context, so hook-only callers
+  // (without a ResponsiveGridContext.Provider) can still get grid item styles.
+  const config = gridConfig ?? contextConfig;
 
   const gridItemStyles = useMemo(() => {
     if (!config || colSpan <= 1) return {};
