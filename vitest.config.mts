@@ -11,5 +11,10 @@ export default defineConfig({
     css: true,
     // TreeFilter tests take ~800ms locally and ~2.5s in CI; the default 5s wasn't enough
     testTimeout: 15_000,
+    server: {
+      deps: {
+        inline: ["use-query-params", "serialize-query-params", "@homebound/rtl-react-router-utils"],
+      },
+    },
   },
 });
