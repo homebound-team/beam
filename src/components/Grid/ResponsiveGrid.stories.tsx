@@ -17,6 +17,7 @@ import {
 } from "src";
 import { useResponsiveGrid } from "src/components/Grid/useResponsiveGrid";
 import { useResponsiveGridItem } from "src/components/Grid/useResponsiveGridItem";
+import { ResponsiveGridContext } from "src/components/Grid/utils";
 import { zeroTo } from "src/utils/sb";
 
 export default {
@@ -30,8 +31,9 @@ export function Example() {
   const [numItems, setNumItems] = useState(10);
   const [sortable, setSortable] = useState(false);
 
+  const gridConfig = { minColumnWidth, columns, gap };
   const gridItems: GridItem[] = zeroTo(numItems).map((i) => ({ id: `${i + 1}` }));
-  const { gridStyles } = useResponsiveGrid({ minColumnWidth, columns, gap });
+  const { gridStyles } = useResponsiveGrid(gridConfig);
 
   const gridItemElements = gridItems.map((item) => <ResizableGridItem key={item.id} item={item} sortable={sortable} />);
 
@@ -55,13 +57,15 @@ export function Example() {
       </div>
       <div css={Css.df.$}>
         <div css={Css.add("resize", "horizontal").mwPx(120).hPx(150).bshBasic.ba.bcGray400.p1.oa.mr2.$}>Resize Me</div>
-        {sortable ? (
-          <DnDGrid onReorder={(items) => console.log("onReorder:", { items })} gridStyles={styles}>
-            {gridItemElements}
-          </DnDGrid>
-        ) : (
-          <div css={styles}>{gridItemElements}</div>
-        )}
+        <ResponsiveGridContext.Provider value={gridConfig}>
+          {sortable ? (
+            <DnDGrid onReorder={(items) => console.log("onReorder:", { items })} gridStyles={styles}>
+              {gridItemElements}
+            </DnDGrid>
+          ) : (
+            <div css={styles}>{gridItemElements}</div>
+          )}
+        </ResponsiveGridContext.Provider>
       </div>
     </PresentationProvider>
   );
@@ -74,7 +78,7 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
   const [stretch, setStretch] = useState(true);
   const [pin, setPin] = useState(false);
   const [text, setText] = useState("");
-  const { gridItemProps } = useResponsiveGridItem({ colSpan });
+  const { gridItemProps, gridItemStyles } = useResponsiveGridItem({ colSpan });
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState("auto");
   const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: item.id, itemRef: ref });
@@ -91,6 +95,7 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
       css={{
         ...Css.br8.ba.bshBasic.bcGray400.bgWhite.p2.df.aic.fdc.sm.gr(`span ${rowSpan}`).if(!stretch).asfs.$,
         ...(pin ? Css.sticky.top0.$ : {}),
+        ...gridItemStyles,
       }}
       {...gridItemProps}
       {...dragItemProps}

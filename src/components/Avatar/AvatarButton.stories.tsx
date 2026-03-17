@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { AvatarButton, AvatarButtonProps, hoverStyles, pressedStyles } from "src/components/Avatar/AvatarButton";
+import { AvatarButton, AvatarButtonProps, hoverStyles } from "src/components/Avatar/AvatarButton";
 import { Css } from "src/Css";
 import { action } from "storybook/actions";
 
@@ -22,6 +22,7 @@ export default {
         "tooltip",
         "openInNew",
         "autoFocus",
+        "forcePressedStyles",
       ],
     },
     design: {
@@ -71,9 +72,5 @@ function HoveredAvatarButton(props: AvatarButtonProps) {
 
 /** Pressed styled version of the AvatarButton */
 function PressedAvatarButton(props: AvatarButtonProps) {
-  return (
-    <div css={{ "& button": pressedStyles }}>
-      <AvatarButton {...props} />
-    </div>
-  );
+  return <AvatarButton {...props} forcePressedStyles />;
 }

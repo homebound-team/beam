@@ -127,8 +127,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
         ":hover": { ...style.nonHeaderRowHoverCss },
       }),
     ...(levelIndent && Css.mlPx(levelIndent).$),
-    // For virtual tables use `display: flex` to keep all cells on the same row. For each cell in the row use `fn` to ensure they stay their defined widths
-    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.addIn("&>*", Css.fn.$).$),
+    // For virtual tables use `display: flex` to keep all cells on the same row.
+    ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
@@ -136,7 +136,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       [`> .${revealOnRowHoverClass} > *`]: Css.vh.$,
       [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
     },
-    ...(isLastKeptRow && Css.addIn("&>*", style.keptLastRowCss).$),
+    // keptLastRowCss is now applied per-cell in cellCss below
   };
 
   let currentColspan = 1;
@@ -304,7 +304,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           // not Google spreadsheets" tables.
           const cellCss = {
             // Adding `display: flex` so we can align content within the cells, unless it is displayed as a `table`, then use `table-cell`.
-            ...Css.df.if(as === "table").dtc.$,
+            // For virtual tables (non-table), use `flex: none` to ensure cells stay their defined widths.
+            ...Css.df.if(as === "table").dtc.else.fn.$,
             // Apply sticky column/cell styles
             ...maybeStickyColumnStyles,
             // Apply any static/all-cell styling
@@ -320,10 +321,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isTotals && hasExpandableHeader && Css.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$),
             // Then apply any expandable header specific override
             ...(isExpandableHeader && style.expandableHeaderCss),
+            // Add right border on expandable header cells except the last column
+            ...(isExpandableHeader &&
+              columnIndex + currentColspan < columns.length &&
+              style.expandableHeaderNonLastColumnCss),
             // Conditionally apply the right border styling for the header or totals row when using expandable tables
             // Only apply if not the last column in the table AND when this column is the last column in the group of expandable column or not expanded AND
             ...(hasExpandableHeader &&
-              columns.length - 1 !== columnIndex &&
+              columnIndex + currentColspan < columns.length &&
               (isHeader || isTotals) &&
               currentExpandedColumnCount === 0 &&
               Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
@@ -339,6 +344,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
+            // Apply kept last row styling per-cell
+            ...(isLastKeptRow && style.keptLastRowCss),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.

@@ -34,6 +34,8 @@ export interface GridStyle {
   totalsCellCss?: Properties;
   /** Applied to 'kind: "expandableHeader"' cells */
   expandableHeaderCss?: Properties;
+  /** Applied to expandable header cells that are not the last table column. */
+  expandableHeaderNonLastColumnCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
@@ -150,8 +152,10 @@ function memoizedTableStyles() {
         expandableHeaderCss: Css.bgWhite.gray900.xsSb.wsn
           .hPx(expandableHeaderRowHeight)
           .pxPx(12)
-          .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
-          .addIn("&:not(:last-of-type)", Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$).$,
+          .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+        // Draw a 1px divider inside the cell on the right edge and bottom edge.
+        // Using `inset` keeps the line inside the cell so it doesn't change layout.
+        expandableHeaderNonLastColumnCss: Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$,
         cellCss: {
           ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
             .$,

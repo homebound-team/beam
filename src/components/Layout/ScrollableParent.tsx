@@ -88,10 +88,12 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         <div
           css={{
             ...Css.pl(context.pl).pr(context.pr).$,
-            ...(!hasScrollableContent ? { ...Css.oa.h100.$, ...scrollContainerBottomPadding } : undefined),
+            ...(!hasScrollableContent ? Css.oa.h100.$ : undefined),
           }}
         >
           {children}
+          {/* Spacer to ensure bottom padding is part of the scrollable height */}
+          {!hasScrollableContent && <div css={Css.h2.$} />}
         </div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
         <div css={Css.fg1.oa.$} ref={scrollableRef} />
@@ -103,6 +105,3 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
 export function useScrollableParent() {
   return useContext(ScrollableParentContext);
 }
-
-// Styles to wrap around the scrollable content in order to give padding beneath the content within the scrollable container.
-export const scrollContainerBottomPadding = Css.addIn("&:after", Css.contentEmpty.db.h2.$).$;

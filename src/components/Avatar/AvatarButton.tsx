@@ -13,6 +13,7 @@ import { useTestIds } from "src/utils/useTestIds";
 export interface AvatarButtonProps extends AvatarProps, BeamButtonProps, BeamFocusableProps {
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement>;
+  forcePressedStyles?: boolean;
 }
 
 export function AvatarButton(props: AvatarButtonProps) {
@@ -25,6 +26,7 @@ export function AvatarButton(props: AvatarButtonProps) {
     menuTriggerProps,
     openInNew,
     forceFocusStyles = false,
+    forcePressedStyles = false,
     ...avatarProps
   } = props;
   const isDisabled = !!disabled;
@@ -46,11 +48,11 @@ export function AvatarButton(props: AvatarButtonProps) {
     () => ({
       ...resetStyles,
       ...(isHovered && hoverStyles),
-      ...(isPressed && pressedStyles),
+      // pressed state is handled by rendering a pressedOverlayCss span
       ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
       ...(isDisabled && disabledStyles),
     }),
-    [isHovered, isFocusVisible, isDisabled, isPressed, forceFocusStyles],
+    [isHovered, isFocusVisible, isDisabled, forceFocusStyles],
   );
 
   const buttonAttrs = {
@@ -63,13 +65,20 @@ export function AvatarButton(props: AvatarButtonProps) {
     css: styles,
   };
 
+  const content = (
+    <>
+      <Avatar {...avatarProps} {...tid} disableTooltip />
+      {(isPressed || forcePressedStyles) && <span css={pressedOverlayCss} />}
+    </>
+  );
+
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
   return maybeTooltip({
     // Default the tooltip to the avatar's name, if defined.
     title: resolveTooltip(disabled, tooltip ?? avatarProps.name),
     placement: "top",
     // Disable the auto-tooltip in Avatar to prevent nested tooltips which can cause issues with interactions
-    children: getButtonOrLink(<Avatar {...avatarProps} {...tid} disableTooltip />, onPress, buttonAttrs, openInNew),
+    children: getButtonOrLink(content, onPress, buttonAttrs, openInNew),
   });
 }
 
@@ -77,7 +86,6 @@ const resetStyles = Css.br100.cursorPointer.outline0.relative.$;
 export const hoverStyles = Css.boxShadow(`0 0 4px ${Palette.Gray900}`).$;
 const focusStyles = Css.bshFocus.$;
 const disabledStyles = Css.cursorNotAllowed.$;
-export const pressedStyles = Css.addIn(
-  ":after",
-  Css.br100.bgGray900.contentEmpty.w100.h100.absolute.top0.left0.add("opacity", "0.2").$,
-).$;
+export const pressedOverlayCss = Css.br100.bgGray900.w100.h100.absolute.top0.left0
+  .add("opacity", "0.2")
+  .add("pointerEvents", "none").$;

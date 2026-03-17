@@ -93,8 +93,7 @@ export function SuperDrawer(): ReactPortal | null {
             >
               <AutoSaveStatusProvider>
                 <header css={Css.p3.bb.bcGray200.df.aic.jcsb.gap3.$}>
-                  {/* Provide default styling for the `h1` tag within SuperDrawer to help with consistency */}
-                  <div ref={headerRef} css={Css.gray900.fg1.addIn("& h1", Css.xl2.$).$}></div>
+                  <div ref={headerRef} css={Css.gray900.fg1.$}></div>
                   <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
                 </header>
                 {content}

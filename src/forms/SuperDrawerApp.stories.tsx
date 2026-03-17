@@ -64,9 +64,7 @@ function SuperDrawerForm() {
         },
       ]}
     >
-      <SuperDrawerHeader>
-        <h1>Create Author</h1>
-      </SuperDrawerHeader>
+      <SuperDrawerHeader title="Create Author" />
       <fieldset>
         <legend css={Css.xl.mb2.$}>Author</legend>
         <BoundTextField field={formState.firstName} />
