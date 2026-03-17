@@ -10,7 +10,7 @@ export function useResponsiveGridItem({ colSpan = 1 }: { colSpan?: number }): {
 
   const gridItemStyles = useMemo(() => {
     if (!config || colSpan <= 1) return {};
-    const { minColumnWidth, gap, columns } = config;
+    const { minColumnWidth, gap } = config;
 
     // Build container query styles for each possible span from 1 to colSpan
     let styles: Properties = {};

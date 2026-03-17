@@ -8,8 +8,12 @@ export interface useResponsiveGridProps {
 }
 
 /**
- * Returns the styles for a responsive grid.
- * Use in tandem with the `useResponsiveGridItem` hook to generate props for each grid item to ensure proper behavior at breakpoints.
+ * Returns container styles for a responsive CSS grid.
+ *
+ * Callers must provide the grid config via `ResponsiveGridContext` (or use the
+ * `ResponsiveGrid` component) so that each item can call `useResponsiveGridItem`
+ * and apply the returned `gridItemStyles` to achieve container-query-based
+ * breakpoint behavior for multi-column spans.
  */
 export function useResponsiveGrid(props: useResponsiveGridProps): { gridStyles: Properties } {
   const { minColumnWidth, gap, columns } = props;
