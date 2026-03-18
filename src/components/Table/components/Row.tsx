@@ -47,6 +47,7 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  isFirstHeadRow: boolean;
   isFirstBodyRow: boolean;
   isLastBodyRow: boolean;
   /* column resizers */
@@ -76,6 +77,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    isFirstHeadRow,
     isFirstBodyRow,
     isLastBodyRow,
     resizedWidths,
@@ -101,10 +103,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
   const isKeptGroupRow = row.kind === KEPT_GROUP;
   const isBodyRow = !isHeader && !isTotals && !isExpandableHeader;
-  // `isFirstHeadRow` drives first-row cell styling; when there is no expandable header,
+  // `isFirstHeadCellRow` drives first-row cell styling; when there is no expandable header,
   // treat either a header or a totals row as the first head row so totals-first tables
   // receive the correct top styling.
-  const isFirstHeadRow = isExpandableHeader || (!hasExpandableHeader && (isHeader || isTotals));
+  const isFirstHeadCellRow = isExpandableHeader || (!hasExpandableHeader && (isHeader || isTotals));
   const rowStyle = rowStyles?.[row.kind as R["kind"]];
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
@@ -126,6 +128,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     ...(isFirstBodyRow && style.firstNonHeaderRowCss),
+    ...(isFirstHeadRow && style.firstRowCss),
     ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
@@ -331,12 +334,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...style.cellCss,
             // Apply between-row cell styling for body rows.
             ...(isBodyRow && style.betweenRowsCss),
-            ...(isFirstHeadRow && style.firstRowCellCss),
+            ...(isFirstHeadCellRow && style.firstRowCellCss),
             ...(isLastBodyRow && style.lastRowCellCss),
             // Then override with first/last cell styling
             ...getFirstOrLastCellCss(style, columnIndex, columns),
-            ...(columnIndex === 0 && isFirstHeadRow && style.firstRowFirstCellCss),
-            ...(columnIndex === columns.length - 1 && isFirstHeadRow && style.firstRowLastCellCss),
+            ...(columnIndex === 0 && isFirstHeadCellRow && style.firstRowFirstCellCss),
+            ...(columnIndex === columns.length - 1 && isFirstHeadCellRow && style.firstRowLastCellCss),
             ...(columnIndex === 0 && isLastBodyRow && style.lastRowFirstCellCss),
             ...(columnIndex === columns.length - 1 && isLastBodyRow && style.lastRowLastCellCss),
             // Then override with per-cell/per-row justification

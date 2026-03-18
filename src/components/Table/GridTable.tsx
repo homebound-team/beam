@@ -470,17 +470,19 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       visibleRows.every(
         (rs) =>
           // For our purposes, "body rows" are any non-header / non-totals rows.
-          [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind) ||
-          rs.isKept ||
-          rs.kind === KEPT_GROUP,
+          [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind) || rs.isKept || rs.kind === KEPT_GROUP,
       );
     let bodyRowsSeen = 0;
     let foundFirstBodyRow = false;
+    let foundFirstHeadRow = false;
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
+      const isHeadRow = [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      const isFirstHeadRow = isHeadRow && !foundFirstHeadRow;
       const isBodyRow = ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
       const isFirstBodyRow = isBodyRow && !foundFirstBodyRow;
+      if (isHeadRow) foundFirstHeadRow = true;
       if (isBodyRow) bodyRowsSeen += 1;
       if (isBodyRow) foundFirstBodyRow = true;
       const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount && !onlyKeptBodyRows;
@@ -503,6 +505,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             hasExpandableHeader,
+            isFirstHeadRow,
             isFirstBodyRow,
             isLastBodyRow,
             resizedWidths,
@@ -640,7 +643,6 @@ function renderDiv<R extends Kinded>(
       {/* Table Head */}
       <div
         css={{
-          ...(style.firstRowCss && Css.addIn("& > div:first-of-type", style.firstRowCss).$),
           ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
         }}
       >
@@ -695,7 +697,6 @@ function renderTable<R extends Kinded>(
       ref={tableContainerRef as MutableRefObject<HTMLTableElement | null>}
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
-        ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
@@ -930,18 +931,12 @@ function renderVirtual<R extends Kinded>(
 const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
   (gs, _columns, id, xss) => {
     return React.forwardRef(function VirtualRoot({ style, children }, ref) {
-      // This VirtualRoot list represent the header when no styles are given. The
-      // table list generally has styles to scroll the page for windowing.
-      const isHeader = Object.keys(style || {}).length === 0;
-
       // This re-renders each time we have new children in the viewport
       return (
         <div
           ref={ref}
           style={{ ...style, ...{ minWidth: "fit-content" } }}
           css={{
-            // Table list styles only
-            ...(isHeader ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$ : {}),
             ...gs.rootCss,
             ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
             ...xss,

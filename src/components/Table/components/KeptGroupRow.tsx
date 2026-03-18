@@ -14,6 +14,14 @@ interface KeptGroupRowProps {
   isLastBodyRow: boolean;
 }
 
+/**
+ * Renders the synthetic group row for kept rows.
+ *
+ * Kept rows are user-selected leaf rows that are not currently visible in the
+ * table results because a client-side search or server-side filter removed
+ * them from the active dataset. We keep these rows selected and grouped so
+ * users can still review or unselect them before taking bulk actions.
+ */
 export function KeptGroupRow(props: KeptGroupRowProps) {
   const { as, columnSizes, style, row, colSpan, isLastBodyRow } = props;
   const CellTag = as === "table" ? "td" : "div";
