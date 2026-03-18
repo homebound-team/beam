@@ -13,7 +13,12 @@ import { useTestIds } from "src/utils/useTestIds";
 export interface AvatarButtonProps extends AvatarProps, BeamButtonProps, BeamFocusableProps {
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement>;
-  forcePressedStyles?: boolean;
+  /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
+  __storyState?: {
+    hovered?: boolean;
+    focusVisible?: boolean;
+    pressed?: boolean;
+  };
 }
 
 export function AvatarButton(props: AvatarButtonProps) {
@@ -26,13 +31,13 @@ export function AvatarButton(props: AvatarButtonProps) {
     menuTriggerProps,
     openInNew,
     forceFocusStyles = false,
-    forcePressedStyles = false,
+    __storyState,
     ...avatarProps
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
   const ref = useGetRef(buttonRef);
-  const { buttonProps, isPressed } = useButton(
+  const { buttonProps, isPressed: isPressedFromEvents } = useButton(
     {
       ...ariaProps,
       onPress: typeof onPress === "string" ? noop : onPress,
@@ -40,8 +45,11 @@ export function AvatarButton(props: AvatarButtonProps) {
     },
     ref,
   );
-  const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
-  const { hoverProps, isHovered } = useHover(ariaProps);
+  const { focusProps, isFocusVisible: isFocusVisibleFromEvents } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover(ariaProps);
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
+  const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
+  const isPressed = __storyState?.pressed ?? isPressedFromEvents;
   const tid = useTestIds(props, avatarProps.name);
 
   const styles = useMemo(
@@ -68,7 +76,7 @@ export function AvatarButton(props: AvatarButtonProps) {
   const content = (
     <>
       <Avatar {...avatarProps} {...tid} disableTooltip />
-      {(isPressed || forcePressedStyles) && <span css={pressedOverlayCss} />}
+      {isPressed && <span css={pressedOverlayCss} />}
     </>
   );
 

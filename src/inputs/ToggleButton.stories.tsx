@@ -3,13 +3,7 @@ import { useState } from "react";
 import { Css } from "src/Css";
 import { isPromise } from "src/utils";
 import { action } from "storybook/actions";
-import {
-  ToggleButton as ToggleButtonComponent,
-  ToggleButtonProps,
-  toggleFocusStyles,
-  toggleHoverStyles,
-  togglePressStyles,
-} from "./ToggleButton";
+import { ToggleButton as ToggleButtonComponent, ToggleButtonProps } from "./ToggleButton";
 
 export default {
   component: ToggleButtonComponent,
@@ -30,8 +24,8 @@ export default {
 
 export const ToggleButton = () => {
   return (
-    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-      <h1>Toggle Button</h1>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Toggle Button</h1>
       <div css={Css.df.gap4.fdc.aifs.$}>
         <ToggleButtonWrapper label="Inactive" />
         <ToggleButtonWrapper label="Hovered" isHovered />
@@ -47,15 +41,15 @@ export const ToggleButton = () => {
 
 export const AsyncToggleButton = () => {
   return (
-    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-      <h1>Toggle Button</h1>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Toggle Button</h1>
       <div css={Css.df.gap4.fdc.$}>
-        <h3>Resolved (2s)</h3>
+        <h3 css={Css.xl.mb4.$}>Resolved (2s)</h3>
         <ToggleButtonWrapper
           label="Toggle button"
           onChange={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
         />
-        <h3>Rejected</h3>
+        <h3 css={Css.xl.mb4.$}>Rejected</h3>
         <ToggleButtonWrapper
           label="Toggle button"
           onChange={async () => await new Promise((resolve, reject) => setTimeout(() => reject("Promise error"), 2000))}
@@ -71,7 +65,7 @@ type StoryStates = {
   isPressed?: boolean;
 };
 
-type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected" | "onChange"> &
+type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected"> &
   StoryStates & {
     onChange?: ((selected: boolean) => void) | ((active: boolean) => Promise<void>);
     selected?: boolean;
@@ -79,36 +73,32 @@ type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected" 
 
 function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...props }: ToggleButtonWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
+
   return (
-    <div
-      css={{
-        "& label": {
-          ...(isHovered && toggleHoverStyles),
-          ...(isPressed && togglePressStyles),
-          ...(isFocused && toggleFocusStyles),
-        },
+    <ToggleButtonComponent
+      {...props}
+      icon="bell"
+      selected={selected}
+      __storyState={{
+        hovered: isHovered,
+        pressed: isPressed,
+        focusVisible: isFocused,
       }}
-    >
-      <ToggleButtonComponent
-        {...props}
-        icon="bell"
-        selected={selected}
-        onChange={
-          onChange
-            ? (value) => {
-                const result = onChange(value);
-                setSelected(value);
-                if (isPromise(result)) {
-                  result.catch(() => setSelected(!value));
-                }
-                return result;
+      onChange={
+        onChange
+          ? (value) => {
+              const result = onChange(value);
+              setSelected(value);
+              if (isPromise(result)) {
+                result.catch(() => setSelected(!value));
               }
-            : (value) => {
-                action("onChange")(value);
-                setSelected(value);
-              }
-        }
-      />
-    </div>
+              return result;
+            }
+          : (value) => {
+              action("onChange")(value);
+              setSelected(value);
+            }
+      }
+    />
   );
 }

@@ -35,7 +35,15 @@ export function ButtonGroup(props: ButtonGroupProps) {
     <div {...tid} css={Css.df.lh(0).add({ ...sizeStyles[size] }).$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
-        <GroupButton key={i} {...buttonProps} disabled={disabled || buttonDisabled} size={size} {...tid} />
+        <GroupButton
+          key={i}
+          {...buttonProps}
+          disabled={disabled || buttonDisabled}
+          size={size}
+          isFirst={i === 0}
+          isLast={i === buttons.length - 1}
+          {...tid}
+        />
       ))}
     </div>
   );
@@ -43,10 +51,25 @@ export function ButtonGroup(props: ButtonGroupProps) {
 
 interface GroupButtonProps extends ButtonGroupButton {
   size: ButtonGroupSize;
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 function GroupButton(props: GroupButtonProps) {
-  const { icon, iconInc, iconColor, text, active, onClick: onPress, disabled, size, tooltip, ...otherProps } = props;
+  const {
+    icon,
+    iconInc,
+    iconColor,
+    text,
+    active,
+    onClick: onPress,
+    disabled,
+    size,
+    tooltip,
+    isFirst,
+    isLast,
+    ...otherProps
+  } = props;
   const ariaProps = { onPress, isDisabled: !!disabled, ...otherProps };
   const ref = useRef(null);
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
@@ -55,7 +78,7 @@ function GroupButton(props: GroupButtonProps) {
   const tid = useTestIds(props);
 
   return (
-    <span css={getButtonStyles()}>
+    <span css={getButtonStyles(isFirst, isLast)}>
       {maybeTooltip({
         title: resolveTooltip(disabled, tooltip),
         placement: "top",
@@ -91,15 +114,15 @@ const activeStyles = Css.bgGray300.$;
 const hoverStyles = Css.bgGray100.$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
-function getButtonStyles() {
+function getButtonStyles(isFirst: boolean, isLast: boolean) {
   return {
     ...Css.z1.bgWhite.bcGray300.bw1.ba.gray900.br0.oh.$,
-    // Our first button should have a rounded left border
-    "&:first-of-type": Css.add("borderRadius", "4px 0 0 4px").$,
-    // Our last button should have a rounded right border
-    "&:last-of-type": Css.add("borderRadius", "0 4px 4px 0").$,
-    // Nudge buttons one pixel to the left so they visually share a border
-    "&:not(:first-of-type)": Css.mlPx(-1).$,
+    // Our first button should have a rounded left border.
+    ...(isFirst && Css.add("borderRadius", "4px 0 0 4px").$),
+    // Our last button should have a rounded right border.
+    ...(isLast && Css.add("borderRadius", "0 4px 4px 0").$),
+    // Nudge buttons one pixel to the left so they visually share a border.
+    ...(!isFirst && Css.mlPx(-1).$),
   };
 }
 

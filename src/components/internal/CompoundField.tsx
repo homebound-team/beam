@@ -1,4 +1,4 @@
-import { cloneElement } from "react";
+import { FocusEvent, cloneElement, useState } from "react";
 import { Css } from "src/Css";
 import { TextFieldInternalProps } from "src/interfaces";
 
@@ -9,14 +9,23 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
   }
   const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bcGray300.$;
   const internalProps: TextFieldInternalProps = { compound: true };
+  // TODO(stylex): Replace focus event tracking with stylex.when.ancestor once we migrate to stylex.
+  const [hasFocusWithin, setHasFocusWithin] = useState(false);
+
+  function onFocusCapture() {
+    setHasFocusWithin(true);
+  }
+
+  function onBlurCapture(e: FocusEvent<HTMLDivElement>) {
+    const nextFocusedElement = e.relatedTarget;
+    if (nextFocusedElement instanceof Node && e.currentTarget.contains(nextFocusedElement)) {
+      return;
+    }
+    setHasFocusWithin(false);
+  }
 
   return (
-    <div
-      css={{
-        ...Css.df.$,
-        "&:focus-within > div:nth-of-type(2)": Css.bgBlue700.$, // Separation line when inputs are focused
-      }}
-    >
+    <div css={Css.df.$} onFocusCapture={onFocusCapture} onBlurCapture={onBlurCapture}>
       <div
         css={{
           ...commonStyles,
@@ -29,7 +38,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         })}
       </div>
       {/* Separation line */}
-      <div css={Css.wPx(1).fn.bgGray300.$} />
+      <div css={{ ...Css.wPx(1).fn.bgGray300.$, ...(hasFocusWithin && Css.bgBlue700.$) }} />
 
       <div
         css={{

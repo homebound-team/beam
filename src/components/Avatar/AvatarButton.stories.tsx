@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { AvatarButton, AvatarButtonProps, hoverStyles } from "src/components/Avatar/AvatarButton";
+import { AvatarButton, AvatarButtonProps } from "src/components/Avatar/AvatarButton";
 import { Css } from "src/Css";
 import { action } from "storybook/actions";
 
@@ -22,7 +22,7 @@ export default {
         "tooltip",
         "openInNew",
         "autoFocus",
-        "forcePressedStyles",
+        "__storyState",
       ],
     },
     design: {
@@ -47,7 +47,7 @@ export function Examples(props: AvatarButtonProps) {
         </div>
         <div>
           <h2>Focused</h2>
-          <AvatarButton {...props} autoFocus />
+          <FocusedAvatarButton {...props} />
         </div>
         <div>
           <h2>Disabled</h2>
@@ -63,14 +63,15 @@ export function Examples(props: AvatarButtonProps) {
 }
 /** Hover styled version of the AvatarButton */
 function HoveredAvatarButton(props: AvatarButtonProps) {
-  return (
-    <div css={{ "& button": hoverStyles }}>
-      <AvatarButton {...props} />
-    </div>
-  );
+  return <AvatarButton {...props} __storyState={{ hovered: true }} />;
+}
+
+/** Focused styled version of the AvatarButton */
+function FocusedAvatarButton(props: AvatarButtonProps) {
+  return <AvatarButton {...props} __storyState={{ focusVisible: true }} />;
 }
 
 /** Pressed styled version of the AvatarButton */
 function PressedAvatarButton(props: AvatarButtonProps) {
-  return <AvatarButton {...props} forcePressedStyles />;
+  return <AvatarButton {...props} __storyState={{ pressed: true }} />;
 }

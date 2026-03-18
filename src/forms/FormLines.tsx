@@ -55,17 +55,22 @@ export function FormLines(props: FormLinesProps) {
         css={{
           // Note that we're purposefully not using display:flex so that our children's margins will collapse.
           ...Css.w(sizes[width]).$,
-          // Purposefully use this instead of childGap3 to put margin-bottom on the last line
-          "& > *": Css.mb(gap).$,
         }}
       >
         {Children.map(children, (child) => {
+          if (child === null || child === undefined || typeof child === "boolean") {
+            return child;
+          }
+
+          // Purposefully render wrappers with margin-bottom instead of childGap3
+          // so the last line also gets bottom spacing.
+
           if (child && typeof child === "object" && "type" in child && (child.type as any).isFormHeading) {
             const clone = cloneElement(child, { isFirst: firstFormHeading });
             firstFormHeading = false;
-            return clone;
+            return <div css={Css.mb(gap).$}>{clone}</div>;
           } else {
-            return child;
+            return <div css={Css.mb(gap).$}>{child}</div>;
           }
         })}
       </div>

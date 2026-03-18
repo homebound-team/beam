@@ -26,6 +26,9 @@ export function SuperDrawerWithForm() {
 }
 
 function DrawerWithInputs() {
+  const fieldsetCss = Css.df.fdc.gap2.$;
+  const legendCss = Css.md.mb2.$;
+
   return (
     <SuperDrawerContent
       actions={[
@@ -34,9 +37,9 @@ function DrawerWithInputs() {
       ]}
     >
       <SuperDrawerHeader title="5304.01 - Counters" />
-      <form css={{ ...Css.df.fdc.gap5.$, "& fieldset": Css.df.fdc.gap2.$, "& legend": Css.md.mb2.$ }}>
-        <fieldset>
-          <legend>Details</legend>
+      <form css={Css.df.fdc.gap5.$}>
+        <fieldset css={fieldsetCss}>
+          <legend css={legendCss}>Details</legend>
           <TextField label="Item Name" value="Counters" onChange={action("TextField - onChange")} />
           <SelectField<Options, number>
             label="Location"
@@ -49,8 +52,8 @@ function DrawerWithInputs() {
           />
         </fieldset>
 
-        <fieldset>
-          <legend>Notes</legend>
+        <fieldset css={fieldsetCss}>
+          <legend css={legendCss}>Notes</legend>
           <TextAreaField
             label="Specifications (visible to everyone)"
             value="Here's a note for everyone"

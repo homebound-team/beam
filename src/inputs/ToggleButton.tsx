@@ -15,10 +15,16 @@ export interface ToggleButtonProps {
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   tooltip?: ReactNode;
+  /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
+  __storyState?: {
+    hovered?: boolean;
+    pressed?: boolean;
+    focusVisible?: boolean;
+  };
 }
 
 export function ToggleButton(props: ToggleButtonProps) {
-  const { selected: isSelected = false, disabled = false, label, onChange, icon, ...otherProps } = props;
+  const { selected: isSelected = false, disabled = false, label, onChange, icon, __storyState, ...otherProps } = props;
   const [asyncInProgress, setAsyncInProgress] = useState(false);
   const isDisabled = !!disabled || asyncInProgress;
   const ariaProps = { "aria-label": label, isSelected, isDisabled, ...otherProps };
@@ -35,11 +41,15 @@ export function ToggleButton(props: ToggleButtonProps) {
   });
   const labelRef = useRef(null);
   const ref = useRef(null);
-  const tid = useTestIds(props, label);
-  const { isPressed, pressProps } = usePress({ ref: labelRef, isDisabled });
+  const tid = useTestIds(otherProps, label);
+  const { isPressed: isPressedFromEvents, pressProps } = usePress({ ref: labelRef, isDisabled });
   const { inputProps } = useSwitch(ariaProps, state, ref);
-  const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing({ ...otherProps, within: true });
-  const { hoverProps, isHovered } = useHover({ isDisabled });
+  const { isFocusVisible: isFocusVisibleFromEvents, focusProps } = useFocusRing({ ...otherProps, within: true });
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
+
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
+  const isPressed = __storyState?.pressed ?? isPressedFromEvents;
+  const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
 
   const tooltip = resolveTooltip(disabled);
 
@@ -53,7 +63,7 @@ export function ToggleButton(props: ToggleButtonProps) {
       ...(isHovered && toggleHoverStyles),
       ...(isPressed && togglePressStyles),
       ...(isSelected && !isDisabled && Css.blue700.$),
-      ...(isKeyboardFocus && toggleFocusStyles),
+      ...(isFocusVisible && toggleFocusStyles),
       ...(isDisabled && Css.gray300.cursorNotAllowed.$),
     },
     ...tid,

@@ -2,13 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { action } from "storybook/actions";
-import {
-  Switch as SwitchComponent,
-  switchFocusStyles,
-  switchHoverStyles,
-  SwitchProps,
-  switchSelectedHoverStyles,
-} from "./Switch";
+import { Switch as SwitchComponent, SwitchProps } from "./Switch";
 import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 
 export default {
@@ -23,10 +17,10 @@ export default {
 
 export const Switch = () => {
   return (
-    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-      <h1>Switch</h1>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Switch</h1>
       <div css={Css.df.gap4.fdc.$}>
-        <h2>Switch</h2>
+        <h2 css={Css.xl.mb4.$}>Switch</h2>
         <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 365px)").$}>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
             <SwitchWrapper label="Remember me?" />
@@ -65,7 +59,7 @@ export const Switch = () => {
             <SwitchWrapper label="Remember me?" withIcon compact disabled />
           </div>
         </div>
-        <h2>Switch Group</h2>
+        <h2 css={Css.xl.mb4.$}>Switch Group</h2>
         <div css={Css.dg.gapPx(48).$}>
           <div css={Css.df.gap("16px 32px").$}>
             <SwitchGroupWrapper label="Notifications" />
@@ -123,26 +117,21 @@ type SwitchWrapperProps = Omit<SwitchProps, "onChange" | "selected"> &
 
 function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
+
   return (
-    <div
-      css={{
-        "& label > div:nth-of-type(1) > div": {
-          ...(isHovered && switchHoverStyles),
-          ...(props.selected && isHovered && switchSelectedHoverStyles),
-          ...(isFocused && switchFocusStyles),
-        },
+    <SwitchComponent
+      {...props}
+      labelStyle={"inline"}
+      selected={selected}
+      __storyState={{
+        hovered: isHovered,
+        focusVisible: isFocused,
       }}
-    >
-      <SwitchComponent
-        {...props}
-        labelStyle={"inline"}
-        selected={selected}
-        onChange={(value) => {
-          action("onChange")(value);
-          setSelected(value);
-        }}
-      />
-    </div>
+      onChange={(value) => {
+        action("onChange")(value);
+        setSelected(value);
+      }}
+    />
   );
 }
 
