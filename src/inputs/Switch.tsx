@@ -28,6 +28,11 @@ export interface SwitchProps {
   withIcon?: boolean;
   /** Adds tooltip for the switch */
   tooltip?: ReactNode;
+  /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
+  __storyState?: {
+    hovered?: boolean;
+    focusVisible?: boolean;
+  };
 }
 
 export function Switch(props: SwitchProps) {
@@ -42,6 +47,7 @@ export function Switch(props: SwitchProps) {
     label,
     labelStyle = "inline",
     hideLabel = false,
+    __storyState,
     ...otherProps
   } = props;
   const isDisabled = !!disabled;
@@ -49,8 +55,10 @@ export function Switch(props: SwitchProps) {
   const state = toToggleState(isSelected, onChange);
   const ref = useRef(null);
   const { inputProps } = useSwitch({ ...ariaProps, "aria-label": label }, state, ref);
-  const { isFocusVisible: isKeyboardFocus, focusProps } = useFocusRing(otherProps);
-  const { hoverProps, isHovered } = useHover(ariaProps);
+  const { isFocusVisible: isFocusVisibleFromEvents, focusProps } = useFocusRing(otherProps);
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover(ariaProps);
+  const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
   const tooltip = resolveTooltip(disabled, props.tooltip);
   const tid = useTestIds(otherProps, label);
 
@@ -84,7 +92,7 @@ export function Switch(props: SwitchProps) {
           css={{
             ...Css.wPx(toggleWidth(compact)).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
             ...(isHovered && switchHoverStyles),
-            ...(isKeyboardFocus && switchFocusStyles),
+            ...(isFocusVisible && switchFocusStyles),
             ...(isDisabled && Css.bgGray300.$),
             ...(isSelected && Css.bgBlue700.$),
             ...(isSelected && isHovered && switchSelectedHoverStyles),

@@ -2,13 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { action } from "storybook/actions";
-import {
-  Switch as SwitchComponent,
-  switchFocusStyles,
-  switchHoverStyles,
-  SwitchProps,
-  switchSelectedHoverStyles,
-} from "./Switch";
+import { Switch as SwitchComponent, SwitchProps } from "./Switch";
 import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
 
 export default {
@@ -123,26 +117,21 @@ type SwitchWrapperProps = Omit<SwitchProps, "onChange" | "selected"> &
 
 function SwitchWrapper({ isHovered, isFocused, ...props }: SwitchWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
+
   return (
-    <div
-      css={{
-        "& label > div:nth-of-type(1) > div": {
-          ...(isHovered && switchHoverStyles),
-          ...(props.selected && isHovered && switchSelectedHoverStyles),
-          ...(isFocused && switchFocusStyles),
-        },
+    <SwitchComponent
+      {...props}
+      labelStyle={"inline"}
+      selected={selected}
+      __storyState={{
+        hovered: isHovered,
+        focusVisible: isFocused,
       }}
-    >
-      <SwitchComponent
-        {...props}
-        labelStyle={"inline"}
-        selected={selected}
-        onChange={(value) => {
-          action("onChange")(value);
-          setSelected(value);
-        }}
-      />
-    </div>
+      onChange={(value) => {
+        action("onChange")(value);
+        setSelected(value);
+      }}
+    />
   );
 }
 

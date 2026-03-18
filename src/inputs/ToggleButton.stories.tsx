@@ -3,13 +3,7 @@ import { useState } from "react";
 import { Css } from "src/Css";
 import { isPromise } from "src/utils";
 import { action } from "storybook/actions";
-import {
-  ToggleButton as ToggleButtonComponent,
-  ToggleButtonProps,
-  toggleFocusStyles,
-  toggleHoverStyles,
-  togglePressStyles,
-} from "./ToggleButton";
+import { ToggleButton as ToggleButtonComponent, ToggleButtonProps } from "./ToggleButton";
 
 export default {
   component: ToggleButtonComponent,
@@ -71,7 +65,7 @@ type StoryStates = {
   isPressed?: boolean;
 };
 
-type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected" | "onChange"> &
+type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected"> &
   StoryStates & {
     onChange?: ((selected: boolean) => void) | ((active: boolean) => Promise<void>);
     selected?: boolean;
@@ -79,36 +73,32 @@ type ToggleButtonWrapperProps = Omit<ToggleButtonProps, "onChange" | "selected" 
 
 function ToggleButtonWrapper({ isHovered, isFocused, isPressed, onChange, ...props }: ToggleButtonWrapperProps) {
   const [selected, setSelected] = useState<boolean>(props.selected || false);
+
   return (
-    <div
-      css={{
-        "& label": {
-          ...(isHovered && toggleHoverStyles),
-          ...(isPressed && togglePressStyles),
-          ...(isFocused && toggleFocusStyles),
-        },
+    <ToggleButtonComponent
+      {...props}
+      icon="bell"
+      selected={selected}
+      __storyState={{
+        hovered: isHovered,
+        pressed: isPressed,
+        focusVisible: isFocused,
       }}
-    >
-      <ToggleButtonComponent
-        {...props}
-        icon="bell"
-        selected={selected}
-        onChange={
-          onChange
-            ? (value) => {
-                const result = onChange(value);
-                setSelected(value);
-                if (isPromise(result)) {
-                  result.catch(() => setSelected(!value));
-                }
-                return result;
+      onChange={
+        onChange
+          ? (value) => {
+              const result = onChange(value);
+              setSelected(value);
+              if (isPromise(result)) {
+                result.catch(() => setSelected(!value));
               }
-            : (value) => {
-                action("onChange")(value);
-                setSelected(value);
-              }
-        }
-      />
-    </div>
+              return result;
+            }
+          : (value) => {
+              action("onChange")(value);
+              setSelected(value);
+            }
+      }
+    />
   );
 }
