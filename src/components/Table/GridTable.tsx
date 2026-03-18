@@ -9,7 +9,14 @@ import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableAp
 import { useColumnResizeHandlers } from "src/components/Table/hooks/useColumnResizeHandlers";
 import { useScrollStorage } from "src/components/Table/hooks/useScrollStorage";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
-import { defaultStyle, GridStyle, GridStyleDef, resolveStyles, RowStyles } from "src/components/Table/TableStyles";
+import {
+  defaultStyle,
+  GridStyle,
+  GridStyleDef,
+  resolveStyles,
+  RowStyles,
+  tableRowPrintBreakCss,
+} from "src/components/Table/TableStyles";
 import {
   Direction,
   GridColumn,
@@ -22,7 +29,14 @@ import {
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { EXPANDABLE_HEADER, isCursorBelowMidpoint, KEPT_GROUP, zIndices } from "src/components/Table/utils/utils";
+import {
+  EXPANDABLE_HEADER,
+  HEADER,
+  isCursorBelowMidpoint,
+  KEPT_GROUP,
+  TOTALS,
+  zIndices,
+} from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
@@ -450,9 +464,29 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     const { visibleRows } = tableState;
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+    const bodyRowsCount = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind)).length;
+    const onlyKeptBodyRows =
+      bodyRowsCount > 0 &&
+      visibleRows.every(
+        (rs) =>
+          // For our purposes, "body rows" are any non-header / non-totals rows.
+          [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind) || rs.isKept || rs.kind === KEPT_GROUP,
+      );
+    let bodyRowsSeen = 0;
+    let foundFirstBodyRow = false;
+    let foundFirstHeadRow = false;
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
+      const isHeadRow = [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      const isFirstHeadRow = isHeadRow && !foundFirstHeadRow;
+      const isBodyRow = ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      const isFirstBodyRow = isBodyRow && !foundFirstBodyRow;
+      if (isHeadRow) foundFirstHeadRow = true;
+      if (isBodyRow) bodyRowsSeen += 1;
+      if (isBodyRow) foundFirstBodyRow = true;
+      const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount && !onlyKeptBodyRows;
+
       const row = (
         <Row
           key={rs.key}
@@ -471,6 +505,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
             omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
             hasExpandableHeader,
+            isFirstHeadRow,
+            isFirstBodyRow,
+            isLastBodyRow,
             resizedWidths,
             setResizedWidth: handleColumnResize,
             disableColumnResizing,
@@ -606,7 +643,6 @@ function renderDiv<R extends Kinded>(
       {/* Table Head */}
       <div
         css={{
-          ...(style.firstRowCss && Css.addIn("& > div:first-of-type", style.firstRowCss).$),
           ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
         }}
       >
@@ -614,17 +650,21 @@ function renderDiv<R extends Kinded>(
       </div>
 
       {/* Table Body */}
-      <div
-        css={{
-          ...(style.betweenRowsCss ? Css.addIn(`& > div > *`, style.betweenRowsCss).$ : {}),
-          ...(style.firstNonHeaderRowCss ? Css.addIn(`& > div:first-of-type`, style.firstNonHeaderRowCss).$ : {}),
-          ...(style.lastRowCss && Css.addIn("& > div:last-of-type", style.lastRowCss).$),
-        }}
-      >
+      <div>
         {keptSelectedRows}
         {/* Show an info message if it's set. */}
         {firstRowMessage && (
-          <div css={{ ...style.firstRowMessageCss }} data-gridrow>
+          <div
+            css={{
+              ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
+              ...style.firstRowMessageCss,
+              ...(visibleDataRows.length === 0 && style.lastRowCss),
+              ...(visibleDataRows.length === 0 && style.lastRowCellCss),
+              ...(visibleDataRows.length === 0 && style.lastRowFirstCellCss),
+              ...(visibleDataRows.length === 0 && style.lastRowLastCellCss),
+            }}
+            data-gridrow
+          >
             {firstRowMessage}
           </div>
         )}
@@ -657,12 +697,6 @@ function renderTable<R extends Kinded>(
       ref={tableContainerRef as MutableRefObject<HTMLTableElement | null>}
       css={{
         ...Css.w100.add("borderCollapse", "separate").add("borderSpacing", "0").$,
-        ...Css.addIn("& tr ", { pageBreakAfter: "auto", pageBreakInside: "avoid" }).$,
-        ...Css.addIn("& > tbody > tr > * ", style.betweenRowsCss || {})
-          // removes border between header and second row
-          .addIn("& > tbody > tr:first-of-type", style.firstNonHeaderRowCss || {}).$,
-        ...Css.addIn("& > tbody > tr:last-of-type", style.lastRowCss).$,
-        ...Css.addIn("& > thead > tr:first-of-type", style.firstRowCss).$,
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
@@ -674,8 +708,23 @@ function renderTable<R extends Kinded>(
         {keptSelectedRows}
         {/* Show an all-column-span info message if it's set. */}
         {firstRowMessage && (
-          <tr>
-            <td colSpan={columns.length} css={{ ...style.firstRowMessageCss }}>
+          <tr
+            css={{
+              ...tableRowPrintBreakCss,
+              ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
+              ...(visibleDataRows.length === 0 && style.lastRowCss),
+            }}
+          >
+            <td
+              colSpan={columns.length}
+              css={{
+                ...style.betweenRowsCss,
+                ...style.firstRowMessageCss,
+                ...(visibleDataRows.length === 0 && style.lastRowCellCss),
+                ...(visibleDataRows.length === 0 && style.lastRowFirstCellCss),
+                ...(visibleDataRows.length === 0 && style.lastRowLastCellCss),
+              }}
+            >
               {firstRowMessage}
             </td>
           </tr>
@@ -799,8 +848,23 @@ function renderVirtual<R extends Kinded>(
           if (index === 0) {
             return (
               // Ensure the fallback message is the same width as the table
-              <div css={getTableRefWidthStyles(true)}>
-                <div css={{ ...style.firstRowMessageCss }}>{firstRowMessage}</div>
+              <div
+                css={{
+                  ...getTableRefWidthStyles(true),
+                  ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
+                  ...(visibleDataRows.length === 0 && style.lastRowCss),
+                }}
+              >
+                <div
+                  css={{
+                    ...style.firstRowMessageCss,
+                    ...(visibleDataRows.length === 0 && style.lastRowCellCss),
+                    ...(visibleDataRows.length === 0 && style.lastRowFirstCellCss),
+                    ...(visibleDataRows.length === 0 && style.lastRowLastCellCss),
+                  }}
+                >
+                  {firstRowMessage}
+                </div>
               </div>
             );
           }
@@ -867,25 +931,12 @@ function renderVirtual<R extends Kinded>(
 const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
   (gs, _columns, id, xss) => {
     return React.forwardRef(function VirtualRoot({ style, children }, ref) {
-      // This VirtualRoot list represent the header when no styles are given. The
-      // table list generally has styles to scroll the page for windowing.
-      const isHeader = Object.keys(style || {}).length === 0;
-
       // This re-renders each time we have new children in the viewport
       return (
         <div
           ref={ref}
           style={{ ...style, ...{ minWidth: "fit-content" } }}
           css={{
-            // Add an extra `> div` due to Item + itemContent both having divs
-            ...Css.addIn("& > div + div > div > *", gs.betweenRowsCss || {}).$,
-            // Table list styles only
-            ...(isHeader
-              ? Css.addIn("& > div:first-of-type > *", gs.firstRowCss).$
-              : {
-                  ...Css.addIn("& > div:first-of-type", gs.firstNonHeaderRowCss).$,
-                  ...Css.addIn("& > div:last-of-type > *", gs.lastRowCss).$,
-                }),
             ...gs.rootCss,
             ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
             ...xss,

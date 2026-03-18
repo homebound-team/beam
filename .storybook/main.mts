@@ -9,19 +9,17 @@ const config: StorybookConfig = {
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },
 
-  async viteFinal(config, { configType }) {
+  async viteFinal(config) {
     return mergeConfig(config, {
-      esbuild: {
-        // ignoring console warns of "Top-level "this" will be replaced with undefined since this file is an ECMAScript module"
-        // See https://github.com/vitejs/vite/issues/8644#issuecomment-1159308803
-        logOverride: { "this-is-undefined-in-esm": "silent" },
+      resolve: {
+        alias: {
+          // Stub out vitest in Storybook — it's pulled in transitively by
+          // @homebound/rtl-react-router-utils (which unconditionally re-exports
+          // mocks.js that imports `vi` from vitest). The real fix is splitting
+          // that package's exports so withRouter doesn't drag in vitest.
+          vitest: new URL("./vitest-stub.mts", import.meta.url).pathname,
+        },
       },
-      // If you see weird errors around `createElement is undefined`, it is likely because of
-      // React now wanting the `key` prop to always come first:
-      //
-      // - https://github.com/facebook/react/pull/25697/files?diff=unified&w=1
-      // - https://github.com/vitejs/vite/issues/6215
-      // - https://github.com/mui/material-ui/issues/39833
     });
   },
 
@@ -31,6 +29,7 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: { strictMode: false },
   },
+  core: { builder: "@storybook/builder-vite" },
 };
 
 export default config;

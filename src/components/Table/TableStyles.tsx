@@ -9,23 +9,27 @@ import { safeKeys } from "src/utils";
 export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
-  /** Applied with the owl operator between rows for rendering border lines. */
+  /**
+   * Applied as the base body-row cell styling (commonly used for row separators).
+   * This is applied to body rows broadly (including the last body row); use
+   * `lastRowCellCss`/`lastRowCss` to adjust/cancel any final-row treatment.
+   */
   betweenRowsCss?: Properties;
-  /** Applied on the last row of the table. */
+  /** Applied on the last row of the table, typically to override/cancel `betweenRowsCss`. */
   lastRowCss?: Properties;
   /** Applied on the first row of the table (could be the Header or Totals row). */
   firstRowCss?: Properties;
   /** Applied to every non-header row of the table */
   nonHeaderRowCss?: Properties;
-  /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
-  firstNonHeaderRowCss?: Properties;
+  /** Applied to the first body row, i.e. if you want to cancel out `betweenRowsCss`. */
+  firstBodyRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss?: Properties;
   /**
    * Applied to the header row divs.
    *
    * NOTE `as=virtual`: When using a virtual table with the goal of adding space
-   * between the header and the first row use `firstNonHeaderRowCss` with a
+   * between the header and the first row use `firstBodyRowCss` with a
    * margin-top instead. Using `headerCellCss` will not work since the header
    * rows are wrapper with Chrome rows.
    */
@@ -40,6 +44,18 @@ export interface GridStyle {
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
+  /** Applied to every cell in the first table-head row (expandableHeader/header/totals). */
+  firstRowCellCss?: Properties;
+  /** Applied to the first cell in the first table-head row. */
+  firstRowFirstCellCss?: Properties;
+  /** Applied to the last cell in the first table-head row. */
+  firstRowLastCellCss?: Properties;
+  /** Applied to every cell in the last table-body row. */
+  lastRowCellCss?: Properties;
+  /** Applied to the first cell in the last table-body row. */
+  lastRowFirstCellCss?: Properties;
+  /** Applied to the last cell in the last table-body row. */
+  lastRowLastCellCss?: Properties;
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
@@ -161,22 +177,18 @@ function memoizedTableStyles() {
             .$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
           ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
-          ...(bordered && { "&:first-child": Css.bl.bcGray200.$, "&:last-child": Css.br.bcGray200.$ }),
         },
-        firstRowCss: {
-          ...Css.addIn("& > *:first-of-type", Css.borderRadius("8px 0 0 0 ").$).addIn(
-            "& > *:last-of-type",
-            Css.borderRadius("0 8px 0 0").$,
-          ).$,
-          ...(bordered && Css.addIn("& > *", Css.bt.bcGray200.$).$),
-        },
-        // Only apply border radius styles to the last row when using the `bordered` style table.
-        lastRowCss: bordered
-          ? Css.addIn("& > *:first-of-type", Css.borderRadius("0 0 0 8px").$).addIn(
-              "& > *:last-of-type",
-              Css.borderRadius("0 0 8px 0").$,
-            ).$
-          : Css.addIn("> *", Css.bsh0.$).$,
+        firstCellCss: bordered ? Css.bl.bcGray200.$ : undefined,
+        lastCellCss: bordered ? Css.br.bcGray200.$ : undefined,
+        firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
+        firstRowFirstCellCss: Css.borderRadius("8px 0 0 0 ").$,
+        firstRowLastCellCss: Css.borderRadius("0 8px 0 0").$,
+        // Keep `betweenRowsCss` on all body rows, but on the final body row
+        // remove the inset shadow and, when bordered, replace it with a true bottom border.
+        lastRowCellCss: bordered ? Css.bsh0.bb.bcGray200.$ : Css.bsh0.$,
+        // Only apply bottom corner radii to the final body-row cells when using `bordered`.
+        lastRowFirstCellCss: bordered ? Css.borderRadius("0 0 0 8px").$ : undefined,
+        lastRowLastCellCss: bordered ? Css.borderRadius("0 0 8px 0").$ : undefined,
         presentationSettings: {
           borderless: true,
           typeScale: "xs",
@@ -198,6 +210,7 @@ export const getTableStyles = memoizedTableStyles();
 
 export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
+export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("pageBreakInside", "avoid").$;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type RowStyles<R extends Kinded> = {

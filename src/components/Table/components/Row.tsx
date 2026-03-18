@@ -10,7 +10,7 @@ import {
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { GridStyle, RowStyles } from "src/components/Table/TableStyles";
+import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
 import { parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
@@ -47,6 +47,9 @@ interface RowProps<R extends Kinded> {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  isFirstHeadRow: boolean;
+  isFirstBodyRow: boolean;
+  isLastBodyRow: boolean;
   /* column resizers */
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
@@ -74,6 +77,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    isFirstHeadRow,
+    isFirstBodyRow,
+    isLastBodyRow,
     resizedWidths,
     setResizedWidth,
     disableColumnResizing = true,
@@ -96,6 +102,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isTotals = row.kind === TOTALS;
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
   const isKeptGroupRow = row.kind === KEPT_GROUP;
+  const isBodyRow = !isHeader && !isTotals && !isExpandableHeader;
+  // `isFirstHeadCellRow` drives first-row cell styling; when there is no expandable header,
+  // treat either a header or a totals row as the first head row so totals-first tables
+  // receive the correct top styling.
+  const isFirstHeadCellRow = isExpandableHeader || (!hasExpandableHeader && (isHeader || isTotals));
   const rowStyle = rowStyles?.[row.kind as R["kind"]];
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
@@ -116,6 +127,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
+    ...(isFirstBodyRow && style.firstBodyRowCss),
+    ...(isFirstHeadRow && style.firstRowCss),
+    ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && {
       // Even though backgroundColor is set on the cellCss, the hover target is the row.
@@ -129,6 +143,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(levelIndent && Css.mlPx(levelIndent).$),
     // For virtual tables use `display: flex` to keep all cells on the same row.
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
+    ...(isLastBodyRow && style.lastRowCss),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
@@ -160,7 +175,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const RowContent = () => (
     <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={BorderHoverParent}>
       {isKeptGroupRow ? (
-        <KeptGroupRow as={as} style={style} columnSizes={columnSizes} row={row} colSpan={columns.length} />
+        <KeptGroupRow
+          as={as}
+          style={style}
+          columnSizes={columnSizes}
+          row={row}
+          colSpan={columns.length}
+          isLastBodyRow={isLastBodyRow}
+        />
       ) : (
         columns.map((column, columnIndex) => {
           // If the expandable column was hidden, then we need to look at the previous column to format the `expandHeader` and 'header' kinds correctly.
@@ -310,8 +332,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...maybeStickyColumnStyles,
             // Apply any static/all-cell styling
             ...style.cellCss,
+            // Apply between-row cell styling for body rows.
+            ...(isBodyRow && style.betweenRowsCss),
+            ...(isFirstHeadCellRow && style.firstRowCellCss),
+            ...(isLastBodyRow && style.lastRowCellCss),
             // Then override with first/last cell styling
-            ...getFirstOrLastCellCss(style, columnIndex, columns),
+            ...getFirstOrLastCellCss(style, columnIndex, columns, currentColspan),
+            ...(columnIndex === 0 && isFirstHeadCellRow && style.firstRowFirstCellCss),
+            ...(columnIndex === columns.length - 1 && isFirstHeadCellRow && style.firstRowLastCellCss),
+            ...(columnIndex === 0 && isLastBodyRow && style.lastRowFirstCellCss),
+            ...(columnIndex === columns.length - 1 && isLastBodyRow && style.lastRowLastCellCss),
             // Then override with per-cell/per-row justification
             ...justificationCss,
             // Then apply any header-specific override
@@ -333,7 +363,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               currentExpandedColumnCount === 0 &&
               Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
             // Or level-specific styling
-            ...(!isHeader && !isTotals && !isExpandableHeader && levelStyle?.cellCss),
+            ...(isBodyRow && levelStyle?.cellCss),
             // Level specific styling for the first content column
             ...(applyFirstContentColumnStyles && levelStyle?.firstContentColumn),
             // The specific cell's css (if any from GridCellContent)
