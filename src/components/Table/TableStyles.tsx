@@ -182,8 +182,9 @@ function memoizedTableStyles() {
         firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
         firstRowFirstCellCss: Css.borderRadius("8px 0 0 0 ").$,
         firstRowLastCellCss: Css.borderRadius("0 8px 0 0").$,
-        // Keep `betweenRowsCss` on all body rows, but remove it for the final body row.
-        lastRowCellCss: !bordered ? Css.bsh0.$ : undefined,
+        // Keep `betweenRowsCss` on all body rows, but on the final body row
+        // remove the inset shadow and, when bordered, replace it with a true bottom border.
+        lastRowCellCss: bordered ? Css.bsh0.bb.bcGray200.$ : Css.bsh0.$,
         // Only apply bottom corner radii to the final body-row cells when using `bordered`.
         lastRowFirstCellCss: bordered ? Css.borderRadius("0 0 0 8px").$ : undefined,
         lastRowLastCellCss: bordered ? Css.borderRadius("0 0 8px 0").$ : undefined,
