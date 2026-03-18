@@ -166,10 +166,11 @@ export function getFirstOrLastCellCss<R extends Kinded>(
   style: GridStyle,
   columnIndex: number,
   columns: GridColumnWithId<R>[],
+  colspan: number = 1,
 ): Properties {
   return {
     ...(columnIndex === 0 ? style.firstCellCss : {}),
-    ...(columnIndex === columns.length - 1 ? style.lastCellCss : {}),
+    ...(columnIndex + colspan >= columns.length ? style.lastCellCss : {}),
   };
 }
 

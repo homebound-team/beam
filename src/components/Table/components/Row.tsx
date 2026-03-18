@@ -337,7 +337,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isFirstHeadCellRow && style.firstRowCellCss),
             ...(isLastBodyRow && style.lastRowCellCss),
             // Then override with first/last cell styling
-            ...getFirstOrLastCellCss(style, columnIndex, columns),
+            ...getFirstOrLastCellCss(style, columnIndex, columns, currentColspan),
             ...(columnIndex === 0 && isFirstHeadCellRow && style.firstRowFirstCellCss),
             ...(columnIndex === columns.length - 1 && isFirstHeadCellRow && style.firstRowLastCellCss),
             ...(columnIndex === 0 && isLastBodyRow && style.lastRowFirstCellCss),
