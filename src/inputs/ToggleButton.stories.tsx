@@ -30,8 +30,8 @@ export default {
 
 export const ToggleButton = () => {
   return (
-    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-      <h1>Toggle Button</h1>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Toggle Button</h1>
       <div css={Css.df.gap4.fdc.aifs.$}>
         <ToggleButtonWrapper label="Inactive" />
         <ToggleButtonWrapper label="Hovered" isHovered />
@@ -47,15 +47,15 @@ export const ToggleButton = () => {
 
 export const AsyncToggleButton = () => {
   return (
-    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-      <h1>Toggle Button</h1>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Toggle Button</h1>
       <div css={Css.df.gap4.fdc.$}>
-        <h3>Resolved (2s)</h3>
+        <h3 css={Css.xl.mb4.$}>Resolved (2s)</h3>
         <ToggleButtonWrapper
           label="Toggle button"
           onChange={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
         />
-        <h3>Rejected</h3>
+        <h3 css={Css.xl.mb4.$}>Rejected</h3>
         <ToggleButtonWrapper
           label="Toggle button"
           onChange={async () => await new Promise((resolve, reject) => setTimeout(() => reject("Promise error"), 2000))}

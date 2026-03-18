@@ -23,10 +23,10 @@ export default {
 
 export const Switch = () => {
   return (
-    <div css={{ "& h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-      <h1>Switch</h1>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Switch</h1>
       <div css={Css.df.gap4.fdc.$}>
-        <h2>Switch</h2>
+        <h2 css={Css.xl.mb4.$}>Switch</h2>
         <div css={Css.dg.gapPx(48).gtc("repeat(auto-fit, 365px)").$}>
           <div css={Css.dg.gtc("max-content max-content").gap("16px 32px").$}>
             <SwitchWrapper label="Remember me?" />
@@ -65,7 +65,7 @@ export const Switch = () => {
             <SwitchWrapper label="Remember me?" withIcon compact disabled />
           </div>
         </div>
-        <h2>Switch Group</h2>
+        <h2 css={Css.xl.mb4.$}>Switch Group</h2>
         <div css={Css.dg.gapPx(48).$}>
           <div css={Css.df.gap("16px 32px").$}>
             <SwitchGroupWrapper label="Notifications" />

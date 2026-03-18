@@ -6,15 +6,15 @@ export default {
 } as Meta;
 
 export const BoxShadow = () => (
-  <div css={{ "& > h1": Css.xl2.mb4.$, "& h2": Css.xl.mb4.$ }}>
-    <h1 css={Css.xl2.$}>Drop Shadow</h1>
+  <div>
+    <h1 css={Css.xl2.mb4.$}>Drop Shadow</h1>
     <div css={Css.df.gap4.$}>
       <div>
-        <h2>Basic</h2>
+        <h2 css={Css.xl.mb4.$}>Basic</h2>
         <div css={Css.hPx(250).wPx(250).bshBasic.$}></div>
       </div>
       <div>
-        <h2>Hover</h2>
+        <h2 css={Css.xl.mb4.$}>Hover</h2>
         <div css={Css.hPx(250).wPx(250).bshHover.$}></div>
       </div>
     </div>

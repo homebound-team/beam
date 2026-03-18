@@ -8,21 +8,21 @@ export default {
 export const Color = () => {
   const paletteEntries = Object.entries(Palette);
   return (
-    <div css={{ "& > h1": Css.xl2.mb4.$, "& > h2": Css.xl.mb4.$ }}>
-      <h1>Extended Palette</h1>
-      <h2>Gray</h2>
+    <div>
+      <h1 css={Css.xl2.mb4.$}>Extended Palette</h1>
+      <h2 css={Css.xl.mb4.$}>Gray</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Gray"))} />
-      <h2>Blue</h2>
+      <h2 css={Css.xl.mb4.$}>Blue</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Blue"))} />
-      <h2>Red</h2>
+      <h2 css={Css.xl.mb4.$}>Red</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Red"))} />
-      <h2>Yellow</h2>
+      <h2 css={Css.xl.mb4.$}>Yellow</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Yellow"))} />
-      <h2>Green</h2>
+      <h2 css={Css.xl.mb4.$}>Green</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Green"))} />
-      <h2>Purple</h2>
+      <h2 css={Css.xl.mb4.$}>Purple</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Purple"))} />
-      <h2>Orange</h2>
+      <h2 css={Css.xl.mb4.$}>Orange</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.includes("Orange"))} />
     </div>
   );

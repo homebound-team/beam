@@ -454,24 +454,25 @@ export function OneOffInlineTable() {
     { code: "BBB", name: "Bbb", quantity: 2 },
     { code: "Ccc", name: "Ccc", quantity: 3 },
   ];
+  const headerCellCss = Css.xs2Sb.$;
+  const bodyCellCss = Css.xs.$;
+  const rightAlignedCellCss = Css.tar.$;
+
   return (
     <div
       css={{
         ...Css.dig.gtc("auto auto auto").rg1.cg3.gray700.bgGray300.br4.p1.$,
-        "& > div:nth-of-type(-n+3)": Css.xs2Sb.$,
-        "& > div:nth-of-type(n+4)": Css.xs.$,
-        "& > div:nth-of-type(3n)": Css.tar.$,
       }}
     >
-      <div>Code</div>
-      <div>Item</div>
-      <div>Qty</div>
+      <div css={headerCellCss}>Code</div>
+      <div css={headerCellCss}>Item</div>
+      <div css={{ ...headerCellCss, ...rightAlignedCellCss }}>Qty</div>
       {items.map((item) => {
         return (
           <Fragment key={item.code}>
-            <div>{item.code}</div>
-            <div>{item.name}</div>
-            <div>{item.quantity}</div>
+            <div css={bodyCellCss}>{item.code}</div>
+            <div css={bodyCellCss}>{item.name}</div>
+            <div css={{ ...bodyCellCss, ...rightAlignedCellCss }}>{item.quantity}</div>
           </Fragment>
         );
       })}
