@@ -21,15 +21,15 @@ export interface GridStyle {
   firstRowCss?: Properties;
   /** Applied to every non-header row of the table */
   nonHeaderRowCss?: Properties;
-  /** Applied to the first non-header row, i.e. if you want to cancel out `betweenRowsCss`. */
-  firstNonHeaderRowCss?: Properties;
+  /** Applied to the first body row, i.e. if you want to cancel out `betweenRowsCss`. */
+  firstBodyRowCss?: Properties;
   /** Applied to all cell divs (via a selector off the base div). */
   cellCss?: Properties;
   /**
    * Applied to the header row divs.
    *
    * NOTE `as=virtual`: When using a virtual table with the goal of adding space
-   * between the header and the first row use `firstNonHeaderRowCss` with a
+   * between the header and the first row use `firstBodyRowCss` with a
    * margin-top instead. Using `headerCellCss` will not work since the header
    * rows are wrapper with Chrome rows.
    */

@@ -127,7 +127,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
-    ...(isFirstBodyRow && style.firstNonHeaderRowCss),
+    ...(isFirstBodyRow && style.firstBodyRowCss),
     ...(isFirstHeadRow && style.firstRowCss),
     ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.

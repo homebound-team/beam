@@ -656,7 +656,7 @@ function renderDiv<R extends Kinded>(
         {firstRowMessage && (
           <div
             css={{
-              ...(keptSelectedRows.length === 0 && style.firstNonHeaderRowCss),
+              ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
               ...style.firstRowMessageCss,
               ...(visibleDataRows.length === 0 && style.lastRowCss),
               ...(visibleDataRows.length === 0 && style.lastRowCellCss),
@@ -711,7 +711,7 @@ function renderTable<R extends Kinded>(
           <tr
             css={{
               ...tableRowPrintBreakCss,
-              ...(keptSelectedRows.length === 0 && style.firstNonHeaderRowCss),
+              ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
               ...(visibleDataRows.length === 0 && style.lastRowCss),
             }}
           >
@@ -851,7 +851,7 @@ function renderVirtual<R extends Kinded>(
               <div
                 css={{
                   ...getTableRefWidthStyles(true),
-                  ...(keptSelectedRows.length === 0 && style.firstNonHeaderRowCss),
+                  ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
                   ...(visibleDataRows.length === 0 && style.lastRowCss),
                 }}
               >
