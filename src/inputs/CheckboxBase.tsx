@@ -105,7 +105,7 @@ const disabledSelectedBoxStyles = Css.bgGray400.bcGray400.$;
 const disabledColor = Css.gray300.$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bcBlue900.$;
-const markStyles = { ">svg": Css.absolute.topPx(-1).leftPx(-1).$ };
+const markSvgStyles = Css.absolute.topPx(-1).leftPx(-1).$;
 const labelStyles = Css.sm.$;
 const descStyles = Css.sm.gray700.$;
 
@@ -132,7 +132,6 @@ export function StyledCheckbox(props: StyledCheckboxProps) {
         ...(isDisabled && isSelected && disabledSelectedBoxStyles),
         ...(isFocusVisible && focusRingStyles),
         ...(isHovered && hoverBorderStyles),
-        ...markStyles,
       }}
       aria-hidden="true"
       data-checked={isSelected ? true : isIndeterminate ? "mixed" : false}
@@ -144,7 +143,7 @@ export function StyledCheckbox(props: StyledCheckboxProps) {
 }
 
 const checkmarkSmall = (
-  <svg width="16" height="16">
+  <svg width="16" height="16" css={markSvgStyles}>
     <path
       d="M6.66669 10.3907L4.47135 8.19533L3.52869 9.138L6.66669 12.276L13.138 5.80467L12.1954 4.862L6.66669 10.3907Z"
       fill={Palette.White}
@@ -153,7 +152,7 @@ const checkmarkSmall = (
 );
 
 const dashSmall = (
-  <svg width="16" height="16">
+  <svg width="16" height="16" css={markSvgStyles}>
     <rect x="4" y="7.5" width="8" height="1.35" fill={Palette.White} />
   </svg>
 );
