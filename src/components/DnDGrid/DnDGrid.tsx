@@ -1,7 +1,7 @@
 import equal from "fast-deep-equal";
 import React, { KeyboardEvent, ReactNode, useCallback, useRef } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
-import { isDefined } from "src/utils";
+import { clearInlineStyles, isDefined, setInlineStyles } from "src/utils";
 import { DnDGridContext } from "./DnDGridContext";
 
 export interface DnDGridProps {
@@ -23,6 +23,7 @@ export function DnDGrid(props: DnDGridProps) {
   const reorderViaKeyboard = useRef(false);
   const transformFrom = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const tid = useTestIds(props, "dndGrid");
+  const activeStyles = activeItemStyles ?? Css.bshModal.$;
 
   /** Helper function to return an array of GridItems HTMLElements in the DOM */
   const getGridItems = useCallback((): HTMLElement[] => {
@@ -42,9 +43,9 @@ export function DnDGrid(props: DnDGridProps) {
       // Store the current order of the GridItems for comparing against before calling onReorder.
       initialOrder.current = getGridItemIdOrder();
       // Add the customizable 'active' styles to the GridItem being moved.
-      dragEl.current.classList.add(activeGridItemClass);
+      setInlineStyles(dragEl.current, activeStyles);
     }
-  }, [getGridItemIdOrder]);
+  }, [getGridItemIdOrder, activeStyles]);
 
   /** Saves the new order of the GridItems and resets common state */
   const commitReorder = useCallback(() => {
@@ -53,13 +54,13 @@ export function DnDGrid(props: DnDGridProps) {
       const currentOrder = getGridItemIdOrder();
       if (!equal(currentOrder, initialOrder.current)) onReorder(currentOrder);
       // Reset common state
-      dragEl.current.classList.remove(activeGridItemClass);
+      clearInlineStyles(dragEl.current, activeStyles);
       dragEl.current = undefined;
       reorderViaKeyboard.current = false;
       // And update the initial order to the current order.
       initialOrder.current = currentOrder;
     }
-  }, [onReorder, getGridItemIdOrder]);
+  }, [onReorder, getGridItemIdOrder, activeStyles]);
 
   /** Resets common state and reverts the order of the GridItems to the initial order */
   const cancelReorder = useCallback(() => {
@@ -85,11 +86,11 @@ export function DnDGrid(props: DnDGridProps) {
       }
 
       // And finally reset common state.
-      dragEl.current.classList.remove(activeGridItemClass);
+      clearInlineStyles(dragEl.current, activeStyles);
       dragEl.current = undefined;
       reorderViaKeyboard.current = false;
     }
-  }, [getGridItemIdOrder, getGridItems]);
+  }, [getGridItemIdOrder, getGridItems, activeStyles]);
 
   /** Handles moving the GridItem based on cursor position */
   const onMove = useCallback((e: MouseOrTouchEvent) => {
@@ -155,17 +156,19 @@ export function DnDGrid(props: DnDGridProps) {
         cloneEl.current?.setAttribute(gridCloneKey, "true");
         // Remove the id attribute from the clone to avoid duplicate ids on the page.
         cloneEl.current.removeAttribute("id");
-        // Ensure this element does not close the `active` styles as well.
-        cloneEl.current?.classList.remove(activeGridItemClass);
         // And finally place it in the DOM after the element being dragged. If there is no `nextSibling`, then it is appended to the grid element.
         gridEl.current.insertBefore(cloneEl.current, dragEl.current.nextSibling);
 
         // Apply styles to the actual element to make it look like it's being dragged.
         // This will remove it from the normal flow of the page, allowing the clone above to take its place.
-        dragEl.current.setAttribute(
-          "style",
-          `pointer-events: none; position:fixed; z-index: 9999; top:${top}px; left:${left}px; width:${rect.width}px; height:${rect.height}px;`,
-        );
+        dragEl.current.style.pointerEvents = "none";
+        dragEl.current.style.position = "fixed";
+        dragEl.current.style.zIndex = "9999";
+        dragEl.current.style.top = `${top}px`;
+        dragEl.current.style.left = `${left}px`;
+        dragEl.current.style.width = `${rect.width}px`;
+        dragEl.current.style.height = `${rect.height}px`;
+        setInlineStyles(dragEl.current, activeStyles);
         // Applies cursor styling to the Grid element.
         gridEl.current.style.cursor = "grabbing";
 
@@ -174,7 +177,7 @@ export function DnDGrid(props: DnDGridProps) {
         gridEl.current.addEventListener("touchmove", onMove);
       }
     },
-    [initReorder, onMove],
+    [initReorder, onMove, activeStyles],
   );
 
   /** Handles the end of the dragging process */
@@ -278,7 +281,7 @@ export function DnDGrid(props: DnDGridProps) {
       <div
         ref={gridEl}
         css={{
-          ...Css.ctis.dg.addIn(`& .${activeGridItemClass}`, activeItemStyles ?? Css.bshModal.$).$,
+          ...Css.ctis.dg.$,
           ...gridStyles,
         }}
         onTouchStart={onDragStart}
@@ -309,7 +312,6 @@ type GridStyles = Pick<
 
 export const gridItemIdKey = "dndgrid-itemid";
 const gridCloneKey = "dndgrid-clone";
-const activeGridItemClass = "dndgrid-active";
 
 // Create a union of the mouse and touch events, both native and react synthetics.
 // This simplifies the type signature of the event handlers.
