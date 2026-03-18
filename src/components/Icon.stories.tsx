@@ -259,3 +259,36 @@ export const Icon = (props: IconProps) => {
     </div>
   );
 };
+
+export function ColorAndBgColor() {
+  const examples: Array<Pick<IconProps, "icon" | "color" | "bgColor"> & { label: string }> = [
+    { label: "Star / yellow bg", icon: "starFilled", color: Palette.Yellow700, bgColor: Palette.Gray200 },
+    { label: "Warning / red bg", icon: "error", color: Palette.Red700, bgColor: Palette.Red100 },
+    { label: "House / blue bg", icon: "houseFilled", color: Palette.Blue700, bgColor: Palette.Blue100 },
+    { label: "Map / green bg", icon: "mapGlobe", color: Palette.Green700, bgColor: Palette.Green100 },
+  ];
+
+  return (
+    <div css={Css.p2.df.fdc.gap3.$}>
+      <h1 css={Css.xl2.$}>Icon color and background examples</h1>
+      <div css={Css.dg.gtc("repeat(2, minmax(220px, 1fr))").gap3.$}>
+        {examples.map((example) => (
+          <div key={example.label} css={Css.df.aic.gap2.p1.br8.bgGray100.$}>
+            <IconComponent icon={example.icon} color={example.color} bgColor={example.bgColor} inc={4} />
+            <div css={Css.df.fdc.gap1.$}>
+              <div css={Css.smSb.$}>{example.label}</div>
+              <div css={Css.xs.gray700.$}>
+                color={example.color}, bgColor={example.bgColor}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div css={Css.df.aic.gap2.p1.br8.bgGray900.gray200.$}>
+        <IconComponent icon="buildings" color="currentColor" bgColor={Palette.Gray700} inc={4} />
+        <div css={Css.sm.$}>currentColor inherits from container text color</div>
+      </div>
+    </div>
+  );
+}
