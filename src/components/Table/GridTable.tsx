@@ -465,6 +465,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const { visibleRows } = tableState;
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
     const bodyRowsCount = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind)).length;
+    const onlyKeptBodyRows =
+      bodyRowsCount > 0 &&
+      visibleRows.every(
+        (rs) =>
+          // For our purposes, "body rows" are any non-header / non-totals rows.
+          [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind) ||
+          rs.isKept ||
+          rs.kind === KEPT_GROUP,
+      );
     let bodyRowsSeen = 0;
     let foundFirstBodyRow = false;
 
@@ -474,7 +483,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       const isFirstBodyRow = isBodyRow && !foundFirstBodyRow;
       if (isBodyRow) bodyRowsSeen += 1;
       if (isBodyRow) foundFirstBodyRow = true;
-      const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount;
+      const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount && !onlyKeptBodyRows;
 
       const row = (
         <Row
