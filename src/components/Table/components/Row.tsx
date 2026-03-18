@@ -101,7 +101,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
   const isKeptGroupRow = row.kind === KEPT_GROUP;
   const isBodyRow = !isHeader && !isTotals && !isExpandableHeader;
-  const isFirstHeadRow = isExpandableHeader || (!hasExpandableHeader && isHeader);
+  // `isFirstHeadRow` drives first-row cell styling; when there is no expandable header,
+  // treat either a header or a totals row as the first head row so totals-first tables
+  // receive the correct top styling.
+  const isFirstHeadRow = isExpandableHeader || (!hasExpandableHeader && (isHeader || isTotals));
   const rowStyle = rowStyles?.[row.kind as R["kind"]];
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
