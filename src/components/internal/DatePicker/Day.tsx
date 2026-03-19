@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { DayProps, useDayRender } from "react-day-picker";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
+import "./day.css";
 
 /** Follows the same pattern as defined by the React-Day-Picker 'Day' component, plus sprinkling our own styling */
 export function Day(props: DayProps) {
@@ -42,16 +43,10 @@ export function Day(props: DayProps) {
       {...otherProps}
       ref={buttonRef}
       type="button"
-      css={{
-        ...Css.relative.pbPx(4).outline0.if(disabled).cursorNotAllowed.$,
-        // Do not apply interaction styles for disabled or already selected days.
-        ...(!selected &&
-          !disabled && {
-            "&:hover:not(:active) > div": Css.bgGray100.$,
-          }),
-        ...(!disabled && { "&:active > div": Css.bgGray400.gray900.$ }),
-        "&:focus:not(:active) > div": Css.ba.bcBlue700.if(selected).bcBlue900.$,
-      }}
+      className="beam-day-button"
+      css={Css.relative.pbPx(4).outline0.if(disabled).cursorNotAllowed.$}
+      {...(selected && { "data-selected": "" })}
+      {...(disabled && { "data-disabled": "" })}
       {...tid}
     >
       <div
