@@ -51,27 +51,15 @@ export function FormLines(props: FormLinesProps) {
 
   return (
     <PresentationProvider fieldProps={newFieldProps}>
-      <div
-        css={{
-          // Note that we're purposefully not using display:flex so that our children's margins will collapse.
-          ...Css.w(sizes[width]).$,
-        }}
-      >
+      {/* Use flex column + gap for spacing between lines, and pb for bottom spacing.*/}
+      <div css={Css.df.fdc.gap(gap).pb(gap).w(sizes[width]).$}>
         {Children.map(children, (child) => {
-          if (child === null || child === undefined || typeof child === "boolean") {
-            return child;
-          }
-
-          // Purposefully render wrappers with margin-bottom instead of childGap3
-          // so the last line also gets bottom spacing.
-
           if (child && typeof child === "object" && "type" in child && (child.type as any).isFormHeading) {
             const clone = cloneElement(child, { isFirst: firstFormHeading });
             firstFormHeading = false;
-            return <div css={Css.mb(gap).$}>{clone}</div>;
-          } else {
-            return <div css={Css.mb(gap).$}>{child}</div>;
+            return clone;
           }
+          return child;
         })}
       </div>
     </PresentationProvider>
@@ -80,7 +68,7 @@ export function FormLines(props: FormLinesProps) {
 
 /** Draws a line between form lines. */
 export function FormDivider() {
-  return <div css={Css.hPx(1).my2.bgGray200.$} />;
+  return <div css={Css.hPx(1).bgGray200.$} />;
 }
 
 /** Groups multiple fields side-by-side. */

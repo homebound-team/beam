@@ -347,6 +347,43 @@ export function WithHorizontalLayout() {
   );
 }
 
+export function WithFragmentChildren() {
+  const showOptionalFields = true;
+  return (
+    <FormLines width="full">
+      <TextField label="Task Name" value="" onChange={noop} />
+      <FieldGroup>
+        <DateField label="Start Date" value={new Date(2020, 0, 21)} onChange={noop} />
+        <DateField label="End Date" value={new Date(2020, 0, 21)} onChange={noop} />
+      </FieldGroup>
+      <NumberField label="Duration" value={0} onChange={noop} />
+      {showOptionalFields && (
+        <>
+          <SelectField<Options, number>
+            label="Assignee"
+            value={undefined}
+            options={[
+              { id: 1, name: "Alice" },
+              { id: 2, name: "Bob" },
+            ]}
+            onSelect={noop}
+          />
+          <SelectField<Options, number>
+            label="Trade Partner"
+            value={undefined}
+            options={[
+              { id: 1, name: "Acme Corp" },
+              { id: 2, name: "Beta LLC" },
+            ]}
+            onSelect={noop}
+          />
+        </>
+      )}
+      <TextField label="Notes" value="" onChange={noop} />
+    </FormLines>
+  );
+}
+
 type Options = {
   id: number;
   name: string;
