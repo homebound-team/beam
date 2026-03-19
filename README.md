@@ -23,6 +23,25 @@ _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWU
 > yarn watch:truss
 ```
 
+## Storybook Screenshot Harness
+
+Use this local harness when iterating on UX changes with an agent.
+
+```bash
+# Terminal 1: start Storybook
+yarn storybook
+
+# Terminal 2: capture a baseline screenshot
+yarn story:screenshot --story inputs-text-field--default --name baseline
+
+# After making code changes, capture and diff against baseline
+yarn story:screenshot --story inputs-text-field--default --name iter-1 --compare baseline
+```
+
+- Screenshots are stored in `.storyshots/<story-id>/` by default.
+- `--url` also works if you copy a Storybook URL directly from the browser.
+- `--selector` lets you capture a specific element instead of the full story frame.
+
 ## Beam's API Design Approach
 
 tldr: **Consistency & Brevity** over **Power & Flexibility**.
