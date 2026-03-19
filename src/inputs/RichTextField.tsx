@@ -1,4 +1,3 @@
-import { Global } from "@emotion/react";
 import DOMPurify from "dompurify";
 import { ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
@@ -11,6 +10,7 @@ import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
 import "trix/dist/trix";
 import "trix/dist/trix.css";
+import "./trix.css";
 
 export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWidth"> {
   /** The initial html value to show in the trix editor. */
@@ -143,7 +143,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} />}
-        <div css={{ ...Css.br4.bgWhite.$, ...trixCssOverrides }}>
+        <div className="beam-trix-editor">
           {/* "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly (https://github.com/basecamp/trix/issues/254#issuecomment-321814353) */}
           <input type="hidden" id={`input-${id}`} value={value} />
           {createElement("trix-editor", {
@@ -154,7 +154,6 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
             ...(placeholder ? { placeholder } : {}),
           })}
         </div>
-        <Global styles={[tributeOverrides]} />
       </div>
     );
   } else {
@@ -194,42 +193,6 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
     tribute.attach(editorElement!);
   } catch {}
 }
-
-const trixCssOverrides = {
-  ...Css.relative.add({ wordBreak: "break-word" }).br4.bcGray300.ba.$,
-  // Put the toolbar on the bottom
-  ...Css.df.fdcr.gap1.$,
-  // Some basic copy/paste from TextFieldBase
-  "& trix-editor": Css.bgWhite.sm.gray900.bn.p1.$,
-  // Highlight on focus
-  "&:focus-within": Css.bcBlue700.$,
-  "& trix-toolbar": Css.m1.$,
-  // Make the buttons closer to ours
-  "& .trix-button:not(:first-of-type)": Css.bn.$,
-  "& .trix-button-group": Css.bn.m0.$,
-  "& .trix-button": Css.bgWhite.sm.$,
-  // Height is hard-coded to 1.6 in trix, and the default width is wider than we want
-  "& .trix-button--icon": Css.w("1.6em").p0.mxPx(4).bn.$,
-  // icons are hard-coded svg's, so this is a simpler way to get lighter gray for now
-  "& .trix-button--icon::before": Css.add("opacity", "0.3").$,
-  // trix defaults to is active = blue bg - turn that off + make icon darker
-  "& .trix-button.trix-active": Css.bgWhite.add("opacity", "0.7").$,
-  // We don't support file attachment yet, so hide that control for now.
-  "& .trix-button-group--file-tools": Css.dn.$,
-  // Other things that are unused and we want to hide
-  "& .trix-button--icon-heading-1": Css.dn.$,
-  "& .trix-button--icon-code": Css.dn.$,
-  "& .trix-button--icon-quote": Css.dn.$,
-  "& .trix-button--icon-increase-nesting-level": Css.dn.$,
-  "& .trix-button--icon-decrease-nesting-level": Css.dn.$,
-  "& .trix-button-group--history-tools": Css.dn.$,
-};
-
-// Style the @ mention box
-const tributeOverrides = {
-  ".tribute-container": Css.add({ minWidth: "300px" }).$,
-  ".tribute-container > ul": Css.sm.bgWhite.ba.br4.bcBlue700.oh.$,
-};
 
 function extractIdsFromMentions(mergeTags: string[], content: string): string[] {
   return mergeTags.filter((tag) => content.includes(`@${tag}`));
