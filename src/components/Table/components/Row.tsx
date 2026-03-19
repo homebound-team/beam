@@ -111,8 +111,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
 
-  const revealOnRowHoverClass = "revealOnRowHover";
-
   const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
@@ -147,10 +145,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
-    ...{
-      [`> .${revealOnRowHoverClass} > *`]: Css.vh.$,
-      [`:hover > .${revealOnRowHoverClass} > *`]: Css.vv.$,
-    },
     // keptLastRowCss is now applied per-cell in cellCss below
   };
 
@@ -254,8 +248,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               : isExpandableHeader
                 ? numExpandedColumns + 1
                 : 1;
-          const revealOnRowHover = isGridCellContent(maybeContent) ? maybeContent.revealOnRowHover : false;
-
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
             (sortOn === "server" && !!column.serverSideSortKey);
@@ -385,8 +377,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             })`,
           };
 
-          const cellClassNames = revealOnRowHover ? revealOnRowHoverClass : undefined;
-
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
           const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
 
@@ -399,16 +389,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   ? rowClickRenderFn(as, api, currentColspan)
                   : defaultRenderFn(as, currentColspan);
 
-          const cellElement = renderFn(
-            columnIndex,
-            cellCss,
-            content,
-            row,
-            rowStyle,
-            cellClassNames,
-            cellOnClick,
-            tooltip,
-          );
+          const cellElement = renderFn(columnIndex, cellCss, content, row, rowStyle, undefined, cellOnClick, tooltip);
 
           // Add resize handle for header rows when resizing is enabled
           // Only add handle on the right border (not for the last column)

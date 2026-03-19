@@ -1490,30 +1490,6 @@ export function MixedSelectableChildrenRows() {
   );
 }
 
-export function RevealOnRowHover() {
-  const nameColumn: GridColumn<Row> = {
-    header: "Name",
-    data: ({ name }) => ({ content: name }),
-  };
-
-  const revealColumn: GridColumn<Row> = {
-    header: "Reveal",
-    data: ({ value }) => ({ content: <span>{value}</span>, revealOnRowHover: true }),
-  };
-
-  return (
-    <>
-      <GridTable
-        columns={[nameColumn, revealColumn]}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "Hover over me to reveal the number!", value: 7 } },
-        ]}
-      />
-    </>
-  );
-}
-
 export function ToggleCustomCollapse() {
   const api = useGridTableApi<Row | ChildRow>();
 
