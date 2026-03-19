@@ -1,0 +1,130 @@
+/*
+ * Trix editor and Tribute autocomplete CSS overrides.
+ *
+ * These style third-party DOM elements that we don't control,
+ * extracted from inline Emotion styles to a plain CSS file
+ * (StyleX cannot style third-party DOM).
+ */
+
+/* Wrapper container */
+.beam-trix-editor {
+  position: relative;
+  word-break: break-word;
+  border-radius: 4px;
+  border-color: rgba(221, 220, 220, 1);
+  border-style: solid;
+  border-width: 1px;
+  background-color: rgba(255, 255, 255, 1);
+  /* Put the toolbar on the bottom */
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+}
+
+/* Highlight on focus */
+.beam-trix-editor:focus-within {
+  border-color: rgba(29, 78, 216, 1);
+}
+
+/* Basic editor styles (copy/paste from TextFieldBase) */
+.beam-trix-editor trix-editor {
+  background-color: rgba(255, 255, 255, 1);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(36, 36, 36, 1);
+  border-style: none;
+  border-width: 0;
+  padding: 8px;
+}
+
+.beam-trix-editor trix-toolbar {
+  margin: 8px;
+}
+
+/* Make the buttons closer to ours */
+.beam-trix-editor .trix-button:not(:first-of-type) {
+  border-style: none;
+  border-width: 0;
+}
+
+.beam-trix-editor .trix-button-group {
+  border-style: none;
+  border-width: 0;
+  margin: 0;
+}
+
+.beam-trix-editor .trix-button {
+  background-color: rgba(255, 255, 255, 1);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Height is hard-coded to 1.6 in trix, and the default width is wider than we want */
+.beam-trix-editor .trix-button--icon {
+  width: 1.6em;
+  padding: 0;
+  margin-left: 4px;
+  margin-right: 4px;
+  border-style: none;
+  border-width: 0;
+}
+
+/* Icons are hard-coded SVGs, so this is a simpler way to get lighter gray */
+.beam-trix-editor .trix-button--icon::before {
+  opacity: 0.3;
+}
+
+/* Trix defaults to active = blue bg — turn that off + make icon darker */
+.beam-trix-editor .trix-button.trix-active {
+  background-color: rgba(255, 255, 255, 1);
+  opacity: 0.7;
+}
+
+/* We don't support file attachment yet, so hide that control */
+.beam-trix-editor .trix-button-group--file-tools {
+  display: none;
+}
+
+/* Unused buttons we want to hide */
+.beam-trix-editor .trix-button--icon-heading-1 {
+  display: none;
+}
+
+.beam-trix-editor .trix-button--icon-code {
+  display: none;
+}
+
+.beam-trix-editor .trix-button--icon-quote {
+  display: none;
+}
+
+.beam-trix-editor .trix-button--icon-increase-nesting-level {
+  display: none;
+}
+
+.beam-trix-editor .trix-button--icon-decrease-nesting-level {
+  display: none;
+}
+
+.beam-trix-editor .trix-button-group--history-tools {
+  display: none;
+}
+
+/* Style the @ mention box (Tribute) */
+.tribute-container {
+  min-width: 300px;
+}
+
+.tribute-container > ul {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  background-color: rgba(255, 255, 255, 1);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: rgba(29, 78, 216, 1);
+  overflow: hidden;
+}
