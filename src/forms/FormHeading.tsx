@@ -10,15 +10,8 @@ export interface FormHeadingProps {
 export function FormHeading(props: FormHeadingProps) {
   const { title, xss, isFirst = false, ...others } = props;
   return (
-    <h3
-      css={{
-        ...Css.md.$,
-        // Add space before the heading, but only if it's not first.
-        ...(!isFirst && Css.mt4.$),
-        ...xss,
-      }}
-      {...others}
-    >
+    // Add space before the heading, but only if it's not first.
+    <h3 css={{ ...Css.md.if(!isFirst).mt1.$, ...xss }} {...others}>
       {title}
     </h3>
   );
