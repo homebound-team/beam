@@ -1,0 +1,30 @@
+/*
+ * DatePicker Day button CSS overrides.
+ *
+ * These use pseudo-class + child combinator selectors (e.g. ":hover > div")
+ * that StyleX cannot express. Conditional logic previously handled via JS
+ * spreading is now encoded with data-attribute selectors.
+ */
+
+/* Hover: only when not selected and not disabled */
+.beam-day-button:hover:not(:active):not([data-selected]):not([data-disabled]) > div {
+  background-color: rgba(247, 245, 245, 1); /* Gray100 */
+}
+
+/* Active: only when not disabled */
+.beam-day-button:not([data-disabled]):active > div {
+  background-color: rgba(201, 201, 201, 1); /* Gray400 */
+  color: rgba(36, 36, 36, 1); /* Gray900 */
+}
+
+/* Focus: always applied (default blue700 border) */
+.beam-day-button:focus:not(:active) > div {
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgba(29, 78, 216, 1); /* Blue700 */
+}
+
+/* Focus when selected: override border to blue900 */
+.beam-day-button[data-selected]:focus:not(:active) > div {
+  border-color: rgba(30, 58, 138, 1); /* Blue900 */
+}
