@@ -30,7 +30,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         css={{
           ...commonStyles,
           ...Css.bl.borderRadius("4px 0 0 4px").$,
-          "&:focus-within": Css.bcBlue700.$,
+          ...(hasFocusWithin && Css.bcBlue700.$),
         }}
       >
         {cloneElement(children[0], {
@@ -44,7 +44,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         css={{
           ...commonStyles,
           ...Css.fg1.br.borderRadius("0 4px 4px 0").$,
-          "&:focus-within": Css.bcBlue700.$,
+          ...(hasFocusWithin && Css.bcBlue700.$),
         }}
       >
         {cloneElement(children[1], {

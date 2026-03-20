@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { Css, IconCard, IconCardProps } from "src";
-import { iconCardStylesHover } from "src/inputs/IconCard";
+import { Css, IconCard, IconCardProps, Palette } from "src";
 
 export default {
   component: IconCard,
@@ -29,10 +28,11 @@ export function Default() {
   );
 }
 
-/** Hover styled version of the IconButton */
+/** Hover styled version of the IconCard — uses a scoped stylesheet to force hover styles for visual testing. */
 function HoveredIconCard(args: IconCardProps) {
   return (
-    <div css={{ "& button": iconCardStylesHover }}>
+    <div className="hovered-icon-card">
+      <style>{`.hovered-icon-card button { background-color: ${Palette.Gray100}; }`}</style>
       <IconCard {...args} />
     </div>
   );

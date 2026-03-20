@@ -11,6 +11,8 @@ import { safeKeys } from "src/utils";
 export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
+  /** Extra bottom padding for the virtual-table footer loader/spacer, in pixels. */
+  virtualFooterPaddingBottomPx?: number;
   /**
    * Applied as the base body-row cell styling (commonly used for row separators).
    * This is applied to body rows broadly (including the last body row); use
@@ -62,8 +64,6 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: Palette | "none";
-  /** Applied on hover of a row */
-  nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "borderOnHover" | "typeScale"> &
@@ -175,10 +175,12 @@ function memoizedTableStyles() {
         // Using `inset` keeps the line inside the cell so it doesn't change layout.
         expandableHeaderNonLastColumnCss: Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$,
         cellCss: {
-          ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
-            .$,
+          ...Css.typography(cellTypography)
+            .gray900.bgWhite.ai(alignItems)
+            .pxPx(12)
+            .boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
+          ...(cellHighlight ? Css.onHover.bgGray100.$ : {}),
         },
         firstCellCss: bordered ? Css.bl.bcGray200.$ : undefined,
         lastCellCss: bordered ? Css.br.bcGray200.$ : undefined,
@@ -249,8 +251,8 @@ export const condensedStyle: GridStyle = {
  * */
 export const cardStyle: GridStyle = {
   ...defaultStyle,
-  betweenRowsCss: {},
-  nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").$,
+  betweenRowsCss: {} as Properties,
+  nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").onHover.bshHover.bcGray700.$,
   firstRowCss: Css.bl.br.bcGray200.borderRadius("8px 8px 0 0").oh.$,
   cellCss: Css.p2.$,
   // Undo the card look & feel for the header
@@ -259,7 +261,6 @@ export const cardStyle: GridStyle = {
     ...Css.p1.m0.xsSb.gray700.$,
   },
   rowHoverColor: "none",
-  nonHeaderRowHoverCss: Css.bshHover.bcGray700.$,
   // this will allow having N amount of nested childs without having to define each level margin
   levels: (level) => ({ rowIndent: level > 0 ? 24 * level : undefined }),
 };

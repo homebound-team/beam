@@ -643,13 +643,7 @@ function renderDiv<R extends Kinded>(
       data-testid={id}
     >
       {/* Table Head */}
-      <div
-        css={{
-          ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
-        }}
-      >
-        {tableHeadRows}
-      </div>
+      <div css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>{tableHeadRows}</div>
 
       {/* Table Body */}
       <div>
@@ -775,12 +769,6 @@ function renderVirtual<R extends Kinded>(
   persistScrollPosition: boolean = infiniteScroll === undefined, // Enabled by default if infinite scroll is not enabled
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { footerStyle, listStyle } = useMemo(() => {
-    const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
-    return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
-  }, [style]);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -812,10 +800,14 @@ function renderVirtual<R extends Kinded>(
             style={{ ...props.style, ...{ zIndex: zIndices.stickyHeader } }}
           />
         )),
-        List: VirtualRoot(listStyle, columns as any, id, xss),
+        List: VirtualRoot(style, columns as any, id, xss),
         Footer: () => {
           return (
-            <div css={footerStyle}>
+            <div
+              css={
+                Css.if(style.virtualFooterPaddingBottomPx !== undefined).pbPx(style.virtualFooterPaddingBottomPx ?? 0).$
+              }
+            >
               {fetchMoreInProgress && (
                 <div css={Css.h5.df.aic.jcc.$}>
                   <Loader size={"xs"} />
@@ -937,10 +929,11 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
       return (
         <div
           ref={ref}
-          style={{ ...style, ...{ minWidth: "fit-content" } }}
+          style={style}
           css={{
             ...gs.rootCss,
             ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
+            ...Css.add("minWidth", "fit-content").$,
             ...xss,
           }}
           data-testid={id}

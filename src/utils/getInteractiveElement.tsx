@@ -1,14 +1,14 @@
-import { Interpolation, Theme } from "@emotion/react";
 import { PressEvent } from "@react-types/shared";
 import { HTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { Properties } from "src/Css";
 import { isAbsoluteUrl } from "src/utils/index";
 
 export function getButtonOrLink(
   content: ReactNode,
   // PressEvent set by React-Aria's `useButton`.
   onClick: ((e: PressEvent) => void) | VoidFunction | string | undefined,
-  attrs: HTMLAttributes<HTMLButtonElement | HTMLAnchorElement> & { css?: Interpolation<Theme> },
+  attrs: HTMLAttributes<HTMLButtonElement | HTMLAnchorElement> & { css?: Properties },
   openInNew: boolean = false,
   downloadLink: boolean = false,
 ): JSX.Element {

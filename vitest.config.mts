@@ -1,7 +1,8 @@
+import { trussPlugin } from "@homebound/truss/plugin";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [],
+  plugins: [trussPlugin({ mapping: "./src/Css.json" })],
   resolve: { tsconfigPaths: true },
   test: {
     globals: true,

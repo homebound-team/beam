@@ -90,7 +90,7 @@ const sections: Sections = {
       position: "absolute",
       overflow: "hidden",
       clip: "inset(50%)",
-      clipPath: "",
+      clipPath: "none",
       border: 0,
       height: "1px",
       margin: "-1px",
