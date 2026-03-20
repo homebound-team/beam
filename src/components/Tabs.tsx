@@ -112,7 +112,7 @@ export function TabContent<V extends string>(
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        css={contentXss as any}
+        css={contentXss}
       >
         {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
       </div>
@@ -222,14 +222,14 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     role: "tab",
     tabIndex: active ? 0 : -1,
     ...others,
-    css: {
+    ...Css.props({
       ...baseStyles,
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isHovered && hoverStyles),
       ...(isHovered && active && activeHoverStyles),
       ...(isFocusVisible && active && focusRingStyles),
-    },
+    }),
   };
   const interactiveProps = mergeProps(focusProps, hoverProps, {
     onKeyUp,
@@ -270,11 +270,11 @@ export function getTabStyles() {
   return {
     baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
       .cursorPointer.sm.$,
-    activeStyles: Css.add(borderBottomStyles).bcBlue700.smSb.gray900.$,
+    activeStyles: { ...Css.bcBlue700.smSb.gray900.$, ...borderBottomStyles },
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgBlue50.bshFocus.$,
-    hoverStyles: Css.add(borderBottomStyles).bcGray400.$,
-    activeHoverStyles: Css.bgBlue50.add(borderBottomStyles).bcBlue700.$,
+    hoverStyles: { ...Css.bcGray400.$, ...borderBottomStyles },
+    activeHoverStyles: { ...Css.bgBlue50.bcBlue700.$, ...borderBottomStyles },
   };
 }
 

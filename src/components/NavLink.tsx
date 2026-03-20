@@ -56,14 +56,14 @@ export function NavLink(props: NavLinkProps) {
     tabIndex: isDisabled ? -1 : 0,
     /** aria-current represents the current page within a set of pages */
     "aria-current": active ? ("page" as const) : undefined,
-    css: {
+    ...Css.props({
       ...baseStyles,
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isFocusVisible && focusRingStyles),
       ...(isHovered && hoverStyles),
       ...(isPressed && pressedStyles),
-    },
+    }),
   };
 
   const linkContent = (

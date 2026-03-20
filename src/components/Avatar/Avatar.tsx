@@ -20,7 +20,7 @@ export function Avatar({ src, name, size = "md", showName = false, disableToolti
   const styles = Css.br100.wPx(px).hPx(px).mwPx(px).oh.$;
 
   const img = showFallback ? (
-    <div css={{ ...styles, ...Css[sizeToFallbackTypeScale[size]].bgGray400.gray100.df.aic.jcc.$ }} {...tid}>
+    <div css={{ ...styles, ...Css.typography(sizeToFallbackTypeScale[size]).bgGray400.gray100.df.aic.jcc.$ }} {...tid}>
       {name ? nameToInitials(name) : <Icon icon="userCircle" inc={sizeToIconInc[size]} />}
     </div>
   ) : (
@@ -37,7 +37,7 @@ export function Avatar({ src, name, size = "md", showName = false, disableToolti
   return showName && name ? (
     <div css={Css.dif.aic.gap1.if(size === "lg" || size === "xl").fdc.$}>
       {img}
-      <span css={Css[sizeToTypeScale[size]].$}>{name}</span>
+      <span css={Css.typography(sizeToTypeScale[size]).$}>{name}</span>
     </div>
   ) : (
     maybeTooltip({ title: disableTooltip ? undefined : name, children: img, placement: "top" })

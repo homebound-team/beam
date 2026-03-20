@@ -1,7 +1,7 @@
 import { ButtonGroup, ButtonGroupButton } from "src/components/ButtonGroup";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
-import { Css } from "..";
+import { Css, Palette } from "..";
 
 describe("ButtonGroup", () => {
   it("renders and fires callbacks", async () => {
@@ -62,6 +62,6 @@ describe("ButtonGroup", () => {
 
   it("can render jsx", async () => {
     const r = await render(<ButtonGroup buttons={[{ text: <div css={Css.red500.$}>Hello World</div> }]} />);
-    expect(r.getByText("Hello World")).toHaveStyle({ color: Css.red500.$.color });
+    expect(r.getByText("Hello World")).toHaveStyle({ color: Palette.Red500 });
   });
 });

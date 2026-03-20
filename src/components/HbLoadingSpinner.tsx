@@ -33,10 +33,8 @@ export function HbLoadingSpinner({ noQuips, extraQuips = [], extraQuipsOnly, ico
         src={SpinnerGifBase64}
         data-chromatic="ignore" // Chromatic timing would snapshot this on different frames of the 24-frame gif, so ignore it
         css={
-          Css.add({
-            // Image is white-on-black, so this flips it to black-on-white for our almost-always white backgrounds
-            filter: "invert(1)",
-          }).$
+          // Image is white-on-black, so this flips it to black-on-white for our almost-always white backgrounds
+          Css.add("filter", "invert(1)").$
         }
         alt="loading"
         {...tid.gif}

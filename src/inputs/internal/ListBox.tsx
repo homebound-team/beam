@@ -94,12 +94,10 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
 
   return (
     <div
-      css={{
-        // If `horizontalLayout`, then that means `labelStyle === "left"`. In this case the label the the field both take 50% of the horizontal space.
-        // Add `w50` in that case to ensure the ListBox is only the width of the field. If the width definitions ever change, we need to update here as well.
-        ...Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.if(horizontalLayout).w50.$,
-        "&:hover": Css.bshHover.$,
-      }}
+      css={
+        Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.if(horizontalLayout).w50.onHover
+          .bshHover.$
+      }
       ref={listBoxRef}
       {...listBoxProps}
     >

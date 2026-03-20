@@ -1,4 +1,3 @@
-import { Global } from "@emotion/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -44,6 +43,16 @@ export function SuperDrawer(): ReactPortal | null {
 
   const { width = SuperDrawerWidth.Normal } = firstContent ?? {};
 
+  // Prevent body scrolling when the SuperDrawer opens
+  useEffect(() => {
+    if (content) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [content]);
+
   useEffect(
     () => {
       if (headerRef.current?.childNodes.length === 0 && content) {
@@ -59,8 +68,6 @@ export function SuperDrawer(): ReactPortal | null {
     <AnimatePresence>
       {content && (
         <>
-          {/* Prevent scrolling when the SuperDrawer opens */}
-          <Global styles={{ body: Css.oh.$ }} />
           {/* Overlay */}
           <motion.div
             {...testId}

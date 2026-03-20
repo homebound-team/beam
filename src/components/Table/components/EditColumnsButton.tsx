@@ -77,12 +77,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
 
   return (
     <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
-      <div
-        css={{
-          ...Css.dg.gtc("1fr auto").gap2.bgWhite.p2.maxwPx(326).$,
-          "&:hover": Css.bshHover.$,
-        }}
-      >
+      <div css={Css.dg.gtc("1fr auto").gap2.bgWhite.p2.maxwPx(326).onHover.bshHover.$}>
         {options.map((option) => (
           <Fragment key={option.value}>
             <div css={Css.sm.truncate.pr1.$}>{option.label}</div>

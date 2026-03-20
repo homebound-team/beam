@@ -1,14 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import {
-  Css,
-  IconButton,
-  iconButtonCircleStylesHover,
-  iconButtonContrastStylesHover,
-  IconButtonProps,
-  iconButtonStylesHover,
-  Icons,
-  Palette,
-} from "src";
+import { Css, IconButton, IconButtonProps, Icons, Palette } from "src";
 import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -142,18 +133,13 @@ export function IconButtonLink() {
   );
 }
 
-/** Hover styled version of the IconButton */
+/** Hover styled version of the IconButton — uses a scoped stylesheet to force hover styles for visual testing. */
 function HoveredIconButton(args: IconButtonProps) {
+  const bg = args.contrast ? Palette.Gray700 : args.circle ? Palette.Blue100 : Palette.Gray200;
+  const borderColor = args.circle ? Palette.Blue200 : undefined;
   return (
-    <div
-      css={{
-        "& button": args.contrast
-          ? iconButtonContrastStylesHover
-          : args.circle
-            ? iconButtonCircleStylesHover
-            : iconButtonStylesHover,
-      }}
-    >
+    <div className="hovered-icon-button">
+      <style>{`.hovered-icon-button button { background-color: ${bg};${borderColor ? ` border-color: ${borderColor};` : ""} }`}</style>
       <IconButton {...args} active={args.circle} />
     </div>
   );
