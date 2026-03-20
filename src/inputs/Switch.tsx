@@ -108,7 +108,11 @@ export function Switch(props: SwitchProps) {
           >
             {/* Icon */}
             {withIcon && (
-              <Icon icon={isSelected ? "check" : "x"} color={isSelected ? Palette.Blue700 : Palette.Gray400} />
+              <Icon
+                icon={isSelected ? "check" : "x"}
+                color={isSelected ? Palette.Blue700 : Palette.Gray400}
+                inc={toggleHeight(compact) / 16}
+              />
             )}
           </div>
         </div>
@@ -143,7 +147,6 @@ function switchCircleDefaultStyles(isCompact: boolean) {
       .hPx(circleDiameter(isCompact))
       .br100.bgWhite.bshBasic.absolute.leftPx(2)
       .topPx(2).transition.df.aic.jcc.$,
-    svg: Css.hPx(toggleHeight(isCompact) / 2).wPx(toggleHeight(isCompact) / 2).$,
   };
 }
 

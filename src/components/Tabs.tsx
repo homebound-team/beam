@@ -31,6 +31,8 @@ export interface TabsProps<V extends string, X> {
   tabs: Tab<V>[];
   onChange: (value: V) => void;
   contentXss?: X;
+  /** If you want to set your own padding in `contentXss`, you can disable the default FullBleed padding here. */
+  omitFullBleedPadding?: boolean;
   // Allow for showing the tabs even if there is only one enabled tab
   alwaysShowAllTabs?: boolean;
   // Adds a bottom border to the Tabs container
@@ -92,7 +94,7 @@ export function TabContent<V extends string>(
   props: Omit<RequiredRenderTabs<V, AnyObject>, "onChange"> | RequiredRenderRouteTabs<V, AnyObject>,
 ) {
   const tid = useTestIds(props, "tab");
-  const { tabs, contentXss = {} } = props;
+  const { tabs, contentXss = {}, omitFullBleedPadding = false } = props;
   const location = useLocation();
   const selectedTab = isRouteTabs(props)
     ? props.tabs.find((t) => {
@@ -105,14 +107,14 @@ export function TabContent<V extends string>(
   return (
     // Using FullBleed to allow the tab's bgColor to extend to the edges of the <ScrollableContent /> element.
     // Omit the padding from `FullBleed` if the caller passes in the `paddingLeft/Right` styles.
-    <FullBleed omitPadding={"paddingLeft" in contentXss || "paddingRight" in contentXss}>
+    <FullBleed omitPadding={omitFullBleedPadding}>
       <div
         aria-labelledby={`${uniqueValue}-tab`}
         id={`${uniqueValue}-tabPanel`}
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        css={contentXss as any}
+        css={contentXss}
       >
         {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
       </div>
@@ -222,14 +224,14 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     role: "tab",
     tabIndex: active ? 0 : -1,
     ...others,
-    css: {
+    ...Css.props({
       ...baseStyles,
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isHovered && hoverStyles),
       ...(isHovered && active && activeHoverStyles),
       ...(isFocusVisible && active && focusRingStyles),
-    },
+    }),
   };
   const interactiveProps = mergeProps(focusProps, hoverProps, {
     onKeyUp,
@@ -270,11 +272,11 @@ export function getTabStyles() {
   return {
     baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
       .cursorPointer.sm.$,
-    activeStyles: Css.add(borderBottomStyles).bcBlue700.smSb.gray900.$,
+    activeStyles: { ...Css.bcBlue700.smSb.gray900.$, ...borderBottomStyles },
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.bgBlue50.bshFocus.$,
-    hoverStyles: Css.add(borderBottomStyles).bcGray400.$,
-    activeHoverStyles: Css.bgBlue50.add(borderBottomStyles).bcBlue700.$,
+    hoverStyles: { ...Css.bcGray400.$, ...borderBottomStyles },
+    activeHoverStyles: { ...Css.bgBlue50.bcBlue700.$, ...borderBottomStyles },
   };
 }
 

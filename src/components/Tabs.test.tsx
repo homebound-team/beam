@@ -208,15 +208,15 @@ describe("TabsWithContent", () => {
     // Given the TabContent with horizontal padding defined via `contentXss`.
     // And nested within the ScrollableContent which also has horizontal padding defined via `xss`.
     const r = await render(
-      <ScrollableParent xss={Css.px1.$}>
+      <ScrollableParent px={1}>
         <ScrollableContent>
-          <TabContent tabs={testTabs} selected={testTabs[0].value} contentXss={Css.px2.$} />
+          <TabContent tabs={testTabs} selected={testTabs[0].value} contentXss={Css.px2.$} omitFullBleedPadding={true} />
         </ScrollableContent>
       </ScrollableParent>,
       withRouter(),
     );
     // Then expect the tab content to have the expected padding based on `contentXss`
-    expect(r.tab_panel).toHaveStyle("padding-left: 16px");
+    expect(r.tab_panel).toHaveStyle({ paddingLeft: "16px" });
   });
 });
 

@@ -163,11 +163,11 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
 function RotatingChevronIcon(props: { expanded: boolean }) {
   return (
     <span
-      css={{
-        ...Css.fs0.$,
-        transition: "transform 250ms linear",
-        transform: props.expanded ? "rotate(180deg)" : "rotate(0deg)",
-      }}
+      css={
+        Css.fs0
+          .add("transition", "transform 250ms linear")
+          .add("transform", props.expanded ? "rotate(180deg)" : "rotate(0deg)").$
+      }
     >
       <Icon icon="chevronDown" />
     </span>

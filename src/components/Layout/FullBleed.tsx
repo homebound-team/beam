@@ -1,4 +1,5 @@
 import { cloneElement, ReactElement } from "react";
+import { mergeProps } from "react-aria";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { Css } from "src/Css";
 
@@ -7,7 +8,10 @@ export function FullBleed({ children, omitPadding = false }: { children: ReactEl
   const { pr, pl } = useScrollableParent();
   return !pr && !pl
     ? children
-    : cloneElement(children, {
-        style: Css.ml(`-${pl}`).mr(`-${pr}`).if(!omitPadding).pl(pl).pr(pr).$,
-      });
+    : cloneElement(
+        children,
+        // The child might already have className/style set, let Css.props also create
+        // a className/style, and then mergeProps the two together.
+        mergeProps(children.props, Css.props(Css.ml(`-${pl}`).mr(`-${pr}`).if(!omitPadding).pl(pl).pr(pr).$)),
+      );
 }

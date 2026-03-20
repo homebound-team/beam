@@ -13,16 +13,12 @@ describe("Chips", () => {
     expect(r.chip_0.textContent).toBe("123");
     expect(r.chip_1.textContent).toBe("abc");
     expect(r.tooltip).toHaveAttribute("title", "tooltip");
-    expect(r.chip_0).toHaveStyle({
-      "min-height": "24px",
-    });
+    expect(r.chip_0).toHaveStyle({ minHeight: "24px" });
   });
 
   it("can set compact to change size", async () => {
     const r = await render(<Chips values={values} compact />);
 
-    expect(r.chip_0).toHaveStyle({
-      "min-height": "20px",
-    });
+    expect(r.chip_0).toHaveStyle({ minHeight: "20px" });
   });
 });

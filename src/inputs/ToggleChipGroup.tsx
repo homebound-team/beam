@@ -132,9 +132,11 @@ function ToggleChip(props: ToggleChipProps) {
           ...(isSelected
             ? {
                 ...Css.color(xss?.color ?? Palette.White).bgColor(xss?.backgroundColor ?? Palette.Blue700).$,
-                ":hover:not([data-disabled='true'])": Css.bgColor(xss?.backgroundColor ?? Palette.Blue800).$,
+                ...(!isDisabled && Css.onHover.bgColor(xss?.backgroundColor ?? Palette.Blue800).$),
               }
-            : { ":hover:not([data-disabled='true'])": Css.if(!groupState.isReadOnly).bgGray300.$ }),
+            : !isDisabled && !groupState.isReadOnly
+              ? Css.onHover.bgGray300.$
+              : {}),
           ...(isFocusVisible ? Css.bshFocus.$ : {}),
         }}
         data-selected={isSelected}

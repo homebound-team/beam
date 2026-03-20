@@ -57,9 +57,11 @@ export function toContent(
 
   content =
     isGridCellContent(maybeContent) && !!maybeContent.onClick
-      ? getButtonOrLink(content, maybeContent.onClick, {
-          css: Css.maxw100.blue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$,
-        })
+      ? getButtonOrLink(
+          content,
+          maybeContent.onClick,
+          Css.props(Css.maxw100.blue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$),
+        )
       : content;
 
   if (content && typeof content === "string" && isHeader && canSortColumn) {
@@ -168,10 +170,10 @@ export function getFirstOrLastCellCss<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   colspan: number = 1,
 ): Properties {
-  return {
+  return Css.spread({
     ...(columnIndex === 0 ? style.firstCellCss : {}),
     ...(columnIndex + colspan >= columns.length ? style.lastCellCss : {}),
-  };
+  });
 }
 
 /** A heuristic to detect the result of `React.createElement` / i.e. JSX. */

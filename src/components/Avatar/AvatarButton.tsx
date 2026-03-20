@@ -53,13 +53,14 @@ export function AvatarButton(props: AvatarButtonProps) {
   const tid = useTestIds(props, avatarProps.name);
 
   const styles = useMemo(
-    () => ({
-      ...resetStyles,
-      ...(isHovered && hoverStyles),
-      // pressed state is handled by rendering a pressedOverlayCss span
-      ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
-      ...(isDisabled && disabledStyles),
-    }),
+    () =>
+      Css.spread({
+        ...resetStyles,
+        ...(isHovered && hoverStyles),
+        // pressed state is handled by rendering a pressedOverlayCss span
+        ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
+        ...(isDisabled && disabledStyles),
+      }),
     [isHovered, isFocusVisible, isDisabled, forceFocusStyles],
   );
 
@@ -70,7 +71,7 @@ export function AvatarButton(props: AvatarButtonProps) {
     ...hoverProps,
     className: typeof onPress === "string" ? navLink : undefined,
     ref: ref as any,
-    css: styles,
+    ...Css.props(styles),
   };
 
   const content = (

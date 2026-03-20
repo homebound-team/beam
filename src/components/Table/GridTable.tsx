@@ -643,13 +643,7 @@ function renderDiv<R extends Kinded>(
       data-testid={id}
     >
       {/* Table Head */}
-      <div
-        css={{
-          ...Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$,
-        }}
-      >
-        {tableHeadRows}
-      </div>
+      <div css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>{tableHeadRows}</div>
 
       {/* Table Body */}
       <div>
@@ -937,10 +931,11 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
       return (
         <div
           ref={ref}
-          style={{ ...style, ...{ minWidth: "fit-content" } }}
+          style={style}
           css={{
             ...gs.rootCss,
             ...(gs.minWidthPx ? Css.mwPx(gs.minWidthPx).$ : {}),
+            ...Css.add("minWidth", "fit-content").$,
             ...xss,
           }}
           data-testid={id}
