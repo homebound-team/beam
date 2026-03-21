@@ -102,14 +102,14 @@ export function Button(props: ButtonProps) {
     ...focusProps,
     ...hoverProps,
     className: asLink ? navLink : undefined,
-    css: {
+    ...Css.props({
       ...Css.buttonBase.tt("inherit").$,
       ...baseStyles,
       ...(isHovered && !isPressed && !active ? hoverStyles : {}),
       ...(isPressed || active ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
       ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
-    },
+    }),
     ...tid,
   };
 
@@ -129,7 +129,7 @@ function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boo
   }
   return {
     ...styles,
-    baseStyles: { ...styles.baseStyles, ...sizeStyles[size] },
+    baseStyles: Css.add(styles.baseStyles).add(sizeStyles[size]).$,
   };
 }
 

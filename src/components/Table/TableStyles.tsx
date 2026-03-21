@@ -139,10 +139,10 @@ function memoizedTableStyles() {
       const alignItems = vAlign === "center" ? "center" : vAlign === "top" ? "flex-start" : "flex-end";
       const groupedLevels = {
         0: {
-          cellCss: {
+          cellCss: Css.spread({
             ...Css.xsSb.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
             ...(allWhite && Css.bgWhite.$),
-          },
+          }),
           firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.gray900.$) },
         },
         2: { firstContentColumn: Css.xs.pl3.$ },
@@ -153,19 +153,19 @@ function memoizedTableStyles() {
 
       cache[key] = {
         emptyCell: "-",
-        firstRowMessageCss: {
+        firstRowMessageCss: Css.spread({
           ...Css.tac.py3.$,
           ...(allWhite && Css.bgWhite.$),
           ...(bordered && Css.bl.br.bcGray200.$),
-        },
-        headerCellCss: {
+        }),
+        headerCellCss: Css.spread({
           // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
           // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
           // Header's will add `lineClamp2` more locally in their renders.
           // Also `unset`-ing the white-space: nowrap defined in `cellCss` below.
           ...Css.gray700.xsSb.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
-        },
+        }),
         totalsCellCss: Css.bgWhite.gray700.bgGray100.xsSb.hPx(totalsRowHeight).pPx(12).$,
         expandableHeaderCss: Css.bgWhite.gray900.xsSb.wsn
           .hPx(expandableHeaderRowHeight)
@@ -174,12 +174,14 @@ function memoizedTableStyles() {
         // Draw a 1px divider inside the cell on the right edge and bottom edge.
         // Using `inset` keeps the line inside the cell so it doesn't change layout.
         expandableHeaderNonLastColumnCss: Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$,
-        cellCss: {
-          ...Css[cellTypography].gray900.bgWhite.ai(alignItems).pxPx(12).boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`)
-            .$,
+        cellCss: Css.spread({
+          ...Css.typography(cellTypography)
+            .gray900.bgWhite.ai(alignItems)
+            .pxPx(12)
+            .boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? { "&:hover": Css.bgGray100.$ } : {}),
-        },
+          ...(cellHighlight ? Css.onHover.bgGray100.$ : {}),
+        }),
         firstCellCss: bordered ? Css.bl.bcGray200.$ : undefined,
         lastCellCss: bordered ? Css.br.bcGray200.$ : undefined,
         firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
@@ -238,10 +240,10 @@ export const defaultStyle: GridStyle = getTableStyles({});
 /** Tightens up the padding of rows, great for rows that have form elements in them. */
 export const condensedStyle: GridStyle = {
   ...getTableStyles({ rowHeight: "fixed" }),
-  firstRowMessageCss: {
+  firstRowMessageCss: Css.spread({
     ...getTableStyles({ rowHeight: "fixed" }).firstRowMessageCss,
     ...Css.xs.gray900.$,
-  },
+  }),
 };
 
 /** Renders each row as a card.
@@ -249,17 +251,18 @@ export const condensedStyle: GridStyle = {
  * */
 export const cardStyle: GridStyle = {
   ...defaultStyle,
-  betweenRowsCss: {},
+  betweenRowsCss: {} as Properties,
   nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").$,
   firstRowCss: Css.bl.br.bcGray200.borderRadius("8px 8px 0 0").oh.$,
   cellCss: Css.p2.$,
   // Undo the card look & feel for the header
-  headerCellCss: {
+  headerCellCss: Css.spread({
     ...defaultStyle.headerCellCss,
     ...Css.p1.m0.xsSb.gray700.$,
-  },
+  }),
   rowHoverColor: "none",
-  nonHeaderRowHoverCss: Css.bshHover.bcGray700.$,
+  // Use onHover here directly at the declaration site, due to our truss/stylex limitation
+  nonHeaderRowHoverCss: Css.onHover.bshHover.bcGray700.$,
   // this will allow having N amount of nested childs without having to define each level margin
   levels: (level) => ({ rowIndent: level > 0 ? 24 * level : undefined }),
 };

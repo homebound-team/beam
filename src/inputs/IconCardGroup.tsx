@@ -93,7 +93,7 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
           <Label label={label} {...labelProps} {...tid.label} />
         </div>
       )}
-      <div css={Css.df.gap2.add({ flexWrap: "wrap" }).$}>
+      <div css={Css.df.gap2.add("flexWrap", "wrap").$}>
         {options.map((option) => {
           const { icon, label, disabled } = option;
           const isSelected = selected.includes(option.value);

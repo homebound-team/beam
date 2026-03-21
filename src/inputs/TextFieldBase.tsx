@@ -14,7 +14,9 @@ import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
-import { BorderHoverChild, BorderHoverParent } from "src/components/Table/components/Row";
+import { BorderHoverChild } from "src/components/Table/components/Row";
+// Side-effect import: injects CSS for the border-hover-on-row pattern
+import "src/components/Table/components/Row.css.ts";
 import { Css, increment, Only, Palette } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
@@ -138,8 +140,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldStyles = {
     container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
     inputWrapper: {
-      ...Css[typeScale].df.aic.br8
-        .pxPx(textFieldBasePadding)
+      ...Css.typography(typeScale)
+        .df.aic.br8.pxPx(textFieldBasePadding)
         .w100.bgColor(bgColor)
         .gray900.if(contrast && !inputStylePalette)
         .white.if(labelStyle === "left")
@@ -155,10 +157,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(!compound ? Css.ba.$ : {}),
       ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
       ...(borderOnHover && Css.if(isHovered).bgColor(hoverBgColor).ba.bcBlue300.$),
-      ...{
-        // Highlight the field when hovering over the row in a table, unless some other edit component (including ourselves) is hovered
-        [`.${BorderHoverParent}:hover:not(:has(.${BorderHoverChild}:hover)) &`]: Css.ba.bcBlue300.$,
-      },
       // When multiline is true, then we want to allow the field to grow to the height of the content, but not shrink below the minHeight
       // Otherwise, set fixed heights values accordingly.
       ...(multiline
@@ -169,9 +167,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             .if(compact)
             .hPx(compactFieldHeight - maybeSmaller).$),
     },
+    // Border-hover-on-row styling is handled by Row.css.ts (imported above as a side-effect)
     inputWrapperReadOnly: {
-      ...Css[typeScale].df.aic.w100.gray900
-        .if(contrast && !inputStylePalette)
+      ...Css.typography(typeScale)
+        .df.aic.w100.gray900.if(contrast && !inputStylePalette)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
@@ -182,9 +181,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     },
     input: {
       ...Css.w100.mw0.outline0.fg1.bgTransparent.$,
-      // Keep `addIn` for `::selection` until we finish the StyleX migration.
-      // Not using Truss's inline `if` statement here because `addIn` properties do not respect the if statement.
-      ...(contrast && !inputStylePalette && Css.addIn("&::selection", Css.bgGray800.$).$),
+      ...(contrast && !inputStylePalette && Css.element("::selection").bgGray800.$),
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$

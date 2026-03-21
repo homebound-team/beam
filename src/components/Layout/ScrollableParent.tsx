@@ -67,11 +67,11 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
   const [, setTick] = useState(0);
   const hasScrollableContent = scrollableEl.childNodes.length > 0;
   const scrollableRef = useRef<HTMLDivElement | null>(null);
-  const { paddingLeft, paddingRight, ...otherXss } = xss || {};
   const context: ScrollableParentContextProps = {
     scrollableEl,
-    pl: paddingLeft ?? 0,
-    pr: paddingRight ?? 0,
+    // We used to set these based on `xss` having pl/pr set ... we cannot know that in stylex anymore
+    pl: 0,
+    pr: 0,
     setPortalTick: setTick,
   };
 
@@ -84,7 +84,7 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
       {/* mh0/mw0 will respect the flexbox boundaries of the "flex-direction" if set on a parent.
        * Otherwise, the flex-item's min-height/width is based on the content of the flex-item, which maybe overflow the container.
        * See https://stackoverflow.com/questions/42130384/why-should-i-specify-height-0-even-if-i-specified-flex-basis-0-in-css3-flexbox */}
-      <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...otherXss }}>
+      <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...xss }}>
         <div
           css={{
             ...Css.pl(context.pl).pr(context.pr).$,

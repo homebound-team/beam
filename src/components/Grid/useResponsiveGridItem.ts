@@ -1,6 +1,9 @@
-import { useContext, useMemo } from "react";
-import { Css, Properties } from "src";
+import { useContext, useEffect, useMemo } from "react";
+import { Properties } from "src";
 import { gridItemDataAttribute, ResponsiveGridConfig, ResponsiveGridContext } from "src/components/Grid/utils";
+
+const injectedResponsiveGridClasses = new Set<string>();
+let responsiveGridStyleEl: HTMLStyleElement | undefined;
 
 interface UseResponsiveGridItemProps {
   /** How many grid columns this item should span. Defaults to 1. */
@@ -40,7 +43,7 @@ interface UseResponsiveGridItemProps {
  * config is unavailable, `gridItemStyles` will be an empty object.
  */
 export function useResponsiveGridItem(props: UseResponsiveGridItemProps): {
-  gridItemProps: Record<string, number>;
+  gridItemProps: Record<string, string | number>;
   gridItemStyles: Properties;
 } {
   const { colSpan = 1, gridConfig } = props;
@@ -49,27 +52,54 @@ export function useResponsiveGridItem(props: UseResponsiveGridItemProps): {
   // (without a ResponsiveGridContext.Provider) can still get grid item styles.
   const config = gridConfig ?? contextConfig;
 
-  const gridItemStyles = useMemo(() => {
-    if (!config || colSpan <= 1) return {};
+  const { className, cssText } = useMemo(() => {
+    if (!config || colSpan <= 1) return { className: "", cssText: "" };
     const { minColumnWidth, gap } = config;
+    const className = responsiveGridItemClassName(config, colSpan);
+    const rules: string[] = [];
 
-    // Build container query styles for each possible span from 1 to colSpan
-    let styles: Properties = {};
     for (let span = 1; span < colSpan; span++) {
       const minWidth = span === 1 ? 0 : minColumnWidth * span + gap * (span - 1);
       const maxWidth = minColumnWidth * (span + 1) + gap * span;
-      styles = { ...styles, ...Css.ifContainer({ gt: minWidth, lt: maxWidth }).gc(`span ${span}`).$ };
+      rules.push(
+        `@container (min-width: ${minWidth + 1}px) and (max-width: ${maxWidth}px) { .${className} { grid-column: span ${span}; } }`,
+      );
     }
 
-    // Default style: full colSpan when container is wide enough
     const fullSpanMinWidth = minColumnWidth * colSpan + gap * (colSpan - 1);
-    styles = { ...styles, ...Css.ifContainer({ gt: fullSpanMinWidth }).gc(`span ${colSpan}`).$ };
+    rules.push(`@container (min-width: ${fullSpanMinWidth + 1}px) { .${className} { grid-column: span ${colSpan}; } }`);
 
-    return styles;
+    return { className, cssText: rules.join("\n") };
   }, [config, colSpan]);
 
+  useResponsiveGridItemStyle(className, cssText);
+
   return {
-    gridItemProps: { [gridItemDataAttribute]: colSpan },
-    gridItemStyles,
+    gridItemProps: { [gridItemDataAttribute]: colSpan, ...(className ? { className } : {}) },
+    gridItemStyles: {},
   };
+}
+
+function useResponsiveGridItemStyle(className: string, cssText: string) {
+  useEffect(
+    function () {
+      if (!className || !cssText || typeof document === "undefined") return;
+
+      if (!responsiveGridStyleEl) {
+        responsiveGridStyleEl = document.createElement("style");
+        responsiveGridStyleEl.setAttribute("data-responsive-grid-item-styles", "true");
+        document.head.appendChild(responsiveGridStyleEl);
+      }
+
+      if (!injectedResponsiveGridClasses.has(className)) {
+        responsiveGridStyleEl.textContent = `${responsiveGridStyleEl.textContent}\n${cssText}`.trim();
+        injectedResponsiveGridClasses.add(className);
+      }
+    },
+    [className, cssText],
+  );
+}
+
+function responsiveGridItemClassName(config: ResponsiveGridConfig, colSpan: number) {
+  return `responsive-grid-item-${config.minColumnWidth}-${config.gap}-${config.columns}-${colSpan}`;
 }

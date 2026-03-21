@@ -194,7 +194,7 @@ export const Icon = (props: IconProps) => {
   return (
     <div css={Css.gray900.$}>
       <h1 css={Css.xl2.$}>Actions</h1>
-      <ul css={Css.dg.gtc("repeat(5, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(5, 1fr)").gap3.add("listStyle", "none").$}>
         {actionIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
@@ -203,7 +203,7 @@ export const Icon = (props: IconProps) => {
         ))}
       </ul>
       <h1 css={Css.xl2.$}>Alerts</h1>
-      <ul css={Css.dg.gtc("repeat(5, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(5, 1fr)").gap3.add("listStyle", "none").$}>
         {alertIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
@@ -212,7 +212,7 @@ export const Icon = (props: IconProps) => {
         ))}
       </ul>
       <h1 css={Css.xl2.$}>Arrows</h1>
-      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add("listStyle", "none").$}>
         {arrowIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
@@ -221,7 +221,7 @@ export const Icon = (props: IconProps) => {
         ))}
       </ul>
       <h1 css={Css.xl2.$}>Media</h1>
-      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add("listStyle", "none").$}>
         {mediaIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
@@ -230,7 +230,7 @@ export const Icon = (props: IconProps) => {
         ))}
       </ul>
       <h1 css={Css.xl2.$}>Misc</h1>
-      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add("listStyle", "none").$}>
         {miscIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
@@ -239,7 +239,7 @@ export const Icon = (props: IconProps) => {
         ))}
       </ul>
       <h1 css={Css.xl2.$}>Navigation</h1>
-      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(4, 1fr)").gap3.add("listStyle", "none").$}>
         {navigationIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />
@@ -248,7 +248,7 @@ export const Icon = (props: IconProps) => {
         ))}
       </ul>
       <h1 css={Css.xl2.$}>Weather</h1>
-      <ul css={Css.dg.gtc("repeat(5, 1fr)").gap3.add({ listStyle: "none" }).$}>
+      <ul css={Css.dg.gtc("repeat(5, 1fr)").gap3.add("listStyle", "none").$}>
         {weatherIcons.map((icon, i) => (
           <li key={icon} css={Css.xs.df.aic.fdc.gap1.$}>
             <IconComponent icon={icon} data-testid={icon} id={icon} color={props.color} />

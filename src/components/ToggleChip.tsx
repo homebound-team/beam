@@ -58,4 +58,5 @@ export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipPr
 }
 
 export const chipHoverStyles = Css.bgGray300.$;
+export const chipHoverOnlyStyles = Css.onHover.bgGray300.$;
 export const chipDisabledStyles = Css.gray600.cursorNotAllowed.$;

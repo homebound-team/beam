@@ -70,16 +70,17 @@ export function IconButton(props: IconButtonProps) {
   const testIds = useTestIds(props, icon);
 
   const styles = useMemo(
-    () => ({
-      ...iconButtonStylesReset,
-      ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered &&
-        (contrast ? iconButtonContrastStylesHover : circle ? iconButtonCircleStylesHover : iconButtonStylesHover)),
-      ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
-      ...(active ? (contrast ? iconButtonContrastStylesHover : activeStyles) : {}),
-      ...(isDisabled && iconButtonStylesDisabled),
-      ...(bgColor && Css.bgColor(bgColor).$),
-    }),
+    () =>
+      Css.spread({
+        ...iconButtonStylesReset,
+        ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
+        ...(isHovered &&
+          (contrast ? iconButtonContrastStylesHover : circle ? iconButtonCircleStylesHover : iconButtonStylesHover)),
+        ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
+        ...(active ? (contrast ? iconButtonContrastStylesHover : activeStyles) : {}),
+        ...(isDisabled && iconButtonStylesDisabled),
+        ...(bgColor && Css.bgColor(bgColor).$),
+      }),
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isHovered, isFocusVisible, isDisabled, compact],
@@ -93,7 +94,7 @@ export function IconButton(props: IconButtonProps) {
     ...hoverProps,
     className: typeof onPress === "string" ? navLink : undefined,
     ref: ref as any,
-    css: styles,
+    ...Css.props(styles),
     "aria-label": label,
   };
   const buttonContent = (
