@@ -2,19 +2,12 @@ import { comparer } from "mobx";
 import { computedFn } from "mobx-utils";
 import { MutableRefObject, useMemo } from "react";
 import { ListRange, VirtuosoHandle } from "react-virtuoso";
-import {
-  applyRowFn,
-  createRowLookup,
-  GridRowLookup,
-  GridTableScrollOptions,
-  isGridCellContent,
-  isJSX,
-  MaybeFn,
-  shouldSkipScrollTo,
-} from "src/components/index";
-import { GridDataRow } from "src/components/Table/components/Row";
-import { DiscriminateUnion, Kinded } from "src/components/Table/types";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import type { DiscriminateUnion, GridTableScrollOptions, Kinded, MaybeFn } from "src/components/Table/types";
+import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 import { TableState } from "src/components/Table/utils/TableState";
+import { applyRowFn, isGridCellContent, isJSX } from "src/components/Table/utils/utils";
 import { isDefined } from "src/utils";
 
 /**

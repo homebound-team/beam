@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { LoadingSkeleton, LoadingSkeletonProps } from "src/components/LoadingSkeleton";
-import { GridDataRow } from "src/components/Table/components/Row";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Only } from "src/Css";

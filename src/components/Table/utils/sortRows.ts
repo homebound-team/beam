@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
-import { GridDataRow } from "src/components/Table/components/Row";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
 import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";

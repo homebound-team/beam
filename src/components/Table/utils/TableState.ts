@@ -1,13 +1,13 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import React from "react";
-import { Kinded, OnRowSelect, sortFn } from "src/components";
-import { GridDataRow } from "src/components/Table/components/Row";
-import { GridSortConfig } from "src/components/Table/GridTable";
-import { GridTableApi } from "src/components/Table/GridTableApi";
-import { Direction, GridColumnWithId } from "src/components/Table/types";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
+import type { GridTableApi } from "src/components/Table/GridTableApi";
+import { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
+import { sortFn } from "src/components/Table/utils/sortRows";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
 
 // A parent row can be partially selected when some children are selected/some aren't.
