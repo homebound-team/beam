@@ -769,12 +769,6 @@ function renderVirtual<R extends Kinded>(
   persistScrollPosition: boolean = infiniteScroll === undefined, // Enabled by default if infinite scroll is not enabled
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { footerStyle, listStyle } = useMemo(() => {
-    const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
-    return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
-  }, [style]);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -806,10 +800,14 @@ function renderVirtual<R extends Kinded>(
             style={{ ...props.style, ...{ zIndex: zIndices.stickyHeader } }}
           />
         )),
-        List: VirtualRoot(listStyle, columns as any, id, xss),
+        List: VirtualRoot(style, columns as any, id, xss),
         Footer: () => {
           return (
-            <div css={footerStyle}>
+            <div
+              css={
+                Css.if(style.virtualFooterPaddingBottomPx !== undefined).pbPx(style.virtualFooterPaddingBottomPx ?? 0).$
+              }
+            >
               {fetchMoreInProgress && (
                 <div css={Css.h5.df.aic.jcc.$}>
                   <Loader size={"xs"} />

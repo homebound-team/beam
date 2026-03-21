@@ -11,6 +11,8 @@ import { safeKeys } from "src/utils";
 export interface GridStyle {
   /** Applied to the base div element. */
   rootCss?: Properties;
+  /** Extra bottom padding for the virtual-table footer loader/spacer, in pixels. */
+  virtualFooterPaddingBottomPx?: number;
   /**
    * Applied as the base body-row cell styling (commonly used for row separators).
    * This is applied to body rows broadly (including the last body row); use
