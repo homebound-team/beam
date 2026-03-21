@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Icon } from "src/components/Icon";
 import { GridCellContent } from "src/components/Table/components/cell";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
-import { GridDataRow } from "src/components/Table/components/Row";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
@@ -227,13 +227,6 @@ function filterValue(value: ReactNode | GridCellContent): any {
     return maybeFn();
   }
   return maybeFn;
-}
-
-export function maybeApplyFunction<T>(
-  row: T,
-  maybeFn: Properties | ((row: T) => Properties) | undefined,
-): Properties | undefined {
-  return typeof maybeFn === "function" ? maybeFn(row) : maybeFn;
 }
 
 export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter: string): boolean {

@@ -1,6 +1,6 @@
 import { Icon } from "src";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
-import { GridDataRow } from "src/components/Table/components/Row";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";

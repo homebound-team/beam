@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
-import { TableStateContext } from "src/components/Table";
+import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 

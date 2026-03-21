@@ -26,13 +26,12 @@ import {
   HEADER,
   isGridCellContent,
   KEPT_GROUP,
-  maybeApplyFunction,
   reservedRowKinds,
   toContent,
   TOTALS,
   zIndices,
 } from "src/components/Table/utils/utils";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Properties } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
@@ -63,6 +62,13 @@ interface RowProps<R extends Kinded> {
   onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   // onDrag?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
   // onDragLeave?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
+}
+
+function maybeApplyFunction<T>(
+  row: T,
+  maybeFn: Properties | ((row: T) => Properties) | undefined,
+): Properties | undefined {
+  return typeof maybeFn === "function" ? maybeFn(row) : maybeFn;
 }
 
 // We extract Row to its own mini-component primarily so we can React.memo'ize it.

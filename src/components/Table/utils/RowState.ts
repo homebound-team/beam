@@ -1,6 +1,6 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import { Kinded } from "src";
-import { GridDataRow } from "src/components/Table/components/Row";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";

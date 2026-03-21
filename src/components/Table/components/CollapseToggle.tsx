@@ -1,5 +1,9 @@
 import { useContext } from "react";
-import { GridDataRow, HEADER, IconButton, IconButtonProps, KEPT_GROUP, TableStateContext } from "src/components/index";
+import type { IconButtonProps } from "src/components/IconButton";
+import { IconButton } from "src/components/IconButton";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { TableStateContext } from "src/components/Table/utils/TableState";
+import { HEADER, KEPT_GROUP } from "src/components/Table/utils/utils";
 import { useComputed } from "src/hooks";
 
 export interface GridTableCollapseToggleProps extends Pick<IconButtonProps, "compact"> {

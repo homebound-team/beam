@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
-import { GridRowKind } from "src/components/Table/components/Row";
+import type { GridRowKind } from "src/components/Table/components/Row";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { Margin, Xss } from "src/Css";
 

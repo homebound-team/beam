@@ -2,8 +2,7 @@ import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Components, ListRange, Virtuoso, VirtuosoHandle } from "react-virtuoso";
-import { getTableRefWidthStyles, Loader } from "src/components";
-import { DiscriminateUnion, GridRowKind } from "src/components/index";
+import { Loader } from "src/components/Loader";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useColumnResizeHandlers } from "src/components/Table/hooks/useColumnResizeHandlers";
@@ -17,6 +16,7 @@ import {
   RowStyles,
   tableRowPrintBreakCss,
 } from "src/components/Table/TableStyles";
+import type { DiscriminateUnion } from "src/components/Table/types";
 import {
   Direction,
   GridColumn,
@@ -31,6 +31,7 @@ import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
+  getTableRefWidthStyles,
   HEADER,
   isCursorBelowMidpoint,
   KEPT_GROUP,
@@ -41,7 +42,8 @@ import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { isPromise } from "src/utils";
-import { GridDataRow, Row } from "./components/Row";
+import type { GridDataRow, GridRowKind } from "./components/Row";
+import { Row } from "./components/Row";
 import { DraggedOver } from "./utils/RowState";
 
 let runningInJest = false;
