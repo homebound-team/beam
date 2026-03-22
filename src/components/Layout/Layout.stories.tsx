@@ -296,7 +296,7 @@ function TestTopNav() {
 function TestSideNav() {
   const [showNav, setShowNav] = useState(true);
   return (
-    <ScrollableParent xss={Css.transition.br.bcGray200.fg0.fs0.wPx(224).px2.if(!showNav).mlPx(-186).$} px={2}>
+    <ScrollableParent xss={Css.transition.br.bcGray200.fg0.fs0.wPx(224).if(!showNav).mlPx(-186).$} px={2}>
       <div css={Css.relative.$}>
         <div css={Css.absolute.top1.rightPx(-12).bgGray50.df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />
