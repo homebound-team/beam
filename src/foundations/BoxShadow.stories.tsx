@@ -7,7 +7,7 @@ export default {
 
 export const BoxShadow = () => (
   <div>
-    <h1 css={Css.xl2.mb4.$}>Drop Shadow</h1>
+    <h1 css={Css.xl2.mb4.$}>Drop Shadows</h1>
     <div css={Css.df.gap4.$}>
       <div>
         <h2 css={Css.xl.mb4.$}>Basic</h2>
