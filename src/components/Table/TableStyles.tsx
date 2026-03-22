@@ -64,8 +64,6 @@ export interface GridStyle {
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
   rowHoverColor?: Palette | "none";
-  /** Applied on hover of a row */
-  nonHeaderRowHoverCss?: Properties;
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "borderOnHover" | "typeScale"> &
@@ -254,7 +252,7 @@ export const condensedStyle: GridStyle = {
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {} as Properties,
-  nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").$,
+  nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").onHover.bshHover.bcGray700.$,
   firstRowCss: Css.bl.br.bcGray200.borderRadius("8px 8px 0 0").oh.$,
   cellCss: Css.p2.$,
   // Undo the card look & feel for the header
@@ -263,8 +261,6 @@ export const cardStyle: GridStyle = {
     ...Css.p1.m0.xsSb.gray700.$,
   },
   rowHoverColor: "none",
-  // Use onHover here directly at the declaration site, due to our truss/stylex limitation
-  nonHeaderRowHoverCss: Css.onHover.bshHover.bcGray700.$,
   // this will allow having N amount of nested childs without having to define each level margin
   levels: (level) => ({ rowIndent: level > 0 ? 24 * level : undefined }),
 };

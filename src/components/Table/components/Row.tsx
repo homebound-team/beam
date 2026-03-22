@@ -136,8 +136,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
     ...(showRowHoverColor && Css.onHover.bgColor(style.rowHoverColor ?? Palette.Blue100).$),
-    // We don't use onHover here b/c of a truss limitation; the caller is responsible for using `onHover`
-    ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowHoverCss),
     ...(levelIndent && Css.mlPx(levelIndent).$),
     // For virtual tables use `display: flex` to keep all cells on the same row.
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
