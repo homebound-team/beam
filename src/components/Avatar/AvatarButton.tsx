@@ -53,14 +53,13 @@ export function AvatarButton(props: AvatarButtonProps) {
   const tid = useTestIds(props, avatarProps.name);
 
   const styles = useMemo(
-    () =>
-      Css.spread({
-        ...resetStyles,
-        ...(isHovered && hoverStyles),
-        // pressed state is handled by rendering a pressedOverlayCss span
-        ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
-        ...(isDisabled && disabledStyles),
-      }),
+    () => ({
+      ...resetStyles,
+      ...(isHovered && hoverStyles),
+      // pressed state is handled by rendering a pressedOverlayCss span
+      ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
+      ...(isDisabled && disabledStyles),
+    }),
     [isHovered, isFocusVisible, isDisabled, forceFocusStyles],
   );
 

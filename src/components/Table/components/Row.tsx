@@ -418,10 +418,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Only add position:relative if the cell isn't already sticky, since sticky provides its own positioning context.
             // Overriding sticky with relative would break the sticky behavior and cause gaps in the header.
             const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
-              css: Css.spread({
+              css: {
                 ...((cellElement as React.ReactElement).props.css || {}),
                 ...(!maybeSticky && Css.relative.$),
-              }),
+              },
               children: (
                 <>
                   {(cellElement as React.ReactElement).props.children}

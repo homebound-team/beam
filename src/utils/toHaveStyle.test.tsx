@@ -13,14 +13,14 @@ describe("custom toHaveStyle", () => {
 
     const style = getComputedStyle(r.countBadge);
 
-    expect(style.width).toBe("var(--x-width)");
-    expect(style.height).toBe("var(--x-height)");
-    expect(style.color).toBe("var(--x-color)");
-    expect(style.backgroundColor).toBe("var(--x-backgroundColor)");
-    expect(style.getPropertyValue("--x-width")).toBe("16px");
-    expect(style.getPropertyValue("--x-height")).toBe("16px");
-    expect(style.getPropertyValue("--x-color")).toBe("rgba(255,255,255,1)");
-    expect(style.getPropertyValue("--x-backgroundColor")).toBe("rgba(29, 78, 216, 1)");
+    expect(style.width).toBe("var(--width)");
+    expect(style.height).toBe("var(--height)");
+    expect(style.color).toBe("var(--color)");
+    expect(style.backgroundColor).toBe("var(--backgroundColor)");
+    expect(style.getPropertyValue("--width")).toBe("16px");
+    expect(style.getPropertyValue("--height")).toBe("16px");
+    expect(style.getPropertyValue("--color")).toBe("rgba(255,255,255,1)");
+    expect(style.getPropertyValue("--backgroundColor")).toBe("rgba(29, 78, 216, 1)");
 
     expect(r.countBadge).toHaveStyle({
       width: "16px",

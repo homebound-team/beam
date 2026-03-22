@@ -170,10 +170,10 @@ export function getFirstOrLastCellCss<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   colspan: number = 1,
 ): Properties {
-  return Css.spread({
+  return {
     ...(columnIndex === 0 ? style.firstCellCss : {}),
     ...(columnIndex + colspan >= columns.length ? style.lastCellCss : {}),
-  });
+  };
 }
 
 /** A heuristic to detect the result of `React.createElement` / i.e. JSX. */

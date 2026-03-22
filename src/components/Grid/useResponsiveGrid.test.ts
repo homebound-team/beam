@@ -7,37 +7,27 @@ describe(useResponsiveGrid, () => {
 
     expect(result).toMatchInlineSnapshot(`
       {
-        "gridStyles": [
-          TrussDebugInfo {
-            "src": "useResponsiveGrid.ts:77",
-          },
-          {
-            "$$css": true,
-            "k1xSpc": "xrvj5dj",
-          },
-          [
-            {
-              "$$css": true,
-              "kumcoG": "xqketvx",
-            },
-            {
-              "--x-gridTemplateColumns": "repeat(auto-fill, minmax(max(100px, calc((100% - 30px) / 4)), 1fr))",
+        "gridStyles": {
+          "containerType": "ctis",
+          "display": [
+            "dg",
+            TrussDebugInfo {
+              "src": "useResponsiveGrid.ts:77",
             },
           ],
-          {
-            "$$css": true,
-            "k9g6sI": "x12h1iku",
-          },
-          [
+          "gap": [
+            "gap_var",
             {
-              "$$css": true,
-              "kOIVth": "x1pidvrl",
-            },
-            {
-              "--x-gap": "10px",
+              "--gap": "10px",
             },
           ],
-        ],
+          "gridTemplateColumns": [
+            "gtc_var",
+            {
+              "--gridTemplateColumns": "repeat(auto-fill, minmax(max(100px, calc((100% - 30px) / 4)), 1fr))",
+            },
+          ],
+        },
       }
     `);
   });
