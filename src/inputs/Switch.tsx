@@ -160,5 +160,5 @@ function switchCircleDefaultStyles(isCompact: boolean) {
  * - `2px` is to keep 2px edge spacing.
  */
 function switchCircleSelectedStyles(isCompact: boolean) {
-  return Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px);`).$;
+  return Css.left(`calc(100% - ${circleDiameter(isCompact)}px - 2px)`).$;
 }
