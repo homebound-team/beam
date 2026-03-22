@@ -55,9 +55,9 @@ export const withBeamDecorator: Decorator = (Story) => (
 export const withDimensions =
   // Use 100% width instead of viewport width so Storybook iframe scrollbars/borders
   // don't create a tiny horizontal overflow that shows up as a right-edge Chromatic
-  // diff. Use dynamic viewport height so fullscreen stories size more like the real
-  // viewport for fixed-position content.
-  (width: number | string = "100%", height: number | string = "100dvh", xss?: Properties) =>
+  // diff. Keep height at 100vh because dynamic viewport units changed story layouts
+  // in Chromatic and increased unrelated diffs
+  (width: number | string = "100%", height: number | string = "100vh", xss?: Properties) =>
     (Story: () => JSX.Element) => (
       <div css={{ ...Css.w(width).h(height).$, ...xss }}>
         <Story />
