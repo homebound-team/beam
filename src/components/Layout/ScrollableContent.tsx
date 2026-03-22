@@ -21,7 +21,7 @@ interface ScrollableContentProps {
  */
 export function ScrollableContent(props: ScrollableContentProps): ReactPortal | JSX.Element {
   const { children, virtualized = false, omitBottomPadding, bgColor } = props;
-  const { scrollableEl, setPortalTick, pl, pr } = useScrollableParent();
+  const { scrollableEl, setPortalTick, paddingLeft, paddingRight } = useScrollableParent();
 
   useEffect(() => {
     // The below `tick` logic is a way to detect whether the ScrollableContent is being used.
@@ -41,7 +41,7 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
   return createPortal(
     <div
       css={{
-        ...Css.h100.pr(pr).pl(pl).if(virtualized).pr0.$,
+        ...Css.h100.pr(paddingRight).pl(paddingLeft).if(virtualized).pr0.$,
         ...(bgColor && Css.bgColor(bgColor).$),
       }}
     >

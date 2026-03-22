@@ -9,19 +9,19 @@ import {
   useRef,
   useState,
 } from "react";
-import { Css, Properties } from "src/Css";
+import { Css, maybeInc, Properties } from "src/Css";
 
 interface ScrollableParentContextProps {
   scrollableEl: HTMLElement | null;
-  pr: string | number;
-  pl: string | number;
+  paddingRight: string;
+  paddingLeft: string;
   setPortalTick: Dispatch<SetStateAction<number>>;
 }
 
 const ScrollableParentContext = createContext<ScrollableParentContextProps>({
   scrollableEl: null,
-  pr: 0,
-  pl: 0,
+  paddingRight: "0px",
+  paddingLeft: "0px",
   setPortalTick: (v) => {},
 });
 
@@ -61,6 +61,8 @@ interface ScrollableParentContextProviderProps {
  */
 export function ScrollableParent(props: PropsWithChildren<ScrollableParentContextProviderProps>) {
   const { children, xss, px, pl = px ?? 0, pr = px ?? 0, tagName: Tag = "div" as keyof JSX.IntrinsicElements } = props;
+  const paddingLeft = maybeInc(pl);
+  const paddingRight = maybeInc(pr);
   const scrollableEl = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container
@@ -72,8 +74,8 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
   const scrollableRef = useRef<HTMLDivElement | null>(null);
   const context: ScrollableParentContextProps = {
     scrollableEl,
-    pl,
-    pr,
+    paddingLeft,
+    paddingRight,
     setPortalTick: setTick,
   };
 
@@ -89,7 +91,7 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
       <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...xss }}>
         <div
           css={{
-            ...Css.pl(context.pl).pr(context.pr).$,
+            ...Css.pl(context.paddingLeft).pr(context.paddingRight).$,
             ...(!hasScrollableContent ? Css.oa.h100.$ : undefined),
           }}
         >
