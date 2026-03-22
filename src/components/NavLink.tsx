@@ -50,7 +50,6 @@ export function NavLink(props: NavLinkProps) {
   );
 
   const linkAttributes = {
-    className: navLink,
     ref: ref,
     /** does not focus if disabled */
     tabIndex: isDisabled ? -1 : 0,
@@ -77,7 +76,11 @@ export function NavLink(props: NavLinkProps) {
     </>
   );
 
-  return getButtonOrLink(linkContent, href, { ...mergeProps(buttonProps, focusProps, hoverProps), ...linkAttributes });
+  return getButtonOrLink(
+    linkContent,
+    href,
+    mergeProps(buttonProps, focusProps, hoverProps, linkAttributes, { className: navLink }),
+  );
 }
 
 export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {

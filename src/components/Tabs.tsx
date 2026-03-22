@@ -253,7 +253,7 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
       children: <div {...tabProps}>{tabLabel}</div>,
     })
   ) : isRouteTab(tab) ? (
-    <Link {...{ ...tabProps, ...interactiveProps }} className="navLink" to={tab.href}>
+    <Link {...mergeProps(tabProps, interactiveProps, { className: "navLink" })} to={tab.href}>
       {tabLabel}
     </Link>
   ) : (
