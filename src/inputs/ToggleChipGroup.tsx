@@ -120,6 +120,16 @@ function ToggleChip(props: ToggleChipProps) {
   const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, isReadOnly, isDisabled }, groupState, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
   const tooltip = resolveTooltip(disabled);
+  const chipStateCss = isSelected
+    ? Css.color(xss?.color ?? Palette.White)
+        .bgColor(xss?.backgroundColor ?? Palette.Blue700)
+        .if(!isDisabled)
+        .onHover.bgColor(xss?.backgroundColor ?? Palette.Blue800).$
+    : isDisabled
+      ? Css.bgGray200.cursorNotAllowed.gray600.$
+      : !groupState.isReadOnly
+        ? Css.bgGray200.onHover.bgGray300.$
+        : Css.bgGray200.$;
 
   return maybeTooltip({
     title: tooltip,
@@ -127,16 +137,8 @@ function ToggleChip(props: ToggleChipProps) {
     children: (
       <label
         css={{
-          ...Css.relative.dif.gap1.aic.br16.sm.px1.cursorPointer.pyPx(4).bgGray200.if(isDisabled).cursorNotAllowed
-            .gray600.pr1.$,
-          ...(isSelected
-            ? {
-                ...Css.color(xss?.color ?? Palette.White).bgColor(xss?.backgroundColor ?? Palette.Blue700).$,
-                ...(!isDisabled && Css.onHover.bgColor(xss?.backgroundColor ?? Palette.Blue800).$),
-              }
-            : !isDisabled && !groupState.isReadOnly
-              ? Css.onHover.bgGray300.$
-              : {}),
+          ...Css.relative.dif.gap1.aic.br16.sm.px1.cursorPointer.pyPx(4).pr1.$,
+          ...chipStateCss,
           ...(isFocusVisible ? Css.bshFocus.$ : {}),
         }}
         data-selected={isSelected}
