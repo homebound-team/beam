@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import React, { ReactElement, useCallback, useContext, useRef } from "react";
+import { mergeProps } from "react-aria";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -415,25 +416,28 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // The resize handle uses position:absolute, which needs a positioning context (relative/sticky/fixed).
             // Only add position:relative if the cell isn't already sticky, since sticky provides its own positioning context.
             // Overriding sticky with relative would break the sticky behavior and cause gaps in the header.
-            const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
-              css: {
-                ...((cellElement as React.ReactElement).props.css || {}),
-                ...(!maybeSticky && Css.relative.$),
-              },
-              children: (
-                <>
-                  {(cellElement as React.ReactElement).props.children}
-                  <ColumnResizeHandle
-                    columnId={column.id}
-                    columnIndex={columnIndex}
-                    currentWidth={currentWidthPx}
-                    minWidth={minWidthPx}
-                    onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
-                    calculatePreviewWidth={calculatePreviewWidth}
-                  />
-                </>
+            const cellElementWithHandle = React.cloneElement(
+              cellElement as React.ReactElement,
+              mergeProps(
+                (cellElement as React.ReactElement).props,
+                Css.props({ ...(!maybeSticky && Css.relative.$) }),
+                {
+                  children: (
+                    <>
+                      {(cellElement as React.ReactElement).props.children}
+                      <ColumnResizeHandle
+                        columnId={column.id}
+                        columnIndex={columnIndex}
+                        currentWidth={currentWidthPx}
+                        minWidth={minWidthPx}
+                        onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
+                        calculatePreviewWidth={calculatePreviewWidth}
+                      />
+                    </>
+                  ),
+                },
               ),
-            });
+            );
             return cellElementWithHandle;
           }
 
