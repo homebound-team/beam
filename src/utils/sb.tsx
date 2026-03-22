@@ -53,13 +53,9 @@ export const withBeamDecorator: Decorator = (Story) => (
  * Used to help Chromatic properly render positioned `fixed` components.
  */
 export const withDimensions =
-  // Use 100% width instead of viewport width so Storybook iframe scrollbars/borders
-  // don't create a tiny horizontal overflow that shows up as a right-edge Chromatic
-  // diff. Keep height at 100vh because dynamic viewport units changed story layouts
-  // in Chromatic and increased unrelated diffs
-  (width: number | string = "100%", height: number | string = "100vh", xss?: Properties) =>
-    (Story: () => JSX.Element) => (
-      <div css={{ ...Css.w(width).h(height).$, ...xss }}>
-        <Story />
-      </div>
-    );
+  (width: number | string = "100vw", height: number | string = "100vh", xss?: Properties) =>
+  (Story: () => JSX.Element) => (
+    <div css={{ ...Css.w(width).h(height).$, ...xss }}>
+      <Story />
+    </div>
+  );
