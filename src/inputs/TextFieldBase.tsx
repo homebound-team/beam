@@ -180,8 +180,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
-      ...Css.w100.mw0.outline0.fg1.bgTransparent.$,
-      ...(contrast && !inputStylePalette && Css.element("::selection").bgGray800.$),
+      ...Css.w100.mw0.outline0.fg1.bgTransparent.if(contrast && !inputStylePalette).element("::selection").bgGray800.$,
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$
