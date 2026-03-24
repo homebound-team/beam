@@ -69,4 +69,8 @@ In this way, Beam should be seen as a place to "copy & paste" start from, rather
 
 ## Alpha release
 
-Beam does support [semantic releases](https://semantic-release.gitbook.io/semantic-release/recipes/release-workflow/pre-releases). Homebound most common use case is pushing to the `alpha` branch.
+Beam follows [semantic releases](https://semantic-release.gitbook.io/semantic-release/recipes/release-workflow/pre-releases).
+
+If you want to make an alpha release, just create/push to the `alpha` branch.
+
+You don't need to create a PR for the `alpha` branch.
