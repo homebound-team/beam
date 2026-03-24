@@ -32,7 +32,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
   const tid = useTestIds(props, "buttonGroup");
   return (
     // Adding `line-height: 0` prevent inheriting line-heights that might throw off sizing within the button group.
-    <div {...tid} css={Css.df.lh(0).add({ ...sizeStyles[size] }).$}>
+    <div {...tid} css={{ ...Css.df.lh(0).$, ...sizeStyles[size] }}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton
@@ -89,8 +89,7 @@ function GroupButton(props: GroupButtonProps) {
             {...focusProps}
             {...hoverProps}
             css={{
-              ...Css.buttonBase.px2.br0.h100.$,
-              "&:disabled": Css.gray400.cursorNotAllowed.bcGray300.$,
+              ...Css.buttonBase.px2.br0.h100.onDisabled.gray400.cursorNotAllowed.bcGray300.$,
               ...(isFocusVisible ? defaultFocusRingStyles : {}),
               ...(active ? activeStyles : {}),
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),

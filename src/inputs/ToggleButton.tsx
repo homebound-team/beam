@@ -57,7 +57,7 @@ export function ToggleButton(props: ToggleButtonProps) {
     ...focusProps,
     ...hoverProps,
     ...pressProps,
-    css: {
+    ...Css.props({
       ...Css.br4.dif.aic.gap1.bgTransparent.gray500.hPx(32).plPx(4).pr1.relative.cursorPointer.w("max-content").sm.usn
         .$,
       ...(isHovered && toggleHoverStyles),
@@ -65,7 +65,7 @@ export function ToggleButton(props: ToggleButtonProps) {
       ...(isSelected && !isDisabled && Css.blue700.$),
       ...(isFocusVisible && toggleFocusStyles),
       ...(isDisabled && Css.gray300.cursorNotAllowed.$),
-    },
+    }),
     ...tid,
   };
 

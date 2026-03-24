@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react-vite";
-import { Css, Properties } from "src/Css";
+import { Css } from "src/Css";
 import { newStory } from "src/utils/sb";
-import { PlayFunction } from "storybook/internal/types";
+import type { PlayFunction } from "storybook/internal/types";
 import { userEvent, waitFor, within } from "storybook/test";
 import { Card as CardComponent, CardProps } from "./Card";
 
@@ -65,13 +65,13 @@ export const BorderedCard = createCardStory(
 export const BorderlessListCard = createCardStory(
   { ...baseArgs, type: "list", bordered: false },
   hoverPlayFn({ click: true }),
-  { ...Css.fdc.$ },
+  true,
 );
 
 export const BorderedListCard = createCardStory(
   { ...baseArgs, type: "list", bordered: true },
   hoverPlayFn({ click: true }),
-  { ...Css.fdc.$ },
+  true,
 );
 
 function hoverPlayFn({ click: shouldClick }: { click: boolean }): PlayFunction {
@@ -87,10 +87,10 @@ function hoverPlayFn({ click: shouldClick }: { click: boolean }): PlayFunction {
   };
 }
 
-function createCardStory(args: CardProps, hoverPlayFn?: PlayFunction, css?: Properties) {
+function createCardStory(args: CardProps, hoverPlayFn?: PlayFunction, stackCards?: boolean) {
   return newStory(
     () => (
-      <div css={{ ...Css.df.gap5.$, ...css }}>
+      <div css={Css.df.gap5.if(!!stackCards).fdc.$}>
         <div>
           <h2>Default</h2>
           <CardComponent {...args} />

@@ -50,20 +50,19 @@ export function NavLink(props: NavLinkProps) {
   );
 
   const linkAttributes = {
-    className: navLink,
     ref: ref,
     /** does not focus if disabled */
     tabIndex: isDisabled ? -1 : 0,
     /** aria-current represents the current page within a set of pages */
     "aria-current": active ? ("page" as const) : undefined,
-    css: {
+    ...Css.props({
       ...baseStyles,
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isFocusVisible && focusRingStyles),
       ...(isHovered && hoverStyles),
       ...(isPressed && pressedStyles),
-    },
+    }),
   };
 
   const linkContent = (
@@ -77,7 +76,11 @@ export function NavLink(props: NavLinkProps) {
     </>
   );
 
-  return getButtonOrLink(linkContent, href, { ...mergeProps(buttonProps, focusProps, hoverProps), ...linkAttributes });
+  return getButtonOrLink(
+    linkContent,
+    href,
+    mergeProps(buttonProps, focusProps, hoverProps, linkAttributes, { className: navLink }),
+  );
 }
 
 export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {

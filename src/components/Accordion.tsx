@@ -98,7 +98,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
 
   const touchableStyle = useMemo(
     () => ({
-      ...Css.df.jcsb.gapPx(12).aic.p2.md.outline("none").onHover.bgGray100.if(!!titleOnClick).mdSb.$,
+      ...Css.df.jcsb.gapPx(12).aic.p2.md.outline("none").onHover.bgGray100.if(!!titleOnClick).onHover.mdSb.$,
       ...(compact && Css.sm.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
       ...(compact && !!titleOnClick && Css.br0.$),
       ...(disabled && Css.gray500.$),
@@ -163,11 +163,11 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
 function RotatingChevronIcon(props: { expanded: boolean }) {
   return (
     <span
-      css={{
-        ...Css.fs0.$,
-        transition: "transform 250ms linear",
-        transform: props.expanded ? "rotate(180deg)" : "rotate(0deg)",
-      }}
+      css={
+        Css.fs0
+          .add("transition", "transform 250ms linear")
+          .add("transform", props.expanded ? "rotate(180deg)" : "rotate(0deg)").$
+      }
     >
       <Icon icon="chevronDown" />
     </span>
