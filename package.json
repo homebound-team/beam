@@ -19,12 +19,12 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.jsx",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./rtl": {
       "types": "./dist/utils/rtlUtils.d.ts",
-      "import": "./dist/utils/rtlUtils.jsx",
+      "import": "./dist/utils/rtlUtils.js",
       "require": "./dist/utils/rtlUtils.cjs"
     },
     "./Css.json": "./dist/Css.json",
