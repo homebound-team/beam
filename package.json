@@ -19,12 +19,12 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.jsx",
       "require": "./dist/index.cjs"
     },
     "./rtl": {
       "types": "./dist/utils/rtlUtils.d.ts",
-      "import": "./dist/utils/rtlUtils.js",
+      "import": "./dist/utils/rtlUtils.jsx",
       "require": "./dist/utils/rtlUtils.cjs"
     },
     "./Css.json": "./dist/Css.json",
@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "yarn tsup-node src/index.ts src/utils/rtlUtils.tsx --format esm,cjs --dts --clean --sourcemap && yarn copy:truss",
+    "build": "yarn tsup-node --config tsup.config.ts && yarn copy:truss",
     "build:truss": "truss",
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
     "test": "vitest run",
