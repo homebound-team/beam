@@ -27,11 +27,12 @@
       "import": "./dist/utils/rtlUtils.js",
       "require": "./dist/utils/rtlUtils.cjs"
     },
+    "./Css.json": "./dist/Css.json",
     "./index.css": "./dist/index.css"
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "yarn tsup-node src/index.ts src/utils/rtlUtils.tsx --format esm,cjs --dts --clean --sourcemap",
+    "build": "yarn tsup-node src/index.ts src/utils/rtlUtils.tsx --format esm,cjs --dts --clean --sourcemap && yarn copy:truss",
     "build:truss": "truss",
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
     "test": "vitest run",
@@ -41,6 +42,7 @@
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded --only-changed",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
+    "copy:truss": "cp \"./src/Css.json\" \"./dist/Css.json\"",
     "copy-to-internal-frontend": "cp -r dist/* ~/homebound/internal-frontend/node_modules/@homebound/beam/dist/",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\"",
     "type-check": "yarn tsc"
