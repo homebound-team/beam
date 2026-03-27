@@ -6,7 +6,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
-import { GridCellAlignment, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
+import { GridCellAlignment, GridColumnBorder, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
@@ -171,6 +171,14 @@ export function getFirstOrLastCellCss<R extends Kinded>(
   return {
     ...(columnIndex === 0 ? style.firstCellCss : {}),
     ...(columnIndex + colspan >= columns.length ? style.lastCellCss : {}),
+  };
+}
+
+export function getColumnBorderCss(border: GridColumnBorder | undefined, style: GridStyle): Properties {
+  if (!border) return {};
+  return {
+    ...(border === "left" ? Css.bl.$ : Css.br.$),
+    ...style.borderStyle,
   };
 }
 

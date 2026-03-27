@@ -21,6 +21,7 @@ import {
   DragData,
   EXPANDABLE_HEADER,
   getAlignment,
+  getColumnBorderCss,
   getFirstOrLastCellCss,
   getJustification,
   HEADER,
@@ -364,6 +365,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isBodyRow && levelStyle?.cellCss),
             // Level specific styling for the first content column
             ...(applyFirstContentColumnStyles && levelStyle?.firstContentColumn),
+            // Apply any declarative column border styling after header/body defaults.
+            ...getColumnBorderCss(column.border, style),
             // The specific cell's css (if any from GridCellContent)
             ...rowStyleCellCss,
             // Apply active row styling for non-nested card styles.
