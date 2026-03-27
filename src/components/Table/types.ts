@@ -11,6 +11,7 @@ export type Direction = "ASC" | "DESC";
 
 export type MaybeFn<T> = T | (() => T);
 export type GridCellAlignment = "left" | "right" | "center";
+export type GridColumnBorder = "left" | "right";
 
 export type GridTableScrollOptions =
   | number
@@ -79,6 +80,8 @@ export type GridColumn<R extends Kinded> = {
   serverSideSortKey?: string;
   /** Allows the column to stay in place when the user scrolls horizontally */
   sticky?: "left" | "right";
+  /** Draws a border on this column's left or right edge for every rendered cell. */
+  border?: GridColumnBorder;
   /** Prevent column from supporting RowStyle.onClick/rowLink in order to avoid nested interactivity. Defaults to true */
   wrapAction?: false;
   /** Used as a signal to defer adding the row's level indentation styling */
@@ -119,6 +122,7 @@ export const nonKindGridColumnKeys = [
   "serverSideSortKey",
   "clientSideSort",
   "sticky",
+  "border",
   "wrapAction",
   "isAction",
   "id",

@@ -3,7 +3,7 @@ import { MutableRefObject, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
-import { RowStyles } from "src/components/Table/TableStyles";
+import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
 import { calcColumnSizes, column, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
@@ -242,6 +242,72 @@ describe("GridTable", () => {
     // Then the rows are styled appropriately
     expect(cell(r, 0, 0)).toHaveStyle({ backgroundColor: Palette.Red500 });
     expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Red100 });
+  });
+
+  it("can draw left and right borders on specific columns", async () => {
+    const leftBorderColumn: GridColumn<Row> = {
+      header: () => "Border Left",
+      data: ({ value }) => value,
+      border: "left",
+    };
+    const rightBorderColumn: GridColumn<Row> = {
+      header: () => "Border Right",
+      data: ({ value }) => value,
+      border: "right",
+    };
+
+    const r = await render(<GridTable columns={[nameColumn, leftBorderColumn, rightBorderColumn]} rows={rows} />);
+
+    expect(cell(r, 0, 1)).toHaveStyle({
+      borderLeftStyle: "solid",
+      borderLeftWidth: "1px",
+      borderColor: Palette.Gray200,
+    });
+    expect(cell(r, 1, 1)).toHaveStyle({
+      borderLeftStyle: "solid",
+      borderLeftWidth: "1px",
+      borderColor: Palette.Gray200,
+    });
+    expect(cell(r, 0, 2)).toHaveStyle({
+      borderRightStyle: "solid",
+      borderRightWidth: "1px",
+      borderColor: Palette.Gray200,
+    });
+    expect(cell(r, 1, 2)).toHaveStyle({
+      borderRightStyle: "solid",
+      borderRightWidth: "1px",
+      borderColor: Palette.Gray200,
+    });
+    expect(cell(r, 0, 0)).not.toHaveStyle({ borderLeftWidth: "1px" });
+  });
+
+  it("can customize border styling for bordered columns via GridStyle.borderStyle", async () => {
+    const borderedColumn: GridColumn<Row> = {
+      header: () => "Border Left",
+      data: ({ value }) => value,
+      border: "left",
+    };
+
+    const r = await render(
+      <GridTable
+        columns={[nameColumn, borderedColumn]}
+        rows={rows}
+        style={{ ...defaultStyle, borderStyle: Css.bcGray400.pl2.$ }}
+      />,
+    );
+
+    expect(cell(r, 0, 1)).toHaveStyle({
+      borderLeftStyle: "solid",
+      borderLeftWidth: "1px",
+      borderColor: Palette.Gray400,
+      paddingLeft: "16px",
+    });
+    expect(cell(r, 1, 1)).toHaveStyle({
+      borderLeftStyle: "solid",
+      borderLeftWidth: "1px",
+      borderColor: Palette.Gray400,
+      paddingLeft: "16px",
+    });
   });
 
   describe("client-side sorting", () => {

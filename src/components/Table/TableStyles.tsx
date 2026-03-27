@@ -46,6 +46,8 @@ export interface GridStyle {
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
+  /** Applied to any column that opts into `GridColumn.border`. */
+  borderStyle?: Properties;
   /** Applied to every cell in the first table-head row (expandableHeader/header/totals). */
   firstRowCellCss?: Properties;
   /** Applied to the first cell in the first table-head row. */
@@ -182,6 +184,7 @@ function memoizedTableStyles() {
         },
         firstCellCss: bordered ? Css.bl.bcGray200.$ : undefined,
         lastCellCss: bordered ? Css.br.bcGray200.$ : undefined,
+        borderStyle: Css.bcGray200.$,
         firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
         firstRowFirstCellCss: Css.borderRadius("8px 0 0 0 ").$,
         firstRowLastCellCss: Css.borderRadius("0 8px 0 0").$,
