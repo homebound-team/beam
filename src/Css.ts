@@ -16,13 +16,20 @@ export type Marker = symbol;
 
 export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "md" | "mdSb" | "lg" | "xl" | "xl2";
 
-// Augment React types so JSX elements accept the `css` prop
+// Augment React types so all JSX elements accept the `css` prop:
+// - HTMLAttributes/SVGAttributes cover intrinsic elements (div, svg, etc.)
+// - JSX.IntrinsicAttributes covers custom components (Card, Page, etc.)
 declare module "react" {
   interface HTMLAttributes<T> {
     css?: Properties;
   }
   interface SVGAttributes<T> {
     css?: Properties;
+  }
+  namespace JSX {
+    interface IntrinsicAttributes {
+      css?: Properties;
+    }
   }
 }
 
@@ -3839,6 +3846,12 @@ class CssBuilder<T extends Properties> {
   get onDisabled() {
     return this.newCss({ selector: ":disabled" });
   }
+  get ifFirstOfType() {
+    return this.newCss({ selector: ":first-of-type" });
+  }
+  get ifLastOfType() {
+    return this.newCss({ selector: ":last-of-type" });
+  }
 
   /** Marks this element as a default hover marker (for ancestor pseudo selectors). */
   get marker(): CssBuilder<T> {
@@ -3993,7 +4006,7 @@ export function px(pixels: number): string {
 }
 
 function omitUndefinedValues<T extends object>(value: T): T {
-  const entries = Object.entries(value).filter(function ([, entryValue]) {
+  const entries = Object.entries(value).filter(([, entryValue]) => {
     return entryValue !== undefined;
   });
   return Object.fromEntries(entries) as T;

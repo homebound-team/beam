@@ -12,7 +12,7 @@ The Truss 2 migration blockers that were previously tracked here are now resolve
 
 - enabling `runtimeInjection: true` in `vitest.config.mts` fixed missing StyleX CSS in Vitest/JSDOM
 - style-based test assertions were updated to work with Truss 2 / StyleX CSS variable output
-- `expect(...).toHaveStyle(...)` was extended in `src/setupTests.tsx` to support both normal computed styles and `--x-*` dynamic style variables
+- `expect(...).toHaveStyle(...)` now uses the matcher from `@homebound/truss/vitest` which resolves `var(--x)` references in jsdom
 - `Tabs` / `NavLink` Truss transform issues were resolved without needing to rewrite app code
 - `ScrollableParent` was updated to avoid destructuring style objects
 - responsive grid hook tests were updated for Truss 2 output
