@@ -1,8 +1,9 @@
+import { toHaveStyle } from "@homebound/truss/vitest";
 import "@testing-library/jest-dom/vitest";
 import { configure } from "mobx";
-import { vi } from "vitest";
+import { expect, vi } from "vitest";
 
-import "src/utils/toHaveStyle";
+expect.extend({ toHaveStyle });
 
 // Polyfill CSS.escape for jsdom — react-aria uses CSS.escape(key) in querySelector
 // for data-key attribute selectors, and jsdom doesn't provide it natively.

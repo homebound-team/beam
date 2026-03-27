@@ -10,7 +10,7 @@ describe("Chip", () => {
 
   it("can set type to change background color", async () => {
     const r = await render(<Chip text="Chip" type={ChipTypes.caution} />);
-    expect(r.chip).toHaveStyle({ background: Palette.Yellow200 });
+    expect(r.chip).toHaveStyle({ backgroundColor: Palette.Yellow200 });
   });
 
   it("can set custom testids", async () => {
