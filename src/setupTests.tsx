@@ -3,6 +3,16 @@ import "@testing-library/jest-dom/vitest";
 import { configure } from "mobx";
 import { expect, vi } from "vitest";
 
+// Re-export matchers type to use in module augmentation below
+type JestDomMatchers<E, R> = import("@testing-library/jest-dom/matchers").TestingLibraryMatchers<E, R>;
+
+// Augment @vitest/expect directly since vitest 4.x re-exports Assertion from there,
+// and @testing-library/jest-dom's built-in augmentation targets `vitest` which doesn't merge.
+declare module "@vitest/expect" {
+  interface Assertion<T = any> extends JestDomMatchers<any, T> {}
+  interface AsymmetricMatchersContaining extends JestDomMatchers<any, any> {}
+}
+
 expect.extend({ toHaveStyle });
 
 // Polyfill CSS.escape for jsdom — react-aria uses CSS.escape(key) in querySelector
