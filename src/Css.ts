@@ -16,13 +16,20 @@ export type Marker = symbol;
 
 export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "md" | "mdSb" | "lg" | "xl" | "xl2";
 
-// Augment React types so JSX elements accept the `css` prop
+// Augment React types so all JSX elements accept the `css` prop:
+// - HTMLAttributes/SVGAttributes cover intrinsic elements (div, svg, etc.)
+// - JSX.IntrinsicAttributes covers custom components (Card, Page, etc.)
 declare module "react" {
   interface HTMLAttributes<T> {
     css?: Properties;
   }
   interface SVGAttributes<T> {
     css?: Properties;
+  }
+  namespace JSX {
+    interface IntrinsicAttributes {
+      css?: Properties;
+    }
   }
 }
 
