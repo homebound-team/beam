@@ -597,6 +597,29 @@ export const StyleCondensedWithNoPadding = newStory(() => {
   );
 }, {});
 
+export const ColumnBorders = newStory(() => {
+  const codeColumn: GridColumn<Row> = { header: "Code", data: ({ name }) => name, w: "160px", border: "right" };
+  const qtyColumn: GridColumn<Row> = { header: "Qty", data: ({ value }) => value, align: "right" };
+  const extendedQtyColumn: GridColumn<Row> = {
+    header: "Extended Qty",
+    data: ({ value }) => (value ?? 0) * 10,
+    align: "right",
+  };
+  const notesColumn: GridColumn<Row> = { header: "Notes", data: ({ value }) => `Value ${value}`, border: "left" };
+  return (
+    <GridTable<Row>
+      columns={[codeColumn, qtyColumn, extendedQtyColumn, notesColumn]}
+      style={{ ...defaultStyle, borderStyle: Css.bcGray400.pl2.pr2.$ }}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "AAA", value: 2 } },
+        { kind: "data", id: "2", data: { name: "BBB", value: 4 } },
+        { kind: "data", id: "3", data: { name: "CCC", value: 8 } },
+      ]}
+    />
+  );
+}, {});
+
 export const StyleCondensedWithNoRowsFallback = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
