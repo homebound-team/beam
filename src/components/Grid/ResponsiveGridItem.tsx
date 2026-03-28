@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
-import { useResponsiveGridItem } from "src";
+import { mergeProps } from "react-aria";
+import { Css, useResponsiveGridItem } from "src";
 
 export type ResponsiveGridItemProps = PropsWithChildren<{
   colSpan: number;
@@ -9,9 +10,6 @@ export type ResponsiveGridItemProps = PropsWithChildren<{
 export function ResponsiveGridItem(props: ResponsiveGridItemProps) {
   const { colSpan, children } = props;
   const { gridItemProps, gridItemStyles } = useResponsiveGridItem({ colSpan });
-  return (
-    <div {...gridItemProps} css={{ ...gridItemStyles }}>
-      {children}
-    </div>
-  );
+  // Use mergeProps so we combine classNames
+  return <div {...mergeProps(gridItemProps, Css.props(gridItemStyles))}>{children}</div>;
 }
