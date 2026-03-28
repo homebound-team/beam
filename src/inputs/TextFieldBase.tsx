@@ -113,7 +113,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = useLabelSuffix(required, inputProps.readOnly);
-  const ElementType: React.ElementType = multiline ? "textarea" : "input";
   const tid = useTestIds(props, defaultTestId(label));
   const [isFocused, setIsFocused] = useState(false);
   const { hoverProps, isHovered } = useHover({});
@@ -195,7 +194,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   };
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
-  function onDomChange(e: ChangeEvent<HTMLInputElement>) {
+  function onDomChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     if (onChange) {
       let value: string | undefined = e.target.value;
       if (value === "") {
@@ -218,6 +217,19 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
+  const fieldElementProps = mergeProps(
+    inputProps,
+    { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+    { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
+  );
+  const errorMessageProps = errorMsg ? { "aria-errormessage": errorMessageId } : {};
+  const fieldElementCss = {
+    ...fieldStyles.input,
+    ...(inputProps.disabled ? fieldStyles.disabled : {}),
+    ...(showHover ? fieldStyles.hover : {}),
+    ...(unfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
+    ...xss,
+  };
 
   return (
     <>
@@ -303,24 +315,24 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   {unfocusedPlaceholder}
                 </div>
               )}
-              <ElementType
-                {...mergeProps(
-                  inputProps,
-                  { onBlur, onFocus: onFocusChained, onChange: onDomChange },
-                  { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
-                )}
-                {...(errorMsg ? { "aria-errormessage": errorMessageId } : {})}
-                ref={fieldRef as any}
-                rows={multiline ? 1 : undefined}
-                css={{
-                  ...fieldStyles.input,
-                  ...(inputProps.disabled ? fieldStyles.disabled : {}),
-                  ...(showHover ? fieldStyles.hover : {}),
-                  ...(unfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
-                  ...xss,
-                }}
-                {...tid}
-              />
+              {multiline ? (
+                <textarea
+                  {...(fieldElementProps as TextareaHTMLAttributes<HTMLTextAreaElement>)}
+                  {...errorMessageProps}
+                  ref={fieldRef as MutableRefObject<HTMLTextAreaElement | null>}
+                  rows={1}
+                  css={fieldElementCss}
+                  {...tid}
+                />
+              ) : (
+                <input
+                  {...(fieldElementProps as InputHTMLAttributes<HTMLInputElement>)}
+                  {...errorMessageProps}
+                  ref={fieldRef as MutableRefObject<HTMLInputElement | null>}
+                  css={fieldElementCss}
+                  {...tid}
+                />
+              )}
               {isFocused && clearable && onChange && inputProps.value && (
                 <IconButton
                   icon="xCircle"
