@@ -2185,7 +2185,7 @@ __metadata:
     "@homebound/form-state": "npm:^2.28.0"
     "@homebound/rtl-react-router-utils": "npm:1.3.0"
     "@homebound/rtl-utils": "npm:^2.70.0"
-    "@homebound/truss": "npm:^2.8.4"
+    "@homebound/truss": "npm:^2.9.0"
     "@homebound/tsconfig": "npm:^1.1.1"
     "@internationalized/number": "npm:^3.0.3"
     "@popperjs/core": "npm:^2.11.6"
@@ -2326,9 +2326,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/truss@npm:^2.8.4":
-  version: 2.8.4
-  resolution: "@homebound/truss@npm:2.8.4"
+"@homebound/truss@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "@homebound/truss@npm:2.9.0"
   dependencies:
     "@babel/generator": "npm:^7.29.0"
     "@babel/parser": "npm:^7.29.0"
@@ -2340,7 +2340,7 @@ __metadata:
     ts-poet: "npm:^6.12.0"
   bin:
     truss: cli.js
-  checksum: 10/60fb794c50b52514b5c32e665470e19e3c84a6d15dbb2cf9d72e2bd1ea5f44e09ca3c614b0eca271c66b5f4b0ade43c726569ad60e35ab03069898ab8f469fd0
+  checksum: 10/191378d14a577d1cd8d457ecacbbcb6b5cc7ed5020c840553543a4d1e7e7581ec74137baf5f998cae375ce789c622cd6fbb84923b3de2c1de4d020402ec93608
   languageName: node
   linkType: hard
 
