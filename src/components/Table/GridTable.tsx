@@ -2,6 +2,7 @@ import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Components, ListRange, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -775,6 +776,9 @@ function renderVirtual<R extends Kinded>(
   persistScrollPosition: boolean = infiniteScroll === undefined, // Enabled by default if infinite scroll is not enabled
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  const customScrollParent = useVirtualizedScrollParent();
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { footerStyle, listStyle } = useMemo(() => {
     const { paddingBottom, ...otherRootStyles } = style.rootCss ?? {};
     return { footerStyle: { paddingBottom }, listStyle: { ...style, rootCss: otherRootStyles } };
@@ -802,6 +806,7 @@ function renderVirtual<R extends Kinded>(
       key={virtuosoKey}
       overscan={5}
       ref={virtuosoRef}
+      {...(customScrollParent ? { customScrollParent } : {})}
       {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
       components={{
         // Applying a zIndex: 2 to ensure it stays on top of sticky columns
