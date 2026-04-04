@@ -10,7 +10,12 @@ export { RuntimeStyle, useRuntimeStyle } from "@homebound/truss/runtime";
 /** Given a type X, and the user's proposed type T, only allow keys in X and nothing else. */
 export type Only<X, T> = X & Record<Exclude<keyof T, keyof X>, never>;
 
+type UnionToIntersection<U> = (U extends unknown ? (value: U) => void : never) extends (value: infer I) => void ? I
+  : never;
+
 export type Properties = Properties1<string | 0, string>;
+
+export type InlineStyle = Record<string, string | number | undefined>;
 
 /** A marker token used with `when`/`markerOf` etc. */
 export type Marker = symbol;
@@ -3903,7 +3908,17 @@ class CssBuilder<T extends Properties> {
     relationship: "ancestor" | "descendant" | "anySibling" | "siblingBefore" | "siblingAfter",
     pseudo: string,
   ): CssBuilder<T>;
-  when(_selectorOrMarker: string | Marker, _relationship?: string, _pseudo?: string): CssBuilder<T> {
+  /**
+   * Apply different styles for each selector in the object.
+   *
+   * `when({ ":hover": Css.blue.$, ":focus": Css.red.$ })`
+   */
+  when<W extends Record<string, Properties>>(selectors: W): CssBuilder<T & UnionToIntersection<W[keyof W]>>;
+  when(
+    _selectorOrMarker: string | Marker | Record<string, Properties>,
+    _relationship?: string,
+    _pseudo?: string,
+  ): CssBuilder<T> {
     return this.unsupportedRuntime("when() cannot be used in RuntimeStyle css expressions.");
   }
 
@@ -3965,6 +3980,11 @@ class CssBuilder<T extends Properties> {
     return new CssBuilder({ ...this.opts, enabled: !this.enabled, elseApplied: true });
   }
 
+  /** Reset active conditional modifiers for subsequent styles. */
+  get end(): CssBuilder<T> {
+    return this.newCss({ selector: undefined, elseApplied: false });
+  }
+
   add<P extends Properties>(props: P): CssBuilder<T & P>;
   add<K extends keyof Properties>(prop: K, value: Properties[K]): CssBuilder<T & { [U in K]: Properties[K] }>;
   add<K extends keyof Properties>(propOrStyles: K | Properties, value?: Properties[K]): CssBuilder<any> {
@@ -3988,6 +4008,12 @@ class CssBuilder<T extends Properties> {
   className(className: string): CssBuilder<T> {
     void className;
     return this.unsupportedRuntime("className() cannot be used in RuntimeStyle css expressions.");
+  }
+
+  /** Marker for the build-time transform to append raw inline styles. */
+  style(inlineStyle: InlineStyle): CssBuilder<T> {
+    void inlineStyle;
+    return this.unsupportedRuntime("style() cannot be used in RuntimeStyle css expressions.");
   }
 
   /** Convert a style hash into `{ className, style }` props for manual spreading into non-`css=` contexts. */

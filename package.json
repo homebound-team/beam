@@ -88,7 +88,7 @@
     "@homebound/eslint-config": "^1.10.2",
     "@homebound/rtl-react-router-utils": "1.3.0",
     "@homebound/rtl-utils": "^2.70.0",
-    "@homebound/truss": "^2.15.2",
+    "@homebound/truss": "^2.19.1",
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
