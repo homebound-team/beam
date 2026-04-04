@@ -64,7 +64,7 @@ export function EditableTableSize() {
 export function VirtualizedScrolling() {
   return (
     <TestProjectLayout>
-      <VirutalizedPage />
+      <VirtualizedPage />
     </TestProjectLayout>
   );
 }
@@ -240,24 +240,15 @@ function TableExample({
   );
 }
 
-function VirutalizedPage() {
+function VirtualizedPage() {
   return (
     <>
       <TestHeader title="Change Event - Mud Room" />
       <p css={Css.py2.$}>Content above the table</p>
       {/*
-        Providing a <ScrollableContent> wrapper here isn't really necessary,
-        as the Virtualized component will provide its own scrolling behavior.
-        Though, because we want to wrap the VirtualizedTable in an element to provide some consistent padding,
-        that means we need to set h100 on the wrapping element. Since setting h100 means it'll take the full height of the parent,
-        then it's better to wrap in ScrollableContent because ScrollableContent's height is based on the remaining space available in the viewport. But...
-
-        Side note: Even removing <ScrollableContent /> here and keeping the wrapping div with `h100` seems to work.
-        I am kind of perplexed on why `h100` isn't taking up 100% of the parent container, but somehow taking up just the remaining space.
-        For example, my parent container is 868px. Within this container I have the <TestHeader /> and <p>, then the `h100` div below.
-        That `h100` was translating to '735px', though if I set the `height: 10%`, then it translates to 86.8px. (if 10% is 86.8 how is 100% 735???)
-        Because I am unsure why/how ends up taking up the correct amount of space, I would push to continue to wrap inside of <ScrollableContent />
-        ¯\_(ツ)_/¯
+        Use `ScrollableContent virtualized` whenever a `GridTable as="virtual"` lives inside a
+        `ScrollableParent` layout. That keeps the page-level header pinned above the scroll area and
+        lets react-virtuoso reuse the same bounded scroll container instead of creating a second one.
       */}
       <ScrollableContent virtualized>
         <TableExample virtualized numCols={30} />
