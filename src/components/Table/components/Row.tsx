@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import React, { ReactElement, useCallback, useContext, useRef } from "react";
+import { mergeProps } from "react-aria";
 import {
   defaultRenderFn,
   headerRenderFn,
@@ -136,21 +137,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(isFirstHeadRow && style.firstRowCss),
     ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
-    ...(showRowHoverColor && {
-      // Even though backgroundColor is set on the cellCss, the hover target is the row.
-      "&:hover > *": Css.bgColor(style.rowHoverColor ?? Palette.Blue100).$,
-    }),
-    ...(!reservedRowKinds.includes(row.kind) &&
-      style.nonHeaderRowHoverCss && {
-        // Need to spread this to make TS happy.
-        ":hover": { ...style.nonHeaderRowHoverCss },
-      }),
+    ...(showRowHoverColor && Css.onHover.bgColor(style.rowHoverColor ?? Palette.Blue100).$),
     ...(levelIndent && Css.mlPx(levelIndent).$),
     // For virtual tables use `display: flex` to keep all cells on the same row.
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
     ...(isLastBodyRow && style.lastRowCss),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
-    ...((rowStyle?.rowLink || rowStyle?.onClick) && { "&:hover": Css.cursorPointer.$ }),
+    ...((rowStyle?.rowLink || rowStyle?.onClick) && Css.onHover.cursorPointer.$),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // keptLastRowCss is now applied per-cell in cellCss below
   };
@@ -372,7 +365,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Apply active row styling for non-nested card styles.
             ...(isActive ? Css.bgColor(style.activeBgColor ?? Palette.Blue50).$ : {}),
             // Add any cell specific style overrides
-            ...(isGridCellContent(maybeContent) && maybeContent.typeScale ? Css[maybeContent.typeScale].$ : {}),
+            ...(isGridCellContent(maybeContent) && maybeContent.typeScale
+              ? Css.typography(maybeContent.typeScale).$
+              : {}),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
@@ -380,10 +375,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.
-            // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly
-            width: `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
-              applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
-            })`,
+            // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly.
+            ...Css.w(
+              `calc(${columnSizes.slice(columnIndex, columnIndex + currentColspan).join(" + ")}${
+                applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
+              })`,
+            ).$,
           };
 
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
@@ -422,25 +419,28 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // The resize handle uses position:absolute, which needs a positioning context (relative/sticky/fixed).
             // Only add position:relative if the cell isn't already sticky, since sticky provides its own positioning context.
             // Overriding sticky with relative would break the sticky behavior and cause gaps in the header.
-            const cellElementWithHandle = React.cloneElement(cellElement as React.ReactElement, {
-              css: {
-                ...((cellElement as React.ReactElement).props.css || {}),
-                ...(!maybeSticky && Css.relative.$),
-              },
-              children: (
-                <>
-                  {(cellElement as React.ReactElement).props.children}
-                  <ColumnResizeHandle
-                    columnId={column.id}
-                    columnIndex={columnIndex}
-                    currentWidth={currentWidthPx}
-                    minWidth={minWidthPx}
-                    onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
-                    calculatePreviewWidth={calculatePreviewWidth}
-                  />
-                </>
+            const cellElementWithHandle = React.cloneElement(
+              cellElement as React.ReactElement,
+              mergeProps(
+                (cellElement as React.ReactElement).props,
+                Css.props({ ...(!maybeSticky && Css.relative.$) }),
+                {
+                  children: (
+                    <>
+                      {(cellElement as React.ReactElement).props.children}
+                      <ColumnResizeHandle
+                        columnId={column.id}
+                        columnIndex={columnIndex}
+                        currentWidth={currentWidthPx}
+                        minWidth={minWidthPx}
+                        onResize={(colId, width) => setResizedWidth?.(colId, width, columnIndex)}
+                        calculatePreviewWidth={calculatePreviewWidth}
+                      />
+                    </>
+                  ),
+                },
               ),
-            });
+            );
             return cellElementWithHandle;
           }
 
@@ -528,5 +528,5 @@ export type GridDataRow<R extends Kinded> = {
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Used by TextFieldBase to set a border when the row is being hovered over
-export const BorderHoverParent = "BorderHoverParent";
-export const BorderHoverChild = "BorderHoverChild";
+export const BorderHoverParent = "beam-bhp";
+export const BorderHoverChild = "beam-bhc";

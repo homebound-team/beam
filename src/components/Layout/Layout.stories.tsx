@@ -261,7 +261,7 @@ function TestLayout({ children }: ChildrenOnly) {
   return (
     <PreventBrowserScroll>
       <TestTopNav />
-      <ScrollableParent xss={Css.px(3).$}>{children}</ScrollableParent>
+      <ScrollableParent px={3}>{children}</ScrollableParent>
     </PreventBrowserScroll>
   );
 }
@@ -274,7 +274,7 @@ export function TestProjectLayout({ children }: ChildrenOnly) {
           which would scroll both the side nav and the main content at the same time. */}
       <div css={Css.df.oh.h100.$}>
         <TestSideNav />
-        <ScrollableParent xss={Css.px3.$}>{children}</ScrollableParent>
+        <ScrollableParent px={3}>{children}</ScrollableParent>
       </div>
     </PreventBrowserScroll>
   );
@@ -287,7 +287,7 @@ function TestTopNav() {
 function TestSideNav() {
   const [showNav, setShowNav] = useState(true);
   return (
-    <ScrollableParent xss={Css.transition.br.bcGray200.fg0.fs0.wPx(224).px2.if(!showNav).mlPx(-186).$}>
+    <ScrollableParent xss={Css.transition.br.bcGray200.fg0.fs0.wPx(224).if(!showNav).mlPx(-186).$} px={2}>
       <div css={Css.relative.$}>
         <div css={Css.absolute.top1.rightPx(-12).bgGray50.df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />

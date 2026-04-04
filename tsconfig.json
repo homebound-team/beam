@@ -3,9 +3,7 @@
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
     "types": ["vitest/globals", "node"],
-    // Use React 17 _jsx / automatic runtime support for nice emotion integration
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
     "module": "Preserve",
     // Let tsup rewrite path-less imports
     "moduleResolution": "bundler",

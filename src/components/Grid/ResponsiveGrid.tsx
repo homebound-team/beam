@@ -11,7 +11,7 @@ export function ResponsiveGrid(props: ResponsiveGridProps) {
   const config = useMemo(() => ({ minColumnWidth, gap, columns }), [minColumnWidth, gap, columns]);
   return (
     <ResponsiveGridContext.Provider value={config}>
-      <div css={{ ...gridStyles }}>{children}</div>
+      <div css={gridStyles}>{children}</div>
     </ResponsiveGridContext.Provider>
   );
 }

@@ -518,7 +518,7 @@ export function StickyHeader() {
     data: () => <div>Actions</div>,
   };
   return (
-    <div style={Css.vh100.$}>
+    <div css={Css.vh100.$}>
       some other top of page content
       <GridTable
         columns={[nameColumn, valueColumn, actionColumn]}

@@ -70,7 +70,7 @@ export function AvatarButton(props: AvatarButtonProps) {
     ...hoverProps,
     className: typeof onPress === "string" ? navLink : undefined,
     ref: ref as any,
-    css: styles,
+    ...Css.props(styles),
   };
 
   const content = (

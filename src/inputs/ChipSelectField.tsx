@@ -5,7 +5,7 @@ import { Item, Section, useListData, useSelectState } from "react-stately";
 import {
   chipBaseStyles,
   chipDisabledStyles,
-  chipHoverStyles,
+  chipHoverOnlyStyles,
   Icon,
   maybeTooltip,
   resolveTooltip,
@@ -259,8 +259,7 @@ export function ChipSelectField<O, V extends Value>(
               ref={buttonRef}
               css={{
                 ...Css.tal.br16.pxPx(10).pyPx(2).outline0.if(showClearButton).prPx(4).borderRadius("16px 0 0 16px").$,
-                ...(isDisabled ? chipDisabledStyles : {}),
-                "&:hover:not(:disabled)": chipHoverStyles,
+                ...(isDisabled ? chipDisabledStyles : chipHoverOnlyStyles),
               }}
               title={state.selectedItem ? state.selectedItem.textValue : placeholder}
               {...tid}
@@ -274,7 +273,7 @@ export function ChipSelectField<O, V extends Value>(
                 {...clearFocusProps}
                 css={{
                   ...Css.prPx(4).borderRadius("0 16px 16px 0").outline0.$,
-                  "&:hover": chipHoverStyles,
+                  ...chipHoverOnlyStyles,
                   ...(isClearFocused ? Css.boxShadow(`0px 0px 0px 2px rgba(3,105,161,1)`).$ : {}),
                 }}
                 onClick={() => {

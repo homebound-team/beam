@@ -19,7 +19,24 @@ describe("Switch", () => {
     expect(r.age).not.toBeChecked();
     expect(onChange).toHaveBeenCalledTimes(2);
   });
+
+  it("moves the circle right when selected", async () => {
+    const r = await render(<SwitchTest label="Age" selected />);
+    expect(switchCircle(r.age)).toHaveStyle({ left: "calc(100% - 20px - 2px)" });
+  });
 });
+
+function switchCircle(input: HTMLElement): HTMLElement {
+  const label = input.closest("label");
+  if (!label) {
+    throw new Error("Expected switch input to be wrapped by a label");
+  }
+  const circle = label.querySelector('[aria-hidden="true"] > div');
+  if (!(circle instanceof HTMLElement)) {
+    throw new Error("Expected switch circle element");
+  }
+  return circle;
+}
 
 type SwitchTestProps = Omit<SwitchProps, "onChange" | "selected"> & {
   onChange?: (value: boolean) => void;

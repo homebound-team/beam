@@ -27,11 +27,12 @@
       "import": "./dist/utils/rtlUtils.js",
       "require": "./dist/utils/rtlUtils.cjs"
     },
+    "./Css.json": "./dist/Css.json",
     "./index.css": "./dist/index.css"
   },
   "scripts": {
     "start": "yarn storybook",
-    "build": "yarn tsup-node src/index.ts src/utils/rtlUtils.tsx --format esm,cjs --dts --clean --sourcemap",
+    "build": "yarn tsup-node --config tsup.config.ts && yarn copy:truss",
     "build:truss": "truss",
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
     "test": "vitest run",
@@ -41,6 +42,7 @@
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded --only-changed",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
+    "copy:truss": "cp \"./src/Css.json\" \"./dist/Css.json\"",
     "copy-to-internal-frontend": "cp -r dist/* ~/homebound/internal-frontend/node_modules/@homebound/beam/dist/",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\"",
     "type-check": "yarn tsc"
@@ -70,7 +72,6 @@
     "use-query-params": "^2.2.2"
   },
   "peerDependencies": {
-    "@emotion/react": ">=11",
     "mobx-react": ">=7",
     "react": ">=16",
     "react-router-dom": ">=5.2"
@@ -84,11 +85,10 @@
     }
   },
   "devDependencies": {
-    "@emotion/react": "^11.14.0",
     "@homebound/eslint-config": "^1.10.2",
     "@homebound/rtl-react-router-utils": "1.3.0",
     "@homebound/rtl-utils": "^2.70.0",
-    "@homebound/truss": "^1.137.5",
+    "@homebound/truss": "^2.15.2",
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
@@ -129,7 +129,8 @@
     "@types/react": "18.0.28",
     "react-router": "5.3.4",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0"
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitest/expect": "^4.1.0"
   },
   "imports": {
     "src/*": "./src/*"

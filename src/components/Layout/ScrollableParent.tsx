@@ -9,25 +9,28 @@ import {
   useRef,
   useState,
 } from "react";
-import { Css, Properties } from "src/Css";
+import { Css, maybeInc, Properties } from "src/Css";
 
 interface ScrollableParentContextProps {
   scrollableEl: HTMLElement | null;
-  pr: string | number;
-  pl: string | number;
+  paddingRight: string;
+  paddingLeft: string;
   setPortalTick: Dispatch<SetStateAction<number>>;
 }
 
 const ScrollableParentContext = createContext<ScrollableParentContextProps>({
   scrollableEl: null,
-  pr: 0,
-  pl: 0,
+  paddingRight: "0px",
+  paddingLeft: "0px",
   setPortalTick: (v) => {},
 });
 
 // Allow any css to be applied to the ScrollableParent container.
 interface ScrollableParentContextProviderProps {
   xss?: Properties;
+  px?: string | number;
+  pl?: string | number;
+  pr?: string | number;
   // I.e. for blueprint we use the `main` tag in our layouts.
   tagName?: keyof JSX.IntrinsicElements;
 }
@@ -57,7 +60,9 @@ interface ScrollableParentContextProviderProps {
  * See [this miro](https://miro.com/app/board/o9J_l-FQ-RU=/) and how we need to "cut the component in half".
  */
 export function ScrollableParent(props: PropsWithChildren<ScrollableParentContextProviderProps>) {
-  const { children, xss, tagName: Tag = "div" as keyof JSX.IntrinsicElements } = props;
+  const { children, xss, px, pl = px ?? 0, pr = px ?? 0, tagName: Tag = "div" as keyof JSX.IntrinsicElements } = props;
+  const paddingLeft = maybeInc(pl);
+  const paddingRight = maybeInc(pr);
   const scrollableEl = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container
@@ -67,11 +72,10 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
   const [, setTick] = useState(0);
   const hasScrollableContent = scrollableEl.childNodes.length > 0;
   const scrollableRef = useRef<HTMLDivElement | null>(null);
-  const { paddingLeft, paddingRight, ...otherXss } = xss || {};
   const context: ScrollableParentContextProps = {
     scrollableEl,
-    pl: paddingLeft ?? 0,
-    pr: paddingRight ?? 0,
+    paddingLeft,
+    paddingRight,
     setPortalTick: setTick,
   };
 
@@ -84,10 +88,10 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
       {/* mh0/mw0 will respect the flexbox boundaries of the "flex-direction" if set on a parent.
        * Otherwise, the flex-item's min-height/width is based on the content of the flex-item, which maybe overflow the container.
        * See https://stackoverflow.com/questions/42130384/why-should-i-specify-height-0-even-if-i-specified-flex-basis-0-in-css3-flexbox */}
-      <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...otherXss }}>
+      <Tag css={{ ...Css.mh0.mw0.fg1.df.fdc.$, ...xss }}>
         <div
           css={{
-            ...Css.pl(context.pl).pr(context.pr).$,
+            ...Css.pl(context.paddingLeft).pr(context.paddingRight).$,
             ...(!hasScrollableContent ? Css.oa.h100.$ : undefined),
           }}
         >

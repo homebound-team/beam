@@ -86,10 +86,12 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
   return (
     <FocusScope>
       <div
-        // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container, which updates based on the available space for the overlay within the viewport
         css={{
-          ...Css.df.fdc.myPx(4).bgWhite.outline0.br4.bshBasic.maxh("inherit").oa.if(contrast).bgGray900.$,
-          "&:hover": Css.bshHover.$,
+          // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container,
+          // which updates based on the available space for the overlay within the viewport
+          ...Css.df.fdc.myPx(4).outline0.br4.bshBasic.maxh("inherit").oa.$,
+          ...Css.bgWhite.if(contrast).bgGray900.$,
+          ...Css.onHover.bshHover.$,
         }}
       >
         {searchable && (

@@ -1,6 +1,6 @@
 import { Chip, ChipTypes } from "src/components/Chip";
+import { Css, Palette } from "src/Css";
 import { render } from "src/utils/rtl";
-import { Css } from "../Css";
 
 describe("Chip", () => {
   it("renders", async () => {
@@ -10,7 +10,7 @@ describe("Chip", () => {
 
   it("can set type to change background color", async () => {
     const r = await render(<Chip text="Chip" type={ChipTypes.caution} />);
-    expect(r.chip).toHaveStyle(`background: ${Css.bgYellow200.$}`);
+    expect(r.chip).toHaveStyle({ backgroundColor: Palette.Yellow200 });
   });
 
   it("can set custom testids", async () => {
@@ -26,6 +26,9 @@ describe("Chip", () => {
 
   it("can set background color and color with xss prop", async () => {
     const r = await render(<Chip text="Chip" xss={Css.blue100.bgBlue100.$} />);
-    expect(r.chip).toHaveStyle(Css.blue100.bgBlue100.$);
+    expect(r.chip).toHaveStyle({
+      color: Palette.Blue100,
+      backgroundColor: Palette.Blue100,
+    });
   });
 });
