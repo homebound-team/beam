@@ -1,5 +1,5 @@
 import { change, render, type } from "@homebound/rtl-utils";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
 import { focus } from "src/utils/rtl";
@@ -268,6 +268,32 @@ describe("NumberFieldTest", () => {
       <NumberField label="Code" value={undefined} placeholder="Test Placeholder" onChange={() => {}} />,
     );
     expect(r.code).toHaveAttribute("placeholder", "Test Placeholder");
+  });
+
+  it("does not revert display when user clears the field and blurs", async () => {
+    // Given a NumberField with a value
+    const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
+    expect(r.cost).toHaveValue("$12.00");
+    // When the user focuses (via element.focus so react-aria tracks it), clears, and blurs
+    await act(() => r.cost.focus());
+    fireEvent.change(r.cost, { target: { value: "" } });
+    await act(() => r.cost.blur());
+    // Then the field should stay cleared — react-aria's commit must not reformat with the stale value
+    expect(r.cost).toHaveValue("");
+    expect(lastSet).toBeUndefined();
+  });
+
+  it("does not revert display when re-editing a value and blurring", async () => {
+    // Given a NumberField set to $50.00
+    const r = await render(<TestNumberField label="Cost" type="cents" value={5000} />);
+    expect(r.cost).toHaveValue("$50.00");
+    // When the user focuses, changes to 75, and blurs
+    await act(() => r.cost.focus());
+    fireEvent.change(r.cost, { target: { value: "75" } });
+    await act(() => r.cost.blur());
+    // Then the field should show $75.00 — not revert to $50.00
+    expect(r.cost).toHaveValue("$75.00");
+    expect(lastSet).toEqual(7500);
   });
 
   it("respects useGrouping as false", async () => {

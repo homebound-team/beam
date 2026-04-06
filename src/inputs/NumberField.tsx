@@ -1,5 +1,5 @@
 import { NumberParser } from "@internationalized/number";
-import { ReactNode, useMemo, useRef } from "react";
+import { ReactNode, useMemo, useRef, useState } from "react";
 import { mergeProps, useLocale, useNumberField } from "react-aria";
 import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
@@ -142,6 +142,9 @@ export function NumberField(props: NumberFieldProps) {
   // Tracks the last value we sent to the parent via onChange, so the render-time sync
   // can distinguish "echo of user typing" from "genuinely external value change".
   const lastSentRef = useRef<number | undefined>(undefined);
+  // Force re-render after blur so useProps.value picks up the prop value directly (wip=false)
+  // and react-aria reformats the input correctly.
+  const [, forceRender] = useState(0);
 
   // Render-time sync: if the value prop changed externally while focused, update valueRef.
   // We compare against lastSentRef to avoid reacting to echoes of our own onChange calls,
@@ -162,7 +165,12 @@ export function NumberField(props: NumberFieldProps) {
     value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
     // // This is called on blur with the final/committed value.
     onChange: (value) => {
-      onChange(formatValue(value, factor, numFractionDigits, numIntegerDigits, positiveOnly));
+      const formatted = formatValue(value, factor, numFractionDigits, numIntegerDigits, positiveOnly);
+      // Suppress react-aria's on-blur commit when it differs from what we already sent.
+      // TextFieldBase.onChange pushes the real-time value; react-aria's commit may be stale
+      // (its controlled value lags behind due to echo-detection preserving cursor position).
+      if (formatted !== lastSentRef.current) return;
+      onChange(formatted);
     },
     onFocus: () => {
       valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
@@ -171,6 +179,7 @@ export function NumberField(props: NumberFieldProps) {
     onBlur: () => {
       valueRef.current = { wip: false };
       lastSentRef.current = undefined;
+      forceRender((c) => c + 1);
     },
     onKeyDown: (e) => {
       if (e.key === "Enter") {
