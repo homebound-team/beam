@@ -1,5 +1,5 @@
 import { change, render, type } from "@homebound/rtl-utils";
-import { act, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
 import { focus } from "src/utils/rtl";
@@ -275,9 +275,7 @@ describe("NumberFieldTest", () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
     expect(r.cost).toHaveValue("$12.00");
     // When the user focuses (via element.focus so react-aria tracks it), clears, and blurs
-    await act(() => r.cost.focus());
-    fireEvent.change(r.cost, { target: { value: "" } });
-    await act(() => r.cost.blur());
+    change(r.cost, "");
     // Then the field should stay cleared — react-aria's commit must not reformat with the stale value
     expect(r.cost).toHaveValue("");
     expect(lastSet).toBeUndefined();
@@ -288,9 +286,7 @@ describe("NumberFieldTest", () => {
     const r = await render(<TestNumberField label="Cost" type="cents" value={5000} />);
     expect(r.cost).toHaveValue("$50.00");
     // When the user focuses, changes to 75, and blurs
-    await act(() => r.cost.focus());
-    fireEvent.change(r.cost, { target: { value: "75" } });
-    await act(() => r.cost.blur());
+    change(r.cost, "75");
     // Then the field should show $75.00 — not revert to $50.00
     expect(r.cost).toHaveValue("$75.00");
     expect(lastSet).toEqual(7500);
