@@ -90,6 +90,13 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     onClose: state.close,
     placement: (placement ? `bottom ${placement}` : "bottom left") as Placement,
     offset: showActiveBorder ? 4 : undefined,
+    // Prevents a react-aria ResizeObserver loop that prevents full scrollability in menus
+    // that scroll when the trigger is inside a virtual GridTable with nested
+    // scroll containers (e.g. stepper + layout + virtuoso), and the trigger is far
+    // enough from the viewport edge that the calculated maxHeight differs significantly
+    // This is a very specific set of circumstances that have appeared w/in blueprint
+    // after we upgraded truss to v2
+    maxHeight: window.visualViewport?.height ?? window.innerHeight,
   });
   const tid = useTestIds(
     props,
