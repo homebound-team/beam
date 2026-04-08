@@ -67,7 +67,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
           .relative.oh.h("auto")
           .w("auto")
           // Allow the caller to pass in their own height/width
-          .addCss({ height, width }).$
+          .with({ height, width }).$
       }
       {...tid}
     >
