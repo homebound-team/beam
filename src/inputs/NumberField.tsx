@@ -142,6 +142,8 @@ export function NumberField(props: NumberFieldProps) {
   // Tracks the last value we sent to the parent via onChange, so the render-time sync
   // can distinguish "echo of user typing" from "genuinely external value change".
   const lastSentRef = useRef<number | undefined>(undefined);
+  // Tracks the value at focus time so we can identify stale blur-commits from react-aria.
+  const focusValueRef = useRef<number | undefined>(undefined);
   // Force re-render after blur so useProps.value picks up the prop value directly (wip=false)
   // and react-aria reformats the input correctly.
   const [, forceRender] = useState(0);
@@ -166,15 +168,16 @@ export function NumberField(props: NumberFieldProps) {
     // // This is called on blur with the final/committed value.
     onChange: (value) => {
       const formatted = formatValue(value, factor, numFractionDigits, numIntegerDigits, positiveOnly);
-      // Suppress react-aria's on-blur commit when it differs from what we already sent.
-      // TextFieldBase.onChange pushes the real-time value; react-aria's commit may be stale
-      // (its controlled value lags behind due to echo-detection preserving cursor position).
-      if (formatted !== lastSentRef.current) return;
+      // Suppress react-aria's on-blur commit only when it's reverting to the stale focus value.
+      // This prevents stale blur-commits from overwriting user edits, while still allowing
+      // paste-originated commits (which produce a value different from the focus value).
+      if (formatted !== lastSentRef.current && formatted === focusValueRef.current) return;
       onChange(formatted);
     },
     onFocus: () => {
       valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
       lastSentRef.current = value;
+      focusValueRef.current = value;
     },
     onBlur: () => {
       valueRef.current = { wip: false };

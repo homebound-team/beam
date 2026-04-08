@@ -292,6 +292,21 @@ describe("NumberFieldTest", () => {
     expect(lastSet).toEqual(7500);
   });
 
+  it("does not discard pasted values", async () => {
+    // Given a NumberField with a value
+    const r = await render(<TestNumberField label="Cost" type="cents" value={1200} />);
+    expect(r.cost).toHaveValue("$12.00");
+    // When the user focuses, selects all, and pastes a new value
+    const input = r.cost as HTMLInputElement;
+    focus(input);
+    input.setSelectionRange(0, input.value.length);
+    fireEvent.paste(input, { clipboardData: { getData: () => "75" } });
+    fireEvent.blur(input);
+    // Then the pasted value should be retained
+    expect(r.cost).toHaveValue("$75.00");
+    expect(lastSet).toEqual(7500);
+  });
+
   it("respects useGrouping as false", async () => {
     // Given a NumberField with `useGrouping` set to `false`
     const r = await render(<TestNumberField label="Code" useGrouping={false} value={123456} />);
