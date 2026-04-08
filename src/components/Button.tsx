@@ -129,7 +129,7 @@ function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boo
   }
   return {
     ...styles,
-    baseStyles: Css.add(styles.baseStyles).add(sizeStyles[size]).$,
+    baseStyles: Css.with(styles.baseStyles).with(sizeStyles[size]).$,
   };
 }
 

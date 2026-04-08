@@ -115,7 +115,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
       contrast={contrast}
-      xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : {}}
+      xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : undefined}
       startAdornment={
         (showNumSelection && (
           <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
