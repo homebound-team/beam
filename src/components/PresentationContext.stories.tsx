@@ -3,6 +3,8 @@ import { InternalUser } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { DateField, MultiSelectField, NumberField, SelectField, TextAreaField, TextField } from "src/inputs";
+import { type PlainDate } from "src/types";
+import { Temporal } from "temporal-polyfill";
 
 export default {
   component: PresentationProvider,
@@ -67,7 +69,7 @@ function TestFields({ disabled = false }: { disabled?: boolean }) {
   const [name, setName] = useState<string | undefined>("Brandon");
   const [description, setDescription] = useState<string | undefined>("Initial Description");
   const [age, setAge] = useState<number | undefined>(35);
-  const [birthday, setBirthday] = useState<Date | undefined>(new Date("01/29/86"));
+  const [birthday, setBirthday] = useState<PlainDate | undefined>(Temporal.PlainDate.from("1986-01-29"));
   const [favSuperhero, setFavSuperhero] = useState<string | undefined>("1");
   const [top5Superheros, setTop5FavSuperheros] = useState<string[]>(["1", "2"]);
 

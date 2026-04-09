@@ -4,9 +4,11 @@ import { Button } from "src/components";
 import { Css } from "src/Css";
 import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, DateFieldProps, TextField } from "src/inputs/index";
+import { type DayMatcher, type PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { samples, withDimensions } from "src/utils/sb";
 import { action } from "storybook/actions";
+import { Temporal } from "temporal-polyfill";
 
 export default {
   component: Button,
@@ -45,10 +47,7 @@ export function DateFields() {
     ],
     ["Compact", <TestDateField compact label="Start Date" />],
     ["SchedulesV2", <TestDateField compact label="Start Date" iconLeft format="medium" />],
-    [
-      "Disabled Days",
-      <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={{ after: jan2 }} />,
-    ],
+    ["Disabled Days", <TestDateField compact label="End Date" iconLeft format="medium" disabledDays={isAfter(jan2)} />],
     [
       "Disabled Days - before Jan 1 and after Jan 10",
       <TestDateField
@@ -56,8 +55,7 @@ export function DateFields() {
         label="End Date"
         iconLeft
         format="medium"
-        // passing in Modifier array
-        disabledDays={[{ before: jan1 }, { after: jan10 }]}
+        disabledDays={[isBefore(jan1), isAfter(jan10)]}
       />,
     ],
     ["Full Width", <TestDateField label="Date" fullWidth />],
@@ -73,7 +71,7 @@ export function DatePickerOpen() {
         label="End Date"
         iconLeft
         format="medium"
-        disabledDays={[{ before: jan1 }, { after: jan10 }]}
+        disabledDays={[isBefore(jan1), isAfter(jan10)]}
         defaultOpen
       />
     </>
@@ -82,6 +80,14 @@ export function DatePickerOpen() {
 DatePickerOpen.decorators = [withDimensions()];
 
 function TestDateField(props: Omit<DateFieldProps, "value" | "onChange" | "onBlur" | "onFocus">) {
-  const [value, onChange] = useState<Date | undefined>(jan1);
+  const [value, onChange] = useState<PlainDate | undefined>(jan1);
   return <DateField {...props} {...{ value, onChange }} onBlur={action("onBlur")} onFocus={action("onFocus")} />;
+}
+
+function isAfter(date: PlainDate): DayMatcher {
+  return (value) => Temporal.PlainDate.compare(value, date) > 0;
+}
+
+function isBefore(date: PlainDate): DayMatcher {
+  return (value) => Temporal.PlainDate.compare(value, date) < 0;
 }

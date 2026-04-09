@@ -2,13 +2,14 @@
 // by a GraphQL schema for a `saveAuthor` mutation that takes an author
 // plus the author's books.
 
-import { DateRange } from "src/types";
+import { type DateRange, type PlainDate } from "src/types";
+import { Temporal } from "temporal-polyfill";
 
-export const jan1 = new Date(2020, 0, 1);
-export const jan2 = new Date(2020, 0, 2);
-export const jan10 = new Date(2020, 0, 10);
-export const jan19 = new Date(2020, 0, 19);
-export const jan29 = new Date(2020, 0, 29);
+export const jan1 = Temporal.PlainDate.from("2020-01-01");
+export const jan2 = Temporal.PlainDate.from("2020-01-02");
+export const jan10 = Temporal.PlainDate.from("2020-01-10");
+export const jan19 = Temporal.PlainDate.from("2020-01-19");
+export const jan29 = Temporal.PlainDate.from("2020-01-29");
 export const dd100: DeweyDecimalClassification = { number: "100", category: "Philosophy" };
 export const dd200: DeweyDecimalClassification = { number: "200", category: "Religion" };
 
@@ -23,7 +24,7 @@ export interface AuthorInput {
   firstName?: string | null;
   middleInitial?: string | null;
   lastName?: string | null;
-  birthday?: Date | null;
+  birthday?: PlainDate | null;
   heightInInches?: number | null;
   royaltiesInCents?: number | null;
   royaltiesInMills?: number | null;
@@ -59,10 +60,10 @@ export interface DeweyDecimalClassification {
 }
 
 export class DateOnly {
-  constructor(private readonly date: Date) {}
+  constructor(private readonly date: PlainDate) {}
 
   toString() {
-    return this.date.toISOString().split("T")[0];
+    return this.date.toString();
   }
 
   toJSON() {

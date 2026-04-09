@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Css } from "src";
 import { DatePicker } from "src/components/internal/DatePicker";
 import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
+import { type DayMatcher, type PlainDate } from "src/types";
+import { plainDateToJsDate } from "src/utils/plainDate";
+import { Temporal } from "temporal-polyfill";
 
 export default {
   component: DatePicker,
@@ -19,10 +22,15 @@ export function Default() {
   const [date, setDate] = useState(jan1);
   return (
     <div>
-      <DatePicker value={date} onSelect={setDate} dottedDays={[jan1, jan2, jan29]} disabledDays={[jan10]} />
+      <DatePicker
+        value={date}
+        onSelect={setDate}
+        dottedDays={[matchesDay(jan1), matchesDay(jan2), matchesDay(jan29)]}
+        disabledDays={[matchesDay(jan10)]}
+      />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && format(new Date(date), "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && format(plainDateToJsDate(date), "MM/dd/yyyy")}</span>
       </div>
     </div>
   );
@@ -36,13 +44,17 @@ export function WithYearControlHeader() {
         useYearPicker
         value={date}
         onSelect={setDate}
-        dottedDays={[jan1, jan2, jan29]}
-        disabledDays={[jan10]}
+        dottedDays={[matchesDay(jan1), matchesDay(jan2), matchesDay(jan29)]}
+        disabledDays={[matchesDay(jan10)]}
       />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && format(new Date(date), "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && format(plainDateToJsDate(date), "MM/dd/yyyy")}</span>
       </div>
     </div>
   );
+}
+
+function matchesDay(date: PlainDate): DayMatcher {
+  return (value) => Temporal.PlainDate.compare(value, date) === 0;
 }
