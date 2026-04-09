@@ -3,8 +3,10 @@ import { Filter } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
 import { DateField, SelectField, Value } from "src/inputs";
+import { type PlainDate } from "src/types";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { dehydratePlainDate, parsePersistedPlainDate, todayPlainDate } from "src/utils/plainDate";
 
 export type DateFilterProps<O, V extends Value, DV extends DateFilterValue<V>> = {
   label: string;
@@ -14,7 +16,7 @@ export type DateFilterProps<O, V extends Value, DV extends DateFilterValue<V>> =
   defaultValue?: DV;
 };
 
-export type DateFilterValue<V extends Value> = { op: V; value: Date };
+export type DateFilterValue<V extends Value> = { op: V; value: PlainDate };
 
 export function dateFilter<O, V extends Value>(
   props: DateFilterProps<O, V, DateFilterValue<V>>,
@@ -29,6 +31,16 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
   extends BaseFilter<DV, DateFilterProps<O, V, DV>>
   implements Filter<DV>
 {
+  hydrate(value: unknown): DV | undefined {
+    if (!isDateFilterValue<V>(value)) return undefined;
+    const hydratedValue = parsePersistedPlainDate(value.value);
+    return hydratedValue ? ({ op: value.op, value: hydratedValue } as DV) : undefined;
+  }
+
+  dehydrate(value: DV | undefined): unknown {
+    return value ? { op: value.op, value: dehydratePlainDate(value.value) } : undefined;
+  }
+
   render(value: DV, setValue: (value: DV | undefined) => void, tid: TestIds, inModal: boolean, vertical: boolean) {
     const { label, operations, getOperationValue, getOperationLabel } = this.props;
 
@@ -48,7 +60,7 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
             value={value?.op}
             onSelect={(op) =>
               // default the selected date to today if it doesn't exist in the filter's value
-              setValue(op ? ({ op, value: value?.value ? new Date(value.value) : new Date() } as DV) : undefined)
+              setValue(op ? ({ op, value: value?.value ?? todayPlainDate() } as DV) : undefined)
             }
             label={inModal ? `${label} date filter operation` : label}
             labelStyle={!inModal && !vertical ? "inline" : inModal || vertical ? "hidden" : "above"}
@@ -57,9 +69,13 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
           />
           <DateField
             labelStyle="inline"
-            value={value?.value ? new Date(value.value) : new Date()}
+            value={value?.value ?? todayPlainDate()}
             label="Date"
-            onChange={(d) => setValue({ ...value, value: d })}
+            onChange={(d) => {
+              if (d && value) {
+                setValue({ ...value, value: d });
+              }
+            }}
             disabled={!value}
             {...tid[`${defaultTestId(this.label)}_dateField`]}
           />
@@ -67,4 +83,8 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
       </>
     );
   }
+}
+
+function isDateFilterValue<V extends Value>(value: unknown): value is { op: V; value: unknown } {
+  return typeof value === "object" && value !== null && "op" in value && "value" in value;
 }

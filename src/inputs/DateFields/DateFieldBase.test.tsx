@@ -1,10 +1,11 @@
 import { clickAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { jan10, jan2 } from "src/forms/formStateDomain";
 import { DateFieldBase } from "src/inputs/DateFields/DateFieldBase";
+import { type PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, render } from "src/utils/rtl";
+import { jan10, jan2 } from "src/utils/testDates";
 import { vi } from "vitest";
 
 describe(DateFieldBase, () => {
@@ -156,7 +157,7 @@ describe(DateFieldBase, () => {
   it("updates the field if the date changes from outside the component", async () => {
     // Given a component rendering the DateField with the ability to update the state.
     function TestComponent() {
-      const [date, setDate] = useState<Date | undefined>(jan2);
+      const [date, setDate] = useState<PlainDate | undefined>(jan2);
       return (
         <>
           <DateFieldBase mode="single" value={date} label="Date" onChange={setDate} />
@@ -174,7 +175,7 @@ describe(DateFieldBase, () => {
   it("does not update the field if the focus is currently on the input", async () => {
     // Given a component rendering the DateField with the ability to update the state.
     function TestComponent() {
-      const [date, setDate] = useState<Date | undefined>(jan2);
+      const [date, setDate] = useState<PlainDate | undefined>(jan2);
       return (
         <>
           <DateFieldBase mode="single" value={date} label="Date" onChange={setDate} />
@@ -194,7 +195,7 @@ describe(DateFieldBase, () => {
   it("does not update the field if the date picker is open", async () => {
     // Given a component rendering the DateField with the ability to update the state.
     function TestComponent() {
-      const [date, setDate] = useState<Date | undefined>(jan2);
+      const [date, setDate] = useState<PlainDate | undefined>(jan2);
       return (
         <>
           <DateFieldBase mode="single" value={date} label="Date" onChange={setDate} />

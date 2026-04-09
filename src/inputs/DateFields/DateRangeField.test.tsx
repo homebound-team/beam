@@ -1,9 +1,9 @@
 import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
-import { jan1, jan10, jan19, jan2 } from "src/forms/formStateDomain";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { noop } from "src/utils";
 import { click, focus } from "src/utils/rtl";
+import { jan1, jan10, jan19, jan2 } from "src/utils/testDates";
 import { vi } from "vitest";
 
 describe("DateRangeField", () => {
@@ -38,8 +38,8 @@ describe("DateRangeField", () => {
     expect(r.query.date_datePicker).not.toBeInTheDocument();
     // And onChange should be called with the new range
     const { from, to } = onChange.mock.calls[0][0];
-    expect(new Date(from).toDateString()).toEqual(new Date("01/01/2020").toDateString());
-    expect(new Date(to).toDateString()).toEqual(new Date("01/10/2020").toDateString());
+    expect(from).toEqual(jan1);
+    expect(to).toEqual(jan10);
   });
 
   it("can unset the input value while selecting dates", async () => {
@@ -103,8 +103,8 @@ describe("DateRangeField", () => {
     expect(r.date).toHaveValue("01/01/20 - 01/19/20");
     // And onChange should be called with the new range
     const { from, to } = onChange.mock.calls[0][0];
-    expect(new Date(from).toDateString()).toEqual(new Date("01/01/2020").toDateString());
-    expect(new Date(to).toDateString()).toEqual(new Date("01/19/2020").toDateString());
+    expect(from).toEqual(jan1);
+    expect(to).toEqual(jan19);
   });
 
   it("changes date format upon focus and blur", async () => {

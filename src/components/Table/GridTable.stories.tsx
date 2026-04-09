@@ -35,6 +35,7 @@ import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
+import { type PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { newStory, withRouter, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -2284,7 +2285,7 @@ enum EditableRowStatus {
 type EditableRowData = {
   kind: "data";
   id: string;
-  data: { id: string; name: string; status: EditableRowStatus; value: number; date?: Date };
+  data: { id: string; name: string; status: EditableRowStatus; value: number; date?: PlainDate };
 };
 type EditableRow = EditableRowData | HeaderRow;
 

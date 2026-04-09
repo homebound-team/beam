@@ -1,7 +1,14 @@
-// Import and re-export DateRange type so other apps do not need a direct dependency on react-day-picker
 import React from "react";
-import { DateRange as _DateRange } from "react-day-picker";
-export type { _DateRange as DateRange };
+import { Temporal } from "temporal-polyfill";
+
+export type PlainDate = Temporal.PlainDate;
+
+export type DateRange = {
+  from: PlainDate | undefined;
+  to?: PlainDate | undefined;
+};
+
+export type DayMatcher = (date: PlainDate) => boolean;
 
 export type HasIdIsh<V = string> = { id: V } | { code: V };
 export type HasNameIsh = { name: string } | { displayName: string } | { label: string };
