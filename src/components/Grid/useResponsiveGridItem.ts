@@ -1,44 +1,19 @@
-import { useContext, useEffect, useMemo } from "react";
-import type { Properties } from "src/Css";
-import { gridItemDataAttribute, type ResponsiveGridConfig, ResponsiveGridContext } from "src/components/Grid/utils";
+import { type Properties } from "src/Css";
+import { gridItemDataAttribute, type ResponsiveGridConfig } from "src/components/Grid/utils";
 
 /**
- * The responsive grid logic we use is heavily dependent on @container queries
- * that are extremely dynamic -- i.e. not just "here are our sm/md/lg breakpoints",
- * but the caller can pass in truly adhoc min-size/max-size numbers, that then need
- * added into our `@container ${...} ${...}` classes.
- *
- * Truss v2 fundamentally does not support dynamic selectors like that (neither did
- * StyleX, which we briefly prototyped), and so this component has its own custom
- * class/style management, which is basically a mini-/adhoc-implementation of Emotion,
- * i.e. managing a `style` tag and injecting classes into it at runtime.
- *
- * This is not amazing, but it's the only place in Beam where we do this, and the code
- * really isn't that bad, so :shrug: it's what we're doing for now/to unblock Truss v2.
+ * `useResponsiveGrid` now owns the runtime `@container` rule injection for the
+ * entire grid, and this hook just declares the item's requested span via a data
+ * attribute.
  */
-const injectedResponsiveGridClasses = new Set<string>();
-let responsiveGridStyleEl: HTMLStyleElement | undefined;
-
 interface UseResponsiveGridItemProps {
   /** How many grid columns this item should span. Defaults to 1. */
   colSpan?: number;
   /**
-   * The grid configuration for computing container-query breakpoints.
+   * Retained for backwards compatibility.
    *
-   * When items are rendered inside a `ResponsiveGrid` (or a manual
-   * `ResponsiveGridContext.Provider`), this is picked up from context
-   * automatically and can be omitted.
-   *
-   * When using the hooks directly (i.e. `useResponsiveGrid` +
-   * `useResponsiveGridItem` without a Provider), this **must** be supplied
-   * so the item can generate the correct `@container` query styles.
-   * Pass the same config object you gave to `useResponsiveGrid`:
-   *
-   * ```tsx
-   * const gridConfig = { minColumnWidth: 276, columns: 4, gap: 24 };
-   * const { gridStyles } = useResponsiveGrid(gridConfig);
-   * const { gridItemProps, gridItemStyles } = useResponsiveGridItem({ colSpan: 3, gridConfig });
-   * ```
+   * Span rules are now injected by `useResponsiveGrid`, so callers no longer
+   * need to pass grid config into `useResponsiveGridItem`.
    */
   gridConfig?: ResponsiveGridConfig;
 }
@@ -48,72 +23,19 @@ interface UseResponsiveGridItemProps {
  *
  * - `gridItemProps` — a data attribute used to identify the item's requested
  *   column span. Spread this onto the item's root element.
- * - `gridItemStyles` — `@container` query CSS that gracefully reduces the
- *   item's `grid-column` span as the grid container shrinks. Apply these to
- *   the item's `css` prop.
+ * - `gridItemStyles` — retained as an empty object for API compatibility.
  *
- * The container query breakpoints are derived from the grid config (see
- * `UseResponsiveGridItemProps.gridConfig`). When `colSpan` is 1 or the
- * config is unavailable, `gridItemStyles` will be an empty object.
+ * `useResponsiveGrid` injects the runtime `@container` rules for the whole
+ * grid, so this hook only needs to identify the requested span.
  */
 export function useResponsiveGridItem(props: UseResponsiveGridItemProps): {
   gridItemProps: Record<string, string | number>;
   gridItemStyles: Properties;
 } {
-  const { colSpan = 1, gridConfig } = props;
-  const contextConfig = useContext(ResponsiveGridContext);
-  // Prefer explicitly passed config over context, so hook-only callers
-  // (without a ResponsiveGridContext.Provider) can still get grid item styles.
-  const config = gridConfig ?? contextConfig;
-
-  const { className, cssText } = useMemo(() => {
-    if (!config || colSpan <= 1) return { className: "", cssText: "" };
-    const { minColumnWidth, gap } = config;
-    const className = responsiveGridItemClassName(config, colSpan);
-    const rules: string[] = [];
-
-    for (let span = 1; span < colSpan; span++) {
-      const minWidth = span === 1 ? 0 : minColumnWidth * span + gap * (span - 1);
-      const maxWidth = minColumnWidth * (span + 1) + gap * span;
-      rules.push(
-        `@container (min-width: ${minWidth + 1}px) and (max-width: ${maxWidth}px) { .${className} { grid-column: span ${span}; } }`,
-      );
-    }
-
-    const fullSpanMinWidth = minColumnWidth * colSpan + gap * (colSpan - 1);
-    rules.push(`@container (min-width: ${fullSpanMinWidth + 1}px) { .${className} { grid-column: span ${colSpan}; } }`);
-
-    return { className, cssText: rules.join("\n") };
-  }, [config, colSpan]);
-
-  useResponsiveGridItemStyle(className, cssText);
+  const colSpan = props.colSpan ?? 1;
 
   return {
-    gridItemProps: { [gridItemDataAttribute]: colSpan, ...(className ? { className } : {}) },
+    gridItemProps: { [gridItemDataAttribute]: colSpan },
     gridItemStyles: {},
   };
-}
-
-function useResponsiveGridItemStyle(className: string, cssText: string) {
-  useEffect(
-    function () {
-      if (!className || !cssText || typeof document === "undefined") return;
-
-      if (!responsiveGridStyleEl) {
-        responsiveGridStyleEl = document.createElement("style");
-        responsiveGridStyleEl.setAttribute("data-responsive-grid-item-styles", "true");
-        document.head.appendChild(responsiveGridStyleEl);
-      }
-
-      if (!injectedResponsiveGridClasses.has(className)) {
-        responsiveGridStyleEl.textContent = `${responsiveGridStyleEl.textContent}\n${cssText}`.trim();
-        injectedResponsiveGridClasses.add(className);
-      }
-    },
-    [className, cssText],
-  );
-}
-
-function responsiveGridItemClassName(config: ResponsiveGridConfig, colSpan: number) {
-  return `responsive-grid-item-${config.minColumnWidth}-${config.gap}-${config.columns}-${colSpan}`;
 }
