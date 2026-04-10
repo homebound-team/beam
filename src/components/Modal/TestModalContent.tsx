@@ -10,6 +10,7 @@ import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
 import { DateField, TextAreaField, TextField } from "src/inputs";
+import { type PlainDate } from "src/types";
 import { action } from "storybook/actions";
 
 export interface TestModalContentProps {
@@ -29,7 +30,7 @@ export function TestModalContent(props: TestModalContentProps) {
   const [numSentences, setNumSentences] = useState(initNumSentences);
   const [primaryDisabled, setPrimaryDisabled] = useState(false);
   const [leftActionDisabled, setLeftActionDisabled] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(jan1);
+  const [date, setDate] = useState<PlainDate | undefined>(jan1);
   const [internalValue, setValue] = useState<string | undefined>("");
   const { triggerNotice } = useSnackbar();
 

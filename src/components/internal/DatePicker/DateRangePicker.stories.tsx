@@ -4,7 +4,9 @@ import { useState } from "react";
 import { DateRangePicker } from "src/components/internal/DatePicker";
 import { Css } from "src/Css";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/forms/formStateDomain";
-import { DateRange } from "src/types";
+import { type DateRange, type DayMatcher, type PlainDate } from "src/types";
+import { plainDateToJsDate } from "src/utils/plainDate";
+import { Temporal } from "temporal-polyfill";
 
 export default {
   component: DateRangePicker,
@@ -20,12 +22,17 @@ export function Default() {
   const [range, setRange] = useState<DateRange | undefined>({ from: jan1, to: jan19 });
   return (
     <div>
-      <DateRangePicker range={range} onSelect={setRange} dottedDays={[jan1, jan2, jan29]} disabledDays={[jan10]} />
+      <DateRangePicker
+        range={range}
+        onSelect={setRange}
+        dottedDays={[matchesDay(jan1), matchesDay(jan2), matchesDay(jan29)]}
+        disabledDays={[matchesDay(jan10)]}
+      />
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
-          {range?.from && format(new Date(range?.from), "MM/dd/yyyy")} -{" "}
-          {range?.to && format(new Date(range?.to), "MM/dd/yyyy")}
+          {range?.from && format(plainDateToJsDate(range.from), "MM/dd/yyyy")} -{" "}
+          {range?.to && format(plainDateToJsDate(range.to), "MM/dd/yyyy")}
         </span>
       </div>
     </div>
@@ -40,16 +47,20 @@ export function WithYearControlHeader() {
         useYearPicker
         range={range}
         onSelect={setRange}
-        dottedDays={[jan1, jan2, jan29]}
-        disabledDays={[jan10]}
+        dottedDays={[matchesDay(jan1), matchesDay(jan2), matchesDay(jan29)]}
+        disabledDays={[matchesDay(jan10)]}
       />
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
-          {range?.from && format(new Date(range?.from), "MM/dd/yyyy")} -{" "}
-          {range?.to && format(new Date(range?.to), "MM/dd/yyyy")}
+          {range?.from && format(plainDateToJsDate(range.from), "MM/dd/yyyy")} -{" "}
+          {range?.to && format(plainDateToJsDate(range.to), "MM/dd/yyyy")}
         </span>
       </div>
     </div>
   );
+}
+
+function matchesDay(date: PlainDate): DayMatcher {
+  return (value) => Temporal.PlainDate.compare(value, date) === 0;
 }

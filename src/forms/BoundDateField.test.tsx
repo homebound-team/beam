@@ -1,8 +1,9 @@
 import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-state";
 import { act, fireEvent } from "@testing-library/react";
 import { BoundDateField } from "src/forms/BoundDateField";
-import { AuthorInput, jan1, jan2 } from "src/forms/formStateDomain";
+import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus, render } from "src/utils/rtl";
+import { jan1, jan2 } from "src/utils/testDates";
 import { setUseMockComponents } from "src/utils/withTestMock";
 import { vi } from "vitest";
 
@@ -42,7 +43,7 @@ describe("BoundDateField", () => {
       formConfig,
       { birthday: jan2 },
       // Using toDateString to remove timezone info to prevent flaky test runs.
-      { maybeAutoSave: () => autoSave(author.birthday.value?.toDateString()) },
+      { maybeAutoSave: () => autoSave(author.birthday.value) },
     );
     const r = await render(<BoundDateField field={author.birthday} />);
 
@@ -52,7 +53,7 @@ describe("BoundDateField", () => {
     click(r.datePickerDay_0);
 
     // Then the callback should be triggered with the current value
-    expect(autoSave).toBeCalledWith(jan1.toDateString());
+    expect(autoSave).toBeCalledWith(jan1);
   });
 
   it("triggers 'maybeAutoSave' on enter", async () => {
@@ -62,7 +63,7 @@ describe("BoundDateField", () => {
       formConfig,
       { birthday: jan2 },
       // Using toDateString to remove timezone info to prevent flaky test runs.
-      { maybeAutoSave: () => autoSave(author.birthday.value?.toDateString()) },
+      { maybeAutoSave: () => autoSave(author.birthday.value) },
     );
     const r = await render(<BoundDateField field={author.birthday} />);
 
@@ -70,11 +71,10 @@ describe("BoundDateField", () => {
     fireEvent.keyDown(r.birthday, { key: "Enter" });
 
     // Then the callback should be triggered with the current value
-    expect(autoSave).toBeCalledWith(jan2.toDateString());
+    expect(autoSave).toBeCalledWith(jan2);
   });
 
   it("respects form state's readonly property", async () => {
-    const autoSave = vi.fn();
     // Given a BoundDateField
     const author: ObjectState<AuthorInput> = createObjectState(formConfig, { birthday: jan2 });
     const r = await render(<BoundDateField field={author.birthday} />);

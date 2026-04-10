@@ -281,7 +281,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   // Persist page size and reset to first page when filters/search change
   useEffect(() => {
     if (page.limit !== persistedPageSize) setPersistedPageSize(page.limit);
-    setPage((prev) => ({ ...prev, offset: 0 }));
+    setPage((prev) => (prev.offset === 0 ? prev : { ...prev, offset: 0 }));
   }, [page.limit, persistedPageSize, setPersistedPageSize, filter, searchString]);
 
   return {

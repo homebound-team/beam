@@ -1,15 +1,13 @@
 import { ButtonDatePicker } from "src/components/ButtonDatePicker";
-import { jan1, jan2 } from "src/forms/formStateDomain";
 import { click, render } from "src/utils/rtl";
+import { jan1, jan2 } from "src/utils/testDates";
 import { vi } from "vitest";
 
 describe("ButtonDatePicker", () => {
   it("can render with date picker and select a date", async () => {
     const onSelect = vi.fn();
     // Given a ButtonDatePicker
-    const r = await render(
-      <ButtonDatePicker trigger={{ label: "Trigger" }} value={jan2} onSelect={(d) => onSelect(d.toDateString())} />,
-    );
+    const r = await render(<ButtonDatePicker trigger={{ label: "Trigger" }} value={jan2} onSelect={onSelect} />);
 
     // When clicking the trigger
     click(r.trigger);
@@ -18,7 +16,7 @@ describe("ButtonDatePicker", () => {
     click(r.datePickerDay_0);
 
     // Then the selected date should be returned and the date picker closed
-    expect(onSelect).toBeCalledWith(jan1.toDateString());
+    expect(onSelect).toBeCalledWith(jan1);
     expect(r.queryByTestId("trigger_datePicker")).toBeFalsy();
   });
 });
