@@ -10,7 +10,7 @@ export type LeveledOption<O> = [NestedOption<O>, number];
 
 export type TreeFieldState<O> = {
   inputValue: string;
-  filteredOptions: LeveledOption<O>[];
+  searchValue?: string;
   selectedKeys: AriaKey[];
   selectedOptions: NestedOption<O>[];
   /** These are the labels of the top-level selected values

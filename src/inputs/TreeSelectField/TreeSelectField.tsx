@@ -74,6 +74,7 @@ export type TreeSelectFieldProps<O, V extends Value> = {
    * @default root */
   chipDisplay?: "all" | "leaf" | "root";
   disabledOptions?: V[];
+  groupOptions?: V[];
 } & BeamFocusableProps &
   PresentationFieldProps;
 
@@ -95,6 +96,7 @@ export function TreeSelectField<O, V extends Value>(
   } = props;
 
   const [collapsedKeys, setCollapsedKeys] = useState<AriaKey[]>([]);
+  const groupKeys = useMemo(() => props.groupOptions?.map((option) => valueToKey(option)) ?? [], [props.groupOptions]);
 
   useEffect(() => {
     setCollapsedKeys(
@@ -112,10 +114,10 @@ export function TreeSelectField<O, V extends Value>(
   }, [options, defaultCollapsed]);
 
   const contextValue = useMemo<CollapsedChildrenState<O, V>>(
-    () => ({ collapsedKeys, setCollapsedKeys, getOptionValue }),
+    () => ({ collapsedKeys, setCollapsedKeys, getOptionValue, groupKeys }),
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [collapsedKeys, setCollapsedKeys],
+    [collapsedKeys, setCollapsedKeys, groupKeys],
   );
 
   return (
@@ -135,19 +137,21 @@ export function TreeSelectField<O, V extends Value>(
 }
 
 export function useTreeSelectFieldProvider<O, V extends Value>() {
-  return useContext(CollapsedContext);
+  return useContext(CollapsedContext) as CollapsedChildrenState<O, V>;
 }
 
 type CollapsedChildrenState<O, V extends Value> = {
   collapsedKeys: AriaKey[];
   setCollapsedKeys: Dispatch<SetStateAction<AriaKey[]>>;
   getOptionValue: (opt: O) => V;
+  groupKeys: AriaKey[];
 };
 // create the context to hold the collapsed state, default should be false
 export const CollapsedContext = React.createContext<CollapsedChildrenState<any, any>>({
   collapsedKeys: [],
   setCollapsedKeys: () => {},
   getOptionValue: () => ({}) as any,
+  groupKeys: [],
 });
 
 function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, V>) {
@@ -165,13 +169,16 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     contrast = false,
     nothingSelectedText = "",
     onSelect,
-    defaultCollapsed = false,
+    defaultCollapsed: _defaultCollapsed = false,
     placeholder,
     fullWidth = fieldProps?.fullWidth ?? false,
     chipDisplay = "root",
     disabledOptions,
+    groupOptions: _groupOptions,
     ...otherProps
   } = props;
+
+  void _defaultCollapsed;
 
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
@@ -179,10 +186,13 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   const { contains } = useFilter({ sensitivity: "base" });
 
   const { collapsedKeys } = useTreeSelectFieldProvider();
+  const groupKeys = useMemo(() => _groupOptions?.map((option) => valueToKey(option)) ?? [], [_groupOptions]);
+  const groupKeySet = useMemo<Set<AriaKey>>(() => new Set(groupKeys), [groupKeys]);
 
   // `disabledKeys` from ComboBoxState does not support additional meta for showing a disabled reason to the user
   // This lookup map helps us cleanly prune out the optional reason text, then access it further down the component tree
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
+  const disabledKeys = [...new Set<AriaKey>([...Object.keys(disabledOptionsWithReasons), ...groupKeys])];
 
   const initTreeFieldState: () => TreeFieldState<O> = useCallback(() => {
     // Figure out which options should be considered selected.
@@ -200,11 +210,12 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       }),
     );
 
-    function selectOptionAndAllChildren(maybeParent: NestedOption<O>): string[] {
+    function selectOptionAndAllChildren(maybeParent: NestedOption<O>): AriaKey[] {
       // Check if the maybeParent has children, if so, return those as selected keys
       // Do in a recursive way so that children may have children
+      const key = valueToKey(getOptionValue(maybeParent));
       return [
-        valueToKey(getOptionValue(maybeParent)),
+        ...(groupKeySet.has(key) ? [] : [key]),
         ...(maybeParent.children?.flatMap(selectOptionAndAllChildren) ?? []),
       ];
     }
@@ -212,15 +223,16 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     // It is possible that all the children of a parent were considered selected `values`, but the parent wasn't included in the `values` array.
     // In this case, the parent also should be considered a selected option.
     function areAllChildrenSelected(maybeParent: NestedOption<O>): boolean {
-      const isSelected = selectedKeys.has(valueToKey(getOptionValue(maybeParent)));
+      const key = valueToKey(getOptionValue(maybeParent));
+      const isSelected = selectedKeys.has(key);
       // If already selected, or the options does not have children, then return its current state.
       if (isSelected || !maybeParent.children || maybeParent.children.length === 0) return isSelected;
 
       // If we do have children, then check if all children are selected.
       // if all are selected, then push this parent to the selectedKeys
       const areAllSelected = maybeParent.children.every(areAllChildrenSelected);
-      if (areAllSelected) {
-        selectedKeys.add(valueToKey(getOptionValue(maybeParent)));
+      if (areAllSelected && !groupKeySet.has(key)) {
+        selectedKeys.add(key);
       }
       return areAllSelected;
     }
@@ -243,10 +255,9 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           ? selectedOptions.filter((o) => !o.children || o.children.length === 0).map(getOptionLabel)
           : selectedOptions.map(getOptionLabel);
 
-    const filteredOptions = initialOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue));
-
     return {
       selectedKeys: [...selectedKeys],
+      searchValue: undefined,
       inputValue:
         selectedOptions.length === 1
           ? getOptionLabel([...selectedOptions][0])
@@ -255,7 +266,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             : selectedOptions.length === 0
               ? nothingSelectedText
               : "",
-      filteredOptions,
       selectedOptions,
       allOptions: initialOptions,
       selectedOptionsLabels,
@@ -270,7 +280,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     isReadOnly,
     nothingSelectedText,
     getOptionValue,
-    collapsedKeys,
+    groupKeySet,
   ]);
 
   // Initialize the TreeFieldState
@@ -299,75 +309,47 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getOptionValue, initTreeFieldState, values]);
 
-  // React to collapsed keys and update the filtered options
-  const reactToCollapse = useRef(false);
-  useEffect(
-    () => {
-      // Do not run this effect on first render. Otherwise we'd be triggering a re-render on first render.
-      if (reactToCollapse.current) {
-        setFieldState(({ allOptions, inputValue, ...others }) => ({
-          allOptions,
-          inputValue,
-          ...others,
-          filteredOptions: allOptions.flatMap((o) =>
-            levelOptions(o, 0, inputValue.length > 0, collapsedKeys, getOptionValue).filter(([option]) =>
-              contains(getOptionLabel(option), inputValue),
-            ),
-          ),
-        }));
-      }
-      reactToCollapse.current = true;
-    },
-    // Only react to collapseKey changes. Other deps should be stable (`contains`, `getOptionLabel`, `getOptionValue`).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [collapsedKeys],
+  const filteredOptions = useMemo(
+    () =>
+      getFilteredOptions(
+        fieldState.allOptions,
+        fieldState.searchValue,
+        collapsedKeys,
+        contains,
+        getOptionLabel,
+        getOptionValue,
+      ),
+    [fieldState.allOptions, fieldState.searchValue, collapsedKeys, contains, getOptionLabel, getOptionValue],
   );
 
   // Update the filtered options when the input value changes
-  const onInputChange = useCallback(
-    (inputValue: string) => {
-      setFieldState((prevState) => {
-        return {
-          ...prevState,
-          inputValue,
-          allowCollapsing: inputValue.length === 0,
-          filteredOptions: prevState.allOptions.flatMap((o) =>
-            levelOptions(o, 0, inputValue.length > 0, collapsedKeys, getOptionValue).filter(([option]) =>
-              contains(getOptionLabel(option), inputValue),
-            ),
-          ),
-        };
-      });
-    },
-    [collapsedKeys, contains, getOptionLabel, getOptionValue],
-  );
+  const onInputChange = useCallback((inputValue: string) => {
+    setFieldState((prevState) => {
+      return {
+        ...prevState,
+        inputValue,
+        searchValue: inputValue.length === 0 ? undefined : inputValue,
+        allowCollapsing: inputValue.length === 0,
+      };
+    });
+  }, []);
 
   // Handle loading of the options in the case that they are loaded via a Promise.
   const maybeInitLoad = useCallback(
-    async (
-      options: NestedOptionsOrLoad<O>,
-      fieldState: TreeFieldState<O>,
-      setFieldState: React.Dispatch<React.SetStateAction<TreeFieldState<O>>>,
-    ) => {
+    async (options: NestedOptionsOrLoad<O>, setFieldState: React.Dispatch<React.SetStateAction<TreeFieldState<O>>>) => {
       if (!Array.isArray(options)) {
         setFieldState((prevState) => ({ ...prevState, optionsLoading: true }));
         const loadedOptions = (await options.load()).options;
-        const filteredOptions = loadedOptions.flatMap((o) =>
-          levelOptions(o, 0, fieldState.inputValue.length > 0, collapsedKeys, getOptionValue).filter(([option]) =>
-            contains(getOptionLabel(option), fieldState.inputValue),
-          ),
-        );
 
         // Ensure the `unset` option is prepended to the top of the list if `unsetLabel` was provided
         setFieldState((prevState) => ({
           ...prevState,
-          filteredOptions,
           allOptions: loadedOptions,
           optionsLoading: false,
         }));
       }
     },
-    [collapsedKeys, contains, getOptionLabel, getOptionValue],
+    [],
   );
 
   // Only on the first open of the listbox, we want to load the options if they haven't been loaded yet.
@@ -376,7 +358,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     if (firstOpen.current && isOpen) {
       // TODO: verify this eslint ignore
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      maybeInitLoad(options, fieldState, setFieldState);
+      maybeInitLoad(options, setFieldState);
       firstOpen.current = false;
     }
     if (isOpen) {
@@ -384,7 +366,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       setFieldState((prevState) => ({
         ...prevState,
         inputValue: "",
-        filteredOptions: prevState.allOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue)),
+        searchValue: undefined,
+        allowCollapsing: true,
       }));
     }
   }
@@ -402,11 +385,11 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
   const comboBoxProps = {
     ...otherProps,
-    disabledKeys: Object.keys(disabledOptionsWithReasons),
+    disabledKeys,
     placeholder: !values || values.length === 0 ? placeholder : "",
     label: props.label,
     inputValue: fieldState.inputValue,
-    items: fieldState.filteredOptions,
+    items: filteredOptions,
     isDisabled,
     isReadOnly,
     onInputChange,
@@ -437,6 +420,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           setFieldState((prevState) => ({
             ...prevState,
             inputValue: nothingSelectedText,
+            searchValue: undefined,
+            allowCollapsing: true,
             selectedKeys: [],
             selectedOptions: [],
           }));
@@ -467,18 +452,19 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
                   // remove children that are disabled
                   return !state.disabledKeys.has(childKey);
                 });
-              [key, ...childrenKeys].forEach(addedKeys.add, addedKeys);
+              [...(groupKeySet.has(key) ? [] : [key]), ...childrenKeys].forEach(addedKeys.add, addedKeys);
             }
 
             // If this was a child that was selected, then see if every other child is also selected, and if so, consider the parent selected.
             // Walk up the parents and determine their state.
-            for (const parent of parents.reverse()) {
-              const allChecked = parent.children?.every((child) => {
-                const childKey = valueToKey(getOptionValue(child));
-                return addedKeys.has(childKey) || existingKeys.has(childKey) || state.disabledKeys.has(childKey);
-              });
-              if (allChecked) {
-                addedKeys.add(valueToKey(getOptionValue(parent)));
+            const selectionKeys = new Set([...existingKeys, ...addedKeys]);
+            for (const parent of [...parents].reverse()) {
+              const parentKey = valueToKey(getOptionValue(parent));
+              if (isOptionFullySelected(parent, selectionKeys, state.disabledKeys, groupKeySet, getOptionValue)) {
+                if (!groupKeySet.has(parentKey)) {
+                  addedKeys.add(parentKey);
+                  selectionKeys.add(parentKey);
+                }
               }
             }
           }
@@ -539,7 +525,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           ...prevState,
           // Since we reset the list of options upon selection changes, then set the `inputValue` to empty string to reflect that.
           inputValue: "",
-          filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue)),
+          searchValue: undefined,
           selectedKeys: [...selectedKeys],
           selectedOptions,
           selectedOptionsLabels:
@@ -574,7 +560,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             : selectedOptions.length === 0
               ? nothingSelectedText
               : "",
-        filteredOptions: initialOptions.flatMap((o) => levelOptions(o, 0, false, collapsedKeys, getOptionValue)),
+        searchValue: undefined,
         allowCollapsing: true,
       }));
     }
@@ -714,4 +700,41 @@ function getTopLevelSelections<O, V extends Value>(
   // If this element has no children, then look through the children for top level selected options.
   if (o.children) return [...o.children.flatMap((c) => getTopLevelSelections(c, selectedKeys, getOptionValue))];
   return [];
+}
+
+function getFilteredOptions<O, V extends Value>(
+  allOptions: NestedOption<O>[],
+  searchValue: string | undefined,
+  collapsedKeys: AriaKey[],
+  contains: (string: string, substring: string) => boolean,
+  getOptionLabel: (o: O) => string,
+  getOptionValue: (o: O) => V,
+): LeveledOption<O>[] {
+  return allOptions.flatMap((option) =>
+    levelOptions(option, 0, !!searchValue, collapsedKeys, getOptionValue).filter(([nestedOption]) =>
+      searchValue ? contains(getOptionLabel(nestedOption), searchValue) : true,
+    ),
+  );
+}
+
+function isOptionFullySelected<O, V extends Value>(
+  option: NestedOption<O>,
+  selectedKeys: Set<AriaKey>,
+  disabledKeys: Set<AriaKey>,
+  groupKeys: Set<AriaKey>,
+  getOptionValue: (o: O) => V,
+): boolean {
+  const key = valueToKey(getOptionValue(option));
+  if (groupKeys.has(key)) {
+    return option.children?.length
+      ? option.children.every((child) =>
+          isOptionFullySelected(child, selectedKeys, disabledKeys, groupKeys, getOptionValue),
+        )
+      : false;
+  }
+  if (selectedKeys.has(key) || disabledKeys.has(key)) return true;
+  if (!option.children || option.children.length === 0) return false;
+  return option.children.every((child) =>
+    isOptionFullySelected(child, selectedKeys, disabledKeys, groupKeys, getOptionValue),
+  );
 }
