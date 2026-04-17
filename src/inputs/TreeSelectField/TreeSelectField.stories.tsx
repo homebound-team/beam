@@ -6,7 +6,7 @@ import { Value } from "src/inputs/index";
 import { TreeSelectField, TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
-import { zeroTo } from "src/utils/sb";
+import { newStory, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
 import { within } from "storybook/test";
 
@@ -160,54 +160,33 @@ export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { compact: true, contrast: true };
 
-export function OpenMenu() {
-  const options: NestedOption<HasIdAndName>[] = zeroTo(3).map((dIdx) => ({
-    id: `d:${dIdx}`,
-    name: `Development ${dIdx}`,
-    children: zeroTo(2).map((cIdx) => ({
-      id: `c:${cIdx}:d:${dIdx}`,
-      name: `Cohort ${cIdx}`,
-      children: zeroTo(2).map((pIdx) => ({
-        id: `p:${pIdx}:c:${cIdx}:d:${dIdx}`,
-        name: `Project ${pIdx}`,
+export const OpenMenu = newStory(
+  () => {
+    const options: NestedOption<HasIdAndName>[] = zeroTo(3).map((dIdx) => ({
+      id: `d:${dIdx}`,
+      name: `Development ${dIdx}`,
+      children: zeroTo(2).map((cIdx) => ({
+        id: `c:${cIdx}:d:${dIdx}`,
+        name: `Cohort ${cIdx}`,
+        children: zeroTo(2).map((pIdx) => ({
+          id: `p:${pIdx}:c:${cIdx}:d:${dIdx}`,
+          name: `Project ${pIdx}`,
+        })),
       })),
-    })),
-  }));
+    }));
 
-  return <TestTreeSelectField values={[]} options={options} label="Nested options" placeholder="Select a project" />;
-}
-OpenMenu.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-  const canvas = within(canvasElement);
-  canvas.getByTestId("toggleListBox").click();
-};
+    return <TestTreeSelectField values={[]} options={options} label="Nested options" placeholder="Select a project" />;
+  },
+  {
+    play: async ({ canvasElement }) => {
+      const canvas = within(canvasElement);
+      canvas.getByTestId("toggleListBox").click();
+    },
+  },
+);
 
 export function AsyncOptions() {
-  const options: NestedOption<HasIdAndName>[] = [
-    {
-      id: "baseball",
-      name: "Baseball",
-      children: [
-        { id: "mlb", name: "MLB" },
-        { id: "milb", name: "Minor League Baseball" },
-      ],
-    },
-    {
-      id: "basketball",
-      name: "Basketball",
-      children: [
-        { id: "nba", name: "NBA" },
-        { id: "wnba", name: "WNBA" },
-      ],
-    },
-    {
-      id: "football",
-      name: "Football",
-      children: [
-        { id: "nfl", name: "NFL" },
-        { id: "xfl", name: "XFL" },
-      ],
-    },
-  ];
+  const options = getLeagueOptions();
   const initialOption = [options[0]];
 
   return (
@@ -227,6 +206,36 @@ export function AsyncOptions() {
     />
   );
 }
+
+export function GroupOptions() {
+  return (
+    <TestTreeSelectField
+      values={["mlb", "nba"]}
+      options={getLeagueOptions()}
+      groupOptions={["baseball", "basketball"]}
+      label="Favorite League"
+      placeholder="Select a league"
+    />
+  );
+}
+
+export const GroupOptionsOpen = newStory(
+  () => (
+    <TestTreeSelectField
+      values={["mlb", "nba"]}
+      options={getLeagueOptions()}
+      groupOptions={["baseball", "basketball"]}
+      label="Favorite League"
+      placeholder="Select a league"
+    />
+  ),
+  {
+    play: ({ canvasElement }) => {
+      const canvas = within(canvasElement);
+      canvas.getByTestId("toggleListBox").click();
+    },
+  },
+);
 
 export function Interactive() {
   const options: NestedOption<HasIdAndName>[] = zeroTo(3).map((dIdx) => ({
@@ -279,4 +288,33 @@ function TestTreeSelectField<T extends HasIdAndName, V extends Value>(
       getOptionValue={(o) => o.id}
     />
   );
+}
+
+function getLeagueOptions(): NestedOption<HasIdAndName>[] {
+  return [
+    {
+      id: "baseball",
+      name: "Baseball",
+      children: [
+        { id: "mlb", name: "MLB" },
+        { id: "milb", name: "Minor League Baseball" },
+      ],
+    },
+    {
+      id: "basketball",
+      name: "Basketball",
+      children: [
+        { id: "nba", name: "NBA" },
+        { id: "wnba", name: "WNBA" },
+      ],
+    },
+    {
+      id: "football",
+      name: "Football",
+      children: [
+        { id: "nfl", name: "NFL" },
+        { id: "xfl", name: "XFL" },
+      ],
+    },
+  ];
 }

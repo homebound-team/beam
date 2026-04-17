@@ -10,12 +10,12 @@ import { LeveledOption, NestedOption } from "src/inputs/TreeSelectField/utils";
 import { Value, valueToKey } from "src/inputs/Value";
 import { useTestIds } from "src/utils";
 
-interface TreeOptionProps<O> {
+type TreeOptionProps<O> = {
   item: Node<LeveledOption<O>>;
   state: ListState<O>;
   contrast?: boolean;
   allowCollapsing?: boolean;
-}
+};
 /** Represents a single option within a ListBox - used by SelectField, MultiSelectField, and TreeSelectField */
 export function TreeOption<O>(props: TreeOptionProps<O>) {
   const { item, state, contrast = false, allowCollapsing = true } = props;
@@ -35,7 +35,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
 
   // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { collapsedKeys, setCollapsedKeys, getOptionValue } = useTreeSelectFieldProvider<O, Value>();
+  const { collapsedKeys, setCollapsedKeys, getOptionValue, groupKeys } = useTreeSelectFieldProvider<O, Value>();
 
   // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -44,6 +44,15 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
     state,
     ref,
   );
+  const isGroup = groupKeys.includes(item.key);
+  const canCollapse = allowCollapsing && !!option.children?.length;
+
+  function toggleCollapsed() {
+    if (!canCollapse) return;
+    setCollapsedKeys((prevKeys) =>
+      collapsedKeys.includes(item.key) ? prevKeys.filter((k) => k !== item.key) : [...prevKeys, item.key],
+    );
+  }
 
   // If this item is not selected, then determine if some of its children are selected to show the indeterminate state.
   // Note: If `isSelected` will be true if all of the children were selected. That auto-parent-selection happens in the `onSelect` callback in TreeSelectField.
@@ -59,24 +68,28 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   return (
     <li
       {...hoverProps}
+      onClick={(e) => {
+        if (!isGroup) return;
+        e.preventDefault();
+        e.stopPropagation();
+        toggleCollapsed();
+      }}
       css={{
         ...Css.df.aic.jcsb.gap1.pl2.mh("42px").outline0.cursorPointer.sm.plPx(16 + level * 8).$,
         ...listItemStyles.item,
-        ...(isHovered && !isDisabled ? listItemStyles.hover : {}),
-        ...(isFocused ? listItemStyles.focus : {}),
-        ...(isDisabled ? listItemStyles.disabled : {}),
+        ...(isHovered && (!isDisabled || isGroup) ? listItemStyles.hover : {}),
+        ...(isFocused && !isGroup ? listItemStyles.focus : {}),
+        ...(isDisabled && !isGroup ? listItemStyles.disabled : {}),
       }}
     >
       {allowCollapsing && (
         <span css={Css.wPx(18).fs0.df.aic.$}>
-          {option.children && option.children?.length > 0 && (
+          {canCollapse && (
             <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setCollapsedKeys((prevKeys) =>
-                  collapsedKeys.includes(item.key) ? prevKeys.filter((k) => k !== item.key) : [...prevKeys, item.key],
-                );
+                toggleCollapsed();
                 return false;
               }}
               css={Css.br4.hPx(16).wPx(16).bgTransparent.onHover.bgGray300.$}
@@ -88,12 +101,14 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
         </span>
       )}
       <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps} data-label={item.textValue}>
-        <StyledCheckbox
-          isDisabled={isDisabled}
-          isSelected={isSelected}
-          isIndeterminate={isIndeterminate}
-          {...tid[item.key.toString()]}
-        />
+        {!isGroup && (
+          <StyledCheckbox
+            isDisabled={isDisabled}
+            isSelected={isSelected}
+            isIndeterminate={isIndeterminate}
+            {...tid[item.key.toString()]}
+          />
+        )}
         <div css={Css.pl1.$}>{item.rendered}</div>
       </span>
     </li>
