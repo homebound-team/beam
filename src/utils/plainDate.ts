@@ -1,40 +1,44 @@
-import { type DateRange as DayPickerDateRange, type Matcher } from "react-day-picker";
-import { type DateRange, type DayMatcher, type PlainDate } from "src/types";
+import { type PlainDate } from "src/types";
 import { Temporal } from "temporal-polyfill";
 
-export function plainDateToJsDate(date: PlainDate): Date {
-  return new Date(date.year, date.month - 1, date.day, 12);
-}
+export type SupportedDateFormat =
+  | "MM/dd/yy" // I.e. 01/02/20
+  | "MM/dd/yyyy" // I.e. 01/02/2020
+  | "EEE, MMM d" // I.e. Thu, Jan 2
+  | "EEEE LLLL d, uuuu" // I.e. Thursday January 2, 2020
+  | "MMMM yyyy" // I.e. January 2020
+  | "MMM" // I.e. Jan
+  | "yyyy" // I.e. 2020
+  | "EEEEE" // I.e. T
+  | "EEEE"; // I.e. Thursday
 
 export function jsDateToPlainDate(date: Date): PlainDate {
   return new Temporal.PlainDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
 }
 
-export function dateRangeToJsDateRange(range: DateRange | undefined): DayPickerDateRange | undefined {
-  if (!range) return undefined;
-  return {
-    from: range.from ? plainDateToJsDate(range.from) : undefined,
-    to: range.to ? plainDateToJsDate(range.to) : undefined,
-  };
-}
-
-export function jsDateRangeToDateRange(range: DayPickerDateRange | undefined): DateRange | undefined {
-  if (!range) return undefined;
-  return {
-    from: range.from ? jsDateToPlainDate(range.from) : undefined,
-    to: range.to ? jsDateToPlainDate(range.to) : undefined,
-  };
-}
-
-export function dayMatcherToDayPickerMatcher(matcher: DayMatcher): Matcher {
-  return (date: Date) => matcher(jsDateToPlainDate(date));
-}
-
-export function dayMatchersToDayPickerMatchers(
-  matchers: DayMatcher | DayMatcher[] | undefined,
-): Matcher | Matcher[] | undefined {
-  if (matchers === undefined) return undefined;
-  return Array.isArray(matchers) ? matchers.map(dayMatcherToDayPickerMatcher) : dayMatcherToDayPickerMatcher(matchers);
+export function formatPlainDate(date: PlainDate, format: SupportedDateFormat): string {
+  switch (format) {
+    case "MM/dd/yy":
+      return date.toLocaleString("en-US", plainDateFormatOptions.mmDdYy);
+    case "MM/dd/yyyy":
+      return date.toLocaleString("en-US", plainDateFormatOptions.mmDdYyyy);
+    case "EEE, MMM d":
+      return date.toLocaleString("en-US", plainDateFormatOptions.eeeMmmD);
+    case "EEEE LLLL d, uuuu":
+      return `${date.toLocaleString("en-US", plainDateFormatOptions.eeeeLong)} ${date.toLocaleString("en-US", plainDateFormatOptions.monthLong)} ${date.day}, ${formatYear(date.year)}`;
+    case "MMMM yyyy":
+      return date.toLocaleString("en-US", plainDateFormatOptions.mmmmYyyy);
+    case "MMM":
+      return date.toLocaleString("en-US", plainDateFormatOptions.mmm);
+    case "yyyy":
+      return formatYear(date.year);
+    case "EEEEE":
+      return date.toLocaleString("en-US", plainDateFormatOptions.eeeeeNarrow);
+    case "EEEE":
+      return date.toLocaleString("en-US", plainDateFormatOptions.eeeeLong);
+    default:
+      throw new Error(`Unsupported date format: ${format}`);
+  }
 }
 
 export function todayPlainDate(): PlainDate {
@@ -64,4 +68,23 @@ export function parsePersistedPlainDate(value: unknown): PlainDate | undefined {
 
 export function dehydratePlainDate(value: PlainDate | undefined): string | undefined {
   return value?.toString();
+}
+
+const plainDateFormatOptions = {
+  mmDdYy: { month: "2-digit", day: "2-digit", year: "2-digit" } satisfies Intl.DateTimeFormatOptions,
+  mmDdYyyy: { month: "2-digit", day: "2-digit", year: "numeric" } satisfies Intl.DateTimeFormatOptions,
+  eeeMmmD: { weekday: "short", month: "short", day: "numeric" } satisfies Intl.DateTimeFormatOptions,
+  mmmmYyyy: { month: "long", year: "numeric" } satisfies Intl.DateTimeFormatOptions,
+  mmm: { month: "short" } satisfies Intl.DateTimeFormatOptions,
+  eeeeeNarrow: { weekday: "narrow" } satisfies Intl.DateTimeFormatOptions,
+  eeeeLong: { weekday: "long" } satisfies Intl.DateTimeFormatOptions,
+  monthLong: { month: "long" } satisfies Intl.DateTimeFormatOptions,
+};
+
+function padNumber(value: number, length: number): string {
+  return Math.abs(value).toString().padStart(length, "0");
+}
+
+function formatYear(year: number): string {
+  return `${year < 0 ? "-" : ""}${padNumber(year, 4)}`;
 }

@@ -113,7 +113,7 @@ Update `src/inputs/DateFields/utils.ts`.
 Changes:
 
 - replace `Date`-based types with `PlainDate`
-- keep date-fns formatting/parsing only at the interop boundary
+- replace date formatting/parsing helpers with Temporal-compatible utilities at the interop boundary
 - convert parsed JS `Date` results into `PlainDate`
 - update validation helpers to validate `PlainDate`
 

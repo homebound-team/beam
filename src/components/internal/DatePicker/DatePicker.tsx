@@ -1,25 +1,21 @@
 import { DayPicker } from "react-day-picker";
+import { dayMatchersToDayPickerMatchers, plainDateToJsDate } from "src/components/internal/DatePicker/dates";
 import { Day } from "src/components/internal/DatePicker/Day";
 import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
 import { Css } from "src/Css";
 import { type DayMatcher, type PlainDate } from "src/types";
 import { useTestIds } from "src/utils";
-import {
-  dayMatchersToDayPickerMatchers,
-  jsDateToPlainDate,
-  plainDateToJsDate,
-  todayPlainDate,
-} from "src/utils/plainDate";
+import { jsDateToPlainDate, todayPlainDate } from "src/utils/plainDate";
 import "./DatePicker.css";
 
-export interface DatePickerProps {
+export type DatePickerProps = {
   value?: PlainDate;
   onSelect: (value: PlainDate) => void;
   disabledDays?: DayMatcher | DayMatcher[];
   dottedDays?: DayMatcher[];
   useYearPicker?: boolean;
-}
+};
 
 export function DatePicker(props: DatePickerProps) {
   const { value, onSelect, disabledDays, dottedDays, useYearPicker } = props;
