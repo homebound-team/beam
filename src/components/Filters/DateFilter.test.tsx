@@ -2,15 +2,17 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
 import { ProjectFilter, taskDueFilter } from "src/components/Filters/testDomain";
-import { formatPlainDate, todayPlainDate } from "src/utils/plainDate";
 import { click, render, type } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("DateFilter", () => {
   it("shows Any operation and date field is disabled by default", async () => {
+    vi.setSystemTime(new Date(2020, 0, 29, 12));
+
     const r = await render(<TestFilters defs={{ date: taskDueFilter }} />);
     expect(r.filter_taskDue_dateOperation).toHaveValue("Any");
     expect(r.filter_taskDue_dateField).toBeDisabled();
-    expect(r.filter_taskDue_dateField).toHaveValue(formatPlainDate(todayPlainDate(), "MM/dd/yy"));
+    expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");
   });
 
   it("can set and unset the date filter", async () => {

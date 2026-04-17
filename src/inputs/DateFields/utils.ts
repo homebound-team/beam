@@ -5,9 +5,9 @@ import { Temporal } from "temporal-polyfill";
 export type DateFieldMode = "single" | "range";
 
 export const dateFormats = {
-  short: "MM/dd/yy",
-  medium: "EEE, MMM d",
-  long: "EEEE LLLL d, uuuu",
+  short: "shortDate",
+  medium: "shortWeekdayMonthDay",
+  long: "longWeekdayMonthDayYear",
 } as const;
 
 export type DateFieldFormat = (typeof dateFormats)[keyof typeof dateFormats];
@@ -30,11 +30,11 @@ export function formatDateRange(date: DateRange | undefined, format: SupportedDa
   return !fromFormatted && !toFormatted ? undefined : `${fromFormatted} - ${toFormatted}`;
 }
 
-export function parseDate(str: string, format: DateFieldFormat | "MM/dd/yyyy"): PlainDate | undefined {
+export function parseDate(str: string, format: DateFieldFormat | "date"): PlainDate | undefined {
   return parseDateString(str, format);
 }
 
-export function parseDateRange(str: string, format: DateFieldFormat | "MM/dd/yyyy"): DateRange | undefined {
+export function parseDateRange(str: string, format: DateFieldFormat | "date"): DateRange | undefined {
   const [from = "", to = ""] = str.split("-");
   const fromDate = parseDateString(from.trim(), format);
   const toDate = parseDateString(to.trim(), format);
@@ -49,8 +49,8 @@ export function parseDateRange(str: string, format: DateFieldFormat | "MM/dd/yyy
   return { from: fromDate, to: toDate };
 }
 
-function parseDateString(str: string, format: DateFieldFormat | "MM/dd/yyyy"): PlainDate | undefined {
-  if (format !== dateFormats.short && format !== "MM/dd/yyyy") {
+function parseDateString(str: string, format: DateFieldFormat | "date"): PlainDate | undefined {
+  if (format !== dateFormats.short && format !== "date") {
     return undefined;
   }
 

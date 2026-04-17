@@ -29,7 +29,7 @@ export function Default() {
       />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && formatPlainDate(date, "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && formatPlainDate(date, "date")}</span>
       </div>
     </div>
   );
@@ -48,7 +48,7 @@ export function WithYearControlHeader() {
       />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && formatPlainDate(date, "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && formatPlainDate(date, "date")}</span>
       </div>
     </div>
   );

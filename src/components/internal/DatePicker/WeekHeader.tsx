@@ -14,9 +14,9 @@ export function WeekHeader() {
     <thead className="rdp-head">
       <tr className="rdp-head_row">
         {days.map((day) => (
-          <th scope="col" css={Css.p1.pbPx(12).xs.gray400.$} key={formatPlainDate(day, "EEEE")}>
-            <span aria-hidden="true">{formatPlainDate(day, "EEEEE")}</span>
-            <span className="rdp-vhidden">{formatPlainDate(day, "EEEE")}</span>
+          <th scope="col" css={Css.p1.pbPx(12).xs.gray400.$} key={formatPlainDate(day, "weekday")}>
+            <span aria-hidden="true">{formatPlainDate(day, "weekdayInitial")}</span>
+            <span className="rdp-vhidden">{formatPlainDate(day, "weekday")}</span>
           </th>
         ))}
       </tr>

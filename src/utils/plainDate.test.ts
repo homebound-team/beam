@@ -7,15 +7,15 @@ describe("plainDate", () => {
       const date = Temporal.PlainDate.from("2020-01-02");
 
       expect({
-        short: formatPlainDate(date, "MM/dd/yy"),
-        shortYear: formatPlainDate(date, "MM/dd/yyyy"),
-        medium: formatPlainDate(date, "EEE, MMM d"),
-        long: formatPlainDate(date, "EEEE LLLL d, uuuu"),
-        monthYear: formatPlainDate(date, "MMMM yyyy"),
-        month: formatPlainDate(date, "MMM"),
-        year: formatPlainDate(date, "yyyy"),
-        narrowWeekday: formatPlainDate(date, "EEEEE"),
-        weekday: formatPlainDate(date, "EEEE"),
+        short: formatPlainDate(date, "shortDate"),
+        shortYear: formatPlainDate(date, "date"),
+        medium: formatPlainDate(date, "shortWeekdayMonthDay"),
+        long: formatPlainDate(date, "longWeekdayMonthDayYear"),
+        monthYear: formatPlainDate(date, "monthYear"),
+        month: formatPlainDate(date, "shortMonth"),
+        year: formatPlainDate(date, "year"),
+        narrowWeekday: formatPlainDate(date, "weekdayInitial"),
+        weekday: formatPlainDate(date, "weekday"),
       }).toEqual({
         short: "01/02/20",
         shortYear: "01/02/2020",

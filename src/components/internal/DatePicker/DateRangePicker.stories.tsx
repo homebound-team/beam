@@ -30,8 +30,7 @@ export function Default() {
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
-          {range?.from && formatPlainDate(range.from, "MM/dd/yyyy")} -{" "}
-          {range?.to && formatPlainDate(range.to, "MM/dd/yyyy")}
+          {range?.from && formatPlainDate(range.from, "date")} - {range?.to && formatPlainDate(range.to, "date")}
         </span>
       </div>
     </div>
@@ -52,8 +51,7 @@ export function WithYearControlHeader() {
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
-          {range?.from && formatPlainDate(range.from, "MM/dd/yyyy")} -{" "}
-          {range?.to && formatPlainDate(range.to, "MM/dd/yyyy")}
+          {range?.from && formatPlainDate(range.from, "date")} - {range?.to && formatPlainDate(range.to, "date")}
         </span>
       </div>
     </div>
