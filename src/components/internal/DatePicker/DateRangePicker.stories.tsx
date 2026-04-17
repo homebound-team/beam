@@ -3,9 +3,8 @@ import { useState } from "react";
 import { DateRangePicker } from "src/components/internal/DatePicker";
 import { Css } from "src/Css";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/forms/formStateDomain";
-import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
+import { type DateRange } from "src/types";
 import { formatPlainDate } from "src/utils/plainDate";
-import { Temporal } from "temporal-polyfill";
 
 export default {
   component: DateRangePicker,
@@ -21,12 +20,7 @@ export function Default() {
   const [range, setRange] = useState<DateRange | undefined>({ from: jan1, to: jan19 });
   return (
     <div>
-      <DateRangePicker
-        range={range}
-        onSelect={setRange}
-        dottedDays={[matchesDay(jan1), matchesDay(jan2), matchesDay(jan29)]}
-        disabledDays={[matchesDay(jan10)]}
-      />
+      <DateRangePicker range={range} onSelect={setRange} dottedDays={[jan1, jan2, jan29]} disabledDays={[jan10]} />
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
@@ -45,8 +39,8 @@ export function WithYearControlHeader() {
         useYearPicker
         range={range}
         onSelect={setRange}
-        dottedDays={[matchesDay(jan1), matchesDay(jan2), matchesDay(jan29)]}
-        disabledDays={[matchesDay(jan10)]}
+        dottedDays={[jan1, jan2, jan29]}
+        disabledDays={[jan10]}
       />
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
@@ -56,8 +50,4 @@ export function WithYearControlHeader() {
       </div>
     </div>
   );
-}
-
-function matchesDay(date: PlainDate): DateMatcher {
-  return (value) => Temporal.PlainDate.compare(value, date) === 0;
 }
