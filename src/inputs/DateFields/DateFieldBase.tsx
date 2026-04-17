@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { FocusScope, useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
@@ -6,7 +6,6 @@ import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { Css, Palette, Properties } from "src/Css";
 import {
-  DateFieldMode,
   dateFormats,
   formatDate,
   formatDateRange,
@@ -15,12 +14,12 @@ import {
   parseDate,
   parseDateRange,
 } from "src/inputs/DateFields/utils";
-import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-export type DateFieldBaseProps = Pick<
+type DateFieldCommonProps = Pick<
   TextFieldBaseProps<Properties>,
   "borderless" | "visuallyDisabled" | "labelStyle" | "compact" | "fullWidth"
 > & {
@@ -47,24 +46,28 @@ export type DateFieldBaseProps = Pick<
   onEnter?: VoidFunction;
   /** for storybook */
   defaultOpen?: boolean;
-  onChange: ((value: PlainDate | undefined) => void) | ((value: DateRange | undefined) => void);
-  mode: DateFieldMode;
   /** Range filters should only allow a full DateRange or nothing */
   isRangeFilterField?: boolean;
   /** Render header that skips years in addition to months */
   useYearPicker?: boolean;
 };
 
-export type DateSingleFieldBaseProps = DateFieldBaseProps & {
-  mode: "single";
+export type DateFieldProps = DateFieldCommonProps & {
   value: PlainDate | undefined;
   onChange: (value: PlainDate | undefined) => void;
 };
 
-export type DateRangeFieldBaseProps = DateFieldBaseProps & {
-  mode: "range";
+export type DateRangeFieldProps = DateFieldCommonProps & {
   value: DateRange | undefined;
   onChange: (value: DateRange | undefined) => void;
+};
+
+type DateSingleFieldBaseProps = DateFieldProps & {
+  mode: "single";
+};
+
+type DateRangeFieldBaseProps = DateRangeFieldProps & {
+  mode: "range";
 };
 
 export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBaseProps) {
