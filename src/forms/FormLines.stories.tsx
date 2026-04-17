@@ -13,7 +13,7 @@ import { NumberField } from "src/inputs/NumberField";
 import { Switch } from "src/inputs/Switch";
 import { TextField } from "src/inputs/TextField";
 import { noop } from "src/utils/index";
-import { Temporal } from "temporal-polyfill";
+import { jan21 } from "src/utils/testDates";
 
 export default {
   component: FormLines,
@@ -354,8 +354,8 @@ export function WithFragmentChildren() {
     <FormLines width="full">
       <TextField label="Task Name" value="" onChange={noop} />
       <FieldGroup>
-        <DateField label="Start Date" value={Temporal.PlainDate.from("2020-01-21")} onChange={noop} />
-        <DateField label="End Date" value={Temporal.PlainDate.from("2020-01-21")} onChange={noop} />
+        <DateField label="Start Date" value={jan21} onChange={noop} />
+        <DateField label="End Date" value={jan21} onChange={noop} />
       </FieldGroup>
       <NumberField label="Duration" value={0} onChange={noop} />
       {showOptionalFields && (

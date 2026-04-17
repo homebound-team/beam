@@ -56,13 +56,8 @@ describe("usePersistedFilter", () => {
       defaultValue: Stage.StageOne,
     });
     const r = await render(<StableFilterTestPage filterDefs={{ stageSingle: stage }} />, withRouter());
-
-    await wait();
-
     expect(r.filterIds.textContent).toEqual("[1,1]");
-
     click(r.rerenderButton);
-
     expect(r.filterIds.textContent).toEqual("[1,1,1]");
   });
 
@@ -71,9 +66,6 @@ describe("usePersistedFilter", () => {
       <TestPage filterDefs={{ date: taskDueFilter }} />,
       withRouter(createFilterRoute({ date: { op: "ON", value: "2020-01-29" } })),
     );
-
-    await wait();
-
     expect(r.filter_taskDue_dateOperation).toHaveValue("On");
     expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");
     expect(r.applied.textContent).toEqual('{"date":{"op":"ON","value":"2020-01-29"}}');
@@ -91,9 +83,6 @@ describe("usePersistedFilter", () => {
         }),
       ),
     );
-
-    await wait();
-
     expect(r.filter_taskCompleted_dateField).toHaveValue("01/02/20 - 01/19/20");
     expect(r.applied.textContent).toEqual(
       '{"dateRange":{"op":"BETWEEN","value":{"from":"2020-01-02","to":"2020-01-19"}}}',
@@ -119,9 +108,7 @@ function StableFilterTestPage(props: { filterDefs: FilterDefs<ProjectFilter> }) 
   const { filter } = usePersistedFilter({ storageKey: "test", filterDefs });
   const [tick, setTick] = useState(0);
   const filterIds = useRef<number[]>([]);
-
   filterIds.current.push(objectId(filter));
-
   return (
     <div>
       <button data-testid="rerenderButton" onClick={() => setTick((tick) => tick + 1)}>

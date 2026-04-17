@@ -536,6 +536,64 @@ describe("TreeSelectField", () => {
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-disabled", "true");
   });
 
+  it("renders group options as non-selectable text and toggles them from the row click", async () => {
+    // Given a TreeSelectField with group options
+    const onSelect = vi.fn() as any;
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        values={[]}
+        options={getNestedOptions()}
+        groupOptions={["basketball"]}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When opening the options
+    click(r.favoriteLeague);
+
+    // Then the group option renders without a checkbox
+    expect(r.query.treeOption_basketball_checkbox).not.toBeInTheDocument();
+
+    // And clicking the row does not select it
+    click(r.getByRole("option", { name: "Basketball" }));
+    expect(onSelect).not.toHaveBeenCalled();
+
+    // But it does collapse and expand its children
+    expect(r.queryByRole("option", { name: "NBA" })).toBeFalsy();
+    click(r.getByRole("option", { name: "Basketball" }));
+    expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
+  });
+
+  it("does not auto-select group options when all of their children are selected", async () => {
+    // Given a TreeSelectField with a group option
+    const onSelect = vi.fn() as any;
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        values={[]}
+        options={getNestedOptions()}
+        groupOptions={["basketball"]}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When selecting all of the group's children
+    click(r.favoriteLeague);
+    click(r.getByRole("option", { name: "NBA" }));
+    click(r.getByRole("option", { name: "WNBA" }));
+
+    // Then the group itself is still not selected
+    expect(r.getByRole("option", { name: "Basketball" })).toHaveAttribute("aria-selected", "false");
+    // And the callback returns the children as the top-level selections
+    expect(onSelect.mock.calls[1][0].leaf.values).toEqual(["nba", "wnba"]);
+    expect(onSelect.mock.calls[1][0].root.values).toEqual(["nba", "wnba"]);
+  });
+
   it("selects all matching options when there are duplicates and only the child is passed as values", async () => {
     // Given the multiple parents with duplicate children
     const options: NestedOption<HasIdAndName>[] = [

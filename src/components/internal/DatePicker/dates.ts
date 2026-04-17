@@ -2,6 +2,9 @@ import { type DateRange as DayPickerDateRange, type Matcher } from "react-day-pi
 import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
 import { isPlainDate, jsDateToPlainDate } from "src/utils/plainDate";
 
+// These conversions exist solely for Beam/react-day-picker interop and shouldn't
+// be used outside the DatePicker/ package, as the rest of Beam is temporal native.
+
 export function plainDateToJsDate(date: PlainDate): Date {
   return new Date(date.year, date.month - 1, date.day, 12);
 }
