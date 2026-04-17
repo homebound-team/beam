@@ -61,14 +61,18 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
   return (
     <Virtuoso
       ref={virtuosoRef}
-      key={items.length}
       totalListHeightChanged={onListHeightChange}
       totalCount={items.length}
       {...(process.env.NODE_ENV === "test"
         ? {
-            // We don't really need to set this, but it's handy for tests, which would
-            // otherwise render just 1 row. A better way to do this would be to jest.mock
-            // out Virtuoso with an impl that just rendered everything, but doing this for now.
+            // In tests, we render all rows so assertions can see expands/async-loaded items. However,
+            // the `initialItemCount` (next prop) is only applied on amount, so we set `key={items.length}`
+            // to force a remount when our list changes -- and we only want/need this in tests, b/c otherwise
+            // in production a Virtuoso remount causes visible flashing.
+            key: items.length,
+            // We don't really need to set this, but it's handy for tests, which would otherwise render
+            // just 1 row. A better way to do this would be to jest.mock out Virtuoso with an impl that
+            // just rendered everything, but doing this for now.
             initialItemCount: items.length,
           }
         : {
