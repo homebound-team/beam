@@ -1,8 +1,8 @@
 import { fireEvent } from "@testing-library/react";
-import { jan1, jan2 } from "src/forms/formStateDomain";
 import { DateFieldImpl as DateField } from "src/inputs/DateFields/DateField";
 import { noop } from "src/utils";
 import { blur, click, focus, render, type } from "src/utils/rtl";
+import { jan1, jan2, jan29 } from "src/utils/testDates";
 import { vi } from "vitest";
 
 describe("DateField", () => {
@@ -36,7 +36,7 @@ describe("DateField", () => {
     // And the input's value should reflect the new date.
     expect(r.date).toHaveValue("01/01/20");
     expect(onChange).toBeCalledTimes(1);
-    expect(new Date(onChange.mock.calls[0][0]).toDateString()).toEqual(jan1.toDateString());
+    expect(onChange.mock.calls[0][0]).toEqual(jan1);
   });
 
   it("resets to previous date if user enters invalid value", async () => {
@@ -58,7 +58,7 @@ describe("DateField", () => {
     // Then the date should persist in the field
     expect(r.date).toHaveValue("01/29/20");
     // And onChange should be called with the new date
-    expect(new Date(onChange.mock.calls[0][0]).toDateString()).toEqual(new Date("01/29/2020").toDateString());
+    expect(onChange.mock.calls[0][0]).toEqual(jan29);
   });
 
   it("changes date format upon focus and blur", async () => {

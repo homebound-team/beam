@@ -1,22 +1,33 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
+import { dateFilter } from "src/components/Filters/DateFilter";
 import { ProjectFilter, taskDueFilter } from "src/components/Filters/testDomain";
 import { click, render, type } from "src/utils/rtl";
+import { jan29 } from "src/utils/testDates";
 
 describe("DateFilter", () => {
   it("shows Any operation and date field is disabled by default", async () => {
-    const today = new Date();
-    const month = today.getMonth() + 1;
-    const day = today.getDate();
-    const year = `${today.getFullYear()}`.substring(2);
-
-    const r = await render(<TestFilters defs={{ date: taskDueFilter }} />);
+    const r = await render(
+      <TestFilters
+        defs={{
+          date: dateFilter({
+            operations: [
+              { label: "On", value: "ON" },
+              { label: "Before", value: "BEFORE" },
+              { label: "After", value: "AFTER" },
+            ],
+            label: "Task Due",
+            getOperationLabel: (o) => o.label,
+            getOperationValue: (o) => o.value,
+            defaultValue: { op: "ON", value: jan29 },
+          }),
+        }}
+      />,
+    );
     expect(r.filter_taskDue_dateOperation).toHaveValue("Any");
     expect(r.filter_taskDue_dateField).toBeDisabled();
-    expect(r.filter_taskDue_dateField).toHaveValue(
-      `${month < 10 ? `0${month}` : month}/${day < 10 ? `0${day}` : day}/${year}`,
-    );
+    expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");
   });
 
   it("can set and unset the date filter", async () => {
@@ -28,8 +39,8 @@ describe("DateFilter", () => {
     expect(r.filter_taskDue_dateField).not.toBeDisabled();
     // And we type in a new date
     type(r.filter_taskDue_dateField, "10/31/21");
-    // Then the filter should be set (intentionally omitting the time value from the 'date' value)
-    expect(r.filter_value).toHaveTextContent('{"date":{"op":"ON","value":"2021-10-31T');
+    // Then the filter should be set as a plain date string
+    expect(r.filter_value).toHaveTextContent('{"date":{"op":"ON","value":"2021-10-31"}}');
     // When we select Any
     fireEvent.click(r.filter_taskDue_dateOperation);
     click(r.getByRole("option", { name: "Any" }));

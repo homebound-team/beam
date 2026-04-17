@@ -1,15 +1,16 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { DateField, DateFieldProps } from "src/inputs";
+import { type PlainDate } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
 export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onChange"> & {
-  field: FieldState<Date | null | undefined>;
+  field: FieldState<PlainDate | null | undefined>;
   // Make optional as it'll create a label from the field's key if not present
   label?: string;
   // Optional in case the page wants extra behavior
-  onChange?: (value: Date | undefined) => void;
+  onChange?: (value: PlainDate | undefined) => void;
 };
 
 /** Wraps `TextField` and binds it to a form field. */
@@ -31,7 +32,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
         <DateField
           label={label}
           value={field.value || undefined}
-          onChange={(value) => {
+          onChange={(value: PlainDate | undefined) => {
             onChange(value);
             field.maybeAutoSave();
           }}

@@ -2,8 +2,9 @@ import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-st
 import { render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { BoundDateRangeField } from "src/forms/BoundDateRangeField";
-import { AuthorInput, jan1, jan19, jan2 } from "src/forms/formStateDomain";
+import { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus } from "src/utils/rtl";
+import { jan1, jan19, jan2 } from "src/utils/testDates";
 import { vi } from "vitest";
 
 describe(BoundDateRangeField, () => {

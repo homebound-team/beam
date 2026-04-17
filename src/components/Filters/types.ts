@@ -29,6 +29,22 @@ export interface Filter<V> {
   /** The default value to use in `usePersistedFilter` for creating the initial filter. */
   defaultValue: V | undefined;
 
+  /**
+   * Rehydrates persisted query/session values back into the filter's runtime shape.
+   *
+   * This exists because persisted filter state is JSON-based, so rich values like
+   * `Temporal.PlainDate` round-trip as strings and need explicit reconstruction.
+   */
+  hydrate?(value: unknown): V | undefined;
+
+  /**
+   * Converts the filter's runtime value into a JSON-safe value for query params/session storage.
+   *
+   * This keeps persistence stable for non-plain JS values and lets filters preserve
+   * backwards-compatible serialized formats when needed.
+   */
+  dehydrate?(value: V | undefined): unknown;
+
   /** Renders the filter into either the page or the modal. */
   render(
     value: V | undefined,

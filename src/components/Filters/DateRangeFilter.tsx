@@ -1,17 +1,17 @@
-import { Matcher } from "react-day-picker";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { Label } from "src/components/Label";
 import { DateRangeField } from "src/inputs";
-import { DateRange } from "src/types";
+import { type DateMatcher, type DateRange } from "src/types";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { dehydratePlainDate, parsePersistedPlainDate } from "src/utils/plainDate";
 
 export type DateRangeFilterProps<O extends string> = {
   label: string;
   defaultValue?: DateRangeFilterValue<O>;
   placeholderText?: string;
-  disabledDays?: Matcher | Matcher[];
+  disabledDays?: DateMatcher | DateMatcher[];
   // For storybook to support showing dateRange and date filters in same Filter component
   testFieldLabel?: string;
 };
@@ -30,6 +30,23 @@ class DateRangeFilter<O extends string>
   extends BaseFilter<DateRangeFilterValue<O>, DateRangeFilterProps<O>>
   implements Filter<DateRangeFilterValue<O>>
 {
+  hydrate(value: unknown): DateRangeFilterValue<O> | undefined {
+    if (!isDateRangeFilterValue<O>(value)) return undefined;
+    const hydratedValue = hydrateDateRange(value.value);
+    return hydratedValue ? { op: value.op, value: hydratedValue } : undefined;
+  }
+
+  dehydrate(value: DateRangeFilterValue<O> | undefined): unknown {
+    return value
+      ? {
+          op: value.op,
+          value: value.value
+            ? { from: dehydratePlainDate(value.value.from), to: dehydratePlainDate(value.value.to) }
+            : undefined,
+        }
+      : undefined;
+  }
+
   render(
     value: DateRangeFilterValue<O>,
     setValue: (value: DateRangeFilterValue<O> | undefined) => void,
@@ -46,17 +63,34 @@ class DateRangeFilter<O extends string>
           isRangeFilterField
           placeholder={placeholderText}
           label={testFieldLabel ?? "Date"}
-          // Making sure that DateRange is Date type and not string before passing. Will never have undefined from/to
-          value={
-            value?.value
-              ? { from: new Date(value.value.from as Date), to: new Date(value.value.to as Date) }
-              : undefined
-          }
-          onChange={(d) => (d ? setValue({ op: defaultValue?.op, value: d } as any) : setValue(undefined))}
+          value={value?.value}
+          onChange={(d: DateRange | undefined) => {
+            if (!d) {
+              setValue(undefined);
+              return;
+            }
+            const op = value?.op ?? defaultValue?.op;
+            if (op !== undefined) {
+              setValue({ op, value: d });
+            }
+          }}
           disabledDays={disabledDays}
           {...tid[`${defaultTestId(this.label)}_dateField`]}
         />
       </>
     );
   }
+}
+
+function isDateRangeFilterValue<O extends string>(value: unknown): value is { op: O; value: unknown } {
+  return typeof value === "object" && value !== null && "op" in value && "value" in value;
+}
+
+function hydrateDateRange(value: unknown): DateRange | undefined {
+  if (typeof value !== "object" || value === null) return undefined;
+  const { from, to } = value as { from?: unknown; to?: unknown };
+  const hydratedFrom = parsePersistedPlainDate(from);
+  const hydratedTo = parsePersistedPlainDate(to);
+  if (hydratedFrom === undefined && hydratedTo === undefined) return undefined;
+  return { from: hydratedFrom, to: hydratedTo };
 }

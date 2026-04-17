@@ -1,13 +1,11 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { FocusScope, useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
-import { isDateRange, Matcher } from "react-day-picker";
 import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
 import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import { Css, Palette, Properties } from "src/Css";
 import {
-  DateFieldMode,
   dateFormats,
   formatDate,
   formatDateRange,
@@ -16,15 +14,15 @@ import {
   parseDate,
   parseDateRange,
 } from "src/inputs/DateFields/utils";
-import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
-import { DateRange } from "src/types";
+import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-export interface DateFieldBaseProps extends Pick<
+type DateFieldCommonProps = Pick<
   TextFieldBaseProps<Properties>,
   "borderless" | "visuallyDisabled" | "labelStyle" | "compact" | "fullWidth"
-> {
+> & {
   label: string;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -43,31 +41,34 @@ export interface DateFieldBaseProps extends Pick<
   hideCalendarIcon?: boolean;
   /**
    * Set custom logic for individual dates or date ranges to be disabled in the picker
-   * exposed from `react-day-picker`: https://react-day-picker.js.org/api/DayPicker#modifiers
    */
-  disabledDays?: Matcher | Matcher[];
+  disabledDays?: DateMatcher | DateMatcher[];
   onEnter?: VoidFunction;
   /** for storybook */
   defaultOpen?: boolean;
-  onChange: ((value: Date | undefined) => void) | ((value: DateRange | undefined) => void);
-  mode: DateFieldMode;
   /** Range filters should only allow a full DateRange or nothing */
   isRangeFilterField?: boolean;
   /** Render header that skips years in addition to months */
   useYearPicker?: boolean;
-}
+};
 
-export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
-  mode: "single";
-  value: Date | undefined;
-  onChange: (value: Date | undefined) => void;
-}
+export type DateFieldProps = DateFieldCommonProps & {
+  value: PlainDate | undefined;
+  onChange: (value: PlainDate | undefined) => void;
+};
 
-export interface DateRangeFieldBaseProps extends DateFieldBaseProps {
-  mode: "range";
+export type DateRangeFieldProps = DateFieldCommonProps & {
   value: DateRange | undefined;
   onChange: (value: DateRange | undefined) => void;
-}
+};
+
+type DateSingleFieldBaseProps = DateFieldProps & {
+  mode: "single";
+};
+
+type DateRangeFieldBaseProps = DateRangeFieldProps & {
+  mode: "range";
+};
 
 export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBaseProps) {
   const {
@@ -216,20 +217,24 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
 
   // Create a type safe `onChange` to handle both Single and Range date fields.
   const onChange = useCallback(
-    (d: Date | DateRange | undefined) => {
+    (d: PlainDate | DateRange | undefined) => {
       setWipValue(d);
       if (d && isParsedDateValid(d)) {
-        if (isRangeMode && isDateRange(d)) {
+        if (isRangeMode && isDateRangeValue(d)) {
           props.onChange(d);
           return;
         }
 
-        if (!isRangeMode && !isDateRange(d)) {
+        if (!isRangeMode && !isDateRangeValue(d)) {
           props.onChange(d);
           return;
         }
       } else {
-        props.onChange(undefined);
+        if (isRangeMode) {
+          (props as DateRangeFieldBaseProps).onChange(undefined);
+        } else {
+          (props as DateSingleFieldBaseProps).onChange(undefined);
+        }
         return;
       }
     },
@@ -337,7 +342,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
                 />
               ) : (
                 <DatePicker
-                  value={wipValue as Date | undefined}
+                  value={wipValue as PlainDate | undefined}
                   disabledDays={disabledDays}
                   onSelect={(d) => {
                     state.close();
@@ -356,7 +361,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   );
 }
 
-function isParsedDateValid(d: DateRange | Date | undefined): boolean {
+function isParsedDateValid(d: DateRange | PlainDate | undefined): boolean {
   // Only consider a DateRange valid when both `from` and `to` values are valid dates
-  return d !== undefined && (!isDateRange(d) || (isDateRange(d) && isValidDate(d.from) && isValidDate(d.to)));
+  return d !== undefined && (!isDateRangeValue(d) || (isValidDate(d.from) && isValidDate(d.to)));
+}
+
+function isDateRangeValue(value: DateRange | PlainDate): value is DateRange {
+  return typeof value === "object" && value !== null && ("from" in value || "to" in value);
 }

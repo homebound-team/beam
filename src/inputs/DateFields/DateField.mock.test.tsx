@@ -2,11 +2,13 @@ import { fireEvent } from "@testing-library/react";
 import { DateFieldMock as MockDateField } from "src/inputs/DateFields/DateField.mock";
 import { noop } from "src/utils";
 import { render, type } from "src/utils/rtl";
+import { feb11, jan1 } from "src/utils/testDates";
+import { Temporal } from "temporal-polyfill";
 import { vi } from "vitest";
 
 describe("DateFieldMock", () => {
   it("formats date value when provided", async () => {
-    const r = await render(<MockDateField label="Start Date" value={new Date(2020, 0, 1)} onChange={noop} />);
+    const r = await render(<MockDateField label="Start Date" value={jan1} onChange={noop} />);
     expect(r.date).toHaveValue("01/01/20");
   });
 
@@ -16,7 +18,7 @@ describe("DateFieldMock", () => {
     // When we change the date
     type(r.date, "02/11/20");
     // Then onChange was called with parsed date
-    expect(onChange).toHaveBeenCalledWith(new Date(2020, 1, 11));
+    expect(onChange.mock.calls[0][0]).toEqual(feb11);
     expect(r.date).toHaveValue("02/11/20");
   });
 
@@ -36,9 +38,9 @@ describe("DateFieldMock", () => {
   });
 
   it("forwards disabledDays prop as stringified object", async () => {
-    const testDate = new Date(2020, 0, 1);
+    const testDate = jan1;
     // Given an array of disabled days with a BeforeModifier and a FunctionModifier
-    const disabledDays = [{ before: testDate }, (date: Date) => false];
+    const disabledDays = [(date: typeof testDate) => Temporal.PlainDate.compare(date, testDate) < 0, () => false];
     // When we render the MockDateField
     const r = await render(
       <MockDateField label="Start Date" value={testDate} disabledDays={disabledDays} onChange={noop} />,

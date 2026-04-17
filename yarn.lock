@@ -2233,6 +2233,7 @@ __metadata:
     react-virtuoso: "npm:^4.2.2"
     semantic-release: "npm:^24.2.9"
     storybook: "npm:^10.2.19"
+    temporal-polyfill: "npm:^0.3.2"
     tributejs: "npm:^5.1.3"
     trix: "npm:^1.3.1"
     tsup: "npm:^8.5.1"
@@ -13676,6 +13677,22 @@ __metadata:
   version: 3.0.0
   resolution: "temp-dir@npm:3.0.0"
   checksum: 10/577211e995d1d584dd60f1469351d45e8a5b4524e4a9e42d3bdd12cfde1d0bb8f5898311bef24e02aaafb69514c1feb58c7b4c33dcec7129da3b0861a4ca935b
+  languageName: node
+  linkType: hard
+
+"temporal-polyfill@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "temporal-polyfill@npm:0.3.2"
+  dependencies:
+    temporal-spec: "npm:0.3.1"
+  checksum: 10/3e4ced86e08e7893286b9471f28baacc7c1d29a854372405d81c490eaa3eaed860d2e1aa25094f110ff5edc5a9d932c7957a723004ac0a4f145e8045fa387fc0
+  languageName: node
+  linkType: hard
+
+"temporal-spec@npm:0.3.1":
+  version: 0.3.1
+  resolution: "temporal-spec@npm:0.3.1"
+  checksum: 10/69509d1a4162c834b76d1394a3a97cef57df9ec912b8aa549a989be8bd75f25a72c987fcc7747d566298b73d4264be9e48a8d0a91e60edcb71c7901aabfb00e7
   languageName: node
   linkType: hard
 

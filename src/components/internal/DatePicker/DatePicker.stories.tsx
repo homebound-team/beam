@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
-import { format } from "date-fns";
+import { type Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src";
 import { DatePicker } from "src/components/internal/DatePicker";
 import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
+import { formatPlainDate } from "src/utils/plainDate";
 
 export default {
   component: DatePicker,
@@ -22,7 +22,7 @@ export function Default() {
       <DatePicker value={date} onSelect={setDate} dottedDays={[jan1, jan2, jan29]} disabledDays={[jan10]} />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && format(new Date(date), "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && formatPlainDate(date, "date")}</span>
       </div>
     </div>
   );
@@ -41,7 +41,7 @@ export function WithYearControlHeader() {
       />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && format(new Date(date), "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && formatPlainDate(date, "date")}</span>
       </div>
     </div>
   );

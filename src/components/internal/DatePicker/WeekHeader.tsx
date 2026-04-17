@@ -1,11 +1,12 @@
-import { addDays, format, startOfWeek } from "date-fns";
 import { Css } from "src/Css";
+import { formatPlainDate, todayPlainDate } from "src/utils/plainDate";
 
 export function WeekHeader() {
-  const start = startOfWeek(new Date());
+  const today = todayPlainDate();
+  const start = today.subtract({ days: today.dayOfWeek % 7 });
   const days = [];
   for (let i = 0; i < 7; i++) {
-    days.push(addDays(start, i));
+    days.push(start.add({ days: i }));
   }
 
   // Copies the existing structure and classes defined by React-Day-Picker. Adds in Beam styling and formatting.
@@ -13,9 +14,9 @@ export function WeekHeader() {
     <thead className="rdp-head">
       <tr className="rdp-head_row">
         {days.map((day) => (
-          <th scope="col" css={Css.p1.pbPx(12).xs.gray400.$} key={format(day, "EEEE")}>
-            <span aria-hidden="true">{format(day, "EEEEE")}</span>
-            <span className="rdp-vhidden">{format(day, "EEEE")}</span>
+          <th scope="col" css={Css.p1.pbPx(12).xs.gray400.$} key={formatPlainDate(day, "weekday")}>
+            <span aria-hidden="true">{formatPlainDate(day, "weekdayInitial")}</span>
+            <span className="rdp-vhidden">{formatPlainDate(day, "weekday")}</span>
           </th>
         ))}
       </tr>
