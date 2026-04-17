@@ -1,15 +1,30 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
+import { dateFilter } from "src/components/Filters/DateFilter";
 import { ProjectFilter, taskDueFilter } from "src/components/Filters/testDomain";
 import { click, render, type } from "src/utils/rtl";
-import { vi } from "vitest";
+import { jan29 } from "src/utils/testDates";
 
 describe("DateFilter", () => {
   it("shows Any operation and date field is disabled by default", async () => {
-    vi.setSystemTime(new Date(2020, 0, 29, 12));
-
-    const r = await render(<TestFilters defs={{ date: taskDueFilter }} />);
+    const r = await render(
+      <TestFilters
+        defs={{
+          date: dateFilter({
+            operations: [
+              { label: "On", value: "ON" },
+              { label: "Before", value: "BEFORE" },
+              { label: "After", value: "AFTER" },
+            ],
+            label: "Task Due",
+            getOperationLabel: (o) => o.label,
+            getOperationValue: (o) => o.value,
+            defaultValue: { op: "ON", value: jan29 },
+          }),
+        }}
+      />,
+    );
     expect(r.filter_taskDue_dateOperation).toHaveValue("Any");
     expect(r.filter_taskDue_dateField).toBeDisabled();
     expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");

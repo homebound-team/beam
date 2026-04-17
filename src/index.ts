@@ -6,5 +6,7 @@ export * from "./forms";
 export * from "./hooks";
 export * from "./inputs";
 export * from "./interfaces";
+export { formatPlainDate } from "./utils/plainDate";
+export type { SupportedDateFormat } from "./utils/plainDate";
 export * from "./utils/defaultTestId";
 export * from "./utils/useTestIds";
