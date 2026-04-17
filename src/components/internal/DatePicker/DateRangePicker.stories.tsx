@@ -3,7 +3,7 @@ import { useState } from "react";
 import { DateRangePicker } from "src/components/internal/DatePicker";
 import { Css } from "src/Css";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/forms/formStateDomain";
-import { type DateRange, type DayMatcher, type PlainDate } from "src/types";
+import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
 import { formatPlainDate } from "src/utils/plainDate";
 import { Temporal } from "temporal-polyfill";
 
@@ -60,6 +60,6 @@ export function WithYearControlHeader() {
   );
 }
 
-function matchesDay(date: PlainDate): DayMatcher {
+function matchesDay(date: PlainDate): DateMatcher {
   return (value) => Temporal.PlainDate.compare(value, date) === 0;
 }

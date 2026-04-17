@@ -1,6 +1,6 @@
 import { type DateRange as DayPickerDateRange, type Matcher } from "react-day-picker";
-import { type DateRange, type DayMatcher, type PlainDate } from "src/types";
-import { jsDateToPlainDate } from "src/utils/plainDate";
+import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
+import { isPlainDate, jsDateToPlainDate } from "src/utils/plainDate";
 
 export function plainDateToJsDate(date: PlainDate): Date {
   return new Date(date.year, date.month - 1, date.day, 12);
@@ -22,15 +22,32 @@ export function jsDateRangeToDateRange(range: DayPickerDateRange | undefined): D
   };
 }
 
-export function dayMatcherToDayPickerMatcher(matcher: DayMatcher): Matcher {
-  return function dayPickerMatcher(date: Date) {
-    return matcher(jsDateToPlainDate(date));
+export function dateMatcherToDayPickerMatcher(matcher: DateMatcher): Matcher {
+  if (typeof matcher === "function") {
+    return function dayPickerMatcher(date: Date) {
+      return matcher(jsDateToPlainDate(date));
+    };
+  }
+
+  if (Array.isArray(matcher)) {
+    return matcher.map(plainDateToJsDate);
+  }
+
+  if (isPlainDate(matcher)) {
+    return plainDateToJsDate(matcher);
+  }
+
+  return {
+    from: matcher.from ? plainDateToJsDate(matcher.from) : undefined,
+    to: matcher.to ? plainDateToJsDate(matcher.to) : undefined,
   };
 }
 
-export function dayMatchersToDayPickerMatchers(
-  matchers: DayMatcher | DayMatcher[] | undefined,
+export function dateMatchersToDayPickerMatchers(
+  matchers: DateMatcher | DateMatcher[] | undefined,
 ): Matcher | Matcher[] | undefined {
   if (matchers === undefined) return undefined;
-  return Array.isArray(matchers) ? matchers.map(dayMatcherToDayPickerMatcher) : dayMatcherToDayPickerMatcher(matchers);
+  return Array.isArray(matchers)
+    ? matchers.map(dateMatcherToDayPickerMatcher)
+    : dateMatcherToDayPickerMatcher(matchers);
 }

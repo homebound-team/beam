@@ -1,6 +1,6 @@
 // organize-imports-ignore
 export * from "./Css";
-export type { CheckFn, DateRange, DayMatcher, HasIdAndName, Optional, PlainDate } from "./types";
+export type { CheckFn, DateMatcher, DateRange, HasIdAndName, Optional, PlainDate } from "./types";
 export * from "./components";
 export * from "./forms";
 export * from "./hooks";

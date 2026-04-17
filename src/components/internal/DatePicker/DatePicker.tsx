@@ -1,10 +1,10 @@
 import { DayPicker } from "react-day-picker";
-import { dayMatchersToDayPickerMatchers, plainDateToJsDate } from "src/components/internal/DatePicker/dates";
+import { dateMatchersToDayPickerMatchers, plainDateToJsDate } from "src/components/internal/DatePicker/dates";
 import { Day } from "src/components/internal/DatePicker/Day";
 import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
 import { Css } from "src/Css";
-import { type DayMatcher, type PlainDate } from "src/types";
+import { type DateMatcher, type PlainDate } from "src/types";
 import { useTestIds } from "src/utils";
 import { jsDateToPlainDate, todayPlainDate } from "src/utils/plainDate";
 import "./DatePicker.css";
@@ -12,8 +12,8 @@ import "./DatePicker.css";
 export type DatePickerProps = {
   value?: PlainDate;
   onSelect: (value: PlainDate) => void;
-  disabledDays?: DayMatcher | DayMatcher[];
-  dottedDays?: DayMatcher[];
+  disabledDays?: DateMatcher | DateMatcher[];
+  dottedDays?: DateMatcher | DateMatcher[];
   useYearPicker?: boolean;
 };
 
@@ -33,8 +33,8 @@ export function DatePicker(props: DatePickerProps) {
           // Set the day value
           onSelect(jsDateToPlainDate(day));
         }}
-        disabled={dayMatchersToDayPickerMatchers(disabledDays)}
-        modifiers={{ indicatorDot: dayMatchersToDayPickerMatchers(dottedDays) ?? [] }}
+        disabled={dateMatchersToDayPickerMatchers(disabledDays)}
+        modifiers={{ indicatorDot: dateMatchersToDayPickerMatchers(dottedDays) ?? [] }}
       />
     </div>
   );

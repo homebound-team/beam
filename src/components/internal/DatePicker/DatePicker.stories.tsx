@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Css } from "src";
 import { DatePicker } from "src/components/internal/DatePicker";
 import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
-import { type DayMatcher, type PlainDate } from "src/types";
+import { type DateMatcher, type PlainDate } from "src/types";
 import { formatPlainDate } from "src/utils/plainDate";
 import { Temporal } from "temporal-polyfill";
 
@@ -54,6 +54,6 @@ export function WithYearControlHeader() {
   );
 }
 
-function matchesDay(date: PlainDate): DayMatcher {
+function matchesDay(date: PlainDate): DateMatcher {
   return (value) => Temporal.PlainDate.compare(value, date) === 0;
 }

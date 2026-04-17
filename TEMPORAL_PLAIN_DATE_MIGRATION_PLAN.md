@@ -52,16 +52,7 @@ export type DateAfter = { after: PlainDate };
 export type DateInterval = { before: PlainDate; after: PlainDate };
 export type DayOfWeek = { dayOfWeek: number[] };
 
-export type DateMatcher =
-  | boolean
-  | PlainDate
-  | PlainDate[]
-  | DateRange
-  | DateBefore
-  | DateAfter
-  | DateInterval
-  | DayOfWeek
-  | ((date: PlainDate) => boolean);
+export type DateMatcher = PlainDate[] | DateRange | ((date: PlainDate) => boolean);
 ```
 
 Beam should no longer publicly expose `react-day-picker`'s `DateRange` or `Matcher` types.
