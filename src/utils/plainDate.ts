@@ -49,12 +49,16 @@ export function isPlainDate(value: unknown): value is PlainDate {
   return value instanceof Temporal.PlainDate;
 }
 
+/** Accepts both new PlainDate strings and legacy Date-based persisted values. */
 export function parsePersistedPlainDate(value: unknown): PlainDate | undefined {
   if (isPlainDate(value)) return value;
+  // Some callers hand us already-hydrated Dates, so keep supporting that shape while the migration settles.
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
     return jsDateToPlainDate(value);
   }
   if (typeof value !== "string") return undefined;
+
+  // Prefer the new YYYY-MM-DD format because it is timezone-free and matches what we now persist.
   try {
     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
       return Temporal.PlainDate.from(value);
@@ -62,6 +66,8 @@ export function parsePersistedPlainDate(value: unknown): PlainDate | undefined {
   } catch {
     return undefined;
   }
+
+  // Fall back to Date parsing so old deep links / session state still survive the PlainDate migration.
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : jsDateToPlainDate(date);
 }
