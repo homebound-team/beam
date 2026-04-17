@@ -227,7 +227,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           return;
         }
       } else {
-        props.onChange(undefined);
+        if (isRangeMode) {
+          (props as DateRangeFieldBaseProps).onChange(undefined);
+        } else {
+          (props as DateSingleFieldBaseProps).onChange(undefined);
+        }
         return;
       }
     },

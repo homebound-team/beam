@@ -32,7 +32,7 @@ export function BoundDateField(props: BoundDateFieldProps) {
         <DateField
           label={label}
           value={field.value || undefined}
-          onChange={(value) => {
+          onChange={(value: PlainDate | undefined) => {
             onChange(value);
             field.maybeAutoSave();
           }}

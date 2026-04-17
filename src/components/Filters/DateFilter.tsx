@@ -71,7 +71,7 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
             labelStyle="inline"
             value={value?.value ?? todayPlainDate()}
             label="Date"
-            onChange={(d) => {
+            onChange={(d: PlainDate | undefined) => {
               if (d && value) {
                 setValue({ ...value, value: d });
               }

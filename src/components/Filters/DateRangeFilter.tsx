@@ -64,7 +64,7 @@ class DateRangeFilter<O extends string>
           placeholder={placeholderText}
           label={testFieldLabel ?? "Date"}
           value={value?.value}
-          onChange={(d) => {
+          onChange={(d: DateRange | undefined) => {
             if (!d) {
               setValue(undefined);
               return;
