@@ -99,15 +99,18 @@ function hasValidFilterKeys<F>(queryParamsFilter: F, definedKeys: (keyof F)[]): 
   return !!queryParamsFilter && safeKeys(queryParamsFilter).every((key) => definedKeys.includes(key as keyof F));
 }
 
+/** Rebuilds persisted filter values via each filter's hydrate hook so rich runtime values can round-trip safely. */
 function hydrateFilter<F>(filterImpls: FilterImpls<F>, value: unknown): F | undefined {
   if (typeof value !== "object" || value === null) return undefined;
   const hydratedEntries: [string, unknown][] = [];
   safeEntries(value as AnyObject).forEach(([key, rawValue]) => {
     const filter = filterImpls[key as keyof F];
+    // Ignore unknown keys so old query params / session state keep working after filter definitions change.
     if (!filter) return;
     const hydratedValue = filter.hydrate
       ? filter.hydrate(rawValue)
       : (rawValue as Exclude<F[keyof F], null | undefined> | undefined);
+    // Dropping undefined lets filters reject stale or invalid persisted values without leaving partial state behind.
     if (hydratedValue !== undefined) {
       hydratedEntries.push([key, hydratedValue]);
     }
@@ -115,6 +118,7 @@ function hydrateFilter<F>(filterImpls: FilterImpls<F>, value: unknown): F | unde
   return Object.fromEntries(hydratedEntries) as F;
 }
 
+/** Converts runtime filter values into the JSON-safe shape we store in query params and session storage. */
 function dehydrateFilter<F>(filterImpls: FilterImpls<F>, value: F | undefined): unknown {
   if (!value) return value;
   return Object.fromEntries(
@@ -122,6 +126,7 @@ function dehydrateFilter<F>(filterImpls: FilterImpls<F>, value: F | undefined): 
       const filter = filterImpls[key as keyof F];
       return [
         key,
+        // Let each filter own serialization so persisted state stays stable for non-plain JSON values like PlainDate.
         filter?.dehydrate ? filter.dehydrate(rawValue as Exclude<F[keyof F], null | undefined> | undefined) : rawValue,
       ];
     }),

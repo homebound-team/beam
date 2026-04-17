@@ -58,15 +58,3 @@ export interface DeweyDecimalClassification {
   number: string;
   category: string;
 }
-
-export class DateOnly {
-  constructor(private readonly date: PlainDate) {}
-
-  toString() {
-    return this.date.toString();
-  }
-
-  toJSON() {
-    return this.toString();
-  }
-}
