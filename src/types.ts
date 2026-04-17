@@ -8,7 +8,7 @@ export type DateRange = {
   to?: PlainDate | undefined;
 };
 
-export type DayMatcher = (date: PlainDate) => boolean;
+export type DateMatcher = PlainDate | PlainDate[] | DateRange | ((date: PlainDate) => boolean);
 
 export type HasIdIsh<V = string> = { id: V } | { code: V };
 export type HasNameIsh = { name: string } | { displayName: string } | { label: string };

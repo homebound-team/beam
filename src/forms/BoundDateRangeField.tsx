@@ -32,7 +32,7 @@ export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
         <DateRangeField
           label={label}
           value={field.value || undefined}
-          onChange={(value) => {
+          onChange={(value: DateRange | undefined) => {
             onChange(value);
             field.maybeAutoSave();
           }}

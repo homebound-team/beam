@@ -1,7 +1,7 @@
 import { withRouter } from "@homebound/rtl-react-router-utils";
 import { useMemo, useRef, useState } from "react";
 import { booleanFilter, FilterDefs, Filters, singleFilter } from "src/components/Filters";
-import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
+import { ProjectFilter, Stage, taskCompleteFilter, taskDueFilter } from "src/components/Filters/testDomain";
 import { usePersistedFilter } from "src/hooks/usePersistedFilter";
 import { objectId } from "src/utils/objectId";
 import { click, render, wait } from "src/utils/rtl";
@@ -65,6 +65,40 @@ describe("usePersistedFilter", () => {
 
     expect(r.filterIds.textContent).toEqual("[1,1,1]");
   });
+
+  it("rehydrates plain date strings for persisted date filters", async () => {
+    const r = await render(
+      <TestPage filterDefs={{ date: taskDueFilter }} />,
+      withRouter(createFilterRoute({ date: { op: "ON", value: "2020-01-29" } })),
+    );
+
+    await wait();
+
+    expect(r.filter_taskDue_dateOperation).toHaveValue("On");
+    expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");
+    expect(r.applied.textContent).toEqual('{"date":{"op":"ON","value":"2020-01-29"}}');
+  });
+
+  it("rehydrates legacy timestamp strings for persisted date range filters", async () => {
+    const r = await render(
+      <TestPage filterDefs={{ dateRange: taskCompleteFilter }} />,
+      withRouter(
+        createFilterRoute({
+          dateRange: {
+            op: "BETWEEN",
+            value: { from: "2020-01-02T12:00:00.000Z", to: "2020-01-19T12:00:00.000Z" },
+          },
+        }),
+      ),
+    );
+
+    await wait();
+
+    expect(r.filter_taskCompleted_dateField).toHaveValue("01/02/20 - 01/19/20");
+    expect(r.applied.textContent).toEqual(
+      '{"dateRange":{"op":"BETWEEN","value":{"from":"2020-01-02","to":"2020-01-19"}}}',
+    );
+  });
 });
 
 function TestPage(props: { filterDefs: FilterDefs<ProjectFilter> }) {
@@ -96,4 +130,8 @@ function StableFilterTestPage(props: { filterDefs: FilterDefs<ProjectFilter> }) 
       <div data-testid="filterIds">{JSON.stringify(filterIds.current)}</div>
     </div>
   );
+}
+
+function createFilterRoute(filter: unknown): string {
+  return `/?filter=${encodeURIComponent(JSON.stringify(filter))}`;
 }

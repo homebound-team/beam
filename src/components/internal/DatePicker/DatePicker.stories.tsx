@@ -1,11 +1,10 @@
-import { Meta } from "@storybook/react-vite";
-import { format } from "date-fns";
+import { type Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src";
 import { DatePicker } from "src/components/internal/DatePicker";
 import { jan1, jan10, jan2, jan29 } from "src/forms/formStateDomain";
-import { type DayMatcher, type PlainDate } from "src/types";
-import { plainDateToJsDate } from "src/utils/plainDate";
+import { type DateMatcher, type PlainDate } from "src/types";
+import { formatPlainDate } from "src/utils/plainDate";
 import { Temporal } from "temporal-polyfill";
 
 export default {
@@ -30,7 +29,7 @@ export function Default() {
       />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && format(plainDateToJsDate(date), "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && formatPlainDate(date, "date")}</span>
       </div>
     </div>
   );
@@ -49,12 +48,12 @@ export function WithYearControlHeader() {
       />
       <div css={Css.mt1.$}>
         <strong>Selected Date:</strong>
-        <span css={Css.ml1.$}>{date && format(plainDateToJsDate(date), "MM/dd/yyyy")}</span>
+        <span css={Css.ml1.$}>{date && formatPlainDate(date, "date")}</span>
       </div>
     </div>
   );
 }
 
-function matchesDay(date: PlainDate): DayMatcher {
+function matchesDay(date: PlainDate): DateMatcher {
   return (value) => Temporal.PlainDate.compare(value, date) === 0;
 }

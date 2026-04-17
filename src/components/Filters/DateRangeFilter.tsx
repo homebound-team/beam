@@ -2,7 +2,7 @@ import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { Filter } from "src/components/Filters/types";
 import { Label } from "src/components/Label";
 import { DateRangeField } from "src/inputs";
-import { type DateRange, type DayMatcher } from "src/types";
+import { type DateMatcher, type DateRange } from "src/types";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { dehydratePlainDate, parsePersistedPlainDate } from "src/utils/plainDate";
@@ -11,7 +11,7 @@ export type DateRangeFilterProps<O extends string> = {
   label: string;
   defaultValue?: DateRangeFilterValue<O>;
   placeholderText?: string;
-  disabledDays?: DayMatcher | DayMatcher[];
+  disabledDays?: DateMatcher | DateMatcher[];
   // For storybook to support showing dateRange and date filters in same Filter component
   testFieldLabel?: string;
 };
@@ -64,7 +64,7 @@ class DateRangeFilter<O extends string>
           placeholder={placeholderText}
           label={testFieldLabel ?? "Date"}
           value={value?.value}
-          onChange={(d) => {
+          onChange={(d: DateRange | undefined) => {
             if (!d) {
               setValue(undefined);
               return;

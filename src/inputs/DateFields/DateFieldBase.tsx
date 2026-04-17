@@ -16,14 +16,14 @@ import {
   parseDateRange,
 } from "src/inputs/DateFields/utils";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
-import { type DateRange, type DayMatcher, type PlainDate } from "src/types";
+import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-export interface DateFieldBaseProps extends Pick<
+export type DateFieldBaseProps = Pick<
   TextFieldBaseProps<Properties>,
   "borderless" | "visuallyDisabled" | "labelStyle" | "compact" | "fullWidth"
-> {
+> & {
   label: string;
   /** Called when the component loses focus */
   onBlur?: () => void;
@@ -43,7 +43,7 @@ export interface DateFieldBaseProps extends Pick<
   /**
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    */
-  disabledDays?: DayMatcher | DayMatcher[];
+  disabledDays?: DateMatcher | DateMatcher[];
   onEnter?: VoidFunction;
   /** for storybook */
   defaultOpen?: boolean;
@@ -53,19 +53,19 @@ export interface DateFieldBaseProps extends Pick<
   isRangeFilterField?: boolean;
   /** Render header that skips years in addition to months */
   useYearPicker?: boolean;
-}
+};
 
-export interface DateSingleFieldBaseProps extends DateFieldBaseProps {
+export type DateSingleFieldBaseProps = DateFieldBaseProps & {
   mode: "single";
   value: PlainDate | undefined;
   onChange: (value: PlainDate | undefined) => void;
-}
+};
 
-export interface DateRangeFieldBaseProps extends DateFieldBaseProps {
+export type DateRangeFieldBaseProps = DateFieldBaseProps & {
   mode: "range";
   value: DateRange | undefined;
   onChange: (value: DateRange | undefined) => void;
-}
+};
 
 export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBaseProps) {
   const {
@@ -227,7 +227,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           return;
         }
       } else {
-        props.onChange(undefined);
+        if (isRangeMode) {
+          (props as DateRangeFieldBaseProps).onChange(undefined);
+        } else {
+          (props as DateSingleFieldBaseProps).onChange(undefined);
+        }
         return;
       }
     },

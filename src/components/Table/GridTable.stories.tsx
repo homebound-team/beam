@@ -2344,7 +2344,7 @@ export function HighlightFields() {
         <DateField
           label=""
           value={row.date}
-          onChange={(date) => setRow(row.id, "date", date)}
+          onChange={(date: PlainDate | undefined) => setRow(row.id, "date", date)}
           hideCalendarIcon
           format="medium"
         />
@@ -2360,7 +2360,7 @@ export function HighlightFields() {
         <DateField
           label=""
           value={row.date}
-          onChange={(date) => setRow(row.id, "date", date)}
+          onChange={(date: PlainDate | undefined) => setRow(row.id, "date", date)}
           hideCalendarIcon
           format="medium"
         />
