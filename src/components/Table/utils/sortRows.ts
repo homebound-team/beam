@@ -4,6 +4,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
 import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
+import { Temporal } from "temporal-polyfill";
 
 // Returns a shallow copy of the `rows` parameter sorted based on `sortState`
 // We really only use this for tests; in production the RowState.visibleSortedChildren uses the sortFn
@@ -107,8 +108,7 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
     maybeFn = maybeFn();
   }
 
-  // If it is a string, then always lower case it for comparisons
-  return typeof maybeFn === "string" && !caseSensitive ? maybeFn.toLowerCase() : maybeFn;
+  return normalizeSortValue(maybeFn, caseSensitive);
 }
 
 export function ensureClientSideSortValueIsSortable(
@@ -132,6 +132,34 @@ export function ensureClientSideSortValueIsSortable(
 function canClientSideSort(value: any): boolean {
   const t = typeof value;
   return (
-    value === null || t === "undefined" || t === "number" || t === "string" || t === "boolean" || value instanceof Date
+    value === null ||
+    t === "undefined" ||
+    t === "number" ||
+    t === "string" ||
+    t === "bigint" ||
+    t === "boolean" ||
+    value instanceof Date ||
+    isPlainDate(value) ||
+    isZonedDateTime(value)
   );
+}
+
+function normalizeSortValue(value: any, caseSensitive: boolean): any {
+  if (isPlainDate(value)) {
+    return value.toString();
+  } else if (isZonedDateTime(value)) {
+    return value.epochNanoseconds;
+  } else if (typeof value === "string" && !caseSensitive) {
+    return value.toLowerCase();
+  } else {
+    return value;
+  }
+}
+
+function isPlainDate(value: unknown): value is Temporal.PlainDate {
+  return value instanceof Temporal.PlainDate;
+}
+
+function isZonedDateTime(value: unknown): value is Temporal.ZonedDateTime {
+  return value instanceof Temporal.ZonedDateTime;
 }

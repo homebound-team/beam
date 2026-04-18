@@ -5,6 +5,9 @@ import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { Css, Properties, Typography } from "src/Css";
+import { Temporal } from "temporal-polyfill";
+
+type GridCellValue = number | string | Date | boolean | Temporal.PlainDate | Temporal.ZonedDateTime | null | undefined;
 
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or
@@ -19,9 +22,9 @@ export type GridCellContent = {
   content: MaybeFn<ReactNode>;
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
-  value?: MaybeFn<number | string | Date | boolean | null | undefined>;
+  value?: MaybeFn<GridCellValue>;
   /** The value to use specifically for sorting (i.e. if `value` is used for filtering); defaults to `value`. */
-  sortValue?: MaybeFn<number | string | Date | boolean | null | undefined>;
+  sortValue?: MaybeFn<GridCellValue>;
   colspan?: number;
   typeScale?: Typography;
   /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */

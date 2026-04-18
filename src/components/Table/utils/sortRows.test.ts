@@ -1,7 +1,8 @@
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridColumnWithId } from "src/components/Table/types";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
-import { sortRows } from "src/components/Table/utils/sortRows";
+import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/utils/sortRows";
+import { Temporal } from "temporal-polyfill";
 
 describe("sortRows", () => {
   it("can return a sorted copy of nested rows in ascending order", () => {
@@ -121,11 +122,64 @@ describe("sortRows", () => {
     // Then expected sort in ascending order with primary column sorting on top
     expect(rowsToIdArray(sorted)).toEqual(["3", "1", "2"]);
   });
+
+  it("sorts ZonedDateTime values by instant across time zones", () => {
+    // These are intentionally clustered around the same calendar boundary but with very different offsets.
+    // Kiritimati (+14) is the earliest instant, UTC is in the middle, and Honolulu (-10) is latest.
+    // That makes the test fail if we ever sort by the wall-clock date/time text instead of the actual instant.
+    const zdt1 = Temporal.ZonedDateTime.from("2019-12-31T23:00:00-10:00[Pacific/Honolulu]");
+    const zdt2 = Temporal.ZonedDateTime.from("2020-01-01T00:00:00+14:00[Pacific/Kiritimati]");
+    const zdt3 = Temporal.ZonedDateTime.from("2020-01-01T00:00:00+00:00[UTC]");
+    const zonedDateTimeColumn: GridColumnWithId<Row> = {
+      id: "dateTime",
+      header: "DateTime",
+      parent: (data) => ({ content: data.name, value: data.name, sortValue: data.dateTime }),
+      child: (data) => ({ content: data.name, value: data.name, sortValue: data.dateTime }),
+    };
+    const rows: GridDataRow<Row>[] = [
+      { kind: "parent", id: "1", data: { name: "honolulu", dateTime: zdt1 } },
+      { kind: "parent", id: "2", data: { name: "kiritimati", dateTime: zdt2 } },
+      { kind: "parent", id: "3", data: { name: "utc", dateTime: zdt3 } },
+    ];
+    const sorted = sortRows(
+      [zonedDateTimeColumn],
+      rows,
+      { current: { columnId: zonedDateTimeColumn.id, direction: "ASC" } },
+      false,
+    );
+    expect(rowsToIdArray(sorted)).toEqual(["2", "3", "1"]);
+  });
+
+  it("accepts ZonedDateTime sort values for client-side sorting", () => {
+    const zonedDateTimeColumn: GridColumnWithId<any> = {
+      id: "dateTime",
+      header: "DateTime",
+      parent: "DateTime",
+      child: "DateTime",
+    };
+
+    expect(() =>
+      ensureClientSideSortValueIsSortable("client", false, zonedDateTimeColumn, 0, {
+        content: "utc",
+        // The specific instant is not important here; this just needs to be a real ZonedDateTime
+        // with an explicit zone annotation so the validation path sees the Temporal object shape.
+        sortValue: Temporal.ZonedDateTime.from("2020-01-01T00:00:00+00:00[UTC]"),
+      }),
+    ).not.toThrow();
+  });
 });
 
 type HeaderRow = { kind: "header" };
-type ParentRow = { kind: "parent"; id: string; data: { name: string | undefined; favorite?: boolean | undefined } };
-type ChildRow = { kind: "child"; id: string; data: { name: string | undefined; favorite?: boolean | undefined } };
+type ParentRow = {
+  kind: "parent";
+  id: string;
+  data: { name: string | undefined; favorite?: boolean | undefined; dateTime?: Temporal.ZonedDateTime | undefined };
+};
+type ChildRow = {
+  kind: "child";
+  id: string;
+  data: { name: string | undefined; favorite?: boolean | undefined; dateTime?: Temporal.ZonedDateTime | undefined };
+};
 type Row = HeaderRow | ParentRow | ChildRow;
 const nameColumn: GridColumnWithId<Row> = {
   id: "name",
