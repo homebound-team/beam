@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { type PageSessionStorage, loadSessionStorageJson } from "src/hooks/usePageSessionStorage";
 import { useDebouncedCallback } from "use-debounce";
 
 export type ResizedWidths = Record<string, number>;
@@ -7,34 +8,22 @@ export type ResizedWidths = Record<string, number>;
  * Hook to manage column resizing state and persistence.
  * Stores resized column widths in sessionStorage with debounced writes (500ms).
  *
- * @param storageKey - Unique key for sessionStorage. If undefined, persistence is disabled.
+ * @param storage - Page-scoped storage adapter. If undefined, persistence is disabled.
  */
-export function useColumnResizing(storageKey: string | undefined): {
+export function useColumnResizing(storage: PageSessionStorage | undefined): {
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number) => void;
   setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
   resetColumnWidths: () => void;
 } {
   const [resizedWidths, setResizedWidths] = useState<ResizedWidths>(() => {
-    if (!storageKey) return {};
-    try {
-      const stored = sessionStorage.getItem(`columnWidths_${storageKey}`);
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
+    return storage ? loadSessionStorageJson<ResizedWidths>(storage) ?? {} : {};
   });
 
   // Debounced persistence to session storage - prevents blocking main thread during fast dragging
   const persistToStorage = useDebouncedCallback((widths: ResizedWidths) => {
-    if (!storageKey) return;
-
-    const key = `columnWidths_${storageKey}`;
-    try {
-      sessionStorage.setItem(key, JSON.stringify(widths));
-    } catch {
-      // Ignore storage errors
-    }
+    if (!storage) return;
+    storage.setItem(JSON.stringify(widths));
   }, 500);
 
   useEffect(() => {

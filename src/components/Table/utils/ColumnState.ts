@@ -19,13 +19,13 @@ export class ColumnState<R extends Kinded> {
 
   constructor(
     private states: ColumnStates<R>,
-    storage: ColumnStorage<R>,
+    private storage: ColumnStorage<R>,
     column: GridColumnWithId<R>,
   ) {
     this.column = column;
     // If the user sets `canHide: true`, we default to hidden unless they set `initHidden: false`
-    this.visible = storage.wasVisible(column.id) ?? (column.canHide ? !(column.initHidden ?? true) : true);
-    if (this.visible && (storage.wasExpanded(column.id) ?? column.initExpanded)) {
+    this.visible = this.storage.wasVisible(column.id) ?? (column.canHide ? !(column.initHidden ?? true) : true);
+    if (this.visible && (this.storage.wasExpanded(column.id) ?? column.initExpanded)) {
       this.expanded = true;
       // TODO: verify this eslint ignore
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -38,7 +38,7 @@ export class ColumnState<R extends Kinded> {
     const wasVisible = this.visible;
     this.visible = visible;
     // If an expandable header is becoming visible for the 1st time, expand it
-    if (!wasVisible && visible && this.column.initExpanded && this.children === undefined) {
+    if (!wasVisible && visible && (this.storage.wasExpanded(this.column.id) ?? this.column.initExpanded) && this.children === undefined) {
       this.expanded = true;
       // TODO: verify this eslint ignore
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -48,6 +48,10 @@ export class ColumnState<R extends Kinded> {
 
   get isExpanded(): boolean {
     return this.expanded;
+  }
+
+  get isVisible(): boolean {
+    return this.visible;
   }
 
   toggleExpanded(): void {
@@ -88,5 +92,9 @@ export class ColumnState<R extends Kinded> {
     } else {
       return [this];
     }
+  }
+
+  get selfAndLoadedChildren(): ColumnState<R>[] {
+    return [this, ...(this.children?.flatMap((child) => child.selfAndLoadedChildren) ?? [])];
   }
 }

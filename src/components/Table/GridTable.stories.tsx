@@ -32,7 +32,7 @@ import {
 } from "src/components/index";
 import { Css, Palette } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
+import { getPageSessionStorageKey, useComputed } from "src/hooks";
 import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { type PlainDate } from "src/types";
@@ -246,8 +246,8 @@ export function VirtualWithScrollPersistence() {
           label="Clear saved position"
           onClick={() => {
             // Clear all scroll positions for this table (any query param combination)
-            const prefix = `scrollPosition_${window.location.pathname}`;
-            const suffix = `_${tableId}`;
+            const prefix = getPageSessionStorageKey("scrollPosition", { pathname: window.location.pathname });
+            const suffix = `:${tableId}`;
             Object.keys(sessionStorage)
               .filter((key) => key.startsWith(prefix) && key.endsWith(suffix))
               .forEach((key) => sessionStorage.removeItem(key));

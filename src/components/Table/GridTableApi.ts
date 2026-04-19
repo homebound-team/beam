@@ -5,6 +5,7 @@ import { ListRange, VirtuosoHandle } from "react-virtuoso";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { DiscriminateUnion, GridTableScrollOptions, Kinded, MaybeFn } from "src/components/Table/types";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import type { TableStateStorage } from "src/components/Table/utils/TableState";
 import { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 import { TableState } from "src/components/Table/utils/TableState";
 import { applyRowFn, isGridCellContent, isJSX } from "src/components/Table/utils/utils";
@@ -116,12 +117,11 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
   init(
-    persistCollapse: string | undefined,
+    storage: TableStateStorage,
     virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
     virtuosoRangeRef: MutableRefObject<ListRange | null>,
   ) {
-    // Technically this drives both row-collapse and column-expanded
-    if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
+    this.tableState.initStorage(storage);
     this.virtuosoRef = virtuosoRef;
     this.virtuosoRangeRef = virtuosoRangeRef;
     this.lookup = createRowLookup(this, virtuosoRef, virtuosoRangeRef);

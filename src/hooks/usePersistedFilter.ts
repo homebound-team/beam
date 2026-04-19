@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { type FilterDefs, type FilterImpls } from "src/components";
-import { useSessionStorage } from "src/hooks";
+import { usePageSessionStorage, useSessionStorage } from "src/hooks";
 import { type AnyObject } from "src/types";
 import { safeEntries, safeKeys } from "src/utils";
 import { JsonParam, useQueryParams } from "use-query-params";
@@ -36,8 +36,9 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
     [filterImpls],
   );
   const [{ filter: queryParamsFilter }, setQueryParams] = useQueryParams({ filter: JsonParam });
+  const storedFilterStorage = usePageSessionStorage("persistedFilter", storageKey);
   const [storedFilter, setStoredFilter] = useSessionStorage<unknown>(
-    storageKey,
+    storedFilterStorage,
     dehydrateFilter(filterImpls, defaultFilter as F) ?? defaultFilter,
   );
   const isQueryParamFilterValid = hasValidFilterKeys(queryParamsFilter, filterKeys);

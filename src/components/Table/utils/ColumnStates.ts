@@ -1,6 +1,6 @@
-import { camelCase } from "change-case";
 import { makeAutoObservable } from "mobx";
 import { GridColumnWithId, Kinded } from "src";
+import { type PageSessionStorage } from "src/hooks/usePageSessionStorage";
 import { ColumnState } from "src/components/Table/utils/ColumnState";
 import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
 
@@ -15,23 +15,9 @@ export class ColumnStates<R extends Kinded> {
     makeAutoObservable(this);
   }
 
-  /**
-   * Updates our internal columns states when `props.columns` changes.
-   *
-   * We handle sessionStorage here b/c we allow the user to either provide their own
-   * storage key, or calc the storage key based on the currently-visible columns.
-   * So like you expand a column, and new columns show up, but we'll remember they
-   * were hidden last time you looked at this specific expansion of columns.
-   */
-  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
-    if (columns.some((c) => c.canHide)) {
-      // We optionally auto-calc visible columns based on the currently-_potentially_-visible columns
-      visibleColumnsStorageKey ??= camelCase(columns.map((c) => c.id).join());
-      this.loadVisible(visibleColumnsStorageKey);
-    }
+  /** Updates our internal column states when `props.columns` changes. */
+  setColumns(columns: GridColumnWithId<R>[]): void {
     this.columns = columns.map((c) => this.addColumn(c));
-    // After the very first non-zero `setColumns`, we disconnect from sessionStorage
-    if (columns.length > 0) this.storage.done();
   }
 
   /** Adds a column to our state, i.e. maybe a dynamically loaded column. */
@@ -63,6 +49,11 @@ export class ColumnStates<R extends Kinded> {
     return this.columns.filter((cs) => cs.isExpanded);
   }
 
+  /** Returns every current column, including hidden and loaded children. */
+  get allColumns(): ColumnState<R>[] {
+    return this.columns.flatMap((cs) => cs.selfAndLoadedChildren);
+  }
+
   /** Returns a flat list of all visible columns. */
   allVisibleColumns(showIn: "web" | "csv"): ColumnState<R>[] {
     return this.columns
@@ -77,11 +68,11 @@ export class ColumnStates<R extends Kinded> {
     }
   }
 
-  loadExpanded(storageKey: string): void {
-    this.storage.loadExpanded(storageKey);
+  loadExpanded(storage: PageSessionStorage): void {
+    this.storage.loadExpanded(storage);
   }
 
-  loadVisible(storageKey: string): void {
-    this.storage.loadVisible(storageKey);
+  loadVisible(storage: PageSessionStorage): void {
+    this.storage.loadVisible(storage);
   }
 }

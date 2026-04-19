@@ -1,45 +1,66 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createSessionStorageAdapter,
+  loadSessionStorageJson,
+  type SessionStorageInput,
+} from "src/hooks/usePageSessionStorage";
 
 type UseSessionStorage<T> = [T, (value: T) => void];
 
-export function useSessionStorage<T>(key: string, defaultValue: T): UseSessionStorage<T> {
-  let hasSessionStorage = false;
-  try {
-    hasSessionStorage = !!window.sessionStorage;
-  } catch (e) {
-    // Catch errors if browser storage access is denied
+/** Persists React state to either a raw or page-scoped `sessionStorage` key. */
+export function useSessionStorage<T>(storage: SessionStorageInput, defaultValue: T): UseSessionStorage<T> {
+  const storageAdapter = useMemo(
+    function memoizedStorageAdapter() {
+      return typeof storage === "string" ? createSessionStorageAdapter(storage) : storage;
+    },
+    [storage],
+  );
+  const defaultValueKey = useMemo(function defaultValueKey() {
+    return JSON.stringify(defaultValue);
+  }, [defaultValue]);
+  const stableDefaultValue = useRef(defaultValue);
+  const stableDefaultValueKey = useRef(defaultValueKey);
+  if (stableDefaultValueKey.current !== defaultValueKey) {
+    stableDefaultValue.current = defaultValue;
+    stableDefaultValueKey.current = defaultValueKey;
   }
 
-  const [state, setState] = useState(() => {
-    if (!hasSessionStorage) {
-      return defaultValue;
-    }
-    const parsed = getParsedStorage(key);
-    if (parsed) {
-      return parsed;
-    }
-    sessionStorage.setItem(key, JSON.stringify(defaultValue));
-    return defaultValue;
+  const [state, setState] = useState(function initialState() {
+    return getStoredValue(storageAdapter, stableDefaultValue.current);
   });
 
+  useEffect(
+    function syncStateWhenStorageChanges() {
+      setState(getStoredValue(storageAdapter, stableDefaultValue.current));
+    },
+    [defaultValueKey, storageAdapter],
+  );
+
   const setAndSave = useCallback(
-    (value: T) => {
-      if (hasSessionStorage && value) {
-        sessionStorage.setItem(key, JSON.stringify(value));
+    function setAndSave(value: T) {
+      if (value === undefined) {
+        storageAdapter.removeItem();
+      } else {
+        storageAdapter.setItem(JSON.stringify(value));
       }
       setState(value);
     },
-    [hasSessionStorage, key],
+    [storageAdapter],
   );
 
   return [state, setAndSave];
 }
 
-function getParsedStorage(key: string) {
-  try {
-    const storedString = sessionStorage.getItem(key);
-    return storedString && JSON.parse(storedString);
-  } catch (e) {
-    sessionStorage.removeItem(key);
+function getStoredValue<T>(storage: SessionStorageInput, defaultValue: T): T {
+  const parsed = loadSessionStorageJson<T>(storage);
+  if (parsed !== undefined) {
+    return parsed;
   }
+
+  if (defaultValue !== undefined) {
+    const storageAdapter = typeof storage === "string" ? createSessionStorageAdapter(storage) : storage;
+    storageAdapter.setItem(JSON.stringify(defaultValue));
+  }
+
+  return defaultValue;
 }

@@ -1,43 +1,86 @@
-import { autorun, reaction } from "mobx";
+import { reaction } from "mobx";
 import { Kinded } from "src/components/Table/types";
+import { type PageSessionStorage, loadSessionStorageJson } from "src/hooks/usePageSessionStorage";
+import { ColumnState } from "src/components/Table/utils/ColumnState";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
 /** Loads/saves the column state from sessionStorage. */
 export class ColumnStorage<R extends Kinded> {
-  private expandedIds: string[] | undefined;
-  private visibleIds: string[] | undefined;
+  private expandedById: Record<string, boolean> | undefined;
+  private visibleById: Record<string, boolean> | undefined;
+  private expandedStorageKey: string | undefined;
+  private visibleStorageKey: string | undefined;
+  private persistExpandedColumns: (() => void) | undefined;
+  private persistVisibleColumns: (() => void) | undefined;
 
   constructor(private states: ColumnStates<R>) {}
 
-  loadExpanded(persistCollapse: string): void {
-    const key = `expandedColumn_${persistCollapse}`;
-    this.expandedIds = loadArrayOrUndefined(key);
-    reaction(
-      () => this.states.expandedColumns.map((cs) => cs.column.id),
-      (columnIds) => sessionStorage.setItem(key, JSON.stringify(columnIds)),
+  loadExpanded(storage: PageSessionStorage): void {
+    if (this.expandedStorageKey === storage.key) return;
+
+    this.persistExpandedColumns?.();
+    this.expandedStorageKey = storage.key;
+    this.expandedById = loadBooleanRecordOrUndefined(storage);
+    this.persistExpandedColumns = reaction(
+      () => JSON.stringify(getExpandedOverrides(this.states.allColumns)),
+      (serialized) => storage.setItem(serialized),
     );
   }
 
-  loadVisible(storageKey: string): void {
-    this.visibleIds = loadArrayOrUndefined(storageKey);
-    // Unlike the others, where we only store the value on change, we immediately
-    // store this value (but I'm not sure why...), hence using `autorun`.
-    autorun(() => {
-      const columnIds = this.states.allVisibleColumns("web").map((cs) => cs.column.id);
-      sessionStorage.setItem(storageKey, JSON.stringify(columnIds));
-    });
+  loadVisible(storage: PageSessionStorage): void {
+    if (this.visibleStorageKey === storage.key) return;
+
+    this.persistVisibleColumns?.();
+    this.visibleStorageKey = storage.key;
+    this.visibleById = loadBooleanRecordOrUndefined(storage);
+    this.persistVisibleColumns = reaction(
+      () => JSON.stringify(getVisibleOverrides(this.states.allColumns)),
+      (serialized) => storage.setItem(serialized),
+    );
   }
 
   wasExpanded(id: string): boolean | undefined {
-    return this.expandedIds?.includes(id);
+    return this.expandedById?.[id];
   }
 
   wasVisible(id: string): boolean | undefined {
-    return this.visibleIds?.includes(id);
+    return this.visibleById?.[id];
+  }
+}
+
+function loadBooleanRecordOrUndefined(storage: PageSessionStorage): Record<string, boolean> | undefined {
+  const parsed = loadSessionStorageJson<unknown>(storage);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return undefined;
   }
 
-  done() {
-    this.expandedIds = undefined;
+  const entries = Object.entries(parsed);
+  if (entries.every((entry) => typeof entry[1] === "boolean")) {
+    return Object.fromEntries(entries) as Record<string, boolean>;
   }
+
+  storage.removeItem();
+  return undefined;
+}
+
+function getExpandedOverrides<R extends Kinded>(columns: ColumnState<R>[]): Record<string, boolean> {
+  return Object.fromEntries(
+    columns
+      .filter((cs) => cs.isExpanded !== !!cs.column.initExpanded)
+      .map((cs) => [cs.column.id, cs.isExpanded]),
+  );
+}
+
+function getVisibleOverrides<R extends Kinded>(columns: ColumnState<R>[]): Record<string, boolean> {
+  return Object.fromEntries(
+    columns
+      .filter((cs) => cs.column.canHide)
+      .filter((cs) => cs.isVisible !== isVisibleByDefault(cs))
+      .map((cs) => [cs.column.id, cs.isVisible]),
+  );
+}
+
+function isVisibleByDefault<R extends Kinded>(columnState: ColumnState<R>): boolean {
+  const { column } = columnState;
+  return column.canHide ? !(column.initHidden ?? true) : true;
 }

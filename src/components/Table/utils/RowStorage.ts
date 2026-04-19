@@ -2,6 +2,7 @@ import { reaction } from "mobx";
 import { Kinded } from "src";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
+import { type PageSessionStorage } from "src/hooks/usePageSessionStorage";
 
 /**
  * Manages loading/saving our currently-collapsed rows to session storage.
@@ -16,16 +17,22 @@ import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
  */
 export class RowStorage<R extends Kinded> {
   private historicalIds: string[] | undefined;
+  private storageKey: string | undefined;
+  private persistCollapsedRows: (() => void) | undefined;
 
   constructor(private states: RowStates<R>) {}
 
-  load(persistCollapse: string): void {
+  load(storage: PageSessionStorage): void {
+    if (this.storageKey === storage.key) return;
+
+    this.persistCollapsedRows?.();
+    this.storageKey = storage.key;
     // Load what our previously collapsed rows were
-    this.historicalIds = loadArrayOrUndefined(persistCollapse);
+    this.historicalIds = loadArrayOrUndefined(storage);
     // And store new collapsed rows going forward
-    reaction(
+    this.persistCollapsedRows = reaction(
       () => this.states.collapsedRows.map((rs) => rs.row.id),
-      (rowIds) => sessionStorage.setItem(persistCollapse, JSON.stringify(rowIds)),
+      (rowIds) => storage.setItem(JSON.stringify(rowIds)),
     );
   }
 

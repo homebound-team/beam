@@ -40,7 +40,7 @@ import {
   zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
-import { useComputed } from "src/hooks";
+import { useComputed, usePageSessionStorage } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { isPromise } from "src/utils";
 import type { GridDataRow, GridRowKind } from "./components/Row";
@@ -115,6 +115,7 @@ type DragEventType = React.DragEvent<HTMLElement>;
 export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
 
 export interface GridTableProps<R extends Kinded, X> {
+  /** Stable table identifier used for test ids and page-scoped session storage. */
   id?: string;
   /**
    * The HTML used to create the table.
@@ -153,13 +154,6 @@ export interface GridTableProps<R extends Kinded, X> {
   /** A combination of CSS settings to set the static look & feel (vs. rowStyles which is per-row styling). */
   style?: GridStyle | GridStyleDef;
   /**
-   * If provided, collapsed rows on the table persists when the page is reloaded.
-   *
-   * This key should generally be unique to the page it's on, i.e. `specsTable_p:1_precon` would
-   *  be the collapsed state for project `p:1`'s precon stage specs & selections table.
-   */
-  persistCollapse?: string;
-  /**
    * If true, scroll position persists when the page is reloaded (only applies to `as=virtual` without infinite scroll, where it defaults to true).
    *
    * The storage key is automatically generated using the current URL pathname and the table's `id`.
@@ -181,11 +175,6 @@ export interface GridTableProps<R extends Kinded, X> {
    * Expected format is `${row.kind}_${row.id}_${column.id}`.
    */
   activeCellId?: string;
-  /**
-   * Defines the session storage key for which columns are visible. If not provided, a default storage key will be used based on column order and/or `GridColumn.id`
-   * This is beneficial when looking at the same table, but of a different subject (i.e. Project A's PreCon Schedule vs Project A's Construction schedule)
-   */
-  visibleColumnsStorageKey?: string;
   /**
    * Infinite scroll is only supported with `as=virtual` mode
    *
@@ -243,12 +232,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     filterMaxRows,
     fallbackMessage = "No rows found.",
     infoMessage,
-    persistCollapse,
     persistScrollPosition,
     resizeTarget,
     activeRowId,
     activeCellId,
-    visibleColumnsStorageKey,
     infiniteScroll,
     onRowSelect,
     onRowDrop: droppedCallback,
@@ -266,18 +253,30 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const resizeRef = useRef<HTMLDivElement>(null);
   // Ref to the table container element (for column resize guide line)
   const tableContainerRef = useRef<HTMLElement | null>(null);
+  const collapsedRowsStorage = usePageSessionStorage("collapsedRows", id);
+  const expandedColumnsStorage = usePageSessionStorage("expandedColumns", id);
+  const visibleColumnsStorage = usePageSessionStorage("visibleColumns", id);
+  const columnWidthsStorage = usePageSessionStorage("columnWidths", id);
 
   const api = useMemo<GridTableApiImpl<R>>(
     () => {
       // Let the user pass in their own api handle, otherwise make our own
       const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
-      api.init(persistCollapse, virtuosoRef, virtuosoRangeRef);
+      api.init(
+        {
+          collapsedRows: collapsedRowsStorage,
+          expandedColumns: expandedColumnsStorage,
+          visibleColumns: visibleColumnsStorage,
+        },
+        virtuosoRef,
+        virtuosoRangeRef,
+      );
       api.setActiveRowId(activeRowId);
       api.setActiveCellId(activeCellId);
       // Push the initial columns directly into tableState, b/c that is what
       // makes the tests pass, but then further updates we'll do through useEffect
       // to avoid "Cannot update component during render" errors.
-      api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      api.tableState.setColumns(columnsWithIds);
       return api;
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
@@ -305,13 +304,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // Use runInAction so mobx delays any reactions until all the mutations happen
     runInAction(() => {
       tableState.setRows(rows);
-      tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      tableState.setColumns(columnsWithIds);
       tableState.setSearch(filter);
       tableState.setCsvPrefixRows(csvPrefixRows);
       tableState.activeRowId = activeRowId;
       tableState.activeCellId = activeCellId;
     });
-  }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
+  }, [tableState, rows, columnsWithIds, activeRowId, activeCellId, filter, csvPrefixRows]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
@@ -335,7 +334,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       columns,
       resizeTarget ?? resizeRef,
       expandedColumnIds,
-      visibleColumnsStorageKey,
+      columnWidthsStorage,
       disableColumnResizing,
     );
 

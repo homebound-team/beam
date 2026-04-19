@@ -11,7 +11,14 @@ import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
+import {
+  useComputed,
+  useGroupBy,
+  usePageSessionStorage,
+  usePersistedFilter,
+  UsePersistedFilterProps,
+  useSessionStorage,
+} from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -141,8 +148,6 @@ function GridTableLayoutComponent<
     }
   }, [visibleColumnIds, layoutState]);
 
-  const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
-
   return (
     <>
       <Header
@@ -187,7 +192,6 @@ function GridTableLayoutComponent<
             style={{ allWhite: true }}
             stickyHeader
             disableColumnResizing={false}
-            visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         ) : (
           <QueryTable
@@ -197,7 +201,6 @@ function GridTableLayoutComponent<
             style={{ allWhite: true }}
             stickyHeader
             disableColumnResizing={false}
-            visibleColumnsStorageKey={visibleColumnsStorageKey}
           />
         )}
         {layoutState && totalCount !== undefined && (
@@ -260,16 +263,24 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   const [searchString, setSearchString] = useState<string | undefined>("");
 
   const columnsFallback = "unset-columns";
-  const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(
+  const visibleColumnsStorage = usePageSessionStorage(
+    "gridTableLayoutVisibleColumns",
     persistedColumns?.storageKey ?? columnsFallback,
+  );
+  const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(
+    visibleColumnsStorage,
     undefined,
   );
 
   // Pagination state
   const paginationFallbackKey = "unset-pagination";
   const pageSizes = pagination?.pageSizes ?? [100, 500, 1000];
-  const [persistedPageSize, setPersistedPageSize] = useSessionStorage<number>(
+  const paginationStorage = usePageSessionStorage(
+    "gridTableLayoutPageSize",
     pagination?.storageKey ?? paginationFallbackKey,
+  );
+  const [persistedPageSize, setPersistedPageSize] = useSessionStorage<number>(
+    paginationStorage,
     100, // default page size
   );
 
@@ -294,7 +305,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     groupBy: maybeGroupBy ? groupBy : undefined,
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
     setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
-    persistedColumnsStorageKey: persistedColumns?.storageKey,
     /** Current page offset/limit - use this for server query variables */
     page,
     /** @internal Used by GridTableLayout component */

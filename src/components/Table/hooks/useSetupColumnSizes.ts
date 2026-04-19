@@ -3,6 +3,7 @@ import { MutableRefObject, useCallback, useEffect, useRef, useState } from "reac
 import { GridStyle } from "src/components/Table/TableStyles";
 import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
+import { type PageSessionStorage } from "src/hooks/usePageSessionStorage";
 import { calcColumnSizes } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -30,7 +31,7 @@ export function useSetupColumnSizes<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   resizeRef: MutableRefObject<HTMLElement | null>,
   expandedColumnIds: string[],
-  visibleColumnsStorageKey: string | undefined,
+  columnWidthsStorage: PageSessionStorage | undefined,
   disableColumnResizing: boolean,
 ): {
   columnSizes: string[];
@@ -42,7 +43,7 @@ export function useSetupColumnSizes<R extends Kinded>(
 } {
   // Call useColumnResizing to manage column width state and persistence
   const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
-    disableColumnResizing ? undefined : visibleColumnsStorageKey,
+    disableColumnResizing ? undefined : columnWidthsStorage,
   );
 
   // Calculate the column sizes immediately rather than via the `debounce` method.

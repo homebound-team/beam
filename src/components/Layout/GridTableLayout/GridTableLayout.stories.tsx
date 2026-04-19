@@ -5,6 +5,7 @@ import { GridDataRow } from "src/components/Table";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
+import { getPageSessionStorageKey } from "src/hooks";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "../Layout.stories";
@@ -234,7 +235,7 @@ export function GridTableLayoutWithColor() {
   });
 
   useEffect(() => {
-    const columnWidthsKey = `columnWidths_${storageKey}`;
+    const columnWidthsKey = getPageSessionStorageKey("columnWidths", { componentId: storageKey });
     if (!sessionStorage.getItem(columnWidthsKey)) {
       sessionStorage.setItem(
         columnWidthsKey,
@@ -259,10 +260,10 @@ export function GridTableLayoutWithColor() {
         ]}
         layoutState={layoutState}
         tableProps={{
+          id: storageKey,
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
-          visibleColumnsStorageKey: storageKey,
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}

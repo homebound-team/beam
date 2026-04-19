@@ -9,9 +9,16 @@ import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { sortFn } from "src/components/Table/utils/sortRows";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
+import { type PageSessionStorage } from "src/hooks/usePageSessionStorage";
 
 // A parent row can be partially selected when some children are selected/some aren't.
 export type SelectedState = "checked" | "unchecked" | "partial";
+
+export type TableStateStorage = {
+  collapsedRows: PageSessionStorage;
+  expandedColumns: PageSessionStorage;
+  visibleColumns: PageSessionStorage;
+};
 
 /**
  * Stores the collapsed & selected state of rows.
@@ -29,7 +36,6 @@ export type SelectedState = "checked" | "unchecked" | "partial";
  * changes.
  */
 export class TableState<R extends Kinded> {
-  private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
   private rows: GridDataRow<R>[] = [];
   // The current list of columns, basically a useRef.current. Only ref reactive.
@@ -81,10 +87,10 @@ export class TableState<R extends Kinded> {
     );
   }
 
-  loadCollapse(persistCollapse: string): void {
-    this.persistCollapse = persistCollapse;
-    this.rowStates.storage.load(persistCollapse);
-    this.columnStates.loadExpanded(persistCollapse);
+  initStorage(storage: TableStateStorage): void {
+    this.rowStates.storage.load(storage.collapsedRows);
+    this.columnStates.loadExpanded(storage.expandedColumns);
+    this.columnStates.loadVisible(storage.visibleColumns);
   }
 
   initSortState(sortConfig: GridSortConfig | undefined, columns: GridColumnWithId<R>[]) {
@@ -157,9 +163,9 @@ export class TableState<R extends Kinded> {
     this.rows = rows;
   }
 
-  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
+  setColumns(columns: GridColumnWithId<R>[]): void {
     if (columns !== this.columns) {
-      this.columnStates.setColumns(columns, visibleColumnsStorageKey);
+      this.columnStates.setColumns(columns);
       this.columns = columns;
     }
   }

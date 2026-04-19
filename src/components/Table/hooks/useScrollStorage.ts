@@ -1,8 +1,9 @@
 import { useMemo } from "react";
+import { usePageSessionStorage } from "src/hooks";
 
 /**
  * Track a table's scroll row index in `sessionStorage`, scoped to pathname + search + `tableId`.
- * Key: `scrollPosition_${window.location.pathname}${window.location.search}_${tableId}`. Browser-only.
+ * The storage key is derived by `usePageSessionStorage("scrollPosition", tableId, { includeSearch: true })`.
  * If `enabled` is false, reads return `undefined` (writes still allowed).
  *
  * Including search params ensures that different filter states have separate scroll positions,
@@ -12,19 +13,19 @@ import { useMemo } from "react";
  * @param enabled - Disable reads; defaults to true.
  */
 export function useScrollStorage(tableId: string, enabled: boolean = true) {
-  const storageKey = `scrollPosition_${window.location.pathname}${window.location.search}_${tableId}`;
+  const storage = usePageSessionStorage("scrollPosition", tableId, { includeSearch: true });
 
   return useMemo(
     () => ({
       getScrollIndex: () => {
         if (!enabled) return undefined;
-        const value = sessionStorage.getItem(storageKey);
+        const value = storage.getItem();
         return value === null ? undefined : parseInt(value, 10);
       },
       setScrollIndex: (index: number) => {
-        sessionStorage.setItem(storageKey, index.toString());
+        storage.setItem(index.toString());
       },
     }),
-    [storageKey, enabled],
+    [enabled, storage],
   );
 }

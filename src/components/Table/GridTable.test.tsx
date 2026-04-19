@@ -12,7 +12,7 @@ import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/component
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
-import { useComputed } from "src/hooks";
+import { getPageSessionStorageKey, useComputed } from "src/hooks";
 import { SelectField, TextField } from "src/inputs";
 import { isDefined, noop } from "src/utils";
 import {
@@ -1589,8 +1589,8 @@ describe("GridTable", () => {
 
   it("persists collapse", async () => {
     const tableIdentifier = "gridTableTest";
-    // Given that parent 2 is set to collapsed in local storage
-    sessionStorage.setItem(tableIdentifier, JSON.stringify(["p2", "p2c1"]));
+    // Given that parent 2 is set to collapsed in session storage
+    sessionStorage.setItem(tableSessionKey("collapsedRows", tableIdentifier), JSON.stringify(["p2", "p2c1"]));
     // And two parents with a child each
     const rows: GridDataRow<NestedRow>[] = [
       simpleHeader,
@@ -1608,19 +1608,17 @@ describe("GridTable", () => {
       },
     ];
 
-    // When we render the table with the persistCollapse prop set
-    const r = await render(
-      <GridTable<NestedRow> columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />,
-    );
+    // When we render the table with a stable table id
+    const r = await render(<GridTable<NestedRow> id={tableIdentifier} columns={nestedColumns} rows={rows} />);
     // Then the header is shown
-    expect(row(r, 0)).toBeDefined();
+    expect(row(r, 0, tableIdentifier)).toBeDefined();
     // And Child of parent 1 is shown
-    expect(row(r, 2)).toBeDefined();
+    expect(row(r, 2, tableIdentifier)).toBeDefined();
     // And Parent 2 is collapsed
-    expect(row(r, 4)).toBeUndefined();
+    expect(row(r, 4, tableIdentifier)).toBeUndefined();
 
-    // Unset local storage
-    sessionStorage.setItem(tableIdentifier, "");
+    // Unset session storage
+    sessionStorage.setItem(tableSessionKey("collapsedRows", tableIdentifier), "");
   });
 
   it("updates collapse state in header when collapsing and expanding the parent rows", async () => {
@@ -2781,8 +2779,8 @@ describe("GridTable", () => {
     expect(cell(r, 3, 2).textContent).toBe("child p2c1");
   });
 
-  it("respects initCollapsed on rows if persistCollapse is set but not yet stored", async () => {
-    const tableIdentifier = "persistCollapse";
+  it("respects initCollapsed on rows when no persisted collapse state exists", async () => {
+    const tableIdentifier = "collapsedRowsTable";
     // Given rows with a group row that is initially collapsed
     const rows: GridDataRow<NestedRow>[] = [
       simpleHeader,
@@ -2792,19 +2790,19 @@ describe("GridTable", () => {
       },
     ];
 
-    // When initially rendering the table with a 'persistCollapse' value, but an associated local storage item has not been set
-    const r = await render(<GridTable columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />);
+    // When initially rendering the table with a stable id, but no associated session storage item has been set
+    const r = await render(<GridTable id={tableIdentifier} columns={nestedColumns} rows={rows} />);
 
     // Then expect "parent 1" to be collapsed based on the GridDataRow property
-    expect(cell(r, 1, 0).textContent).toBe("+");
-    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    expect(cellOf(r, tableIdentifier, 1, 0).textContent).toBe("+");
+    expect(cellOf(r, tableIdentifier, 1, 2).textContent).toBe("parent 1");
 
-    // And the local storage value is initially set with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p1"]');
+    // And the session storage value is initially set with the current state
+    expect(sessionStorage.getItem(tableSessionKey("collapsedRows", tableIdentifier))).toBe('["keptGroup","p1"]');
   });
 
-  it("ignores initCollapsed on rows if persistCollapse is set and available in sessionStorage", async () => {
-    const tableIdentifier = "persistCollapse";
+  it("ignores initCollapsed on rows when persisted collapse state is available", async () => {
+    const tableIdentifier = "collapsedRowsTable";
     // Given rows with a group row that is initially collapsed
     const rows: GridDataRow<NestedRow>[] = [
       simpleHeader,
@@ -2814,15 +2812,15 @@ describe("GridTable", () => {
       },
     ];
 
-    sessionStorage.setItem(tableIdentifier, "[]");
+    sessionStorage.setItem(tableSessionKey("collapsedRows", tableIdentifier), "[]");
 
-    // When initially rendering the table with a 'persistCollapse' value with an existing sessionStorage value
-    const r = await render(<GridTable columns={nestedColumns} rows={rows} persistCollapse={tableIdentifier} />);
+    // When initially rendering the table with an existing session storage value
+    const r = await render(<GridTable id={tableIdentifier} columns={nestedColumns} rows={rows} />);
 
     // Then expect "parent 1" to not be collapsed
-    expect(cell(r, 1, 0).textContent).toBe("-");
-    expect(cell(r, 1, 2).textContent).toBe("parent 1");
-    expect(cell(r, 2, 2).textContent).toBe("child p1c1");
+    expect(cellOf(r, tableIdentifier, 1, 0).textContent).toBe("-");
+    expect(cellOf(r, tableIdentifier, 1, 2).textContent).toBe("parent 1");
+    expect(cellOf(r, tableIdentifier, 2, 2).textContent).toBe("child p1c1");
   });
 
   it("can update table with new rows with initCollapsed set and updates sessionStorage with new values", async () => {
@@ -2834,16 +2832,16 @@ describe("GridTable", () => {
           <button onClick={() => setRows(initRows)} data-testid="initRows" />
           <button onClick={() => setRows(newRows)} data-testid="updateRows" />
           <GridTable
+            id={tableIdentifier}
             columns={nestedColumns}
             rows={rows}
-            persistCollapse={tableIdentifier}
             fallbackMessage="Loading..."
           />
         </>
       );
     }
 
-    const tableIdentifier = "persistCollapse";
+    const tableIdentifier = "collapsedRowsTable";
     const staticRows: GridDataRow<NestedRow>[] = [
       { kind: "totals" as const, id: "totals", data: undefined },
       simpleHeader,
@@ -2869,39 +2867,39 @@ describe("GridTable", () => {
     ];
 
     // With the sessionStorage value differing from the initial row set.
-    sessionStorage.setItem(tableIdentifier, "[]");
+    sessionStorage.setItem(tableSessionKey("collapsedRows", tableIdentifier), "[]");
 
     // When rendering the table
     const r = await render(<TestComponent />);
 
     // Then expect the fallback message
-    expect(cell(r, 2, 0).textContent).toBe("Loading...");
+    expect(cellOf(r, tableIdentifier, 2, 0).textContent).toBe("Loading...");
 
     // When initializing the first set of rows
     click(r.initRows);
 
     // Then expect "parent 1" and "parent 2" to be expanded, as their `initCollapsed` properties were ignored due to the sessionStorage
-    expect(cell(r, 2, 0).textContent).toBe("-");
-    expect(cell(r, 4, 0).textContent).toBe("-");
+    expect(cellOf(r, tableIdentifier, 2, 0).textContent).toBe("-");
+    expect(cellOf(r, tableIdentifier, 4, 0).textContent).toBe("-");
 
     // When expanding parent 2
     click(r.collapse_2);
 
     // Then expect parent 2 to now be expanded
-    expect(cell(r, 4, 0).textContent).toBe("+");
+    expect(cellOf(r, tableIdentifier, 4, 0).textContent).toBe("+");
 
     // When updating the set of rows
     click(r.updateRows);
 
     // Then expect "parent 1" to remain not collapsed
-    expect(cell(r, 2, 0).textContent).toBe("-");
+    expect(cellOf(r, tableIdentifier, 2, 0).textContent).toBe("-");
     // And parent 2 to remain expanded, as it was updated since the initial render
-    expect(cell(r, 4, 0).textContent).toBe("+");
+    expect(cellOf(r, tableIdentifier, 4, 0).textContent).toBe("+");
     // And parent 3, the newly added row, to be collapsed based on its `initCollapsed` prop
-    expect(cell(r, 5, 0).textContent).toBe("+");
+    expect(cellOf(r, tableIdentifier, 5, 0).textContent).toBe("+");
 
-    // And the local storage value is updated with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p2","p3"]');
+    // And the session storage value is updated with the current state
+    expect(sessionStorage.getItem(tableSessionKey("collapsedRows", tableIdentifier))).toBe('["keptGroup","p2","p3"]');
   });
 
   it("can lazily initialize table with collapsed rows", async () => {
@@ -3201,37 +3199,41 @@ describe("GridTable", () => {
       expect(cell(r, 2, 0)).toHaveTextContent("Brandon");
     });
 
-    it("auto assigns 'visibleColumnsStorageKey'", async () => {
-      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
-
-      // Given some hide-able columns
+    it("scopes visible column persistence by page and table id", async () => {
+      const tableIdentifier = "scheduleTable";
       const columns: GridColumn<Row>[] = [
         { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initHidden: false },
-        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
-        { id: "action", header: () => "Action", data: () => "action" },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true, initHidden: false },
       ];
 
-      // Given a table
-      await render(<GridTable columns={columns} rows={rows} />);
-      // Then the visible column session storage is defined using a key build via the columns' `id` prop
-      expect(sessionStorage.setItem).toHaveBeenLastCalledWith("nameValueAction", '["name","action"]');
+      sessionStorage.setItem(
+        getPageSessionStorageKey("visibleColumns", { pathname: "/other", componentId: tableIdentifier }),
+        '{"value":false}',
+      );
+
+      const r = await render(<GridTable id={tableIdentifier} columns={columns} rows={rows} />);
+
+      expect(cellOf(r, tableIdentifier, 0, 0)).toHaveTextContent("Name");
+      expect(cellOf(r, tableIdentifier, 0, 1)).toHaveTextContent("Value");
     });
 
-    it("accepts a specified 'visibleColumnsStorageKey'", async () => {
-      vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
+    it("keeps newly added default-visible columns visible when saved visibility overrides exist", async () => {
+      const tableIdentifier = "testStorageKey";
+      const visibleColumnsKey = tableSessionKey("visibleColumns", tableIdentifier);
 
-      // Given some hide-able columns
+      sessionStorage.setItem(visibleColumnsKey, '{"value":false}');
+
       const columns: GridColumn<Row>[] = [
         { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initHidden: false },
-        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true },
+        { id: "value", header: () => "Value", data: ({ value }) => value, canHide: true, initHidden: false },
+        { id: "age", header: () => "Age", data: () => 42, canHide: true, initHidden: false },
       ];
 
-      // And a table with setting the `visibleColumnsStorageKey`
-      await render(<GridTable columns={columns} rows={rows} visibleColumnsStorageKey="testStorageKey" />);
-      // Then the visible column session storage is defined using the `visibleColumnsStorageKey` prop
-      expect(sessionStorage.setItem).toHaveBeenCalledWith("testStorageKey", '["name"]');
-      // And the column widths are also persisted using the same storage key
-      expect(sessionStorage.setItem).toHaveBeenCalledWith("columnWidths_testStorageKey", "{}");
+      const r = await render(<GridTable id={tableIdentifier} columns={columns} rows={rows} />);
+
+      expect(cellOf(r, tableIdentifier, 0, 0)).toHaveTextContent("Name");
+      expect(cellOf(r, tableIdentifier, 0, 1)).toHaveTextContent("Age");
+      expect(cellOf(r, tableIdentifier, 0, 2)).toBeUndefined();
     });
 
     it("respects setting inferSelectState to false", async () => {
@@ -3291,13 +3293,14 @@ describe("GridTable", () => {
       expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1gc2"]);
     });
 
-    it("respects initExpand and updates localStorage", async () => {
-      const tableIdentifier = "persistCollapse";
+    it("respects initExpand without needing a persisted override", async () => {
+      const tableIdentifier = "expandedColumnsTable";
 
       // Given a table with expandable columns that are initially expanded
       // When initially rendered with the expandable column set to `initExpanded: true`.
       const r = await render(
         <GridTable
+          id={tableIdentifier}
           columns={[
             column<ExpandableRow>({
               expandableHeader: () => "Client name",
@@ -3318,26 +3321,25 @@ describe("GridTable", () => {
             { kind: "expandableHeader", id: "expandableHeader", data: {} },
             { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
           ]}
-          persistCollapse={tableIdentifier}
         />,
       );
 
       // Then the column is initially expanded
-      expect(cell(r, 1, 0)).toHaveTextContent("First name");
-      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
-      // And the local storage value is updated with the current state
-      expect(sessionStorage.getItem(`expandedColumn_${tableIdentifier}`)).toBe('["beamColumn_0"]');
+      expect(cellOf(r, tableIdentifier, 1, 0)).toHaveTextContent("First name");
+      expect(cellOf(r, tableIdentifier, 1, 1)).toHaveTextContent("Last name");
+      expect(sessionStorage.getItem(tableSessionKey("expandedColumns", tableIdentifier))).toBeNull();
     });
 
-    it("respects initially expands columns set in localstorage", async () => {
-      const tableIdentifier = "persistCollapse";
+    it("respects saved expanded column overrides", async () => {
+      const tableIdentifier = "expandedColumnsTable";
 
-      sessionStorage.setItem(`expandedColumn_${tableIdentifier}`, JSON.stringify(["column1"]));
+      sessionStorage.setItem(tableSessionKey("expandedColumns", tableIdentifier), '{"column1":true}');
 
       // Given a table with expandable columns that are initially expanded
       // When initially rendered with the expandable column not initially collapsed
       const r = await render(
         <GridTable
+          id={tableIdentifier}
           columns={[
             column<ExpandableRow>({
               id: "column1",
@@ -3358,13 +3360,51 @@ describe("GridTable", () => {
             { kind: "expandableHeader", id: "expandableHeader", data: {} },
             { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
           ]}
-          persistCollapse={tableIdentifier}
         />,
       );
 
       // Then the column is initially expanded
-      expect(cell(r, 1, 0)).toHaveTextContent("First name");
-      expect(cell(r, 1, 1)).toHaveTextContent("Last name");
+      expect(cellOf(r, tableIdentifier, 1, 0)).toHaveTextContent("First name");
+      expect(cellOf(r, tableIdentifier, 1, 1)).toHaveTextContent("Last name");
+    });
+
+    it("keeps newly added initExpanded columns expanded when saved overrides exist", async () => {
+      const tableIdentifier = "expandedColumnsTable";
+
+      sessionStorage.setItem(tableSessionKey("expandedColumns", tableIdentifier), '{"column1":false}');
+
+      const r = await render(
+        <GridTable
+          id={tableIdentifier}
+          columns={[
+            column<ExpandableRow>({
+              id: "column1",
+              expandableHeader: () => "Name",
+              initExpanded: true,
+              header: (data, { expanded }) => (expanded ? "First name" : "Full name"),
+              data: ({ firstName, lastName }, { expanded }) => (expanded ? firstName : `${firstName} ${lastName}`),
+              expandColumns: [column<ExpandableRow>({ expandableHeader: emptyCell, header: "Last name", data: ({ lastName }) => lastName })],
+            }),
+            column<ExpandableRow>({
+              id: "column2",
+              expandableHeader: () => "Age",
+              initExpanded: true,
+              header: () => "Age",
+              data: ({ age }) => age,
+              expandColumns: [column<ExpandableRow>({ expandableHeader: emptyCell, header: "Years", data: ({ age }) => age })],
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      expect(cellOf(r, tableIdentifier, 1, 0)).toHaveTextContent("Full name");
+      expect(cellOf(r, tableIdentifier, 1, 1)).toHaveTextContent("Age");
+      expect(cellOf(r, tableIdentifier, 1, 2)).toHaveTextContent("Years");
     });
 
     it("ignores init expanded, but respects new columns", async () => {
@@ -4113,6 +4153,10 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1)).toBeUndefined();
   });
 });
+
+function tableSessionKey(storageName: string, tableId: string = "gridTable", includeSearch: boolean = false): string {
+  return getPageSessionStorageKey(storageName, { componentId: tableId, includeSearch });
+}
 
 function Collapse({ id }: { id: string }) {
   const { tableState } = useContext(TableStateContext);

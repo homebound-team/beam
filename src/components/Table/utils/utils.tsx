@@ -8,6 +8,7 @@ import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnBorder, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
+import { createSessionStorageAdapter, type SessionStorageInput } from "src/hooks/usePageSessionStorage";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
@@ -264,13 +265,18 @@ export const zIndices = {
 };
 
 /** Loads an array from sessionStorage, if it exists, or `undefined`. */
-export function loadArrayOrUndefined(key: string) {
+export function loadArrayOrUndefined(storage: SessionStorageInput): string[] | undefined {
+  const storageAdapter = typeof storage === "string" ? createSessionStorageAdapter(storage) : storage;
+
   try {
-    const ids = sessionStorage.getItem(key);
-    return ids ? JSON.parse(ids) : undefined;
-  } catch (e) {
+    const ids = storageAdapter.getItem();
+    if (ids === null) return undefined;
+
+    const parsed = JSON.parse(ids);
+    return Array.isArray(parsed) && parsed.every((value) => typeof value === "string") ? parsed : undefined;
+  } catch {
     // If the stored value is invalid JSON (e.g., the string "undefined"), remove it
-    sessionStorage.removeItem(key);
+    storageAdapter.removeItem();
     return undefined;
   }
 }
