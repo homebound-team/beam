@@ -58,7 +58,8 @@ describe("TreeFilter", () => {
     const r = await render(<TestFilter filterBy="all" defaultValue={["gp:0"]} />);
     // Then the filter is correctly initialized
     expect(r.filter_tree).toHaveValue("");
-    expect(r.selectedOptionsCount).toHaveTextContent("1");
+    expect(r.query.selectedOptionsCount).not.toBeInTheDocument();
+    expect(r.filter_tree_unfocusedPlaceholderContainer).toHaveTextContent("Grandparent 0");
     expect(r.value).toHaveTextContent('{"tree":["gp:0"]}');
   });
 

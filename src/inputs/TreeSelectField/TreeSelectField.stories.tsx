@@ -185,6 +185,23 @@ export const OpenMenu = newStory(
   },
 );
 
+export const OpenMenuWithSelections = newStory(
+  () => (
+    <TestTreeSelectField
+      values={["baseball", "basketball"]}
+      options={getLeagueOptions()}
+      label="Favorite League"
+      placeholder="Select a league"
+    />
+  ),
+  {
+    play: async ({ canvasElement }) => {
+      const canvas = within(canvasElement);
+      canvas.getByTestId("toggleListBox").click();
+    },
+  },
+);
+
 export function AsyncOptions() {
   const options = getLeagueOptions();
   const initialOption = [options[0]];

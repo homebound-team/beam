@@ -84,7 +84,6 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
 
   const [isFocused, setIsFocused] = useState(false);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
-  const showNumSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 1;
   // Show selections as chips when using multiselect when unfocused
   const showChipSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 0;
   // For MultiSelect only show the `fieldDecoration` when input is not in focus.
@@ -94,6 +93,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const multilineProps = allowWrap ? { textAreaMinHeight: 0, multiline: true } : {};
 
   const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
+  const selectedChipCount = chipLabels.length;
+  const showNumSelection = isMultiSelect && selectedChipCount > 1;
 
   useGrowingTextField({
     // This says: When using a multiselect, then only enable the growing textfield when we are focused on it.
@@ -119,10 +120,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       startAdornment={
         (showNumSelection && (
           <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
-            <CountBadge
-              count={isTree ? (selectedOptionsLabels?.length ?? 0) : state.selectionManager.selectedKeys.size}
-              data-testid="selectedOptionsCount"
-            />
+            <CountBadge count={selectedChipCount} data-testid="selectedOptionsCount" />
           </Tooltip>
         )) ||
         (showFieldDecoration && fieldDecoration(selectedOptions[0]))

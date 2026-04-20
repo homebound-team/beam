@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, within } from "@testing-library/react";
 import { useState } from "react";
 import { TreeSelectField } from "src/inputs";
 import { NestedOption } from "src/inputs/TreeSelectField/utils";
@@ -224,6 +224,61 @@ describe("TreeSelectField", () => {
     // And the parent options checkboxes are in the indeterminate state
     expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
     expect(r.treeOption_football_checkbox).toHaveAttribute("data-checked", "mixed");
+  });
+
+  it("renders the selected chip list above the open options", async () => {
+    // Given a TreeSelectField with multiple top-level selections
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={["baseball", "basketball"]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When opening the options
+    click(r.favoriteLeague);
+
+    // Then the open listbox shows the same selected chips above the options list
+    const chips = within(r.getByRole("listbox")).getAllByTestId("chip");
+    expect(chips).toHaveLength(2);
+    expect(chips[0]).toHaveTextContent("Baseball");
+    expect(chips[1]).toHaveTextContent("Basketball");
+  });
+
+  it("can remove selections by clicking the open chip list", async () => {
+    // Given a TreeSelectField with multiple top-level selections
+    const onSelect = vi.fn() as any;
+    const options = getNestedOptions();
+    const basketballOption = options[1];
+    const nbaOption = basketballOption.children![0];
+    const wnbaOption = basketballOption.children![1];
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        options={options}
+        label="Favorite League"
+        values={["baseball", "basketball"]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When opening the options and clicking a selected chip
+    click(r.favoriteLeague);
+    const chips = within(r.getByRole("listbox")).getAllByTestId("chip");
+    click(chips[0]);
+
+    // Then the menu remains open and the corresponding tree selection is removed
+    expect(r.getByRole("listbox")).toBeInTheDocument();
+    expect(onSelect).toHaveBeenCalledWith({
+      all: { values: ["basketball", "nba", "wnba"], options: [basketballOption, nbaOption, wnbaOption] },
+      leaf: { values: ["nba", "wnba"], options: [nbaOption, wnbaOption] },
+      root: { values: ["basketball"], options: [basketballOption] },
+    });
   });
 
   it("renders with one option selected", async () => {
@@ -716,6 +771,32 @@ describe("TreeSelectField", () => {
     expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent("MLBMinor League BaseballNBAWNBA");
   });
 
+  it("uses chipDisplay for the open selected chip list", async () => {
+    // Given the TreeSelectField with top level options selected and chipDisplay of 'leaf'
+    const r = await render(
+      <TreeSelectField
+        chipDisplay="leaf"
+        onSelect={noop}
+        values={["baseball", "basketball"]}
+        options={getNestedOptions()}
+        label="Favorite League"
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When we open the menu
+    click(r.favoriteLeague);
+
+    // Then the open chip list matches the same leaf selections shown in the field
+    const chips = within(r.getByRole("listbox")).getAllByTestId("chip");
+    expect(chips).toHaveLength(4);
+    expect(chips[0]).toHaveTextContent("MLB");
+    expect(chips[1]).toHaveTextContent("Minor League Baseball");
+    expect(chips[2]).toHaveTextContent("NBA");
+    expect(chips[3]).toHaveTextContent("WNBA");
+  });
+
   it("respects chipDisplay for 'all'", async () => {
     // Given the TreeSelectField with top level options selected and chipDisplay of 'all'
     const r = await render(
@@ -764,7 +845,7 @@ describe("TreeSelectField", () => {
     click(r.update);
 
     // Then the only remaining option is Baseball
-    expect(r.selectedOptionsCount).toHaveTextContent("1");
+    expect(r.query.selectedOptionsCount).not.toBeInTheDocument();
     expect(r.favoriteLeague_unfocusedPlaceholderContainer).toHaveTextContent("Baseball");
   });
 
