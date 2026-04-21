@@ -13,9 +13,9 @@ export type TreeFieldState<O> = {
   searchValue?: string;
   selectedKeys: AriaKey[];
   selectedOptions: NestedOption<O>[];
-  /** These are the labels of the top-level selected values
-   * (e.g. ["d1c1", "d1c1p1", "d2c2p1"] will be ["d1c1", "d2c2p1"]).
-   */
+  /** These are the selected options shown as chips for the current `chipDisplay` mode. */
+  selectedChipOptions: NestedOption<O>[];
+  /** These are the labels shown as chips for the current `chipDisplay` mode. */
   selectedOptionsLabels: string[];
   allOptions: NestedOption<O>[];
   optionsLoading: boolean;

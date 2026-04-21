@@ -247,13 +247,15 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
       return [maybeOption.option];
     });
 
-    // Store a list of the selected option labels so we can quickly refer to them later
-    const selectedOptionsLabels =
-      chipDisplay === "root"
-        ? initialOptions.flatMap((o) => getTopLevelSelections(o, selectedKeys, getOptionValue)).map(getOptionLabel)
-        : chipDisplay === "leaf"
-          ? selectedOptions.filter((o) => !o.children || o.children.length === 0).map(getOptionLabel)
-          : selectedOptions.map(getOptionLabel);
+    // Store the selected options shown as chips so we can reuse them across the input and open listbox.
+    const selectedChipState = getSelectedChipState(
+      initialOptions,
+      selectedOptions,
+      selectedKeys,
+      chipDisplay,
+      getOptionLabel,
+      getOptionValue,
+    );
 
     return {
       selectedKeys: [...selectedKeys],
@@ -262,13 +264,14 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         selectedOptions.length === 1
           ? getOptionLabel([...selectedOptions][0])
           : isReadOnly && selectedOptions.length > 0
-            ? selectedOptionsLabels.join(", ")
+            ? selectedChipState.labels.join(", ")
             : selectedOptions.length === 0
               ? nothingSelectedText
               : "",
       selectedOptions,
+      selectedChipOptions: selectedChipState.options,
       allOptions: initialOptions,
-      selectedOptionsLabels,
+      selectedOptionsLabels: selectedChipState.labels,
       optionsLoading: false,
       allowCollapsing: true,
     };
@@ -424,6 +427,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             allowCollapsing: true,
             selectedKeys: [],
             selectedOptions: [],
+            selectedChipOptions: [],
+            selectedOptionsLabels: [],
           }));
           onSelect({
             all: { values: [], options: [] },
@@ -520,6 +525,14 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         // Finally get the list of options that are just the "leaf" options, meaning they have no children.
         const leafOptions = selectedOptions.filter((o) => !o.children || o.children.length === 0);
         const leafValues = leafOptions.map(getOptionValue);
+        const selectedChipState = getSelectedChipState(
+          fieldState.allOptions,
+          selectedOptions,
+          selectedKeys,
+          chipDisplay,
+          getOptionLabel,
+          getOptionValue,
+        );
 
         setFieldState((prevState) => ({
           ...prevState,
@@ -528,12 +541,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
           searchValue: undefined,
           selectedKeys: [...selectedKeys],
           selectedOptions,
-          selectedOptionsLabels:
-            chipDisplay === "root"
-              ? rootOptions.map(getOptionLabel)
-              : chipDisplay === "leaf"
-                ? leafOptions.map(getOptionLabel)
-                : selectedOptions.map(getOptionLabel),
+          selectedChipOptions: selectedChipState.options,
+          selectedOptionsLabels: selectedChipState.labels,
         }));
 
         onSelect({
@@ -653,7 +662,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             positionProps={positionProps}
             state={state}
             listBoxRef={listBoxRef}
-            selectedOptions={fieldState.selectedOptions}
+            selectedOptions={fieldState.selectedChipOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
             contrast={contrast}
@@ -737,4 +746,49 @@ function isOptionFullySelected<O, V extends Value>(
   return option.children.every((child) =>
     isOptionFullySelected(child, selectedKeys, disabledKeys, groupKeys, getOptionValue),
   );
+}
+
+function getSelectedChipState<O, V extends Value>(
+  allOptions: NestedOption<O>[],
+  selectedOptions: NestedOption<O>[],
+  selectedKeys: Set<AriaKey>,
+  chipDisplay: "all" | "leaf" | "root",
+  getOptionLabel: (o: O) => string,
+  getOptionValue: (o: O) => V,
+): { options: NestedOption<O>[]; labels: string[] } {
+  // `root` mode intentionally collapses a fully-selected subtree into its highest selected ancestor,
+  // so the chip UI summarizes the selection instead of repeating every selected descendant.
+  const options =
+    chipDisplay === "root"
+      ? dedupeOptionsByValue(
+          allOptions.flatMap((option) => getTopLevelSelections(option, selectedKeys, getOptionValue)),
+          getOptionValue,
+        )
+      : chipDisplay === "leaf"
+        ? selectedOptions.filter(isLeafOption)
+        : selectedOptions;
+
+  return { options, labels: options.map(getOptionLabel) };
+}
+
+/**
+ * Dedupe tree selections by value so shared chip rendering shows one chip per logical selection,
+ * even when tree traversal yields the same option multiple times.
+ */
+function dedupeOptionsByValue<O, V extends Value>(
+  options: NestedOption<O>[],
+  getOptionValue: (o: O) => V,
+): NestedOption<O>[] {
+  const seen = new Set<AriaKey>();
+
+  return options.filter(function filterOption(option) {
+    const key = valueToKey(getOptionValue(option));
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function isLeafOption<O>(option: NestedOption<O>): boolean {
+  return !option.children || option.children.length === 0;
 }
