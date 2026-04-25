@@ -1,6 +1,5 @@
 import { act, fireEvent } from "@testing-library/react";
 import { MutableRefObject, useContext, useMemo, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
@@ -28,6 +27,7 @@ import {
   wait,
   withRouter,
 } from "src/utils/rtl";
+import { Temporal } from "temporal-polyfill";
 import { vi } from "vitest";
 import { GridCellContent } from "./components/cell";
 
