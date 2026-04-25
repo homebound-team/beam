@@ -207,7 +207,7 @@ function MiscAuthorDetails({ formState, onBack }: { formState: FormValue; onBack
                   <strong>Books</strong> {formState.value.books?.map((b) => b.title).join(", ")}
                 </li>
                 <li>
-                  <strong>Birthday</strong> {formState.value.birthday?.toDateString()}
+                  <strong>Birthday</strong> {formState.value.birthday?.toString()}
                 </li>
                 <li>
                   <strong>Height</strong> {formState.value.heightInInches}

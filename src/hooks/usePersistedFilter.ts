@@ -1,18 +1,19 @@
-import { useEffect, useMemo } from "react";
-import { FilterDefs } from "src/components";
+import { useEffect, useMemo, useRef } from "react";
+import { type FilterDefs, type FilterImpls } from "src/components";
 import { useSessionStorage } from "src/hooks";
+import { type AnyObject } from "src/types";
 import { safeEntries, safeKeys } from "src/utils";
 import { JsonParam, useQueryParams } from "use-query-params";
 
-export interface UsePersistedFilterProps<F> {
+export type UsePersistedFilterProps<F> = {
   filterDefs: FilterDefs<F>;
   storageKey: string;
-}
+};
 
-interface PersistedFilterHook<F> {
+type PersistedFilterHook<F> = {
   filter: F;
   setFilter: (filter: F) => void;
-}
+};
 
 /**
  * Persists filter details in both browser storage and query parameters.
@@ -20,22 +21,54 @@ interface PersistedFilterHook<F> {
  * Otherwise it looks at browser storage, and finally the defaultFilter prop.
  */
 export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFilterProps<F>): PersistedFilterHook<F> {
-  const filterKeys = Object.keys(filterDefs);
+  const filterImpls = useMemo(
+    () => Object.fromEntries(safeEntries(filterDefs).map(([key, def]) => [key, def(key as string)])) as FilterImpls<F>,
+    [filterDefs],
+  );
+  const filterKeys = useMemo(() => Object.keys(filterImpls) as (keyof F)[], [filterImpls]);
   const defaultFilter = useMemo(
     () =>
       Object.fromEntries(
-        safeEntries(filterDefs)
-          .filter(([key, def]) => def(key as string).defaultValue !== undefined)
-          .map(([key, def]) => [key, def(key as string).defaultValue]),
+        safeEntries(filterImpls)
+          .filter(([, def]) => def.defaultValue !== undefined)
+          .map(([key, def]) => [key, def.defaultValue]),
       ),
-    [filterDefs],
+    [filterImpls],
   );
   const [{ filter: queryParamsFilter }, setQueryParams] = useQueryParams({ filter: JsonParam });
-  const [storedFilter, setStoredFilter] = useSessionStorage<F>(storageKey, queryParamsFilter ?? defaultFilter);
+  const [storedFilter, setStoredFilter] = useSessionStorage<unknown>(
+    storageKey,
+    dehydrateFilter(filterImpls, defaultFilter as F) ?? defaultFilter,
+  );
   const isQueryParamFilterValid = hasValidFilterKeys(queryParamsFilter, filterKeys);
-  const filter: F = isQueryParamFilterValid ? queryParamsFilter : (storedFilter ?? defaultFilter);
+  // `use-query-params` / session storage can hand us fresh object identities even when the
+  // underlying filter contents have not changed. We normalize them through a serialized snapshot
+  // so downstream `useMemo`s can key off content changes instead of identity churn.
+  const serializedQueryParamsFilter = useMemo(() => JSON.stringify(queryParamsFilter), [queryParamsFilter]);
+  const serializedStoredFilter = useMemo(() => JSON.stringify(storedFilter), [storedFilter]);
+  const queryParamsFilterSnapshot = useMemo(
+    () => parseSerializedValue(serializedQueryParamsFilter),
+    [serializedQueryParamsFilter],
+  );
+  const storedFilterSnapshot = useMemo(() => parseSerializedValue(serializedStoredFilter), [serializedStoredFilter]);
+  const hydratedQueryParamsFilter = useMemo(
+    () => (isQueryParamFilterValid ? hydrateFilter(filterImpls, queryParamsFilterSnapshot) : undefined),
+    [filterImpls, isQueryParamFilterValid, queryParamsFilterSnapshot],
+  );
+  const hydratedStoredFilter = useMemo(
+    () =>
+      hasValidFilterKeys(storedFilterSnapshot as F, filterKeys)
+        ? hydrateFilter(filterImpls, storedFilterSnapshot)
+        : undefined,
+    [filterImpls, filterKeys, storedFilterSnapshot],
+  );
+  // Prefer query params over session storage over defaults, but then keep the returned object
+  // reference stable for logically-equal filters. Callers frequently put `filter` into effect
+  // dependency arrays, so returning a fresh object every render can cause accidental rerender loops.
+  const rawFilter = hydratedQueryParamsFilter ?? hydratedStoredFilter ?? (defaultFilter as F);
+  const filter = useStableValue(rawFilter);
 
-  const setFilter = (filter: F) => setQueryParams({ filter });
+  const setFilter = (filter: F) => setQueryParams({ filter: dehydrateFilter(filterImpls, filter) });
 
   useEffect(
     () => {
@@ -46,7 +79,7 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
         setQueryParams({ filter: storedFilter }, "replaceIn");
       } else if (!isQueryParamFilterValid) {
         // if there are invalid query params, fallback to the default filters
-        setQueryParams({ filter: defaultFilter }, "replaceIn");
+        setQueryParams({ filter: dehydrateFilter(filterImpls, defaultFilter as F) }, "replaceIn");
       } else if (JSON.stringify(queryParamsFilter) !== JSON.stringify(storedFilter)) {
         // if there is a valid filter in query params and its different from the
         // current storedFilter, use query params filter
@@ -63,5 +96,56 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
 
 // check for valid filter keys in the query params
 function hasValidFilterKeys<F>(queryParamsFilter: F, definedKeys: (keyof F)[]): queryParamsFilter is F {
-  return queryParamsFilter && safeKeys(queryParamsFilter).every((key) => definedKeys.includes(key as keyof F));
+  return !!queryParamsFilter && safeKeys(queryParamsFilter).every((key) => definedKeys.includes(key as keyof F));
+}
+
+/** Rebuilds persisted filter values via each filter's hydrate hook so rich runtime values can round-trip safely. */
+function hydrateFilter<F>(filterImpls: FilterImpls<F>, value: unknown): F | undefined {
+  if (typeof value !== "object" || value === null) return undefined;
+  const hydratedEntries: [string, unknown][] = [];
+  safeEntries(value as AnyObject).forEach(([key, rawValue]) => {
+    const filter = filterImpls[key as keyof F];
+    // Ignore unknown keys so old query params / session state keep working after filter definitions change.
+    if (!filter) return;
+    const hydratedValue = filter.hydrate
+      ? filter.hydrate(rawValue)
+      : (rawValue as Exclude<F[keyof F], null | undefined> | undefined);
+    // Dropping undefined lets filters reject stale or invalid persisted values without leaving partial state behind.
+    if (hydratedValue !== undefined) {
+      hydratedEntries.push([key, hydratedValue]);
+    }
+  });
+  return Object.fromEntries(hydratedEntries) as F;
+}
+
+/** Converts runtime filter values into the JSON-safe shape we store in query params and session storage. */
+function dehydrateFilter<F>(filterImpls: FilterImpls<F>, value: F | undefined): unknown {
+  if (!value) return value;
+  return Object.fromEntries(
+    safeEntries(value as AnyObject).map(([key, rawValue]) => {
+      const filter = filterImpls[key as keyof F];
+      return [
+        key,
+        // Let each filter own serialization so persisted state stays stable for non-plain JSON values like PlainDate.
+        filter?.dehydrate ? filter.dehydrate(rawValue as Exclude<F[keyof F], null | undefined> | undefined) : rawValue,
+      ];
+    }),
+  );
+}
+
+function parseSerializedValue(value: string | undefined): unknown {
+  return value === undefined ? undefined : JSON.parse(value);
+}
+
+function useStableValue<T>(value: T): T {
+  // Preserve the previous object identity until the serialized contents actually change.
+  // This keeps hook consumers from seeing spurious dependency changes for equivalent filters.
+  const stableValue = useRef(value);
+  const stableKey = useRef(JSON.stringify(value));
+  const nextKey = JSON.stringify(value);
+  if (stableKey.current !== nextKey) {
+    stableValue.current = value;
+    stableKey.current = nextKey;
+  }
+  return stableValue.current;
 }

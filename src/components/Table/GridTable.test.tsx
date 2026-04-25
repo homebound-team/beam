@@ -27,6 +27,7 @@ import {
   wait,
   withRouter,
 } from "src/utils/rtl";
+import { Temporal } from "temporal-polyfill";
 import { vi } from "vitest";
 import { GridCellContent } from "./components/cell";
 
@@ -434,6 +435,37 @@ describe("GridTable", () => {
       );
       // Then the `value: 1` row is first
       expect(cell(r, 1, 0)).toHaveTextContent("c");
+    });
+
+    it("can sort PlainDate sort values", async () => {
+      // Given the table is using client-side sorting with Temporal.PlainDate sort values
+      const r = await render(
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            {
+              id: "plainDate",
+              header: () => "Date",
+              data: (row) => ({
+                value: row.name,
+                sortValue: Temporal.PlainDate.from(`2024-01-0${row.value}`),
+                content: <div>{row.name}</div>,
+              }),
+            },
+          ]}
+          sorting={{ on: "client", initial: ["plainDate", "ASC"] }}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "2", data: { name: "b", value: 2 } },
+            { kind: "data", id: "1", data: { name: "a", value: 3 } },
+            { kind: "data", id: "3", data: { name: "c", value: 1 } },
+          ]}
+        />,
+      );
+      // Then the earliest PlainDate row is first
+      expect(cell(r, 1, 0)).toHaveTextContent("c");
+      expect(cell(r, 2, 0)).toHaveTextContent("b");
+      expect(cell(r, 3, 0)).toHaveTextContent("a");
     });
 
     it("can sort undefined values", async () => {

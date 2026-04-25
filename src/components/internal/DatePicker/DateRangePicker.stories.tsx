@@ -1,10 +1,10 @@
-import { Meta } from "@storybook/react-vite";
-import { format } from "date-fns";
+import { type Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { DateRangePicker } from "src/components/internal/DatePicker";
 import { Css } from "src/Css";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/forms/formStateDomain";
-import { DateRange } from "src/types";
+import { type DateRange } from "src/types";
+import { formatPlainDate } from "src/utils/plainDate";
 
 export default {
   component: DateRangePicker,
@@ -24,8 +24,7 @@ export function Default() {
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
-          {range?.from && format(new Date(range?.from), "MM/dd/yyyy")} -{" "}
-          {range?.to && format(new Date(range?.to), "MM/dd/yyyy")}
+          {range?.from && formatPlainDate(range.from, "date")} - {range?.to && formatPlainDate(range.to, "date")}
         </span>
       </div>
     </div>
@@ -46,8 +45,7 @@ export function WithYearControlHeader() {
       <div css={Css.mt1.$}>
         <strong>Selected Range:</strong>
         <span css={Css.ml1.$}>
-          {range?.from && format(new Date(range?.from), "MM/dd/yyyy")} -{" "}
-          {range?.to && format(new Date(range?.to), "MM/dd/yyyy")}
+          {range?.from && formatPlainDate(range.from, "date")} - {range?.to && formatPlainDate(range.to, "date")}
         </span>
       </div>
     </div>

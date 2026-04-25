@@ -1,12 +1,12 @@
-import { format, parse } from "date-fns";
 import { useState } from "react";
-import { DateFieldProps } from "src/inputs";
+import { type DateFieldProps } from "src/inputs";
+import { dateFormats, formatDate, parseDate } from "src/inputs/DateFields/utils";
 import { maybeCall, useTestIds } from "src/utils";
 
 /** Mocks out `DateField` as a text `<input>` field. */
 export function DateFieldMock(props: DateFieldProps) {
   const { onChange = () => {}, errorMsg, onBlur, onFocus } = props;
-  const [value, setValue] = useState(props.value ? format(props.value, "MM/dd/yy") : "");
+  const [value, setValue] = useState(formatDate(props.value, dateFormats.short));
   const tid = useTestIds(props, "date");
   return (
     <input
@@ -16,7 +16,7 @@ export function DateFieldMock(props: DateFieldProps) {
       onChange={(e) => {
         const { value } = e.target;
         setValue(value);
-        onChange(parse(value, "MM/dd/yy", new Date()));
+        onChange(parseDate(value, dateFormats.short));
       }}
       onBlur={() => maybeCall(onBlur)}
       onFocus={() => maybeCall(onFocus)}
