@@ -72,8 +72,8 @@ export function rowAnd(r: RenderResult, rowNum: number, testId: string): HTMLEle
  "
  `);
  * */
-export function tableSnapshot(r: RenderResult, columnNames: string[] = []): string {
-  const tableEl = r.getByTestId("gridTable");
+export function tableSnapshot(r: RenderResult, columnNames: string[] = [], tableTestId: string = "gridTable"): string {
+  const tableEl = r.getByTestId(tableTestId);
   const dataRows = Array.from(tableEl.querySelectorAll("[data-gridrow]"));
   const hasExpandableHeader = !!tableEl.querySelector(`[data-testid="expandableColumn"]`);
 
