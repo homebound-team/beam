@@ -3578,6 +3578,33 @@ describe("GridTable", () => {
     `);
   });
 
+  it("tableSnapshot can target a table by a custom testId", async () => {
+    // Given two tables rendered together with distinct testIds
+    const r = await render(
+      <div>
+        <GridTable
+          id="firstTable"
+          columns={[nameColumn, valueColumn]}
+          rows={[simpleHeader, { kind: "data", id: "1", data: { name: "First Row", value: 100 } }]}
+        />
+        <GridTable
+          id="secondTable"
+          columns={[nameColumn, valueColumn]}
+          rows={[simpleHeader, { kind: "data", id: "1", data: { name: "Second Row", value: 200 } }]}
+        />
+      </div>,
+    );
+
+    // Then the snapshot can be scoped to the second table via the tableTestId argument
+    expect(tableSnapshot(r, [], "secondTable")).toMatchInlineSnapshot(`
+      "
+      | Name       | Value |
+      | ---------- | ----- |
+      | Second Row | 200   |
+      "
+    `);
+  });
+
   it("renders totals row in the correct order", async () => {
     type Row = SimpleHeaderAndData<Data> | TotalsRow;
     // Given a table with simple header, totals, and data row
