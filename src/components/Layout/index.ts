@@ -4,4 +4,5 @@ export * from "./GridTableLayout/GridTableLayout";
 export * from "./PreventBrowserScroll";
 export * from "./RightPaneLayout";
 export * from "./ScrollableContent";
+export * from "./ScrollableFooter";
 export * from "./ScrollableParent";
