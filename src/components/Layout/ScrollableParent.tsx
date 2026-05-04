@@ -13,6 +13,7 @@ import { Css, maybeInc, Properties } from "src/Css";
 
 interface ScrollableParentContextProps {
   scrollableEl: HTMLElement | null;
+  footerEl: HTMLElement | null;
   paddingRight: string;
   paddingLeft: string;
   setPortalTick: Dispatch<SetStateAction<number>>;
@@ -20,6 +21,7 @@ interface ScrollableParentContextProps {
 
 const ScrollableParentContext = createContext<ScrollableParentContextProps>({
   scrollableEl: null,
+  footerEl: null,
   paddingRight: "0px",
   paddingLeft: "0px",
   setPortalTick: (v) => {},
@@ -69,11 +71,16 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
     el.style.height = "100%";
     return el;
   }, []);
+  // Sibling of the scrollable region; receives `ScrollableFooter` content. Empty when no footer
+  // is portaled, so the layout is identical to today's two-slot version in that case.
+  const footerEl = useMemo(() => document.createElement("div"), []);
   const [, setTick] = useState(0);
   const hasScrollableContent = scrollableEl.childNodes.length > 0;
   const scrollableRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
   const context: ScrollableParentContextProps = {
     scrollableEl,
+    footerEl,
     paddingLeft,
     paddingRight,
     setPortalTick: setTick,
@@ -82,6 +89,10 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
   useEffect(() => {
     scrollableRef.current!.appendChild(scrollableEl);
   }, [scrollableEl]);
+
+  useEffect(() => {
+    footerRef.current!.appendChild(footerEl);
+  }, [footerEl]);
 
   return (
     <ScrollableParentContext.Provider value={context}>
@@ -101,6 +112,9 @@ export function ScrollableParent(props: PropsWithChildren<ScrollableParentContex
         </div>
         {/* Set fg1 to take up the remaining space in the viewport.*/}
         <div css={Css.fg1.oa.$} ref={scrollableRef} />
+        {/* Sibling slot for `ScrollableFooter`. fs0 keeps it at its natural height so the
+         * scrollable region above shrinks instead of the footer being clipped. */}
+        <div css={Css.fs0.$} ref={footerRef} />
       </Tag>
     </ScrollableParentContext.Provider>
   );

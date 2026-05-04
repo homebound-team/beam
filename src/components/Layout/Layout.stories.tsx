@@ -5,12 +5,14 @@ import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css, Palette } from "src/Css";
 import { FormLines } from "src/forms";
 import {
+  Button,
   FullBleed,
   GridColumn,
   GridDataRow,
   GridTable,
   PreventBrowserScroll,
   ScrollableContent,
+  ScrollableFooter,
   ScrollableParent,
   simpleHeader,
   SimpleHeaderAndData,
@@ -65,6 +67,23 @@ export function VirtualizedScrolling() {
   return (
     <TestProjectLayout>
       <VirtualizedPage />
+    </TestProjectLayout>
+  );
+}
+
+export function WithFooter() {
+  return (
+    <TestProjectLayout>
+      <TestHeader title="Enter Bid Information" />
+      <ScrollableContent virtualized>
+        <TableExample virtualized numCols={20} numRows={200} />
+      </ScrollableContent>
+      <ScrollableFooter>
+        <div css={Css.df.aic.jcfe.gap2.bgWhite.bt.bcGray200.px3.py2.bshHover.$}>
+          <Button variant="quaternary" size="lg" label="Cancel" onClick={() => {}} />
+          <Button size="lg" label="Save" onClick={() => {}} />
+        </div>
+      </ScrollableFooter>
     </TestProjectLayout>
   );
 }
