@@ -16,6 +16,7 @@ export default {
 } satisfies Meta;
 
 type Data = {
+  id: string;
   code: string;
   itemCode: string;
   name: string;
@@ -46,7 +47,7 @@ const rows: GridDataRow<Row>[] = [
 ];
 
 function row(id: string, code: string, itemCode: string, name: string, location: string, feature: string, requestType: "ADD" | "DELETE", designerName: string, requestDate: string, takeoffSection: string, materialCode: string, uom: string, qty: string, budget: string, priority: string): DataRow {
-  return { kind: "data", id, data: { code, itemCode, name, location, feature, requestType, designerName, requestDate, takeoffSection, materialCode, uom, qty, budget, priority } };
+  return { kind: "data", id, data: { id, code, itemCode, name, location, feature, requestType, designerName, requestDate, takeoffSection, materialCode, uom, qty, budget, priority } };
 }
 
 const description = (
@@ -100,7 +101,8 @@ export function TableReviewLayout() {
             <Button
               label="View"
               variant="secondary"
-              onClick={() =>
+              onClick={() => {
+                const isOdd = Number(rowData.id) % 2 !== 0;
                 setPanelContent(
                   <SidePanel
                     title={rowData.name}
@@ -108,16 +110,37 @@ export function TableReviewLayout() {
                     secondaryAction={{ label: "Reject", icon: "x", onClick: () => setPanelContent(null) }}
                   >
                     <div css={Css.p3.df.fdc.gap3.$}>
-                      <Field label="Placeholder type" value={`${rowData.itemCode} ${rowData.name}`} />
-                      <Field label="Location" value={rowData.location} />
-                      <Field label="Feature" value={rowData.feature} />
-                      <Field label="UoM" value={rowData.uom} />
-                      <Field label="Qty" value={rowData.qty} />
-                      <Field label="Budget" value={rowData.budget} />
+                      {isOdd ? (
+                        <>
+                          <Field label="Placeholder type" value={`${rowData.itemCode} ${rowData.name}`} />
+                          <Field label="Code" value={rowData.code} />
+                          <Field label="Location" value={rowData.location} />
+                          <Field label="Feature" value={rowData.feature} />
+                          <Field label="Type" value={rowData.requestType} />
+                          <Field label="Designer" value={rowData.designerName} />
+                          <Field label="Request date" value={rowData.requestDate} />
+                          <Field label="Takeoff section" value={rowData.takeoffSection} />
+                          <Field label="Material code" value={rowData.materialCode} />
+                          <Field label="UoM" value={rowData.uom} />
+                          <Field label="Qty" value={rowData.qty} />
+                          <Field label="Budget" value={rowData.budget} />
+                          <Field label="Priority" value={rowData.priority} />
+                        </>
+                      ) : (
+                        <>
+                          <Field label="Placeholder type" value={`${rowData.itemCode} ${rowData.name}`} />
+                          <Field label="Location" value={rowData.location} />
+                          <Field label="Feature" value={rowData.feature} />
+                          <Field label="Type" value={rowData.requestType} />
+                          <Field label="UoM" value={rowData.uom} />
+                          <Field label="Qty" value={rowData.qty} />
+                          <Field label="Budget" value={rowData.budget} />
+                        </>
+                      )}
                     </div>
                   </SidePanel>,
-                )
-              }
+                );
+              }}
             />
           ),
           value: "",

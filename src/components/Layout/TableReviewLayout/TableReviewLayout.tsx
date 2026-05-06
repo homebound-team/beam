@@ -77,23 +77,16 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
           {description}
         </div>
       </header>
-
-      <div css={Css.fg1.df.$} {...tid.content}>
-        {/* Table column — mr4 when panel is open keeps the scrollbar from reaching the panel border */}
+      <div css={Css.fg1.df.mh0.$} {...tid.content}>
+        {/* Table column — margin instead of padding to keep table from touching panel border */}
         <div css={{ ...Css.fg1.h100.oya.pl3.mr3.$, ...Css.if(!!panelContent).mr4.$ }}>
           {isGridTableProps(tableProps) ? (
-            <GridTable {...tableProps} style={{ allWhite: true }} stickyHeader disableColumnResizing={false} />
+            <GridTable {...tableProps} style={{ allWhite: true }} stickyHeader />
           ) : (
-            <QueryTable
-              {...(tableProps as QueryTableProps<R, QData, X>)}
-              style={{ allWhite: true }}
-              stickyHeader
-              disableColumnResizing={false}
-            />
+            <QueryTable {...(tableProps as QueryTableProps<R, QData, X>)} style={{ allWhite: true }} stickyHeader />
           )}
         </div>
-
-        {/* Panel column — no overflow:hidden on the motion.div so the close button can sit on the border */}
+        {/* Panel column */}
         <AnimatePresence>
           {panelContent && (
             <motion.div
@@ -102,15 +95,15 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
               animate={{ width: rightPaneWidth }}
               exit={{ width: 0 }}
               transition={{ ease: "linear", duration: 0.2 }}
-              css={Css.h100.fs0.relative.$}
+              css={Css.df.fdc.fs0.relative.$}
             >
               {/* Close button + vertical line — negative top pulls it up into the header description row */}
               <div css={Css.absolute.topPx(-32).df.fdc.aic.leftPx(-24).z1.$}>
                 <IconButton bgColor={Palette.White} circle icon="x" inc={3.5} onClick={onClosePanel ?? (() => {})} />
-                <div css={Css.wPx(1).bgGray300.mt1.$} style={{ height: "100vh" }} />
+                <div css={Css.wPx(1).bgGray300.$} style={{ height: "100vh" }} />
               </div>
-              {/* Panel content — overflow:hidden here clips to animated width */}
-              <div css={Css.h100.oh.$}>{panelContent}</div>
+              {/* Panel content */}
+              <div css={Css.fg1.oh.mh0.$}>{panelContent}</div>
             </motion.div>
           )}
         </AnimatePresence>
