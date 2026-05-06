@@ -166,6 +166,28 @@ export function TableReviewLayout() {
   );
 }
 
+export function EmptyState() {
+  const columns = useMemo(
+    () => [column<Row>({ header: "Name", data: ({ name }) => name })],
+    [],
+  );
+  return (
+    <TableReviewLayoutComponent
+      pageTitle="Review slot requests"
+      breadcrumb={{ href: "/", label: "The Emerson plan" }}
+      description={description}
+      closeAction={() => {}}
+      tableProps={{ columns, rows: [simpleHeader] }}
+      emptyState={
+        <div css={Css.df.fdc.aic.gap2.$}>
+          <div css={Css.xl.$}>All set!</div>
+          <div css={Css.sm.gray500.$}>All slot requests have been reviewed.</div>
+        </div>
+      }
+    />
+  );
+}
+
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>

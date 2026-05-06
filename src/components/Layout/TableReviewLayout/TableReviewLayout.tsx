@@ -40,9 +40,19 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
   description: ReactNode;
   closeAction: VoidFunction;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
-  /** When set, renders the panel column alongside the table. Caller owns this state. */
+  /**
+   * Replaces the table region with centered content.
+   *
+   * For rows-based tables: shown automatically when `tableProps.rows` contains no data rows.
+   * For query-based tables: shown whenever defined
+   */
+  emptyState?: ReactNode;
+  /**
+   * Content to render in the slide-in panel column. Renders when defined.
+   */
   panelContent?: ReactNode;
   onClosePanel?: VoidFunction;
+  /** Defaults to 450. */
   rightPaneWidth?: number;
 };
 
@@ -55,6 +65,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
     description,
     closeAction,
     tableProps,
+    emptyState,
     panelContent,
     onClosePanel,
     rightPaneWidth = defaultRightPaneWidth,
@@ -81,7 +92,17 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
         {/* Table column — margin instead of padding to keep table from touching panel border */}
         <div css={{ ...Css.fg1.h100.oya.pl3.mr3.$, ...Css.if(!!panelContent).mr4.$ }}>
           {isGridTableProps(tableProps) ? (
-            <GridTable {...tableProps} style={{ allWhite: true }} stickyHeader />
+            // For rows-based tables: show emptyState when no data rows exist and emptyState is provided;
+            // otherwise let GridTable render its own fallback.
+            emptyState && !tableProps.rows.some((r) => r.kind !== "header") ? (
+              <div css={Css.h100.df.fdc.aic.jcc.$}>{emptyState}</div>
+            ) : (
+              <GridTable {...tableProps} style={{ allWhite: true }} stickyHeader />
+            )
+          ) : // For query-based tables: caller owns the decision on when to show emptyState if they want that behavior.
+          // This is really more a workaround for only having "fallbackMessage" on the QueryTable.
+          emptyState ? (
+            <div css={Css.h100.df.fdc.aic.jcc.$}>{emptyState}</div>
           ) : (
             <QueryTable {...(tableProps as QueryTableProps<R, QData, X>)} style={{ allWhite: true }} stickyHeader />
           )}
