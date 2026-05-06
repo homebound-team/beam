@@ -3,12 +3,14 @@ import { ReactElement, useEffect } from "react";
 import { Css, Palette } from "src/Css";
 import { useRightPaneContext } from "./RightPaneContext";
 
-export function RightPaneLayout(props: {
+export type RightPaneLayoutProps = {
   children: ReactElement;
   paneBgColor?: Palette;
   paneWidth?: number;
   defaultPaneContent?: ReactElement;
-}) {
+};
+
+export function RightPaneLayout(props: RightPaneLayoutProps) {
   const { children, paneBgColor = Palette.White, paneWidth = 450, defaultPaneContent } = props;
   const { isRightPaneOpen, rightPaneContent, clearPane, closePane } = useRightPaneContext();
 
@@ -16,7 +18,7 @@ export function RightPaneLayout(props: {
   useEffect(() => closePane, [closePane]);
 
   return (
-    <div css={Css.h100.df.oxh.$}>
+    <div css={Css.df.h100.oxh.$}>
       <>
         <div
           css={{
