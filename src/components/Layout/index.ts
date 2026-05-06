@@ -6,3 +6,4 @@ export * from "./RightPaneLayout";
 export * from "./ScrollableContent";
 export * from "./ScrollableFooter";
 export * from "./ScrollableParent";
+export * from "./SidePanel";
