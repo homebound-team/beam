@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { GridTable } from "src/components/Table/GridTable";
@@ -7,11 +7,7 @@ import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 import { QueryTable, QueryTableProps } from "../GridTableLayout/QueryTable";
-import {
-  GridTablePropsWithRows,
-  isGridTableProps,
-  BaseQueryTableProps as QueryTablePropsWithQuery,
-} from "../layoutTypes";
+import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 
 const defaultRightPaneWidth = 450;
@@ -22,12 +18,12 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
   /** Instructional text rendered below the title, above the table. */
   description: ReactNode;
   closeAction: VoidFunction;
-  tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
+  tableProps: GridTablePropsWithRows<R, X> | BaseQueryTableProps<R, X, QData>;
   /**
    * Replaces the table region with centered content.
    *
    * For rows-based tables: shown automatically when `tableProps.rows` contains no data rows.
-   * For query-based tables: shown whenever defined
+   * For query-based tables: shown when prop is defined; TableReviewLayout does not peek into query results to determine if empty.
    */
   emptyState?: ReactNode;
   /**
@@ -39,7 +35,7 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
   rightPaneWidth?: number;
 };
 
-function TableReviewLayoutComponent<R extends Kinded, X extends Only<GridTableXss, X>, QData>(
+export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss, X>, QData>(
   props: TableReviewLayoutProps<R, X, QData>,
 ) {
   const {
@@ -138,5 +134,3 @@ function TableReviewLayoutComponent<R extends Kinded, X extends Only<GridTableXs
     </div>
   );
 }
-
-export const TableReviewLayout = React.memo(TableReviewLayoutComponent) as typeof TableReviewLayoutComponent;
