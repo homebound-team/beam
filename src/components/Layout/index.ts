@@ -1,6 +1,7 @@
 export * from "./FormPageLayout";
 export * from "./FullBleed";
 export * from "./GridTableLayout/GridTableLayout";
+export * from "./layoutTypes";
 export * from "./PreventBrowserScroll";
 export * from "./RightPaneLayout";
 export * from "./ScrollableContent";

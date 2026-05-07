@@ -1,9 +1,8 @@
 import { ReactNode } from "react";
-import { Button, ButtonProps } from "src/components/Button";
+import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
-
-type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip" | "icon">;
+import { ActionButtonProps } from "../layoutTypes";
 
 export type SidePanelProps = {
   title: ReactNode;

@@ -52,7 +52,7 @@ describe("GridTableLayout", () => {
           search: "client",
         }}
         pageTitle="Grid Table Layout Example"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
         ]}
@@ -108,7 +108,7 @@ describe("GridTableLayout", () => {
           // And no search config
         }}
         pageTitle="Query Table Layout Example"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
         ]}

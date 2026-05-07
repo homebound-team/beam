@@ -1,17 +1,18 @@
 import { ObjectState } from "@homebound/form-state";
-import React, { createRef, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { createRef, ReactNode, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing } from "react-aria";
 import { Css, Palette } from "src/Css";
 import { BoundForm, BoundFormInputConfig, SubmitButton } from "src/forms";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
-import { Button, ButtonProps } from "../Button";
+import { Button } from "../Button";
 import { Icon, IconKey } from "../Icon";
 import { RIGHT_SIDEBAR_MIN_WIDTH, RightSidebar, SidebarContentProps } from "../RightSidebar";
 import { Toast } from "../Toast/Toast";
 import { useToastContext } from "../Toast/ToastContext";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "./PageHeaderBreadcrumbs";
+import { ActionButtonProps } from "./layoutTypes";
 
 type FormSection<F> = {
   title?: string;
@@ -21,10 +22,8 @@ type FormSection<F> = {
 
 export type FormSectionConfig<F> = FormSection<F>[];
 
-type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
-
 type FormPageLayoutProps<F> = {
-  pageTitle: string;
+  pageTitle: ReactNode;
   breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   formState: ObjectState<F>;
   formSections: FormSectionConfig<F>;

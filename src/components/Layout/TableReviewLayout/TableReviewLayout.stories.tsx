@@ -39,15 +39,131 @@ type Row = HeaderRow | DataRow;
 
 const rows: GridDataRow<Row>[] = [
   simpleHeader,
-  row("1", "5501", "BA-TR", "Towel / Robe Hook", "Primary Bath 205", "Towel Bar", "ADD", "Skyler Gibson", "03/19/2026", "Bath Accessories", "BA-TR-001", "EA", "2", "$45.00", "High"),
-  row("2", "5501", "BA-TH", "Tissue Holder", "Bath 112", "Tissue", "ADD", "Skyler Gibson", "03/19/2026", "Bath Accessories", "BA-TH-002", "EA", "1", "$32.00", "Medium"),
-  row("3", "5501", "BA-TR", "Towel / Robe Hook", "Every Day Entry 115", "Hooks", "ADD", "Skyler Gibson", "03/19/2026", "Bath Accessories", "BA-TR-001", "EA", "3", "$45.00", "High"),
-  row("4", "5501", "BA-TR", "Towel / Robe Hook", "Every Day Entry 115", "Hooks", "DELETE", "Skyler Gibson", "03/17/2026", "Bath Accessories", "BA-TR-001", "EA", "1", "$45.00", "Low"),
-  row("5", "5503", "CHW", "Cabinet Hardware", "Kitchen", "Island > Base > Door", "ADD", "Skyler Gibson", "03/17/2026", "Cabinet Hardware", "CHW-003", "EA", "12", "$8.50", "Medium"),
+  row(
+    "1",
+    "5501",
+    "BA-TR",
+    "Towel / Robe Hook",
+    "Primary Bath 205",
+    "Towel Bar",
+    "ADD",
+    "Skyler Gibson",
+    "03/19/2026",
+    "Bath Accessories",
+    "BA-TR-001",
+    "EA",
+    "2",
+    "$45.00",
+    "High",
+  ),
+  row(
+    "2",
+    "5501",
+    "BA-TH",
+    "Tissue Holder",
+    "Bath 112",
+    "Tissue",
+    "ADD",
+    "Skyler Gibson",
+    "03/19/2026",
+    "Bath Accessories",
+    "BA-TH-002",
+    "EA",
+    "1",
+    "$32.00",
+    "Medium",
+  ),
+  row(
+    "3",
+    "5501",
+    "BA-TR",
+    "Towel / Robe Hook",
+    "Every Day Entry 115",
+    "Hooks",
+    "ADD",
+    "Skyler Gibson",
+    "03/19/2026",
+    "Bath Accessories",
+    "BA-TR-001",
+    "EA",
+    "3",
+    "$45.00",
+    "High",
+  ),
+  row(
+    "4",
+    "5501",
+    "BA-TR",
+    "Towel / Robe Hook",
+    "Every Day Entry 115",
+    "Hooks",
+    "DELETE",
+    "Skyler Gibson",
+    "03/17/2026",
+    "Bath Accessories",
+    "BA-TR-001",
+    "EA",
+    "1",
+    "$45.00",
+    "Low",
+  ),
+  row(
+    "5",
+    "5503",
+    "CHW",
+    "Cabinet Hardware",
+    "Kitchen",
+    "Island > Base > Door",
+    "ADD",
+    "Skyler Gibson",
+    "03/17/2026",
+    "Cabinet Hardware",
+    "CHW-003",
+    "EA",
+    "12",
+    "$8.50",
+    "Medium",
+  ),
 ];
 
-function row(id: string, code: string, itemCode: string, name: string, location: string, feature: string, requestType: "ADD" | "DELETE", designerName: string, requestDate: string, takeoffSection: string, materialCode: string, uom: string, qty: string, budget: string, priority: string): DataRow {
-  return { kind: "data", id, data: { id, code, itemCode, name, location, feature, requestType, designerName, requestDate, takeoffSection, materialCode, uom, qty, budget, priority } };
+function row(
+  id: string,
+  code: string,
+  itemCode: string,
+  name: string,
+  location: string,
+  feature: string,
+  requestType: "ADD" | "DELETE",
+  designerName: string,
+  requestDate: string,
+  takeoffSection: string,
+  materialCode: string,
+  uom: string,
+  qty: string,
+  budget: string,
+  priority: string,
+): DataRow {
+  return {
+    kind: "data",
+    id,
+    data: {
+      id,
+      code,
+      itemCode,
+      name,
+      location,
+      feature,
+      requestType,
+      designerName,
+      requestDate,
+      takeoffSection,
+      materialCode,
+      uom,
+      qty,
+      budget,
+      priority,
+    },
+  };
 }
 
 const description = (
@@ -66,9 +182,21 @@ export function TableReviewLayout() {
   const columns = useMemo(
     () => [
       column<Row>({ id: "code", name: "Code", header: "Code", data: ({ code }) => code, w: "80px" }),
-      column<Row>({ id: "itemCode", name: "Item code", header: "Item code", data: ({ itemCode }) => itemCode, w: "110px" }),
+      column<Row>({
+        id: "itemCode",
+        name: "Item code",
+        header: "Item code",
+        data: ({ itemCode }) => itemCode,
+        w: "110px",
+      }),
       column<Row>({ id: "name", name: "Name", header: "Name", data: ({ name }) => name, w: "180px" }),
-      column<Row>({ id: "location", name: "Location", header: "Location", data: ({ location }) => location, w: "180px" }),
+      column<Row>({
+        id: "location",
+        name: "Location",
+        header: "Location",
+        data: ({ location }) => location,
+        w: "180px",
+      }),
       column<Row>({ id: "feature", name: "Feature", header: "Feature", data: ({ feature }) => feature, w: "160px" }),
       column<Row>({
         id: "type",
@@ -76,7 +204,12 @@ export function TableReviewLayout() {
         header: "Type",
         data: ({ requestType }) => ({
           content: (
-            <span css={{ ...Css.xsSb.br4.pxPx(6).pyPx(2).$, ...(requestType === "ADD" ? Css.green800.bgGreen100.$ : Css.red800.bgRed100.$) }}>
+            <span
+              css={{
+                ...Css.xsSb.br4.pxPx(6).pyPx(2).$,
+                ...(requestType === "ADD" ? Css.green800.bgGreen100.$ : Css.red800.bgRed100.$),
+              }}
+            >
               {requestType}
             </span>
           ),
@@ -84,14 +217,44 @@ export function TableReviewLayout() {
         }),
         w: "90px",
       }),
-      column<Row>({ id: "designerName", name: "Designer name", header: "Designer name", data: ({ designerName }) => designerName, w: "160px" }),
-      column<Row>({ id: "requestDate", name: "Request date", header: "Request date", data: ({ requestDate }) => requestDate, w: "130px" }),
-      column<Row>({ id: "takeoffSection", name: "Takeoff section", header: "Takeoff section", data: ({ takeoffSection }) => takeoffSection, w: "160px" }),
-      column<Row>({ id: "materialCode", name: "Material code", header: "Material code", data: ({ materialCode }) => materialCode, w: "130px" }),
+      column<Row>({
+        id: "designerName",
+        name: "Designer name",
+        header: "Designer name",
+        data: ({ designerName }) => designerName,
+        w: "160px",
+      }),
+      column<Row>({
+        id: "requestDate",
+        name: "Request date",
+        header: "Request date",
+        data: ({ requestDate }) => requestDate,
+        w: "130px",
+      }),
+      column<Row>({
+        id: "takeoffSection",
+        name: "Takeoff section",
+        header: "Takeoff section",
+        data: ({ takeoffSection }) => takeoffSection,
+        w: "160px",
+      }),
+      column<Row>({
+        id: "materialCode",
+        name: "Material code",
+        header: "Material code",
+        data: ({ materialCode }) => materialCode,
+        w: "130px",
+      }),
       column<Row>({ id: "uom", name: "UoM", header: "UoM", data: ({ uom }) => uom, w: "80px" }),
       column<Row>({ id: "qty", name: "Qty", header: "Qty", data: ({ qty }) => qty, w: "70px" }),
       column<Row>({ id: "budget", name: "Budget", header: "Budget", data: ({ budget }) => budget, w: "90px" }),
-      column<Row>({ id: "priority", name: "Priority", header: "Priority", data: ({ priority }) => priority, w: "90px" }),
+      column<Row>({
+        id: "priority",
+        name: "Priority",
+        header: "Priority",
+        data: ({ priority }) => priority,
+        w: "90px",
+      }),
       column<Row>({
         id: "action",
         name: "Action",
@@ -156,7 +319,7 @@ export function TableReviewLayout() {
   return (
     <TableReviewLayoutComponent
       pageTitle="Review slot requests"
-      breadcrumb={{ href: "/", label: "The Emerson plan" }}
+      breadCrumb={{ href: "/", label: "The Emerson plan" }}
       description={description}
       closeAction={() => {}}
       tableProps={{ columns, rows }}
@@ -167,14 +330,11 @@ export function TableReviewLayout() {
 }
 
 export function EmptyState() {
-  const columns = useMemo(
-    () => [column<Row>({ header: "Name", data: ({ name }) => name })],
-    [],
-  );
+  const columns = useMemo(() => [column<Row>({ header: "Name", data: ({ name }) => name })], []);
   return (
     <TableReviewLayoutComponent
       pageTitle="Review slot requests"
-      breadcrumb={{ href: "/", label: "The Emerson plan" }}
+      breadCrumb={{ href: "/", label: "The Emerson plan" }}
       description={description}
       closeAction={() => {}}
       tableProps={{ columns, rows: [simpleHeader] }}

@@ -2,40 +2,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
-import { GridDataRow } from "src/components/Table";
-import { GridTable, GridTableProps } from "src/components/Table/GridTable";
+import { GridTable } from "src/components/Table/GridTable";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
-import { QueryResult, QueryTable, QueryTableProps } from "../GridTableLayout/QueryTable";
+import { QueryTable, QueryTableProps } from "../GridTableLayout/QueryTable";
+import {
+  GridTablePropsWithRows,
+  isGridTableProps,
+  BaseQueryTableProps as QueryTablePropsWithQuery,
+} from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
-
-type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
-type BaseTableProps<R extends Kinded, X extends Only<GridTableXss, X>> = Omit<GridTableProps<R, X>, OmittedTableProps>;
-
-type GridTablePropsWithRows<R extends Kinded, X extends Only<GridTableXss, X>> = BaseTableProps<R, X> & {
-  rows: GridTableProps<R, X>["rows"];
-  query?: never;
-  createRows?: never;
-};
-
-type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseTableProps<R, X> & {
-  query: QueryResult<QData>;
-  createRows: (data: QData | undefined) => GridDataRow<R>[];
-  rows?: never;
-};
-
-function isGridTableProps<R extends Kinded, X extends Only<GridTableXss, X>, QData>(
-  props: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>,
-): props is GridTablePropsWithRows<R, X> {
-  return "rows" in props;
-}
 
 const defaultRightPaneWidth = 450;
 
 export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss, X>, QData> = {
   pageTitle: ReactNode;
-  breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
+  breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   /** Instructional text rendered below the title, above the table. */
   description: ReactNode;
   closeAction: VoidFunction;
@@ -61,7 +44,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
 ) {
   const {
     pageTitle,
-    breadcrumb,
+    breadCrumb,
     description,
     closeAction,
     tableProps,
@@ -77,7 +60,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
       <header css={Css.px3.pt3.pb2.fs0.$} {...tid.header}>
         <div css={Css.df.jcsb.aic.$}>
           <div>
-            {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} />}
+            {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
             <h1 css={Css.xl2.mt1.mb0.$} {...tid.pageTitle}>
               {pageTitle}
             </h1>

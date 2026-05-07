@@ -1,12 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Button, ButtonProps } from "src/components/Button";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { Icon } from "src/components/Icon";
 import { OffsetAndLimit, Pagination } from "src/components/Pagination";
-import { GridDataRow } from "src/components/Table";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
-import { GridTable, GridTableProps } from "src/components/Table/GridTable";
+import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
@@ -17,37 +16,24 @@ import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 import { FullBleed } from "../FullBleed";
+import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 import { ScrollableContent } from "../ScrollableContent";
-import { QueryResult, QueryTable, QueryTableProps } from "./QueryTable";
+import { QueryTable, QueryTableProps } from "./QueryTable";
 
 // Omit to force all action button menus to look the same
 type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
-type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip">;
-
-type OmittedTableProps = "filter" | "stickyHeader" | "style" | "rows";
-
-// To wrap the `QueryTable` behavior, we allow a user to pass in EITHER `rows` OR `query` + `createRows` to opt-in to the QueryTable behavior
-type BaseTableProps<R extends Kinded, X extends Only<GridTableXss, X>> = Omit<GridTableProps<R, X>, OmittedTableProps>;
-type GridTablePropsWithRows<R extends Kinded, X extends Only<GridTableXss, X>> = BaseTableProps<R, X> & {
-  rows: GridTableProps<R, X>["rows"];
-  query?: never;
-  createRows?: never;
-};
-type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseTableProps<R, X> & {
-  query: QueryResult<QData>;
-  createRows: (data: QData | undefined) => GridDataRow<R>[];
+// GridTableLayout-specific query props extend the shared base with pagination/display extras.
+type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseQueryTableProps<
+  R,
+  X,
+  QData
+> & {
   getPageInfo?: (data: QData) => { hasNextPage: boolean };
   emptyFallback?: string;
   keepHeaderWhenLoading?: boolean;
-  rows?: never;
 };
-function isGridTableProps<R extends Kinded, X extends Only<GridTableXss, X>, QData>(
-  props: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>,
-): props is GridTablePropsWithRows<R, X> {
-  return "rows" in props;
-}
 
 export type GridTableLayoutProps<
   F extends Record<string, unknown>,
@@ -55,9 +41,9 @@ export type GridTableLayoutProps<
   X extends Only<GridTableXss, X>,
   QData,
 > = {
-  pageTitle: string;
+  pageTitle: ReactNode;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
-  breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
+  breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   /** Renders a ButtonMenu with "verticalDots" icon as trigger */
   actionMenu?: ActionButtonMenuProps;
@@ -104,7 +90,7 @@ function GridTableLayoutComponent<
 >(props: GridTableLayoutProps<F, R, X, QData>) {
   const {
     pageTitle,
-    breadcrumb,
+    breadCrumb,
     tableProps,
     layoutState,
     primaryAction,
@@ -147,7 +133,7 @@ function GridTableLayoutComponent<
     <>
       <Header
         pageTitle={pageTitle}
-        breadcrumb={breadcrumb}
+        breadCrumb={breadCrumb}
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}
         tertiaryAction={tertiaryAction}
@@ -303,8 +289,8 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
 }
 
 type HeaderProps = {
-  pageTitle: string;
-  breadcrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
+  pageTitle: ReactNode;
+  breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   primaryAction?: ActionButtonProps;
   secondaryAction?: ActionButtonProps;
   tertiaryAction?: ActionButtonProps;
@@ -312,14 +298,14 @@ type HeaderProps = {
 };
 
 function Header(props: HeaderProps) {
-  const { pageTitle, breadcrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
+  const { pageTitle, breadCrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
   const tids = useTestIds(props);
 
   return (
     <FullBleed>
       <header css={{ ...Css.p3.mb3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
         <div>
-          {breadcrumb && <PageHeaderBreadcrumbs breadcrumb={breadcrumb} />}
+          {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
           <h1 css={Css.xl2.mt1.$} {...tids.pageTitle}>
             {pageTitle}
           </h1>
