@@ -324,7 +324,7 @@ export function TableReviewLayout() {
       closeAction={() => {}}
       tableProps={{ columns, rows }}
       panelContent={panelContent}
-      onClosePanel={() => setPanelContent(null)}
+      onPanelClose={() => setPanelContent(null)}
     />
   );
 }
