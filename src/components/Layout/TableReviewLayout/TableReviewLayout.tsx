@@ -119,7 +119,14 @@ function TableReviewLayoutComponent<R extends Kinded, X extends Only<GridTableXs
             >
               {/* Close button + vertical line — negative top pulls it up into the header description row */}
               <div css={Css.absolute.topPx(-32).df.fdc.aic.leftPx(-24).z1.$}>
-                <IconButton bgColor={Palette.White} circle icon="x" inc={3.5} onClick={handleClosePanel} />
+                <IconButton
+                  bgColor={Palette.White}
+                  circle
+                  icon="x"
+                  inc={3.5}
+                  onClick={handleClosePanel}
+                  {...tid.closePanelButton}
+                />
                 <div css={Css.wPx(1).bgGray300.vh100.$} />
               </div>
               {/* Panel content */}

@@ -1,4 +1,3 @@
-// Replace AnimatePresence with a passthrough so exit animations don't block element removal
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
@@ -6,10 +5,43 @@ import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
 import { SidePanel } from "./SidePanel";
 import { TableReviewLayout, TableReviewLayoutProps } from "./TableReviewLayout";
 
+// Replace AnimatePresence with a passthrough so exit animations don't block element removal
 vi.mock("framer-motion", async () => {
   const actual = await vi.importActual("framer-motion");
   return { ...actual, AnimatePresence: ({ children }: any) => <>{children}</> };
 });
+
+type Data = { id: string; name: string };
+type HeaderRow = { kind: "header"; id: string; data: undefined };
+type DataRow = { kind: "data"; id: string; data: Data };
+type Row = HeaderRow | DataRow;
+
+const columns = [column<Row>({ header: "Name", data: ({ name }) => name, id: "name", name: "Name" })];
+const dataRows: Row[] = [
+  { kind: "data", id: "1", data: { id: "1", name: "Alpha" } },
+  { kind: "data", id: "2", data: { id: "2", name: "Beta" } },
+];
+
+const queryTableProps = {
+  columns,
+  query: { data: dataRows.map((r) => r.data), loading: false },
+  createRows: (data: Data[] | undefined) => [
+    simpleHeader,
+    ...(data?.map((d) => ({ kind: "data" as const, id: d.id, data: d })) ?? []),
+  ],
+};
+
+function baseProps(
+  overrides: Partial<TableReviewLayoutProps<Row, any, any>> = {},
+): TableReviewLayoutProps<Row, any, any> {
+  return {
+    pageTitle: "Review items",
+    description: "Review and manage items",
+    closeAction: noop,
+    tableProps: { columns, rows: [simpleHeader, ...dataRows] },
+    ...overrides,
+  };
+}
 
 describe("TableReviewLayout", () => {
   it("renders title, description, and table", async () => {
@@ -86,15 +118,6 @@ describe("TableReviewLayout", () => {
     });
 
     describe("query-based table", () => {
-      const queryTableProps = {
-        columns,
-        query: { data: dataRows.map((r) => r.data), loading: false },
-        createRows: (data: Data[] | undefined) => [
-          simpleHeader,
-          ...(data?.map((d) => ({ kind: "data" as const, id: d.id, data: d })) ?? []),
-        ],
-      };
-
       it("always shows emptyState when defined, regardless of query results", async () => {
         // For query tables the caller owns this decision — the component defers to them
         const r = await render(
@@ -149,7 +172,7 @@ describe("TableReviewLayout", () => {
       );
 
       expect(r.sidePanel).toBeInTheDocument();
-      click(r.x);
+      click(r.tableReviewLayout_closePanelButton);
       expect(r.query.sidePanel).not.toBeInTheDocument();
     });
 
@@ -164,32 +187,9 @@ describe("TableReviewLayout", () => {
         />,
       );
 
-      click(r.x);
+      click(r.tableReviewLayout_closePanelButton);
 
       expect(onPanelClose).toHaveBeenCalledTimes(1);
     });
   });
 });
-
-type Data = { id: string; name: string };
-type HeaderRow = { kind: "header"; id: string; data: undefined };
-type DataRow = { kind: "data"; id: string; data: Data };
-type Row = HeaderRow | DataRow;
-
-const columns = [column<Row>({ header: "Name", data: ({ name }) => name, id: "name", name: "Name" })];
-const dataRows: Row[] = [
-  { kind: "data", id: "1", data: { id: "1", name: "Alpha" } },
-  { kind: "data", id: "2", data: { id: "2", name: "Beta" } },
-];
-
-function baseProps(
-  overrides: Partial<TableReviewLayoutProps<Row, any, any>> = {},
-): TableReviewLayoutProps<Row, any, any> {
-  return {
-    pageTitle: "Review items",
-    description: "Review and manage items",
-    closeAction: noop,
-    tableProps: { columns, rows: [simpleHeader, ...dataRows] },
-    ...overrides,
-  };
-}
