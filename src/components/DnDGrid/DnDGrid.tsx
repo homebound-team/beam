@@ -4,7 +4,7 @@ import { Css, Palette, Properties, useTestIds } from "src";
 import { clearInlineStyles, isDefined, setInlineStyles } from "src/utils";
 import { DnDGridContext } from "./DnDGridContext";
 
-export interface DnDGridProps {
+export type DnDGridProps = {
   children: ReactNode;
   /** CSS Grid styles for the grid container. */
   gridStyles?: GridStyles;
@@ -12,7 +12,7 @@ export interface DnDGridProps {
   activeItemStyles?: Properties;
   /** Returns the new order of the GridItems. */
   onReorder: (items: string[]) => void;
-}
+};
 
 export function DnDGrid(props: DnDGridProps) {
   const { children, gridStyles, onReorder, activeItemStyles } = props;
@@ -113,9 +113,12 @@ export function DnDGrid(props: DnDGridProps) {
       // Figure out if we need to move the placeholder element based on the `dragEl`'s new position.
       if (target instanceof HTMLElement && target !== cloneEl.current && target !== dragEl.current) {
         const targetPos = target.getBoundingClientRect();
-        const isHalfwayPassedTarget =
-          (clientY - targetPos.top) / (targetPos.bottom - targetPos.top) > 0.5 ||
-          (clientX - targetPos.left) / (targetPos.right - targetPos.left) > 0.5;
+        const clonePos = cloneEl.current.getBoundingClientRect();
+        // Pick the axis along which the placeholder and target are most separated, that's the layout's flow direction.
+        const useYAxis = Math.abs(targetPos.top - clonePos.top) >= Math.abs(targetPos.left - clonePos.left);
+        const isHalfwayPassedTarget = useYAxis
+          ? (clientY - targetPos.top) / (targetPos.bottom - targetPos.top) > 0.5
+          : (clientX - targetPos.left) / (targetPos.right - targetPos.left) > 0.5;
 
         // Only insert the placeholder if it's not already in the correct position.
         const shouldInsert =
