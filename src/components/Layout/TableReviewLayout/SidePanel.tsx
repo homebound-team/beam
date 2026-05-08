@@ -1,18 +1,10 @@
-import { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
-import { ActionButtonProps } from "../layoutTypes";
-
-export type SidePanelProps = {
-  title: ReactNode;
-  children: ReactNode;
-  primaryAction?: ActionButtonProps;
-  secondaryAction?: ActionButtonProps;
-};
+import type { SidePanelProps } from "./TableReviewLayout";
 
 export function SidePanel(props: SidePanelProps) {
-  const { title, children, primaryAction, secondaryAction } = props;
+  const { title, content, primaryAction, secondaryAction } = props;
   const tid = useTestIds(props, "sidePanel");
   const hasFooter = primaryAction || secondaryAction;
 
@@ -24,7 +16,7 @@ export function SidePanel(props: SidePanelProps) {
         </h2>
       </div>
       <div css={Css.fg1.oya.mh0.$} {...tid.body}>
-        {children}
+        {content}
       </div>
       {hasFooter && (
         <div css={Css.df.gap2.jcfe.p3.fs0.$} {...tid.footer}>

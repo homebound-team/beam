@@ -1,13 +1,12 @@
 import { Meta } from "@storybook/react-vite";
-import { ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { GridDataRow } from "src/components/Table";
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
-import { SidePanel } from "./SidePanel";
-import { TableReviewLayout as TableReviewLayoutComponent } from "./TableReviewLayout";
+import { SidePanelProps, TableReviewLayout as TableReviewLayoutComponent } from "./TableReviewLayout";
 
 export default {
   component: TableReviewLayoutComponent,
@@ -177,7 +176,7 @@ const description = (
 );
 
 export function TableReviewLayout() {
-  const [panelContent, setPanelContent] = useState<ReactNode>(null);
+  const [panelContent, setPanelContent] = useState<SidePanelProps | undefined>(undefined);
 
   const columns = useMemo(
     () => [
@@ -266,12 +265,11 @@ export function TableReviewLayout() {
               variant="secondary"
               onClick={() => {
                 const isOdd = Number(rowData.id) % 2 !== 0;
-                setPanelContent(
-                  <SidePanel
-                    title={rowData.name}
-                    primaryAction={{ label: "Accept", icon: "check", onClick: () => setPanelContent(null) }}
-                    secondaryAction={{ label: "Reject", icon: "x", onClick: () => setPanelContent(null) }}
-                  >
+                setPanelContent({
+                  title: rowData.name,
+                  primaryAction: { label: "Accept", icon: "check", onClick: () => setPanelContent(undefined) },
+                  secondaryAction: { label: "Reject", icon: "x", onClick: () => setPanelContent(undefined) },
+                  content: (
                     <div css={Css.p3.df.fdc.gap3.$}>
                       {isOdd ? (
                         <>
@@ -301,8 +299,8 @@ export function TableReviewLayout() {
                         </>
                       )}
                     </div>
-                  </SidePanel>,
-                );
+                  ),
+                });
               }}
             />
           ),
@@ -324,7 +322,7 @@ export function TableReviewLayout() {
       closeAction={() => {}}
       tableProps={{ columns, rows }}
       panelContent={panelContent}
-      onPanelClose={() => setPanelContent(null)}
+      onPanelClose={() => setPanelContent(undefined)}
     />
   );
 }

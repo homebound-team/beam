@@ -27,15 +27,16 @@ export function Basic() {
         title="Towel / Robe Hook"
         primaryAction={{ label: "Accept", icon: "check", onClick: () => {} }}
         secondaryAction={{ label: "Reject", icon: "x", onClick: () => {} }}
-      >
-        <div css={Css.p3.df.fdc.gap3.$}>
-          <Field label="Placeholder type" value="BA-TR Towel / Robe Hook" />
-          <Field label="Location" value="Primary Bath 205" />
-          <Field label="Feature" value="XXX" />
-          <Field label="Length" value="7.8125" />
-          <Field label="Depth" value='2-5/8"' />
-        </div>
-      </SidePanel>
+        content={
+          <div css={Css.p3.df.fdc.gap3.$}>
+            <Field label="Placeholder type" value="BA-TR Towel / Robe Hook" />
+            <Field label="Location" value="Primary Bath 205" />
+            <Field label="Feature" value="XXX" />
+            <Field label="Length" value="7.8125" />
+            <Field label="Depth" value='2-5/8"' />
+          </div>
+        }
+      />
     </PanelShell>
   );
 }
@@ -47,13 +48,14 @@ export function WithScrollingContent() {
         title="Towel / Robe Hook"
         primaryAction={{ label: "Accept", icon: "check", onClick: () => {} }}
         secondaryAction={{ label: "Reject", icon: "x", onClick: () => {} }}
-      >
-        <div css={Css.p3.df.fdc.gap3.$}>
-          {zeroTo(20).map((i) => (
-            <Field key={i} label={`Field ${i + 1}`} value={`Value for field ${i + 1}`} />
-          ))}
-        </div>
-      </SidePanel>
+        content={
+          <div css={Css.p3.df.fdc.gap3.$}>
+            {zeroTo(20).map((i) => (
+              <Field key={i} label={`Field ${i + 1}`} value={`Value for field ${i + 1}`} />
+            ))}
+          </div>
+        }
+      />
     </PanelShell>
   );
 }
@@ -61,13 +63,16 @@ export function WithScrollingContent() {
 export function WithoutFooter() {
   return (
     <PanelShell>
-      <SidePanel title="Read Only Detail">
-        <div css={Css.p3.df.fdc.gap3.$}>
-          <Field label="Placeholder type" value="BA-TR Towel / Robe Hook" />
-          <Field label="Location" value="Primary Bath 205" />
-          <Field label="Feature" value="XXX" />
-        </div>
-      </SidePanel>
+      <SidePanel
+        title="Read Only Detail"
+        content={
+          <div css={Css.p3.df.fdc.gap3.$}>
+            <Field label="Placeholder type" value="BA-TR Towel / Robe Hook" />
+            <Field label="Location" value="Primary Bath 205" />
+            <Field label="Feature" value="XXX" />
+          </div>
+        }
+      />
     </PanelShell>
   );
 }
@@ -79,9 +84,8 @@ export function WithLongTitle() {
         title="A Very Long Placeholder Title That Might Need To Wrap Or Truncate"
         primaryAction={{ label: "Accept", icon: "check", onClick: () => {} }}
         secondaryAction={{ label: "Reject", icon: "x", onClick: () => {} }}
-      >
-        <div css={Css.p3.$}>Content here</div>
-      </SidePanel>
+        content={<div css={Css.p3.$}>Content here</div>}
+      />
     </PanelShell>
   );
 }
@@ -97,25 +101,26 @@ export function WithFormInputs() {
         title="Towel / Robe Hook"
         primaryAction={{ label: "Accept", icon: "check", onClick: () => {} }}
         secondaryAction={{ label: "Reject", icon: "x", onClick: () => {} }}
-      >
-        <div css={Css.p3.df.fdc.gap3.$}>
-          <Field label="Placeholder type" value="BA-TR Towel / Robe Hook" />
-          <Field label="Location" value="Primary Bath 205" />
-          <Field label="Feature" value="XXX" />
-          <RadioGroupField
-            label="Task allocation"
-            value={taskAllocation}
-            onChange={setTaskAllocation}
-            options={[
-              { label: "Install Interior Hardware", value: "install" },
-              { label: "Rough Hardware", value: "rough" },
-              { label: "Finish Carpentry", value: "finish" },
-            ]}
-          />
-          <TextField label="Qty" value={qty} onChange={setQty} />
-          <TextAreaField label="Notes" value={notes} onChange={setNotes} />
-        </div>
-      </SidePanel>
+        content={
+          <div css={Css.p3.df.fdc.gap3.$}>
+            <Field label="Placeholder type" value="BA-TR Towel / Robe Hook" />
+            <Field label="Location" value="Primary Bath 205" />
+            <Field label="Feature" value="XXX" />
+            <RadioGroupField
+              label="Task allocation"
+              value={taskAllocation}
+              onChange={setTaskAllocation}
+              options={[
+                { label: "Install Interior Hardware", value: "install" },
+                { label: "Rough Hardware", value: "rough" },
+                { label: "Finish Carpentry", value: "finish" },
+              ]}
+            />
+            <TextField label="Qty" value={qty} onChange={setQty} />
+            <TextAreaField label="Notes" value={notes} onChange={setNotes} />
+          </div>
+        }
+      />
     </PanelShell>
   );
 }

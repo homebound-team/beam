@@ -2,8 +2,7 @@ import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { noop } from "src/utils";
 import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
-import { SidePanel } from "./SidePanel";
-import { TableReviewLayout, TableReviewLayoutProps } from "./TableReviewLayout";
+import { SidePanelProps, TableReviewLayout, TableReviewLayoutProps } from "./TableReviewLayout";
 
 // Replace AnimatePresence with a passthrough so exit animations don't block element removal
 vi.mock("framer-motion", async () => {
@@ -152,7 +151,7 @@ describe("TableReviewLayout", () => {
       const r = await render(
         <TableReviewLayout
           {...baseProps({
-            panelContent: <SidePanel title="Towel / Robe Hook">Detail content</SidePanel>,
+            panelContent: { title: "Towel / Robe Hook", content: "Detail content" } satisfies SidePanelProps,
           })}
         />,
       );
@@ -166,7 +165,7 @@ describe("TableReviewLayout", () => {
       const r = await render(
         <TableReviewLayout
           {...baseProps({
-            panelContent: <SidePanel title="Detail">Content</SidePanel>,
+            panelContent: { title: "Detail", content: "Content" } satisfies SidePanelProps,
           })}
         />,
       );
@@ -181,7 +180,7 @@ describe("TableReviewLayout", () => {
       const r = await render(
         <TableReviewLayout
           {...baseProps({
-            panelContent: <SidePanel title="Detail">Content</SidePanel>,
+            panelContent: { title: "Detail", content: "Content" } satisfies SidePanelProps,
             onPanelClose,
           })}
         />,

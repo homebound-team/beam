@@ -7,10 +7,18 @@ import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
 import { QueryTable, QueryTableProps } from "../GridTableLayout/QueryTable";
-import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
+import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
+import { SidePanel } from "./SidePanel";
 
 const defaultRightPaneWidth = 450;
+
+export type SidePanelProps = {
+  title: ReactNode;
+  content: ReactNode;
+  primaryAction?: ActionButtonProps;
+  secondaryAction?: ActionButtonProps;
+};
 
 export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss, X>, QData> = {
   pageTitle: ReactNode;
@@ -27,9 +35,9 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
    */
   emptyState?: ReactNode;
   /**
-   * Content to render in the slide-in panel column. Renders when defined.
+   * When set, slides open the panel column and renders a `SidePanel` with the given props.
    */
-  panelContent?: ReactNode;
+  panelContent?: SidePanelProps;
   onPanelClose?: VoidFunction;
   /** Defaults to 450. */
   rightPaneWidth?: number;
@@ -126,7 +134,9 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
                 <div css={Css.wPx(1).bgGray300.vh100.$} />
               </div>
               {/* Panel content */}
-              <div css={Css.fg1.oh.mh0.$}>{panelContent}</div>
+              <div css={Css.fg1.oh.mh0.$}>
+                <SidePanel {...panelContent} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
