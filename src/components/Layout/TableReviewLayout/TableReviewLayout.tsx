@@ -78,7 +78,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
     if (emptyState && !tableProps.rows.some((r) => r.kind !== "header")) {
       tableContent = <div css={Css.h100.df.fdc.aic.jcc.$}>{emptyState}</div>;
     } else {
-      tableContent = <GridTable {...tableProps} style={{ allWhite: true }} stickyHeader />;
+      tableContent = <GridTable {...tableProps} style={{ allWhite: true, bordered: true }} stickyHeader />;
     }
   } else if (emptyState) {
     // For query-based tables: caller owns the decision on when to show emptyState.
@@ -87,7 +87,11 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
     tableContent = <div css={Css.h100.df.fdc.aic.jcc.$}>{emptyState}</div>;
   } else {
     tableContent = (
-      <QueryTable {...(tableProps as QueryTableProps<R, QData, X>)} style={{ allWhite: true }} stickyHeader />
+      <QueryTable
+        {...(tableProps as QueryTableProps<R, QData, X>)}
+        style={{ allWhite: true, bordered: true }}
+        stickyHeader
+      />
     );
   }
 
