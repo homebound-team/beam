@@ -38,7 +38,7 @@ export function GridTableLayout() {
     <TestProjectLayout>
       <GridTableLayoutComponent
         pageTitle="Grid Table Layout Example"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
         ]}
@@ -84,7 +84,7 @@ export function ManyFilters() {
     <TestProjectLayout>
       <GridTableLayoutComponent
         pageTitle="Grid Table Layout with Many Filters"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
         ]}
@@ -116,7 +116,7 @@ export function WithCheckboxFilter() {
     <TestProjectLayout>
       <GridTableLayoutComponent
         pageTitle="Grid Table Layout with Checkbox Filter"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
         ]}
@@ -158,7 +158,7 @@ export function QueryTableLayout() {
     <TestProjectLayout>
       <GridTableLayoutComponent
         pageTitle="Query Table Layout Example"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page A" },
           { href: "/", label: "Sub Page B" },
@@ -203,7 +203,7 @@ export function WithPagination() {
     <TestProjectLayout>
       <GridTableLayoutComponent
         pageTitle="Grid Table With Pagination"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Product Offerings" },
         ]}
@@ -253,7 +253,7 @@ export function GridTableLayoutWithColor() {
     <TestProjectLayout>
       <GridTableLayoutComponent
         pageTitle="Grid Table Layout with Color for clearer column manipulation"
-        breadcrumb={[
+        breadCrumb={[
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page" },
         ]}
