@@ -109,7 +109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/generator@npm:^7.29.0":
+"@babel/generator@npm:^7.29.0, @babel/generator@npm:^7.29.1":
   version: 7.29.1
   resolution: "@babel/generator@npm:7.29.1"
   dependencies:
@@ -331,6 +331,17 @@ __metadata:
   bin:
     parser: ./bin/babel-parser.js
   checksum: 10/b1576dca41074997a33ee740d87b330ae2e647f4b7da9e8d2abd3772b18385d303b0cee962b9b88425e0f30d58358dbb8d63792c1a2d005c823d335f6a029747
+  languageName: node
+  linkType: hard
+
+"@babel/parser@npm:^7.29.2":
+  version: 7.29.3
+  resolution: "@babel/parser@npm:7.29.3"
+  dependencies:
+    "@babel/types": "npm:^7.29.0"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: 10/10e8f34e0fdaa495b9db8be71f4eb29b16d8a57e0818c1bb1c4084015b0383803fd77812ed41597760cbf3d9ab3ae9f4af54f39ff5e5d8e081ba43593232f0ca
   languageName: node
   linkType: hard
 
@@ -2185,7 +2196,7 @@ __metadata:
     "@homebound/form-state": "npm:^2.28.0"
     "@homebound/rtl-react-router-utils": "npm:1.3.0"
     "@homebound/rtl-utils": "npm:^2.71.0"
-    "@homebound/truss": "npm:^2.21.3"
+    "@homebound/truss": "npm:2.24.0"
     "@homebound/tsconfig": "npm:^1.1.1"
     "@internationalized/number": "npm:^3.0.3"
     "@popperjs/core": "npm:^2.11.6"
@@ -2327,12 +2338,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/truss@npm:^2.21.3":
-  version: 2.21.3
-  resolution: "@homebound/truss@npm:2.21.3"
+"@homebound/truss@npm:2.24.0":
+  version: 2.24.0
+  resolution: "@homebound/truss@npm:2.24.0"
   dependencies:
-    "@babel/generator": "npm:^7.29.0"
-    "@babel/parser": "npm:^7.29.0"
+    "@babel/generator": "npm:^7.29.1"
+    "@babel/parser": "npm:^7.29.2"
     "@babel/traverse": "npm:^7.29.0"
     "@babel/types": "npm:^7.29.0"
     change-case: "npm:^5.4.4"
@@ -2343,7 +2354,7 @@ __metadata:
     react: ">=18"
   bin:
     truss: cli.js
-  checksum: 10/9bf56eda8c0ac7eccf96e25f7ab8c0eb3e8d69d04f4cc905139100281e6e8e47e414dbe8e028844a9b7fa50fdcea3f392b07dc2549778cdb457268e91fccac76
+  checksum: 10/ec7441503db99d512727eafbe6be4081ae337ed7eb3657981a165a3b1f3a8f59f5e87f7d71ea473c62fee986254e657f43fb5fee73e25b73ecf023b3c266666e
   languageName: node
   linkType: hard
 
@@ -9819,11 +9830,11 @@ __metadata:
   linkType: hard
 
 "jiti@npm:^2.6.1":
-  version: 2.6.1
-  resolution: "jiti@npm:2.6.1"
+  version: 2.7.0
+  resolution: "jiti@npm:2.7.0"
   bin:
     jiti: lib/jiti-cli.mjs
-  checksum: 10/8cd72c5fd03a0502564c3f46c49761090f6dadead21fa191b73535724f095ad86c2fa89ee6fe4bc3515337e8d406cc8fb2d37b73fa0c99a34584bac35cd4a4de
+  checksum: 10/6d75a8dbd61dbee031aa0937fabb748ff8ddf370b971958cc704f5cf26b4c5bdc9dcd0563059b2627a2bd41d946fa0bc64f912fdc8981ca7945a9d63c74ad0f9
   languageName: node
   linkType: hard
 
