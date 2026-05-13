@@ -216,7 +216,7 @@ describe("TabsWithContent", () => {
       withRouter(),
     );
     // Then expect the tab content to have the expected padding based on `contentXss`
-    expect(r.tab_panel).toHaveStyle({ paddingLeft: "16px" });
+    expect(r.tab_panel).toHaveStyle({ paddingLeft: "calc(var(--t-spacing) * 2)" });
   });
 });
 
