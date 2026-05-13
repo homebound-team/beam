@@ -12,10 +12,10 @@ describe("FullBleed", () => {
     );
 
     expect(r.fullBleed).toHaveStyle({
-      marginLeft: "calc(24px * -1)",
-      marginRight: "calc(24px * -1)",
-      paddingLeft: "24px",
-      paddingRight: "24px",
+      marginLeft: "calc(calc(var(--t-spacing) * 3) * -1)",
+      marginRight: "calc(calc(var(--t-spacing) * 3) * -1)",
+      paddingLeft: "calc(var(--t-spacing) * 3)",
+      paddingRight: "calc(var(--t-spacing) * 3)",
     });
   });
 });

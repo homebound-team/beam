@@ -10,7 +10,7 @@ describe("Tag", () => {
 
   it("can apply margin changes via xss", async () => {
     const r = await render(<Tag text="test" data-testid="testTag" xss={Css.mt1.$} />);
-    expect(r.testTag).toHaveStyle({ marginTop: "8px" });
+    expect(r.testTag).toHaveStyle({ marginTop: "calc(var(--t-spacing) * 1)" });
   });
 
   it("renders with icon", async () => {

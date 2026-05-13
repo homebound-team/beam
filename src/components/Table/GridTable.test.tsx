@@ -301,13 +301,13 @@ describe("GridTable", () => {
       borderLeftStyle: "solid",
       borderLeftWidth: "1px",
       borderColor: Palette.Gray400,
-      paddingLeft: "16px",
+      paddingLeft: "calc(var(--t-spacing) * 2)",
     });
     expect(cell(r, 1, 1)).toHaveStyle({
       borderLeftStyle: "solid",
       borderLeftWidth: "1px",
       borderColor: Palette.Gray400,
-      paddingLeft: "16px",
+      paddingLeft: "calc(var(--t-spacing) * 2)",
     });
   });
 
