@@ -85,7 +85,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
       <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
-        <div css={Css.df.if(layout === "horizontal").fdr.fww.gap3.else.fdc.$}>
+        <div css={Css.df.if(layout === "horizontal").fdr.fww.gap3.else.fdc.gap1.$}>
           {options.map((option) => {
             return (
               <Fragment key={option.value}>
@@ -98,7 +98,6 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
                       option={option}
                       state={state}
                       isOptionDisabled={!!option.disabled}
-                      layout={layout}
                       {...otherProps}
                       {...tid[option.value]}
                     />
@@ -124,7 +123,6 @@ function Radio<K extends string>(props: {
   // react-aria uses a WeakMap keyed by the state object identity to store radio group
   // metadata, so spreading state into a new object breaks the lookup.
   isOptionDisabled?: boolean;
-  layout?: RadioGroupFieldLayout;
   onBlur?: () => void;
   onFocus?: () => void;
 }) {
@@ -133,7 +131,6 @@ function Radio<K extends string>(props: {
     option: { description, label, value },
     state,
     isOptionDisabled,
-    layout = "vertical",
     ...others
   } = props;
 
@@ -152,17 +149,7 @@ function Radio<K extends string>(props: {
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 
   return (
-    // In vertical layout, each option uses `mb1` for stacking spacing.
-    // In horizontal layout, spacing comes from the parent flex `gap`, so we skip `mb1`.
-    <label
-      css={
-        Css.df.cursorPointer
-          .if(layout === "vertical")
-          .mb1.if(disabled)
-          .add("cursor", "initial").$
-      }
-      {...hoverProps}
-    >
+    <label css={Css.df.cursorPointer.if(disabled).add("cursor", "initial").$} {...hoverProps}>
       <input
         type="radio"
         ref={ref}
