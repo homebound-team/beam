@@ -85,7 +85,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
       <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
-        <div css={Css.df.if(layout === "horizontal").fdr.gap3.else.fdc.$}>
+        <div css={Css.df.if(layout === "horizontal").fdr.fww.gap3.else.fdc.$}>
           {options.map((option) => {
             return (
               <Fragment key={option.value}>
