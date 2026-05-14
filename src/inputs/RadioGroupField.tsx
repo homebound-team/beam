@@ -24,6 +24,8 @@ export type RadioFieldOption<K extends string> = {
   disabled?: boolean | ReactNode;
 };
 
+export type RadioGroupFieldLayout = "vertical" | "horizontal";
+
 export type RadioGroupFieldProps<K extends string> = {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
@@ -38,6 +40,8 @@ export type RadioGroupFieldProps<K extends string> = {
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
+  /** Direction of the options. Defaults to "vertical". */
+  layout?: RadioGroupFieldLayout;
 } & Pick<PresentationFieldProps, "labelStyle">;
 
 /**
@@ -48,7 +52,18 @@ export type RadioGroupFieldProps<K extends string> = {
  * TODO: Add hover (non selected and selected) styles
  */
 export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
-  const { label, labelStyle, value, onChange, options, disabled = false, errorMsg, helperText, ...otherProps } = props;
+  const {
+    label,
+    labelStyle,
+    value,
+    onChange,
+    options,
+    disabled = false,
+    errorMsg,
+    helperText,
+    layout = "vertical",
+    ...otherProps
+  } = props;
 
   // useRadioGroupState uses a random group name, so use our name
   const name = useMemo(() => `radio-group-${++nextNameId}`, []);
@@ -70,26 +85,29 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
       <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
-        {options.map((option) => {
-          return (
-            <Fragment key={option.value}>
-              {maybeTooltip({
-                title: resolveTooltip(option.disabled),
-                placement: "bottom",
-                children: (
-                  <Radio
-                    parentId={name}
-                    option={option}
-                    state={state}
-                    isOptionDisabled={!!option.disabled}
-                    {...otherProps}
-                    {...tid[option.value]}
-                  />
-                ),
-              })}
-            </Fragment>
-          );
-        })}
+        <div css={Css.df.if(layout === "horizontal").fdr.gap3.else.fdc.$}>
+          {options.map((option) => {
+            return (
+              <Fragment key={option.value}>
+                {maybeTooltip({
+                  title: resolveTooltip(option.disabled),
+                  placement: "bottom",
+                  children: (
+                    <Radio
+                      parentId={name}
+                      option={option}
+                      state={state}
+                      isOptionDisabled={!!option.disabled}
+                      layout={layout}
+                      {...otherProps}
+                      {...tid[option.value]}
+                    />
+                  ),
+                })}
+              </Fragment>
+            );
+          })}
+        </div>
         {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
         {helperText && <HelperText helperText={helperText} />}
       </div>
@@ -106,6 +124,7 @@ function Radio<K extends string>(props: {
   // react-aria uses a WeakMap keyed by the state object identity to store radio group
   // metadata, so spreading state into a new object breaks the lookup.
   isOptionDisabled?: boolean;
+  layout?: RadioGroupFieldLayout;
   onBlur?: () => void;
   onFocus?: () => void;
 }) {
@@ -114,6 +133,7 @@ function Radio<K extends string>(props: {
     option: { description, label, value },
     state,
     isOptionDisabled,
+    layout = "vertical",
     ...others
   } = props;
 
@@ -132,7 +152,17 @@ function Radio<K extends string>(props: {
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 
   return (
-    <label css={Css.df.cursorPointer.mb1.if(disabled).add("cursor", "initial").$} {...hoverProps}>
+    // In vertical layout, each option uses `mb1` for stacking spacing.
+    // In horizontal layout, spacing comes from the parent flex `gap`, so we skip `mb1`.
+    <label
+      css={
+        Css.df.cursorPointer
+          .if(layout === "vertical")
+          .mb1.if(disabled)
+          .add("cursor", "initial").$
+      }
+      {...hoverProps}
+    >
       <input
         type="radio"
         ref={ref}

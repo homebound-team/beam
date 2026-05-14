@@ -49,4 +49,24 @@ describe("RadioGroupField", () => {
     expect(tooltip).toBeInTheDocument();
     expect(tooltip).toHaveAttribute("title", "some reason");
   });
+
+  it("supports horizontal layout", async () => {
+    const r = await render(
+      <RadioGroupField
+        label="Favorite cheese"
+        layout="horizontal"
+        value="a"
+        onChange={() => {}}
+        options={[
+          { value: "a", label: "Asiago" },
+          { value: "b", label: "Burratta" },
+        ]}
+      />,
+    );
+    // Selection still works in horizontal layout.
+    click(r.favoriteCheese_b);
+    // The flex container that wraps the option labels uses row direction.
+    const optionsContainer = r.container.querySelector(`[data-testid="favoriteCheese_a"]`)!.closest("div")!;
+    expect(optionsContainer).toHaveStyle({ "flex-direction": "row" });
+  });
 });

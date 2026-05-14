@@ -294,3 +294,23 @@ export function HelperText() {
     />
   );
 }
+
+export function HorizontalLayout() {
+  const [state, setState] = useState<string | undefined>("a");
+  return (
+    <FormLines width="md">
+      <RadioGroupField
+        label="Estimate Type"
+        layout="horizontal"
+        value={state}
+        onChange={setState}
+        options={[
+          { label: "Temporary", value: "a" },
+          { label: "Lot Determined", value: "b" },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+    </FormLines>
+  );
+}
