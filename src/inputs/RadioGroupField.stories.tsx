@@ -294,3 +294,32 @@ export function HelperText() {
     />
   );
 }
+
+export function HorizontalLayout() {
+  const [state, setState] = useState<string | undefined>("option-1");
+  return (
+    <FormLines width="md">
+      <RadioGroupField
+        label="Estimate Type"
+        layout="horizontal"
+        value={state}
+        onChange={setState}
+        options={[
+          { label: "Option 1", value: "option-1" },
+          { label: "Option 2", value: "option-2" },
+        ]}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <RadioGroupField
+        label="Many Options"
+        layout="horizontal"
+        value={state}
+        onChange={setState}
+        options={Array.from({ length: 25 }, (_, i) => ({ label: `Option ${i + 1}`, value: `option-${i + 1}` }))}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+    </FormLines>
+  );
+}
