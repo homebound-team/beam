@@ -12,15 +12,14 @@ import { Css, Palette } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface MenuItemProps {
+type MenuItemProps = {
   item: Node<MenuItem>;
   state: TreeState<MenuItem>;
   onClose: VoidFunction;
-  contrast: boolean;
-}
+};
 
 export function MenuItemImpl(props: MenuItemProps) {
-  const { item, state, onClose, contrast } = props;
+  const { item, state, onClose } = props;
   const menuItem = item.value;
   if (!menuItem) {
     return null;
@@ -82,10 +81,10 @@ export function MenuItemImpl(props: MenuItemProps) {
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
         ...(menuItem.hasDivider ? Css.bb.bcGray700.$ : {}),
-        ...(!isDisabled && isHovered ? (contrast ? Css.bgGray800.$ : Css.bgGray100.$) : {}),
-        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.Blue700}`).$ : {}),
-        ...(isDisabled ? Css.gray500.cursorNotAllowed.$ : {}),
-        ...(destructive ? Css.red600.$ : {}),
+        ...(!isDisabled && isHovered ? Css.bgMenuItemBgHover.$ : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.FocusRingInset}`).$ : {}),
+        ...(isDisabled ? Css.textDisabled.cursorNotAllowed.$ : {}),
+        ...(destructive ? Css.danger.$ : {}),
         ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
@@ -93,13 +92,13 @@ export function MenuItemImpl(props: MenuItemProps) {
       {maybeTooltip({
         title: resolveTooltip(disabled),
         placement: "right",
-        children: renderMenuItem(menuItem, isSelected, isDisabled, contrast),
+        children: renderMenuItem(menuItem, isSelected, isDisabled),
       })}
     </li>
   );
 }
 
-function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean, contrast: boolean) {
+function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean) {
   return (
     <div css={Css.df.w100.aic.jcsb.gap2.$}>
       <div css={Css.df.aic.$}>
@@ -115,14 +114,7 @@ function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boo
           isDisabled,
         )}
       </div>
-      {isSelected && (
-        <Icon
-          icon="check"
-          color={
-            !contrast ? (isDisabled ? Palette.Gray400 : Palette.Blue700) : isDisabled ? Palette.Gray500 : Palette.White
-          }
-        />
-      )}
+      {isSelected && <Icon icon="check" color={isDisabled ? Palette.TextDisabled : Palette.SelectionIndicator} />}
     </div>
   );
 }

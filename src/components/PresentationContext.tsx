@@ -25,7 +25,7 @@ export interface PresentationFieldProps {
   errorInTooltip?: true;
   /** Allow the fields to grow to the width of its container. By default, fields will extend up to 550px */
   fullWidth?: boolean;
-  /** Changes bg and hoverBg; Takes priority over `contrast`; Useful when showing many fields w/in a table that require user attention; In no way should be used as a replacement for error/focus state */
+  /** Changes bg and hoverBg; useful when showing many fields w/in a table that require user attention; in no way should be used as a replacement for error/focus state */
   inputStylePalette?: InputStylePalette;
 }
 

@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { Fragment } from "react";
-import { navLink } from "src/components";
+import { ContrastScope, navLink } from "src/components";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 import { Icon, Icons } from "./Icon";
@@ -36,9 +36,8 @@ export default {
 } as Meta;
 
 export function BaseStates() {
-  const sideNavStyles = getNavLinkStyles("side", false);
-  const sideContrastNavStyles = getNavLinkStyles("side", true);
-  const globalNavStyles = getNavLinkStyles("global", false);
+  const sideNavStyles = getNavLinkStyles("side");
+  const globalNavStyles = getNavLinkStyles("global");
   const args = { href: "", className: navLink };
 
   return (
@@ -63,26 +62,28 @@ export function BaseStates() {
           {getChildren("Side nav disabled")}
         </a>
       </div>
-      <div css={Css.df.fdc.gap2.bgGray900.p1.br12.$}>
-        <a {...args} css={{ ...sideContrastNavStyles.baseStyles }}>
-          {getChildren("Side contrast nav default")}
-        </a>
-        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.hoverStyles }}>
-          {getChildren("Side contrast nav hovered")}
-        </a>
-        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.pressedStyles }}>
-          {getChildren("Side contrast nav pressed")}
-        </a>
-        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.activeStyles }}>
-          {getChildren("Side contrast nav active")}
-        </a>
-        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.focusRingStyles }}>
-          {getChildren("Side contrast nav focus ring")}
-        </a>
-        <a {...args} css={{ ...sideContrastNavStyles.baseStyles, ...sideContrastNavStyles.disabledStyles }}>
-          {getChildren("Side contrast nav disabled")}
-        </a>
-      </div>
+      <ContrastScope>
+        <div css={Css.df.fdc.gap2.bgGray900.p1.br12.$}>
+          <a {...args} css={{ ...sideNavStyles.baseStyles }}>
+            {getChildren("Side contrast nav default")}
+          </a>
+          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
+            {getChildren("Side contrast nav hovered")}
+          </a>
+          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
+            {getChildren("Side contrast nav pressed")}
+          </a>
+          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
+            {getChildren("Side contrast nav active")}
+          </a>
+          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
+            {getChildren("Side contrast nav focus ring")}
+          </a>
+          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
+            {getChildren("Side contrast nav disabled")}
+          </a>
+        </div>
+      </ContrastScope>
       <div css={Css.df.fdc.gap2.p1.$}>
         <a {...args} css={{ ...globalNavStyles.baseStyles }}>
           {getChildren("Global nav default")}

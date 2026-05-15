@@ -1,5 +1,6 @@
 import { defineConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
 import { palette } from "./truss-palette";
+import { Tokens } from "./truss-token-vars";
 
 const increment = 8;
 const numberOfIncrements = 8;
@@ -117,6 +118,7 @@ export default defineConfig({
   typeAliases: {
     Font: ["fontSize", "fontWeight", "lineHeight"],
   },
+  tokens: Tokens,
   breakpoints,
   sections,
 });

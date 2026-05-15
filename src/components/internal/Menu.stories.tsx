@@ -1,7 +1,9 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { ButtonMenu } from "src/components/ButtonMenu";
+import { ContrastScope } from "src/components/ContrastScope";
 import { Menu } from "src/components/internal/Menu";
+import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withDimensions, withRouter } from "src/utils/sb";
 
@@ -49,17 +51,20 @@ export function IconMenuItems() {
 
 export function DividerMenuItems() {
   return (
-    <ButtonMenu
-      defaultOpen
-      contrast
-      trigger={{ label: "Menu Trigger" }}
-      items={[
-        { label: "Edit", hasDivider: true, onClick: noop },
-        { label: "Like", onClick: noop },
-        { label: "Favorite", hasDivider: true, onClick: noop },
-        { label: "Delete", onClick: noop },
-      ]}
-    />
+    <ContrastScope>
+      <div css={Css.p2.bgGray800.white.mhPx(200).$}>
+        <ButtonMenu
+          defaultOpen
+          trigger={{ label: "Menu Trigger" }}
+          items={[
+            { label: "Edit", hasDivider: true, onClick: noop },
+            { label: "Like", onClick: noop },
+            { label: "Favorite", hasDivider: true, onClick: noop },
+            { label: "Delete", onClick: noop },
+          ]}
+        />
+      </div>
+    </ContrastScope>
   );
 }
 

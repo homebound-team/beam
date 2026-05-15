@@ -7,16 +7,9 @@ export type LoadingSkeletonProps = {
   columns?: number;
   size?: Sizes;
   randomizeWidths?: boolean;
-  contrast?: boolean;
 };
 
-export function LoadingSkeleton({
-  rows = 1,
-  columns = 1,
-  size = "md",
-  randomizeWidths = false,
-  contrast = false,
-}: LoadingSkeletonProps) {
+export function LoadingSkeleton({ rows = 1, columns = 1, size = "md", randomizeWidths = false }: LoadingSkeletonProps) {
   const cellArray = [...Array(columns)];
   const rowArray = [...Array(rows)];
 
@@ -29,10 +22,8 @@ export function LoadingSkeleton({
       <div
         key={`row-${rowNumber}-cell-${i}`}
         css={
-          Css.br4
-            .add("animation", "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite")
-            .add("flexGrow", flexGrowForCell)
-            .bgGray300.if(contrast).bgGray700.$
+          Css.br4.add("animation", "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite").add("flexGrow", flexGrowForCell)
+            .bgOnSurfaceMuted.$
         }
       />
     ));

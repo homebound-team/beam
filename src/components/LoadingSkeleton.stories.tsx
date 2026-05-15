@@ -1,4 +1,4 @@
-import { LoadingSkeleton, LoadingSkeletonProps } from "src/components";
+import { ContrastScope, LoadingSkeleton, LoadingSkeletonProps } from "src/components";
 import { Css } from "src/Css";
 
 export default {
@@ -43,9 +43,11 @@ InteractiveExample.args = {
 };
 
 export const Contrast = () => (
-  <div>
-    <h1 css={Css.xl2.mb1.bb.bcGray400.gray400.$}>Contrast Background Example</h1>
-    <LoadingSkeleton rows={5} contrast />
-  </div>
+  <ContrastScope>
+    <div>
+      <h1 css={Css.xl2.mb1.bb.bcGray400.gray400.$}>Contrast Background Example</h1>
+      <LoadingSkeleton rows={5} />
+    </div>
+  </ContrastScope>
 );
 Contrast.globals = { backgrounds: { value: "dark" } };

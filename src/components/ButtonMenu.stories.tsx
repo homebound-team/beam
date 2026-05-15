@@ -2,6 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
+import { ContrastScope } from "src/components/ContrastScope";
 import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -220,19 +221,20 @@ export function NavLinkButtonMenu() {
   ];
 
   return (
-    <div css={Css.mlPx(200).$}>
-      <h2 css={Css.lg.$}>Nav Link Button Menu</h2>
-      <ButtonMenu
-        trigger={{ navLabel: "Menu trigger", variant: "global" }}
-        items={menuItems}
-        persistentItems={[
-          { label: "Persistent Action", onClick: action("Persistent action clicked") },
-          { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
-        ]}
-        defaultOpen
-        contrast={true}
-      />
-    </div>
+    <ContrastScope>
+      <div css={Css.mlPx(200).p2.bgGray800.white.$}>
+        <h2 css={Css.lg.$}>Nav Link Button Menu</h2>
+        <ButtonMenu
+          trigger={{ navLabel: "Menu trigger", variant: "global" }}
+          items={menuItems}
+          persistentItems={[
+            { label: "Persistent Action", onClick: action("Persistent action clicked") },
+            { label: "Destructive Action", onClick: action("Destructive Action Clicked"), destructive: true },
+          ]}
+          defaultOpen
+        />
+      </div>
+    </ContrastScope>
   );
 }
 

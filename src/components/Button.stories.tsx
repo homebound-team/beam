@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { capitalCase } from "change-case";
-import { Button, ButtonSize, ButtonVariant, Icon } from "src";
+import { Button, ButtonSize, ButtonVariant, ContrastScope, Icon } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -27,9 +27,19 @@ const variants: ButtonVariant[] = [
   "textSecondary",
 ];
 
+/** Compact row for `Css.setVar` / token demos (primary uses `--b-primary`). */
+function TrussTokenSampleButtons() {
+  return (
+    <div css={Css.dg.gtc("repeat(2, max-content)").gap2.aic.$}>
+      <Button variant="primary" size="md" label="Primary" onClick={action("Clicked")} />
+      <Button variant="secondary" size="md" label="Secondary" onClick={action("Clicked")} />
+    </div>
+  );
+}
+
 export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
   return (
-    <div css={Css.if(contrast).white.$}>
+    <ContrastScope contrast={contrast}>
       <div css={Css.dg.gtc("repeat(5, max-content)").jifs.gap("8px 16px").$}>
         {variants.map((variant, idx) => {
           const variantName = capitalCase(variant);
@@ -38,35 +48,14 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
               <h2 css={Css.xl.gc("1/6").if(idx !== 0).mt3.$}>{variantName}</h2>
               {sizes.map((size) => (
                 <div key={size} css={Css.display("contents").$}>
-                  <Button
-                    size={size}
-                    variant={variant}
-                    label={`${variantName} button`}
-                    contrast={contrast}
-                    onClick={action("Clicked")}
-                  />
-                  <Button
-                    size={size}
-                    variant={variant}
-                    disabled
-                    label="Disabled"
-                    contrast={contrast}
-                    onClick={action("Clicked")}
-                  />
-                  <Button
-                    size={size}
-                    variant={variant}
-                    active
-                    label="Pressed"
-                    contrast={contrast}
-                    onClick={action("Clicked")}
-                  />
+                  <Button size={size} variant={variant} label={`${variantName} button`} onClick={action("Clicked")} />
+                  <Button size={size} variant={variant} disabled label="Disabled" onClick={action("Clicked")} />
+                  <Button size={size} variant={variant} active label="Pressed" onClick={action("Clicked")} />
                   <Button
                     size={size}
                     variant={variant}
                     icon="plus"
                     label={`${variantName} button`}
-                    contrast={contrast}
                     onClick={action("Clicked")}
                   />
                   <Button
@@ -75,7 +64,6 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
                     disabled
                     icon="plus"
                     label="Disabled"
-                    contrast={contrast}
                     onClick={action("Clicked")}
                   />
                 </div>
@@ -88,28 +76,21 @@ export function ButtonVariations({ contrast = false }: { contrast?: boolean }) {
       <div css={Css.mt3.$}>
         <h2 css={Css.xl.$}>Text</h2>
         <div css={Css.my1.dg.gtc("repeat(2, max-content)").jifs.gap("8px 16px").$}>
-          <Button variant="text" label="Text Button" contrast={contrast} onClick={action("Clicked")} />
-          <Button variant="text" disabled label="Disabled" contrast={contrast} onClick={action("Clicked")} />
-          <Button icon="plus" variant="text" label="Text Button" contrast={contrast} onClick={action("Clicked")} />
-          <Button
-            icon="plus"
-            variant="text"
-            disabled
-            label="Disabled"
-            contrast={contrast}
-            onClick={action("Clicked")}
-          />
+          <Button variant="text" label="Text Button" onClick={action("Clicked")} />
+          <Button variant="text" disabled label="Disabled" onClick={action("Clicked")} />
+          <Button icon="plus" variant="text" label="Text Button" onClick={action("Clicked")} />
+          <Button icon="plus" variant="text" disabled label="Disabled" onClick={action("Clicked")} />
         </div>
         <p css={Css.mb1.xs.$}>
-          Example of a <Button variant="text" label="Text Button" contrast={contrast} onClick={action("Clicked")} />{" "}
-          placed inheriting "xs" font size.
+          Example of a <Button variant="text" label="Text Button" onClick={action("Clicked")} /> placed inheriting "xs"
+          font size.
         </p>
         <p css={Css.lg.$}>
-          Example of a <Button variant="text" label="Text Button" contrast={contrast} onClick={action("Clicked")} />{" "}
-          placed inheriting "lg" font size.
+          Example of a <Button variant="text" label="Text Button" onClick={action("Clicked")} /> placed inheriting "lg"
+          font size.
         </p>
       </div>
-    </div>
+    </ContrastScope>
   );
 }
 
@@ -191,17 +172,18 @@ export function AsyncButton() {
 }
 export function ConstrastAsyncButton() {
   return (
-    <div css={Css.white.$}>
-      <h2 css={Css.mb2.$}>Contrast is also passed to spinner</h2>
-      <Button
-        label="Upload"
-        endAdornment={<Icon icon={"cloudUpload"} />}
-        icon="templates"
-        labelInFlight="Uploading"
-        onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
-        contrast
-      />
-    </div>
+    <ContrastScope>
+      <div css={Css.white.$}>
+        <h2 css={Css.mb2.$}>Spinner inherits contrast tokens from scope</h2>
+        <Button
+          label="Upload"
+          endAdornment={<Icon icon={"cloudUpload"} />}
+          icon="templates"
+          labelInFlight="Uploading"
+          onClick={async () => await new Promise((resolve) => setTimeout(resolve, 2000))}
+        />
+      </div>
+    </ContrastScope>
   );
 }
 

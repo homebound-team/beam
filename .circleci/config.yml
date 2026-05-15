@@ -61,6 +61,12 @@ jobs:
       - <<: *node-image
     steps:
       - bootstrap
+      - run:
+          name: Validate design tokens (tokens.json)
+          command: yarn validate:tokens
+      - run:
+          name: Check design token generated files match tokens
+          command: yarn check:token-drift
       - run: yarn build
       - run: yarn type-check
       - run: yarn test
@@ -78,7 +84,7 @@ jobs:
             - eslint-cache-main
       - run:
           name: Run ESLint
-          command: yarn lint --cache --cache-location .eslintcache --quiet
+          command: yarn lint:ci
       - save_cache:
           name: Save ESLint Cache
           key: eslint-cache-{{ .Branch }}

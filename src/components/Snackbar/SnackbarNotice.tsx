@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Button, ButtonProps } from "src/components/Button";
+import { contrastDataTheme } from "src/components/ContrastScope";
 import { Icon, IconProps } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { Css, Palette } from "src/Css";
@@ -28,7 +29,7 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
   // Only allow the "close" button to be hidden if not a `persistent` notice. Otherwise we could get in a state where the user cannot remove the notice from the screen.
   const reallyHideClose = hideCloseButton && !persistent;
   return (
-    <div css={Css.white.bgGray800.br4.md.df.aic.maxwPx(420).$} {...tid} role="alert">
+    <div css={Css.white.bgGray800.br4.md.df.aic.maxwPx(420).$} data-theme={contrastDataTheme} {...tid} role="alert">
       {icon && (
         <span css={Css.fs0.plPx(12).$}>
           <Icon {...typeToIcon[icon]} {...tid.icon} />
@@ -48,12 +49,12 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
         <span css={Css.fs0.df.aic.$}>
           {action && (
             <span css={Css.ttu.sm.prPx(!reallyHideClose && action.variant !== "text" ? 4 : 8).$}>
-              <Button contrast {...action} {...tid.action} />
+              <Button {...action} {...tid.action} />
             </span>
           )}
           {!reallyHideClose && (
             <span css={Css.pr1.add("lineHeight", 0).$}>
-              <IconButton icon="x" contrast onClick={onClose} {...tid.close} />
+              <IconButton icon="x" onClick={onClose} {...tid.close} />
             </span>
           )}
         </span>

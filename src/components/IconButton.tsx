@@ -9,7 +9,7 @@ import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
-export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
+export type IconButtonProps = {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
   color?: Palette;
@@ -21,8 +21,6 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   buttonRef?: RefObject<HTMLButtonElement>;
   /** Whether to show a 16x16px version of the IconButton */
   compact?: boolean;
-  /** Whether to display the contrast variant */
-  contrast?: boolean;
   /** Whether to display the circle variant */
   circle?: boolean;
   /** Indicates that the button is active/selected */
@@ -31,7 +29,8 @@ export interface IconButtonProps extends BeamButtonProps, BeamFocusableProps {
   download?: boolean;
   /** Provides label for screen readers - Will become a required soon */
   label?: string;
-}
+} & BeamButtonProps &
+  BeamFocusableProps;
 
 export function IconButton(props: IconButtonProps) {
   const {
@@ -48,7 +47,6 @@ export function IconButton(props: IconButtonProps) {
     openInNew,
     active = false,
     compact = false,
-    contrast = false,
     circle = false,
     download = false,
     forceFocusStyles = false,
@@ -73,18 +71,15 @@ export function IconButton(props: IconButtonProps) {
     () => ({
       ...iconButtonStylesReset,
       ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered &&
-        (contrast ? iconButtonContrastStylesHover : circle ? iconButtonCircleStylesHover : iconButtonStylesHover)),
+      ...(isHovered && (circle ? iconButtonCircleStylesHover : iconButtonTokenHover)),
       ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
-      ...(active ? (contrast ? iconButtonContrastStylesHover : activeStyles) : {}),
+      ...(active && (circle ? activeStylesCircle : iconButtonTokenHover)),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     }),
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isHovered, isFocusVisible, isDisabled, compact],
+    [isHovered, isFocusVisible, isDisabled, compact, circle, active, bgColor, forceFocusStyles],
   );
-  const iconColor = contrast ? contrastIconColor : circle ? circleIconColor : defaultIconColor;
+  const iconColor = circle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
     ...testIds,
@@ -102,7 +97,7 @@ export function IconButton(props: IconButtonProps) {
       color={
         color ||
         (isDisabled
-          ? Palette.Gray400
+          ? Palette.TextDisabled
           : circle && (isHovered || active || isFocusVisible)
             ? defaultIconColor
             : iconColor)
@@ -120,17 +115,18 @@ export function IconButton(props: IconButtonProps) {
   });
 }
 
-const defaultIconColor = Palette.Gray900;
-const contrastIconColor = Palette.White;
+const defaultIconColor = Palette.OnSurface;
 const circleIconColor = Palette.Gray700;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
+/** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
+const iconButtonTokenHover = Css.bgNeutralFillHoverStrong.$;
 export const iconButtonStylesHover = Css.bgGray200.$;
-export const iconButtonContrastStylesHover = Css.bgGray700.$;
+export const iconButtonContrastStylesHover = iconButtonTokenHover;
 export const iconButtonCircleStylesHover = Css.bgBlue100.bcBlue200.$;
 const iconButtonStylesFocus = Css.bcBlue700.$;
 const iconButtonCircleStylesFocus = Css.bgBlue100.bcBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
-const activeStyles = Css.bgGray200.bcGray200.$;
+const activeStylesCircle = Css.bgGray200.bcGray200.$;

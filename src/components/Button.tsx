@@ -10,7 +10,7 @@ import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 import { labelOr } from "./internal/OverlayTrigger";
 
-export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
+export type ButtonProps = {
   label: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -24,13 +24,13 @@ export interface ButtonProps extends BeamButtonProps, BeamFocusableProps {
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
-  contrast?: boolean;
 
   /** Additional text to further customize button during an async request is in progress. */
   labelInFlight?: string;
   /** Shows pressed/active styles (useful when a menu is open) */
   active?: boolean;
-}
+} & BeamButtonProps &
+  BeamFocusableProps;
 
 export function Button(props: ButtonProps) {
   const {
@@ -41,7 +41,6 @@ export function Button(props: ButtonProps) {
     tooltip,
     openInNew,
     download,
-    contrast = false,
     forceFocusStyles = false,
     active = false,
     labelInFlight,
@@ -82,8 +81,8 @@ export function Button(props: ButtonProps) {
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
   const { baseStyles, hoverStyles, disabledStyles, pressedStyles, focusStyles } = useMemo(
-    () => getButtonStyles(variant, size, contrast),
-    [variant, size, contrast],
+    () => getButtonStyles(variant, size),
+    [variant, size],
   );
 
   const buttonContent = (
@@ -91,7 +90,7 @@ export function Button(props: ButtonProps) {
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {labelInFlight && asyncInProgress ? labelInFlight : label}
       {(endAdornment || asyncInProgress) && (
-        <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} contrast={contrast} /> : endAdornment}</span>
+        <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} /> : endAdornment}</span>
       )}
     </>
   );
@@ -121,10 +120,10 @@ export function Button(props: ButtonProps) {
   });
 }
 
-function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boolean) {
-  const styles = variantStyles(contrast)[variant];
+function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
+  const styles = variantStyles[variant];
   if (variant === "text") {
-    // The text variant does not support the 'size'. The 'size' prop only effects the button's height and padding which is not relevant for this variant.
+    // The text variant does not support the 'size'. The `size` prop only effects the button's height and padding which is not relevant for this variant.
     return styles;
   }
   return {
@@ -133,7 +132,7 @@ function getButtonStyles(variant: ButtonVariant, size: ButtonSize, contrast: boo
   };
 }
 
-const variantStyles: (contrast: boolean) => Record<
+const variantStyles: Record<
   ButtonVariant,
   {
     baseStyles: Properties;
@@ -142,85 +141,78 @@ const variantStyles: (contrast: boolean) => Record<
     pressedStyles: Properties;
     focusStyles: Properties;
   }
-> = (contrast) => ({
+> = {
   primary: {
-    baseStyles: Css.bgBlue600.white.$,
-    hoverStyles: Css.bgBlue700.$,
-    pressedStyles: Css.bgBlue800.$,
-    disabledStyles: Css.bgBlue200.if(contrast).gray600.bgBlue900.$,
-    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+    baseStyles: Css.bgPrimary.onPrimary.$,
+    hoverStyles: Css.bgPrimaryHover.$,
+    pressedStyles: Css.bgPrimaryPressed.$,
+    disabledStyles: Css.bgButtonPrimaryDisabledBg.buttonPrimaryDisabledFg.$,
+    focusStyles: Css.bshFocus.$,
   },
 
   secondary: {
     baseStyles: Css.bgWhite.bcGray300.bw1.ba.blue600.$,
-    hoverStyles: Css.bgGray100.if(contrast).bgGray300.$,
-    pressedStyles: Css.bgGray200.if(contrast).bgGray100.$,
+    hoverStyles: Css.bgNeutralFillHoverSubtle.$,
+    pressedStyles: Css.bgNeutralFillPressed.$,
     disabledStyles: Css.bgWhite.blue300.$,
-    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+    focusStyles: Css.bshFocus.$,
   },
 
   secondaryBlack: {
     baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray900.$,
-    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.bgGray100.gray900.if(contrast).bgWhite.gray900.$,
-    disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
-      .if(contrast)
-      .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
+    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
+    pressedStyles: Css.bgNeutralSurfacePressed.gray900.$,
+    disabledStyles: Css.buttonGhostDisabledFg.$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.FocusRingInset}, 0px 0px 0px 4px ${Palette.Gray900}`).$,
   },
 
   tertiary: {
-    baseStyles: Css.bgTransparent.blue600.if(contrast).white.$,
-    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.blue800.if(contrast).bgWhite.gray900.$,
-    disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.Blue400}`).bgGray700.white.$,
+    baseStyles: Css.bgTransparent.buttonTertiaryFg.$,
+    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
+    pressedStyles: Css.bgNeutralSurfacePressed.buttonTertiaryFgPressed.$,
+    disabledStyles: Css.buttonGhostDisabledFg.$,
+    focusStyles: Css.bshFocus.bgNeutralFillHoverStrong.onSurface.$,
   },
 
   tertiaryDanger: {
-    baseStyles: Css.bgTransparent.red600.if(contrast).red400.$,
-    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.red800.if(contrast).bgWhite.gray900.$,
-    disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Red500}`)
-      .if(contrast)
-      .boxShadow(`0px 0px 0px 2px ${Palette.Red500}`).$,
+    baseStyles: Css.bgTransparent.danger.$,
+    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
+    pressedStyles: Css.bgNeutralSurfacePressed.dangerPressed.$,
+    disabledStyles: Css.buttonGhostDisabledFg.$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.FocusRingInset}, 0px 0px 0px 4px ${Palette.Red500}`).$,
   },
 
   danger: {
     baseStyles: Css.bgRed600.white.$,
     hoverStyles: Css.bgRed700.$,
     pressedStyles: Css.bgRed800.$,
-    disabledStyles: Css.bgRed200.if(contrast).bgRed900.gray600.$,
-    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+    disabledStyles: Css.bgButtonDangerDisabledBg.buttonDangerDisabledFg.$,
+    focusStyles: Css.bshDanger.$,
   },
 
   quaternary: {
-    baseStyles: Css.bgTransparent.gray900.if(contrast).gray400.$,
-    hoverStyles: Css.bgGray100.if(contrast).bgGray700.white.$,
-    pressedStyles: Css.gray900.if(contrast).bgWhite.gray900.$,
-    disabledStyles: Css.gray400.if(contrast).gray700.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.White}, 0px 0px 0px 4px ${Palette.Gray900}`)
-      .if(contrast)
-      .boxShadow(`0px 0px 0px 2px ${Palette.Gray500}`).$,
+    baseStyles: Css.bgTransparent.buttonGhostFg.$,
+    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
+    pressedStyles: Css.bgNeutralSurfacePressed.gray900.$,
+    disabledStyles: Css.buttonGhostDisabledFg.$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.FocusRingInset}, 0px 0px 0px 4px ${Palette.Gray900}`).$,
   },
 
   caution: {
     baseStyles: Css.bgYellow200.gray900.$,
     hoverStyles: Css.bgYellow300.$,
     pressedStyles: Css.bgYellow400.$,
-    disabledStyles: Css.bgYellow200.if(contrast).bgYellow900.white.$,
-    focusStyles: Css.bshDanger.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+    disabledStyles: Css.bgButtonCautionDisabledBg.buttonCautionDisabledFg.$,
+    focusStyles: Css.bshDanger.$,
   },
 
   text: {
-    baseStyles: Css.blue700.add("fontSize", "inherit").if(contrast).blue400.$,
-    hoverStyles: Css.blue600.if(contrast).blue300.$,
-    pressedStyles: Css.blue700.if(contrast).blue200.$,
-    disabledStyles: Css.blue300.if(contrast).blue700.$,
-    focusStyles: Css.bshFocus.if(contrast).boxShadow(`0 0 0 2px ${Palette.White}`).$,
+    baseStyles: Css.textLinkDefault.add("fontSize", "inherit").$,
+    hoverStyles: Css.textLinkHover.$,
+    pressedStyles: Css.textLinkPressed.$,
+    disabledStyles: Css.textLinkDisabled.$,
+    focusStyles: Css.bshFocus.$,
   },
-  // Todo: handle contrast variant
   textSecondary: {
     baseStyles: Css.blue600.add("fontSize", "inherit").$,
     hoverStyles: Css.bgGray100.$,
@@ -228,7 +220,7 @@ const variantStyles: (contrast: boolean) => Record<
     disabledStyles: Css.bgWhite.blue300.$,
     focusStyles: Css.blue600.$,
   },
-});
+};
 
 const sizeStyles: Record<ButtonSize, Properties> = {
   sm: Css.hPx(32).pxPx(12).$,

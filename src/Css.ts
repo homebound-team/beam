@@ -41,7 +41,68 @@ export type RuntimeStyles = RawCssProperties & { readonly __kind: "runtime" };
 
 export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "md" | "mdSb" | "lg" | "xl" | "xl2";
 
-export type CssSetVarKeys = `--${string}`;
+export enum Tokens {
+  ButtonCautionDisabledBg = "--b-button-caution-disabled-bg",
+  ButtonCautionDisabledFg = "--b-button-caution-disabled-fg",
+  ButtonDangerDisabledBg = "--b-button-danger-disabled-bg",
+  ButtonDangerDisabledFg = "--b-button-danger-disabled-fg",
+  ButtonGhostDisabledFg = "--b-button-ghost-disabled-fg",
+  ButtonGhostFg = "--b-button-ghost-fg",
+  ButtonPrimaryDisabledBg = "--b-button-primary-disabled-bg",
+  ButtonPrimaryDisabledFg = "--b-button-primary-disabled-fg",
+  ButtonTertiaryFg = "--b-button-tertiary-fg",
+  ButtonTertiaryFgPressed = "--b-button-tertiary-fg-pressed",
+  Danger = "--b-danger",
+  DangerPressed = "--b-danger-pressed",
+  FieldBgDefault = "--b-field-bg-default",
+  FieldBgDisabled = "--b-field-bg-disabled",
+  FieldBgHover = "--b-field-bg-hover",
+  FieldBorderDefault = "--b-field-border-default",
+  FieldBorderError = "--b-field-border-error",
+  FieldBorderFocus = "--b-field-border-focus",
+  FieldBorderHover = "--b-field-border-hover",
+  FieldTextDisabled = "--b-field-text-disabled",
+  FocusRingInset = "--b-focus-ring-inset",
+  FocusRingMuted = "--b-focus-ring-muted",
+  ListRowBgHover = "--b-list-row-bg-hover",
+  LoaderSpinner = "--b-loader-spinner",
+  LoaderTrack = "--b-loader-track",
+  MenuItemBgHover = "--b-menu-item-bg-hover",
+  NavItemBgActive = "--b-nav-item-bg-active",
+  NavItemBgHover = "--b-nav-item-bg-hover",
+  NavItemBgPressed = "--b-nav-item-bg-pressed",
+  NavText = "--b-nav-text",
+  NavTextActive = "--b-nav-text-active",
+  NavTextDisabled = "--b-nav-text-disabled",
+  NavTextFocusVisible = "--b-nav-text-focus-visible",
+  NavTextPressed = "--b-nav-text-pressed",
+  NeutralFillHoverStrong = "--b-neutral-fill-hover-strong",
+  NeutralFillHoverSubtle = "--b-neutral-fill-hover-subtle",
+  NeutralFillPressed = "--b-neutral-fill-pressed",
+  NeutralSurfacePressed = "--b-neutral-surface-pressed",
+  OnPrimary = "--b-on-primary",
+  OnSurface = "--b-on-surface",
+  OnSurfaceMuted = "--b-on-surface-muted",
+  PopoverSurface = "--b-popover-surface",
+  Primary = "--b-primary",
+  PrimaryHover = "--b-primary-hover",
+  PrimaryPressed = "--b-primary-pressed",
+  Scrim = "--b-scrim",
+  SelectionIndicator = "--b-selection-indicator",
+  StatusSuccessFg = "--b-status-success-fg",
+  Surface = "--b-surface",
+  TextDisabled = "--b-text-disabled",
+  TextHelper = "--b-text-helper",
+  TextLabel = "--b-text-label",
+  TextLinkDefault = "--b-text-link-default",
+  TextLinkDisabled = "--b-text-link-disabled",
+  TextLinkHover = "--b-text-link-hover",
+  TextLinkPressed = "--b-text-link-pressed",
+  TextPlaceholder = "--b-text-placeholder",
+  TextSelection = "--b-text-selection",
+}
+
+export type CssSetVarKeys = Tokens | `--${string}`;
 
 export type CssSetVarScalar = string | number;
 
@@ -106,9 +167,241 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // borderColor
-  /** Sets `borderColor: "rgba(255,255,255,1)"`. */
+  /** Sets `borderColor: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
+  get bcButtonCautionDisabledBg() {
+    return this.add("borderColor", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
+  get bcButtonCautionDisabledFg() {
+    return this.add("borderColor", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
+  get bcButtonDangerDisabledBg() {
+    return this.add("borderColor", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get bcButtonDangerDisabledFg() {
+    return this.add("borderColor", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
+  get bcButtonGhostDisabledFg() {
+    return this.add("borderColor", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
+  get bcButtonGhostFg() {
+    return this.add("borderColor", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
+  get bcButtonPrimaryDisabledBg() {
+    return this.add("borderColor", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get bcButtonPrimaryDisabledFg() {
+    return this.add("borderColor", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
+  get bcButtonTertiaryFg() {
+    return this.add("borderColor", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `borderColor: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
+  get bcButtonTertiaryFgPressed() {
+    return this.add("borderColor", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `borderColor: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
+  get bcDanger() {
+    return this.add("borderColor", "var(--b-danger, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `borderColor: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
+  get bcDangerPressed() {
+    return this.add("borderColor", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
+  get bcFieldBgDefault() {
+    return this.add("borderColor", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
+  get bcFieldBgDisabled() {
+    return this.add("borderColor", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bcFieldBgHover() {
+    return this.add("borderColor", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
+  get bcFieldBorderDefault() {
+    return this.add("borderColor", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
+  get bcFieldBorderError() {
+    return this.add("borderColor", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
+  get bcFieldBorderFocus() {
+    return this.add("borderColor", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
+  get bcFieldBorderHover() {
+    return this.add("borderColor", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `borderColor: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
+  get bcFieldTextDisabled() {
+    return this.add("borderColor", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
+  }
+  /** Sets `borderColor: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
+  get bcFocusRingInset() {
+    return this.add("borderColor", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
+  get bcFocusRingMuted() {
+    return this.add("borderColor", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `borderColor: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bcListRowBgHover() {
+    return this.add("borderColor", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
+  get bcLoaderSpinner() {
+    return this.add("borderColor", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
+  get bcLoaderTrack() {
+    return this.add("borderColor", "var(--b-loader-track, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bcMenuItemBgHover() {
+    return this.add("borderColor", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
+  get bcNavItemBgActive() {
+    return this.add("borderColor", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bcNavItemBgHover() {
+    return this.add("borderColor", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
+  get bcNavItemBgPressed() {
+    return this.add("borderColor", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
+  get bcNavText() {
+    return this.add("borderColor", "var(--b-nav-text, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
+  get bcNavTextActive() {
+    return this.add("borderColor", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get bcNavTextDisabled() {
+    return this.add("borderColor", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
+  get bcNavTextFocusVisible() {
+    return this.add("borderColor", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `borderColor: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
+  get bcNavTextPressed() {
+    return this.add("borderColor", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `borderColor: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
+  get bcNeutralFillHoverStrong() {
+    return this.add("borderColor", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
+  get bcNeutralFillHoverSubtle() {
+    return this.add("borderColor", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `borderColor: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
+  get bcNeutralFillPressed() {
+    return this.add("borderColor", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `borderColor: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
+  get bcNeutralSurfacePressed() {
+    return this.add("borderColor", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
+  get bcOnPrimary() {
+    return this.add("borderColor", "var(--b-on-primary, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
+  get bcOnSurface() {
+    return this.add("borderColor", "var(--b-on-surface, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `borderColor: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
+  get bcOnSurfaceMuted() {
+    return this.add("borderColor", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `borderColor: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
+  get bcPopoverSurface() {
+    return this.add("borderColor", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
+  get bcPrimary() {
+    return this.add("borderColor", "var(--b-primary, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `borderColor: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
+  get bcPrimaryHover() {
+    return this.add("borderColor", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
+  get bcPrimaryPressed() {
+    return this.add("borderColor", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `borderColor: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
+  get bcScrim() {
+    return this.add("borderColor", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
+  }
+  /** Sets `borderColor: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
+  get bcSelectionIndicator() {
+    return this.add("borderColor", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
+  get bcStatusSuccessFg() {
+    return this.add("borderColor", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
+  }
+  /** Sets `borderColor: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
+  get bcSurface() {
+    return this.add("borderColor", "var(--b-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get bcTextDisabled() {
+    return this.add("borderColor", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
+  get bcTextHelper() {
+    return this.add("borderColor", "var(--b-text-helper, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
+  get bcTextLabel() {
+    return this.add("borderColor", "var(--b-text-label, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
+  get bcTextLinkDefault() {
+    return this.add("borderColor", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
+  get bcTextLinkDisabled() {
+    return this.add("borderColor", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
+  get bcTextLinkHover() {
+    return this.add("borderColor", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
+  get bcTextLinkPressed() {
+    return this.add("borderColor", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
+  get bcTextPlaceholder() {
+    return this.add("borderColor", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `borderColor: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
+  get bcTextSelection() {
+    return this.add("borderColor", "var(--b-text-selection, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `borderColor: "rgba(255, 255, 255, 1)"`. */
   get bcWhite() {
-    return this.add("borderColor", "rgba(255,255,255,1)");
+    return this.add("borderColor", "rgba(255, 255, 255, 1)");
   }
   /** Sets `borderColor: "rgba(0,0,0,0)"`. */
   get bcTransparent() {
@@ -490,13 +783,13 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get bshHover() {
     return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);");
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
   get bshFocus() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
   get bshDanger() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
   }
   /** Sets `boxShadow: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"`. */
   get bshModal() {
@@ -1747,9 +2040,241 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // skins
-  /** Sets `color: "rgba(255,255,255,1)"`. */
+  /** Sets `color: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
+  get buttonCautionDisabledBg() {
+    return this.add("color", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
+  }
+  /** Sets `color: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
+  get buttonCautionDisabledFg() {
+    return this.add("color", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `color: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
+  get buttonDangerDisabledBg() {
+    return this.add("color", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
+  }
+  /** Sets `color: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get buttonDangerDisabledFg() {
+    return this.add("color", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
+  get buttonGhostDisabledFg() {
+    return this.add("color", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `color: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
+  get buttonGhostFg() {
+    return this.add("color", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `color: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
+  get buttonPrimaryDisabledBg() {
+    return this.add("color", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `color: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get buttonPrimaryDisabledFg() {
+    return this.add("color", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
+  get buttonTertiaryFg() {
+    return this.add("color", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `color: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
+  get buttonTertiaryFgPressed() {
+    return this.add("color", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `color: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
+  get danger() {
+    return this.add("color", "var(--b-danger, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `color: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
+  get dangerPressed() {
+    return this.add("color", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
+  }
+  /** Sets `color: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
+  get fieldBgDefault() {
+    return this.add("color", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
+  get fieldBgDisabled() {
+    return this.add("color", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get fieldBgHover() {
+    return this.add("color", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
+  get fieldBorderDefault() {
+    return this.add("color", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `color: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
+  get fieldBorderError() {
+    return this.add("color", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `color: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
+  get fieldBorderFocus() {
+    return this.add("color", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
+  get fieldBorderHover() {
+    return this.add("color", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `color: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
+  get fieldTextDisabled() {
+    return this.add("color", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
+  }
+  /** Sets `color: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
+  get focusRingInset() {
+    return this.add("color", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
+  get focusRingMuted() {
+    return this.add("color", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `color: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get listRowBgHover() {
+    return this.add("color", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
+  get loaderSpinner() {
+    return this.add("color", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
+  get loaderTrack() {
+    return this.add("color", "var(--b-loader-track, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get menuItemBgHover() {
+    return this.add("color", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
+  get navItemBgActive() {
+    return this.add("color", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
+  }
+  /** Sets `color: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get navItemBgHover() {
+    return this.add("color", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
+  get navItemBgPressed() {
+    return this.add("color", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `color: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
+  get navText() {
+    return this.add("color", "var(--b-nav-text, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `color: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
+  get navTextActive() {
+    return this.add("color", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get navTextDisabled() {
+    return this.add("color", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `color: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
+  get navTextFocusVisible() {
+    return this.add("color", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `color: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
+  get navTextPressed() {
+    return this.add("color", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `color: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
+  get neutralFillHoverStrong() {
+    return this.add("color", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
+  get neutralFillHoverSubtle() {
+    return this.add("color", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `color: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
+  get neutralFillPressed() {
+    return this.add("color", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `color: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
+  get neutralSurfacePressed() {
+    return this.add("color", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
+  get onPrimary() {
+    return this.add("color", "var(--b-on-primary, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
+  get onSurface() {
+    return this.add("color", "var(--b-on-surface, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `color: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
+  get onSurfaceMuted() {
+    return this.add("color", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `color: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
+  get popoverSurface() {
+    return this.add("color", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
+  get primary() {
+    return this.add("color", "var(--b-primary, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `color: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
+  get primaryHover() {
+    return this.add("color", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
+  get primaryPressed() {
+    return this.add("color", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `color: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
+  get scrim() {
+    return this.add("color", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
+  }
+  /** Sets `color: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
+  get selectionIndicator() {
+    return this.add("color", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
+  get statusSuccessFg() {
+    return this.add("color", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
+  }
+  /** Sets `color: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
+  get surface() {
+    return this.add("color", "var(--b-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `color: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get textDisabled() {
+    return this.add("color", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `color: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
+  get textHelper() {
+    return this.add("color", "var(--b-text-helper, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `color: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
+  get textLabel() {
+    return this.add("color", "var(--b-text-label, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `color: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
+  get textLinkDefault() {
+    return this.add("color", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
+  get textLinkDisabled() {
+    return this.add("color", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
+  }
+  /** Sets `color: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
+  get textLinkHover() {
+    return this.add("color", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `color: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
+  get textLinkPressed() {
+    return this.add("color", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `color: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
+  get textPlaceholder() {
+    return this.add("color", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `color: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
+  get textSelection() {
+    return this.add("color", "var(--b-text-selection, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `color: "rgba(255, 255, 255, 1)"`. */
   get white() {
-    return this.add("color", "rgba(255,255,255,1)");
+    return this.add("color", "rgba(255, 255, 255, 1)");
   }
   /** Sets `color: "rgba(0,0,0,0)"`. */
   get transparent() {
@@ -2039,9 +2564,241 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   color(value: Properties["color"]) {
     return this.add("color", value);
   }
-  /** Sets `backgroundColor: "rgba(255,255,255,1)"`. */
+  /** Sets `backgroundColor: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
+  get bgButtonCautionDisabledBg() {
+    return this.add("backgroundColor", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
+  get bgButtonCautionDisabledFg() {
+    return this.add("backgroundColor", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
+  get bgButtonDangerDisabledBg() {
+    return this.add("backgroundColor", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get bgButtonDangerDisabledFg() {
+    return this.add("backgroundColor", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
+  get bgButtonGhostDisabledFg() {
+    return this.add("backgroundColor", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
+  get bgButtonGhostFg() {
+    return this.add("backgroundColor", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
+  get bgButtonPrimaryDisabledBg() {
+    return this.add("backgroundColor", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get bgButtonPrimaryDisabledFg() {
+    return this.add("backgroundColor", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
+  get bgButtonTertiaryFg() {
+    return this.add("backgroundColor", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
+  get bgButtonTertiaryFgPressed() {
+    return this.add("backgroundColor", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
+  get bgDanger() {
+    return this.add("backgroundColor", "var(--b-danger, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
+  get bgDangerPressed() {
+    return this.add("backgroundColor", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
+  get bgFieldBgDefault() {
+    return this.add("backgroundColor", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
+  get bgFieldBgDisabled() {
+    return this.add("backgroundColor", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bgFieldBgHover() {
+    return this.add("backgroundColor", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
+  get bgFieldBorderDefault() {
+    return this.add("backgroundColor", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
+  get bgFieldBorderError() {
+    return this.add("backgroundColor", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
+  get bgFieldBorderFocus() {
+    return this.add("backgroundColor", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
+  get bgFieldBorderHover() {
+    return this.add("backgroundColor", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
+  get bgFieldTextDisabled() {
+    return this.add("backgroundColor", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
+  get bgFocusRingInset() {
+    return this.add("backgroundColor", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
+  get bgFocusRingMuted() {
+    return this.add("backgroundColor", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bgListRowBgHover() {
+    return this.add("backgroundColor", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
+  get bgLoaderSpinner() {
+    return this.add("backgroundColor", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
+  get bgLoaderTrack() {
+    return this.add("backgroundColor", "var(--b-loader-track, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bgMenuItemBgHover() {
+    return this.add("backgroundColor", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
+  get bgNavItemBgActive() {
+    return this.add("backgroundColor", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get bgNavItemBgHover() {
+    return this.add("backgroundColor", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
+  get bgNavItemBgPressed() {
+    return this.add("backgroundColor", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
+  get bgNavText() {
+    return this.add("backgroundColor", "var(--b-nav-text, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
+  get bgNavTextActive() {
+    return this.add("backgroundColor", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get bgNavTextDisabled() {
+    return this.add("backgroundColor", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
+  get bgNavTextFocusVisible() {
+    return this.add("backgroundColor", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
+  get bgNavTextPressed() {
+    return this.add("backgroundColor", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
+  get bgNeutralFillHoverStrong() {
+    return this.add("backgroundColor", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
+  get bgNeutralFillHoverSubtle() {
+    return this.add("backgroundColor", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
+  get bgNeutralFillPressed() {
+    return this.add("backgroundColor", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
+  get bgNeutralSurfacePressed() {
+    return this.add("backgroundColor", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
+  get bgOnPrimary() {
+    return this.add("backgroundColor", "var(--b-on-primary, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
+  get bgOnSurface() {
+    return this.add("backgroundColor", "var(--b-on-surface, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
+  get bgOnSurfaceMuted() {
+    return this.add("backgroundColor", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
+  get bgPopoverSurface() {
+    return this.add("backgroundColor", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
+  get bgPrimary() {
+    return this.add("backgroundColor", "var(--b-primary, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
+  get bgPrimaryHover() {
+    return this.add("backgroundColor", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
+  get bgPrimaryPressed() {
+    return this.add("backgroundColor", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
+  get bgScrim() {
+    return this.add("backgroundColor", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
+  }
+  /** Sets `backgroundColor: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
+  get bgSelectionIndicator() {
+    return this.add("backgroundColor", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
+  get bgStatusSuccessFg() {
+    return this.add("backgroundColor", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
+  get bgSurface() {
+    return this.add("backgroundColor", "var(--b-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get bgTextDisabled() {
+    return this.add("backgroundColor", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
+  get bgTextHelper() {
+    return this.add("backgroundColor", "var(--b-text-helper, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
+  get bgTextLabel() {
+    return this.add("backgroundColor", "var(--b-text-label, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
+  get bgTextLinkDefault() {
+    return this.add("backgroundColor", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
+  get bgTextLinkDisabled() {
+    return this.add("backgroundColor", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
+  get bgTextLinkHover() {
+    return this.add("backgroundColor", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
+  get bgTextLinkPressed() {
+    return this.add("backgroundColor", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
+  get bgTextPlaceholder() {
+    return this.add("backgroundColor", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `backgroundColor: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
+  get bgTextSelection() {
+    return this.add("backgroundColor", "var(--b-text-selection, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `backgroundColor: "rgba(255, 255, 255, 1)"`. */
   get bgWhite() {
-    return this.add("backgroundColor", "rgba(255,255,255,1)");
+    return this.add("backgroundColor", "rgba(255, 255, 255, 1)");
   }
   /** Sets `backgroundColor: "rgba(0,0,0,0)"`. */
   get bgTransparent() {
@@ -2331,9 +3088,241 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   bgColor(value: Properties["backgroundColor"]) {
     return this.add("backgroundColor", value);
   }
-  /** Sets `fill: "rgba(255,255,255,1)"`. */
+  /** Sets `fill: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
+  get fButtonCautionDisabledBg() {
+    return this.add("fill", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
+  }
+  /** Sets `fill: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
+  get fButtonCautionDisabledFg() {
+    return this.add("fill", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `fill: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
+  get fButtonDangerDisabledBg() {
+    return this.add("fill", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
+  }
+  /** Sets `fill: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get fButtonDangerDisabledFg() {
+    return this.add("fill", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
+  get fButtonGhostDisabledFg() {
+    return this.add("fill", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `fill: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
+  get fButtonGhostFg() {
+    return this.add("fill", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `fill: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
+  get fButtonPrimaryDisabledBg() {
+    return this.add("fill", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `fill: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
+  get fButtonPrimaryDisabledFg() {
+    return this.add("fill", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
+  get fButtonTertiaryFg() {
+    return this.add("fill", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `fill: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
+  get fButtonTertiaryFgPressed() {
+    return this.add("fill", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `fill: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
+  get fDanger() {
+    return this.add("fill", "var(--b-danger, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `fill: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
+  get fDangerPressed() {
+    return this.add("fill", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
+  }
+  /** Sets `fill: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
+  get fFieldBgDefault() {
+    return this.add("fill", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
+  get fFieldBgDisabled() {
+    return this.add("fill", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get fFieldBgHover() {
+    return this.add("fill", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
+  get fFieldBorderDefault() {
+    return this.add("fill", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `fill: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
+  get fFieldBorderError() {
+    return this.add("fill", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
+  }
+  /** Sets `fill: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
+  get fFieldBorderFocus() {
+    return this.add("fill", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
+  get fFieldBorderHover() {
+    return this.add("fill", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `fill: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
+  get fFieldTextDisabled() {
+    return this.add("fill", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
+  }
+  /** Sets `fill: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
+  get fFocusRingInset() {
+    return this.add("fill", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
+  get fFocusRingMuted() {
+    return this.add("fill", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `fill: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get fListRowBgHover() {
+    return this.add("fill", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
+  get fLoaderSpinner() {
+    return this.add("fill", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
+  get fLoaderTrack() {
+    return this.add("fill", "var(--b-loader-track, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get fMenuItemBgHover() {
+    return this.add("fill", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
+  get fNavItemBgActive() {
+    return this.add("fill", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
+  get fNavItemBgHover() {
+    return this.add("fill", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
+  get fNavItemBgPressed() {
+    return this.add("fill", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
+  get fNavText() {
+    return this.add("fill", "var(--b-nav-text, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
+  get fNavTextActive() {
+    return this.add("fill", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get fNavTextDisabled() {
+    return this.add("fill", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
+  get fNavTextFocusVisible() {
+    return this.add("fill", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `fill: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
+  get fNavTextPressed() {
+    return this.add("fill", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `fill: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
+  get fNeutralFillHoverStrong() {
+    return this.add("fill", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
+  get fNeutralFillHoverSubtle() {
+    return this.add("fill", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
+  }
+  /** Sets `fill: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
+  get fNeutralFillPressed() {
+    return this.add("fill", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
+  }
+  /** Sets `fill: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
+  get fNeutralSurfacePressed() {
+    return this.add("fill", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
+  get fOnPrimary() {
+    return this.add("fill", "var(--b-on-primary, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
+  get fOnSurface() {
+    return this.add("fill", "var(--b-on-surface, rgba(36, 36, 36, 1))");
+  }
+  /** Sets `fill: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
+  get fOnSurfaceMuted() {
+    return this.add("fill", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
+  }
+  /** Sets `fill: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
+  get fPopoverSurface() {
+    return this.add("fill", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
+  get fPrimary() {
+    return this.add("fill", "var(--b-primary, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `fill: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
+  get fPrimaryHover() {
+    return this.add("fill", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
+  get fPrimaryPressed() {
+    return this.add("fill", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
+  }
+  /** Sets `fill: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
+  get fScrim() {
+    return this.add("fill", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
+  }
+  /** Sets `fill: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
+  get fSelectionIndicator() {
+    return this.add("fill", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
+  get fStatusSuccessFg() {
+    return this.add("fill", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
+  }
+  /** Sets `fill: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
+  get fSurface() {
+    return this.add("fill", "var(--b-surface, rgba(255, 255, 255, 1))");
+  }
+  /** Sets `fill: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
+  get fTextDisabled() {
+    return this.add("fill", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
+  }
+  /** Sets `fill: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
+  get fTextHelper() {
+    return this.add("fill", "var(--b-text-helper, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `fill: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
+  get fTextLabel() {
+    return this.add("fill", "var(--b-text-label, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `fill: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
+  get fTextLinkDefault() {
+    return this.add("fill", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
+  get fTextLinkDisabled() {
+    return this.add("fill", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
+  }
+  /** Sets `fill: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
+  get fTextLinkHover() {
+    return this.add("fill", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
+  }
+  /** Sets `fill: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
+  get fTextLinkPressed() {
+    return this.add("fill", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
+  }
+  /** Sets `fill: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
+  get fTextPlaceholder() {
+    return this.add("fill", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
+  }
+  /** Sets `fill: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
+  get fTextSelection() {
+    return this.add("fill", "var(--b-text-selection, rgba(191, 219, 254, 1))");
+  }
+  /** Sets `fill: "rgba(255, 255, 255, 1)"`. */
   get fWhite() {
-    return this.add("fill", "rgba(255,255,255,1)");
+    return this.add("fill", "rgba(255, 255, 255, 1)");
   }
   /** Sets `fill: "rgba(0,0,0,0)"`. */
   get fTransparent() {
@@ -4121,7 +5110,65 @@ function omitUndefinedValues<T extends object>(value: T): T {
 }
 
 export enum Palette {
-  White = "rgba(255,255,255,1)",
+  ButtonCautionDisabledBg = "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))",
+  ButtonCautionDisabledFg = "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))",
+  ButtonDangerDisabledBg = "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))",
+  ButtonDangerDisabledFg = "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))",
+  ButtonGhostDisabledFg = "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))",
+  ButtonGhostFg = "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))",
+  ButtonPrimaryDisabledBg = "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))",
+  ButtonPrimaryDisabledFg = "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))",
+  ButtonTertiaryFg = "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))",
+  ButtonTertiaryFgPressed = "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))",
+  Danger = "var(--b-danger, rgba(220, 38, 38, 1))",
+  DangerPressed = "var(--b-danger-pressed, rgba(153, 27, 27, 1))",
+  FieldBgDefault = "var(--b-field-bg-default, rgba(255, 255, 255, 1))",
+  FieldBgDisabled = "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))",
+  FieldBgHover = "var(--b-field-bg-hover, rgba(247, 245, 245, 1))",
+  FieldBorderDefault = "var(--b-field-border-default, rgba(221, 220, 220, 1))",
+  FieldBorderError = "var(--b-field-border-error, rgba(220, 38, 38, 1))",
+  FieldBorderFocus = "var(--b-field-border-focus, rgba(29, 78, 216, 1))",
+  FieldBorderHover = "var(--b-field-border-hover, rgba(221, 220, 220, 1))",
+  FieldTextDisabled = "var(--b-field-text-disabled, rgba(141, 141, 141, 1))",
+  FocusRingInset = "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))",
+  FocusRingMuted = "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))",
+  ListRowBgHover = "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))",
+  LoaderSpinner = "var(--b-loader-spinner, rgba(29, 78, 216, 1))",
+  LoaderTrack = "var(--b-loader-track, rgba(255, 255, 255, 1))",
+  MenuItemBgHover = "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))",
+  NavItemBgActive = "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))",
+  NavItemBgHover = "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))",
+  NavItemBgPressed = "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))",
+  NavText = "var(--b-nav-text, rgba(100, 100, 100, 1))",
+  NavTextActive = "var(--b-nav-text-active, rgba(29, 78, 216, 1))",
+  NavTextDisabled = "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))",
+  NavTextFocusVisible = "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))",
+  NavTextPressed = "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))",
+  NeutralFillHoverStrong = "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))",
+  NeutralFillHoverSubtle = "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))",
+  NeutralFillPressed = "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))",
+  NeutralSurfacePressed = "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))",
+  OnPrimary = "var(--b-on-primary, rgba(255, 255, 255, 1))",
+  OnSurface = "var(--b-on-surface, rgba(36, 36, 36, 1))",
+  OnSurfaceMuted = "var(--b-on-surface-muted, rgba(221, 220, 220, 1))",
+  PopoverSurface = "var(--b-popover-surface, rgba(255, 255, 255, 1))",
+  Primary = "var(--b-primary, rgba(37, 99, 235, 1))",
+  PrimaryHover = "var(--b-primary-hover, rgba(29, 78, 216, 1))",
+  PrimaryPressed = "var(--b-primary-pressed, rgba(30, 64, 175, 1))",
+  Scrim = "var(--b-scrim, rgba(36, 36, 36, 0.2))",
+  SelectionIndicator = "var(--b-selection-indicator, rgba(29, 78, 216, 1))",
+  StatusSuccessFg = "var(--b-status-success-fg, rgba(4, 120, 87, 1))",
+  Surface = "var(--b-surface, rgba(255, 255, 255, 1))",
+  TextDisabled = "var(--b-text-disabled, rgba(201, 201, 201, 1))",
+  TextHelper = "var(--b-text-helper, rgba(100, 100, 100, 1))",
+  TextLabel = "var(--b-text-label, rgba(100, 100, 100, 1))",
+  TextLinkDefault = "var(--b-text-link-default, rgba(29, 78, 216, 1))",
+  TextLinkDisabled = "var(--b-text-link-disabled, rgba(147, 197, 253, 1))",
+  TextLinkHover = "var(--b-text-link-hover, rgba(37, 99, 235, 1))",
+  TextLinkPressed = "var(--b-text-link-pressed, rgba(29, 78, 216, 1))",
+  TextPlaceholder = "var(--b-text-placeholder, rgba(100, 100, 100, 1))",
+  TextSelection = "var(--b-text-selection, rgba(191, 219, 254, 1))",
+  White = "rgba(255, 255, 255, 1)",
   Transparent = "rgba(0,0,0,0)",
   Gray50 = "rgba(255, 253, 253, 1)",
   Gray100 = "rgba(247, 245, 245, 1)",

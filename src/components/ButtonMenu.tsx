@@ -20,7 +20,6 @@ type ButtonMenuBaseProps = {
   searchable?: boolean;
   // for storybook purposes
   defaultOpen?: boolean;
-  contrast?: boolean;
 } & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder">;
 
 type SelectionButtonMenuProps = {
@@ -32,7 +31,7 @@ type SelectionButtonMenuProps = {
 export type ButtonMenuProps = ButtonMenuBaseProps | SelectionButtonMenuProps;
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { defaultOpen, disabled, items, persistentItems, trigger, searchable, contrast = false } = props;
+  const { defaultOpen, disabled, items, persistentItems, trigger, searchable } = props;
 
   let selectedItem, onChange;
   if (isSelectionButtonMenuProps(props)) {
@@ -55,21 +54,13 @@ export function ButtonMenu(props: ButtonMenuProps) {
   );
 
   return (
-    <OverlayTrigger
-      {...props}
-      menuTriggerProps={menuTriggerProps}
-      state={state}
-      buttonRef={buttonRef}
-      {...tid}
-      contrast={contrast}
-    >
+    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
       <Menu
         ariaMenuProps={menuProps}
         onClose={() => state.close()}
         items={items}
         persistentItems={persistentItems}
         searchable={searchable}
-        contrast={contrast}
         selectedItem={selectedItem}
         onChange={onChange}
         {...tid}

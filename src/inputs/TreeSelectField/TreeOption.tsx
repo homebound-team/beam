@@ -13,12 +13,11 @@ import { useTestIds } from "src/utils";
 type TreeOptionProps<O> = {
   item: Node<LeveledOption<O>>;
   state: ListState<O>;
-  contrast?: boolean;
   allowCollapsing?: boolean;
 };
 /** Represents a single option within a ListBox - used by SelectField, MultiSelectField, and TreeSelectField */
 export function TreeOption<O>(props: TreeOptionProps<O>) {
-  const { item, state, contrast = false, allowCollapsing = true } = props;
+  const { item, state, allowCollapsing = true } = props;
   const leveledOption = item.value;
   if (!leveledOption) return null;
 
@@ -59,10 +58,10 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   const isIndeterminate = !isSelected && option.children?.some((o) => hasSelectedChildren(o, state, getOptionValue));
 
   const listItemStyles = {
-    item: Css.gray900.if(contrast).white.$,
-    hover: Css.bgGray100.if(contrast).bgGray600.$,
-    disabled: Css.cursorNotAllowed.gray400.if(contrast).gray500.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.Blue700 : Palette.Blue500}`).$,
+    item: Css.onSurface.$,
+    hover: Css.bgListRowBgHover.$,
+    disabled: Css.cursorNotAllowed.textDisabled.$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px ${Palette.FocusRingInset}`).$,
   };
 
   return (
