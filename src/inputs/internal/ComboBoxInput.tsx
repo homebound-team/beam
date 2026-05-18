@@ -11,7 +11,7 @@ import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Chips, CountBadge, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -129,8 +129,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
             disabled={inputProps.disabled}
             ref={buttonRef}
             css={{
-              ...Css.br4.outline0.textPlaceholder.$,
-              ...(inputProps.disabled ? Css.cursorNotAllowed.fieldTextDisabled.$ : {}),
+              ...Css.br4.outline0.color(Tokens.TextPlaceholder).$,
+              ...(inputProps.disabled ? Css.cursorNotAllowed.color(Tokens.FieldTextDisabled).$ : {}),
             }}
             data-testid="toggleListBox"
           >

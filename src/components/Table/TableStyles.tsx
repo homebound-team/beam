@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { BeamColor } from "src/colors";
 import { PresentationContextProps, PresentationFieldProps } from "src/components/PresentationContext";
 import type { RenderCellFn } from "src/components/Table/components/cell";
 import type { GridDataRow } from "src/components/Table/components/Row";
@@ -8,7 +9,7 @@ import { Css, Palette, Properties, Typography } from "src/Css";
 import { safeKeys } from "src/utils";
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
-export interface GridStyle {
+export type GridStyle = {
   /** Applied to the base div element. */
   rootCss?: Properties;
   /** Extra bottom padding for the virtual-table footer loader/spacer, in pixels. */
@@ -65,7 +66,7 @@ export interface GridStyle {
   /** Applied if there is a fallback/overflow message showing. */
   firstRowMessageCss?: Properties;
   /** Applied on hover if a row has a rowLink/onClick set. */
-  rowHoverColor?: Palette | "none";
+  rowHoverColor?: BeamColor | "none";
   /** Default content to put into an empty cell */
   emptyCell?: ReactNode;
   presentationSettings?: Pick<PresentationFieldProps, "borderless" | "borderOnHover" | "typeScale"> &
@@ -90,10 +91,10 @@ export interface GridStyle {
   keptGroupRowCss?: Properties;
   /** Defines styles for the last row `keptGroup` to provide separation from the rest of the table */
   keptLastRowCss?: Properties;
-}
+};
 
 // If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
-export interface GridStyleDef {
+export type GridStyleDef = {
   /** Changes the height of the rows when `rowHeight: fixed` to provide more space between rows for input fields. */
   inlineEditing?: boolean;
   /** Adds styling for grouped rows */
@@ -114,7 +115,7 @@ export interface GridStyleDef {
   cellTypography?: Typography;
   /** Defines if the table should highlight the row on hover. Defaults to true */
   highlightOnHover?: boolean;
-}
+};
 
 // Returns a "blessed" style of GridTable
 function memoizedTableStyles() {
@@ -224,7 +225,7 @@ export type RowStyles<R extends Kinded> = {
   [P in R["kind"]]?: RowStyle<DiscriminateUnion<R, "kind", P>>;
 };
 
-export interface RowStyle<R extends Kinded> {
+export type RowStyle<R extends Kinded> = {
   /** Applies this css to the wrapper row, i.e. for row-level hovers. */
   rowCss?: Properties | ((row: R) => Properties);
   /** Applies this css to each cell in the row. */
@@ -235,7 +236,7 @@ export interface RowStyle<R extends Kinded> {
   rowLink?: (row: R) => string;
   /** Fired when the row is clicked, similar to rowLink but for actions that aren't 'go to this link'. */
   onClick?: (row: GridDataRow<R>, api: GridTableApi<R>) => void;
-}
+};
 
 /** Our original table look & feel/style. */
 export const defaultStyle: GridStyle = getTableStyles({});

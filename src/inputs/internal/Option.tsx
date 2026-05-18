@@ -4,7 +4,7 @@ import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { maybeTooltip } from "src/components";
 import { Icon } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { isPersistentKey } from "src/inputs/ChipSelectField";
 
 type OptionProps<O> = {
@@ -20,10 +20,10 @@ export function Option<O>(props: OptionProps<O>) {
   const { hoverProps, isHovered } = useHover({});
 
   const themeStyles = {
-    item: Css.onSurface.$,
-    hover: Css.bgListRowBgHover.$,
-    disabled: Css.cursorNotAllowed.textDisabled.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${Palette.FocusRingInset}`).$,
+    item: Css.color(Tokens.OnSurface).$,
+    hover: Css.bgColor(Tokens.ListRowBgHover).$,
+    disabled: Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$,
   };
 
   // Get props for the option element.
@@ -55,7 +55,7 @@ export function Option<O>(props: OptionProps<O>) {
         {item.rendered}
         {isSelected && (
           <span css={Css.fs0.$}>
-            <Icon icon="check" color={isDisabled ? Palette.TextDisabled : Palette.SelectionIndicator} />
+            <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
           </span>
         )}
       </li>

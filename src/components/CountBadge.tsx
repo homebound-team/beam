@@ -1,15 +1,16 @@
+import { BeamColor } from "src/colors";
 import { Css, Only, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type CountBadgeXss = "color";
 
-export interface CountBadgeProps<X> {
+export type CountBadgeProps<X> = {
   count: number;
   /** Background color of the badge. Defaults to Blue700. */
-  bgColor?: Palette;
-  color?: Palette;
+  bgColor?: BeamColor;
+  color?: BeamColor;
   hideIfZero?: boolean;
-}
+};
 
 /**
  * CountBadge displays a numeric count in a circular badge.

@@ -3,7 +3,7 @@ import { ReactNode, RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
-import { Css, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamFocusableProps } from "src/interfaces";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
@@ -92,12 +92,12 @@ const navLinkVariantStyles: Record<
   }
 > = {
   side: {
-    baseStyles: { ...baseStyles, ...Css.navText.$ },
-    activeStyles: Css.navTextActive.bgNavItemBgActive.$,
-    disabledStyles: Css.navTextDisabled.cursorNotAllowed.$,
-    focusRingStyles: Css.navTextFocusVisible.bgNavItemBgActive.bshFocus.$,
-    hoverStyles: Css.navText.bgNavItemBgHover.$,
-    pressedStyles: Css.navTextPressed.bgNavItemBgPressed.$,
+    baseStyles: { ...baseStyles, ...Css.color(Tokens.NavText).$ },
+    activeStyles: Css.color(Tokens.NavTextActive).bgColor(Tokens.NavItemBgActive).$,
+    disabledStyles: Css.color(Tokens.NavTextDisabled).cursorNotAllowed.$,
+    focusRingStyles: Css.color(Tokens.NavTextFocusVisible).bgColor(Tokens.NavItemBgActive).bshFocus.$,
+    hoverStyles: Css.color(Tokens.NavText).bgColor(Tokens.NavItemBgHover).$,
+    pressedStyles: Css.color(Tokens.NavTextPressed).bgColor(Tokens.NavItemBgPressed).$,
   },
   global: {
     baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.$ },

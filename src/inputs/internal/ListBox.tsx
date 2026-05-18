@@ -2,7 +2,7 @@ import { Key as AriaKey } from "@react-types/shared";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import { ListState } from "react-stately";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { ListBoxSection } from "src/inputs/internal/ListBoxSection";
 import { ListBoxToggleChip } from "src/inputs/internal/ListBoxToggleChip";
@@ -92,7 +92,10 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
 
   return (
     <div
-      css={Css.bgPopoverSurface.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(horizontalLayout).w50.onHover.bshHover.$}
+      css={
+        Css.bgColor(Tokens.PopoverSurface).br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(horizontalLayout).w50.onHover
+          .bshHover.$
+      }
       ref={listBoxRef}
       {...listBoxProps}
     >

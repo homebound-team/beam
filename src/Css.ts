@@ -167,238 +167,6 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // borderColor
-  /** Sets `borderColor: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
-  get bcButtonCautionDisabledBg() {
-    return this.add("borderColor", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
-  get bcButtonCautionDisabledFg() {
-    return this.add("borderColor", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
-  get bcButtonDangerDisabledBg() {
-    return this.add("borderColor", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get bcButtonDangerDisabledFg() {
-    return this.add("borderColor", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
-  get bcButtonGhostDisabledFg() {
-    return this.add("borderColor", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
-  get bcButtonGhostFg() {
-    return this.add("borderColor", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
-  get bcButtonPrimaryDisabledBg() {
-    return this.add("borderColor", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get bcButtonPrimaryDisabledFg() {
-    return this.add("borderColor", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
-  get bcButtonTertiaryFg() {
-    return this.add("borderColor", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `borderColor: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
-  get bcButtonTertiaryFgPressed() {
-    return this.add("borderColor", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `borderColor: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
-  get bcDanger() {
-    return this.add("borderColor", "var(--b-danger, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `borderColor: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
-  get bcDangerPressed() {
-    return this.add("borderColor", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
-  get bcFieldBgDefault() {
-    return this.add("borderColor", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
-  get bcFieldBgDisabled() {
-    return this.add("borderColor", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bcFieldBgHover() {
-    return this.add("borderColor", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
-  get bcFieldBorderDefault() {
-    return this.add("borderColor", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
-  get bcFieldBorderError() {
-    return this.add("borderColor", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
-  get bcFieldBorderFocus() {
-    return this.add("borderColor", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
-  get bcFieldBorderHover() {
-    return this.add("borderColor", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `borderColor: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
-  get bcFieldTextDisabled() {
-    return this.add("borderColor", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
-  }
-  /** Sets `borderColor: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
-  get bcFocusRingInset() {
-    return this.add("borderColor", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
-  get bcFocusRingMuted() {
-    return this.add("borderColor", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `borderColor: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bcListRowBgHover() {
-    return this.add("borderColor", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
-  get bcLoaderSpinner() {
-    return this.add("borderColor", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
-  get bcLoaderTrack() {
-    return this.add("borderColor", "var(--b-loader-track, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bcMenuItemBgHover() {
-    return this.add("borderColor", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
-  get bcNavItemBgActive() {
-    return this.add("borderColor", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bcNavItemBgHover() {
-    return this.add("borderColor", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
-  get bcNavItemBgPressed() {
-    return this.add("borderColor", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
-  get bcNavText() {
-    return this.add("borderColor", "var(--b-nav-text, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
-  get bcNavTextActive() {
-    return this.add("borderColor", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get bcNavTextDisabled() {
-    return this.add("borderColor", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
-  get bcNavTextFocusVisible() {
-    return this.add("borderColor", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `borderColor: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
-  get bcNavTextPressed() {
-    return this.add("borderColor", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `borderColor: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
-  get bcNeutralFillHoverStrong() {
-    return this.add("borderColor", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
-  get bcNeutralFillHoverSubtle() {
-    return this.add("borderColor", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `borderColor: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
-  get bcNeutralFillPressed() {
-    return this.add("borderColor", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `borderColor: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
-  get bcNeutralSurfacePressed() {
-    return this.add("borderColor", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
-  get bcOnPrimary() {
-    return this.add("borderColor", "var(--b-on-primary, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
-  get bcOnSurface() {
-    return this.add("borderColor", "var(--b-on-surface, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `borderColor: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
-  get bcOnSurfaceMuted() {
-    return this.add("borderColor", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `borderColor: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
-  get bcPopoverSurface() {
-    return this.add("borderColor", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
-  get bcPrimary() {
-    return this.add("borderColor", "var(--b-primary, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `borderColor: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
-  get bcPrimaryHover() {
-    return this.add("borderColor", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
-  get bcPrimaryPressed() {
-    return this.add("borderColor", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `borderColor: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
-  get bcScrim() {
-    return this.add("borderColor", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
-  }
-  /** Sets `borderColor: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
-  get bcSelectionIndicator() {
-    return this.add("borderColor", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
-  get bcStatusSuccessFg() {
-    return this.add("borderColor", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
-  }
-  /** Sets `borderColor: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
-  get bcSurface() {
-    return this.add("borderColor", "var(--b-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get bcTextDisabled() {
-    return this.add("borderColor", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
-  get bcTextHelper() {
-    return this.add("borderColor", "var(--b-text-helper, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
-  get bcTextLabel() {
-    return this.add("borderColor", "var(--b-text-label, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
-  get bcTextLinkDefault() {
-    return this.add("borderColor", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
-  get bcTextLinkDisabled() {
-    return this.add("borderColor", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
-  get bcTextLinkHover() {
-    return this.add("borderColor", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
-  get bcTextLinkPressed() {
-    return this.add("borderColor", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
-  get bcTextPlaceholder() {
-    return this.add("borderColor", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `borderColor: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
-  get bcTextSelection() {
-    return this.add("borderColor", "var(--b-text-selection, rgba(191, 219, 254, 1))");
-  }
   /** Sets `borderColor: "rgba(255, 255, 255, 1)"`. */
   get bcWhite() {
     return this.add("borderColor", "rgba(255, 255, 255, 1)");
@@ -689,7 +457,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `borderColor: value`. */
   bc(value: Properties["borderColor"]) {
-    return this.add("borderColor", value);
+    return this.add("borderColor", maybeCssVar(value));
   }
 
   // borderRadius
@@ -723,7 +491,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `borderRadius: value`. */
   borderRadius(value: Properties["borderRadius"]) {
-    return this.add("borderRadius", value);
+    return this.add("borderRadius", maybeCssVar(value));
   }
   /** Sets `borderTopRightRadius: "4px"; borderTopLeftRadius: "4px"`. */
   get brt4() {
@@ -753,7 +521,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `borderStyle: value`. */
   bs(value: Properties["borderStyle"]) {
-    return this.add("borderStyle", value);
+    return this.add("borderStyle", maybeCssVar(value));
   }
 
   // borderWidth
@@ -767,7 +535,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `borderWidth: value`. */
   bw(value: Properties["borderWidth"]) {
-    return this.add("borderWidth", value);
+    return this.add("borderWidth", maybeCssVar(value));
   }
 
   // boxShadow
@@ -797,7 +565,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `boxShadow: value`. */
   boxShadow(value: Properties["boxShadow"]) {
-    return this.add("boxShadow", value);
+    return this.add("boxShadow", maybeCssVar(value));
   }
 
   // container
@@ -815,11 +583,11 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `containerType: value`. */
   ct(value: Properties["containerType"]) {
-    return this.add("containerType", value);
+    return this.add("containerType", maybeCssVar(value));
   }
   /** Sets `containerName: value`. */
   cn(value: Properties["containerName"]) {
-    return this.add("containerName", value);
+    return this.add("containerName", maybeCssVar(value));
   }
 
   // coordinates
@@ -861,7 +629,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `top: "v"`. */
   top(v: number | string) {
-    return this.add("top", maybeInc(v));
+    return this.add("top", maybeCssVar(maybeInc(v)));
   }
   /** Sets `top: px`. */
   topPx(px: number) {
@@ -905,7 +673,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `right: "v"`. */
   right(v: number | string) {
-    return this.add("right", maybeInc(v));
+    return this.add("right", maybeCssVar(maybeInc(v)));
   }
   /** Sets `right: px`. */
   rightPx(px: number) {
@@ -949,7 +717,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `bottom: "v"`. */
   bottom(v: number | string) {
-    return this.add("bottom", maybeInc(v));
+    return this.add("bottom", maybeCssVar(maybeInc(v)));
   }
   /** Sets `bottom: px`. */
   bottomPx(px: number) {
@@ -993,7 +761,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `left: "v"`. */
   left(v: number | string) {
-    return this.add("left", maybeInc(v));
+    return this.add("left", maybeCssVar(maybeInc(v)));
   }
   /** Sets `left: px`. */
   leftPx(px: number) {
@@ -1011,7 +779,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `cursor: value`. */
   cursor(value: Properties["cursor"]) {
-    return this.add("cursor", value);
+    return this.add("cursor", maybeCssVar(value));
   }
 
   // display
@@ -1069,7 +837,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `display: value`. */
   display(value: Properties["display"]) {
-    return this.add("display", value);
+    return this.add("display", maybeCssVar(value));
   }
 
   // flexbox
@@ -1107,7 +875,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `flex: value`. */
   f(value: Properties["flex"]) {
-    return this.add("flex", value);
+    return this.add("flex", maybeCssVar(value));
   }
   /** Sets `justifyContent: "flex-start"`. */
   get jcfs() {
@@ -1135,7 +903,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `justifyContent: value`. */
   jc(value: Properties["justifyContent"]) {
-    return this.add("justifyContent", value);
+    return this.add("justifyContent", maybeCssVar(value));
   }
   /** Sets `justifySelf: "auto"`. */
   get jsa() {
@@ -1155,7 +923,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `justifySelf: value`. */
   js(value: Properties["justifySelf"]) {
-    return this.add("justifySelf", value);
+    return this.add("justifySelf", maybeCssVar(value));
   }
   /** Sets `justifyItems: "flex-start"`. */
   get jifs() {
@@ -1183,7 +951,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `justifyItems: value`. */
   ji(value: Properties["justifyItems"]) {
-    return this.add("justifyItems", value);
+    return this.add("justifyItems", maybeCssVar(value));
   }
   /** Sets `alignSelf: "flex-start"`. */
   get asfs() {
@@ -1207,7 +975,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `alignSelf: value`. */
   as(value: Properties["alignSelf"]) {
-    return this.add("alignSelf", value);
+    return this.add("alignSelf", maybeCssVar(value));
   }
   /** Sets `alignItems: "flex-start"`. */
   get aifs() {
@@ -1239,7 +1007,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `alignItems: value`. */
   ai(value: Properties["alignItems"]) {
-    return this.add("alignItems", value);
+    return this.add("alignItems", maybeCssVar(value));
   }
   /** Sets `placeSelf: "auto"`. */
   get psa() {
@@ -1271,7 +1039,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `placeSelf: value`. */
   ps(value: Properties["placeSelf"]) {
-    return this.add("placeSelf", value);
+    return this.add("placeSelf", maybeCssVar(value));
   }
   /** Sets `placeContent: "center"`. */
   get pcc() {
@@ -1307,7 +1075,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `placeContent: value`. */
   pc(value: Properties["placeContent"]) {
-    return this.add("placeContent", value);
+    return this.add("placeContent", maybeCssVar(value));
   }
   /** Sets `placeItems: "center"`. */
   get pic() {
@@ -1343,7 +1111,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `placeItems: value`. */
   pi(value: Properties["placeItems"]) {
-    return this.add("placeItems", value);
+    return this.add("placeItems", maybeCssVar(value));
   }
   /** Sets `flexBasis: "100%"`. */
   get fb1() {
@@ -1379,7 +1147,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `flexBasis: value`. */
   fb(value: Properties["flexBasis"]) {
-    return this.add("flexBasis", value);
+    return this.add("flexBasis", maybeCssVar(value));
   }
   /** Sets `flexGrow: 0`. */
   get fg0() {
@@ -1391,7 +1159,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `flexGrow: value`. */
   flexGrow(value: Properties["flexGrow"]) {
-    return this.add("flexGrow", value);
+    return this.add("flexGrow", maybeCssVar(value));
   }
   /** Sets `flexShrink: 0`. */
   get fs0() {
@@ -1403,7 +1171,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `flexShrink: value`. */
   flexShrink(value: Properties["flexShrink"]) {
-    return this.add("flexShrink", value);
+    return this.add("flexShrink", maybeCssVar(value));
   }
   /** Sets `flexDirection: "row"`. */
   get fdr() {
@@ -1423,7 +1191,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `flexDirection: value`. */
   fd(value: Properties["flexDirection"]) {
-    return this.add("flexDirection", value);
+    return this.add("flexDirection", maybeCssVar(value));
   }
   /** Sets `flexWrap: "wrap"`. */
   get fww() {
@@ -1439,11 +1207,11 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `flexWrap: value`. */
   flexWrap(value: Properties["flexWrap"]) {
-    return this.add("flexWrap", value);
+    return this.add("flexWrap", maybeCssVar(value));
   }
   /** Sets `order: value`. */
   order(value: Properties["order"]) {
-    return this.add("order", value);
+    return this.add("order", maybeCssVar(value));
   }
 
   // float
@@ -1457,7 +1225,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `float: value`. */
   float(value: Properties["float"]) {
-    return this.add("float", value);
+    return this.add("float", maybeCssVar(value));
   }
 
   // fontWeight
@@ -1507,33 +1275,33 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `fontWeight: value`. */
   fw(value: Properties["fontWeight"]) {
-    return this.add("fontWeight", value);
+    return this.add("fontWeight", maybeCssVar(value));
   }
 
   // grid
   /** Sets `gridTemplateColumns: value`. */
   gtc(value: Properties["gridTemplateColumns"]) {
-    return this.add("gridTemplateColumns", value);
+    return this.add("gridTemplateColumns", maybeCssVar(value));
   }
   /** Sets `gridTemplateRows: value`. */
   gtr(value: Properties["gridTemplateRows"]) {
-    return this.add("gridTemplateRows", value);
+    return this.add("gridTemplateRows", maybeCssVar(value));
   }
   /** Sets `gridRow: value`. */
   gr(value: Properties["gridRow"]) {
-    return this.add("gridRow", value);
+    return this.add("gridRow", maybeCssVar(value));
   }
   /** Sets `gridColumn: value`. */
   gc(value: Properties["gridColumn"]) {
-    return this.add("gridColumn", value);
+    return this.add("gridColumn", maybeCssVar(value));
   }
   /** Sets `gridAutoRows: value`. */
   gar(value: Properties["gridAutoRows"]) {
-    return this.add("gridAutoRows", value);
+    return this.add("gridAutoRows", maybeCssVar(value));
   }
   /** Sets `gridAutoColumns: value`. */
   gac(value: Properties["gridAutoColumns"]) {
-    return this.add("gridAutoColumns", value);
+    return this.add("gridAutoColumns", maybeCssVar(value));
   }
   /** Sets `gap: "calc(var(--t-spacing) * 0)"`. */
   get gap0() {
@@ -1573,7 +1341,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `gap: "v"`. */
   gap(v: number | string) {
-    return this.add("gap", maybeInc(v));
+    return this.add("gap", maybeCssVar(maybeInc(v)));
   }
   /** Sets `gap: px`. */
   gapPx(px: number) {
@@ -1617,7 +1385,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `rowGap: "v"`. */
   rg(v: number | string) {
-    return this.add("rowGap", maybeInc(v));
+    return this.add("rowGap", maybeCssVar(maybeInc(v)));
   }
   /** Sets `rowGap: px`. */
   rgPx(px: number) {
@@ -1661,7 +1429,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `columnGap: "v"`. */
   cg(v: number | string) {
-    return this.add("columnGap", maybeInc(v));
+    return this.add("columnGap", maybeCssVar(maybeInc(v)));
   }
   /** Sets `columnGap: px`. */
   cgPx(px: number) {
@@ -1711,7 +1479,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `height: "v"`. */
   h(v: number | string) {
-    return this.add("height", maybeInc(v));
+    return this.add("height", maybeCssVar(maybeInc(v)));
   }
   /** Sets `height: px`. */
   hPx(px: number) {
@@ -1787,7 +1555,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `minHeight: value`. */
   mh(value: Properties["minHeight"]) {
-    return this.add("minHeight", value);
+    return this.add("minHeight", maybeCssVar(value));
   }
   /** Sets `minHeight: px`. */
   mhPx(px: number) {
@@ -1815,7 +1583,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `maxHeight: value`. */
   maxh(value: Properties["maxHeight"]) {
-    return this.add("maxHeight", value);
+    return this.add("maxHeight", maybeCssVar(value));
   }
   /** Sets `maxHeight: px`. */
   maxhPx(px: number) {
@@ -1875,7 +1643,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `WebkitLineClamp: value`. */
   lineClamp(value: Properties["WebkitLineClamp"]) {
-    return this.add("WebkitLineClamp", value).add("overflow", "hidden").add("display", "-webkit-box").add(
+    return this.add("WebkitLineClamp", maybeCssVar(value)).add("overflow", "hidden").add("display", "-webkit-box").add(
       "WebkitBoxOrient",
       "vertical",
     ).add("textOverflow", "ellipsis");
@@ -1904,7 +1672,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `objectFit: value`. */
   objectFit(value: Properties["objectFit"]) {
-    return this.add("objectFit", value);
+    return this.add("objectFit", maybeCssVar(value));
   }
 
   // opacity
@@ -1930,7 +1698,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `opacity: value`. */
   o(value: Properties["opacity"]) {
-    return this.add("opacity", value);
+    return this.add("opacity", maybeCssVar(value));
   }
 
   // outline
@@ -1948,7 +1716,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `outline: value`. */
   outline(value: Properties["outline"]) {
-    return this.add("outline", value);
+    return this.add("outline", maybeCssVar(value));
   }
 
   // overflow
@@ -1970,7 +1738,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `overflow: value`. */
   overflow(value: Properties["overflow"]) {
-    return this.add("overflow", value);
+    return this.add("overflow", maybeCssVar(value));
   }
   /** Sets `overflowY: "visible"`. */
   get oyv() {
@@ -1990,7 +1758,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `overflowY: value`. */
   overflowY(value: Properties["overflowY"]) {
-    return this.add("overflowY", value);
+    return this.add("overflowY", maybeCssVar(value));
   }
   /** Sets `overflowX: "visible"`. */
   get oxv() {
@@ -2010,7 +1778,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `overflowX: value`. */
   overflowX(value: Properties["overflowX"]) {
-    return this.add("overflowX", value);
+    return this.add("overflowX", maybeCssVar(value));
   }
 
   // position
@@ -2036,242 +1804,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `position: value`. */
   position(value: Properties["position"]) {
-    return this.add("position", value);
+    return this.add("position", maybeCssVar(value));
   }
 
   // skins
-  /** Sets `color: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
-  get buttonCautionDisabledBg() {
-    return this.add("color", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
-  }
-  /** Sets `color: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
-  get buttonCautionDisabledFg() {
-    return this.add("color", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `color: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
-  get buttonDangerDisabledBg() {
-    return this.add("color", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
-  }
-  /** Sets `color: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get buttonDangerDisabledFg() {
-    return this.add("color", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
-  get buttonGhostDisabledFg() {
-    return this.add("color", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `color: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
-  get buttonGhostFg() {
-    return this.add("color", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `color: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
-  get buttonPrimaryDisabledBg() {
-    return this.add("color", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
-  }
-  /** Sets `color: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get buttonPrimaryDisabledFg() {
-    return this.add("color", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
-  get buttonTertiaryFg() {
-    return this.add("color", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `color: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
-  get buttonTertiaryFgPressed() {
-    return this.add("color", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `color: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
-  get danger() {
-    return this.add("color", "var(--b-danger, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `color: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
-  get dangerPressed() {
-    return this.add("color", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
-  }
-  /** Sets `color: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
-  get fieldBgDefault() {
-    return this.add("color", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
-  get fieldBgDisabled() {
-    return this.add("color", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get fieldBgHover() {
-    return this.add("color", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
-  get fieldBorderDefault() {
-    return this.add("color", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `color: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
-  get fieldBorderError() {
-    return this.add("color", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `color: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
-  get fieldBorderFocus() {
-    return this.add("color", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
-  get fieldBorderHover() {
-    return this.add("color", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `color: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
-  get fieldTextDisabled() {
-    return this.add("color", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
-  }
-  /** Sets `color: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
-  get focusRingInset() {
-    return this.add("color", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
-  get focusRingMuted() {
-    return this.add("color", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `color: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get listRowBgHover() {
-    return this.add("color", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
-  get loaderSpinner() {
-    return this.add("color", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
-  get loaderTrack() {
-    return this.add("color", "var(--b-loader-track, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get menuItemBgHover() {
-    return this.add("color", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
-  get navItemBgActive() {
-    return this.add("color", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
-  }
-  /** Sets `color: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get navItemBgHover() {
-    return this.add("color", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
-  get navItemBgPressed() {
-    return this.add("color", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `color: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
-  get navText() {
-    return this.add("color", "var(--b-nav-text, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `color: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
-  get navTextActive() {
-    return this.add("color", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get navTextDisabled() {
-    return this.add("color", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `color: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
-  get navTextFocusVisible() {
-    return this.add("color", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `color: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
-  get navTextPressed() {
-    return this.add("color", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `color: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
-  get neutralFillHoverStrong() {
-    return this.add("color", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
-  get neutralFillHoverSubtle() {
-    return this.add("color", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `color: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
-  get neutralFillPressed() {
-    return this.add("color", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `color: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
-  get neutralSurfacePressed() {
-    return this.add("color", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
-  get onPrimary() {
-    return this.add("color", "var(--b-on-primary, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
-  get onSurface() {
-    return this.add("color", "var(--b-on-surface, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `color: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
-  get onSurfaceMuted() {
-    return this.add("color", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `color: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
-  get popoverSurface() {
-    return this.add("color", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
-  get primary() {
-    return this.add("color", "var(--b-primary, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `color: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
-  get primaryHover() {
-    return this.add("color", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
-  get primaryPressed() {
-    return this.add("color", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `color: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
-  get scrim() {
-    return this.add("color", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
-  }
-  /** Sets `color: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
-  get selectionIndicator() {
-    return this.add("color", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
-  get statusSuccessFg() {
-    return this.add("color", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
-  }
-  /** Sets `color: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
-  get surface() {
-    return this.add("color", "var(--b-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `color: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get textDisabled() {
-    return this.add("color", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `color: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
-  get textHelper() {
-    return this.add("color", "var(--b-text-helper, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `color: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
-  get textLabel() {
-    return this.add("color", "var(--b-text-label, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `color: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
-  get textLinkDefault() {
-    return this.add("color", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
-  get textLinkDisabled() {
-    return this.add("color", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
-  }
-  /** Sets `color: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
-  get textLinkHover() {
-    return this.add("color", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `color: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
-  get textLinkPressed() {
-    return this.add("color", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `color: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
-  get textPlaceholder() {
-    return this.add("color", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `color: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
-  get textSelection() {
-    return this.add("color", "var(--b-text-selection, rgba(191, 219, 254, 1))");
-  }
   /** Sets `color: "rgba(255, 255, 255, 1)"`. */
   get white() {
     return this.add("color", "rgba(255, 255, 255, 1)");
@@ -2562,239 +2098,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `color: value`. */
   color(value: Properties["color"]) {
-    return this.add("color", value);
-  }
-  /** Sets `backgroundColor: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
-  get bgButtonCautionDisabledBg() {
-    return this.add("backgroundColor", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
-  get bgButtonCautionDisabledFg() {
-    return this.add("backgroundColor", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
-  get bgButtonDangerDisabledBg() {
-    return this.add("backgroundColor", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get bgButtonDangerDisabledFg() {
-    return this.add("backgroundColor", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
-  get bgButtonGhostDisabledFg() {
-    return this.add("backgroundColor", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
-  get bgButtonGhostFg() {
-    return this.add("backgroundColor", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
-  get bgButtonPrimaryDisabledBg() {
-    return this.add("backgroundColor", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get bgButtonPrimaryDisabledFg() {
-    return this.add("backgroundColor", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
-  get bgButtonTertiaryFg() {
-    return this.add("backgroundColor", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
-  get bgButtonTertiaryFgPressed() {
-    return this.add("backgroundColor", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
-  get bgDanger() {
-    return this.add("backgroundColor", "var(--b-danger, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
-  get bgDangerPressed() {
-    return this.add("backgroundColor", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
-  get bgFieldBgDefault() {
-    return this.add("backgroundColor", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
-  get bgFieldBgDisabled() {
-    return this.add("backgroundColor", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bgFieldBgHover() {
-    return this.add("backgroundColor", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
-  get bgFieldBorderDefault() {
-    return this.add("backgroundColor", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
-  get bgFieldBorderError() {
-    return this.add("backgroundColor", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
-  get bgFieldBorderFocus() {
-    return this.add("backgroundColor", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
-  get bgFieldBorderHover() {
-    return this.add("backgroundColor", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
-  get bgFieldTextDisabled() {
-    return this.add("backgroundColor", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
-  get bgFocusRingInset() {
-    return this.add("backgroundColor", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
-  get bgFocusRingMuted() {
-    return this.add("backgroundColor", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bgListRowBgHover() {
-    return this.add("backgroundColor", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
-  get bgLoaderSpinner() {
-    return this.add("backgroundColor", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
-  get bgLoaderTrack() {
-    return this.add("backgroundColor", "var(--b-loader-track, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bgMenuItemBgHover() {
-    return this.add("backgroundColor", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
-  get bgNavItemBgActive() {
-    return this.add("backgroundColor", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get bgNavItemBgHover() {
-    return this.add("backgroundColor", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
-  get bgNavItemBgPressed() {
-    return this.add("backgroundColor", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
-  get bgNavText() {
-    return this.add("backgroundColor", "var(--b-nav-text, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
-  get bgNavTextActive() {
-    return this.add("backgroundColor", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get bgNavTextDisabled() {
-    return this.add("backgroundColor", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
-  get bgNavTextFocusVisible() {
-    return this.add("backgroundColor", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
-  get bgNavTextPressed() {
-    return this.add("backgroundColor", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
-  get bgNeutralFillHoverStrong() {
-    return this.add("backgroundColor", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
-  get bgNeutralFillHoverSubtle() {
-    return this.add("backgroundColor", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
-  get bgNeutralFillPressed() {
-    return this.add("backgroundColor", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
-  get bgNeutralSurfacePressed() {
-    return this.add("backgroundColor", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
-  get bgOnPrimary() {
-    return this.add("backgroundColor", "var(--b-on-primary, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
-  get bgOnSurface() {
-    return this.add("backgroundColor", "var(--b-on-surface, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
-  get bgOnSurfaceMuted() {
-    return this.add("backgroundColor", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
-  get bgPopoverSurface() {
-    return this.add("backgroundColor", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
-  get bgPrimary() {
-    return this.add("backgroundColor", "var(--b-primary, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
-  get bgPrimaryHover() {
-    return this.add("backgroundColor", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
-  get bgPrimaryPressed() {
-    return this.add("backgroundColor", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
-  get bgScrim() {
-    return this.add("backgroundColor", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
-  }
-  /** Sets `backgroundColor: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
-  get bgSelectionIndicator() {
-    return this.add("backgroundColor", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
-  get bgStatusSuccessFg() {
-    return this.add("backgroundColor", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
-  get bgSurface() {
-    return this.add("backgroundColor", "var(--b-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get bgTextDisabled() {
-    return this.add("backgroundColor", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
-  get bgTextHelper() {
-    return this.add("backgroundColor", "var(--b-text-helper, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
-  get bgTextLabel() {
-    return this.add("backgroundColor", "var(--b-text-label, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
-  get bgTextLinkDefault() {
-    return this.add("backgroundColor", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
-  get bgTextLinkDisabled() {
-    return this.add("backgroundColor", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
-  get bgTextLinkHover() {
-    return this.add("backgroundColor", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
-  get bgTextLinkPressed() {
-    return this.add("backgroundColor", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
-  get bgTextPlaceholder() {
-    return this.add("backgroundColor", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `backgroundColor: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
-  get bgTextSelection() {
-    return this.add("backgroundColor", "var(--b-text-selection, rgba(191, 219, 254, 1))");
+    return this.add("color", maybeCssVar(value));
   }
   /** Sets `backgroundColor: "rgba(255, 255, 255, 1)"`. */
   get bgWhite() {
@@ -3086,239 +2390,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `backgroundColor: value`. */
   bgColor(value: Properties["backgroundColor"]) {
-    return this.add("backgroundColor", value);
-  }
-  /** Sets `fill: "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))"`. */
-  get fButtonCautionDisabledBg() {
-    return this.add("fill", "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))");
-  }
-  /** Sets `fill: "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))"`. */
-  get fButtonCautionDisabledFg() {
-    return this.add("fill", "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `fill: "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))"`. */
-  get fButtonDangerDisabledBg() {
-    return this.add("fill", "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))");
-  }
-  /** Sets `fill: "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get fButtonDangerDisabledFg() {
-    return this.add("fill", "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))"`. */
-  get fButtonGhostDisabledFg() {
-    return this.add("fill", "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `fill: "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))"`. */
-  get fButtonGhostFg() {
-    return this.add("fill", "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `fill: "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))"`. */
-  get fButtonPrimaryDisabledBg() {
-    return this.add("fill", "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))");
-  }
-  /** Sets `fill: "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))"`. */
-  get fButtonPrimaryDisabledFg() {
-    return this.add("fill", "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))"`. */
-  get fButtonTertiaryFg() {
-    return this.add("fill", "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `fill: "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))"`. */
-  get fButtonTertiaryFgPressed() {
-    return this.add("fill", "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `fill: "var(--b-danger, rgba(220, 38, 38, 1))"`. */
-  get fDanger() {
-    return this.add("fill", "var(--b-danger, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `fill: "var(--b-danger-pressed, rgba(153, 27, 27, 1))"`. */
-  get fDangerPressed() {
-    return this.add("fill", "var(--b-danger-pressed, rgba(153, 27, 27, 1))");
-  }
-  /** Sets `fill: "var(--b-field-bg-default, rgba(255, 255, 255, 1))"`. */
-  get fFieldBgDefault() {
-    return this.add("fill", "var(--b-field-bg-default, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))"`. */
-  get fFieldBgDisabled() {
-    return this.add("fill", "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-field-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get fFieldBgHover() {
-    return this.add("fill", "var(--b-field-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-field-border-default, rgba(221, 220, 220, 1))"`. */
-  get fFieldBorderDefault() {
-    return this.add("fill", "var(--b-field-border-default, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `fill: "var(--b-field-border-error, rgba(220, 38, 38, 1))"`. */
-  get fFieldBorderError() {
-    return this.add("fill", "var(--b-field-border-error, rgba(220, 38, 38, 1))");
-  }
-  /** Sets `fill: "var(--b-field-border-focus, rgba(29, 78, 216, 1))"`. */
-  get fFieldBorderFocus() {
-    return this.add("fill", "var(--b-field-border-focus, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-field-border-hover, rgba(221, 220, 220, 1))"`. */
-  get fFieldBorderHover() {
-    return this.add("fill", "var(--b-field-border-hover, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `fill: "var(--b-field-text-disabled, rgba(141, 141, 141, 1))"`. */
-  get fFieldTextDisabled() {
-    return this.add("fill", "var(--b-field-text-disabled, rgba(141, 141, 141, 1))");
-  }
-  /** Sets `fill: "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))"`. */
-  get fFocusRingInset() {
-    return this.add("fill", "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))"`. */
-  get fFocusRingMuted() {
-    return this.add("fill", "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `fill: "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get fListRowBgHover() {
-    return this.add("fill", "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-loader-spinner, rgba(29, 78, 216, 1))"`. */
-  get fLoaderSpinner() {
-    return this.add("fill", "var(--b-loader-spinner, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-loader-track, rgba(255, 255, 255, 1))"`. */
-  get fLoaderTrack() {
-    return this.add("fill", "var(--b-loader-track, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get fMenuItemBgHover() {
-    return this.add("fill", "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))"`. */
-  get fNavItemBgActive() {
-    return this.add("fill", "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))"`. */
-  get fNavItemBgHover() {
-    return this.add("fill", "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))"`. */
-  get fNavItemBgPressed() {
-    return this.add("fill", "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-text, rgba(100, 100, 100, 1))"`. */
-  get fNavText() {
-    return this.add("fill", "var(--b-nav-text, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-text-active, rgba(29, 78, 216, 1))"`. */
-  get fNavTextActive() {
-    return this.add("fill", "var(--b-nav-text-active, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get fNavTextDisabled() {
-    return this.add("fill", "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))"`. */
-  get fNavTextFocusVisible() {
-    return this.add("fill", "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `fill: "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))"`. */
-  get fNavTextPressed() {
-    return this.add("fill", "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `fill: "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))"`. */
-  get fNeutralFillHoverStrong() {
-    return this.add("fill", "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))"`. */
-  get fNeutralFillHoverSubtle() {
-    return this.add("fill", "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))");
-  }
-  /** Sets `fill: "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))"`. */
-  get fNeutralFillPressed() {
-    return this.add("fill", "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))");
-  }
-  /** Sets `fill: "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))"`. */
-  get fNeutralSurfacePressed() {
-    return this.add("fill", "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-on-primary, rgba(255, 255, 255, 1))"`. */
-  get fOnPrimary() {
-    return this.add("fill", "var(--b-on-primary, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-on-surface, rgba(36, 36, 36, 1))"`. */
-  get fOnSurface() {
-    return this.add("fill", "var(--b-on-surface, rgba(36, 36, 36, 1))");
-  }
-  /** Sets `fill: "var(--b-on-surface-muted, rgba(221, 220, 220, 1))"`. */
-  get fOnSurfaceMuted() {
-    return this.add("fill", "var(--b-on-surface-muted, rgba(221, 220, 220, 1))");
-  }
-  /** Sets `fill: "var(--b-popover-surface, rgba(255, 255, 255, 1))"`. */
-  get fPopoverSurface() {
-    return this.add("fill", "var(--b-popover-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-primary, rgba(37, 99, 235, 1))"`. */
-  get fPrimary() {
-    return this.add("fill", "var(--b-primary, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `fill: "var(--b-primary-hover, rgba(29, 78, 216, 1))"`. */
-  get fPrimaryHover() {
-    return this.add("fill", "var(--b-primary-hover, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-primary-pressed, rgba(30, 64, 175, 1))"`. */
-  get fPrimaryPressed() {
-    return this.add("fill", "var(--b-primary-pressed, rgba(30, 64, 175, 1))");
-  }
-  /** Sets `fill: "var(--b-scrim, rgba(36, 36, 36, 0.2))"`. */
-  get fScrim() {
-    return this.add("fill", "var(--b-scrim, rgba(36, 36, 36, 0.2))");
-  }
-  /** Sets `fill: "var(--b-selection-indicator, rgba(29, 78, 216, 1))"`. */
-  get fSelectionIndicator() {
-    return this.add("fill", "var(--b-selection-indicator, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-status-success-fg, rgba(4, 120, 87, 1))"`. */
-  get fStatusSuccessFg() {
-    return this.add("fill", "var(--b-status-success-fg, rgba(4, 120, 87, 1))");
-  }
-  /** Sets `fill: "var(--b-surface, rgba(255, 255, 255, 1))"`. */
-  get fSurface() {
-    return this.add("fill", "var(--b-surface, rgba(255, 255, 255, 1))");
-  }
-  /** Sets `fill: "var(--b-text-disabled, rgba(201, 201, 201, 1))"`. */
-  get fTextDisabled() {
-    return this.add("fill", "var(--b-text-disabled, rgba(201, 201, 201, 1))");
-  }
-  /** Sets `fill: "var(--b-text-helper, rgba(100, 100, 100, 1))"`. */
-  get fTextHelper() {
-    return this.add("fill", "var(--b-text-helper, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `fill: "var(--b-text-label, rgba(100, 100, 100, 1))"`. */
-  get fTextLabel() {
-    return this.add("fill", "var(--b-text-label, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `fill: "var(--b-text-link-default, rgba(29, 78, 216, 1))"`. */
-  get fTextLinkDefault() {
-    return this.add("fill", "var(--b-text-link-default, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-text-link-disabled, rgba(147, 197, 253, 1))"`. */
-  get fTextLinkDisabled() {
-    return this.add("fill", "var(--b-text-link-disabled, rgba(147, 197, 253, 1))");
-  }
-  /** Sets `fill: "var(--b-text-link-hover, rgba(37, 99, 235, 1))"`. */
-  get fTextLinkHover() {
-    return this.add("fill", "var(--b-text-link-hover, rgba(37, 99, 235, 1))");
-  }
-  /** Sets `fill: "var(--b-text-link-pressed, rgba(29, 78, 216, 1))"`. */
-  get fTextLinkPressed() {
-    return this.add("fill", "var(--b-text-link-pressed, rgba(29, 78, 216, 1))");
-  }
-  /** Sets `fill: "var(--b-text-placeholder, rgba(100, 100, 100, 1))"`. */
-  get fTextPlaceholder() {
-    return this.add("fill", "var(--b-text-placeholder, rgba(100, 100, 100, 1))");
-  }
-  /** Sets `fill: "var(--b-text-selection, rgba(191, 219, 254, 1))"`. */
-  get fTextSelection() {
-    return this.add("fill", "var(--b-text-selection, rgba(191, 219, 254, 1))");
+    return this.add("backgroundColor", maybeCssVar(value));
   }
   /** Sets `fill: "rgba(255, 255, 255, 1)"`. */
   get fWhite() {
@@ -3610,7 +2682,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `fill: value`. */
   fill(value: Properties["fill"]) {
-    return this.add("fill", value);
+    return this.add("fill", maybeCssVar(value));
   }
 
   // spacing
@@ -3656,7 +2728,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginTop: "v"`. */
   mt(v: number | string) {
-    return this.add("marginTop", maybeInc(v));
+    return this.add("marginTop", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginTop: px`. */
   mtPx(px: number) {
@@ -3704,7 +2776,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginRight: "v"`. */
   mr(v: number | string) {
-    return this.add("marginRight", maybeInc(v));
+    return this.add("marginRight", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginRight: px`. */
   mrPx(px: number) {
@@ -3752,7 +2824,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginBottom: "v"`. */
   mb(v: number | string) {
-    return this.add("marginBottom", maybeInc(v));
+    return this.add("marginBottom", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginBottom: px`. */
   mbPx(px: number) {
@@ -3800,7 +2872,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginLeft: "v"`. */
   ml(v: number | string) {
-    return this.add("marginLeft", maybeInc(v));
+    return this.add("marginLeft", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginLeft: px`. */
   mlPx(px: number) {
@@ -3848,7 +2920,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginLeft: "v"; marginRight: "v"`. */
   mx(v: number | string) {
-    return this.add("marginLeft", maybeInc(v)).add("marginRight", maybeInc(v));
+    return this.add("marginLeft", maybeCssVar(maybeInc(v))).add("marginRight", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginLeft: px; marginRight: px`. */
   mxPx(px: number) {
@@ -3896,7 +2968,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginTop: "v"; marginBottom: "v"`. */
   my(v: number | string) {
-    return this.add("marginTop", maybeInc(v)).add("marginBottom", maybeInc(v));
+    return this.add("marginTop", maybeCssVar(maybeInc(v))).add("marginBottom", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginTop: px; marginBottom: px`. */
   myPx(px: number) {
@@ -3974,10 +3046,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `marginTop: "v"; marginBottom: "v"; marginRight: "v"; marginLeft: "v"`. */
   m(v: number | string) {
-    return this.add("marginTop", maybeInc(v)).add("marginBottom", maybeInc(v)).add("marginRight", maybeInc(v)).add(
-      "marginLeft",
-      maybeInc(v),
-    );
+    return this.add("marginTop", maybeCssVar(maybeInc(v))).add("marginBottom", maybeCssVar(maybeInc(v))).add(
+      "marginRight",
+      maybeCssVar(maybeInc(v)),
+    ).add("marginLeft", maybeCssVar(maybeInc(v)));
   }
   /** Sets `marginTop: px; marginBottom: px; marginRight: px; marginLeft: px`. */
   mPx(px: number) {
@@ -4024,7 +3096,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingTop: "v"`. */
   pt(v: number | string) {
-    return this.add("paddingTop", maybeInc(v));
+    return this.add("paddingTop", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingTop: px`. */
   ptPx(px: number) {
@@ -4068,7 +3140,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingRight: "v"`. */
   pr(v: number | string) {
-    return this.add("paddingRight", maybeInc(v));
+    return this.add("paddingRight", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingRight: px`. */
   prPx(px: number) {
@@ -4112,7 +3184,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingBottom: "v"`. */
   pb(v: number | string) {
-    return this.add("paddingBottom", maybeInc(v));
+    return this.add("paddingBottom", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingBottom: px`. */
   pbPx(px: number) {
@@ -4156,7 +3228,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingLeft: "v"`. */
   pl(v: number | string) {
-    return this.add("paddingLeft", maybeInc(v));
+    return this.add("paddingLeft", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingLeft: px`. */
   plPx(px: number) {
@@ -4200,7 +3272,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingLeft: "v"; paddingRight: "v"`. */
   px(v: number | string) {
-    return this.add("paddingLeft", maybeInc(v)).add("paddingRight", maybeInc(v));
+    return this.add("paddingLeft", maybeCssVar(maybeInc(v))).add("paddingRight", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingLeft: px; paddingRight: px`. */
   pxPx(px: number) {
@@ -4244,7 +3316,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingTop: "v"; paddingBottom: "v"`. */
   py(v: number | string) {
-    return this.add("paddingTop", maybeInc(v)).add("paddingBottom", maybeInc(v));
+    return this.add("paddingTop", maybeCssVar(maybeInc(v))).add("paddingBottom", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingTop: px; paddingBottom: px`. */
   pyPx(px: number) {
@@ -4315,10 +3387,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `paddingTop: "v"; paddingBottom: "v"; paddingRight: "v"; paddingLeft: "v"`. */
   p(v: number | string) {
-    return this.add("paddingTop", maybeInc(v)).add("paddingBottom", maybeInc(v)).add("paddingRight", maybeInc(v)).add(
-      "paddingLeft",
-      maybeInc(v),
-    );
+    return this.add("paddingTop", maybeCssVar(maybeInc(v))).add("paddingBottom", maybeCssVar(maybeInc(v))).add(
+      "paddingRight",
+      maybeCssVar(maybeInc(v)),
+    ).add("paddingLeft", maybeCssVar(maybeInc(v)));
   }
   /** Sets `paddingTop: px; paddingBottom: px; paddingRight: px; paddingLeft: px`. */
   pPx(px: number) {
@@ -4347,7 +3419,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `textAlign: value`. */
   ta(value: Properties["textAlign"]) {
-    return this.add("textAlign", value);
+    return this.add("textAlign", maybeCssVar(value));
   }
 
   // textDecoration
@@ -4365,7 +3437,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `textDecoration: value`. */
   textDecoration(value: Properties["textDecoration"]) {
-    return this.add("textDecoration", value);
+    return this.add("textDecoration", maybeCssVar(value));
   }
 
   // textTransform
@@ -4387,7 +3459,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `textTransform: value`. */
   tt(value: Properties["textTransform"]) {
-    return this.add("textTransform", value);
+    return this.add("textTransform", maybeCssVar(value));
   }
 
   // typeScale
@@ -4463,7 +3535,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `fontSize: value`. */
   fs(value: Properties["fontSize"]) {
-    return this.add("fontSize", value);
+    return this.add("fontSize", maybeCssVar(value));
   }
   /** Sets `fontSize: px`. */
   fsPx(px: number) {
@@ -4471,7 +3543,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `lineHeight: value`. */
   lh(value: Properties["lineHeight"]) {
-    return this.add("lineHeight", value);
+    return this.add("lineHeight", maybeCssVar(value));
   }
   /** Sets `lineHeight: px`. */
   lhPx(px: number) {
@@ -4497,7 +3569,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `userSelect: value`. */
   select(value: Properties["userSelect"]) {
-    return this.add("userSelect", value);
+    return this.add("userSelect", maybeCssVar(value));
   }
 
   // verticalAlign
@@ -4519,7 +3591,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `verticalAlign: value`. */
   va(value: Properties["verticalAlign"]) {
-    return this.add("verticalAlign", value);
+    return this.add("verticalAlign", maybeCssVar(value));
   }
 
   // visibility
@@ -4533,7 +3605,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `visibility: value`. */
   visibility(value: Properties["visibility"]) {
-    return this.add("visibility", value);
+    return this.add("visibility", maybeCssVar(value));
   }
 
   // whitespace
@@ -4563,7 +3635,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `whiteSpace: value`. */
   whiteSpace(value: Properties["whiteSpace"]) {
-    return this.add("whiteSpace", value);
+    return this.add("whiteSpace", maybeCssVar(value));
   }
 
   // width
@@ -4629,7 +3701,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `minWidth: value`. */
   mw(value: Properties["minWidth"]) {
-    return this.add("minWidth", value);
+    return this.add("minWidth", maybeCssVar(value));
   }
   /** Sets `minWidth: px`. */
   mwPx(px: number) {
@@ -4669,7 +3741,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `maxWidth: value`. */
   maxw(value: Properties["maxWidth"]) {
-    return this.add("maxWidth", value);
+    return this.add("maxWidth", maybeCssVar(value));
   }
   /** Sets `maxWidth: px`. */
   maxwPx(px: number) {
@@ -4717,7 +3789,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `width: "v"`. */
   w(v: number | string) {
-    return this.add("width", maybeInc(v));
+    return this.add("width", maybeCssVar(maybeInc(v)));
   }
   /** Sets `width: px`. */
   wPx(px: number) {
@@ -4743,7 +3815,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `wordBreak: value`. */
   wordBreak(value: Properties["wordBreak"]) {
-    return this.add("wordBreak", value);
+    return this.add("wordBreak", maybeCssVar(value));
   }
 
   // zIndex
@@ -4793,7 +3865,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `zIndex: value`. */
   z(value: Properties["zIndex"]) {
-    return this.add("zIndex", value);
+    return this.add("zIndex", maybeCssVar(value));
   }
 
   // fontFamily
@@ -4803,7 +3875,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
   /** Sets `fontFamily: value`. */
   fontFamily(value: Properties["fontFamily"]) {
-    return this.add("fontFamily", value);
+    return this.add("fontFamily", maybeCssVar(value));
   }
 
   // animation
@@ -5092,6 +4164,17 @@ export function maybeInc(inc: number | string): string {
   return typeof inc === "string" ? inc : `calc(var(--t-spacing) * ${inc})`;
 }
 
+/** Wraps `--token` custom property names as `var(--token)` for CSS property values. */
+export function maybeCssVar<T>(value: T): T {
+  if (typeof value !== "string") {
+    return value;
+  }
+  if (value.startsWith("--")) {
+    return `var(${value})` as T;
+  }
+  return value;
+}
+
 /** Converts `inc` into pixels. */
 export function increment(inc: number): number {
   return inc * 8;
@@ -5110,64 +4193,6 @@ function omitUndefinedValues<T extends object>(value: T): T {
 }
 
 export enum Palette {
-  ButtonCautionDisabledBg = "var(--b-button-caution-disabled-bg, rgba(254, 240, 138, 1))",
-  ButtonCautionDisabledFg = "var(--b-button-caution-disabled-fg, rgba(36, 36, 36, 1))",
-  ButtonDangerDisabledBg = "var(--b-button-danger-disabled-bg, rgba(254, 202, 202, 1))",
-  ButtonDangerDisabledFg = "var(--b-button-danger-disabled-fg, rgba(255, 255, 255, 1))",
-  ButtonGhostDisabledFg = "var(--b-button-ghost-disabled-fg, rgba(201, 201, 201, 1))",
-  ButtonGhostFg = "var(--b-button-ghost-fg, rgba(36, 36, 36, 1))",
-  ButtonPrimaryDisabledBg = "var(--b-button-primary-disabled-bg, rgba(191, 219, 254, 1))",
-  ButtonPrimaryDisabledFg = "var(--b-button-primary-disabled-fg, rgba(255, 255, 255, 1))",
-  ButtonTertiaryFg = "var(--b-button-tertiary-fg, rgba(37, 99, 235, 1))",
-  ButtonTertiaryFgPressed = "var(--b-button-tertiary-fg-pressed, rgba(30, 64, 175, 1))",
-  Danger = "var(--b-danger, rgba(220, 38, 38, 1))",
-  DangerPressed = "var(--b-danger-pressed, rgba(153, 27, 27, 1))",
-  FieldBgDefault = "var(--b-field-bg-default, rgba(255, 255, 255, 1))",
-  FieldBgDisabled = "var(--b-field-bg-disabled, rgba(247, 245, 245, 1))",
-  FieldBgHover = "var(--b-field-bg-hover, rgba(247, 245, 245, 1))",
-  FieldBorderDefault = "var(--b-field-border-default, rgba(221, 220, 220, 1))",
-  FieldBorderError = "var(--b-field-border-error, rgba(220, 38, 38, 1))",
-  FieldBorderFocus = "var(--b-field-border-focus, rgba(29, 78, 216, 1))",
-  FieldBorderHover = "var(--b-field-border-hover, rgba(221, 220, 220, 1))",
-  FieldTextDisabled = "var(--b-field-text-disabled, rgba(141, 141, 141, 1))",
-  FocusRingInset = "var(--b-focus-ring-inset, rgba(29, 78, 216, 1))",
-  FocusRingMuted = "var(--b-focus-ring-muted, rgba(36, 36, 36, 1))",
-  ListRowBgHover = "var(--b-list-row-bg-hover, rgba(247, 245, 245, 1))",
-  LoaderSpinner = "var(--b-loader-spinner, rgba(29, 78, 216, 1))",
-  LoaderTrack = "var(--b-loader-track, rgba(255, 255, 255, 1))",
-  MenuItemBgHover = "var(--b-menu-item-bg-hover, rgba(247, 245, 245, 1))",
-  NavItemBgActive = "var(--b-nav-item-bg-active, rgba(239, 246, 255, 1))",
-  NavItemBgHover = "var(--b-nav-item-bg-hover, rgba(247, 245, 245, 1))",
-  NavItemBgPressed = "var(--b-nav-item-bg-pressed, rgba(236, 235, 235, 1))",
-  NavText = "var(--b-nav-text, rgba(100, 100, 100, 1))",
-  NavTextActive = "var(--b-nav-text-active, rgba(29, 78, 216, 1))",
-  NavTextDisabled = "var(--b-nav-text-disabled, rgba(201, 201, 201, 1))",
-  NavTextFocusVisible = "var(--b-nav-text-focus-visible, rgba(100, 100, 100, 1))",
-  NavTextPressed = "var(--b-nav-text-pressed, rgba(100, 100, 100, 1))",
-  NeutralFillHoverStrong = "var(--b-neutral-fill-hover-strong, rgba(247, 245, 245, 1))",
-  NeutralFillHoverSubtle = "var(--b-neutral-fill-hover-subtle, rgba(247, 245, 245, 1))",
-  NeutralFillPressed = "var(--b-neutral-fill-pressed, rgba(236, 235, 235, 1))",
-  NeutralSurfacePressed = "var(--b-neutral-surface-pressed, rgba(255, 255, 255, 1))",
-  OnPrimary = "var(--b-on-primary, rgba(255, 255, 255, 1))",
-  OnSurface = "var(--b-on-surface, rgba(36, 36, 36, 1))",
-  OnSurfaceMuted = "var(--b-on-surface-muted, rgba(221, 220, 220, 1))",
-  PopoverSurface = "var(--b-popover-surface, rgba(255, 255, 255, 1))",
-  Primary = "var(--b-primary, rgba(37, 99, 235, 1))",
-  PrimaryHover = "var(--b-primary-hover, rgba(29, 78, 216, 1))",
-  PrimaryPressed = "var(--b-primary-pressed, rgba(30, 64, 175, 1))",
-  Scrim = "var(--b-scrim, rgba(36, 36, 36, 0.2))",
-  SelectionIndicator = "var(--b-selection-indicator, rgba(29, 78, 216, 1))",
-  StatusSuccessFg = "var(--b-status-success-fg, rgba(4, 120, 87, 1))",
-  Surface = "var(--b-surface, rgba(255, 255, 255, 1))",
-  TextDisabled = "var(--b-text-disabled, rgba(201, 201, 201, 1))",
-  TextHelper = "var(--b-text-helper, rgba(100, 100, 100, 1))",
-  TextLabel = "var(--b-text-label, rgba(100, 100, 100, 1))",
-  TextLinkDefault = "var(--b-text-link-default, rgba(29, 78, 216, 1))",
-  TextLinkDisabled = "var(--b-text-link-disabled, rgba(147, 197, 253, 1))",
-  TextLinkHover = "var(--b-text-link-hover, rgba(37, 99, 235, 1))",
-  TextLinkPressed = "var(--b-text-link-pressed, rgba(29, 78, 216, 1))",
-  TextPlaceholder = "var(--b-text-placeholder, rgba(100, 100, 100, 1))",
-  TextSelection = "var(--b-text-selection, rgba(191, 219, 254, 1))",
   White = "rgba(255, 255, 255, 1)",
   Transparent = "rgba(0,0,0,0)",
   Gray50 = "rgba(255, 253, 253, 1)",

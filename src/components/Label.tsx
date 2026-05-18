@@ -1,7 +1,7 @@
 import React, { LabelHTMLAttributes, ReactNode } from "react";
 import { VisuallyHidden } from "react-aria";
 import { Icon } from "src";
-import { Css, Font, Only, Palette, Xss } from "src/Css";
+import { Css, Font, Only, Tokens, Xss } from "src/Css";
 
 type LabelXss = Font | "color";
 
@@ -27,7 +27,10 @@ function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) 
       {...labelProps}
       {...others}
       css={{
-        ...Css.dif.aic.gap1.sm.gray700.mbPx(inline ? 0 : 4).textLabel.if(!inline).asfs.$,
+        ...Css.dif.aic.gap1.sm.gray700
+          .mbPx(inline ? 0 : 4)
+          .color(Tokens.TextLabel)
+          .if(!inline).asfs.$,
         ...xss,
       }}
     >
@@ -35,7 +38,7 @@ function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) 
       {suffix && ` ${suffix}`}
       {tooltip && (
         <span css={Css.fs0.$}>
-          <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.TextLabel} />
+          <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.TextLabel} />
         </span>
       )}
     </label>

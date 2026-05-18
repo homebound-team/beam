@@ -2,7 +2,7 @@
 
 Source of truth: [`tokens.json`](./tokens.json) (DTCG 2025.10–shaped). [`yarn generate:design-tokens`](../scripts/generate-design-tokens.ts) reads it and emits **`truss-token-vars.ts`**, **`truss-palette.ts`**, and **`src/css/generated/theme-scopes.css`**. Truss uses [`truss-config.ts`](../truss-config.ts); run **`yarn build:truss`** after token edits when you also need regenerated **`src/Css.ts`** / **`src/Css.json`**.
 
-**Palette order in `truss-palette.ts`:** every `beam.color.semantic.*` leaf in **JSON key order** (keep semantic keys **sorted alphabetically** for stable diffs), then **Extended Palette**: `White` / `Transparent` literals, then other `beam.color.primitive.*` keys in JSON order.
+**Palette in `truss-palette.ts`:** primitives only — `White` / `Transparent`, then other `beam.color.primitive.*` keys in JSON order. Semantic roles are **not** in the Truss palette.
 
 **Normative color format:** [Design Tokens Color Module 2025.10](https://www.designtokens.org/tr/2025.10/color/#color-tokens) — for `$type: "color"`, `$value` is `colorSpace: "srgb"`, `components: [r, g, b]` (each **0–1**), optional `alpha`, optional `hex`. Semantic baselines usually reference `{beam.color.primitive.*}`.
 
@@ -37,7 +37,9 @@ Literal DTCG `srgb` colors (ramps `Gray50` … `Blue900`, etc.). **`White`** and
 
 ### `beam.color.semantic.*`
 
-Role colors consumed as `var(--b-*, …)` in [`truss-palette.ts`](../truss-palette.ts). Each leaf **must** include `$extensions["com.homebound.beam"]` with **`cssVar`** (`--b-*`). Optional theme axes (e.g. **`contrast`**) are hex or `{beam.color.primitive.*}`. Leaf keys: **PascalCase**; do not prefix keys with `Beam`. **`$value`:** baseline (usually a primitive reference). **`$description`:** optional usage note.
+Role colors exposed as **`Tokens`** in [`truss-token-vars.ts`](../truss-token-vars.ts) (`--b-*` names). Baseline values are on **`:root`** in [`src/css/generated/theme-scopes.css`](../src/css/generated/theme-scopes.css); theme overrides use **`[data-theme="…"]`**. Each leaf **must** include `$extensions["com.homebound.beam"]` with **`cssVar`** (`--b-*`). Optional theme axes (e.g. **`contrast`**) are hex or `{beam.color.primitive.*}`. Leaf keys: **PascalCase**; do not prefix keys with `Beam`. **`$value`:** baseline (usually a primitive reference). **`$description`:** optional usage note.
+
+**Usage in components:** pass `Tokens` to Truss param methods (Truss wraps `--*` in `var()`), e.g. `Css.bgColor(Tokens.Surface).$`, `Css.color(Tokens.OnSurface).$`, `Css.bc(Tokens.FieldBorderDefault).$`. For `Icon` / `CountBadge` and similar props, use type `BeamColor` (`Palette | Tokens`) and pass `Tokens` directly — `Css.fill` / `Css.bgColor` wrap it. Inside template strings (e.g. `boxShadow`), use `` `var(${Tokens.FocusRingInset})` `` yourself.
 
 ## Nomenclature and best practices
 
@@ -64,8 +66,8 @@ Avoid semantic leaf keys that **collide with Truss `Css` shorthands** (e.g. do n
 
 ## Contrast and theming
 
-- Baseline colors live in JSON; fallbacks appear in `truss-palette.ts` as `var(--b-*, rgba(…))`.
-- Theme axes on the Beam extension (e.g. `contrast`) resolve to rgba and emit as **`[data-theme="…"] { --b-*: … }`** in **`src/css/generated/theme-scopes.css`** (axis keys must align with [`ContrastScope`](../src/components/ContrastScope.tsx)).
+- Baseline colors live in JSON and emit on **`:root { --b-*: rgba(…) }`** in **`src/css/generated/theme-scopes.css`**.
+- Theme axes on the Beam extension (e.g. `contrast`) resolve to rgba and emit as **`[data-theme="…"] { --b-*: … }`** in the same file (axis keys must align with [`ContrastScope`](../src/components/ContrastScope.tsx)).
 - Wrap subtrees in **`ContrastScope`**. Portaled overlays (e.g. menus from a field) should inherit the preset (`Popover` / `data-theme` when contrast scope is active).
 - **`CssReset`** imports **`theme-scopes.css`** so rules ship with the app.
 

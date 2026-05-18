@@ -3,7 +3,7 @@ import { useMenuSection, useSeparator } from "react-aria";
 import { TreeState } from "react-stately";
 import { MenuItem } from "src/components/ButtonMenu";
 import { MenuItemImpl } from "src/components/internal";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type MenuSectionProps = {
@@ -22,7 +22,7 @@ export function MenuSectionImpl(props: MenuSectionProps) {
   return (
     <>
       {isPersistentSection && <li {...separatorProps} css={Css.bt.bcGray200.$} />}
-      <li {...itemProps} css={Css.onSurface.if(!isPersistentSection).oa.$}>
+      <li {...itemProps} css={Css.color(Tokens.OnSurface).if(!isPersistentSection).oa.$}>
         <ul css={Css.listReset.$} {...groupProps} {...tid[isPersistentSection ? "persistentItems" : "menuItems"]}>
           {[...section.childNodes].map((item) => (
             <MenuItemImpl key={item.key} item={item} state={state} onClose={onClose} {...tid} />

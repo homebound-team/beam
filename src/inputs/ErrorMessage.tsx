@@ -1,6 +1,6 @@
 import { VisuallyHidden } from "react-aria";
 import { Icon } from "src/components";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 
 type ErrorMessageProps = {
   /** The dom id for `aria-errormessage` to point to us. */
@@ -16,7 +16,7 @@ type ErrorMessageProps = {
 export function ErrorMessage(props: ErrorMessageProps) {
   const { id, errorMsg, hidden = false, ...others } = props;
   const errorEl = errorMsg ? (
-    <div css={Css.danger.sm.df.mtPx(4).$}>
+    <div css={Css.color(Tokens.Danger).sm.df.mtPx(4).$}>
       <span css={Css.fs0.$}>
         <Icon icon="error" />
       </span>

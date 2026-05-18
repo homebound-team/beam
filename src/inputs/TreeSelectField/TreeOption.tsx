@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { useHover, useOption } from "react-aria";
 import { ListState } from "react-stately";
 import { Icon } from "src/components";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { LeveledOption, NestedOption } from "src/inputs/TreeSelectField/utils";
@@ -58,10 +58,10 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   const isIndeterminate = !isSelected && option.children?.some((o) => hasSelectedChildren(o, state, getOptionValue));
 
   const listItemStyles = {
-    item: Css.onSurface.$,
-    hover: Css.bgListRowBgHover.$,
-    disabled: Css.cursorNotAllowed.textDisabled.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${Palette.FocusRingInset}`).$,
+    item: Css.color(Tokens.OnSurface).$,
+    hover: Css.bgColor(Tokens.ListRowBgHover).$,
+    disabled: Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$,
   };
 
   return (

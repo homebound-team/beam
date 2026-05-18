@@ -8,7 +8,7 @@ import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -81,10 +81,10 @@ export function MenuItemImpl(props: MenuItemProps) {
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
         ...(menuItem.hasDivider ? Css.bb.bcGray700.$ : {}),
-        ...(!isDisabled && isHovered ? Css.bgMenuItemBgHover.$ : {}),
-        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px ${Palette.FocusRingInset}`).$ : {}),
-        ...(isDisabled ? Css.textDisabled.cursorNotAllowed.$ : {}),
-        ...(destructive ? Css.danger.$ : {}),
+        ...(!isDisabled && isHovered ? Css.bgColor(Tokens.MenuItemBgHover).$ : {}),
+        ...(isFocused ? Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$ : {}),
+        ...(isDisabled ? Css.color(Tokens.TextDisabled).cursorNotAllowed.$ : {}),
+        ...(destructive ? Css.color(Tokens.Danger).$ : {}),
         ...(isSelected ? Css.fw5.$ : {}),
       }}
       {...tid[defaultTestId(menuItem.label)]}
@@ -114,7 +114,7 @@ function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boo
           isDisabled,
         )}
       </div>
-      {isSelected && <Icon icon="check" color={isDisabled ? Palette.TextDisabled : Palette.SelectionIndicator} />}
+      {isSelected && <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />}
     </div>
   );
 }

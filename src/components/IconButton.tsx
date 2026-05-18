@@ -1,8 +1,9 @@
 import { AriaButtonProps } from "@react-types/button";
 import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
+import { BeamColor } from "src/colors";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { noop } from "src/utils";
@@ -12,8 +13,8 @@ import { useTestIds } from "src/utils/useTestIds";
 export type IconButtonProps = {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
-  color?: Palette;
-  bgColor?: Palette;
+  color?: BeamColor;
+  bgColor?: BeamColor;
   /** The size of the icon, in increments, defaults to 3 which is 24px. */
   inc?: number;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
@@ -97,7 +98,7 @@ export function IconButton(props: IconButtonProps) {
       color={
         color ||
         (isDisabled
-          ? Palette.TextDisabled
+          ? Tokens.TextDisabled
           : circle && (isHovered || active || isFocusVisible)
             ? defaultIconColor
             : iconColor)
@@ -115,14 +116,14 @@ export function IconButton(props: IconButtonProps) {
   });
 }
 
-const defaultIconColor = Palette.OnSurface;
+const defaultIconColor = Tokens.OnSurface;
 const circleIconColor = Palette.Gray700;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
 /** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
-const iconButtonTokenHover = Css.bgNeutralFillHoverStrong.$;
+const iconButtonTokenHover = Css.bgColor(Tokens.NeutralFillHoverStrong).$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 export const iconButtonContrastStylesHover = iconButtonTokenHover;
 export const iconButtonCircleStylesHover = Css.bgBlue100.bcBlue200.$;

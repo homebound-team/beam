@@ -1,10 +1,10 @@
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export function LoadingDots() {
   const dotCss = Css.hPx(8)
     .wPx(8)
-    .br4.bgColor(Palette.OnSurfaceMuted)
+    .br4.bgColor(Tokens.OnSurfaceMuted)
     .add("animationName", "loadingDots")
     .add("animationDuration", "800ms")
     .add("animationIterationCount", "infinite")

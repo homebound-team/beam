@@ -2,7 +2,7 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette, Properties } from "src/Css";
+import { Css, Palette, Properties, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
@@ -143,74 +143,74 @@ const variantStyles: Record<
   }
 > = {
   primary: {
-    baseStyles: Css.bgPrimary.onPrimary.$,
-    hoverStyles: Css.bgPrimaryHover.$,
-    pressedStyles: Css.bgPrimaryPressed.$,
-    disabledStyles: Css.bgButtonPrimaryDisabledBg.buttonPrimaryDisabledFg.$,
+    baseStyles: Css.bgColor(Tokens.Primary).color(Tokens.OnPrimary).$,
+    hoverStyles: Css.bgColor(Tokens.PrimaryHover).$,
+    pressedStyles: Css.bgColor(Tokens.PrimaryPressed).$,
+    disabledStyles: Css.bgColor(Tokens.ButtonPrimaryDisabledBg).color(Tokens.ButtonPrimaryDisabledFg).$,
     focusStyles: Css.bshFocus.$,
   },
 
   secondary: {
     baseStyles: Css.bgWhite.bcGray300.bw1.ba.blue600.$,
-    hoverStyles: Css.bgNeutralFillHoverSubtle.$,
-    pressedStyles: Css.bgNeutralFillPressed.$,
+    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).$,
+    pressedStyles: Css.bgColor(Tokens.NeutralFillPressed).$,
     disabledStyles: Css.bgWhite.blue300.$,
     focusStyles: Css.bshFocus.$,
   },
 
   secondaryBlack: {
     baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray900.$,
-    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
-    pressedStyles: Css.bgNeutralSurfacePressed.gray900.$,
-    disabledStyles: Css.buttonGhostDisabledFg.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.FocusRingInset}, 0px 0px 0px 4px ${Palette.Gray900}`).$,
+    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
+    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).gray900.$,
+    disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px ${Palette.Gray900}`).$,
   },
 
   tertiary: {
-    baseStyles: Css.bgTransparent.buttonTertiaryFg.$,
-    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
-    pressedStyles: Css.bgNeutralSurfacePressed.buttonTertiaryFgPressed.$,
-    disabledStyles: Css.buttonGhostDisabledFg.$,
-    focusStyles: Css.bshFocus.bgNeutralFillHoverStrong.onSurface.$,
+    baseStyles: Css.bgTransparent.color(Tokens.ButtonTertiaryFg).$,
+    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
+    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.ButtonTertiaryFgPressed).$,
+    disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
+    focusStyles: Css.bshFocus.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
   },
 
   tertiaryDanger: {
-    baseStyles: Css.bgTransparent.danger.$,
-    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
-    pressedStyles: Css.bgNeutralSurfacePressed.dangerPressed.$,
-    disabledStyles: Css.buttonGhostDisabledFg.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.FocusRingInset}, 0px 0px 0px 4px ${Palette.Red500}`).$,
+    baseStyles: Css.bgTransparent.color(Tokens.Danger).$,
+    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
+    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.DangerPressed).$,
+    disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px ${Palette.Red500}`).$,
   },
 
   danger: {
     baseStyles: Css.bgRed600.white.$,
     hoverStyles: Css.bgRed700.$,
     pressedStyles: Css.bgRed800.$,
-    disabledStyles: Css.bgButtonDangerDisabledBg.buttonDangerDisabledFg.$,
+    disabledStyles: Css.bgColor(Tokens.ButtonDangerDisabledBg).color(Tokens.ButtonDangerDisabledFg).$,
     focusStyles: Css.bshDanger.$,
   },
 
   quaternary: {
-    baseStyles: Css.bgTransparent.buttonGhostFg.$,
-    hoverStyles: Css.bgNeutralFillHoverStrong.onSurface.$,
-    pressedStyles: Css.bgNeutralSurfacePressed.gray900.$,
-    disabledStyles: Css.buttonGhostDisabledFg.$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Palette.FocusRingInset}, 0px 0px 0px 4px ${Palette.Gray900}`).$,
+    baseStyles: Css.bgTransparent.color(Tokens.ButtonGhostFg).$,
+    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
+    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).gray900.$,
+    disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px ${Palette.Gray900}`).$,
   },
 
   caution: {
     baseStyles: Css.bgYellow200.gray900.$,
     hoverStyles: Css.bgYellow300.$,
     pressedStyles: Css.bgYellow400.$,
-    disabledStyles: Css.bgButtonCautionDisabledBg.buttonCautionDisabledFg.$,
+    disabledStyles: Css.bgColor(Tokens.ButtonCautionDisabledBg).color(Tokens.ButtonCautionDisabledFg).$,
     focusStyles: Css.bshDanger.$,
   },
 
   text: {
-    baseStyles: Css.textLinkDefault.add("fontSize", "inherit").$,
-    hoverStyles: Css.textLinkHover.$,
-    pressedStyles: Css.textLinkPressed.$,
-    disabledStyles: Css.textLinkDisabled.$,
+    baseStyles: Css.color(Tokens.TextLinkDefault).add("fontSize", "inherit").$,
+    hoverStyles: Css.color(Tokens.TextLinkHover).$,
+    pressedStyles: Css.color(Tokens.TextLinkPressed).$,
+    disabledStyles: Css.color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
   textSecondary: {

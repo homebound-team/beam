@@ -4,7 +4,7 @@ import { AriaMenuOptions, FocusScope, useFilter, useMenu } from "react-aria";
 import { Item, Section, useTreeData, useTreeState } from "react-stately";
 import { MenuItem, MenuSection } from "src/components";
 import { MenuSectionImpl } from "src/components/internal/MenuSection";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { MenuSearchField } from "src/inputs/internal/MenuSearchField";
 import { useTestIds } from "src/utils";
 
@@ -89,7 +89,7 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
           // Using `max-height: inherit` allows us to take advantage of the height set on the overlay container,
           // which updates based on the available space for the overlay within the viewport
           ...Css.df.fdc.myPx(4).outline0.br4.bshBasic.maxh("inherit").oa.$,
-          ...Css.bgSurface.$,
+          ...Css.bgColor(Tokens.Surface).$,
           ...Css.onHover.bshHover.$,
         }}
       >

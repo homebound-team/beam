@@ -17,7 +17,7 @@ import { InputStylePalette, usePresentationContext } from "src/components/Presen
 import { BorderHoverChild } from "src/components/Table/components/Row";
 // Side-effect import: injects CSS for the border-hover-on-row pattern
 import "src/components/Table/components/Row.css.ts";
-import { Css, increment, Only, Palette } from "src/Css";
+import { Css, increment, Only, Palette, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -129,7 +129,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         [Palette.Transparent, Palette.Blue100, Palette.Gray100]
       : borderless && !compound
         ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-        : [Palette.FieldBgDefault, Palette.FieldBgHover, Palette.FieldBgDisabled];
+        : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 
@@ -141,14 +141,17 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...Css.typography(typeScale)
         .df.aic.br8.pxPx(textFieldBasePadding)
         .w100.bgColor(bgColor)
-        .onSurface.if(!inputStylePalette && contrastScopeActive)
+        .color(Tokens.OnSurface)
+        .if(!inputStylePalette && contrastScopeActive)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
       // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
       // Note: Do not modify width and position of 'compound' fields.
-      ...(borderless && !compound ? Css.bcTransparent.w("calc(100% + 16px)").ml(-1).$ : Css.bcFieldBorderDefault.$),
+      ...(borderless && !compound
+        ? Css.bcTransparent.w("calc(100% + 16px)").ml(-1).$
+        : Css.bc(Tokens.FieldBorderDefault).$),
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
       ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
@@ -166,7 +169,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     // Border-hover-on-row styling is handled by Row.css.ts (imported above as a side-effect)
     inputWrapperReadOnly: {
       ...Css.typography(typeScale)
-        .df.aic.w100.onSurface.if(!inputStylePalette && contrastScopeActive)
+        .df.aic.w100.color(Tokens.OnSurface)
+        .if(!inputStylePalette && contrastScopeActive)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
@@ -176,18 +180,21 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
-      ...Css.w100.mw0.outline0.fg1.bgTransparent.if(!inputStylePalette).element("::selection").bgTextSelection.$,
+      ...Css.w100.mw0.outline0.fg1.bgTransparent
+        .if(!inputStylePalette)
+        .element("::selection")
+        .bgColor(Tokens.TextSelection).$,
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$
         : Css.truncate.$),
     },
-    hover: Css.bgColor(hoverBgColor).bcFieldBorderHover.$,
-    focus: Css.bcFieldBorderFocus.bgColor(hoverBgColor).if(borderOnHover).bcFieldBorderFocus.$,
+    hover: Css.bgColor(hoverBgColor).bc(Tokens.FieldBorderHover).$,
+    focus: Css.bc(Tokens.FieldBorderFocus).bgColor(hoverBgColor).if(borderOnHover).bc(Tokens.FieldBorderFocus).$,
     disabled: visuallyDisabled
-      ? Css.cursorNotAllowed.fieldTextDisabled.bgColor(disabledBgColor).$
+      ? Css.cursorNotAllowed.color(Tokens.FieldTextDisabled).bgColor(disabledBgColor).$
       : Css.cursorNotAllowed.$,
-    error: Css.bcFieldBorderError.$,
+    error: Css.bc(Tokens.FieldBorderError).$,
   };
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange

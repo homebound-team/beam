@@ -1,4 +1,4 @@
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 
 type LoaderProps = {
   size?: "xs" | "sm" | "md" | "lg";
@@ -6,7 +6,7 @@ type LoaderProps = {
 
 export function Loader({ size = "lg" }: LoaderProps) {
   const [dimensions, borderSize] = sizeToPixels[size];
-  const [bgColor, spinnerColor] = [Palette.LoaderTrack, Palette.LoaderSpinner];
+  const [bgColor, spinnerColor] = [Tokens.LoaderTrack, Tokens.LoaderSpinner];
 
   return (
     <div

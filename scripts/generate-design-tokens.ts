@@ -1,12 +1,11 @@
 /**
  * Reads `tokens/tokens.json` (DTCG 2025.10–shaped) and emits:
  * - `truss-token-vars.ts` — `Tokens` map for Truss (`--b-*` names only)
- * - `truss-palette.ts` — `palette` with full `var(--b-*, rgba(...))` literals (no imports)
- * - `src/css/generated/theme-scopes.css` — `[data-theme="…"]` custom property overrides per theme axis
+ * - `truss-palette.ts` — primitive color literals only (Truss `palette`; no semantic roles)
+ * - `src/css/generated/theme-scopes.css` — `:root` semantic defaults and `[data-theme="…"]` overrides
  *
- * Palette order: `beam.color.semantic` keys in JSON order, then `// Extended Palette`: `White` / `Transparent`
- * literals plus remaining `beam.color.primitive` keys in JSON order. Semantic JSON keys match Truss `palette` keys
- * (e.g. `Primary`, `Surface`, `FieldBgHover`).
+ * Palette order: `White` / `Transparent`, then remaining `beam.color.primitive.*` keys in JSON order.
+ * Semantic roles use `Tokens` (`--b-*`) and baseline values on `:root` in `theme-scopes.css`.
  *
  *   yarn generate:design-tokens
  */
@@ -32,11 +31,6 @@ const trussPalettePath = join(rootDir, "truss-palette.ts");
 const themeScopesCssPath = join(rootDir, "src/css/generated/theme-scopes.css");
 
 const BEAM_EXT = "com.homebound.beam";
-
-/** Truss `palette` key for a semantic JSON leaf (same as JSON key). */
-function paletteExportKey(semanticLeafKey: string): string {
-  return semanticLeafKey;
-}
 
 type SemanticCodegenRow = {
   tokenName: string;
@@ -134,18 +128,28 @@ function entriesForTheme(rows: SemanticCodegenRow[], themeKey: string): [string,
   return pairs;
 }
 
+function entriesForRoot(rows: SemanticCodegenRow[]): [string, string][] {
+  const pairs = rows.map((row) => [row.cssVar, row.defaultRgba] as [string, string]);
+  pairs.sort((a, b) => a[0].localeCompare(b[0]));
+  return pairs;
+}
+
 function emitThemeScopesCss(rows: SemanticCodegenRow[]): string {
   const header = `/*
  * AUTO-GENERATED — do not edit. Run \`yarn generate:design-tokens\`, \`yarn build\`, or \`yarn build:truss\`.
  *
- * [data-theme] attribute values must match \`contrastDataTheme\` (etc.) in src/components/ContrastScope.tsx.
- * Source: beam.color.semantic.* theme axes in tokens/tokens.json (excluding baseline default).
+ * :root — baseline semantic custom properties from beam.color.semantic.* $value.
+ * [data-theme] — overrides per theme axis; values must match ContrastScope / tokens.json.
  */
 
 `;
 
+  const rootPairs = entriesForRoot(rows);
+  const rootDecls = rootPairs.map(([k, v]) => `  ${k}: ${v};`).join("\n");
+  const rootBlock = `:root {\n${rootDecls}\n}`;
+
   const themeKeys = themeAxisKeysFromRows(rows);
-  const blocks = themeKeys
+  const themeBlocks = themeKeys
     .map((key) => {
       const pairs = entriesForTheme(rows, key);
       if (pairs.length === 0) return null;
@@ -154,6 +158,7 @@ function emitThemeScopesCss(rows: SemanticCodegenRow[]): string {
     })
     .filter((block): block is string => block !== null);
 
+  const blocks = [rootBlock, ...themeBlocks];
   return header + blocks.join("\n\n") + "\n";
 }
 
@@ -171,11 +176,9 @@ function main(): void {
   }
 
   const semanticRows = collectSemanticRows(merged, semanticLeaves, pathMap);
-  const rowByTokenName = new Map(semanticRows.map((r) => [r.tokenName, r]));
 
   const beamRoot = merged.beam as Record<string, unknown>;
   const colorRoot = beamRoot.color as Record<string, unknown>;
-  const semanticObj = colorRoot.semantic as Record<string, unknown>;
   const primitiveObj = colorRoot.primitive as Record<string, unknown>;
 
   const baseLiteralNames = ["White", "Transparent"] as const;
@@ -190,16 +193,6 @@ function main(): void {
     const rgba = resolvedColorToRgbaString(resolved, pathMap);
     const q = JSON.stringify(rgba).replaceAll('"', "'");
     baseLines.push(`  ${name}:  ${q},`);
-  }
-
-  const semanticPaletteLines: string[] = [];
-  for (const name of Object.keys(semanticObj)) {
-    const row = rowByTokenName.get(name);
-    if (!row) {
-      throw new Error(`Semantic token ${name} has no codegen row`);
-    }
-    const exportKey = paletteExportKey(name);
-    semanticPaletteLines.push(`  ${exportKey}: 'var(${row.cssVar}, ${row.defaultRgba})',`);
   }
 
   const primitiveSkip = new Set<string>(["White", "Transparent"]);
@@ -234,10 +227,6 @@ function main(): void {
     ` */\n\n` +
     `// Use rgba() for colors as Beam may attempt to modify opacity values in some components (e.g. ScrollShadows)\n` +
     `export const palette = {\n` +
-    `  // Semantic palette\n` +
-    semanticPaletteLines.join("\n") +
-    `\n\n` +
-    `  // Extended Palette\n` +
     baseLines.join("\n") +
     (baseLines.length > 0 && primitiveLines.length > 0 ? "\n" : "") +
     primitiveLines.join("\n") +
