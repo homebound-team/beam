@@ -3,6 +3,7 @@ import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
+import { BeamColor } from "src/colors";
 import { Css, Padding, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
@@ -13,7 +14,7 @@ import { useTestIds } from "src/utils";
 type TooltipXss = Xss<Padding | "borderRadius">;
 
 /** Note: Only 1 tooltip is ever on screen at a time */
-interface TooltipProps {
+type TooltipProps = {
   /** The content that shows up when hovered */
   title: ReactNode;
   children: ReactNode;
@@ -26,9 +27,9 @@ interface TooltipProps {
    */
   delay?: number;
   disabled?: boolean;
-  bgColor?: Palette;
+  bgColor?: BeamColor;
   xss?: TooltipXss;
-}
+};
 
 // Small delay to allow mouse to cross the gap between trigger and tooltip
 const gapCrossingDelay = 100;
@@ -80,15 +81,15 @@ export function Tooltip(props: TooltipProps) {
 // As necessary, more values can be pulled in from the ones available in the library
 export type Placement = "top" | "bottom" | "left" | "right" | "auto";
 
-interface PopperProps {
+type PopperProps = {
   triggerRef: React.MutableRefObject<HTMLElement | null>;
   content: ReactNode;
   placement?: Placement;
-  bgColor: Palette | undefined;
+  bgColor: BeamColor | undefined;
   xss?: TooltipXss;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-}
+};
 
 function Popper(props: PopperProps) {
   const {

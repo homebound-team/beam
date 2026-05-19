@@ -1,13 +1,14 @@
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { Css, Icon, IconKey, Palette, useTestIds } from "src";
+import { Css, Icon, IconKey, useTestIds } from "src";
+import { BeamColor } from "src/colors";
 import { DnDGridItemProps } from "src/components/DnDGrid/useDnDGridItem";
 
-export interface DnDGridItemHandleProps {
+export type DnDGridItemHandleProps = {
   dragHandleProps: DnDGridItemProps["dragHandleProps"];
   icon?: IconKey;
   compact?: boolean;
-  color?: Palette;
-}
+  color?: BeamColor;
+};
 
 /** Provides a specific handle element for dragging a GridItem. Includes handling behaviors and interactions */
 export function DnDGridItemHandle(props: DnDGridItemHandleProps) {

@@ -46,8 +46,6 @@ export type ComboBoxBaseProps<O, V extends Value> = {
    * Unlike `unsetLabel`, this does not add an explicit option for the user to select.
    */
   nothingSelectedText?: string;
-  /** When set the SelectField is expected to be put on a darker background */
-  contrast?: boolean;
   /** Placeholder content */
   placeholder?: string;
   /**
@@ -94,7 +92,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     multiselect = false,
     values: propValues,
     nothingSelectedText = "",
-    contrast,
     disabledOptions,
     borderless,
     unsetLabel,
@@ -386,7 +383,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         selectedOptions={selectedOptions}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
-        contrast={contrast}
         nothingSelectedText={nothingSelectedText}
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
@@ -410,7 +406,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
             selectedOptions={selectedOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
-            contrast={contrast}
             horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}

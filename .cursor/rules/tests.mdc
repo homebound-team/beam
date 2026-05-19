@@ -5,6 +5,7 @@ alwaysApply: false
 ---
 # Guidelines for writing tests
 - This project uses Jest and a custom wrapper around `react-testing-library` that is imported via [rtl.tsx](mdc:src/utils/rtl.tsx) with additional helpers within [rtlUtils.tsx](mdc:src/utils/rtlUtils.tsx)
+- After editing a test file, run `yarn lint:fix:files` on that path (see [AGENTS.md](mdc:AGENTS.md) **Linting**); before a PR run `yarn lint:ci`.
 
 ## Test Structure
 - Follow the Given/When/Then pattern with clear comments for each section

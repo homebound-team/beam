@@ -12,7 +12,6 @@ type VirtualizedOptionsProps<O> = {
   state: ListState<O>;
   items: Node<O>[] | Node<LeveledOption<O>>[];
   onListHeightChange: (height: number) => void;
-  contrast: boolean;
   // Whether we should auto-scroll to the item in focus. Should only be used when Options are using "virtual focus". Should not be used if focus is triggered on clicking an element.
   scrollOnFocus?: boolean;
   // Adds 'Loading' footer to the list
@@ -28,7 +27,6 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
     state,
     items,
     onListHeightChange,
-    contrast,
     scrollOnFocus,
     loading,
     disabledOptionsWithReasons,
@@ -92,7 +90,6 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
                 key={item.key}
                 item={item}
                 state={state}
-                contrast={contrast}
                 // scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
                 allowCollapsing={allowCollapsing}
               />
@@ -104,7 +101,6 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
                 key={item.key}
                 item={item}
                 state={state}
-                contrast={contrast}
                 // Only send scrollToIndex functionality forward if we are not auto-scrolling on focus.
                 scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
                 disabledReason={disabledOptionsWithReasons[item.key]}
@@ -112,12 +108,13 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
             );
           }
         }
+        return null;
       }}
       components={
         !loading
           ? {}
           : {
-              Footer: typeof loading === "function" ? loading : () => <LoadingDots contrast={contrast} />,
+              Footer: typeof loading === "function" ? loading : () => <LoadingDots />,
             }
       }
     />

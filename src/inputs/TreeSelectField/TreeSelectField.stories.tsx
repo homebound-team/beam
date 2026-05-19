@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { Button } from "src/components";
+import { Button, ContrastScope } from "src/components";
 import { Css } from "src/Css";
 import { Value } from "src/inputs/index";
 import { TreeSelectField, TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -12,9 +12,15 @@ import { within } from "storybook/test";
 
 export default {
   component: TreeSelectField,
-} as Meta<TreeSelectFieldProps<HasIdAndName, string>>;
+  argTypes: {
+    contrastStory: { control: false },
+  },
+} as Meta<TreeSelectFieldProps<HasIdAndName, string> & { contrastStory?: boolean }>;
 
-function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
+type TreeSelectFieldStoryArgs = TreeSelectFieldProps<HasIdAndName, string> & { contrastStory?: boolean };
+
+function Template(args: TreeSelectFieldStoryArgs) {
+  const { contrastStory, ...fieldArgs } = args;
   const options: NestedOption<HasIdAndName>[] = zeroTo(10).map((dIdx) => ({
     id: `d:${dIdx}`,
     name: `Development ${dIdx}`,
@@ -37,11 +43,11 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
   const singleValueId = [options[0]!.children![0]!.children![0].id];
   const multipleValueIds = [...singleValueId, options[0]!.children![0].children![1].id];
 
-  return (
-    <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
+  const surface = (
+    <div css={Css.df.fdc.gap5.p2.if(contrastStory === true).white.bgGray800.$}>
       <div css={Css.df.fdc.gap3.$}>
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           values={["c:1:d:0"]}
           options={options}
           placeholder="Select a project"
@@ -49,7 +55,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           values={multipleValueIds}
           options={options}
           placeholder="Select a project"
@@ -57,7 +63,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           multiline
           values={multipleValueIds}
           options={options}
@@ -66,7 +72,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           values={[]}
           options={options}
           placeholder="Select a project"
@@ -74,7 +80,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           disabled="Disabled reason tooltip text"
           label="Disabled"
           values={singleValueId}
@@ -82,7 +88,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           readOnly="Read-only reason tooltip text"
           label="Read-only"
           values={multipleValuesWithParents}
@@ -90,7 +96,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           label="With error message"
           values={singleValueId}
           options={options}
@@ -98,7 +104,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         />
 
         <TestTreeSelectField
-          {...args}
+          {...fieldArgs}
           label="With helper text"
           values={singleValueId}
           options={options}
@@ -108,7 +114,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
         <div css={Css.df.fdc.gap4.$}>
           <h2 css={Css.lg.$}>Other Label Styles</h2>
           <TestTreeSelectField
-            {...args}
+            {...fieldArgs}
             values={multipleValueIds}
             labelStyle="inline"
             options={options}
@@ -117,7 +123,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
 
           <div css={Css.maxwPx(550).$}>
             <TestTreeSelectField
-              {...args}
+              {...fieldArgs}
               values={multipleValueIds}
               labelStyle="left"
               options={options}
@@ -127,7 +133,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
 
           <div css={Css.maxwPx(550).$}>
             <TestTreeSelectField
-              {...args}
+              {...fieldArgs}
               values={[]}
               labelStyle="hidden"
               options={options}
@@ -138,7 +144,7 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
 
           <div>
             <TestTreeSelectField
-              {...args}
+              {...fieldArgs}
               fullWidth
               values={[]}
               options={options}
@@ -150,6 +156,8 @@ function Template(args: TreeSelectFieldProps<HasIdAndName, string>) {
       </div>
     </div>
   );
+
+  return contrastStory ? <ContrastScope>{surface}</ContrastScope> : surface;
 }
 
 export const Regular = Template.bind({});
@@ -158,7 +166,7 @@ export const Compact = Template.bind({});
 Compact.args = { compact: true };
 export const Contrast = Template.bind({});
 // @ts-ignore
-Contrast.args = { compact: true, contrast: true };
+Contrast.args = { compact: true, contrastStory: true };
 
 export const OpenMenu = newStory(
   () => {

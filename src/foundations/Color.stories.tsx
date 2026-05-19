@@ -11,19 +11,19 @@ export const Color = () => {
     <div>
       <h1 css={Css.xl2.mb4.$}>Extended Palette</h1>
       <h2 css={Css.xl.mb4.$}>Gray</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Gray"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Gray"))} />
       <h2 css={Css.xl.mb4.$}>Blue</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Blue"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Blue"))} />
       <h2 css={Css.xl.mb4.$}>Red</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Red"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Red"))} />
       <h2 css={Css.xl.mb4.$}>Yellow</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Yellow"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Yellow"))} />
       <h2 css={Css.xl.mb4.$}>Green</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Green"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Green"))} />
       <h2 css={Css.xl.mb4.$}>Purple</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Purple"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Purple"))} />
       <h2 css={Css.xl.mb4.$}>Orange</h2>
-      <ListColors palette={paletteEntries.filter(([name]) => name.includes("Orange"))} />
+      <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Orange"))} />
     </div>
   );
 };

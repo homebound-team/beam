@@ -1,13 +1,12 @@
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 
-interface LoaderProps {
+type LoaderProps = {
   size?: "xs" | "sm" | "md" | "lg";
-  contrast?: boolean;
-}
+};
 
-export function Loader({ size = "lg", contrast = false }: LoaderProps) {
+export function Loader({ size = "lg" }: LoaderProps) {
   const [dimensions, borderSize] = sizeToPixels[size];
-  const [bgColor, spinnerColor] = contrast ? [Palette.Gray600, Palette.Gray200] : [Palette.White, Palette.Blue700];
+  const [bgColor, spinnerColor] = [Tokens.LoaderTrack, Tokens.LoaderSpinner];
 
   return (
     <div

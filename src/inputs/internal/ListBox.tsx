@@ -2,7 +2,7 @@ import { Key as AriaKey } from "@react-types/shared";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import { ListState } from "react-stately";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { ListBoxSection } from "src/inputs/internal/ListBoxSection";
 import { ListBoxToggleChip } from "src/inputs/internal/ListBoxToggleChip";
@@ -16,7 +16,6 @@ type ListBoxProps<O, V extends AriaKey> = {
   selectedOptions?: O[];
   getOptionLabel: (opt: O) => string;
   getOptionValue: (opt: O) => V;
-  contrast?: boolean;
   horizontalLayout?: boolean;
   positionProps: React.HTMLAttributes<Element>;
   loading?: boolean | (() => JSX.Element);
@@ -33,7 +32,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     selectedOptions = [],
     getOptionLabel,
     getOptionValue,
-    contrast = false,
     positionProps,
     horizontalLayout = false,
     loading,
@@ -95,7 +93,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={
-        Css.bgWhite.br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(contrast).bgGray700.if(horizontalLayout).w50.onHover
+        Css.bgColor(Tokens.PopoverSurface).br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(horizontalLayout).w50.onHover
           .bshHover.$
       }
       ref={listBoxRef}
@@ -126,7 +124,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
               key={section.key}
               section={section}
               state={state}
-              contrast={contrast}
               onListHeightChange={onListHeightChange}
               popoverHeight={popoverHeight}
               // Only scroll on focus if using VirtualFocus (used for ComboBoxState (SelectField), but not SelectState (ChipSelectField))
@@ -139,7 +136,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
             state={state}
             items={[...state.collection]}
             onListHeightChange={onListHeightChange}
-            contrast={contrast}
             // Only scroll on focus if using VirtualFocus (used for ComboBoxState (SelectField), but not SelectState (ChipSelectField))
             scrollOnFocus={(props as any).shouldUseVirtualFocus}
             loading={loading}

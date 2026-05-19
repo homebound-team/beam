@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { Css, IconButton, IconButtonProps, Icons, Palette } from "src";
+import { ContrastScope, Css, IconButton, IconButtonProps, Icons, Palette } from "src";
 import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -16,6 +16,7 @@ export default {
   argTypes: {
     icon: { control: { type: "select", options: Object.keys(Icons) } },
     autoFocus: { control: false },
+    storyContrast: { control: false },
   },
 
   parameters: {
@@ -30,16 +31,19 @@ export default {
       value: "white",
     },
   },
-} as Meta<IconButtonProps>;
+} as Meta<IconButtonProps & { storyContrast?: boolean }>;
 
-function Template(args: IconButtonProps) {
-  return (
-    <div css={Css.if(!!args.contrast).bgGray800.white.$}>
+type IconButtonStoryArgs = IconButtonProps & { storyContrast?: boolean };
+
+function Template(args: IconButtonStoryArgs) {
+  const { storyContrast = false, ...iconArgs } = args;
+  const surface = (
+    <div css={Css.if(storyContrast).bgGray800.white.$}>
       <h1 css={Css.xl2.mbPx(30).$}>Icon Only Button</h1>
       <div css={Css.df.gapPx(90).$}>
         <div>
           <h2>Default</h2>
-          <IconButton {...args} />
+          <IconButton {...iconArgs} />
         </div>
         <div>
           <h2>Hover</h2>
@@ -47,27 +51,28 @@ function Template(args: IconButtonProps) {
         </div>
         <div>
           <h2>Focused</h2>
-          <IconButton {...args} autoFocus />
+          <IconButton {...iconArgs} autoFocus />
         </div>
         <div>
           <h2>Active</h2>
-          <IconButton {...args} active />
+          <IconButton {...iconArgs} active />
         </div>
         <div>
           <h2>Disabled</h2>
-          <IconButton {...args} disabled="Disabled reason" />
+          <IconButton {...iconArgs} disabled="Disabled reason" />
         </div>
         <div>
           <h2>Colored</h2>
-          <IconButton {...args} color={Palette.Red700} />
+          <IconButton {...iconArgs} color={Palette.Red700} />
         </div>
         <div>
           <h2>Labeled</h2>
-          <IconButton {...args} label="Download" />
+          <IconButton {...iconArgs} label="Download" />
         </div>
       </div>
     </div>
   );
+  return storyContrast ? <ContrastScope>{surface}</ContrastScope> : surface;
 }
 export const Regular = Template.bind({});
 
@@ -77,7 +82,7 @@ Compact.args = { compact: true };
 
 export const Contrast = Template.bind({});
 // @ts-ignore
-Contrast.args = { contrast: true };
+Contrast.args = { storyContrast: true };
 
 export const Circle = Template.bind({});
 // @ts-ignore
@@ -134,13 +139,15 @@ export function IconButtonLink() {
 }
 
 /** Hover styled version of the IconButton — uses a scoped stylesheet to force hover styles for visual testing. */
-function HoveredIconButton(args: IconButtonProps) {
-  const bg = args.contrast ? Palette.Gray700 : args.circle ? Palette.Blue100 : Palette.Gray200;
-  const borderColor = args.circle ? Palette.Blue200 : undefined;
-  return (
+function HoveredIconButton(args: IconButtonStoryArgs) {
+  const { storyContrast = false, circle, ...iconArgs } = args;
+  const bg = storyContrast ? Palette.Gray700 : circle ? Palette.Blue100 : Palette.Gray200;
+  const borderColor = circle ? Palette.Blue200 : undefined;
+  const hoverBlock = (
     <div className="hovered-icon-button">
       <style>{`.hovered-icon-button button { background-color: ${bg};${borderColor ? ` border-color: ${borderColor};` : ""} }`}</style>
-      <IconButton {...args} active={args.circle} />
+      <IconButton {...iconArgs} circle={circle} active={circle} />
     </div>
   );
+  return storyContrast ? <ContrastScope>{hoverBlock}</ContrastScope> : hoverBlock;
 }

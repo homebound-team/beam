@@ -15,7 +15,7 @@ import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
-interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "contrast" | "inc"> {}
+interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "inc"> {}
 interface AvatarButtonTriggerProps extends Pick<AvatarButtonProps, "src" | "name" | "size"> {}
 interface NavLinkButtonTriggerProps extends Pick<NavLinkProps, "active" | "variant" | "icon"> {
   navLabel: string;
@@ -41,7 +41,6 @@ export interface OverlayTriggerProps {
   variant?: ButtonVariant;
   hideEndAdornment?: boolean;
   showActiveBorder?: boolean;
-  contrast?: boolean;
 }
 
 // FIXME: The `popover` doesn't automatically get focus in all use cases so we cant tab through inputs/buttons immediately without
@@ -60,7 +59,6 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
     variant,
     hideEndAdornment,
     showActiveBorder = false,
-    contrast = false,
   } = props;
   // react-aria v3.33+ changed useMenuTrigger so that mouse/virtual clicks call state.open() instead
   // of state.toggle(), breaking click-to-close behavior (specifically for our rtl-utils `click(...)`
@@ -115,7 +113,6 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
       {isTextButton(trigger) ? (
         <Button
           variant={variant ? variant : "secondary"}
-          contrast={contrast}
           {...trigger}
           menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
@@ -131,7 +128,6 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           {...trigger}
           label={trigger.navLabel}
           disabled={!!disabled}
-          contrast={contrast}
           menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
           {...tid}

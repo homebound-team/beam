@@ -60,8 +60,6 @@ export type TreeSelectFieldProps<O, V extends Value> = {
   sizeToContent?: boolean;
   /** The text to show when nothing is selected, i.e. could be "All" for filters. */
   nothingSelectedText?: string;
-  /** When set the SelectField is expected to be put on a darker background */
-  contrast?: boolean;
   /** Placeholder content */
   placeholder?: string;
   hideErrorMessage?: boolean;
@@ -166,7 +164,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     readOnly,
     labelStyle,
     borderless,
-    contrast = false,
     nothingSelectedText = "",
     onSelect,
     defaultCollapsed: _defaultCollapsed = false,
@@ -640,7 +637,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         selectedOptionsLabels={fieldState.selectedOptionsLabels}
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
-        contrast={contrast}
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
@@ -665,7 +661,6 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             selectedOptions={fieldState.selectedChipOptions}
             getOptionLabel={getOptionLabel}
             getOptionValue={(o) => valueToKey(getOptionValue(o))}
-            contrast={contrast}
             horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
             allowCollapsing={fieldState.allowCollapsing}

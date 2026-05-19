@@ -3,13 +3,13 @@ import { ReactNode, RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
-import { Css, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamFocusableProps } from "src/interfaces";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { Icon } from "./Icon";
 
-export interface NavLinkProps extends BeamFocusableProps {
+export type NavLinkProps = {
   /** active indicates the user is on the current page */
   active?: boolean;
   disabled?: boolean;
@@ -19,24 +19,15 @@ export interface NavLinkProps extends BeamFocusableProps {
   icon?: IconKey;
   variant: NavLinkVariant;
   openInNew?: boolean;
-  contrast?: boolean;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLElement>;
-}
+} & BeamFocusableProps;
 
 type NavLinkVariant = "side" | "global";
 
 export function NavLink(props: NavLinkProps) {
-  const {
-    disabled: isDisabled,
-    label,
-    openInNew,
-    contrast = false,
-    menuTriggerProps,
-    buttonRef,
-    ...otherProps
-  } = props;
+  const { disabled: isDisabled, label, openInNew, menuTriggerProps, buttonRef, ...otherProps } = props;
   const ariaProps = { children: label, isDisabled, ...menuTriggerProps, ...otherProps };
   const { href, active = false, icon = false, variant } = ariaProps;
   const ref = useGetRef(buttonRef);
@@ -45,8 +36,8 @@ export function NavLink(props: NavLinkProps) {
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
 
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(
-    () => getNavLinkStyles(variant, contrast),
-    [variant, contrast],
+    () => getNavLinkStyles(variant),
+    [variant],
   );
 
   const linkAttributes = {
@@ -83,13 +74,13 @@ export function NavLink(props: NavLinkProps) {
   );
 }
 
-export function getNavLinkStyles(variant: NavLinkVariant, contrast: boolean) {
-  return navLinkVariantStyles(contrast)[variant];
+export function getNavLinkStyles(variant: NavLinkVariant) {
+  return navLinkVariantStyles[variant];
 }
 
 const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smSb.outline0.$;
 
-const navLinkVariantStyles: (contrast: boolean) => Record<
+const navLinkVariantStyles: Record<
   NavLinkVariant,
   {
     baseStyles: Properties;
@@ -99,14 +90,14 @@ const navLinkVariantStyles: (contrast: boolean) => Record<
     activeStyles: Properties;
     pressedStyles: Properties;
   }
-> = (contrast) => ({
+> = {
   side: {
-    baseStyles: { ...baseStyles, ...Css.gray700.if(contrast).gray600.$ },
-    activeStyles: Css.blue700.bgBlue50.if(contrast).white.bgGray700.$,
-    disabledStyles: Css.gray400.cursorNotAllowed.if(contrast).gray800.$,
-    focusRingStyles: Css.bgBlue50.bshFocus.if(contrast).bgGray700.white.$,
-    hoverStyles: Css.gray700.bgGray100.if(contrast).bgGray800.gray600.$,
-    pressedStyles: Css.gray700.bgGray200.if(contrast).bgGray200.gray800.$,
+    baseStyles: { ...baseStyles, ...Css.color(Tokens.NavText).$ },
+    activeStyles: Css.color(Tokens.NavTextActive).bgColor(Tokens.NavItemBgActive).$,
+    disabledStyles: Css.color(Tokens.NavTextDisabled).cursorNotAllowed.$,
+    focusRingStyles: Css.color(Tokens.NavTextFocusVisible).bgColor(Tokens.NavItemBgActive).bshFocus.$,
+    hoverStyles: Css.color(Tokens.NavText).bgColor(Tokens.NavItemBgHover).$,
+    pressedStyles: Css.color(Tokens.NavTextPressed).bgColor(Tokens.NavItemBgPressed).$,
   },
   global: {
     baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.$ },
@@ -119,4 +110,4 @@ const navLinkVariantStyles: (contrast: boolean) => Record<
     hoverStyles: Css.gray500.bgGray900.$,
     pressedStyles: Css.gray500.bgGray700.$,
   },
-});
+};

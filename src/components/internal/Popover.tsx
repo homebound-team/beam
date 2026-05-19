@@ -1,5 +1,6 @@
 import React, { MutableRefObject } from "react";
 import { DismissButton, OverlayContainer, useOverlay } from "react-aria";
+import { contrastDataTheme, useContrastScope } from "src/components/ContrastScope";
 
 interface PopoverProps extends React.PropsWithChildren<any> {
   triggerRef: MutableRefObject<HTMLElement | null>;
@@ -12,6 +13,7 @@ interface PopoverProps extends React.PropsWithChildren<any> {
 /** Popover is used for generating menus and list-boxes */
 export function Popover(props: PopoverProps) {
   const { triggerRef, popoverRef, positionProps, children, onClose, isOpen, ...others } = props;
+  const contrastScopeActive = useContrastScope();
   const { overlayProps } = useOverlay(
     {
       onClose,
@@ -38,7 +40,11 @@ export function Popover(props: PopoverProps) {
 
   return (
     <OverlayContainer>
-      <div {...{ ...overlayProps, ...positionProps }} ref={popoverRef}>
+      <div
+        {...{ ...overlayProps, ...positionProps }}
+        ref={popoverRef}
+        data-theme={contrastScopeActive ? contrastDataTheme : undefined}
+      >
         {children}
         <DismissButton onDismiss={() => onClose()} />
       </div>

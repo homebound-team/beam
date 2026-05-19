@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
+import { ContrastScope, GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { InputStylePalette } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
@@ -22,9 +22,11 @@ export default {
   },
   argTypes: {
     compact: { control: false },
-    contrast: { control: false },
+    contrastStory: { control: false },
   },
 } as Meta;
+
+type SelectFieldStoryArgs = SelectFieldProps<any, any> & { contrastStory?: boolean };
 
 type TestOption = {
   id: string;
@@ -69,16 +71,17 @@ const autoSortOptions: TestOption[] = [
   { id: "5", name: "Banana" },
 ];
 
-function Template(args: SelectFieldProps<any, any>) {
+function Template(args: SelectFieldStoryArgs) {
+  const { contrastStory, ...fieldArgs } = args;
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
-  const options = (args?.options as TestOption[]) ?? standardOptions;
+  const options = (fieldArgs?.options as TestOption[]) ?? standardOptions;
 
-  return (
-    <div css={Css.df.fdc.gap5.p2.if(args.contrast === true).white.bgGray800.$}>
+  const surface = (
+    <div css={Css.df.fdc.gap5.p2.if(contrastStory === true).white.bgGray800.$}>
       <div css={Css.df.fdc.gap2.$}>
-        <h1 css={Css.lg.$}>{args.compact ? "Compact" : "Regular"}</h1>
+        <h1 css={Css.lg.$}>{fieldArgs.compact ? "Compact" : "Regular"}</h1>
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Auto Sort - Default"
           required={true}
           value={autoSortOptions[0].id}
@@ -86,7 +89,7 @@ function Template(args: SelectFieldProps<any, any>) {
           unsetLabel="N/A"
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Auto Sort - False"
           required={true}
           value={autoSortOptions[2].id}
@@ -95,7 +98,7 @@ function Template(args: SelectFieldProps<any, any>) {
           autoSort={false}
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Favorite Icon"
           required={true}
           value={options[2].id}
@@ -113,7 +116,7 @@ function Template(args: SelectFieldProps<any, any>) {
           )}
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Favorite Icon - with field decoration"
           options={options}
           fieldDecoration={(o) => o.icon && <Icon icon={o.icon} />}
@@ -130,14 +133,14 @@ function Template(args: SelectFieldProps<any, any>) {
           )}
         />
         <TestSelectField<TestOption, string>
-          {...args}
+          {...fieldArgs}
           label="Favorite Icon - Disabled"
           value={undefined}
           options={options}
           disabled="Disabled reason"
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Favorite Icon - Read Only"
           options={options}
           value={options[2].id}
@@ -145,7 +148,7 @@ function Template(args: SelectFieldProps<any, any>) {
           readOnly="Read only reason"
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="With Placeholder"
           value={undefined}
           options={options}
@@ -161,22 +164,28 @@ function Template(args: SelectFieldProps<any, any>) {
             </div>
           )}
         />
-        <TestSelectField {...args} label="Favorite Icon - Read Only" options={options} value={options[2].id} readOnly />
+        <TestSelectField
+          {...fieldArgs}
+          label="Favorite Icon - Read Only"
+          options={options}
+          value={options[2].id}
+          readOnly
+        />
         <TestSelectField<TestOption, string>
-          {...args}
+          {...fieldArgs}
           label="Favorite Icon - Invalid"
           value={undefined}
           options={options}
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Favorite Icon - Helper Text"
           value={options[0].id}
           options={options}
           helperText="Some really long helper text that we expect to wrap."
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Favorite Number - Numeric"
           value={1}
           options={optionsWithNumericIds}
@@ -184,7 +193,7 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionLabel={(o) => o.name}
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Is Available - Boolean"
           value={false}
           options={booleanOptions}
@@ -192,7 +201,7 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionLabel={(o) => o.label}
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Has 'unselect' option"
           value={undefined}
           options={[{ id: undefined, name: "No Selection", icon: "x" }, ...options]}
@@ -200,7 +209,7 @@ function Template(args: SelectFieldProps<any, any>) {
           getOptionLabel={(o) => o.name}
         />
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Inline Label"
           labelStyle="inline"
           value={undefined}
@@ -210,7 +219,7 @@ function Template(args: SelectFieldProps<any, any>) {
         />
         <p>(SelectField with hidden label below)</p>
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Hidden Label"
           labelStyle="hidden"
           value={undefined}
@@ -220,7 +229,7 @@ function Template(args: SelectFieldProps<any, any>) {
         />
         <p>(Omit Error Message)</p>
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Hidden Label"
           labelStyle="hidden"
           value={undefined}
@@ -231,7 +240,7 @@ function Template(args: SelectFieldProps<any, any>) {
         />
 
         <TestSelectField
-          {...args}
+          {...fieldArgs}
           label="Disabled Options"
           value={options[2].id}
           options={options}
@@ -239,15 +248,17 @@ function Template(args: SelectFieldProps<any, any>) {
           helperText="Disabled options can optionally have tooltip text"
         />
 
-        <TestSelectField {...args} fullWidth label="Full Width" value={options[2].id} options={options} />
+        <TestSelectField {...fieldArgs} fullWidth label="Full Width" value={options[2].id} options={options} />
       </div>
 
       <div css={Css.df.fdc.gap2.$}>
         <h1 css={Css.lg.$}>Load test, 1000 Options</h1>
-        <TestSelectField {...args} label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />
+        <TestSelectField {...fieldArgs} label="Project" value={loadTestOptions[2].id} options={loadTestOptions} />
       </div>
     </div>
   );
+
+  return contrastStory ? <ContrastScope>{surface}</ContrastScope> : surface;
 }
 
 export const Regular = Template.bind({});
@@ -258,7 +269,7 @@ Compact.args = { compact: true };
 
 export const Contrast = Template.bind({});
 // @ts-ignore
-Contrast.args = { compact: true, contrast: true };
+Contrast.args = { compact: true, contrastStory: true };
 
 // @ts-ignore
 function getInputStylePalette(v): InputStylePalette | undefined {
@@ -276,7 +287,7 @@ Colored.args = { options: coloredOptions };
 export const ColoredContrast = Template.bind({});
 // @ts-ignore
 ColoredContrast.args = {
-  contrast: true,
+  contrastStory: true,
   options: coloredOptions,
 };
 

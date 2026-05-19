@@ -10,14 +10,14 @@ import React, {
   useState,
 } from "react";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
-import { Icon, IconButton, maybeTooltip } from "src/components";
+import { Icon, IconButton, maybeTooltip, useContrastScope } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
 import { BorderHoverChild } from "src/components/Table/components/Row";
 // Side-effect import: injects CSS for the border-hover-on-row pattern
 import "src/components/Table/components/Row.css.ts";
-import { Css, increment, Only, Palette } from "src/Css";
+import { Css, increment, Only, Palette, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
@@ -35,7 +35,6 @@ export type TextFieldBaseProps<X> = {
   groupProps?: NumberFieldAria["groupProps"];
   endAdornment?: ReactNode;
   startAdornment?: ReactNode;
-  contrast?: boolean;
   clearable?: boolean;
   // TextArea specific
   textAreaMinHeight?: number;
@@ -92,7 +91,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     endAdornment,
     startAdornment,
     labelStyle = fieldProps?.labelStyle ?? "above",
-    contrast = false,
     borderless = fieldProps?.borderless ?? false,
     borderOnHover = fieldProps?.borderOnHover ?? false,
     textAreaMinHeight = 96,
@@ -118,6 +116,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
   const fieldRef = useGetRef(inputRef);
+  const contrastScopeActive = useContrastScope();
 
   const maybeSmaller = compound ? 2 : 0;
   const fieldHeight = 40;
@@ -125,24 +124,25 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   const [bgColor, hoverBgColor, disabledBgColor] = inputStylePalette
     ? getInputStylePalette(inputStylePalette)
-    : contrast
-      ? [Palette.Gray700, Palette.Gray600, Palette.Gray700]
-      : borderOnHover
-        ? // Use transparent backgrounds to blend with the table row hover color
-          [Palette.Transparent, Palette.Blue100, Palette.Gray100]
-        : borderless && !compound
-          ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-          : [Palette.White, Palette.Gray100, Palette.Gray100];
+    : borderOnHover
+      ? // Use transparent backgrounds to blend with the table row hover color
+        [Palette.Transparent, Palette.Blue100, Palette.Gray100]
+      : borderless && !compound
+        ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+        : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 
   const fieldStyles = {
-    container: Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
+    container: {
+      ...Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
+    },
     inputWrapper: {
       ...Css.typography(typeScale)
         .df.aic.br8.pxPx(textFieldBasePadding)
         .w100.bgColor(bgColor)
-        .gray900.if(contrast && !inputStylePalette)
+        .color(Tokens.OnSurface)
+        .if(!inputStylePalette && contrastScopeActive)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
@@ -151,7 +151,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       // Note: Do not modify width and position of 'compound' fields.
       ...(borderless && !compound
         ? Css.bcTransparent.w("calc(100% + 16px)").ml(-1).$
-        : Css.bcGray300.if(contrast).bcGray700.$),
+        : Css.bc(Tokens.FieldBorderDefault).$),
       // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
       ...(!compound ? Css.ba.$ : {}),
       ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
@@ -169,7 +169,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     // Border-hover-on-row styling is handled by Row.css.ts (imported above as a side-effect)
     inputWrapperReadOnly: {
       ...Css.typography(typeScale)
-        .df.aic.w100.gray900.if(contrast && !inputStylePalette)
+        .df.aic.w100.color(Tokens.OnSurface)
+        .if(!inputStylePalette && contrastScopeActive)
         .white.if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
@@ -179,18 +180,21 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           .mhPx(compactFieldHeight - maybeSmaller).$),
     },
     input: {
-      ...Css.w100.mw0.outline0.fg1.bgTransparent.if(contrast && !inputStylePalette).element("::selection").bgGray800.$,
+      ...Css.w100.mw0.outline0.fg1.bgTransparent
+        .if(!inputStylePalette)
+        .element("::selection")
+        .bgColor(Tokens.TextSelection).$,
       // For "multiline" fields we add top and bottom padding of 7px for compact, or 11px for non-compact, to properly match the height of the single line fields
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$
         : Css.truncate.$),
     },
-    hover: Css.bgColor(hoverBgColor).if(contrast).bcGray600.$,
-    focus: Css.bcBlue700.bgColor(hoverBgColor).if(contrast).bcBlue500.if(borderOnHover).bcBlue500.$,
+    hover: Css.bgColor(hoverBgColor).bc(Tokens.FieldBorderHover).$,
+    focus: Css.bc(Tokens.FieldBorderFocus).bgColor(hoverBgColor).if(borderOnHover).bc(Tokens.FieldBorderFocus).$,
     disabled: visuallyDisabled
-      ? Css.cursorNotAllowed.gray600.bgColor(disabledBgColor).if(contrast).gray500.$
+      ? Css.cursorNotAllowed.color(Tokens.FieldTextDisabled).bgColor(disabledBgColor).$
       : Css.cursorNotAllowed.$,
-    error: Css.bcRed600.if(contrast).bcRed400.$,
+    error: Css.bc(Tokens.FieldBorderError).$,
   };
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
@@ -242,7 +246,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             label={label}
             inline={labelStyle !== "above"}
             suffix={labelSuffix}
-            contrast={contrast}
             {...tid.label}
           />
         )}

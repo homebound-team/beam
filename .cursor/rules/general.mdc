@@ -13,6 +13,8 @@ alwaysApply: true
 - Styles are generated via the `@homebound/truss` library
 - Style properties are defined in the generated @Css.ts file
   - ALWAYS check [Css.ts](mdc:src/Css.ts) for the correct property names and available methods
+- **Design tokens:** Edit [`tokens/tokens.json`](mdc:tokens/tokens.json) per [`tokens/README.md`](mdc:tokens/README.md). After changes: `yarn generate:design-tokens`, `yarn validate:tokens`. CI runs validate then `check:token-drift` before build — see [`AGENTS.md`](mdc:AGENTS.md).
+- **Linting:** After editing files under `src/`, run `yarn lint:fix:files` with those paths (see [`AGENTS.md`](mdc:AGENTS.md)). Before a PR, run `yarn lint:ci` so CI’s ESLint job matches local.
 
 ## Type Safety
 - Utilize TypeScript's features to ensure type safety.

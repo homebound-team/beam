@@ -1,12 +1,13 @@
-// prettier-ignore
+/**
+ * AUTO-GENERATED — do not edit by hand. Source: tokens/tokens.json.
+ * Run yarn generate:design-tokens, yarn build, or yarn build:truss.
+ */
+
 // Use rgba() for colors as Beam may attempt to modify opacity values in some components (e.g. ScrollShadows)
 export const palette = {
-  // Primary Palette
-  White:        'rgba(255,255,255,1)',
+  White:  'rgba(255, 255, 255, 1)',
   Transparent:  'rgba(0,0,0,0)',
-
-  // Extended Palette
-  Gray50:   'rgba(255, 253, 253, 1)',
+  Gray50:  'rgba(255, 253, 253, 1)',
   Gray100:  'rgba(247, 245, 245, 1)',
   Gray200:  'rgba(236, 235, 235, 1)',
   Gray300:  'rgba(221, 220, 220, 1)',
@@ -16,8 +17,7 @@ export const palette = {
   Gray700:  'rgba(100, 100, 100, 1)',
   Gray800:  'rgba(53, 53, 53, 1)',
   Gray900:  'rgba(36, 36, 36, 1)',
-
-  Blue50:   'rgba(239, 246, 255, 1)',
+  Blue50:  'rgba(239, 246, 255, 1)',
   Blue100:  'rgba(219, 234, 254, 1)',
   Blue200:  'rgba(191, 219, 254, 1)',
   Blue300:  'rgba(147, 197, 253, 1)',
@@ -27,8 +27,7 @@ export const palette = {
   Blue700:  'rgba(29, 78, 216, 1)',
   Blue800:  'rgba(30, 64, 175, 1)',
   Blue900:  'rgba(30, 58, 138, 1)',
-
-  Red50:   'rgba(254, 242, 242, 1)',
+  Red50:  'rgba(254, 242, 242, 1)',
   Red100:  'rgba(254, 226, 226, 1)',
   Red200:  'rgba(254, 202, 202, 1)',
   Red300:  'rgba(252, 165, 165, 1)',
@@ -38,8 +37,7 @@ export const palette = {
   Red700:  'rgba(185, 28, 28, 1)',
   Red800:  'rgba(153, 27, 27, 1)',
   Red900:  'rgba(127, 29, 29, 1)',
-
-  Yellow50:   'rgba(254, 252, 232, 1)',
+  Yellow50:  'rgba(254, 252, 232, 1)',
   Yellow100:  'rgba(254, 249, 195, 1)',
   Yellow200:  'rgba(254, 240, 138, 1)',
   Yellow300:  'rgba(253, 224, 71, 1)',
@@ -49,8 +47,7 @@ export const palette = {
   Yellow700:  'rgba(161, 98, 7, 1)',
   Yellow800:  'rgba(133, 77, 14, 1)',
   Yellow900:  'rgba(113, 63, 18, 1)',
-
-  Green50:   'rgba(236, 253, 245, 1)',
+  Green50:  'rgba(236, 253, 245, 1)',
   Green100:  'rgba(209, 250, 229, 1)',
   Green200:  'rgba(167, 243, 208, 1)',
   Green300:  'rgba(110, 231, 183, 1)',
@@ -60,26 +57,24 @@ export const palette = {
   Green700:  'rgba(4, 120, 87, 1)',
   Green800:  'rgba(6, 95, 70, 1)',
   Green900:  'rgba(6, 78, 59, 1)',
-
-  Purple50:     'rgba(245, 243, 255, 1)',
-  Purple100:    'rgba(237, 233, 254, 1)',
-  Purple200:    'rgba(221, 214, 254, 1)',
-  Purple300:    'rgba(196, 181, 253, 1)',
-  Purple400:    'rgba(167, 139, 250, 1)',
-  Purple500:    'rgba(139, 92, 246, 1)',
-  Purple600:    'rgba(124, 58, 237, 1)',
-  Purple700:    'rgba(109, 40, 217, 1)',
-  Purple800:    'rgba(91, 33, 182, 1)',
-  Purple900:    'rgba(76, 29, 149, 1)',
-
-  Orange50:     'rgba(255, 247, 237, 1)',
-  Orange100:    'rgba(255, 237, 213, 1)',
-  Orange200:    'rgba(254, 215, 170, 1)',
-  Orange300:    'rgba(253, 186, 116, 1)',
-  Orange400:    'rgba(251, 146, 60, 1)',
-  Orange500:    'rgba(249, 115, 22, 1)',
-  Orange600:    'rgba(234, 88, 12, 1)',
-  Orange700:    'rgba(194, 65, 12, 1)',
-  Orange800:    'rgba(154, 52, 18, 1)',
-  Orange900:    'rgba(124, 45, 18, 1)',
+  Purple50:  'rgba(245, 243, 255, 1)',
+  Purple100:  'rgba(237, 233, 254, 1)',
+  Purple200:  'rgba(221, 214, 254, 1)',
+  Purple300:  'rgba(196, 181, 253, 1)',
+  Purple400:  'rgba(167, 139, 250, 1)',
+  Purple500:  'rgba(139, 92, 246, 1)',
+  Purple600:  'rgba(124, 58, 237, 1)',
+  Purple700:  'rgba(109, 40, 217, 1)',
+  Purple800:  'rgba(91, 33, 182, 1)',
+  Purple900:  'rgba(76, 29, 149, 1)',
+  Orange50:  'rgba(255, 247, 237, 1)',
+  Orange100:  'rgba(255, 237, 213, 1)',
+  Orange200:  'rgba(254, 215, 170, 1)',
+  Orange300:  'rgba(253, 186, 116, 1)',
+  Orange400:  'rgba(251, 146, 60, 1)',
+  Orange500:  'rgba(249, 115, 22, 1)',
+  Orange600:  'rgba(234, 88, 12, 1)',
+  Orange700:  'rgba(194, 65, 12, 1)',
+  Orange800:  'rgba(154, 52, 18, 1)',
+  Orange900:  'rgba(124, 45, 18, 1)',
 };

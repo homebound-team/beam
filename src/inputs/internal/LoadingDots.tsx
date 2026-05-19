@@ -1,11 +1,11 @@
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export function LoadingDots({ contrast }: { contrast: boolean }) {
+export function LoadingDots() {
   const dotCss = Css.hPx(8)
     .wPx(8)
-    .br4.bgColor(contrast ? Palette.Gray500 : Palette.Gray300)
-    .add("animationName", contrast ? "loadingDotsContrast" : "loadingDots")
+    .br4.bgColor(Tokens.OnSurfaceMuted)
+    .add("animationName", "loadingDots")
     .add("animationDuration", "800ms")
     .add("animationIterationCount", "infinite")
     .add("animationTimingFunction", "linear")

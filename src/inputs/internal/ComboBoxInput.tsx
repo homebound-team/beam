@@ -11,7 +11,7 @@ import { mergeProps } from "react-aria";
 import { ComboBoxState } from "react-stately";
 import { Chips, CountBadge, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -40,7 +40,6 @@ type ComboBoxInputProps<O, V extends Value> = {
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
   sizeToContent?: boolean;
-  contrast?: boolean;
   nothingSelectedText: string;
   tooltip?: ReactNode;
   resetField: VoidFunction;
@@ -65,7 +64,6 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     getOptionValue,
     getOptionLabel,
     sizeToContent = false,
-    contrast = false,
     nothingSelectedText,
     resetField,
     isTree,
@@ -115,7 +113,6 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
-      contrast={contrast}
       xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : undefined}
       startAdornment={
         (showNumSelection && (
@@ -132,8 +129,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
             disabled={inputProps.disabled}
             ref={buttonRef}
             css={{
-              ...Css.br4.outline0.gray700.if(contrast).gray400.$,
-              ...(inputProps.disabled ? Css.cursorNotAllowed.gray400.if(contrast).gray600.$ : {}),
+              ...Css.br4.outline0.color(Tokens.TextPlaceholder).$,
+              ...(inputProps.disabled ? Css.cursorNotAllowed.color(Tokens.FieldTextDisabled).$ : {}),
             }}
             data-testid="toggleListBox"
           >

@@ -4,27 +4,26 @@ import { mergeProps, useHover, useOption } from "react-aria";
 import { ListState, TreeState } from "react-stately";
 import { maybeTooltip } from "src/components";
 import { Icon } from "src/components/Icon";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { isPersistentKey } from "src/inputs/ChipSelectField";
 
-interface OptionProps<O> {
+type OptionProps<O> = {
   item: Node<O>;
   state: ListState<O> | TreeState<O>;
-  contrast?: boolean;
   scrollToIndex?: (index: number) => void;
   disabledReason?: string;
-}
+};
 /** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
 export function Option<O>(props: OptionProps<O>) {
-  const { item, state, contrast = false, scrollToIndex, disabledReason } = props;
+  const { item, state, scrollToIndex, disabledReason } = props;
   const ref = useRef<HTMLLIElement>(null);
   const { hoverProps, isHovered } = useHover({});
 
   const themeStyles = {
-    item: Css.gray900.if(contrast).white.$,
-    hover: Css.bgGray100.if(contrast).bgGray600.$,
-    disabled: Css.cursorNotAllowed.gray400.if(contrast).gray500.$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px ${!contrast ? Palette.Blue700 : Palette.Blue500}`).$,
+    item: Css.color(Tokens.OnSurface).$,
+    hover: Css.bgColor(Tokens.ListRowBgHover).$,
+    disabled: Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$,
   };
 
   // Get props for the option element.
@@ -56,18 +55,7 @@ export function Option<O>(props: OptionProps<O>) {
         {item.rendered}
         {isSelected && (
           <span css={Css.fs0.$}>
-            <Icon
-              icon="check"
-              color={
-                !contrast
-                  ? isDisabled
-                    ? Palette.Gray400
-                    : Palette.Blue700
-                  : isDisabled
-                    ? Palette.Gray500
-                    : Palette.White
-              }
-            />
+            <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
           </span>
         )}
       </li>

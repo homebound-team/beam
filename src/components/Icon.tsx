@@ -1,20 +1,22 @@
 import { DOMProps } from "@react-types/shared";
 import React, { AriaAttributes, ReactNode } from "react";
+import { BeamColor } from "src/colors";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, increment, Margin, Palette, Xss } from "src/Css";
+import { Css, increment, Margin, Xss } from "src/Css";
 
-export interface IconProps extends AriaAttributes, DOMProps {
+export type IconProps = {
   /** The name of an icon */
   icon: IconKey;
   /** Defaults to currentColor */
-  color?: Palette | "inherit" | "currentColor";
-  bgColor?: Palette;
+  color?: BeamColor;
+  bgColor?: BeamColor;
   /** The size of the icon in increments, i.e. 1 == 8px, default is 3 == 24px. */
   inc?: number;
   /** Styles overrides */
   xss?: Xss<Margin | "visibility" | "flexShrink">;
   tooltip?: ReactNode;
-}
+} & AriaAttributes &
+  DOMProps;
 
 export const Icon = React.memo((props: IconProps) => {
   const { icon, inc = 3, color = "currentColor", bgColor, xss, tooltip, ...other } = props;

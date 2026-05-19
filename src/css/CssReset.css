@@ -19,22 +19,14 @@
   /**
  * Beam animations
  */
+  /* Opacity pulse so dot fill follows --b-on-surface-muted (ContrastScope / palette). */
   @keyframes loadingDots {
-    0% {
-      background-color: rgba(141, 141, 141, 1);
-    }
-    50%,
+    0%,
     100% {
-      background-color: rgba(221, 220, 220, 1);
+      opacity: 1;
     }
-  }
-  @keyframes loadingDotsContrast {
-    0% {
-      background-color: rgba(236, 235, 235, 1);
-    }
-    50%,
-    100% {
-      background-color: rgba(175, 175, 175, 1);
+    50% {
+      opacity: 0.35;
     }
   }
 

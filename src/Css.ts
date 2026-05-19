@@ -41,7 +41,68 @@ export type RuntimeStyles = RawCssProperties & { readonly __kind: "runtime" };
 
 export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "md" | "mdSb" | "lg" | "xl" | "xl2";
 
-export type CssSetVarKeys = `--${string}`;
+export enum Tokens {
+  ButtonCautionDisabledBg = "--b-button-caution-disabled-bg",
+  ButtonCautionDisabledFg = "--b-button-caution-disabled-fg",
+  ButtonDangerDisabledBg = "--b-button-danger-disabled-bg",
+  ButtonDangerDisabledFg = "--b-button-danger-disabled-fg",
+  ButtonGhostDisabledFg = "--b-button-ghost-disabled-fg",
+  ButtonGhostFg = "--b-button-ghost-fg",
+  ButtonPrimaryDisabledBg = "--b-button-primary-disabled-bg",
+  ButtonPrimaryDisabledFg = "--b-button-primary-disabled-fg",
+  ButtonTertiaryFg = "--b-button-tertiary-fg",
+  ButtonTertiaryFgPressed = "--b-button-tertiary-fg-pressed",
+  Danger = "--b-danger",
+  DangerPressed = "--b-danger-pressed",
+  FieldBgDefault = "--b-field-bg-default",
+  FieldBgDisabled = "--b-field-bg-disabled",
+  FieldBgHover = "--b-field-bg-hover",
+  FieldBorderDefault = "--b-field-border-default",
+  FieldBorderError = "--b-field-border-error",
+  FieldBorderFocus = "--b-field-border-focus",
+  FieldBorderHover = "--b-field-border-hover",
+  FieldTextDisabled = "--b-field-text-disabled",
+  FocusRingInset = "--b-focus-ring-inset",
+  FocusRingMuted = "--b-focus-ring-muted",
+  ListRowBgHover = "--b-list-row-bg-hover",
+  LoaderSpinner = "--b-loader-spinner",
+  LoaderTrack = "--b-loader-track",
+  MenuItemBgHover = "--b-menu-item-bg-hover",
+  NavItemBgActive = "--b-nav-item-bg-active",
+  NavItemBgHover = "--b-nav-item-bg-hover",
+  NavItemBgPressed = "--b-nav-item-bg-pressed",
+  NavText = "--b-nav-text",
+  NavTextActive = "--b-nav-text-active",
+  NavTextDisabled = "--b-nav-text-disabled",
+  NavTextFocusVisible = "--b-nav-text-focus-visible",
+  NavTextPressed = "--b-nav-text-pressed",
+  NeutralFillHoverStrong = "--b-neutral-fill-hover-strong",
+  NeutralFillHoverSubtle = "--b-neutral-fill-hover-subtle",
+  NeutralFillPressed = "--b-neutral-fill-pressed",
+  NeutralSurfacePressed = "--b-neutral-surface-pressed",
+  OnPrimary = "--b-on-primary",
+  OnSurface = "--b-on-surface",
+  OnSurfaceMuted = "--b-on-surface-muted",
+  PopoverSurface = "--b-popover-surface",
+  Primary = "--b-primary",
+  PrimaryHover = "--b-primary-hover",
+  PrimaryPressed = "--b-primary-pressed",
+  Scrim = "--b-scrim",
+  SelectionIndicator = "--b-selection-indicator",
+  StatusSuccessFg = "--b-status-success-fg",
+  Surface = "--b-surface",
+  TextDisabled = "--b-text-disabled",
+  TextHelper = "--b-text-helper",
+  TextLabel = "--b-text-label",
+  TextLinkDefault = "--b-text-link-default",
+  TextLinkDisabled = "--b-text-link-disabled",
+  TextLinkHover = "--b-text-link-hover",
+  TextLinkPressed = "--b-text-link-pressed",
+  TextPlaceholder = "--b-text-placeholder",
+  TextSelection = "--b-text-selection",
+}
+
+export type CssSetVarKeys = Tokens | `--${string}`;
 
 export type CssSetVarScalar = string | number;
 
@@ -106,9 +167,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // borderColor
-  /** Sets `borderColor: "rgba(255,255,255,1)"`. */
+  /** Sets `borderColor: "rgba(255, 255, 255, 1)"`. */
   get bcWhite() {
-    return this.add("borderColor", "rgba(255,255,255,1)");
+    return this.add("borderColor", "rgba(255, 255, 255, 1)");
   }
   /** Sets `borderColor: "rgba(0,0,0,0)"`. */
   get bcTransparent() {
@@ -490,13 +551,13 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get bshHover() {
     return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);");
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
   get bshFocus() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
   get bshDanger() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(255,255,255,1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
   }
   /** Sets `boxShadow: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"`. */
   get bshModal() {
@@ -1747,9 +1808,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // skins
-  /** Sets `color: "rgba(255,255,255,1)"`. */
+  /** Sets `color: "rgba(255, 255, 255, 1)"`. */
   get white() {
-    return this.add("color", "rgba(255,255,255,1)");
+    return this.add("color", "rgba(255, 255, 255, 1)");
   }
   /** Sets `color: "rgba(0,0,0,0)"`. */
   get transparent() {
@@ -2039,9 +2100,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   color(value: Properties["color"]) {
     return this.add("color", value);
   }
-  /** Sets `backgroundColor: "rgba(255,255,255,1)"`. */
+  /** Sets `backgroundColor: "rgba(255, 255, 255, 1)"`. */
   get bgWhite() {
-    return this.add("backgroundColor", "rgba(255,255,255,1)");
+    return this.add("backgroundColor", "rgba(255, 255, 255, 1)");
   }
   /** Sets `backgroundColor: "rgba(0,0,0,0)"`. */
   get bgTransparent() {
@@ -2331,9 +2392,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   bgColor(value: Properties["backgroundColor"]) {
     return this.add("backgroundColor", value);
   }
-  /** Sets `fill: "rgba(255,255,255,1)"`. */
+  /** Sets `fill: "rgba(255, 255, 255, 1)"`. */
   get fWhite() {
-    return this.add("fill", "rgba(255,255,255,1)");
+    return this.add("fill", "rgba(255, 255, 255, 1)");
   }
   /** Sets `fill: "rgba(0,0,0,0)"`. */
   get fTransparent() {
@@ -4029,7 +4090,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
       return this;
     }
 
-    const newRules = typeof propOrStyles === "string" ? { [propOrStyles]: value } : propOrStyles;
+    const newRules = typeof propOrStyles === "string"
+      ? { [propOrStyles]: maybeCssVar(value) }
+      : maybeCssVarValues(propOrStyles as Record<string, unknown>);
     if (typeof propOrStyles !== "string" && (newRules as any).$css) {
       throw new Error("add() received a Css expression — use with() to compose Css expressions");
     }
@@ -4046,7 +4109,7 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
       return this;
     }
     const { $css, ...rest } = cssProp as any;
-    const filtered = omitUndefinedValues(rest);
+    const filtered = maybeCssVarValues(omitUndefinedValues(rest));
     const rules = this.selector
       ? { ...this.rules, [this.selector]: { ...(this.rules as any)[this.selector], ...filtered } }
       : { ...this.rules, ...filtered };
@@ -4103,6 +4166,21 @@ export function maybeInc(inc: number | string): string {
   return typeof inc === "string" ? inc : `calc(var(--t-spacing) * ${inc})`;
 }
 
+/** Wraps `--token` custom property names as `var(--token)` for CSS property values. */
+export function maybeCssVar<T>(value: T): T {
+  if (typeof value !== "string") {
+    return value;
+  }
+  if (value.startsWith("--")) {
+    return `var(${value})` as T;
+  }
+  return value;
+}
+
+function maybeCssVarValues<O extends Record<string, unknown>>(obj: O): O {
+  return Object.fromEntries(Object.entries(obj).map(([key, val]) => [key, maybeCssVar(val)])) as O;
+}
+
 /** Converts `inc` into pixels. */
 export function increment(inc: number): number {
   return inc * 8;
@@ -4121,7 +4199,7 @@ function omitUndefinedValues<T extends object>(value: T): T {
 }
 
 export enum Palette {
-  White = "rgba(255,255,255,1)",
+  White = "rgba(255, 255, 255, 1)",
   Transparent = "rgba(0,0,0,0)",
   Gray50 = "rgba(255, 253, 253, 1)",
   Gray100 = "rgba(247, 245, 245, 1)",
