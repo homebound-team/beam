@@ -67,8 +67,8 @@
     "react-aria": "^3.47.0",
     "react-day-picker": "8.0.7",
     "react-popper": "^2.3.0",
-    "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4",
+    "react-router": "^6.28.0",
+    "react-router-dom": "^6.28.0",
     "react-stately": "^3.45.0",
     "react-virtuoso": "^4.2.2",
     "temporal-polyfill": "^0.3.2",
@@ -80,7 +80,7 @@
   "peerDependencies": {
     "mobx-react": ">=7",
     "react": ">=16",
-    "react-router-dom": ">=5.2"
+    "react-router-dom": ">=6"
   },
   "peerDependenciesMeta": {
     "mobx-react": {
@@ -92,7 +92,7 @@
   },
   "devDependencies": {
     "@homebound/eslint-config": "^1.10.2",
-    "@homebound/rtl-react-router-utils": "1.3.0",
+    "@homebound/rtl-react-router-utils": "2.0.0",
     "@homebound/rtl-utils": "^2.71.0",
     "@homebound/truss": "2.25.0",
     "@homebound/tsconfig": "^1.1.1",
@@ -109,7 +109,6 @@
     "@types/react": "^18.3.11",
     "@types/react-beautiful-dnd": "^13.1.3",
     "@types/react-dom": "^18.3.1",
-    "@types/react-router-dom": "^5.3.3",
     "array-move": "^4.0.0",
     "chromatic": "^15.3.0",
     "conventional-changelog-conventionalcommits": "^9.3.0",
@@ -134,7 +133,8 @@
   },
   "resolutions": {
     "@types/react": "18.0.28",
-    "react-router": "5.3.4",
+    "react-router": "6.28.0",
+    "react-router-dom": "6.28.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitest/expect": "^4.1.0"

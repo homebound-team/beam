@@ -1,7 +1,7 @@
 import { camelCase } from "change-case";
 import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { matchPath, Route } from "react-router";
+import { matchPath, Route, Routes } from "react-router";
 import { Link, useLocation } from "react-router-dom";
 import { FullBleed, IconKey, maybeTooltip, resolveTooltip } from "src/components";
 import { Css, Margin, Only, Padding, Xss } from "src/Css";
@@ -99,7 +99,7 @@ export function TabContent<V extends string>(
   const selectedTab = isRouteTabs(props)
     ? props.tabs.find((t) => {
         const paths = Array.isArray(t.path) ? t.path : [t.path];
-        return paths.some((p) => !!matchPath(location.pathname, { path: p, exact: true }));
+        return paths.some((p) => !!matchPath({ path: p, end: true }, location.pathname));
       }) || tabs[0]
     : props.tabs.find((tab) => tab.value === props.selected) || tabs[0];
   const uniqueValue = uniqueTabValue(selectedTab);
@@ -116,7 +116,15 @@ export function TabContent<V extends string>(
         {...tid.panel}
         css={contentXss}
       >
-        {isRouteTab(selectedTab) ? <Route path={selectedTab.path} render={selectedTab.render} /> : selectedTab.render()}
+        {isRouteTab(selectedTab) ? (
+          <Routes>
+            {(Array.isArray(selectedTab.path) ? selectedTab.path : [selectedTab.path]).map((p) => (
+              <Route key={p} path={p} element={selectedTab.render()} />
+            ))}
+          </Routes>
+        ) : (
+          selectedTab.render()
+        )}
       </div>
     </FullBleed>
   );
@@ -128,7 +136,10 @@ export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTab
   const location = useLocation();
   const selected = isRouteTabs(props)
     ? uniqueTabValue(
-        props.tabs.find((t) => !!matchPath(location.pathname, { path: t.path, exact: true })) || props.tabs[0],
+        props.tabs.find((t) => {
+          const paths = Array.isArray(t.path) ? t.path : [t.path];
+          return paths.some((p) => !!matchPath({ path: p, end: true }, location.pathname));
+        }) || props.tabs[0],
       )
     : props.selected;
   const { isFocusVisible, focusProps } = useFocusRing();

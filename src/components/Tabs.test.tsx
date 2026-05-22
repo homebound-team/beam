@@ -163,7 +163,7 @@ describe("TabsWithContent", () => {
     click(r.tabs_tabB);
 
     // Then expect the URL to be updated and the tab panel to show the selected tab's content
-    expect(router.history.location.pathname).toBe("/tab2");
+    expect(router.location.pathname).toBe("/tab2");
     expect(r.tab_panel.textContent).toBe("Tab 2 Content");
   });
 

@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { noop } from "src/utils";
-import { click, render } from "src/utils/rtl";
+import { click, render, withRouter } from "src/utils/rtl";
 import { Card, CardProps } from "./Card";
 
 describe("Card Component", () => {
@@ -27,7 +27,7 @@ describe("Card Component", () => {
   it("can display and handle click events on the vertical dots menu button", async () => {
     // Given a card component with buttonMenuItems
     const buttonMenuItems = [{ label: "View", onClick: noop }];
-    const r = await render(<Card {...defaultProps} buttonMenuItems={buttonMenuItems} />);
+    const r = await render(<Card {...defaultProps} buttonMenuItems={buttonMenuItems} />, withRouter());
 
     // Expect the vertical dots menu button to be in the document initially
     expect(r.query.verticalDots).not.toBeInTheDocument();

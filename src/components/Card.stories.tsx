@@ -1,12 +1,13 @@
 import { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
-import { newStory } from "src/utils/sb";
+import { newStory, withRouter } from "src/utils/sb";
 import type { PlayFunction } from "storybook/internal/types";
 import { userEvent, waitFor, within } from "storybook/test";
 import { Card as CardComponent, CardProps } from "./Card";
 
 export default {
   component: CardComponent,
+  decorators: [withRouter()],
 } as Meta;
 
 const planDetailsComponent = (

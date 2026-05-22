@@ -1,8 +1,7 @@
 import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
-import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
@@ -21,33 +20,19 @@ type MenuItemProps = {
 export function MenuItemImpl(props: MenuItemProps) {
   const { item, state, onClose } = props;
   const menuItem = item.value;
-  if (!menuItem) {
-    return null;
-  }
-
-  const { disabled, onClick, label, destructive } = menuItem;
-  const isDisabled = Boolean(disabled);
-  const isSelected = state.selectionManager.selectedKeys.has(label);
-  const isFocused = state.selectionManager.focusedKey === item.key;
-  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const ref = useRef<HTMLLIElement>(null);
-  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const history = useHistory();
-  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const navigate = useNavigate();
   const { hoverProps, isHovered } = useHover({});
-  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const tid = useTestIds(props);
-  // TODO: validate this eslint-disable with https://app.shortcut.com/homebound-team/story/40045
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { menuItemProps } = useMenuItem(
     {
       key: item.key,
-      isDisabled,
+      isDisabled: Boolean(menuItem?.disabled),
       onAction: () => {
+        if (!menuItem) {
+          return;
+        }
+        const { onClick } = menuItem;
         if (typeof onClick === "string") {
           // if it is an absolute URL, then open in new window. Assuming this should leave the App
           if (isAbsoluteUrl(onClick)) {
@@ -62,7 +47,7 @@ export function MenuItemImpl(props: MenuItemProps) {
           }
 
           // Otherwise, it is a relative URL and we'll assume it is still within the App.
-          history.push(onClick);
+          navigate(onClick);
           return;
         }
         onClick && onClick();
@@ -72,6 +57,15 @@ export function MenuItemImpl(props: MenuItemProps) {
     state,
     ref,
   );
+
+  if (!menuItem) {
+    return null;
+  }
+
+  const { disabled, label, destructive } = menuItem;
+  const isDisabled = Boolean(disabled);
+  const isSelected = state.selectionManager.selectedKeys.has(label);
+  const isFocused = state.selectionManager.focusedKey === item.key;
 
   return (
     <li

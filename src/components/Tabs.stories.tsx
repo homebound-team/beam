@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { Fragment, useState } from "react";
-import { Route, useHistory, useLocation, useParams } from "react-router";
-import { Link } from "react-router-dom";
+import { Route, Routes, useLocation, useParams } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { RouteTabWithContent, TabContent, Tabs, TabsWithContent, TabWithContent } from "src/components";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
@@ -20,7 +20,7 @@ export default {
     },
   },
 
-  decorators: [withRouter(), withBeamDecorator],
+  decorators: [withRouter("/ce:2"), withBeamDecorator],
 
   globals: {
     backgrounds: {
@@ -109,12 +109,10 @@ export function TabsWithBottomBorder() {
 export function TabsAsLinks() {
   return <TestComponent />;
 }
-// Use `/` as the root path in order to ensure the Tab's component provides a <Route /> wrapper for matching.
-TabsAsLinks.decorators = [withRouter("/ce:2")];
 
 function TestComponent() {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const routeTabs: RouteTabWithContent[] = [
     {
       name: "Tab 1",
@@ -148,7 +146,7 @@ function TestComponent() {
         <div>
           <strong>Current URL:</strong> <pre css={Css.dib.$}>{location?.pathname}</pre>
         </div>
-        <Button label="Reset to root path" onClick={() => history.push("/ce:2")} /> (Will match Tab 1)
+        <Button label="Reset to root path" onClick={() => navigate("/ce:2")} /> (Will match Tab 1)
       </div>
       <TabsWithContent tabs={routeTabs} />
     </div>
@@ -243,7 +241,9 @@ function RouteTab2() {
         <p>Click below to load a sub route of this tab, which should keep this tab as "active"</p>
         <Link to="/ce:1/line-items/celi:1/overview">Line Item Details</Link>
         <div>
-          <Route path="/:ceId/line-items/:celiId">Loaded Line Items Overview!</Route>
+          <Routes>
+            <Route path="/:ceId/line-items/:celiId" element={<>Loaded Line Items Overview!</>} />
+          </Routes>
         </div>
       </div>
     </>

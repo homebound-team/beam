@@ -173,42 +173,44 @@ describe("GridTableLayout", () => {
       // Given columns without id property
       const columnsWithoutId = [column<Row>({ header: () => "Name", data: (row) => row.name, name: "Name" })];
 
-      // Then it throws an error
-      await expect(
-        render(
-          <TestWrapper
-            layoutStateProps={{}}
-            pageTitle="Test"
-            totalCount={100}
-            tableProps={{
-              columns: columnsWithoutId,
-              rows: [simpleHeader, ...rows],
-            }}
-          />,
-          withRouter(),
-        ),
-      ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns: columnsWithoutId,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
+        withRouter(),
+      );
+
+      expect(r.baseElement).toHaveTextContent(
+        "Columns must have id and name properties when EditColumnsButtons is enabled",
+      );
     });
 
     it("throws error when columns missing name and hideEditColumns is false", async () => {
       // Given columns without name property
       const columnsWithoutName = [column<Row>({ header: () => "Name", data: (row) => row.name, id: "name" })];
 
-      // Then it throws an error
-      await expect(
-        render(
-          <TestWrapper
-            layoutStateProps={{}}
-            pageTitle="Test"
-            totalCount={100}
-            tableProps={{
-              columns: columnsWithoutName,
-              rows: [simpleHeader, ...rows],
-            }}
-          />,
-          withRouter(),
-        ),
-      ).rejects.toThrow("Columns must have id and name properties when EditColumnsButtons is enabled");
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns: columnsWithoutName,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
+        withRouter(),
+      );
+
+      expect(r.baseElement).toHaveTextContent(
+        "Columns must have id and name properties when EditColumnsButtons is enabled",
+      );
     });
 
     it("does not throw error when columns missing id/name and hideEditColumns is true", async () => {
