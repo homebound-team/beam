@@ -1,6 +1,6 @@
 import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
 import { act } from "@testing-library/react";
-import { click, render } from "src/utils/rtl";
+import { click, render, withRouter } from "src/utils/rtl";
 import { boundCheckboxField, BoundForm, boundTextField } from "./BoundForm";
 import { ListFieldConfig } from "./BoundListField";
 import { AuthorInput } from "./formStateDomain";
@@ -123,7 +123,10 @@ describe("BoundForm", () => {
       };
 
       // When rendered with a list field
-      const r = await render(<BoundForm formState={formState} rows={[{ listFieldBooks: listFieldConfig }]} />);
+      const r = await render(
+        <BoundForm formState={formState} rows={[{ listFieldBooks: listFieldConfig }]} />,
+        withRouter(),
+      );
 
       // We expect the two book rows to be rendered
       expect(r.getAllByTestId("listFieldRow")).toHaveLength(2);

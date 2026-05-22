@@ -3,12 +3,12 @@ import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { click, render, type } from "src/utils/rtl";
+import { click, render, type, withRouter } from "src/utils/rtl";
 
 describe("ButtonMenu", () => {
   it("can update menu items", async () => {
     // Given a Button Menu
-    const r = await render(<TestButtonMenu />);
+    const r = await render(<TestButtonMenu />, withRouter());
 
     // When opening the menu
     click(r.menuTrigger);
@@ -35,7 +35,7 @@ describe("ButtonMenu", () => {
 
   it("can initialize with an empty list and load items afterwards", async () => {
     // Given a Button Menu with no items to start out with
-    const r = await render(<TestButtonMenu empty />);
+    const r = await render(<TestButtonMenu empty />, withRouter());
 
     // The menu items should initially be empty
     click(r.menuTrigger);
@@ -49,7 +49,7 @@ describe("ButtonMenu", () => {
 
   it("can accept testid", async () => {
     // Given a Button Menu with a testid defined
-    const r = await render(<TestButtonMenu data-testid="example" />);
+    const r = await render(<TestButtonMenu data-testid="example" />, withRouter());
 
     // Then button should use that testid.
     click(r.example);
@@ -81,7 +81,7 @@ describe("ButtonMenu", () => {
 
   it("can filter menu items", async () => {
     // Given a Button Menu with items
-    const r = await render(<TestButtonMenu searchable={true} />);
+    const r = await render(<TestButtonMenu searchable={true} />, withRouter());
 
     // When opening the menu
     click(r.menuTrigger);
@@ -97,7 +97,7 @@ describe("ButtonMenu", () => {
   it("supports tooltips on disabled menu items", async () => {
     // Given a menu item that is disabled with a value that will show as a tooltip
     const menuItems = [{ label: "Disabled", disabled: "Tooltip", onClick: noop }];
-    const r = await render(<ButtonMenu trigger={{ label: "Trigger" }} items={menuItems} />);
+    const r = await render(<ButtonMenu trigger={{ label: "Trigger" }} items={menuItems} />, withRouter());
 
     // When opening the menu
     click(r.trigger);
@@ -126,7 +126,7 @@ describe("ButtonMenu", () => {
       );
     }
 
-    const r = await render(<TestComponent />);
+    const r = await render(<TestComponent />, withRouter());
 
     // When opening the menu
     click(r.trigger);
@@ -150,6 +150,7 @@ describe("ButtonMenu", () => {
     // Given a ButtonMenu
     const r = await render(
       <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Option A", onClick: noop }]} />,
+      withRouter(),
     );
     // When opening the menu by clicking the trigger
     click(r.trigger);

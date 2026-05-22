@@ -109,66 +109,60 @@ export function ClientSideCsv() {
   );
 }
 
-export const Hovering = newStory(
-  () => {
-    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-    const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: RowStyles<Row> = {
-      data: {
-        cellCss: (row) => (row.data.value === 3 ? Css.bgRed300.$ : {}),
-        rowLink: () => "http://homebound.com",
-      },
-      header: {},
-    };
-    return (
-      <GridTable<Row>
-        columns={[nameColumn, valueColumn, actionColumn]}
-        rowStyles={rowStyles}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "c", value: 1 } },
-          { kind: "data", id: "2", data: { name: "b", value: 2 } },
-          { kind: "data", id: "3", data: { name: "a", value: 3 } },
-        ]}
-      />
-    );
-  },
-  { decorators: [withRouter()] },
-);
+export const Hovering = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  const rowStyles: RowStyles<Row> = {
+    data: {
+      cellCss: (row) => (row.data.value === 3 ? Css.bgRed300.$ : {}),
+      rowLink: () => "http://homebound.com",
+    },
+    header: {},
+  };
+  return (
+    <GridTable<Row>
+      columns={[nameColumn, valueColumn, actionColumn]}
+      rowStyles={rowStyles}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
+      ]}
+    />
+  );
+}, {});
 
-export const ActiveCell = newStory(
-  () => {
-    const nameColumn: GridColumn<Row> = { id: "name", header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
-    const actionColumn: GridColumn<Row> = { id: "actions", header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: RowStyles<Row> = useMemo(
-      () => ({
-        data: {
-          onClick: (row, api) => {
-            api.setActiveRowId(`data_${row.id}`);
-          },
+export const ActiveCell = newStory(() => {
+  const nameColumn: GridColumn<Row> = { id: "name", header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { id: "value", header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { id: "actions", header: "Action", data: () => <div>Actions</div> };
+  const rowStyles: RowStyles<Row> = useMemo(
+    () => ({
+      data: {
+        onClick: (row, api) => {
+          api.setActiveRowId(`data_${row.id}`);
         },
-      }),
-      [],
-    );
-    return (
-      <GridTable<Row>
-        columns={[nameColumn, valueColumn, actionColumn]}
-        activeCellId={"data_1_value"}
-        style={{ cellHighlight: true }}
-        rowStyles={rowStyles}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "c", value: 1 } },
-          { kind: "data", id: "2", data: { name: "b", value: 2 } },
-          { kind: "data", id: "3", data: { name: "a", value: 3 } },
-        ]}
-      />
-    );
-  },
-  { decorators: [withRouter()] },
-);
+      },
+    }),
+    [],
+  );
+  return (
+    <GridTable<Row>
+      columns={[nameColumn, valueColumn, actionColumn]}
+      activeCellId={"data_1_value"}
+      style={{ cellHighlight: true }}
+      rowStyles={rowStyles}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
+      ]}
+    />
+  );
+}, {});
 
 export function VirtualFiltering() {
   const rows: GridDataRow<Row>[] = useMemo(
@@ -740,77 +734,71 @@ export function AsTableWithCustomStyles() {
   );
 }
 
-export const AsTableWithRowLink = newStory(
-  () => {
-    const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
-    const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-    const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
-    const rowStyles: RowStyles<Row> = {
-      data: { rowLink: () => "http://homebound.com" },
-      header: {},
-    };
-    return (
-      <GridTable<Row>
-        as="table"
-        columns={[nameColumn, valueColumn, actionColumn]}
-        rowStyles={rowStyles}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "c", value: 1 } },
-          { kind: "data", id: "2", data: { name: "b", value: 2 } },
-          { kind: "data", id: "3", data: { name: "a", value: 3 } },
-        ]}
-      />
-    );
-  },
-  { decorators: [withRouter()] },
-);
+export const AsTableWithRowLink = newStory(() => {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const actionColumn: GridColumn<Row> = { header: "Action", data: () => <div>Actions</div> };
+  const rowStyles: RowStyles<Row> = {
+    data: { rowLink: () => "http://homebound.com" },
+    header: {},
+  };
+  return (
+    <GridTable<Row>
+      as="table"
+      columns={[nameColumn, valueColumn, actionColumn]}
+      rowStyles={rowStyles}
+      rows={[
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "c", value: 1 } },
+        { kind: "data", id: "2", data: { name: "b", value: 2 } },
+        { kind: "data", id: "3", data: { name: "a", value: 3 } },
+      ]}
+    />
+  );
+}, {});
 
 type Data2 = { name: string; role: string; date: string; priceInCents: number };
 type Row2 = SimpleHeaderAndData<Data2>;
-export const DataTypeColumns = newStory(
-  () => {
-    const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
-    const detailCol = column<Row2>({ header: "Details", data: ({ role }) => role });
-    const dateCol = dateColumn<Row2>({ header: "Date", data: ({ date }) => date });
-    const priceCol = numericColumn<Row2>({
-      header: "Price",
-      data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
-    });
-    const readOnlyPriceCol = numericColumn<Row2>({
-      header: "Read only Price",
-      data: ({ priceInCents }) => (
-        <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
-      ),
-    });
-    const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
-    return (
-      <GridTable<Row2>
-        columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
-        rows={[
-          simpleHeader,
-          {
-            kind: "data",
-            id: "1",
-            data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
-          },
-          { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
-          {
-            kind: "data",
-            id: "3",
-            data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
-          },
-          {
-            kind: "data",
-            id: "4",
-            data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
-          },
-        ]}
-      />
-    );
-  },
-  { decorators: [withRouter()] },
-);
+export const DataTypeColumns = newStory(() => {
+  const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
+  const detailCol = column<Row2>({ header: "Details", data: ({ role }) => role });
+  const dateCol = dateColumn<Row2>({ header: "Date", data: ({ date }) => date });
+  const priceCol = numericColumn<Row2>({
+    header: "Price",
+    data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
+  });
+  const readOnlyPriceCol = numericColumn<Row2>({
+    header: "Read only Price",
+    data: ({ priceInCents }) => (
+      <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" readOnly />
+    ),
+  });
+  const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+  return (
+    <GridTable<Row2>
+      columns={[nameCol, detailCol, dateCol, priceCol, readOnlyPriceCol, actionCol]}
+      rows={[
+        simpleHeader,
+        {
+          kind: "data",
+          id: "1",
+          data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+        },
+        { kind: "data", id: "2", data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 } },
+        {
+          kind: "data",
+          id: "3",
+          data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+        },
+        {
+          kind: "data",
+          id: "4",
+          data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+        },
+      ]}
+    />
+  );
+}, {});
 
 export function WrappedHeaders() {
   const leftAlignedColumn = column<Row2>({
@@ -2074,64 +2062,61 @@ export function DraggableRows() {
   );
 }
 
-export const DraggableWithInputColumns = newStory(
-  () => {
-    const dragColumn = dragHandleColumn<Row2>({});
-    const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
-    const priceCol = numericColumn<Row2>({
-      header: "Price",
-      data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
-    });
-    const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
+export const DraggableWithInputColumns = newStory(() => {
+  const dragColumn = dragHandleColumn<Row2>({});
+  const nameCol = column<Row2>({ header: "Name", data: ({ name }) => name });
+  const priceCol = numericColumn<Row2>({
+    header: "Price",
+    data: ({ priceInCents }) => <NumberField label="Price" value={priceInCents} onChange={noop} type="cents" />,
+  });
+  const actionCol = actionColumn<Row2>({ header: "Action", data: () => <IconButton icon="check" onClick={noop} /> });
 
-    const [rows, setRows] = useState<GridDataRow<Row2>[]>([
-      simpleHeader,
-      {
-        kind: "data",
-        id: "1",
-        data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
-        draggable: true,
-      },
-      {
-        kind: "data",
-        id: "2",
-        data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
-        draggable: true,
-      },
-      {
-        kind: "data",
-        id: "3",
-        data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
-        draggable: true,
-      },
-      {
-        kind: "data",
-        id: "4",
-        data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
-        draggable: true,
-      },
-    ]);
+  const [rows, setRows] = useState<GridDataRow<Row2>[]>([
+    simpleHeader,
+    {
+      kind: "data",
+      id: "1",
+      data: { name: "Foo", role: "Manager", date: "11/29/85", priceInCents: 113_00 },
+      draggable: true,
+    },
+    {
+      kind: "data",
+      id: "2",
+      data: { name: "Bar", role: "VP", date: "01/29/86", priceInCents: 1_524_99 },
+      draggable: true,
+    },
+    {
+      kind: "data",
+      id: "3",
+      data: { name: "Biz", role: "Engineer", date: "11/08/18", priceInCents: 80_65 },
+      draggable: true,
+    },
+    {
+      kind: "data",
+      id: "4",
+      data: { name: "Baz", role: "Contractor", date: "04/21/21", priceInCents: 12_365_00 },
+      draggable: true,
+    },
+  ]);
 
-    return (
-      <GridTable<Row2>
-        columns={[dragColumn, nameCol, priceCol, actionCol]}
-        rows={rows}
-        onRowDrop={(draggedRow, droppedRow, indexOffset) => {
-          const tempRows = [...rows];
-          // remove dragged row
-          const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
-          const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
+  return (
+    <GridTable<Row2>
+      columns={[dragColumn, nameCol, priceCol, actionCol]}
+      rows={rows}
+      onRowDrop={(draggedRow, droppedRow, indexOffset) => {
+        const tempRows = [...rows];
+        // remove dragged row
+        const draggedRowIndex = tempRows.findIndex((r) => r.id === draggedRow.id);
+        const reorderRow = tempRows.splice(draggedRowIndex, 1)[0];
 
-          const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
+        const droppedRowIndex = tempRows.findIndex((r) => r.id === droppedRow.id);
 
-          // insert it at the dropped row index
-          setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
-        }}
-      />
-    );
-  },
-  { decorators: [withRouter()] },
-);
+        // insert it at the dropped row index
+        setRows([...insertAtIndex(tempRows, reorderRow, droppedRowIndex + indexOffset)]);
+      }}
+    />
+  );
+}, {});
 
 const draggableRows = makeNestedRows(1, true);
 const draggableRowsWithHeader: GridDataRow<NestedRow>[] = [simpleHeader, ...draggableRows];
