@@ -19,7 +19,7 @@
   /**
  * Beam animations
  */
-  /* Opacity pulse so dot fill follows --b-on-surface-muted (ContrastScope / palette). */
+  /* Opacity pulse so dot fill follows --b-loader-fill (ContrastScope / palette). */
   @keyframes loadingDots {
     0%,
     100% {
@@ -42,6 +42,20 @@
   @keyframes pulse {
     50% {
       opacity: 0.6;
+    }
+  }
+
+  /* Respect WCAG SC 2.3.3 — collapse animations and transitions when the user
+     has set prefers-reduced-motion: reduce in their OS. Applies globally so it
+     covers every motion-token-driven helper as well as legacy inline transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 

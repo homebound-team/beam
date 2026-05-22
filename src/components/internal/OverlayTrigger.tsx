@@ -9,19 +9,19 @@ import { Button, ButtonProps, ButtonVariant } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Popover } from "src/components/internal";
-import { NavLink, NavLinkProps } from "src/components/NavLink";
+import { NavLink, NavLinkProps } from "src/components/NavLinks";
 import { Css } from "src/Css";
 import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface TextButtonTriggerProps extends Pick<ButtonProps, "label" | "variant" | "size" | "icon"> {}
-interface IconButtonTriggerProps extends Pick<IconButtonProps, "icon" | "color" | "compact" | "inc"> {}
-interface AvatarButtonTriggerProps extends Pick<AvatarButtonProps, "src" | "name" | "size"> {}
-interface NavLinkButtonTriggerProps extends Pick<NavLinkProps, "active" | "variant" | "icon"> {
+type TextButtonTriggerProps = Pick<ButtonProps, "label" | "variant" | "size" | "icon">;
+type IconButtonTriggerProps = Pick<IconButtonProps, "icon" | "color" | "compact" | "inc">;
+type AvatarButtonTriggerProps = Pick<AvatarButtonProps, "src" | "name" | "size">;
+type NavLinkButtonTriggerProps = {
   navLabel: string;
-}
+} & Pick<NavLinkProps, "active" | "variant" | "icon">;
 
-export interface OverlayTriggerProps {
+export type OverlayTriggerProps = {
   trigger: TextButtonTriggerProps | IconButtonTriggerProps | AvatarButtonTriggerProps | NavLinkButtonTriggerProps;
   /** Defaults to "left" */
   placement?: "left" | "right";
@@ -41,7 +41,7 @@ export interface OverlayTriggerProps {
   variant?: ButtonVariant;
   hideEndAdornment?: boolean;
   showActiveBorder?: boolean;
-}
+};
 
 // FIXME: The `popover` doesn't automatically get focus in all use cases so we cant tab through inputs/buttons immediately without
 // a second click on the popover

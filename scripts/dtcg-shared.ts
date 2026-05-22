@@ -58,6 +58,33 @@ export type DtcgSrgbColorValue = {
   hex?: string;
 };
 
+/** DTCG 2025.10 — `$type: "duration"` (value + unit `ms` | `s`). */
+export type DtcgDurationValue = {
+  value: number;
+  unit: "ms" | "s";
+};
+
+export function isDtcgDurationValue(v: unknown): v is DtcgDurationValue {
+  return (
+    !!v &&
+    typeof v === "object" &&
+    !Array.isArray(v) &&
+    typeof (v as Record<string, unknown>).value === "number" &&
+    !Number.isNaN((v as Record<string, unknown>).value as number) &&
+    ((v as Record<string, unknown>).unit === "ms" || (v as Record<string, unknown>).unit === "s")
+  );
+}
+
+/** DTCG 2025.10 — `$type: "cubicBezier"` — `[P1x, P1y, P2x, P2y]` with P1x, P2x in [0, 1]. */
+export type DtcgCubicBezierValue = [number, number, number, number];
+
+export function isDtcgCubicBezierValue(v: unknown): v is DtcgCubicBezierValue {
+  if (!Array.isArray(v) || v.length !== 4) return false;
+  if (!v.every((n) => typeof n === "number" && !Number.isNaN(n))) return false;
+  const [p1x, , p2x] = v;
+  return p1x >= 0 && p1x <= 1 && p2x >= 0 && p2x <= 1;
+}
+
 export function isDtcgSrgbColorValue(v: unknown): v is DtcgSrgbColorValue {
   if (v === null || typeof v !== "object" || Array.isArray(v)) return false;
   const o = v as Record<string, unknown>;

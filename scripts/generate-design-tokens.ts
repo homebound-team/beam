@@ -17,6 +17,8 @@ import {
   collectTokenLeaves,
   dtcgSrgbColorToRgbaString,
   hexToRgbaString,
+  isDtcgCubicBezierValue,
+  isDtcgDurationValue,
   isDtcgSrgbColorValue,
   isPathReference,
   loadTokensJson,
@@ -28,6 +30,7 @@ const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensDir = join(rootDir, "tokens");
 const trussTokenVarsPath = join(rootDir, "truss-token-vars.ts");
 const trussPalettePath = join(rootDir, "truss-palette.ts");
+const trussMotionPath = join(rootDir, "truss-motion.ts");
 const themeScopesCssPath = join(rootDir, "src/css/generated/theme-scopes.css");
 
 const BEAM_EXT = "com.homebound.beam";
@@ -162,6 +165,65 @@ function emitThemeScopesCss(rows: SemanticCodegenRow[]): string {
   return header + blocks.join("\n\n") + "\n";
 }
 
+type MotionLeafKind = "duration" | "cubicBezier";
+
+function serializeMotionLeaf(leaf: TokenLeaf, pathMap: Map<string, TokenLeaf>): string {
+  const resolved = resolveValue(leaf.$value, pathMap);
+  if (leaf.$type === "duration") {
+    if (!isDtcgDurationValue(resolved)) {
+      throw new Error(`Token ${leaf.path}: invalid duration $value ${JSON.stringify(resolved)}`);
+    }
+    return `${resolved.value}${resolved.unit}`;
+  }
+  if (leaf.$type === "cubicBezier") {
+    if (!isDtcgCubicBezierValue(resolved)) {
+      throw new Error(`Token ${leaf.path}: invalid cubicBezier $value ${JSON.stringify(resolved)}`);
+    }
+    const [a, b, c, d] = resolved;
+    return `cubic-bezier(${a}, ${b}, ${c}, ${d})`;
+  }
+  throw new Error(`Token ${leaf.path}: unsupported motion $type ${leaf.$type}`);
+}
+
+function emitTrussMotion(pathMap: Map<string, TokenLeaf>): string {
+  const groups: Record<MotionLeafKind, { jsKey: string; prefix: string }> = {
+    duration: { jsKey: "duration", prefix: "beam.motion.duration." },
+    cubicBezier: { jsKey: "easing", prefix: "beam.motion.easing." },
+  };
+
+  // Collect leaves by group, preserving JSON order via pathMap insertion order.
+  const collected: Record<string, [string, string][]> = { duration: [], easing: [] };
+  for (const [path, leaf] of pathMap.entries()) {
+    for (const [kind, { jsKey, prefix }] of Object.entries(groups) as [MotionLeafKind, { jsKey: string; prefix: string }][]) {
+      if (leaf.$type === kind && path.startsWith(prefix)) {
+        const name = path.slice(prefix.length);
+        collected[jsKey].push([name, serializeMotionLeaf(leaf, pathMap)]);
+      }
+    }
+  }
+
+  const renderGroup = (entries: [string, string][]): string =>
+    entries.map(([k, v]) => `    ${JSON.stringify(k)}: ${JSON.stringify(v)},`).join("\n");
+
+  const header = `/**
+ * AUTO-GENERATED — do not edit by hand. Source: tokens/tokens.json (DTCG 2025.10 — duration + cubicBezier types).
+ * Run yarn generate:design-tokens, yarn build, or yarn build:truss.
+ *
+ * Motion tokens are JS-only literals (not CSS variables) because Beam's animation behavior
+ * is static — Truss bakes these strings into class declarations at build time.
+ */
+
+`;
+
+  return (
+    header +
+    `export const motion = {\n` +
+    `  duration: {\n${renderGroup(collected.duration)}\n  },\n` +
+    `  easing: {\n${renderGroup(collected.easing)}\n  },\n` +
+    `} as const;\n`
+  );
+}
+
 function main(): void {
   const merged = loadTokensJson(tokensDir) as Record<string, unknown>;
   const leaves: TokenLeaf[] = [];
@@ -233,13 +295,15 @@ function main(): void {
     `\n};\n`;
 
   const themeScopesCss = emitThemeScopesCss(semanticRows);
+  const trussMotionContent = emitTrussMotion(pathMap);
 
   writeFileSync(trussTokenVarsPath, trussTokenVarsContent, "utf8");
   writeFileSync(trussPalettePath, trussPaletteContent, "utf8");
+  writeFileSync(trussMotionPath, trussMotionContent, "utf8");
   mkdirSync(dirname(themeScopesCssPath), { recursive: true });
   writeFileSync(themeScopesCssPath, themeScopesCss, "utf8");
 
-  console.log(`Wrote ${trussTokenVarsPath}, ${trussPalettePath}, ${themeScopesCssPath}`);
+  console.log(`Wrote ${trussTokenVarsPath}, ${trussPalettePath}, ${trussMotionPath}, ${themeScopesCssPath}`);
 }
 
 main();

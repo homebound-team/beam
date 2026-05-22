@@ -3,6 +3,7 @@ import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 
 type ColumnResizeHandleProps = {
   columnId: string;
@@ -279,7 +280,8 @@ export function ColumnResizeHandle({
               .leftPx(guideLineX)
               .wPx(4)
               .bgGray700.add("pointerEvents", "none")
-              .z9999.add("transform", "translateX(-50%)").$
+              .z(zIndices.dragHandle)
+              .add("transform", "translateX(-50%)").$
           }
           {...tid.guideLine}
         />

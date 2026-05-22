@@ -1,4 +1,5 @@
 import { defineConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
+import { motion } from "./truss-motion";
 import { palette } from "./truss-palette";
 import { Tokens } from "./truss-token-vars";
 
@@ -27,8 +28,19 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600 | 700, fontSize: strin
   xl2:  { fontWeight: 600, fontSize: "30px", lineHeight: "36px" },
 };
 
-const transition: string = ["background-color", "border-color", "box-shadow", "left", "right", "margin"]
-  .map((property) => `${property} 200ms`)
+// Default transition list, driven by motion tokens. `width` and `opacity` are included so
+// layout elements (e.g. SideNavLayout rail + overlay scrim) animate via Css.transition.
+const transition: string = [
+  "background-color",
+  "border-color",
+  "box-shadow",
+  "left",
+  "right",
+  "margin",
+  "width",
+  "opacity",
+]
+  .map((property) => `${property} ${motion.duration.normal} ${motion.easing.standard}`)
   .join(", ");
 
 // Custom rules
@@ -50,7 +62,21 @@ const sections: Sections = {
     newMethod("brt4", { borderTopRightRadius: "4px", borderTopLeftRadius: "4px" }),
     newMethod("brb4", { borderBottomRightRadius: "4px", borderBottomLeftRadius: "4px" }),
   ],
-  animation: () => [newMethod("transition", { transition })],
+  animation: () => [
+    newMethod("transition", { transition }),
+    newMethod("transitionWidth", {
+      transition: `width ${motion.duration.normal} ${motion.easing.standard}`,
+    }),
+    newMethod("transitionOpacity", {
+      transition: `opacity ${motion.duration.normal} ${motion.easing.standard}`,
+    }),
+    newMethod("transitionTransform", {
+      transition: `transform ${motion.duration.normal} ${motion.easing.standard}`,
+    }),
+    newMethod("transitionHeight", {
+      transition: `height ${motion.duration.normal} ${motion.easing.standard}`,
+    }),
+  ],
   boxShadow: () =>
     newMethodsForProp("boxShadow", {
       bsh0: "none",

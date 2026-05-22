@@ -25,7 +25,7 @@ export function LoadingSkeleton({ rows = 1, columns = 1, size = "md", randomizeW
           Css.br4
             .add("animation", "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite")
             .add("flexGrow", flexGrowForCell)
-            .bgColor(Tokens.OnSurfaceMuted).$
+            .bgColor(Tokens.LoaderFill).$
         }
       />
     ));

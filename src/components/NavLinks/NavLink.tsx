@@ -3,11 +3,13 @@ import { ReactNode, RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
+import { Icon } from "src/components/Icon";
 import { Css, Properties, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamFocusableProps } from "src/interfaces";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
-import { Icon } from "./Icon";
+
+export type NavLinkVariant = "side" | "global";
 
 export type NavLinkProps = {
   /** active indicates the user is on the current page */
@@ -22,14 +24,21 @@ export type NavLinkProps = {
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLElement>;
+  /** Press handler for button-mode NavLinks (no `href`). */
+  onPress?: () => void;
+  /**
+   * When true with an `icon`, shows icon only but keeps `label` for accessibility
+   * (visually hidden text). Used by SideNav when the rail is collapsed.
+   */
+  iconOnly?: boolean;
 } & BeamFocusableProps;
 
-type NavLinkVariant = "side" | "global";
-
 export function NavLink(props: NavLinkProps) {
-  const { disabled: isDisabled, label, openInNew, menuTriggerProps, buttonRef, ...otherProps } = props;
-  const ariaProps = { children: label, isDisabled, ...menuTriggerProps, ...otherProps };
-  const { href, active = false, icon = false, variant } = ariaProps;
+  const { disabled: isDisabled, label, openInNew, menuTriggerProps, buttonRef, iconOnly, ...otherProps } = props;
+  const { href, active = false, icon = false, variant } = otherProps;
+  const isIconOnly = !!iconOnly && !!icon;
+  const labelContent = isIconOnly ? <span css={Css.visuallyHidden.$}>{label}</span> : label;
+  const ariaProps = { children: labelContent, isDisabled, ...menuTriggerProps, ...otherProps };
   const ref = useGetRef(buttonRef);
   const { buttonProps, isPressed } = useButton({ ...ariaProps, elementType: href ? "a" : "button" }, ref);
   const { hoverProps, isHovered } = useHover({ isDisabled });
@@ -48,6 +57,7 @@ export function NavLink(props: NavLinkProps) {
     "aria-current": active ? ("page" as const) : undefined,
     ...Css.props({
       ...baseStyles,
+      ...(isIconOnly && Css.jcc.$),
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isFocusVisible && focusRingStyles),
@@ -58,9 +68,9 @@ export function NavLink(props: NavLinkProps) {
 
   const linkContent = (
     <>
-      {label}
+      {labelContent}
       {icon && (
-        <span css={Css.ml1.$}>
+        <span css={Css.fs0.$}>
           <Icon icon={icon} />
         </span>
       )}
@@ -71,6 +81,7 @@ export function NavLink(props: NavLinkProps) {
     linkContent,
     href,
     mergeProps(buttonProps, focusProps, hoverProps, linkAttributes, { className: navLink }),
+    openInNew,
   );
 }
 
@@ -78,7 +89,7 @@ export function getNavLinkStyles(variant: NavLinkVariant) {
   return navLinkVariantStyles[variant];
 }
 
-const baseStyles = Css.df.aic.hPx(32).pyPx(6).px1.br4.smSb.outline0.$;
+const baseStyles = Css.df.gap1.aic.hPx(32).pyPx(6).px1.br4.smSb.outline0.$;
 
 const navLinkVariantStyles: Record<
   NavLinkVariant,

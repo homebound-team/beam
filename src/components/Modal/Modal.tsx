@@ -9,11 +9,12 @@ import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import { useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { ModalProvider } from "./ModalContext";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
-export interface ModalProps {
+export type ModalProps = {
   /**
    * The modal size, defaults to `md`.
    *
@@ -39,7 +40,7 @@ export interface ModalProps {
    * Useful if you definitely need to force the user to make a choice.
    * */
   allowClosing?: boolean;
-}
+};
 
 export type ModalApi = {
   setSize: (size: ModalProps["size"]) => void;
@@ -126,7 +127,7 @@ export function Modal(props: ModalProps) {
     <ModalProvider>
       <OverlayContainer>
         <AutoSaveStatusProvider>
-          <div css={Css.underlay.z4.$} {...underlayProps} {...testId.underlay}>
+          <div css={Css.underlay.z(zIndices.modalUnderlay).$} {...underlayProps} {...testId.underlay}>
             <FocusScope contain restoreFocus autoFocus>
               <div
                 css={

@@ -31,14 +31,14 @@ import {
   reservedRowKinds,
   toContent,
   TOTALS,
-  zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Palette, Properties } from "src/Css";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { useDebouncedCallback } from "use-debounce";
 
-interface RowProps<R extends Kinded> {
+type RowProps<R extends Kinded> = {
   as: RenderAs;
   rs: RowState<R>;
   style: GridStyle;
@@ -64,7 +64,7 @@ interface RowProps<R extends Kinded> {
   onDragOver?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   // onDrag?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
   // onDragLeave?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void; // currently unused
-}
+};
 
 function maybeApplyFunction<T>(
   row: T,
@@ -286,7 +286,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const maybeStickyColumnStyles =
             maybeSticky && columnSizes
               ? {
-                  ...Css.sticky.z(zIndices.stickyColumns).bgWhite.$,
+                  ...Css.sticky.z(zIndices.tableStickyColumn).bgWhite.$,
                   ...(maybeSticky === "left"
                     ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
                     : {}),

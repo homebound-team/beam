@@ -1,10 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { Fragment } from "react";
 import { ContrastScope, navLink } from "src/components";
+import { Icon, Icons } from "src/components/Icon";
+import { getNavLinkStyles, NavLink, NavLinkProps } from "src/components/NavLinks/NavLink";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
-import { Icon, Icons } from "./Icon";
-import { getNavLinkStyles, NavLink, NavLinkProps } from "./NavLink";
 
 export default {
   component: NavLink,

@@ -12,10 +12,16 @@ alwaysApply: false
 - Each test should focus on a single piece of functionality
 - Test both happy path and error/edge cases
 - Use descriptive test names that explain what is being tested
+- **Helper placement:** Any helper components, factory functions, or fixtures used only in that file go **after all `it` / `test` cases** inside the `describe` block (tests first, helpers last). Example: [NavGroup.test.tsx](mdc:src/components/NavLinks/NavGroup.test.tsx) (`createDefaultLinks`, `TestComponent` at the bottom of `describe("NavGroup")`).
+- **No module-level fixtures:** Do **not** declare objects, arrays, or other non-trivial values at the **top level** of a test file (outside `describe`). Vitest/Storybook load the whole module when any file in the suite runs, so top-level `const items = [{ … }]` is **eagerly evaluated** even when this file’s tests are not running — wasted memory and work. Prefer a **factory function** (`function createItems() { return […]; }`) at the bottom of the `describe`, and call it from tests or harnesses. Inline literals inside an `it` body are fine (they run only when that test runs). Avoid top-level `const` for fixtures when possible; use factories instead.
 
 ## Test Selectors
 - Always prefer `data-testid` for DOM selection
-- Use the `useTestIds` hook from [useTestIds.tsx](mdc:src/utils/useTestIds.tsx) to generate test IDs if none are found
+- Use the `useTestIds` hook from [useTestIds.tsx](mdc:src/utils/useTestIds.tsx) to generate test IDs — **never** assign `data-testid={someVariable}` manually on components or in tests (`<MyComponent data-testid="foo" />` is forbidden in tests)
+- Prefix: `props["data-testid"]` when a parent forwarded it via `{...tid}` / `{...tid.somePart}`, else `defaultTestId(defaultPrefix)` from the hook’s second argument
+- Apply ids with spreads only: `{...tid}` on the root, `{...tid.trigger}` / `{...tid.panel}` on named DOM nodes
+- **Nested components:** parent spreads `tid` into the child (`<NavGroupTrigger {...tid} … />` or `<SideNavLinkGroupView {...tid.linkGroup} … />`); child calls `useTestIds(props, "trigger")` and spreads `{...tid.trigger}` on the element ([NavGroup](mdc:src/components/NavLinks/NavGroup.tsx) / [NavGroupTrigger](mdc:src/components/NavLinks/NavGroupTrigger.tsx)). Do **not** build or pass `data-testid` strings by hand (`data-testid={groupTestId}` is wrong)
+- In tests, query defaults (e.g. `r.sideNav_items`, `r.navGroup_trigger`) — no custom `data-testid` on the component under test
 - Test IDs should be descriptive and follow a consistent naming pattern
 - Avoid using text content, classes, or other brittle selectors
 

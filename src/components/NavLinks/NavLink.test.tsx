@@ -1,4 +1,4 @@
-import { NavLink } from "src/components/NavLink";
+import { NavLink } from "src/components/NavLinks/NavLink";
 import { render, withRouter } from "src/utils/rtl";
 
 describe("NavLink", () => {
@@ -22,5 +22,14 @@ describe("NavLink", () => {
       withRouter(),
     );
     expect(r.link).toHaveTextContent("Navlink button");
+  });
+
+  it("keeps an accessible name when iconOnly", async () => {
+    const r = await render(
+      <NavLink href="/projects" label="Settings" icon="pencil" iconOnly variant="side" data-testid="link" />,
+      withRouter(),
+    );
+
+    expect(r.getByRole("button", { name: "Settings" })).toBe(r.link);
   });
 });

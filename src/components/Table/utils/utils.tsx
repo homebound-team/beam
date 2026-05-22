@@ -256,13 +256,6 @@ export const EXPANDABLE_HEADER = "expandableHeader";
 export const KEPT_GROUP = "keptGroup";
 export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, KEPT_GROUP];
 
-export const zIndices = {
-  stickyHeader: 4,
-  stickyColumns: 3,
-  expandableHeaderTitle: 2,
-  expandableHeaderIcon: 1,
-};
-
 /** Loads an array from sessionStorage, if it exists, or `undefined`. */
 export function loadArrayOrUndefined(key: string) {
   try {

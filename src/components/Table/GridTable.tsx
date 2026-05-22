@@ -37,12 +37,12 @@ import {
   isCursorBelowMidpoint,
   KEPT_GROUP,
   TOTALS,
-  zIndices,
 } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { isPromise } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
 import { DraggedOver } from "./utils/RowState";
@@ -54,10 +54,10 @@ export function setRunningInJest() {
   runningInJest = true;
 }
 
-export interface GridTableDefaults {
+export type GridTableDefaults = {
   style: GridStyle | GridStyleDef;
   stickyHeader: boolean;
-}
+};
 
 let defaults: GridTableDefaults = {
   style: defaultStyle,
@@ -114,7 +114,7 @@ type DragEventType = React.DragEvent<HTMLElement>;
 
 export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
 
-export interface GridTableProps<R extends Kinded, X> {
+export type GridTableProps<R extends Kinded, X> = {
   id?: string;
   /**
    * The HTML used to create the table.
@@ -206,7 +206,7 @@ export interface GridTableProps<R extends Kinded, X> {
   onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
   /** Disable column resizing functionality. Defaults to false. */
   disableColumnResizing?: boolean;
-}
+};
 
 /**
  * Renders data in our table layout.
@@ -644,7 +644,7 @@ function renderDiv<R extends Kinded>(
       data-testid={id}
     >
       {/* Table Head */}
-      <div css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>{tableHeadRows}</div>
+      <div css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.tableStickyHeader).$}>{tableHeadRows}</div>
 
       {/* Table Body */}
       <div>
@@ -700,7 +700,9 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.stickyHeader).$}>{tableHeadRows}</thead>
+      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.tableStickyHeader).$}>
+        {tableHeadRows}
+      </thead>
       <tbody>
         {keptSelectedRows}
         {/* Show an all-column-span info message if it's set. */}
@@ -802,7 +804,7 @@ function renderVirtual<R extends Kinded>(
           <div
             {...props}
             ref={ref as MutableRefObject<HTMLDivElement>}
-            style={{ ...props.style, ...{ zIndex: zIndices.stickyHeader } }}
+            style={{ ...props.style, ...{ zIndex: zIndices.tableStickyHeader } }}
           />
         )),
         List: VirtualRoot(style, columns as any, id, xss),
