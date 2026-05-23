@@ -167,9 +167,9 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel.textContent).toBe("Tab 2 Content");
   });
 
-  it("captures path parameters within Route context", async () => {
-    // Given Route-able tabs with path parameters
-    const router = withRouter("/ce:1/overview");
+  it("reads path parameters from parent route context", async () => {
+    // Given route tabs with path parameters and a parent route that defines `ceId`
+    const router = withRouter("/ce:1/overview", "/:ceId/*");
     const testTabs: RouteTabWithContent[] = [
       { name: "Tab A", path: "/:ceId/overview", href: "/ce:1/overview", render: () => <TestRouteTab /> },
       {
@@ -180,12 +180,33 @@ describe("TabsWithContent", () => {
       },
     ];
     const r = await render(<TabsWithContent tabs={testTabs} />, router);
-    // Then expect the first tab to have captured the param
+
+    // Then expect the first tab to have captured the param from the parent route
     expect(r.ceId.textContent).toBe("ce:1");
 
     // When clicking the second tab
     click(r.tabs_tabB);
-    // Then expect the second tab to have captured both params
+
+    // Then expect the URL to be updated and `ceId` to reflect the new route
+    expect(router.location.pathname).toBe("/ce:2/line-items/celi:2");
+    expect(r.ceId.textContent).toBe("ce:2");
+  });
+
+  it("reads nested path parameters when the parent route defines them", async () => {
+    // Given route tabs and a parent route that defines both `ceId` and `celiId`
+    const router = withRouter("/ce:2/line-items/celi:2", "/:ceId/line-items/:celiId");
+    const testTabs: RouteTabWithContent[] = [
+      { name: "Tab A", path: "/:ceId/overview", href: "/ce:1/overview", render: () => <TestRouteTab /> },
+      {
+        name: "Tab B",
+        path: "/:ceId/line-items/:celiId",
+        href: "/ce:2/line-items/celi:2",
+        render: () => <TestRouteTab />,
+      },
+    ];
+    const r = await render(<TabsWithContent tabs={testTabs} />, router);
+
+    // Then expect both params to be available from the parent route
     expect(r.ceId.textContent).toBe("ce:2");
     expect(r.celiId.textContent).toBe("celi:2");
   });

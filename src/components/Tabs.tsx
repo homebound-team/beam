@@ -1,7 +1,7 @@
 import { camelCase } from "change-case";
 import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { matchPath, Route, Routes } from "react-router";
+import { matchPath } from "react-router";
 import { Link, useLocation } from "react-router-dom";
 import { FullBleed, IconKey, maybeTooltip, resolveTooltip } from "src/components";
 import { Css, Margin, Only, Padding, Xss } from "src/Css";
@@ -11,7 +11,7 @@ import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { Icon } from "./Icon";
 
-export interface Tab<V extends string = string> {
+export type Tab<V extends string = string> = {
   name: string;
   value: V;
   // Suffixes label with specified Icon. If `icon` and `endAdornment` are supplied, only the `icon` will be displayed
@@ -20,11 +20,11 @@ export interface Tab<V extends string = string> {
   endAdornment?: ReactNode;
   /** Whether the Tab is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
-}
+};
 
 type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
 
-export interface TabsProps<V extends string, X> {
+export type TabsProps<V extends string, X> = {
   ariaLabel?: string;
   // the selected tab is connected to the contents displayed
   selected: V;
@@ -39,34 +39,34 @@ export interface TabsProps<V extends string, X> {
   includeBottomBorder?: boolean;
   // Content to be placed to the far right of the tabs
   right?: ReactNode;
-}
+};
 
 // Tabs can be rendered as Links (omit "onChange") and we'll use React-Router for matching (omit "selected")/
-export interface RouteTabsProps<V extends string, X> extends Omit<TabsProps<V, X>, "onChange" | "selected" | "tabs"> {
+export type RouteTabsProps<V extends string, X> = {
   tabs: RouteTab<V>[];
-}
+} & Omit<TabsProps<V, X>, "onChange" | "selected" | "tabs">;
 // A Route Tab has a `href` prop rather than a `value` prop
-export interface RouteTab<V extends string = string> extends Omit<Tab<V>, "value"> {
+export type RouteTab<V extends string = string> = {
   href: V;
   // This is a React-Router path(s) to match the current URL to. Matching on the path(s) is what dictates which TabContent to render
   path: string | string[];
-}
+} & Omit<Tab<V>, "value">;
 
-export interface TabWithContent<V extends string = string> extends Omit<Tab<V>, "render"> {
+export type TabWithContent<V extends string = string> = {
   render: () => ReactNode;
-}
+} & Omit<Tab<V>, "render">;
 
-export interface RouteTabWithContent<V extends string = string> extends Omit<RouteTab<V>, "render"> {
+export type RouteTabWithContent<V extends string = string> = {
   render: () => ReactNode;
-}
+} & Omit<RouteTab<V>, "render">;
 
-interface RequiredRenderTabs<V extends string, X> extends Omit<TabsProps<V, X>, "tabs"> {
+type RequiredRenderTabs<V extends string, X> = {
   tabs: TabWithContent<V>[];
-}
+} & Omit<TabsProps<V, X>, "tabs">;
 
-interface RequiredRenderRouteTabs<V extends string, X> extends Omit<RouteTabsProps<V, X>, "tabs"> {
+type RequiredRenderRouteTabs<V extends string, X> = {
   tabs: RouteTabWithContent<V>[];
-}
+} & Omit<RouteTabsProps<V, X>, "tabs">;
 
 /**
  * Provides a list of tabs and their content.
@@ -116,15 +116,7 @@ export function TabContent<V extends string>(
         {...tid.panel}
         css={contentXss}
       >
-        {isRouteTab(selectedTab) ? (
-          <Routes>
-            {(Array.isArray(selectedTab.path) ? selectedTab.path : [selectedTab.path]).map((p) => (
-              <Route key={p} path={p} element={selectedTab.render()} />
-            ))}
-          </Routes>
-        ) : (
-          selectedTab.render()
-        )}
+        {selectedTab.render()}
       </div>
     </FullBleed>
   );
@@ -205,7 +197,7 @@ export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTab
   );
 }
 
-interface TabImplProps<V extends string> extends BeamFocusableProps {
+type TabImplProps<V extends string> = {
   /** active indicates the current tab is highlighted */
   active: boolean;
   onClick: (value: V) => void;
@@ -214,7 +206,7 @@ interface TabImplProps<V extends string> extends BeamFocusableProps {
   focusProps: HTMLAttributes<HTMLElement>;
   isFocusVisible: boolean;
   tab: Tab<V> | RouteTab<V>;
-}
+} & BeamFocusableProps;
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
