@@ -20,7 +20,7 @@ export default {
     },
   },
 
-  decorators: [withRouter("/ce:2"), withBeamDecorator],
+  decorators: [withRouter("/ce:2", "/:ceId/*"), withBeamDecorator],
 
   globals: {
     backgrounds: {

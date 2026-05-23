@@ -4,8 +4,8 @@ import { BeamProvider } from "src/components";
 import { Css, Properties } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 
-export function withRouter(url?: string): Decorator {
-  return (Story: () => JSX.Element) => rtlWithRouter(url).wrap(<Story />);
+export function withRouter(url?: string, route?: string): Decorator {
+  return (Story: () => JSX.Element) => rtlWithRouter(url, route).wrap(<Story />);
 }
 
 /* Models our currently used parameters. */
