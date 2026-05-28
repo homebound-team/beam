@@ -7,10 +7,6 @@ import { useTestIds } from "src/utils";
 import { click, render } from "src/utils/rtl";
 
 describe("useSideNavLinkGroupExpanded", () => {
-  afterEach(() => {
-    window.localStorage.removeItem(SIDE_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY);
-  });
-
   it("starts collapsed when no stored value, no active link, and no defaultExpanded", async () => {
     const r = await render(<Harness linkGroup={createLinkGroup()} />);
 
@@ -19,7 +15,7 @@ describe("useSideNavLinkGroupExpanded", () => {
 
   it("auto-expands when a child link is active", async () => {
     const r = await render(
-      <Harness linkGroup={createLinkGroup({ links: [{ label: "Budget", href: "/budget", active: true }] })} />,
+      <Harness linkGroup={createLinkGroup({ links: [{ label: "Budget", onClick: "/budget", active: true }] })} />,
     );
 
     expect(r.linkGroupExpanded_expanded).toHaveTextContent("true");
@@ -45,7 +41,7 @@ describe("useSideNavLinkGroupExpanded", () => {
     window.localStorage.setItem(SIDE_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY, JSON.stringify({ Budgets: false }));
 
     const r = await render(
-      <Harness linkGroup={createLinkGroup({ links: [{ label: "Budget", href: "/budget", active: true }] })} />,
+      <Harness linkGroup={createLinkGroup({ links: [{ label: "Budget", onClick: "/budget", active: true }] })} />,
     );
 
     expect(r.linkGroupExpanded_expanded).toHaveTextContent("false");
@@ -54,7 +50,7 @@ describe("useSideNavLinkGroupExpanded", () => {
   function createLinkGroup(overrides: Partial<SideNavLinkGroup> = {}): SideNavLinkGroup {
     return {
       label: "Budgets",
-      links: [{ label: "Budget", href: "/budget" }],
+      links: [{ label: "Budget", onClick: "/budget" }],
       ...overrides,
     };
   }

@@ -53,8 +53,8 @@ describe("NavGroup", () => {
 
   function createDefaultLinks(): NavGroupLink[] {
     return [
-      { label: "Budget", href: "/budget" },
-      { label: "POs", href: "/pos" },
+      { label: "Budget", onClick: "/budget" },
+      { label: "POs", onClick: "/pos" },
     ];
   }
 

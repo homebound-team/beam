@@ -22,15 +22,15 @@ const items: SideNavItem[] = [
   {
     label: "Main",
     items: [
-      { label: "Dashboard", icon: "kanban", href: "/", active: true },
-      { label: "Projects", icon: "search", href: "/projects" },
+      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Projects", icon: "search", onClick: "/projects" },
     ],
   },
   {
     label: "Workspace",
     items: [
-      { label: "Members", icon: "comment", href: "/members" },
-      { label: "Settings", icon: "pencil", href: "/settings" },
+      { label: "Members", icon: "comment", onClick: "/members" },
+      { label: "Settings", icon: "pencil", onClick: "/settings" },
     ],
   },
 ];

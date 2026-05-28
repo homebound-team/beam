@@ -1,5 +1,5 @@
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
-import { click, render } from "src/utils/rtl";
+import { click, render, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("getInteractiveElement", () => {
@@ -10,6 +10,17 @@ describe("getInteractiveElement", () => {
     expect(r.button.tagName).toBe("BUTTON");
     click(r.button);
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not pass role from attrs onto a button", async () => {
+    const onClick = vi.fn();
+    const r = await render(getButtonOrLink("test", onClick, { ...attrs, role: "button" }), {});
+    expect(r.button).not.toHaveAttribute("role");
+  });
+
+  it("does not pass role from attrs onto a link", async () => {
+    const r = await render(getButtonOrLink("test", "/testPath", { ...attrs, role: "button" }), withRouter());
+    expect(r.button).not.toHaveAttribute("role");
   });
 
   it("applies expected properties when rendering a link with an absolute url", async () => {

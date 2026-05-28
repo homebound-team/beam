@@ -7,7 +7,7 @@ import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 
 /** Side-nav link config; `label` is a string (NavLink itself still accepts ReactNode for other callers). */
-export type NavGroupLink = Pick<NavLinkProps, "icon" | "href" | "active" | "disabled" | "openInNew"> & {
+export type NavGroupLink = Pick<NavLinkProps, "icon" | "onClick" | "active" | "disabled" | "openInNew"> & {
   label: string;
 };
 

@@ -26,7 +26,7 @@ describe("SideNavItems", () => {
       items: [
         {
           label: "Inner",
-          items: [{ label: "Deep", href: "/deep" }],
+          items: [{ label: "Deep", onClick: "/deep" }],
         },
       ],
     };
@@ -34,14 +34,14 @@ describe("SideNavItems", () => {
 
   function createItems(): SideNavItem[] {
     return [
-      { label: "Dashboard", href: "/" },
+      { label: "Dashboard", onClick: "/" },
       {
         label: "Budgets",
-        links: [{ label: "Budget", href: "/budget" }],
+        links: [{ label: "Budget", onClick: "/budget" }],
       },
       {
         label: "Workspace",
-        items: [{ label: "Members", href: "/members" }],
+        items: [{ label: "Members", onClick: "/members" }],
       },
     ];
   }

@@ -27,8 +27,8 @@ describe("SideNav", () => {
     const r = await render(withState("collapse", <SideNav items={createItems()} />), withRouter());
 
     expect(r.queryByTestId("sideNav_section_label")).toBeNull();
-    expect(r.getByRole("button", { name: "Dashboard" })).toBeInTheDocument();
-    expect(r.getByRole("button", { name: "Members" })).toBeInTheDocument();
+    expect(r.sideNav_link_0).toHaveTextContent("Dashboard");
+    expect(r.sideNav_link_1).toHaveTextContent("Reports");
   });
 
   it("renders a top-level link group and toggles aria-expanded on click", async () => {
@@ -98,13 +98,13 @@ describe("SideNav", () => {
 
   function createItems(): SideNavItem[] {
     return [
-      { label: "Dashboard", icon: "kanban", href: "/", active: true },
-      { label: "Reports", icon: "search", href: "/reports" },
+      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Reports", icon: "search", onClick: "/reports" },
       {
         label: "Workspace",
         items: [
-          { label: "Members", icon: "comment", href: "/members" },
-          { label: "Settings", icon: "pencil", href: "/settings" },
+          { label: "Members", icon: "comment", onClick: "/members" },
+          { label: "Settings", icon: "pencil", onClick: "/settings" },
         ],
       },
     ];
@@ -115,8 +115,8 @@ describe("SideNav", () => {
       {
         label: "Budgets",
         links: [
-          { label: "Budget", href: "/budget" },
-          { label: "POs", href: "/pos" },
+          { label: "Budget", onClick: "/budget" },
+          { label: "POs", onClick: "/pos" },
         ],
       },
     ];
@@ -127,12 +127,12 @@ describe("SideNav", () => {
       {
         label: "Workspace",
         items: [
-          { label: "Members", href: "/members" },
+          { label: "Members", onClick: "/members" },
           {
             label: "Settings",
             links: [
-              { label: "General", href: "/settings/general" },
-              { label: "Billing", href: "/settings/billing" },
+              { label: "General", onClick: "/settings/general" },
+              { label: "Billing", onClick: "/settings/billing" },
             ],
           },
         ],
@@ -145,8 +145,8 @@ describe("SideNav", () => {
       {
         label: "Budgets",
         links: [
-          { label: "Budget", href: "/budget", active: true },
-          { label: "POs", href: "/pos" },
+          { label: "Budget", onClick: "/budget", active: true },
+          { label: "POs", onClick: "/pos" },
         ],
       },
     ];
@@ -156,15 +156,15 @@ describe("SideNav", () => {
     return [
       {
         label: "Budgets",
-        links: [{ label: "Budget", href: "/budget" }],
+        links: [{ label: "Budget", onClick: "/budget" }],
       },
     ];
   }
 
   function createMixedIconItems(): SideNavItem[] {
     return [
-      { label: "Dashboard", href: "/" },
-      { label: "Reports", icon: "search", href: "/reports" },
+      { label: "Dashboard", onClick: "/" },
+      { label: "Reports", icon: "search", onClick: "/reports" },
     ];
   }
 
@@ -173,8 +173,8 @@ describe("SideNav", () => {
       {
         label: "Budgets",
         links: [
-          { label: "Budget", icon: "search", href: "/budget" },
-          { label: "POs", icon: "search", href: "/pos" },
+          { label: "Budget", icon: "search", onClick: "/budget" },
+          { label: "POs", icon: "search", onClick: "/pos" },
         ],
       },
     ];
@@ -183,7 +183,7 @@ describe("SideNav", () => {
   function createUnlabeledSectionItems(): SideNavItem[] {
     return [
       {
-        items: [{ label: "Help", href: "/help" }],
+        items: [{ label: "Help", onClick: "/help" }],
       },
     ];
   }

@@ -16,24 +16,24 @@ export default {
 } as Meta;
 
 const items: SideNavItem[] = [
-  { label: "Dashboard", icon: "kanban", href: "/", active: true },
-  { label: "Projects", icon: "search", href: "/projects" },
-  { label: "Documents", icon: "comment", href: "/docs" },
+  { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+  { label: "Projects", icon: "search", onClick: "/projects" },
+  { label: "Documents", icon: "comment", onClick: "/docs" },
 ];
 
 const groupedItems: SideNavItem[] = [
   {
     label: "Main",
     items: [
-      { label: "Dashboard", icon: "kanban", href: "/", active: true },
-      { label: "Projects", icon: "search", href: "/projects" },
+      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Projects", icon: "search", onClick: "/projects" },
     ],
   },
   {
     label: "Workspace",
     items: [
-      { label: "Members", icon: "comment", href: "/members" },
-      { label: "Settings", icon: "pencil", href: "/settings" },
+      { label: "Members", icon: "comment", onClick: "/members" },
+      { label: "Settings", icon: "pencil", onClick: "/settings" },
     ],
   },
 ];
@@ -59,29 +59,29 @@ export function GroupedItems() {
 }
 
 const collapsibleItems: SideNavItem[] = [
-  { label: "Dashboard", href: "/" },
-  { label: "Schedule", href: "/schedule" },
+  { label: "Dashboard", onClick: "/" },
+  { label: "Schedule", onClick: "/schedule" },
   {
     label: "Budgets",
     links: [
-      { label: "Metrics", href: "/budgets/metrics" },
-      { label: "Budget", href: "/budgets/budget", active: true },
-      { label: "POs", href: "/budgets/pos" },
-      { label: "Change Events", href: "/budgets/change-events" },
-      { label: "Expenses", href: "/budgets/expenses" },
-      { label: "Estimates", href: "/budgets/estimates" },
-      { label: "Client Contracts", href: "/budgets/client-contracts" },
-      { label: "Client Invoices", href: "/budgets/client-invoices" },
+      { label: "Metrics", onClick: "/budgets/metrics" },
+      { label: "Budget", onClick: "/budgets/budget", active: true },
+      { label: "POs", onClick: "/budgets/pos" },
+      { label: "Change Events", onClick: "/budgets/change-events" },
+      { label: "Expenses", onClick: "/budgets/expenses" },
+      { label: "Estimates", onClick: "/budgets/estimates" },
+      { label: "Client Contracts", onClick: "/budgets/client-contracts" },
+      { label: "Client Invoices", onClick: "/budgets/client-invoices" },
     ],
   },
-  { label: "Scope", href: "/scope" },
-  { label: "Lot Summary", href: "/lot-summary" },
-  { label: "Documents", href: "/documents" },
+  { label: "Scope", onClick: "/scope" },
+  { label: "Lot Summary", onClick: "/lot-summary" },
+  { label: "Documents", onClick: "/documents" },
   {
     label: "Homeowner",
     links: [
-      { label: "Profile", href: "/homeowner/profile" },
-      { label: "Communications", href: "/homeowner/communications" },
+      { label: "Profile", onClick: "/homeowner/profile" },
+      { label: "Communications", onClick: "/homeowner/communications" },
     ],
   },
 ];

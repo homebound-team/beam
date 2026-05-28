@@ -21,8 +21,8 @@ describe("SideNavLinkGroupView", () => {
     const r = await render(<Harness panelCollapsed />, withRouter());
 
     expect(r.queryByTestId("linkGroup_trigger")).toBeNull();
-    expect(r.getByRole("button", { name: "Budget" })).toBeInTheDocument();
-    expect(r.getByRole("button", { name: "POs" })).toBeInTheDocument();
+    expect(r.linkGroup_link_0).toHaveTextContent("Budget");
+    expect(r.linkGroup_link_1).toHaveTextContent("POs");
   });
 
   function Harness({ panelCollapsed = false }: { panelCollapsed?: boolean }) {
@@ -33,8 +33,8 @@ describe("SideNavLinkGroupView", () => {
     return {
       label: "Budgets",
       links: [
-        { label: "Budget", href: "/budget", icon: "search" },
-        { label: "POs", href: "/pos", icon: "search" },
+        { label: "Budget", onClick: "/budget", icon: "search" },
+        { label: "POs", onClick: "/pos", icon: "search" },
       ],
     };
   }

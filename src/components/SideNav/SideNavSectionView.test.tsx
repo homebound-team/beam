@@ -13,7 +13,7 @@ describe("SideNavSectionView", () => {
   });
 
   it("omits the section label when the section is unlabeled", async () => {
-    const r = await render(<Harness section={{ items: [{ label: "Help", href: "/help" }] }} />, withRouter());
+    const r = await render(<Harness section={{ items: [{ label: "Help", onClick: "/help" }] }} />, withRouter());
 
     expect(r.queryByTestId("sideNav_section_label")).toBeNull();
     expect(r.getByText("Help")).toBeInTheDocument();
@@ -29,12 +29,12 @@ describe("SideNavSectionView", () => {
     return {
       label: "Workspace",
       items: [
-        { label: "Members", href: "/members" },
+        { label: "Members", onClick: "/members" },
         {
           label: "Settings",
           links: [
-            { label: "General", href: "/settings/general" },
-            { label: "Billing", href: "/settings/billing" },
+            { label: "General", onClick: "/settings/general" },
+            { label: "Billing", onClick: "/settings/billing" },
           ],
         },
       ],

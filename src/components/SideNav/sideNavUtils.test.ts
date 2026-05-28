@@ -3,8 +3,8 @@ import { sideNavItemKey } from "src/components/SideNav/sideNavUtils";
 
 describe("sideNavItemKey", () => {
   it("uses the link label and link group label for keys", () => {
-    expect(sideNavItemKey({ label: "Dashboard", href: "/" })).toBe("dashboard");
-    expect(sideNavItemKey({ label: "Budgets", links: [{ label: "Budget", href: "/budget" }] })).toBe("budgets");
+    expect(sideNavItemKey({ label: "Dashboard", onClick: "/" })).toBe("dashboard");
+    expect(sideNavItemKey({ label: "Budgets", links: [{ label: "Budget", onClick: "/budget" }] })).toBe("budgets");
   });
 
   it("uses the section label when present", () => {
@@ -13,7 +13,7 @@ describe("sideNavItemKey", () => {
 
   it("derives a stable key for unlabeled sections from child keys", () => {
     const section: SideNavSection = {
-      items: [{ label: "Help", href: "/help" }],
+      items: [{ label: "Help", onClick: "/help" }],
     };
 
     expect(sideNavItemKey(section)).toBe("section-help");

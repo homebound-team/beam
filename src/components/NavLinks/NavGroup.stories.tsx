@@ -15,9 +15,9 @@ export default {
 } as Meta;
 
 const defaultLinks: NavGroupLink[] = [
-  { label: "Budget", href: "/budget" },
-  { label: "POs", href: "/pos" },
-  { label: "Change Events", href: "/change-events" },
+  { label: "Budget", onClick: "/budget" },
+  { label: "POs", onClick: "/pos" },
+  { label: "Change Events", onClick: "/change-events" },
 ];
 
 export function Collapsed() {
@@ -34,7 +34,9 @@ export function WithActiveChildLink() {
 
 function NavGroupStory({ initialExpanded = false, activeHref }: { initialExpanded?: boolean; activeHref?: string }) {
   const [expanded, setExpanded] = useState(initialExpanded);
-  const links = activeHref ? defaultLinks.map((link) => ({ ...link, active: link.href === activeHref })) : defaultLinks;
+  const links = activeHref
+    ? defaultLinks.map((link) => ({ ...link, active: link.onClick === activeHref }))
+    : defaultLinks;
 
   return (
     <div css={Css.wPx(250).$}>
