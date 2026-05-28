@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Click-to-Move List Prototype</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        --bg: #f5f1e8;
+        --panel: #fffaf0;
+        --ink: #201b16;
+        --muted: #776b5e;
+        --line: #e2d5c3;
+        --accent: #db5c28;
+        --accent-dark: #a43d18;
+        --shadow: 0 18px 45px rgb(73 45 24 / 18%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgb(255 188 91 / 30%), transparent 36rem),
+          linear-gradient(145deg, #f8efe0 0%, var(--bg) 48%, #ede4d8 100%);
+      }
+
+      body.is-dragging {
+        cursor: ns-resize;
+        user-select: none;
+      }
+
+      .shell {
+        width: min(920px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0 80px;
+      }
+
+      .hero {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: grid;
+        gap: 12px;
+        padding: 20px 0 18px;
+        background: linear-gradient(to bottom, var(--bg) 72%, rgb(245 241 232 / 0));
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 7vw, 72px);
+        line-height: 0.92;
+        letter-spacing: -0.06em;
+      }
+
+      .lede {
+        max-width: 680px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.55;
+      }
+
+      .status {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: var(--accent-dark);
+        background: rgb(255 250 240 / 82%);
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 8px 24px rgb(73 45 24 / 8%);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+
+      .list-wrap {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 10px;
+        background: rgb(255 250 240 / 78%);
+        box-shadow: var(--shadow);
+      }
+
+      .item-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .item {
+        display: grid;
+        grid-template-columns: 64px 1fr auto;
+        align-items: center;
+        gap: 14px;
+        min-height: 64px;
+        border: 1px solid #eadfce;
+        border-radius: 20px;
+        padding: 12px 14px;
+        background: #fffdf8;
+        box-shadow: 0 3px 0 rgb(97 62 34 / 7%);
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease,
+          transform 120ms ease;
+      }
+
+      .item:hover {
+        border-color: #d9b99f;
+        box-shadow: 0 8px 24px rgb(97 62 34 / 12%);
+        transform: translateY(-1px);
+      }
+
+      .item:focus-visible {
+        outline: 3px solid rgb(219 92 40 / 35%);
+        outline-offset: 2px;
+      }
+
+      .item-number {
+        display: inline-grid;
+        min-width: 46px;
+        height: 40px;
+        place-items: center;
+        border-radius: 14px;
+        color: #6c351e;
+        background: #f7dcc6;
+        font-variant-numeric: tabular-nums;
+        font-weight: 800;
+      }
+
+      .item-title {
+        margin: 0 0 2px;
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .item-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .item-action {
+        border: 1px solid #e8d2bf;
+        border-radius: 999px;
+        padding: 8px 11px;
+        color: var(--accent-dark);
+        background: #fff5eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .placeholder {
+        border: 2px dashed rgb(219 92 40 / 50%);
+        border-radius: 20px;
+        background: rgb(219 92 40 / 10%);
+        box-shadow: inset 0 0 0 999px rgb(255 255 255 / 20%);
+      }
+
+      .ghost {
+        position: fixed;
+        z-index: 1000;
+        margin: 0;
+        pointer-events: none;
+        opacity: 0.96;
+        box-shadow: 0 22px 55px rgb(63 35 18 / 26%);
+        transform: rotate(-0.7deg);
+      }
+
+      .ghost .item-action {
+        color: white;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          width: min(100% - 20px, 920px);
+          padding-top: 20px;
+        }
+
+        .item {
+          grid-template-columns: 48px 1fr;
+        }
+
+        .item-action {
+          grid-column: 1 / -1;
+          width: fit-content;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero" aria-labelledby="title">
+        <h1 id="title">Click once to pick. Click again to place.</h1>
+        <p class="lede">
+          A single-file proof of concept for reordering a long list. Click any row
+          to start moving it, move the mouse vertically to choose a new position,
+          then click again anywhere to drop it.
+        </p>
+        <div class="status" id="status" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          Ready: click a row to start moving it.
+        </div>
+      </section>
+
+      <section class="list-wrap" aria-label="Sortable proof-of-concept list">
+        <ul class="item-list" id="itemList"></ul>
+      </section>
+    </main>
+
+    <script>
+      const itemList = document.querySelector("#itemList");
+      const status = document.querySelector("#status");
+      const rows = Array.from({ length: 100 }, function createRow(_, index) {
+        return {
+          id: index + 1,
+          title: `Prototype row ${String(index + 1).padStart(3, "0")}`,
+          note: `Move me vertically through the long list. Batch ${Math.floor(index / 10) + 1}.`,
+        };
+      });
+
+      let draggedItem = null;
+      let ghost = null;
+      let placeholder = null;
+      let pointerOffsetY = 0;
+      let autoScrollFrame = 0;
+      let lastPointerY = 0;
+
+      renderRows();
+
+      itemList.addEventListener("click", function handleListClick(event) {
+        const item = event.target.closest(".item");
+        if (!item || draggedItem) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        startDrag(item, event.clientY);
+      });
+
+      document.addEventListener("mousemove", function handleMouseMove(event) {
+        if (!draggedItem) return;
+
+        lastPointerY = event.clientY;
+        moveGhost(event.clientY);
+        movePlaceholder(event.clientY);
+        scheduleAutoScroll();
+      });
+
+      document.addEventListener("click", function handleDocumentClick(event) {
+        if (!draggedItem) return;
+
+        event.preventDefault();
+        dropItem();
+      });
+
+      document.addEventListener("keydown", function handleKeyDown(event) {
+        if (event.key === "Escape" && draggedItem) cancelDrag();
+      });
+
+      function renderRows() {
+        const fragment = document.createDocumentFragment();
+
+        rows.forEach(function addRow(row) {
+          const item = document.createElement("li");
+          item.className = "item";
+          item.tabIndex = 0;
+          item.dataset.id = String(row.id);
+          item.innerHTML = `
+            <span class="item-number">${String(row.id).padStart(2, "0")}</span>
+            <span>
+              <p class="item-title">${row.title}</p>
+              <p class="item-note">${row.note}</p>
+            </span>
+            <span class="item-action">Pick up</span>
+          `;
+          fragment.append(item);
+        });
+
+        itemList.append(fragment);
+      }
+
+      function startDrag(item, pointerY) {
+        const rect = item.getBoundingClientRect();
+        draggedItem = item;
+        pointerOffsetY = pointerY - rect.top;
+        lastPointerY = pointerY;
+
+        ghost = item.cloneNode(true);
+        ghost.classList.add("ghost");
+        ghost.style.left = `${rect.left}px`;
+        ghost.style.top = `${rect.top}px`;
+        ghost.style.width = `${rect.width}px`;
+        ghost.querySelector(".item-action").textContent = "Click to drop";
+
+        placeholder = document.createElement("li");
+        placeholder.className = "placeholder";
+        placeholder.style.height = `${rect.height}px`;
+        placeholder.setAttribute("aria-hidden", "true");
+
+        item.before(placeholder);
+        item.remove();
+        document.body.append(ghost);
+        document.body.classList.add("is-dragging");
+        status.lastChild.textContent = ` Moving ${item.querySelector(".item-title").textContent}. Click to drop, or press Escape to cancel.`;
+      }
+
+      function moveGhost(pointerY) {
+        ghost.style.top = `${pointerY - pointerOffsetY}px`;
+      }
+
+      function movePlaceholder(pointerY) {
+        const items = Array.from(itemList.querySelectorAll(".item"));
+        const target = items.find(function findTarget(item) {
+          const rect = item.getBoundingClientRect();
+          return pointerY < rect.top + rect.height / 2;
+        });
+
+        if (target) {
+          itemList.insertBefore(placeholder, target);
+        } else {
+          itemList.append(placeholder);
+        }
+      }
+
+      function dropItem() {
+        placeholder.replaceWith(draggedItem);
+        draggedItem.querySelector(".item-action").textContent = "Pick up";
+        cleanupDrag();
+        status.lastChild.textContent = " Dropped. Click another row to move it.";
+      }
+
+      function cancelDrag() {
+        placeholder.replaceWith(draggedItem);
+        cleanupDrag();
+        status.lastChild.textContent = " Cancelled. Click a row to start moving it.";
+      }
+
+      function cleanupDrag() {
+        ghost.remove();
+        ghost = null;
+        placeholder = null;
+        draggedItem = null;
+        pointerOffsetY = 0;
+        document.body.classList.remove("is-dragging");
+        cancelAnimationFrame(autoScrollFrame);
+        autoScrollFrame = 0;
+      }
+
+      function scheduleAutoScroll() {
+        if (autoScrollFrame) return;
+
+        autoScrollFrame = requestAnimationFrame(function autoScroll() {
+          autoScrollFrame = 0;
+          if (!draggedItem) return;
+
+          const edgeSize = 96;
+          const distanceFromBottom = window.innerHeight - lastPointerY;
+          const topSpeed = lastPointerY < edgeSize ? -((edgeSize - lastPointerY) / edgeSize) * 18 : 0;
+          const bottomSpeed = distanceFromBottom < edgeSize ? ((edgeSize - distanceFromBottom) / edgeSize) * 18 : 0;
+          const speed = topSpeed || bottomSpeed;
+
+          if (!speed) return;
+
+          window.scrollBy(0, speed);
+          moveGhost(lastPointerY);
+          movePlaceholder(lastPointerY);
+          scheduleAutoScroll();
+        });
+      }
+    </script>
+  </body>
+</html>
