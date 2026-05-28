@@ -1,4 +1,3 @@
-import { kebabCase } from "change-case";
 import { NavGroup, NavLink } from "src/components/NavLinks";
 import type { SideNavLinkGroup } from "src/components/SideNav/sideNavTypes";
 import { useSideNavLinkGroupExpanded } from "src/components/SideNav/useSideNavLinkGroupExpanded";
@@ -17,7 +16,7 @@ export function SideNavLinkGroupView(props: SideNavLinkGroupViewProps) {
     return (
       <>
         {linkGroup.links.map((link) => (
-          <NavLink key={kebabCase(link.label)} variant="side" {...link} iconOnly={!!link.icon} {...tid.link} />
+          <NavLink key={link.label} variant="side" {...link} iconOnly={!!link.icon} {...tid.link} />
         ))}
       </>
     );

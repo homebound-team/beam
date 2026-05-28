@@ -1,4 +1,3 @@
-import { kebabCase } from "change-case";
 import type {
   SideNavItem,
   SideNavLink,
@@ -20,9 +19,9 @@ export function isSideNavSection(item: SideNavItem): item is SideNavSection {
 }
 
 export function sideNavItemKey(item: SideNavItem | SideNavSectionItem): string {
-  if (isSideNavLink(item)) return kebabCase(item.label);
-  if (isSideNavLinkGroup(item)) return kebabCase(item.label);
-  if (item.label) return kebabCase(item.label);
+  if (isSideNavLink(item)) return item.label;
+  if (isSideNavLinkGroup(item)) return item.label;
+  if (item.label) return item.label;
   return `section-${item.items.map((child) => sideNavItemKey(child)).join("--")}`;
 }
 

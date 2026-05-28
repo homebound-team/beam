@@ -3,61 +3,7 @@ description:
 globs: *.test.ts,*.test.tsx
 alwaysApply: false
 ---
-# Guidelines for writing tests
-- This project uses Jest and a custom wrapper around `react-testing-library` that is imported via [rtl.tsx](mdc:src/utils/rtl.tsx) with additional helpers within [rtlUtils.tsx](mdc:src/utils/rtlUtils.tsx)
-- After editing a test file, run `yarn lint:fix:files` on that path (see [AGENTS.md](mdc:AGENTS.md) **Linting**); before a PR run `yarn lint:ci`.
 
-## Test Structure
-- Follow the Given/When/Then pattern with clear comments for each section
-- Each test should focus on a single piece of functionality
-- Test both happy path and error/edge cases
-- Use descriptive test names that explain what is being tested
-- **Helper placement:** Any helper components, factory functions, or fixtures used only in that file go **after all `it` / `test` cases** inside the `describe` block (tests first, helpers last). Example: [NavGroup.test.tsx](mdc:src/components/NavLinks/NavGroup.test.tsx) (`createDefaultLinks`, `TestComponent` at the bottom of `describe("NavGroup")`).
-- **No module-level fixtures:** Do **not** declare objects, arrays, or other non-trivial values at the **top level** of a test file (outside `describe`). Vitest/Storybook load the whole module when any file in the suite runs, so top-level `const items = [{ … }]` is **eagerly evaluated** even when this file’s tests are not running — wasted memory and work. Prefer a **factory function** (`function createItems() { return […]; }`) at the bottom of the `describe`, and call it from tests or harnesses. Inline literals inside an `it` body are fine (they run only when that test runs). Avoid top-level `const` for fixtures when possible; use factories instead.
+# Tests
 
-## Test Selectors
-- Always prefer `data-testid` for DOM selection
-- Use the `useTestIds` hook from [useTestIds.tsx](mdc:src/utils/useTestIds.tsx) to generate test IDs — **never** assign `data-testid={someVariable}` manually on components or in tests (`<MyComponent data-testid="foo" />` is forbidden in tests)
-- Prefix: `props["data-testid"]` when a parent forwarded it via `{...tid}` / `{...tid.somePart}`, else `defaultTestId(defaultPrefix)` from the hook’s second argument
-- Apply ids with spreads only: `{...tid}` on the root, `{...tid.trigger}` / `{...tid.panel}` on named DOM nodes
-- **Nested components:** parent spreads `tid` into the child (`<NavGroupTrigger {...tid} … />` or `<SideNavLinkGroupView {...tid.linkGroup} … />`); child calls `useTestIds(props, "trigger")` and spreads `{...tid.trigger}` on the element ([NavGroup](mdc:src/components/NavLinks/NavGroup.tsx) / [NavGroupTrigger](mdc:src/components/NavLinks/NavGroupTrigger.tsx)). Do **not** build or pass `data-testid` strings by hand (`data-testid={groupTestId}` is wrong)
-- In tests, query defaults (e.g. `r.sideNav_items`, `r.navGroup_trigger`) — no custom `data-testid` on the component under test
-- Test IDs should be descriptive and follow a consistent naming pattern
-- Avoid using text content, classes, or other brittle selectors
-
-## Interactions
-- Use the following (non-inclusive list of) functions from `@homebound/rtl-utils` for interactions:
-  - `click(r.save)` - for clicking elements
-  - `type(r.name, "value")` - for typing into inputs
-  - `blur(r.name)` - for blurring inputs
-  - `focus(r.name)` - for focusing inputs
-  - `input(r.name, "value")` - for input events
-- Only `await` methods that return a `Promise` or equivalent
-- The following functions are NOT async and should NOT be awaited:
-  - `click`
-  - `type`
-  - `blur`
-  - `focus`
-  - `input`
-  - `change`
-- The following functions ARE async and should be awaited:
-  - `render`
-  - `clickAndWait`
-  - `typeAndWait`
-  - `changeAndWait`
-  - `wait`
-
-
-## Examples
-- An example of a base input component test is [DateField.test.tsx](mdc:src/inputs/DateFields/DateField.test.tsx)
-- An example of a bound input component test is [BoundDateField.test.tsx](mdc:src/forms/BoundDateField.test.tsx)
-- Examples of a util or hook test are [useTestIds.test.tsx](mdc:src/utils/useTestIds.test.tsx) and [useFilter.test.tsx](mdc:src/hooks/useFilter.test.tsx)
-
-
-## Common Patterns
-- Use `expect().toHaveTextContent()` for text content checks
-- Use `expect().toBeInTheDocument()` for presence checks
-- Use `expect().not.toBeDisabled()` for enabled/disabled checks
-- Use `expect().toHaveValue()` for input value checks
-- Prefer `toBe` / `toBeDefined` / `toBeUndefined` over `toEqual` / `toBeTruthy` / `toBeFalsy`
-
+When writing or editing `*.test.ts` / `*.test.tsx`, follow **[AGENTS.md](mdc:AGENTS.md) → Testing**. That section is the single source of truth (structure, selectors, `useTestIds`, interactions, helpers, and lint commands).

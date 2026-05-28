@@ -15,7 +15,7 @@ describe("SideNavSectionView", () => {
   it("omits the section label when the section is unlabeled", async () => {
     const r = await render(<Harness section={{ items: [{ label: "Help", onClick: "/help" }] }} />, withRouter());
 
-    expect(r.queryByTestId("sideNav_section_label")).toBeNull();
+    expect(r.query.sideNav_section_label).toBeNull();
     expect(r.getByText("Help")).toBeInTheDocument();
   });
 

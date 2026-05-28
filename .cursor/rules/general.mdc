@@ -6,6 +6,7 @@ alwaysApply: true
 
 # Overview
 
+- Agent conventions (testing, Storybook, tokens, linting): **[AGENTS.md](mdc:AGENTS.md)** — cursor rules point there; do not duplicate that guidance elsewhere.
 - This is a React component library repository written in Typescript
 - The [README.md](mdc:README.md) specifies component design approach philosophy
 - This codebase makes use of hooks from `react-aria` V3 for accesible form behavior
@@ -38,17 +39,8 @@ alwaysApply: true
 
 ## Storybook
 
-- The primary method of developing features is via storybook
-- Utils for storybook are found within [sb.tsx](mdc:src/utils/sb.tsx)
-- All component features should have coverage via at least one story
-- Utilize `PlayFunction` functions to mock various states that require user interaction such as `hover` or `focus`
-- Snapshots of storybook files are taken via `chromatic` to spot visual regressions
-- **Helper placement:** Local helper components, render wrappers, factory functions, and utilities in `*.stories.tsx` go **at the bottom of the file**, after all `export default` meta, story exports, and play functions
-- **No module-level fixtures:** Do **not** declare objects, arrays, or other non-trivial values at the **top level** of a story file. Storybook eagerly loads story modules, so top-level `const args = { … }` / `const items = […]` runs even when that story is not open — prefer **factory functions** at the bottom of the file (`function createItems() { return […]; }`) and call them from stories or helpers. Inline values inside a story export are fine.
+- Follow **[AGENTS.md](mdc:AGENTS.md) → Storybook** for stories, helpers, and fixture conventions.
 
 ## Testing
 
-- Always consult the [tests.mdc](mdc:.cursor/rules/tests.mdc) Cursor Rules when creating or modifying tests (including **helper placement** and **no module-level fixtures**)
-- When implementing features, add test ids with `useTestIds` from [useTestIds.tsx](mdc:src/utils/useTestIds.tsx) — spread `{...tid}` / `{...tid.partName}`; do not set `data-testid` manually
-  - Single-component example: [SnackbarNotice.tsx](mdc:src/components/Snackbar/SnackbarNotice.tsx)
-  - Parent/child prefix chaining: spread `{...tid}` (or `{...tid.partName}`) into children — never `data-testid={…}`; see [NavGroup.tsx](mdc:src/components/NavLinks/NavGroup.tsx) + [NavGroupTrigger.tsx](mdc:src/components/NavLinks/NavGroupTrigger.tsx) and [AGENTS.md](mdc:AGENTS.md) **Testing**
+- Follow **[AGENTS.md](mdc:AGENTS.md) → Testing** when adding or changing tests and `useTestIds` usage.

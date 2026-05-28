@@ -46,26 +46,26 @@ describe("useSideNavLinkGroupExpanded", () => {
 
     expect(r.linkGroupExpanded_expanded).toHaveTextContent("false");
   });
-
-  function createLinkGroup(overrides: Partial<SideNavLinkGroup> = {}): SideNavLinkGroup {
-    return {
-      label: "Budgets",
-      links: [{ label: "Budget", onClick: "/budget" }],
-      ...overrides,
-    };
-  }
-
-  function Harness({ linkGroup }: { linkGroup: SideNavLinkGroup }) {
-    const tid = useTestIds({}, "linkGroupExpanded");
-    const { expanded, onToggle } = useSideNavLinkGroupExpanded(linkGroup);
-
-    return (
-      <>
-        <button type="button" {...tid.toggle} onClick={onToggle}>
-          Toggle
-        </button>
-        <span {...tid.expanded}>{String(expanded)}</span>
-      </>
-    );
-  }
 });
+
+function createLinkGroup(overrides: Partial<SideNavLinkGroup> = {}): SideNavLinkGroup {
+  return {
+    label: "Budgets",
+    links: [{ label: "Budget", onClick: "/budget" }],
+    ...overrides,
+  };
+}
+
+function Harness({ linkGroup }: { linkGroup: SideNavLinkGroup }) {
+  const tid = useTestIds({}, "linkGroupExpanded");
+  const { expanded, onToggle } = useSideNavLinkGroupExpanded(linkGroup);
+
+  return (
+    <>
+      <button type="button" {...tid.toggle} onClick={onToggle}>
+        Toggle
+      </button>
+      <span {...tid.expanded}>{String(expanded)}</span>
+    </>
+  );
+}
