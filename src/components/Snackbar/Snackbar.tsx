@@ -1,19 +1,24 @@
 import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 
-interface SnackbarProps {
+type SnackbarProps = {
   notices: SnackbarNoticeProps[];
   offset: Offset;
-}
+};
 
 export function Snackbar({ notices, offset }: SnackbarProps) {
   const tid = useTestIds({});
   return (
     <div
       {...tid.snackbarWrapper}
-      // Using z9999 to ensure notifications appear above all other UI elements, including FormPageLayout
-      css={Css.fixed.z9999.bottomPx(offset.bottom ?? defaultOffset.bottom).left3.df.fdc.aifs.gapPx(12).$}
+      css={
+        Css.fixed
+          .z(zIndices.snackbar)
+          .bottomPx(offset.bottom ?? defaultOffset.bottom)
+          .left3.df.fdc.aifs.gapPx(12).$
+      }
     >
       {notices.map((data) => (
         <SnackbarNotice key={data.id} {...data} />

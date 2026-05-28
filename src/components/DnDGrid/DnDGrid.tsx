@@ -2,6 +2,7 @@ import equal from "fast-deep-equal";
 import React, { KeyboardEvent, ReactNode, useCallback, useRef } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
 import { clearInlineStyles, isDefined, setInlineStyles } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { DnDGridContext } from "./DnDGridContext";
 
 export type DnDGridProps = {
@@ -166,7 +167,7 @@ export function DnDGrid(props: DnDGridProps) {
         // This will remove it from the normal flow of the page, allowing the clone above to take its place.
         dragEl.current.style.pointerEvents = "none";
         dragEl.current.style.position = "fixed";
-        dragEl.current.style.zIndex = "9999";
+        dragEl.current.style.zIndex = String(zIndices.dragHandle);
         dragEl.current.style.top = `${top}px`;
         dragEl.current.style.left = `${left}px`;
         dragEl.current.style.width = `${rect.width}px`;

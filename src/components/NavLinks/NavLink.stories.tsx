@@ -1,16 +1,16 @@
 import { Meta } from "@storybook/react-vite";
 import { Fragment } from "react";
 import { ContrastScope, navLink } from "src/components";
+import { Icon, Icons } from "src/components/Icon";
+import { getNavLinkStyles, NavLink, NavLinkProps } from "src/components/NavLinks/NavLink";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
-import { Icon, Icons } from "./Icon";
-import { getNavLinkStyles, NavLink, NavLinkProps } from "./NavLink";
 
 export default {
   component: NavLink,
 
   args: {
-    href: "",
+    onClick: "",
     label: "Nav link",
     variant: "side",
   },
@@ -38,71 +38,71 @@ export default {
 export function BaseStates() {
   const sideNavStyles = getNavLinkStyles("side");
   const globalNavStyles = getNavLinkStyles("global");
-  const args = { href: "", className: navLink };
+  const args = { onClick: () => {}, className: navLink };
 
   return (
     <div css={Css.df.gap2.$}>
       <div css={Css.df.fdc.gap2.p1.$}>
-        <a {...args} css={{ ...sideNavStyles.baseStyles }}>
+        <button {...args} css={{ ...sideNavStyles.baseStyles }}>
           {getChildren("Side nav default")}
-        </a>
-        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
+        </button>
+        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
           {getChildren("Side nav hovered")}
-        </a>
-        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
+        </button>
+        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
           {getChildren("Side nav pressed")}
-        </a>
-        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
+        </button>
+        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
           {getChildren("Side nav active")}
-        </a>
-        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
+        </button>
+        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
           {getChildren("Side nav focus ring")}
-        </a>
-        <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
+        </button>
+        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
           {getChildren("Side nav disabled")}
-        </a>
+        </button>
       </div>
       <ContrastScope>
         <div css={Css.df.fdc.gap2.bgGray900.p1.br12.$}>
-          <a {...args} css={{ ...sideNavStyles.baseStyles }}>
+          <button {...args} css={{ ...sideNavStyles.baseStyles }}>
             {getChildren("Side contrast nav default")}
-          </a>
-          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
+          </button>
+          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
             {getChildren("Side contrast nav hovered")}
-          </a>
-          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
+          </button>
+          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
             {getChildren("Side contrast nav pressed")}
-          </a>
-          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
+          </button>
+          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
             {getChildren("Side contrast nav active")}
-          </a>
-          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
+          </button>
+          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
             {getChildren("Side contrast nav focus ring")}
-          </a>
-          <a {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
+          </button>
+          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
             {getChildren("Side contrast nav disabled")}
-          </a>
+          </button>
         </div>
       </ContrastScope>
       <div css={Css.df.fdc.gap2.p1.$}>
-        <a {...args} css={{ ...globalNavStyles.baseStyles }}>
+        <button {...args} css={{ ...globalNavStyles.baseStyles }}>
           {getChildren("Global nav default")}
-        </a>
-        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.hoverStyles }}>
+        </button>
+        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.hoverStyles }}>
           {getChildren("Global nav hovered")}
-        </a>
-        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.pressedStyles }}>
+        </button>
+        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.pressedStyles }}>
           {getChildren("Global nav pressed")}
-        </a>
-        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.activeStyles }}>
+        </button>
+        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.activeStyles }}>
           {getChildren("Global nav active")}
-        </a>
-        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.focusRingStyles }}>
+        </button>
+        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.focusRingStyles }}>
           {getChildren("Global nav focus ring")}
-        </a>
-        <a {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.disabledStyles }}>
+        </button>
+        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.disabledStyles }}>
           {getChildren("Global nav disabled")}
-        </a>
+        </button>
       </div>
     </div>
   );

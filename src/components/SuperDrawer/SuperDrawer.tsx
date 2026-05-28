@@ -5,6 +5,7 @@ import { AutoSaveStatusProvider, IconButton, OpenInDrawerOpts, useSuperDrawer } 
 import { useBeamContext } from "src/components/BeamContext";
 import { Css, px } from "src/Css";
 import { useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { SuperDrawerWidth } from "./utils";
 
 /**
@@ -74,9 +75,12 @@ export function SuperDrawer(): ReactPortal | null {
             // Key is required for framer-motion animations
             key="superDrawer"
             // TODO: Should this color be part of the Palette?
-            // z-index of 3 is used to give flexibility for future overlapping content
             // Not using `inset` due to Safari 14.0.x not supporting this CSS property.
-            css={Css.fixed.df.jcfe.add("backgroundColor", "rgba(36,36,36,0.2)").top0.right0.bottom0.left0.z3.$}
+            css={
+              Css.fixed.df.jcfe
+                .add("backgroundColor", "rgba(36,36,36,0.2)")
+                .top0.right0.bottom0.left0.z(zIndices.superDrawerScrim).$
+            }
             // Initial styles (acts similar to `from` in keyframe animations)
             initial={{ opacity: 0 }}
             // Rendered styles (acts similar to `to` in keyframe animations)

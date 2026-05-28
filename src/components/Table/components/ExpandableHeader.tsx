@@ -2,19 +2,19 @@ import { ReactNode, useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { zIndices } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
 import { isFunction } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { Loader } from "../../Loader";
 
-interface ExpandableHeaderProps<R extends Kinded> {
+type ExpandableHeaderProps<R extends Kinded> = {
   title: string;
   column: GridColumnWithId<R>;
   minStickyLeftOffset: number;
   as: RenderAs;
   tooltipEl?: ReactNode;
-}
+};
 
 export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<R>) {
   const { title, column, minStickyLeftOffset, as, tooltipEl } = props;
@@ -46,7 +46,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
           Css.df.aic
             .if(applyStickyStyles)
             .sticky.leftPx(minStickyLeftOffset + 12)
-            .pr2.mr2.bgWhite.z(zIndices.expandableHeaderTitle)
+            .pr2.mr2.bgWhite.z(zIndices.tableExpandableTitle)
             .if(isHovered).bgGray100.$
         }
       >
@@ -54,7 +54,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         {tooltipEl}
       </span>
 
-      <span css={Css.if(applyStickyStyles).sticky.rightPx(12).z(zIndices.expandableHeaderIcon).$}>
+      <span css={Css.if(applyStickyStyles).sticky.rightPx(12).z(zIndices.tableExpandableIcon).$}>
         {isLoading ? <Loader size="xs" /> : <Icon icon={isExpanded ? "chevronLeft" : "chevronRight"} inc={2} />}
       </span>
     </button>

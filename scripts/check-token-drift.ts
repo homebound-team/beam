@@ -9,7 +9,12 @@ import { fileURLToPath } from "url";
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const GENERATED_PATHS = ["truss-token-vars.ts", "truss-palette.ts", "src/css/generated/theme-scopes.css"] as const;
+const GENERATED_PATHS = [
+  "truss-token-vars.ts",
+  "truss-palette.ts",
+  "truss-motion.ts",
+  "src/css/generated/theme-scopes.css",
+] as const;
 
 function main(): void {
   execSync("yarn generate:design-tokens", { cwd: rootDir, stdio: "inherit" });

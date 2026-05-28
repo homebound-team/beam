@@ -65,6 +65,7 @@ export enum Tokens {
   FocusRingInset = "--b-focus-ring-inset",
   FocusRingMuted = "--b-focus-ring-muted",
   ListRowBgHover = "--b-list-row-bg-hover",
+  LoaderFill = "--b-loader-fill",
   LoaderSpinner = "--b-loader-spinner",
   LoaderTrack = "--b-loader-track",
   MenuItemBgHover = "--b-menu-item-bg-hover",
@@ -83,6 +84,7 @@ export enum Tokens {
   OnPrimary = "--b-on-primary",
   OnSurface = "--b-on-surface",
   OnSurfaceMuted = "--b-on-surface-muted",
+  OnSurfaceSubtle = "--b-on-surface-subtle",
   PopoverSurface = "--b-popover-surface",
   Primary = "--b-primary",
   PrimaryHover = "--b-primary-hover",
@@ -91,6 +93,8 @@ export enum Tokens {
   SelectionIndicator = "--b-selection-indicator",
   StatusSuccessFg = "--b-status-success-fg",
   Surface = "--b-surface",
+  SurfaceSeparator = "--b-surface-separator",
+  SurfaceSubtle = "--b-surface-subtle",
   TextDisabled = "--b-text-disabled",
   TextHelper = "--b-text-helper",
   TextLabel = "--b-text-label",
@@ -3879,23 +3883,39 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // animation
-  /** Sets `transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
+  /** Sets `transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
   get transition() {
     return this.add(
       "transition",
-      "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",
+      "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)",
     );
+  }
+  /** Sets `transition: "width 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionWidth() {
+    return this.add("transition", "width 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionOpacity() {
+    return this.add("transition", "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionTransform() {
+    return this.add("transition", "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "height 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionHeight() {
+    return this.add("transition", "height 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   }
 
   // buttonBase
-  /** Sets `fontWeight: 600; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms"`. */
+  /** Sets `fontWeight: 600; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
   get buttonBase() {
     return this.add("fontWeight", 600).add("fontSize", "14px").add("lineHeight", "20px").add("outline", 0).add(
       "borderRadius",
       "8px",
     ).add("display", "inline-flex").add("alignItems", "center").add("whiteSpace", "nowrap").add(
       "transition",
-      "background-color 200ms, border-color 200ms, box-shadow 200ms, left 200ms, right 200ms, margin 200ms",
+      "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)",
     );
   }
 

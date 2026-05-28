@@ -1,8 +1,9 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
+import { zIndices } from "src/utils/zIndices";
 
-interface ScrollShadowsProps {
+type ScrollShadowsProps = {
   children: ReactNode;
   /** Allows for styling the container */
   xss?: Properties;
@@ -10,7 +11,7 @@ interface ScrollShadowsProps {
   horizontal?: boolean;
   /** Defines the background color for the shadows */
   bgColor?: Palette;
-}
+};
 export function ScrollShadows(props: ScrollShadowsProps) {
   const { children, xss, horizontal = false, bgColor = Palette.White } = props;
   const tid = useTestIds(props);
@@ -29,7 +30,7 @@ export function ScrollShadows(props: ScrollShadowsProps) {
   // The shadow styles will rarely every change. Memoize them to avoid recomputing them when we don't have to.
   const [startShadowStyles, endShadowStyles] = useMemo(() => {
     const transparentBgColor = bgColor.replace(/,1\)$/, ",0)");
-    const commonStyles = Css.absolute.z3.add("pointerEvents", "none").$;
+    const commonStyles = Css.absolute.z(zIndices.scrollShadow).add("pointerEvents", "none").$;
     const startShadowStyles = !horizontal ? Css.top0.left0.right0.hPx(40).$ : Css.left0.top0.bottom0.wPx(25).$;
     const endShadowStyles = !horizontal ? Css.bottom0.left0.right0.hPx(40).$ : Css.right0.top0.bottom0.wPx(25).$;
     const startGradient = `linear-gradient(${!horizontal ? 180 : 90}deg, ${bgColor} 0%, ${transparentBgColor} 92%);`;

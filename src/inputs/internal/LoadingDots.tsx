@@ -4,7 +4,7 @@ import { useTestIds } from "src/utils";
 export function LoadingDots() {
   const dotCss = Css.hPx(8)
     .wPx(8)
-    .br4.bgColor(Tokens.OnSurfaceMuted)
+    .br4.bgColor(Tokens.LoaderFill)
     .add("animationName", "loadingDots")
     .add("animationDuration", "800ms")
     .add("animationIterationCount", "infinite")

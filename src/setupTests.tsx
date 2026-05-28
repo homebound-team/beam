@@ -7,6 +7,7 @@ import { vi } from "vitest";
 beforeEach(() => {
   vi.useFakeTimers();
   sessionStorage.clear();
+  localStorage.clear();
 });
 afterEach(() => vi.useRealTimers());
 

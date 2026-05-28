@@ -1,6 +1,6 @@
 # Beam token authoring (`tokens.json`)
 
-Source of truth: [`tokens.json`](./tokens.json) (DTCG 2025.10–shaped). [`yarn generate:design-tokens`](../scripts/generate-design-tokens.ts) reads it and emits **`truss-token-vars.ts`**, **`truss-palette.ts`**, and **`src/css/generated/theme-scopes.css`**. Truss uses [`truss-config.ts`](../truss-config.ts); run **`yarn build:truss`** after token edits when you also need regenerated **`src/Css.ts`** / **`src/Css.json`**.
+Source of truth: [`tokens.json`](./tokens.json) (DTCG 2025.10–shaped). [`yarn generate:design-tokens`](../scripts/generate-design-tokens.ts) reads it and emits **`truss-token-vars.ts`**, **`truss-palette.ts`**, **`truss-motion.ts`**, and **`src/css/generated/theme-scopes.css`**. Truss uses [`truss-config.ts`](../truss-config.ts); run **`yarn build:truss`** after token edits when you also need regenerated **`src/Css.ts`** / **`src/Css.json`**.
 
 **Palette in `truss-palette.ts`:** primitives only — `White` / `Transparent`, then other `beam.color.primitive.*` keys in JSON order. Semantic roles are **not** in the Truss palette.
 
@@ -17,6 +17,7 @@ We mirror [Tailwind theme variable namespaces](https://tailwindcss.com/docs/them
 | Tailwind theme prefix (CSS)                                         | Beam JSON path (group)            | Status                                          |
 | ------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------- |
 | `--color-*`                                                         | `beam.color`                      | **In use** — see below                          |
+| (no Tailwind namespace — Truss/JS literals)                         | `beam.motion`                     | **In use** — see below                          |
 | `--font-*`                                                          | `beam.font`                       | Reserved                                        |
 | `--text-*`                                                          | `beam.text`                       | Reserved                                        |
 | `--font-weight-*`                                                   | `beam.fontWeight`                 | Reserved                                        |
@@ -43,7 +44,7 @@ Role colors exposed as **`Tokens`** in [`truss-token-vars.ts`](../truss-token-va
 
 ## Nomenclature and best practices
 
-These conventions help humans, agents, and upstream tools (e.g. a future Figma export) stay consistent. **`yarn validate:tokens` does not enforce vocabulary** (no allowlist of semantic names). It **does** enforce **structure**: color value shape, unresolved `{path}` refs, required primitive `White`/`Transparent`, semantic `$extensions`, **`contrast`** shape when present, and **`cssVar` must equal `--b-` + kebab-case of the JSON leaf key** (same segment order; see [`scripts/token-naming.ts`](../scripts/token-naming.ts) for the kebab mapping used in validation).
+These conventions help humans, agents, and upstream tools (e.g. a future Figma export) stay consistent. **`yarn validate:tokens` does not enforce vocabulary** (no allowlist of semantic names). It **does** enforce **structure**: color value shape; **`duration`** / **`cubicBezier`** value shape and path prefixes (`beam.motion.duration.*`, `beam.motion.easing.*`); unresolved `{path}` refs; required primitive `White`/`Transparent`; semantic `$extensions`; **`contrast`** shape when present; and **`cssVar` must equal `--b-` + kebab-case of the JSON leaf key** (same segment order; see [`scripts/token-naming.ts`](../scripts/token-naming.ts) for the kebab mapping used in validation).
 
 | Kind | When to use | Shape | Examples |
 |------|-------------|-------|----------|
@@ -60,9 +61,25 @@ These conventions help humans, agents, and upstream tools (e.g. a future Figma e
 - **Fields:** `FieldBg*`, `FieldBorder*`, …
 - **Navigation:** `NavText*`, `NavItemBg*`, …
 - **List / menu:** `ListRowBgHover`, `MenuItemBgHover`, …
-- **Neutrals / buttons / focus / loaders / status:** `Neutral*`, `Button*`, `FocusRing*`, `Loader*`, `StatusSuccessFg`, `DangerPressed`, …
+- **Neutrals / buttons / focus / loaders / status:** `Neutral*`, `Button*`, `FocusRing*`, `LoaderFill`, `LoaderSpinner`, `LoaderTrack`, `StatusSuccessFg`, `DangerPressed`, …
 
 Avoid semantic leaf keys that **collide with Truss `Css` shorthands** (e.g. do not use `Outline` as a color token key).
+
+## `beam.motion`
+
+Transition **durations** and **easing curves** for Truss animation helpers. Unlike colors, motion is **not** themed at runtime: values codegen to string literals in [`truss-motion.ts`](../truss-motion.ts) (no `--b-*` CSS variables). [`truss-config.ts`](../truss-config.ts) imports `motion` for the default `Css.transition` bundle and per-property helpers (`transitionWidth`, `transitionOpacity`, etc.).
+
+Two children:
+
+### `beam.motion.duration.*`
+
+[`$type: "duration"`](https://www.designtokens.org/tr/2025.10/format/#duration) — `$value` is `{ "value": <number>, "unit": "ms" | "s" }` (non-negative `value`). Leaf keys: **camelCase** (`fast`, `normal`, `slow`). No `$extensions["com.homebound.beam"]`.
+
+### `beam.motion.easing.*`
+
+[`$type: "cubicBezier"`](https://www.designtokens.org/tr/2025.10/format/#cubicbezier) — `$value` is `[P1x, P1y, P2x, P2y]` with **P1x and P2x in [0, 1]** (y may be any real). Leaf keys: **camelCase** (`standard`, `decelerate`, `accelerate`). No Beam extensions.
+
+**Usage:** Prefer Truss motion helpers from [`truss-config.ts`](../truss-config.ts) (`Css.transition`, `Css.transitionWidth`, …) rather than hard-coding `ms` / `cubic-bezier(...)` in components. For one-off transitions, compose from `motion.duration.*` and `motion.easing.*` in repo code that already imports [`truss-motion.ts`](../truss-motion.ts).
 
 ## Contrast and theming
 
@@ -81,6 +98,6 @@ Use `{beam.color.primitive.Gray900}` in `$value` and in extension fields when po
 2. Run **`yarn generate:design-tokens`** (or **`yarn build`** / **`yarn build:truss`**).
 3. Run **`yarn validate:tokens`**.
 
-**CI** (see [AGENTS.md](../AGENTS.md)): **`yarn validate:tokens`** then **`yarn check:token-drift`** before **`yarn build`**. If drift fails, regenerate, commit the three emitted files above, and push.
+**CI** (see [AGENTS.md](../AGENTS.md)): **`yarn validate:tokens`** then **`yarn check:token-drift`** before **`yarn build`**. If drift fails, regenerate, commit the four emitted files above, and push.
 
 **Roadmap:** [docs/design-tokens/README.md](../docs/design-tokens/README.md). **Phase 1 (complete) record:** [docs/design-tokens/phase-1-contrast.md](../docs/design-tokens/phase-1-contrast.md).

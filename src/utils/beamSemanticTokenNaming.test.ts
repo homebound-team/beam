@@ -7,7 +7,11 @@ describe("semanticLeafKeyToExpectedCssVar", () => {
     expect(semanticLeafKeyToExpectedCssVar("PopoverSurface")).toBe("--b-popover-surface");
     expect(semanticLeafKeyToExpectedCssVar("SelectionIndicator")).toBe("--b-selection-indicator");
     expect(semanticLeafKeyToExpectedCssVar("FieldBorderFocus")).toBe("--b-field-border-focus");
+    expect(semanticLeafKeyToExpectedCssVar("LoaderFill")).toBe("--b-loader-fill");
     expect(semanticLeafKeyToExpectedCssVar("OnSurfaceMuted")).toBe("--b-on-surface-muted");
+    expect(semanticLeafKeyToExpectedCssVar("OnSurfaceSubtle")).toBe("--b-on-surface-subtle");
+    expect(semanticLeafKeyToExpectedCssVar("SurfaceSubtle")).toBe("--b-surface-subtle");
+    expect(semanticLeafKeyToExpectedCssVar("SurfaceSeparator")).toBe("--b-surface-separator");
     expect(semanticLeafKeyToExpectedCssVar("TextLabel")).toBe("--b-text-label");
     expect(semanticLeafKeyToExpectedCssVar("PrimaryHover")).toBe("--b-primary-hover");
     expect(semanticLeafKeyToExpectedCssVar("PrimaryPressed")).toBe("--b-primary-pressed");

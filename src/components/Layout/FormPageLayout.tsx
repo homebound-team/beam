@@ -5,6 +5,7 @@ import { Css, Palette } from "src/Css";
 import { BoundForm, BoundFormInputConfig, SubmitButton } from "src/forms";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "../Button";
 import { Icon, IconKey } from "../Icon";
@@ -89,7 +90,10 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
   const tids = useTestIds(props);
 
   return (
-    <header css={Css.gr(1).gc("1 / 4").sticky.top0.bgWhite.z5.if(!notice).hPx(headerHeightPx).$} {...tids}>
+    <header
+      css={Css.gr(1).gc("1 / 4").sticky.top0.bgWhite.z(zIndices.pageStickyHeader).if(!notice).hPx(headerHeightPx).$}
+      {...tids}
+    >
       <Toast />
       <div css={Css.py2.px3.df.jcsb.aic.$}>
         <div>

@@ -8,6 +8,8 @@ import { fileURLToPath } from "url";
 import {
   buildPathMap,
   collectTokenLeaves,
+  isDtcgCubicBezierValue,
+  isDtcgDurationValue,
   isDtcgSrgbColorValue,
   isPathReference,
   loadTokensJson,
@@ -51,10 +53,10 @@ function validatePrimitiveWhiteTransparent(merged: Record<string, unknown>): voi
   }
 }
 
-function validateLeaf(leaf: TokenLeaf, pathMap: Map<string, TokenLeaf>): void {
-  if (leaf.$type !== "color") {
-    throw new Error(`Unsupported $type at ${leaf.path}: ${leaf.$type}`);
-  }
+const MOTION_DURATION_PREFIX = "beam.motion.duration.";
+const MOTION_EASING_PREFIX = "beam.motion.easing.";
+
+function validateColorLeaf(leaf: TokenLeaf): void {
   const v = leaf.$value;
   if (isPathReference(v)) {
     // Reference target validated when walking references
@@ -86,6 +88,53 @@ function validateLeaf(leaf: TokenLeaf, pathMap: Map<string, TokenLeaf>): void {
     if (typeof c !== "string" || (!isPathReference(c) && !isHexColor(c))) {
       throw new Error(`Token ${leaf.path}: contrast must be hex or {path} reference`);
     }
+  }
+}
+
+function validateDurationLeaf(leaf: TokenLeaf): void {
+  if (!leaf.path.startsWith(MOTION_DURATION_PREFIX)) {
+    throw new Error(`Token ${leaf.path}: duration tokens must live under ${MOTION_DURATION_PREFIX}`);
+  }
+  const v = leaf.$value;
+  if (isPathReference(v)) {
+    return;
+  }
+  if (!isDtcgDurationValue(v)) {
+    throw new Error(`Token ${leaf.path}: $value must be a DTCG duration object { value, unit: "ms"|"s" } or {path} reference`);
+  }
+  if (v.value < 0) {
+    throw new Error(`Token ${leaf.path}: duration value must be non-negative`);
+  }
+}
+
+function validateCubicBezierLeaf(leaf: TokenLeaf): void {
+  if (!leaf.path.startsWith(MOTION_EASING_PREFIX)) {
+    throw new Error(`Token ${leaf.path}: cubicBezier tokens must live under ${MOTION_EASING_PREFIX}`);
+  }
+  const v = leaf.$value;
+  if (isPathReference(v)) {
+    return;
+  }
+  if (!isDtcgCubicBezierValue(v)) {
+    throw new Error(
+      `Token ${leaf.path}: $value must be a DTCG cubicBezier [P1x, P1y, P2x, P2y] with P1x and P2x in [0, 1], or a {path} reference`,
+    );
+  }
+}
+
+function validateLeaf(leaf: TokenLeaf, _pathMap: Map<string, TokenLeaf>): void {
+  switch (leaf.$type) {
+    case "color":
+      validateColorLeaf(leaf);
+      break;
+    case "duration":
+      validateDurationLeaf(leaf);
+      break;
+    case "cubicBezier":
+      validateCubicBezierLeaf(leaf);
+      break;
+    default:
+      throw new Error(`Unsupported $type at ${leaf.path}: ${leaf.$type}`);
   }
 }
 
