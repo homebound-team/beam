@@ -1,6 +1,8 @@
 import { Meta } from "@storybook/react-vite";
+import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/PageHeader";
 import { Css } from "src/Css";
+import { action } from "storybook/actions";
 
 export default {
   component: PageHeader,
@@ -21,7 +23,10 @@ export function NoRightSlot() {
 export function WithRightSlot() {
   return (
     <div css={Css.bgWhite.$}>
-      <PageHeader title="Test Title" rightSlot={<span>Right Slot</span>} />
+      <PageHeader
+        title="Test Title"
+        rightSlot={<Button label="Test Action" variant="primary" onClick={action("clicked")} />}
+      />
     </div>
   );
 }
