@@ -125,7 +125,9 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
         />
       ) : isNavLinkButton(trigger) ? (
         <NavLink
-          {...trigger}
+          active={trigger.active}
+          variant={trigger.variant}
+          icon={trigger.icon}
           label={trigger.navLabel}
           disabled={!!disabled}
           menuTriggerProps={wrappedMenuTriggerProps}
