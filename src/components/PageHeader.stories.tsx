@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react-vite";
+import { useState } from "react";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/PageHeader";
 import { testTabs } from "src/components/testData";
@@ -28,15 +29,32 @@ export function WithRightSlot() {
 }
 
 export function WithTabs() {
-  return <PageHeader title="Test Title" tabs={testTabs} />;
+  const [selected, setSelected] = useState(testTabs[0].value);
+
+  return (
+    <PageHeader
+      title="Test Title"
+      tabs={{
+        tabs: testTabs,
+        selected,
+        onChange: setSelected,
+      }}
+    />
+  );
 }
 
 export function WithRightSlotAndTabs() {
+  const [selected, setSelected] = useState(testTabs[0].value);
+
   return (
     <PageHeader
       title="Test Title"
       rightSlot={<Button label="Test Action" variant="primary" onClick={action("clicked")} />}
-      tabs={testTabs}
+      tabs={{
+        tabs: testTabs,
+        selected,
+        onChange: setSelected,
+      }}
     />
   );
 }
