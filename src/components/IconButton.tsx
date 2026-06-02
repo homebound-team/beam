@@ -30,6 +30,11 @@ export type IconButtonProps = {
   download?: boolean;
   /** Provides label for screen readers - Will become a required soon */
   label?: string;
+  /**
+   * By default the `label` is also surfaced as a hover tooltip. Set this to keep the `aria-label`
+   * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
+   */
+  preventTooltip?: boolean;
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -52,6 +57,7 @@ export function IconButton(props: IconButtonProps) {
     download = false,
     forceFocusStyles = false,
     label,
+    preventTooltip = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -108,9 +114,10 @@ export function IconButton(props: IconButtonProps) {
     />
   );
 
-  // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
+  // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip.
+  // Unless opted out via `preventTooltip`, the `label` is also surfaced as the tooltip.
   return maybeTooltip({
-    title: resolveTooltip(disabled ?? label, tooltip),
+    title: resolveTooltip(disabled ?? (preventTooltip ? undefined : label), tooltip),
     placement: "top",
     children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });

@@ -11,11 +11,11 @@ export const zIndices = {
   tableStickyColumn: 30,
   tableStickyHeader: 40,
 
-  // Page chrome.
-  scrollShadow: 30,
-  superDrawerScrim: 30,
-  modalUnderlay: 40,
-  pageStickyHeader: 50,
+  // Page chrome - ensure these items sit above the table
+  scrollShadow: 50,
+  superDrawerScrim: 50,
+  modalUnderlay: 60,
+  pageStickyHeader: 70,
 
   dragHandle: 80,
 

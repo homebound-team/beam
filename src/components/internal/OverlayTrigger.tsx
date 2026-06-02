@@ -16,7 +16,7 @@ import { defaultTestId } from "src/utils/defaultTestId";
 
 type TextButtonTriggerProps = Pick<ButtonProps, "label" | "variant" | "size" | "icon">;
 type IconButtonTriggerProps = Pick<IconButtonProps, "icon" | "color" | "compact" | "inc">;
-type AvatarButtonTriggerProps = Pick<AvatarButtonProps, "src" | "name" | "size">;
+type AvatarButtonTriggerProps = Pick<AvatarButtonProps, "src" | "name" | "size" | "preventTooltip">;
 type NavLinkButtonTriggerProps = {
   navLabel: string;
 } & Pick<NavLinkProps, "active" | "variant" | "icon">;

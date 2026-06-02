@@ -10,6 +10,11 @@ describe("IconButton", () => {
     expect(r.tooltip).toHaveAttribute("title", "Move to trash");
   });
 
+  it("renders no tooltip when preventTooltip is set", async () => {
+    const r = await render(<IconButton icon="trash" label="Move to trash" preventTooltip onClick={noop} />);
+    expect(r.query.tooltip).toBeNull();
+  });
+
   it("can have a data-testid", async () => {
     const r = await render(<IconButton icon="trash" data-testid="remove" onClick={noop} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("remove");
