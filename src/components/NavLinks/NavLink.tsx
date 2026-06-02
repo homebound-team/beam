@@ -41,9 +41,11 @@ export function NavLink(props: NavLinkProps) {
     buttonRef,
     iconOnly,
     onClick,
+    active,
+    variant,
+    icon,
     ...otherProps
   } = props;
-  const { active = false, icon = false, variant } = otherProps;
   const asLink = typeof onClick === "string";
   const isIconOnly = !!iconOnly && !!icon;
   const labelContent = isIconOnly ? <span css={Css.visuallyHidden.$}>{label}</span> : label;
