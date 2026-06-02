@@ -55,6 +55,13 @@ describe(AvatarButton, () => {
     // Given a button with no tooltip, but a name defined
     const r = await render(<AvatarButton src="test" name="Test" onClick={() => {}} />);
     // Then the tooltip is correctly displayed
-    expect(r.test_button.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Test");
+    expect(r.tooltip).toHaveAttribute("title", "Test");
+  });
+
+  it("renders no tooltip when preventTooltip is set", async () => {
+    // Given a button with a name but preventTooltip set
+    const r = await render(<AvatarButton src="test" name="Test" preventTooltip onClick={() => {}} />);
+    // Then no tooltip is rendered in the DOM
+    expect(r.query.tooltip).toBeNull();
   });
 });

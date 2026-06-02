@@ -107,6 +107,26 @@ describe("ButtonMenu", () => {
     expect(r.tooltip).toHaveAttribute("title", "Tooltip");
   });
 
+  // OverlayTrigger forwards `preventTooltip` from an avatar trigger through to AvatarButton.
+  it("shows the avatar name as a tooltip by default", async () => {
+    const r = await render(
+      <ButtonMenu trigger={{ src: "test", name: "Test" }} items={[{ label: "Option A", onClick: noop }]} />,
+      withRouter(),
+    );
+    expect(r.tooltip).toHaveAttribute("title", "Test");
+  });
+
+  it("renders no tooltip on an avatar trigger when preventTooltip is set", async () => {
+    const r = await render(
+      <ButtonMenu
+        trigger={{ src: "test", name: "Test", preventTooltip: true }}
+        items={[{ label: "Option A", onClick: noop }]}
+      />,
+      withRouter(),
+    );
+    expect(r.query.tooltip).toBeNull();
+  });
+
   it("handles selecting button menu items", async () => {
     // Given two menu items that can be selected
     function TestComponent() {
