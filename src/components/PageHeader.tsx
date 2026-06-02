@@ -12,7 +12,7 @@ export function PageHeader(props: PageHeaderProps) {
   const tid = useTestIds(otherProps, "pageHeader");
 
   return (
-    <header {...tid} css={Css.df.fdc.pt3.pr3.pl3.bb.bc(Tokens.SurfaceSeparator).$}>
+    <header {...tid} css={Css.df.fdc.pt3.pr3.pl3.bb.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
       <div css={Css.df.jcsb.mb2.w100.gap1.$}>
         <div>
           {/* Breadcrumbs here */}
