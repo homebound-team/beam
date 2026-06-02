@@ -36,6 +36,7 @@ export * from "./Modal";
 export * from "./Modal/useModal";
 export { NavGroup, NavLink, getNavLinkStyles } from "./NavLinks";
 export type { NavGroupLink, NavGroupProps, NavLinkProps, NavLinkVariant } from "./NavLinks";
+export * from "./PageHeader";
 export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
 export type { InputStylePalette, PresentationFieldProps } from "./PresentationContext";

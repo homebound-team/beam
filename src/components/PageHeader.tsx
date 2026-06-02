@@ -1,24 +1,24 @@
 import { ReactNode } from "react";
-import { Css, Margin, Only, Xss } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
-type PageHeaderXss = Margin;
-export interface PageHeaderProps<X> {
+export interface PageHeaderProps {
   title: ReactNode;
   rightSlot?: ReactNode;
-  xss?: X;
 }
 
-export function PageHeader<X extends Only<Xss<PageHeaderXss>, X>>(props: PageHeaderProps<X>) {
-  const { title, rightSlot, xss, ...otherProps } = props;
-  const tid = useTestIds(otherProps);
+export function PageHeader(props: PageHeaderProps) {
+  const { title, rightSlot, ...otherProps } = props;
+  const tid = useTestIds(otherProps, "pageHeader");
 
   return (
-    <header {...tid} css={{ ...Css.df.fdc.pt3.pr3.pl3.$, ...xss }}>
-      <div css={Css.df.jcsb.mb2.w100.aic.$}>
+    <header {...tid} css={Css.df.fdc.pt3.pr3.pl3.bb.bc(Tokens.SurfaceSeparator).$}>
+      <div css={Css.df.jcsb.mb2.w100.gap1.$}>
         <div>
           {/* Breadcrumbs here */}
-          <h2 css={Css.xl.$}>{title}</h2>
+          <h1 {...tid.title} css={Css.xl.$}>
+            {title}
+          </h1>
         </div>
         <div>{rightSlot}</div>
       </div>
