@@ -20,6 +20,16 @@ describe(Avatar, () => {
     expect(r.avatar.textContent).toBe("FML");
   });
 
+  it("shows a tooltip with the name by default", async () => {
+    const r = await render(<Avatar src="test" name="Test" />);
+    expect(r.tooltip).toBeInTheDocument();
+  });
+
+  it("renders no tooltip when preventTooltip is set", async () => {
+    const r = await render(<Avatar src="test" name="Test" preventTooltip />);
+    expect(r.query.tooltip).toBeNull();
+  });
+
   // Note: not testing the `onError` case as jsdom does not request external resources.
   // Instead relying on Storybook to demonstrate fallback
   // See https://github.com/jsdom/jsdom/issues/1816#issuecomment-310106280
