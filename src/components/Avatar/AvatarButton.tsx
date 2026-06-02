@@ -32,6 +32,7 @@ export function AvatarButton(props: AvatarButtonProps) {
     openInNew,
     forceFocusStyles = false,
     __storyState,
+    preventTooltip = false,
     ...avatarProps
   } = props;
   const isDisabled = !!disabled;
@@ -75,15 +76,15 @@ export function AvatarButton(props: AvatarButtonProps) {
 
   const content = (
     <>
-      <Avatar {...avatarProps} {...tid} disableTooltip />
+      <Avatar {...avatarProps} {...tid} preventTooltip />
       {isPressed && <span css={pressedOverlayCss} />}
     </>
   );
 
-  // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip
+  // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip.
+  // Unless opted out via `preventTooltip`, the avatar's `name` is also surfaced as the tooltip.
   return maybeTooltip({
-    // Default the tooltip to the avatar's name, if defined.
-    title: resolveTooltip(disabled, tooltip ?? avatarProps.name),
+    title: resolveTooltip(disabled, tooltip ?? (preventTooltip ? undefined : avatarProps.name)),
     placement: "top",
     // Disable the auto-tooltip in Avatar to prevent nested tooltips which can cause issues with interactions
     children: getButtonOrLink(content, onPress, buttonAttrs, openInNew),
