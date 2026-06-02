@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Tabs, TabsProps } from "src/components/Tabs";
+import { RouteTabsProps, Tabs, TabsProps } from "src/components/Tabs";
 import { Css, Tokens } from "src/Css";
 import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
@@ -7,7 +7,7 @@ import { useTestIds } from "src/utils";
 export interface PageHeaderProps<V extends string> {
   title: ReactNode;
   rightSlot?: ReactNode;
-  tabs?: TabsProps<V, AnyObject>;
+  tabs?: TabsProps<V, AnyObject> | RouteTabsProps<V, AnyObject>;
 }
 
 export function PageHeader<V extends string>(props: PageHeaderProps<V>) {
