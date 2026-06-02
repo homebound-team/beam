@@ -112,9 +112,17 @@ function Popper(props: PopperProps) {
     : null;
 
   const { styles, attributes } = usePopper(targetElement, popperRef.current, {
+    // Use `fixed` positioning so the portaled tooltip is positioned relative to the viewport.
+    // With the default `absolute` strategy the tooltip is appended to `document.body` and counts
+    // toward the document's scroll size, so a trigger near an edge pushes the tooltip past the
+    // document bounds and introduces scrollbars / renders off-screen. `fixed` elements don't
+    // contribute to document scroll size, so they can be kept within the viewport instead.
+    strategy: "fixed",
     modifiers: [
       { name: "arrow", options: { element: arrowRef } },
       { name: "offset", options: { offset: [0, 5] } },
+      // Keep the tooltip inside the viewport (with a small gutter) rather than overflowing it.
+      { name: "preventOverflow", options: { padding: 8 } },
     ],
     placement,
   });
