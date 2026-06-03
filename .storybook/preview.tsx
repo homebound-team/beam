@@ -1,5 +1,6 @@
 import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
+import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from "storybook/viewport";
 import { CssReset } from "../src";
 import beamTheme from "./beamTheme";
 
@@ -30,6 +31,10 @@ const preview: Preview = {
       // https://www.chromatic.com/docs/delay#delay-a-story
       delay: 300,
     },
+    // Catalog of named viewports so per-story `chromatic.modes` (via `viewportModes(...)`) can
+    // reference them by key. This only registers the names — it does not add snapshots; multi-viewport
+    // capture stays opt-in per story. No `initialGlobals.viewport`, so non-moded stories are unaffected.
+    viewport: { options: { ...INITIAL_VIEWPORTS, ...MINIMAL_VIEWPORTS } },
     controls: {
       // Hide NoControls warning
       // https://storybook.js.org/docs/react/essentials/controls#hide-nocontrols-warning
