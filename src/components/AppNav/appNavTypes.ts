@@ -8,6 +8,7 @@ export type AppNavLink = Pick<NavLinkProps, "icon" | "onClick" | "active" | "dis
 /**
  * Collapsible labeled block of nav links (side-nav disclosure or global-nav menu trigger).
  * Use unlabeled {@link AppNavSection} children to group menu rows with dividers.
+ * Differs from AppNavSection in that AppNavGroup can be collapsed/expanded, and there is no visually distinct separation
  */
 export type AppNavGroup = {
   label: string;
@@ -17,7 +18,10 @@ export type AppNavGroup = {
 
 export type AppNavSectionItem = AppNavLink | AppNavGroup;
 
-/** Static section chrome (optional heading, divider) containing links, link groups, and/or nested sections. */
+/** Static section chrome (optional heading, divider) containing links, link groups, and/or nested sections.
+ * Used to group links into visually distinct sections.
+ * Differs from AppNavGroup in that it cannot be collapsed/expanded
+ */
 export type AppNavSection = {
   /** Discriminant — distinguishes sections from {@link AppNavGroup} (both use `items`). */
   section: true;
