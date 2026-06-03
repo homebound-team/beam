@@ -83,7 +83,7 @@ export function NavLink(props: NavLinkProps) {
     "aria-current": active ? ("page" as const) : undefined,
     ...Css.props({
       ...baseStyles,
-      ...(isIconOnly && Css.jcc.$),
+      ...(isIconOnly && Css.jcc.pxPx(6).$),
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isFocusVisible && focusRingStyles),

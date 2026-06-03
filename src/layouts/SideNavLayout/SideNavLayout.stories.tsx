@@ -1,9 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
+import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
-import { SideNav, SideNavItem } from "src/components/SideNav/SideNav";
+import { SideNav } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
@@ -18,8 +19,9 @@ export default {
 // The layout owns the rail's width, surface, border, and collapse toggle, so any sideNav
 // content (`SideNav` or custom JSX) inherits the rail look. Most stories pass SideNav;
 // `CustomSideRail` demonstrates the "any content gets the chrome" path.
-const items: SideNavItem[] = [
+const items: AppNavItem[] = [
   {
+    section: true,
     label: "Main",
     items: [
       { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
@@ -27,6 +29,7 @@ const items: SideNavItem[] = [
     ],
   },
   {
+    section: true,
     label: "Workspace",
     items: [
       { label: "Members", icon: "comment", onClick: "/members" },
