@@ -35,6 +35,7 @@ export * from "./LoadingSkeleton";
 export * from "./MaxLines";
 export * from "./Modal";
 export * from "./Modal/useModal";
+export * from "./Navbar";
 export { NavLink, getNavLinkStyles } from "./NavLinks";
 export type { NavLinkProps, NavLinkVariant } from "./NavLinks";
 export * from "./PageHeader";

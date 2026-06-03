@@ -2,6 +2,10 @@
 
 This file is the **source of truth** for agent-oriented conventions in this repo. Cursor rules under [`.cursor/rules/`](.cursor/rules/) only route you here — they do not duplicate guidance, so practices stay in one place.
 
+## Imports
+
+Use the `src/` path alias (e.g. `import { Css } from "src/Css"`), not relative paths like `../../utils/...`. This applies repo-wide — components, hooks, tests, and stories.
+
 ## Testing
 
 Use **vitest**, not Jest. Example:
@@ -81,7 +85,7 @@ Example tests: [`DateField.test.tsx`](src/inputs/DateFields/DateField.test.tsx),
 
 - Primary development surface for components; utilities in [`src/utils/sb.tsx`](src/utils/sb.tsx).
 - Every feature should have at least one story; use `PlayFunction` for interaction states (hover, focus, etc.).
-- Chromatic snapshots stories for visual regression.
+- Chromatic snapshots stories for visual regression. When a Chromatic mode name matches a built-in Storybook viewport key, use [`viewportModes()`](src/utils/sb.tsx) (e.g. `modes: viewportModes("desktop", "iphone12")`). Keys are type-checked against Storybook's [`INITIAL_VIEWPORTS`](https://storybook.js.org/docs/essentials/viewport#use-a-detailed-set-of-devices) and default [`MINIMAL_VIEWPORTS`](https://storybook.js.org/docs/essentials/viewport#use-a-detailed-set-of-devices) sets via the `StorybookViewportKey` type.
 - **Helper placement:** Local helpers in `*.stories.tsx` go **at the bottom of the file**, after meta, story exports, and play functions.
 - **No module-level fixture values:** Do not declare objects, arrays, or other non-trivial values at the **top level** of a story file — Storybook loads modules eagerly. Use **factory functions** at the bottom (`function createItems() { return […]; }`) or inline values inside a story export.
 

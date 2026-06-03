@@ -1,5 +1,6 @@
 export * from "./useBreakpoint";
 export * from "./useComputed";
+export * from "./useContentOverflow";
 export * from "./useFilter";
 export * from "./useGroupBy";
 export * from "./useHover";

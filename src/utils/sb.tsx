@@ -3,6 +3,10 @@ import { ReactNode } from "react";
 import { BeamProvider } from "src/components";
 import { Css, Properties } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
+import type { InitialViewportKeys, MINIMAL_VIEWPORTS } from "storybook/viewport";
+
+/** Built-in Storybook viewport keys from {@link MINIMAL_VIEWPORTS} and {@link INITIAL_VIEWPORTS}. */
+export type StorybookViewportKey = InitialViewportKeys | keyof typeof MINIMAL_VIEWPORTS;
 
 export function withRouter(url?: string, route?: string): Decorator {
   return (Story: () => JSX.Element) => rtlWithRouter(url, route).wrap(<Story />);
@@ -11,6 +15,15 @@ export function withRouter(url?: string, route?: string): Decorator {
 /* Models our currently used parameters. */
 type StoryParameters = { chromatic?: { delay?: number }; mockData?: unknown };
 type PlayFunction = NonNullable<StoryObj["play"]>;
+
+/**
+ * Chromatic modes that reference built-in Storybook viewports by key
+ * (see [Storybook viewports](https://storybook.js.org/docs/essentials/viewport)).
+ * https://www.chromatic.com/docs/modes/viewports/
+ */
+export function viewportModes<const T extends StorybookViewportKey>(...viewports: T[]): Record<T, { viewport: T }> {
+  return Object.fromEntries(viewports.map((viewport) => [viewport, { viewport }])) as Record<T, { viewport: T }>;
+}
 
 /** A somewhat typesafe way to set `FooStory.story` metadata. */
 export function newStory(
