@@ -23,11 +23,12 @@ export const zIndices = {
   // snackbar so toasts still land on top.
   sideNav: 100,
 
-  // Full-page overlays sit above side-nav and use their own toast internally
-  pageOverlay: 110,
+  // Full-page overlays — high enough to clear consuming-app nav bars (~999).
+  // Both layouts own their Toast internally so it renders inside the overlay header.
+  pageOverlay: 1000,
 
   // Top of stack
-  snackbar: 120,
+  snackbar: 1100,
 } as const;
 
 export type ZIndex = (typeof zIndices)[keyof typeof zIndices];
