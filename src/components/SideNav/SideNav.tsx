@@ -1,24 +1,16 @@
 import { ReactNode } from "react";
-import { SideNavItems } from "src/components/SideNav/SideNavItems";
-import type { SideNavItem } from "src/components/SideNav/sideNavTypes";
-import { allItemsHaveIcons } from "src/components/SideNav/sideNavUtils";
+import { AppNavItems } from "src/components/AppNav/AppNavItems";
+import type { AppNavItem } from "src/components/AppNav/appNavTypes";
+import { allItemsHaveIcons } from "src/components/AppNav/appNavUtils";
 import { Css, Tokens } from "src/Css";
 import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
 import { useTestIds } from "src/utils";
-
-export type {
-  SideNavItem,
-  SideNavLink,
-  SideNavLinkGroup,
-  SideNavSection,
-  SideNavSectionItem,
-} from "src/components/SideNav/sideNavTypes";
 
 export type SideNavProps = {
   /** Optional area above the item list (logo, workspace switcher, etc.). */
   top?: ReactNode;
   /** Top-level entries — links, link groups, and/or sections. */
-  items: SideNavItem[];
+  items: AppNavItem[];
   /** Optional area pinned to the bottom (user menu, settings, sign-out). */
   footer?: ReactNode;
 };
@@ -42,7 +34,7 @@ export function SideNav(props: SideNavProps) {
         </div>
       )}
       <div css={Css.fg1.oya.df.fdc.px1.py1.if(top === undefined).pt5.$} {...tid.items}>
-        {!hideOnCollapse && <SideNavItems items={items} panelCollapsed={panelCollapsed} />}
+        {!hideOnCollapse && <AppNavItems items={items} panelCollapsed={panelCollapsed} />}
       </div>
       {footer !== undefined && (
         <div css={Css.fs0.px2.py2.bt.bc(Tokens.SurfaceSeparator).$} {...tid.footer}>

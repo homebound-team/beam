@@ -1,12 +1,12 @@
-import type { SideNavLinkGroup } from "src/components/SideNav/sideNavTypes";
+import type { AppNavGroup } from "src/components/AppNav/appNavTypes";
 import {
-  SIDE_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY,
-  useSideNavLinkGroupExpanded,
-} from "src/components/SideNav/useSideNavLinkGroupExpanded";
+  APP_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY,
+  useAppNavGroupExpanded,
+} from "src/components/AppNav/useAppNavGroupExpanded";
 import { useTestIds } from "src/utils";
 import { click, render } from "src/utils/rtl";
 
-describe("useSideNavLinkGroupExpanded", () => {
+describe("useAppNavGroupExpanded", () => {
   it("starts collapsed when no stored value, no active link, and no defaultExpanded", async () => {
     const r = await render(<Harness linkGroup={createLinkGroup()} />);
 
@@ -15,7 +15,7 @@ describe("useSideNavLinkGroupExpanded", () => {
 
   it("auto-expands when a child link is active", async () => {
     const r = await render(
-      <Harness linkGroup={createLinkGroup({ links: [{ label: "Budget", onClick: "/budget", active: true }] })} />,
+      <Harness linkGroup={createLinkGroup({ items: [{ label: "Budget", onClick: "/budget", active: true }] })} />,
     );
 
     expect(r.linkGroupExpanded_expanded).toHaveTextContent("true");
@@ -33,32 +33,32 @@ describe("useSideNavLinkGroupExpanded", () => {
     click(r.linkGroupExpanded_toggle);
 
     expect(r.linkGroupExpanded_expanded).toHaveTextContent("true");
-    const stored = JSON.parse(window.localStorage.getItem(SIDE_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY) ?? "{}");
+    const stored = JSON.parse(window.localStorage.getItem(APP_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY) ?? "{}");
     expect(stored).toEqual({ Budgets: true });
   });
 
   it("prefers stored state over active-link auto-expand", async () => {
-    window.localStorage.setItem(SIDE_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY, JSON.stringify({ Budgets: false }));
+    window.localStorage.setItem(APP_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY, JSON.stringify({ Budgets: false }));
 
     const r = await render(
-      <Harness linkGroup={createLinkGroup({ links: [{ label: "Budget", onClick: "/budget", active: true }] })} />,
+      <Harness linkGroup={createLinkGroup({ items: [{ label: "Budget", onClick: "/budget", active: true }] })} />,
     );
 
     expect(r.linkGroupExpanded_expanded).toHaveTextContent("false");
   });
 });
 
-function createLinkGroup(overrides: Partial<SideNavLinkGroup> = {}): SideNavLinkGroup {
+function createLinkGroup(overrides: Partial<AppNavGroup> = {}): AppNavGroup {
   return {
     label: "Budgets",
-    links: [{ label: "Budget", onClick: "/budget" }],
+    items: [{ label: "Budget", onClick: "/budget" }],
     ...overrides,
   };
 }
 
-function Harness({ linkGroup }: { linkGroup: SideNavLinkGroup }) {
+function Harness({ linkGroup }: { linkGroup: AppNavGroup }) {
   const tid = useTestIds({}, "linkGroupExpanded");
-  const { expanded, onToggle } = useSideNavLinkGroupExpanded(linkGroup);
+  const { expanded, onToggle } = useAppNavGroupExpanded(linkGroup);
 
   return (
     <>

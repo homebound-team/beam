@@ -1,8 +1,8 @@
-import { NavGroupTrigger } from "src/components/NavLinks/NavGroupTrigger";
+import { AppNavGroupTrigger } from "src/components/AppNav/AppNavGroupTrigger";
 import { useTestIds } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
 
-describe("NavGroupTrigger", () => {
+describe("AppNavGroupTrigger", () => {
   it("exposes disclosure semantics and label", async () => {
     const r = await render(<Harness expanded={false} />, withRouter());
     const trigger = r.getByRole("button", { name: "Budgets" });
@@ -26,21 +26,21 @@ describe("NavGroupTrigger", () => {
     expect(r.getByRole("button", { name: "Budgets" })).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("uses the parent test-id scope when tid is spread from NavGroup", async () => {
+  it("uses the parent test-id scope when tid is spread from AppNavGroup", async () => {
     const r = await render(<ScopedHarness />, withRouter());
 
-    expect(r.navGroup_trigger).toHaveTextContent("Budgets");
+    expect(r.appNavGroup_trigger).toHaveTextContent("Budgets");
   });
 
   function Harness({ expanded, onClick = vi.fn() }: { expanded: boolean; onClick?: VoidFunction }) {
-    return <NavGroupTrigger label="Budgets" navGroupId="nav-group-budgets" expanded={expanded} onClick={onClick} />;
+    return <AppNavGroupTrigger label="Budgets" navGroupId="nav-group-budgets" expanded={expanded} onClick={onClick} />;
   }
 
   function ScopedHarness() {
-    const tid = useTestIds({}, "navGroup");
+    const tid = useTestIds({}, "appNavGroup");
 
     return (
-      <NavGroupTrigger {...tid} label="Budgets" navGroupId="nav-group-budgets" expanded={false} onClick={vi.fn()} />
+      <AppNavGroupTrigger {...tid} label="Budgets" navGroupId="nav-group-budgets" expanded={false} onClick={vi.fn()} />
     );
   }
 });
