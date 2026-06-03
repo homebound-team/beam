@@ -1,16 +1,17 @@
 import { ReactNode } from "react";
-import { RouteTabsProps, Tabs, TabsProps } from "src/components/Tabs";
-import { Css, Tokens } from "src/Css";
-import { AnyObject } from "src/types";
+import { RouteTabsProps, Tabs, TabsContentXss, TabsProps } from "src/components/Tabs";
+import { Css, Only, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export interface PageHeaderProps<V extends string> {
+export interface PageHeaderProps<V extends string, X> {
   title: ReactNode;
   rightSlot?: ReactNode;
-  tabs?: TabsProps<V, AnyObject> | RouteTabsProps<V, AnyObject>;
+  tabs?:
+    | Omit<TabsProps<V, X>, "contentXss" | "omitFullBleedPadding" | "includeBottomBorder">
+    | Omit<RouteTabsProps<V, X>, "contentXss" | "omitFullBleedPadding" | "includeBottomBorder">;
 }
 
-export function PageHeader<V extends string>(props: PageHeaderProps<V>) {
+export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(props: PageHeaderProps<V, X>) {
   const { title, rightSlot, tabs, ...otherProps } = props;
   const tid = useTestIds(otherProps, "pageHeader");
 

@@ -22,7 +22,7 @@ export type Tab<V extends string = string> = {
   disabled?: boolean | ReactNode;
 };
 
-type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
+export type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
 
 export type TabsProps<V extends string, X> = {
   ariaLabel?: string;
@@ -90,8 +90,8 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
   );
 }
 
-export function TabContent<V extends string>(
-  props: Omit<RequiredRenderTabs<V, AnyObject>, "onChange"> | RequiredRenderRouteTabs<V, AnyObject>,
+export function TabContent<V extends string, X extends Only<TabsContentXss, X>>(
+  props: Omit<RequiredRenderTabs<V, X>, "onChange"> | RequiredRenderRouteTabs<V, X>,
 ) {
   const tid = useTestIds(props, "tab");
   const { tabs, contentXss = {}, omitFullBleedPadding = false } = props;
@@ -123,7 +123,9 @@ export function TabContent<V extends string>(
 }
 
 /** The top list of tabs. */
-export function Tabs<V extends string>(props: TabsProps<V, AnyObject> | RouteTabsProps<V, AnyObject>) {
+export function Tabs<V extends string, X extends Only<TabsContentXss, X>>(
+  props: TabsProps<V, X> | RouteTabsProps<V, X>,
+) {
   const { ariaLabel, tabs, includeBottomBorder, right, ...others } = props;
   const location = useLocation();
   const selected = isRouteTabs(props)

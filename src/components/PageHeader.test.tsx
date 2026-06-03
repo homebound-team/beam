@@ -18,18 +18,9 @@ describe("PageHeader", () => {
 
   it("renders with tabs", async () => {
     const tabs: Tab[] = [
-      {
-        name: "Tab A",
-        value: "tabA",
-      },
-      {
-        name: "Tab B",
-        value: "tabB",
-      },
-      {
-        name: "Tab C",
-        value: "tabC",
-      },
+      { name: "Tab A", value: "tabA" },
+      { name: "Tab B", value: "tabB" },
+      { name: "Tab C", value: "tabC" },
     ];
     const r = await render(
       <PageHeader
