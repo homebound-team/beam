@@ -1,9 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
+import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Avatar } from "src/components/Avatar";
 import { Icon } from "src/components/Icon";
 import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
-import { SideNav, SideNavItem } from "src/components/SideNav/SideNav";
+import { SideNav } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
@@ -15,14 +16,15 @@ export default {
   parameters: { layout: "fullscreen" },
 } as Meta;
 
-const items: SideNavItem[] = [
+const items: AppNavItem[] = [
   { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
   { label: "Projects", icon: "search", onClick: "/projects" },
   { label: "Documents", icon: "comment", onClick: "/docs" },
 ];
 
-const groupedItems: SideNavItem[] = [
+const groupedItems: AppNavItem[] = [
   {
+    section: true,
     label: "Main",
     items: [
       { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
@@ -30,6 +32,7 @@ const groupedItems: SideNavItem[] = [
     ],
   },
   {
+    section: true,
     label: "Workspace",
     items: [
       { label: "Members", icon: "comment", onClick: "/members" },
@@ -58,12 +61,12 @@ export function GroupedItems() {
   );
 }
 
-const collapsibleItems: SideNavItem[] = [
+const collapsibleItems: AppNavItem[] = [
   { label: "Dashboard", onClick: "/" },
   { label: "Schedule", onClick: "/schedule" },
   {
     label: "Budgets",
-    links: [
+    items: [
       { label: "Metrics", onClick: "/budgets/metrics" },
       { label: "Budget", onClick: "/budgets/budget", active: true },
       { label: "POs", onClick: "/budgets/pos" },
@@ -79,7 +82,7 @@ const collapsibleItems: SideNavItem[] = [
   { label: "Documents", onClick: "/documents" },
   {
     label: "Homeowner",
-    links: [
+    items: [
       { label: "Profile", onClick: "/homeowner/profile" },
       { label: "Communications", onClick: "/homeowner/communications" },
     ],

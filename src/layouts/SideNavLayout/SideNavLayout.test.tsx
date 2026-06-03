@@ -3,21 +3,12 @@ import {
   SIDE_NAV_LAYOUT_STATE_STORAGE_KEY,
   SideNavLayoutProvider,
 } from "src/layouts/SideNavLayout/SideNavLayoutContext";
+import { setViewport } from "src/tests/viewport";
 import { click, render } from "src/utils/rtl";
 
 describe("SideNavLayout", () => {
-  afterEach(() => {
-    // Reset the viewport between tests so mobile/desktop mocks don't leak.
-    setViewportWidth(1280);
-    // Clear persisted navState so tests don't influence each other.
-    window.localStorage.removeItem(SIDE_NAV_LAYOUT_STATE_STORAGE_KEY);
-  });
-
   it("renders the rail, side nav slot, and page content at desktop", async () => {
-    // Given a SideNavLayout at a desktop viewport
-    setViewportWidth(1280);
-
-    // When rendered with a sideNav and children
+    // When rendered with a sideNav and children at the default desktop viewport
     const r = await render(
       <SideNavLayout sideNav={<span>Side nav slot</span>}>
         <span>Page content</span>
@@ -36,7 +27,7 @@ describe("SideNavLayout", () => {
   });
 
   it("starts collapsed on mobile viewports", async () => {
-    setViewportWidth(400);
+    setViewport("sm");
 
     const r = await render(<SideNavLayout sideNav={<div>rail</div>} />);
 
@@ -46,7 +37,7 @@ describe("SideNavLayout", () => {
 
   it("ignores stored expanded preference on mobile initial mount", async () => {
     window.localStorage.setItem(SIDE_NAV_LAYOUT_STATE_STORAGE_KEY, "expanded");
-    setViewportWidth(400);
+    setViewport("sm");
 
     const r = await render(<SideNavLayout sideNav={<div>rail</div>} />);
 
@@ -55,7 +46,7 @@ describe("SideNavLayout", () => {
 
   it("sizes the mobile rail to full viewport width when expanded", async () => {
     // Given a mobile viewport (< 600px)
-    setViewportWidth(400);
+    setViewport("sm");
 
     const r = await render(
       <SideNavLayoutProvider defaultNavState="expanded">
@@ -155,27 +146,3 @@ describe("SideNavLayout", () => {
     expect(window.localStorage.getItem(SIDE_NAV_LAYOUT_STATE_STORAGE_KEY)).toBeNull();
   });
 });
-
-// Drive the breakpoint mock by a synthetic viewport width so both `min-width: …`
-// and `max-width: …` queries (used by `mdAndUp` / `mdAndDown`) resolve correctly.
-function setViewportWidth(widthPx: number) {
-  Object.defineProperty(window, "matchMedia", {
-    writable: true,
-    value: (query: string) => {
-      const max = /max-width:\s*(\d+)px/.exec(query);
-      const min = /min-width:\s*(\d+)px/.exec(query);
-      const maxOk = !max || widthPx <= parseInt(max[1], 10);
-      const minOk = !min || widthPx >= parseInt(min[1], 10);
-      return {
-        matches: maxOk && minOk,
-        media: query,
-        onchange: null,
-        addListener: () => {},
-        removeListener: () => {},
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        dispatchEvent: () => false,
-      };
-    },
-  });
-}

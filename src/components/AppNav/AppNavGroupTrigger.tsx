@@ -6,14 +6,14 @@ import { getNavLinkStyles } from "src/components/NavLinks/NavLink";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export type NavGroupTriggerProps = {
+export type AppNavGroupTriggerProps = {
   label: string;
   navGroupId: string;
   expanded: boolean;
   onClick: () => void;
 };
 
-export function NavGroupTrigger(props: NavGroupTriggerProps) {
+export function AppNavGroupTrigger(props: AppNavGroupTriggerProps) {
   const { label, navGroupId, expanded, onClick } = props;
   const tid = useTestIds(props, "trigger");
   const ref = useRef<HTMLButtonElement>(null);

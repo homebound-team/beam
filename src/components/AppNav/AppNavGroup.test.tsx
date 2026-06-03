@@ -1,8 +1,8 @@
-import { SideNavLinkGroupView } from "src/components/SideNav/SideNavLinkGroup";
-import type { SideNavLinkGroup } from "src/components/SideNav/sideNavTypes";
+import { AppNavGroupView } from "src/components/AppNav/AppNavGroup";
+import type { AppNavGroup } from "src/components/AppNav/appNavTypes";
 import { click, render, withRouter } from "src/utils/rtl";
 
-describe("SideNavLinkGroupView", () => {
+describe("AppNavGroupView", () => {
   afterEach(() => {
     localStorage.clear();
   });
@@ -21,18 +21,18 @@ describe("SideNavLinkGroupView", () => {
     const r = await render(<Harness panelCollapsed />, withRouter());
 
     expect(r.queryByTestId("linkGroup_trigger")).toBeNull();
-    expect(r.linkGroup_link_0).toHaveTextContent("Budget");
-    expect(r.linkGroup_link_1).toHaveTextContent("POs");
+    expect(r.linkGroup_link_budget).toHaveTextContent("Budget");
+    expect(r.linkGroup_link_pOs).toHaveTextContent("POs");
   });
 
   function Harness({ panelCollapsed = false }: { panelCollapsed?: boolean }) {
-    return <SideNavLinkGroupView linkGroup={createLinkGroup()} panelCollapsed={panelCollapsed} />;
+    return <AppNavGroupView linkGroup={createLinkGroup()} panelCollapsed={panelCollapsed} />;
   }
 
-  function createLinkGroup(): SideNavLinkGroup {
+  function createLinkGroup(): AppNavGroup {
     return {
       label: "Budgets",
-      links: [
+      items: [
         { label: "Budget", onClick: "/budget", icon: "search" },
         { label: "POs", onClick: "/pos", icon: "search" },
       ],
