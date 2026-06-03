@@ -1,6 +1,7 @@
 import { ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useToast } from "src/components/Toast/useToast";
 import {
   boundCheckboxField,
   boundDateField,
@@ -19,7 +20,6 @@ import {
   TextField,
   Tooltip,
   useSnackbar,
-  useToast,
 } from "src/index";
 import { noop } from "src/utils";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
@@ -241,6 +241,32 @@ const singleColumnConfig: FormSectionConfig<AuthorInput> = [
   },
   { rows: [{ firstName: boundTextField() }] },
 ];
+
+function WithToastWrapper() {
+  const formState = useFormState({
+    config: formConfig,
+    init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },
+  });
+  const { showToast } = useToast();
+  useEffect(() => {
+    showToast({ type: "error", message: "Validation failed: something went wrong while saving." });
+  }, [showToast]);
+
+  return (
+    <FormPageLayoutComponent
+      pageTitle="Detail Title"
+      submitAction={{ label: "Save", onClick: noop }}
+      cancelAction={{ label: "Cancel", onClick: noop }}
+      breadCrumb={[{ label: "Breadcrumb A", href: "/breadcrumb-a" }]}
+      formSections={formSections}
+      formState={formState}
+    />
+  );
+}
+
+export function WithToastVisible() {
+  return <WithToastWrapper />;
+}
 
 function CommentComponent() {
   const [comment, setComment] = useState<string | undefined>(undefined);

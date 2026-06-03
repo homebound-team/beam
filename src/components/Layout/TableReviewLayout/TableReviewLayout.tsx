@@ -6,6 +6,8 @@ import { GridTable } from "src/components/Table/GridTable";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
 import { useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
+import { Toast } from "../../Toast/Toast";
 import { QueryTable, QueryTableProps } from "../GridTableLayout/QueryTable";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
@@ -96,8 +98,9 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
   }
 
   return (
-    <div css={Css.fixed.top0.bottom0.left0.right0.z(1000).bgWhite.df.fdc.$} {...tid}>
+    <div css={Css.fixed.top0.bottom0.left0.right0.z(zIndices.pageOverlay).bgWhite.df.fdc.$} {...tid}>
       <header css={Css.px3.pt3.pb2.fs0.$} {...tid.header}>
+        <Toast />
         <div css={Css.df.jcsb.aic.$}>
           <div>
             {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}

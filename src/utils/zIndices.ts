@@ -23,7 +23,10 @@ export const zIndices = {
   // snackbar so toasts still land on top.
   sideNav: 100,
 
-  // Top of the stack.
+  // Full-page overlays sit above side-nav and use their own toast internally
+  pageOverlay: 110,
+
+  // Top of stack
   snackbar: 120,
 } as const;
 
