@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { Link } from "react-router-dom";
+import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavGroup, AppNavItem } from "src/components/AppNav/appNavTypes";
 import { HomeboundLogo } from "src/components/HomeboundLogo";
 import type { NavbarUser } from "src/components/Navbar/Navbar";
@@ -25,7 +26,7 @@ export function Example() {
     <Navbar
       brand={createBrand()}
       items={createGlobalNavItems({ activeLabel: "Finances" })}
-      trailingItems={createDefaultTrailingItems()}
+      rightSlot={createDefaultRightSlot()}
       user={createDefaultUser()}
     />
   );
@@ -36,7 +37,7 @@ export function WithOpenNav() {
     <Navbar
       brand={createBrand()}
       items={createGlobalNavItems({ activeLabel: "Finances", librariesMenuOpen: true })}
-      trailingItems={createDefaultTrailingItems()}
+      rightSlot={createDefaultRightSlot()}
       user={createDefaultUser()}
     />
   );
@@ -106,11 +107,12 @@ function createLibrariesLinkGroup(opts?: { menuOpen?: boolean }): AppNavGroup {
   };
 }
 
-function createDefaultTrailingItems(): AppNavItem[] {
-  return [
+function createDefaultRightSlot() {
+  const items: AppNavItem[] = [
     { label: "Help", onClick: "/help", icon: "helpCircle", iconOnly: true },
     { label: "Notifications", onClick: "/notifications", icon: "bell", iconOnly: true },
   ];
+  return <AppNavItems variant="global" items={items} />;
 }
 
 function createDefaultUser(): NavbarUser {

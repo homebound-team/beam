@@ -4,7 +4,7 @@ import { click, render, withRouter } from "src/utils/rtl";
 
 describe("NavbarMobileMenu", () => {
   it("toggles the drawer open and closed via the hamburger", async () => {
-    const r = await render(<NavbarMobileMenu items={createItems()} trailingItems={[]} />, withRouter());
+    const r = await render(<NavbarMobileMenu items={createItems()} />, withRouter());
 
     expect(r.query.navbar_mobileMenuPanel).toBeNull();
     click(r.navbar_mobileMenu);
@@ -14,7 +14,7 @@ describe("NavbarMobileMenu", () => {
   });
 
   it("closes the drawer via the in-drawer close button", async () => {
-    const r = await render(<NavbarMobileMenu items={createItems()} trailingItems={[]} />, withRouter());
+    const r = await render(<NavbarMobileMenu items={createItems()} />, withRouter());
 
     click(r.navbar_mobileMenu);
     click(r.navbar_mobileMenuClose);
@@ -22,28 +22,15 @@ describe("NavbarMobileMenu", () => {
   });
 
   it("renders link groups in the drawer", async () => {
-    const r = await render(<NavbarMobileMenu items={createItemsWithLinkGroup()} trailingItems={[]} />, withRouter());
+    const r = await render(<NavbarMobileMenu items={createItemsWithLinkGroup()} />, withRouter());
 
     click(r.navbar_mobileMenu);
     expect(r.navbar_linkGroup_trigger).toHaveAttribute("aria-expanded", "true");
     expect(r.navbar_linkGroup_link_plans).toHaveTextContent("Plans");
   });
 
-  it("excludes icon-only toolbar links from the drawer", async () => {
-    const trailingItems: AppNavItem[] = [
-      { label: "Help", onClick: "/help", icon: "helpCircle", iconOnly: true },
-      { label: "Settings", onClick: "/settings" },
-    ];
-    const r = await render(<NavbarMobileMenu items={createItems()} trailingItems={trailingItems} />, withRouter());
-
-    click(r.navbar_mobileMenu);
-    // Labeled trailing items fold into the drawer; compact icon-only toolbar links do not.
-    expect(r.navbar_link_settings).toBeInTheDocument();
-    expect(r.query.navbar_link_help).toBeNull();
-  });
-
   it("closes the drawer when a navigating link is tapped", async () => {
-    const r = await render(<NavbarMobileMenu items={createItems()} trailingItems={[]} />, withRouter("/"));
+    const r = await render(<NavbarMobileMenu items={createItems()} />, withRouter("/"));
 
     click(r.navbar_mobileMenu);
     expect(r.navbar_mobileMenuPanel).toBeInTheDocument();
@@ -53,7 +40,7 @@ describe("NavbarMobileMenu", () => {
   });
 
   it("closes the drawer when tapping a link for the current route", async () => {
-    const r = await render(<NavbarMobileMenu items={createItems()} trailingItems={[]} />, withRouter("/projects"));
+    const r = await render(<NavbarMobileMenu items={createItems()} />, withRouter("/projects"));
 
     click(r.navbar_mobileMenu);
     expect(r.navbar_mobileMenuPanel).toBeInTheDocument();
@@ -64,7 +51,7 @@ describe("NavbarMobileMenu", () => {
   });
 
   it("keeps the drawer open when toggling a link group", async () => {
-    const r = await render(<NavbarMobileMenu items={createItemsWithLinkGroup()} trailingItems={[]} />, withRouter());
+    const r = await render(<NavbarMobileMenu items={createItemsWithLinkGroup()} />, withRouter());
 
     click(r.navbar_mobileMenu);
     expect(r.navbar_mobileMenuPanel).toBeInTheDocument();

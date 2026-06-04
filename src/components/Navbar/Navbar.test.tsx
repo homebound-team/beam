@@ -33,12 +33,18 @@ describe("Navbar", () => {
     expect(r.queryByTestId("navbar_userMenu")).not.toBeInTheDocument();
   });
 
-  it("shows the mobile hamburger menu on small viewports", async () => {
-    setViewport("sm");
+  it("renders the rightSlot content", async () => {
     const r = await render(
-      <Navbar brand={createBrand()} items={createItems()} trailingItems={createTrailingItems()} />,
+      <Navbar brand={createBrand()} items={createItems()} rightSlot={<span>Right content</span>} />,
       withRouter(),
     );
+
+    expect(r.navbar_rightSlot).toHaveTextContent("Right content");
+  });
+
+  it("shows the mobile hamburger menu on small viewports", async () => {
+    setViewport("sm");
+    const r = await render(<Navbar brand={createBrand()} items={createItems()} />, withRouter());
 
     expect(r.navbar_mobileMenu).toBeInTheDocument();
   });
@@ -62,10 +68,6 @@ function createItems(opts?: { activeLabel?: string }): AppNavItem[] {
       active: activeLabel === "Projects",
     },
   ];
-}
-
-function createTrailingItems(): AppNavItem[] {
-  return [{ label: "Help", onClick: "/help", icon: "helpCircle", iconOnly: true }];
 }
 
 function createUser(): NavbarUser {

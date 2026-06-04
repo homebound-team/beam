@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { FocusScope } from "react-aria";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
@@ -7,23 +7,20 @@ import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { ContrastScope } from "src/components/ContrastScope";
 import { IconButton } from "src/components/IconButton";
-import { navbarItemsForMobileDrawer } from "src/components/Navbar/navbarUtils";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 
 type NavbarMobileMenuProps = {
   items: AppNavItem[];
-  trailingItems: AppNavItem[];
 };
 
 export function NavbarMobileMenu(props: NavbarMobileMenuProps) {
-  const { items, trailingItems } = props;
+  const { items } = props;
   // Defaults to the `navbar` prefix so it can be tested in isolation; when embedded, Navbar forwards
   // its own `navbar` prefix (which wins), so ids are the same either way.
   const tid = useTestIds(props, "navbar");
   const [isOpen, setIsOpen] = useState(false);
-  const drawerItems = useMemo(() => navbarItemsForMobileDrawer([...items, ...trailingItems]), [items, trailingItems]);
   const { pathname, search } = useLocation();
 
   useEffect(() => {
@@ -55,9 +52,7 @@ export function NavbarMobileMenu(props: NavbarMobileMenuProps) {
       {createPortal(
         <ContrastScope>
           {/* AnimatePresence keeps the drawer mounted through its slide/fade-out before unmounting. */}
-          <AnimatePresence>
-            {isOpen && <NavbarMobileDrawer items={drawerItems} onClose={close} tid={tid} />}
-          </AnimatePresence>
+          <AnimatePresence>{isOpen && <NavbarMobileDrawer items={items} onClose={close} tid={tid} />}</AnimatePresence>
         </ContrastScope>,
         document.body,
       )}
