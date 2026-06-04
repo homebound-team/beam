@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
+import { Breadcrumb } from "src/components/Breadcrumbs";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/PageHeader";
 import { TabContent } from "src/components/Tabs";
@@ -45,6 +46,23 @@ export function WithTabs() {
       />
       <TabContent tabs={testTabs} selected={selected} />
     </>
+  );
+}
+
+export function WithBreadcrumbs() {
+  const breadcrumbs: Breadcrumb[] = [
+    { label: "Test 1", href: "" },
+    { label: "Test 2", href: "" },
+    { label: "Test 3", href: "" },
+  ];
+
+  return (
+    <PageHeader
+      title="Test Title"
+      breadcrumbs={{
+        breadcrumbs: breadcrumbs,
+      }}
+    />
   );
 }
 
