@@ -41,7 +41,7 @@ export type GridTableLayoutProps<
   X extends Only<GridTableXss, X>,
   QData,
 > = {
-  pageTitle: ReactNode;
+  pageTitle?: ReactNode;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
@@ -131,14 +131,16 @@ function GridTableLayoutComponent<
 
   return (
     <>
-      <Header
-        pageTitle={pageTitle}
-        breadCrumb={breadCrumb}
-        primaryAction={primaryAction}
-        secondaryAction={secondaryAction}
-        tertiaryAction={tertiaryAction}
-        actionMenu={actionMenu}
-      />
+      {pageTitle && (
+        <Header
+          pageTitle={pageTitle}
+          breadCrumb={breadCrumb}
+          primaryAction={primaryAction}
+          secondaryAction={secondaryAction}
+          tertiaryAction={tertiaryAction}
+          actionMenu={actionMenu}
+        />
+      )}
       {showTableActions && (
         <TableActions
           right={
