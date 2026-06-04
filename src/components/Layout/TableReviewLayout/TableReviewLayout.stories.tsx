@@ -1,9 +1,10 @@
 import { Meta } from "@storybook/react-vite";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { GridDataRow } from "src/components/Table";
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { useToast } from "src/components/Toast/useToast";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
 import { SidePanelProps, TableReviewLayout as TableReviewLayoutComponent } from "./TableReviewLayout";
@@ -344,6 +345,28 @@ export function EmptyState() {
       }
     />
   );
+}
+
+function WithToastWrapper() {
+  const columns = useMemo(() => [column<Row>({ header: "Name", data: ({ name }) => name })], []);
+  const { showToast } = useToast();
+  useEffect(() => {
+    showToast({ type: "error", message: "Validation failed: a takeoff line item already exists at this location." });
+  }, [showToast]);
+
+  return (
+    <TableReviewLayoutComponent
+      pageTitle="Review slot requests"
+      breadCrumb={{ href: "/", label: "The Emerson plan" }}
+      description={description}
+      closeAction={() => {}}
+      tableProps={{ columns, rows }}
+    />
+  );
+}
+
+export function WithToastVisible() {
+  return <WithToastWrapper />;
 }
 
 function Field({ label, value }: { label: string; value: string }) {
