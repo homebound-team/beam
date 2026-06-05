@@ -2419,3 +2419,67 @@ export function MultipleStickyColumns() {
     </div>
   );
 }
+
+/** Reproduces the issue where conditional action column (spread operator) disappears after mode toggle.
+ * This story tests toggling between read/edit modes to verify the trash icon appears/disappears correctly.
+ * Bug: After entering edit mode, the trash column sometimes doesn't render even though the cell content is editable.
+ * Expected: Action column should always be present with 7 total columns.
+ */
+export function ConditionalActionColumnModeToggle() {
+  type DrawRow = { id: string; name: string; amount: number };
+  type Row = SimpleHeaderAndData<DrawRow>;
+
+  const [editing, setEditing] = useState(false);
+
+  const rows: GridDataRow<Row>[] = useMemo(
+    () => [
+      simpleHeader,
+      { kind: "data" as const, id: "1", data: { id: "d:1", name: "Draw 1", amount: 40 } },
+      { kind: "data" as const, id: "2", data: { id: "d:2", name: "Draw 2", amount: 60 } },
+    ],
+    [],
+  );
+
+  // Conditionally include the action column — this pattern causes the bug when toggling read/edit.
+  const columns: GridColumn<Row>[] = useMemo(
+    () => [
+      column<Row>({ header: "Name", data: (d) => (editing ? <input defaultValue={d.name} /> : d.name) }),
+      column<Row>({ header: "Amount", data: (d) => (editing ? <input defaultValue={String(d.amount)} /> : d.amount) }),
+      // This spread operator approach can cause the action column to disappear after mode toggles.
+      ...(editing
+        ? [
+            actionColumn<Row>({
+              header: emptyCell,
+              data: (row) => <IconButton icon="trash" data-testid="trash" onClick={() => action("deleted")(row.id)} />,
+              w: "60px",
+            }),
+          ]
+        : []),
+    ],
+    [editing],
+  );
+
+  return (
+    <div css={Css.df.fdc.gap2.m2.$}>
+      <div css={Css.df.gap2.aic.$}>
+        <span css={Css.mdSb.$}>Mode: {editing ? "EDIT" : "READ"}</span>
+        <Button
+          label={editing ? "Save" : "Edit"}
+          variant={editing ? "primary" : "secondary"}
+          onClick={() => {
+            setEditing(!editing);
+          }}
+        />
+        <span css={Css.gray500.$}>
+          Column count: {columns.length} (expected: {editing ? "3" : "2"})
+        </span>
+      </div>
+      <GridTable columns={columns} rows={rows} />
+      <p css={Css.sm.gray600.$}>
+        Bug: After clicking Save to enter edit mode, the trash icons may disappear even though the cells are editable.
+        Try toggling between Edit and Save multiple times to reproduce. Expected: 3 columns always when editing (Name,
+        Amount, Trash).
+      </p>
+    </div>
+  );
+}
