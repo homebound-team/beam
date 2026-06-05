@@ -11,7 +11,8 @@
   "files": [
     "dist",
     "!dist/**/*.{stories,test}.*",
-    "!dist/setupTests.*"
+    "!dist/setupTests.*",
+    "docs/layout-shells.md"
   ],
   "engines": {
     "node": "~22.14.0"
@@ -28,7 +29,8 @@
       "require": "./dist/utils/rtlUtils.cjs"
     },
     "./Css.json": "./dist/Css.json",
-    "./index.css": "./dist/index.css"
+    "./index.css": "./dist/index.css",
+    "./docs/layout-shells.md": "./docs/layout-shells.md"
   },
   "scripts": {
     "start": "yarn storybook",

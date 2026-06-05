@@ -44,7 +44,7 @@ const groupedItems: AppNavItem[] = [
 export function Default() {
   return (
     <Shell>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={items} footer={<Footer />} />}>
+      <SideNavLayout sideNav={{ top: <Brand />, items, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -54,7 +54,7 @@ export function Default() {
 export function GroupedItems() {
   return (
     <Shell>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={groupedItems} footer={<Footer />} />}>
+      <SideNavLayout sideNav={{ top: <Brand />, items: groupedItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -92,7 +92,7 @@ const collapsibleItems: AppNavItem[] = [
 export function CollapsibleGroups() {
   return (
     <Shell>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={collapsibleItems} footer={<Footer />} />}>
+      <SideNavLayout sideNav={{ top: <Brand />, items: collapsibleItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -102,7 +102,7 @@ export function CollapsibleGroups() {
 export function CollapsibleGroupsContrast() {
   return (
     <Shell>
-      <SideNavLayout contrastRail sideNav={<SideNav top={<Brand />} items={collapsibleItems} footer={<Footer />} />}>
+      <SideNavLayout contrastRail sideNav={{ top: <Brand />, items: collapsibleItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -112,7 +112,7 @@ export function CollapsibleGroupsContrast() {
 export function WithoutTop() {
   return (
     <Shell>
-      <SideNavLayout sideNav={<SideNav items={items} footer={<Footer />} />}>
+      <SideNavLayout sideNav={{ items, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -122,7 +122,7 @@ export function WithoutTop() {
 export function WithoutFooter() {
   return (
     <Shell>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={items} />}>
+      <SideNavLayout sideNav={{ top: <Brand />, items }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -135,7 +135,7 @@ export function ContrastNav() {
   // internally — chrome + content all resolve under contrast tokens.
   return (
     <Shell>
-      <SideNavLayout contrastRail sideNav={<SideNav top={<Brand />} items={groupedItems} footer={<Footer />} />}>
+      <SideNavLayout contrastRail sideNav={{ top: <Brand />, items: groupedItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -184,13 +184,13 @@ function Footer() {
 
 function PageContent() {
   return (
-    <>
+    <div css={Css.px3.$}>
       <h1 css={Css.xl.mb3.$}>Page Content</h1>
       {zeroTo(15).map((i) => (
         <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet. Section {i + 1}.
         </p>
       ))}
-    </>
+    </div>
   );
 }

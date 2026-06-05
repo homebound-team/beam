@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -20,9 +21,8 @@ export type SideNavLayoutContextProps = {
 };
 
 /**
- * localStorage key for persisting the user's open/closed choice across sessions.
- * Only "expanded" and "collapse" are written; "hidden" is treated as consumer-driven
- * (typically per-route) programmatic state, not a user toggle to remember.
+ * localStorage key for the user's open/closed choice. Only `expanded`/`collapse` persist; `hidden` is
+ * programmatic (typically per-route), not a user toggle to remember.
  */
 export const SIDE_NAV_LAYOUT_STATE_STORAGE_KEY = "beam.sideNavLayout.navState";
 
@@ -87,16 +87,13 @@ export function SideNavLayoutProvider(props: { children: ReactNode; defaultNavSt
     });
   }, []);
 
-  return (
-    <SideNavLayoutContext.Provider value={{ navState, setNavState }}>{props.children}</SideNavLayoutContext.Provider>
-  );
+  const value = useMemo(() => ({ navState, setNavState }), [navState, setNavState]);
+  return <SideNavLayoutContext.Provider value={value}>{props.children}</SideNavLayoutContext.Provider>;
 }
 
 /**
- * Read the side-nav layout state.
- *
- * Defaults to `expanded` + a noop setter when called outside a provider, so pattern components
- * (e.g. `SideNav`) can render in isolation without crashing.
+ * Read the side-nav layout state. Defaults to `expanded` + a noop setter outside a provider, so
+ * components like `SideNav` can render standalone.
  */
 export function useSideNavLayoutContext(): SideNavLayoutContextProps {
   return useContext(SideNavLayoutContext) ?? { navState: "expanded", setNavState: () => {} };

@@ -1,10 +1,7 @@
 import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Icon } from "src/components/Icon";
-import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
-import { SideNav } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
@@ -16,9 +13,8 @@ export default {
   parameters: { layout: "fullscreen" },
 } as Meta;
 
-// The layout owns the rail's width, surface, border, and collapse toggle, so any sideNav
-// content (`SideNav` or custom JSX) inherits the rail look. Most stories pass SideNav;
-// `CustomSideRail` demonstrates the "any content gets the chrome" path.
+// The layout owns the rail's width, surface, border, and collapse toggle and always renders the
+// `SideNav` component from its `sideNav` props. `SideNav` reacts to collapse state via context.
 const items: AppNavItem[] = [
   {
     section: true,
@@ -40,65 +36,34 @@ const items: AppNavItem[] = [
 
 export function Default() {
   return (
-    <Shell>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={items} footer={<UserFooter />} />}>
-        <PageContent />
-      </SideNavLayout>
-    </Shell>
-  );
-}
-
-export function WithoutTopNav() {
-  return (
-    <PreventBrowserScroll>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={items} footer={<UserFooter />} />}>
-        <PageContent />
-      </SideNavLayout>
-    </PreventBrowserScroll>
+    <SideNavLayout sideNav={{ top: <Brand />, items, footer: <UserFooter /> }}>
+      <PageContent />
+    </SideNavLayout>
   );
 }
 
 export function ControlledNavState() {
   return (
-    <Shell>
-      <SideNavLayout sideNav={<SideNav top={<Brand />} items={items} footer={<UserFooter />} />}>
-        <NavStateControls />
-        <PageContent />
-      </SideNavLayout>
-    </Shell>
+    <SideNavLayout sideNav={{ top: <Brand />, items, footer: <UserFooter /> }}>
+      <NavStateControls />
+      <PageContent />
+    </SideNavLayout>
   );
 }
 
 export function WithoutCollapseToggle() {
   return (
-    <Shell>
-      <SideNavLayout
-        sideNav={<SideNav top={<Brand />} items={items} footer={<UserFooter />} />}
-        showCollapseToggle={false}
-      >
-        <PageContent />
-      </SideNavLayout>
-    </Shell>
+    <SideNavLayout sideNav={{ top: <Brand />, items, footer: <UserFooter /> }} showCollapseToggle={false}>
+      <PageContent />
+    </SideNavLayout>
   );
 }
 
-export function CustomSideRail() {
-  // Demonstrates the "free chrome" benefit: the layout's rail frame (Surface bg, right border,
-  // width, collapse toggle) wraps any sideNav content, not just the SideNav pattern.
+export function ContrastRail() {
   return (
-    <Shell>
-      <SideNavLayout
-        sideNav={
-          <div css={Css.p2.df.fdc.gap1.$}>
-            <strong css={Css.lg.mb2.$}>Custom Rail</strong>
-            <div>This is plain JSX in the rail slot.</div>
-            <div>It still gets width, surface, border, and the collapse toggle from the layout.</div>
-          </div>
-        }
-      >
-        <PageContent />
-      </SideNavLayout>
-    </Shell>
+    <SideNavLayout contrastRail sideNav={{ top: <Brand />, items, footer: <UserFooter /> }}>
+      <PageContent />
+    </SideNavLayout>
   );
 }
 
@@ -116,19 +81,6 @@ function NavStateControls() {
       </div>
     </>
   );
-}
-
-function Shell({ children }: { children: ReactNode }) {
-  return (
-    <PreventBrowserScroll>
-      <TestTopNav />
-      <div css={Css.df.oh.h100.$}>{children}</div>
-    </PreventBrowserScroll>
-  );
-}
-
-function TestTopNav() {
-  return <nav css={Css.hPx(48).w100.bgGray800.white.df.aic.px3.fs0.mh0.$}>Top Level Navigation</nav>;
 }
 
 function Brand() {
@@ -164,13 +116,13 @@ function UserFooter() {
 
 function PageContent() {
   return (
-    <>
+    <div css={Css.px3.py2.$}>
       <h1 css={Css.xl.mb3.$}>Page Content</h1>
       {zeroTo(15).map((i) => (
         <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Section {i + 1}.
         </p>
       ))}
-    </>
+    </div>
   );
 }

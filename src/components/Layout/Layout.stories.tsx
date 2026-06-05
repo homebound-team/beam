@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
 import { Css, Palette } from "src/Css";
@@ -7,19 +7,15 @@ import { FormLines } from "src/forms";
 import {
   Button,
   FullBleed,
-  GridColumn,
-  GridDataRow,
-  GridTable,
   PreventBrowserScroll,
   ScrollableContent,
   ScrollableFooter,
   ScrollableParent,
-  simpleHeader,
-  SimpleHeaderAndData,
 } from "src/index";
 import { NumberField } from "src/inputs/NumberField";
 import { ChildrenOnly } from "src/types";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { TableExample } from "src/utils/sbComponents";
 
 export default {
   component: ScrollableParent,
@@ -213,49 +209,6 @@ function ScrollableTableExample({
     <ScrollableContent bgColor={bgColor}>
       <TableExample numCols={numCols} numRows={numRows} />
     </ScrollableContent>
-  );
-}
-
-type Row = SimpleHeaderAndData<{ name: string; value: number }>;
-function TableExample({
-  numCols = 10,
-  numRows = 100,
-  virtualized = false,
-}: {
-  numCols?: number;
-  numRows?: number;
-  virtualized?: boolean;
-}) {
-  const rows: GridDataRow<Row>[] = useMemo(
-    () => [
-      simpleHeader,
-      ...zeroTo(numRows).map((i) => ({
-        kind: "data" as const,
-        id: String(i),
-        data: { name: `ccc ${i}`, value: i + 1 },
-      })),
-    ],
-    [numRows],
-  );
-  const columns: GridColumn<Row>[] = useMemo(
-    () =>
-      zeroTo(numCols).map((i) => ({
-        header: `Header ${i + 1}`,
-        data: ({ value }) => `Cell ${i + 1}x${value}`,
-        w: "100px",
-        sticky: i === 0 ? "left" : undefined,
-      })),
-    [numCols],
-  );
-
-  return (
-    <GridTable
-      as={virtualized ? "virtual" : "div"}
-      stickyHeader
-      columns={columns}
-      rows={rows}
-      style={{ rowHeight: "fixed" }}
-    />
   );
 }
 

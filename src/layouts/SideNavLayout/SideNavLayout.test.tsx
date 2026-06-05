@@ -1,3 +1,4 @@
+import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import {
   SIDE_NAV_LAYOUT_STATE_STORAGE_KEY,
@@ -6,19 +7,24 @@ import {
 import { setViewport } from "src/tests/viewport";
 import { click, render } from "src/utils/rtl";
 
+const items: AppNavItem[] = [
+  { label: "Dashboard", icon: "kanban", onClick: () => {}, active: true },
+  { label: "Projects", icon: "search", onClick: () => {} },
+];
+
 describe("SideNavLayout", () => {
   it("renders the rail, side nav slot, and page content at desktop", async () => {
     // When rendered with a sideNav and children at the default desktop viewport
     const r = await render(
-      <SideNavLayout sideNav={<span>Side nav slot</span>}>
+      <SideNavLayout sideNav={{ items }}>
         <span>Page content</span>
       </SideNavLayout>,
     );
 
-    // Then the layout root, rail, and slotted side nav content render
+    // Then the layout root, rail, and slotted SideNav content render
     expect(r.sideNavLayout).toBeInTheDocument();
     expect(r.sideNavLayout_sideNav).toBeInTheDocument();
-    expect(r.sideNavLayout_sideNavContent).toHaveTextContent("Side nav slot");
+    expect(r.sideNavLayout_sideNavContent).toHaveTextContent("Dashboard");
     expect(r.getByText("Page content")).toBeInTheDocument();
     // And the built-in collapse toggle is present
     expect(r.sideNavLayout_toggle).toBeInTheDocument();
@@ -29,7 +35,7 @@ describe("SideNavLayout", () => {
   it("starts collapsed on mobile viewports", async () => {
     setViewport("sm");
 
-    const r = await render(<SideNavLayout sideNav={<div>rail</div>} />);
+    const r = await render(<SideNavLayout sideNav={{ items }} />);
 
     expect(r.sideNavLayout_toggle).toHaveAttribute("aria-label", "Expand navigation");
     expect(r.sideNavLayout_sideNav).toHaveStyle({ width: "56px" });
@@ -39,7 +45,7 @@ describe("SideNavLayout", () => {
     window.localStorage.setItem(SIDE_NAV_LAYOUT_STATE_STORAGE_KEY, "expanded");
     setViewport("sm");
 
-    const r = await render(<SideNavLayout sideNav={<div>rail</div>} />);
+    const r = await render(<SideNavLayout sideNav={{ items }} />);
 
     expect(r.sideNavLayout_toggle).toHaveAttribute("aria-label", "Expand navigation");
   });
@@ -50,7 +56,7 @@ describe("SideNavLayout", () => {
 
     const r = await render(
       <SideNavLayoutProvider defaultNavState="expanded">
-        <SideNavLayout sideNav={<div>rail</div>} />
+        <SideNavLayout sideNav={{ items }} />
       </SideNavLayoutProvider>,
     );
 
@@ -62,14 +68,14 @@ describe("SideNavLayout", () => {
     // Given a hidden nav state
     const r = await render(
       <SideNavLayoutProvider defaultNavState="hidden">
-        <SideNavLayout sideNav={<span>Side nav slot</span>} />
+        <SideNavLayout sideNav={{ items }} />
       </SideNavLayoutProvider>,
     );
 
     // Then the rail and slotted side nav content are absent
     expect(r.queryByTestId("sideNavLayout_sideNav")).toBeNull();
     expect(r.queryByTestId("sideNavLayout_sideNavContent")).toBeNull();
-    expect(r.queryByText("Side nav slot")).toBeNull();
+    expect(r.queryByText("Dashboard")).toBeNull();
   });
 
   it("does not render the rail when sideNav prop is undefined", async () => {
@@ -83,7 +89,7 @@ describe("SideNavLayout", () => {
 
   it("renders the collapse toggle and flips nav state on click", async () => {
     // Given a layout with the default toggle visible
-    const r = await render(<SideNavLayout sideNav={<div>rail</div>} />);
+    const r = await render(<SideNavLayout sideNav={{ items }} />);
     // Initially the toggle reads as "Collapse navigation"
     expect(r.sideNavLayout_toggle).toHaveAttribute("aria-label", "Collapse navigation");
 
@@ -96,7 +102,7 @@ describe("SideNavLayout", () => {
 
   it("omits the toggle when showCollapseToggle is false", async () => {
     // When the consumer opts out of the built-in toggle
-    const r = await render(<SideNavLayout sideNav={<div>rail</div>} showCollapseToggle={false} />);
+    const r = await render(<SideNavLayout sideNav={{ items }} showCollapseToggle={false} />);
 
     // Then no toggle is rendered (but the rail still is)
     expect(r.queryByTestId("sideNavLayout_toggle")).toBeNull();
@@ -104,7 +110,7 @@ describe("SideNavLayout", () => {
   });
 
   it("persists toggled navState to localStorage", async () => {
-    const r = await render(<SideNavLayout sideNav={<div>rail</div>} />);
+    const r = await render(<SideNavLayout sideNav={{ items }} />);
 
     // Initially expanded (default), nothing in storage yet.
     expect(r.sideNavLayout_toggle).toHaveAttribute("aria-label", "Collapse navigation");
@@ -127,7 +133,7 @@ describe("SideNavLayout", () => {
     // When the layout mounts with a conflicting defaultNavState
     const r = await render(
       <SideNavLayoutProvider defaultNavState="expanded">
-        <SideNavLayout sideNav={<div>rail</div>} railWidthPx={300} />
+        <SideNavLayout sideNav={{ items }} railWidthPx={300} />
       </SideNavLayoutProvider>,
     );
 
@@ -138,7 +144,7 @@ describe("SideNavLayout", () => {
   it("does not persist the 'hidden' state (it's programmatic, not a user toggle)", async () => {
     await render(
       <SideNavLayoutProvider defaultNavState="hidden">
-        <SideNavLayout sideNav={<div>rail</div>} />
+        <SideNavLayout sideNav={{ items }} />
       </SideNavLayoutProvider>,
     );
 
