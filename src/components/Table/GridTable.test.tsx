@@ -5,7 +5,13 @@ import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/G
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn } from "src/components/Table/types";
-import { calcColumnSizes, column, generateColumnId, selectColumn } from "src/components/Table/utils/columns";
+import {
+  actionColumn,
+  calcColumnSizes,
+  column,
+  generateColumnId,
+  selectColumn,
+} from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -3215,6 +3221,42 @@ describe("GridTable", () => {
       await render(<GridTable columns={columns} rows={rows} />);
       // Then the visible column session storage is defined using a key build via the columns' `id` prop
       expect(sessionStorage.setItem).toHaveBeenLastCalledWith("nameValueAction", '["name","action"]');
+    });
+
+    it("keeps a conditional action column visible after remount when toggling read/edit", async () => {
+      // Given a table whose action column is conditionally added based on an `editing` flag,
+      // which also changes the auto-derived `visibleColumnsStorageKey` (e.g. "nameValue" vs "nameValueAction").
+      function Test({ startEditing }: { startEditing: boolean }) {
+        const [editing, setEditing] = useState(startEditing);
+        const columns = useMemo<GridColumn<Row>[]>(
+          () => [
+            column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+            column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value }),
+            ...(editing ? [actionColumn<Row>({ id: "action", header: emptyCell, data: () => "trash" })] : []),
+          ],
+          [editing],
+        );
+        return (
+          <div>
+            <button data-testid="toggle" onClick={() => setEditing((e) => !e)} />
+            <GridTable columns={columns} rows={rows} />
+          </div>
+        );
+      }
+
+      // When we enter edit mode (action column appears) and go back to read mode, then unmount
+      const r1 = await render(<Test startEditing={false} />);
+      click(r1.toggle);
+      click(r1.toggle);
+      r1.unmount();
+
+      // And we remount the table fresh (new TableState/ColumnStates) and re-enter edit mode
+      const r2 = await render(<Test startEditing={false} />);
+      click(r2.toggle);
+
+      // Then the action column still renders (it used to disappear b/c a leaked autorun had
+      // overwritten the "nameValueAction" storage key with the read-mode visible set).
+      expect(cell(r2, 1, 2)).toHaveTextContent("trash");
     });
 
     it("accepts a specified 'visibleColumnsStorageKey'", async () => {
