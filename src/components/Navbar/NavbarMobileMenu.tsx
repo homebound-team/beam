@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { FocusScope } from "react-aria";
+import { FocusScope, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
@@ -23,14 +23,7 @@ export function NavbarMobileMenu(props: NavbarMobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { pathname, search } = useLocation();
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = "";
-      };
-    }
-  }, [isOpen]);
+  usePreventScroll({ isDisabled: !isOpen });
 
   // Close when navigation changes the route — covers programmatic `navigate()` and any item whose
   // handler pushes a new location. Same-route taps are handled by the drawer's anchor-click capture.
@@ -83,7 +76,7 @@ function NavbarMobileDrawer({
         onClick={onClose}
         {...tid.mobileMenuScrim}
       />
-      <FocusScope contain restoreFocus>
+      <FocusScope autoFocus contain restoreFocus>
         <motion.aside
           key="navbarMobileMenuDrawer"
           role="dialog"

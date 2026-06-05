@@ -20,12 +20,15 @@ import { useCallback, useLayoutEffect, useRef, useState } from "react";
  *
  * @param enabled When `false`, measurement is skipped and `overflows` is forced to `false`.
  */
-export function useContentOverflow(enabled: boolean = true) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+export function useContentOverflow<
+  TContainer extends HTMLElement = HTMLElement,
+  TContent extends HTMLElement = HTMLElement,
+>(enabled: boolean = true) {
+  const containerRef = useRef<TContainer>(null);
+  const contentRef = useRef<TContent>(null);
   const [overflows, setOverflows] = useState(false);
 
-  const check = useCallback(() => {
+  const checkContentOverflow = useCallback(() => {
     const container = containerRef.current;
     const content = contentRef.current;
     if (!enabled || !container || !content) {
@@ -38,10 +41,10 @@ export function useContentOverflow(enabled: boolean = true) {
   // Measure pre-paint on mount / when `enabled` flips (avoids a flash of the un-collapsed content),
   // then re-measure on viewport resize. See the note above on why we don't observe `containerRef`.
   useLayoutEffect(() => {
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, [check]);
+    checkContentOverflow();
+    window.addEventListener("resize", checkContentOverflow);
+    return () => window.removeEventListener("resize", checkContentOverflow);
+  }, [checkContentOverflow]);
 
   return { containerRef, contentRef, overflows };
 }

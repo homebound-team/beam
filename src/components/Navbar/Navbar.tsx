@@ -40,7 +40,7 @@ export function Navbar(props: NavbarProps) {
   const tid = useTestIds(props, "navbar");
 
   // Collapse to the mobile menu when the items don't fit, even above the `sm` breakpoint.
-  const { containerRef, contentRef, overflows } = useContentOverflow(!sm);
+  const { containerRef, contentRef, overflows } = useContentOverflow<HTMLDivElement, HTMLDivElement>(!sm);
   const showMobile = sm || overflows;
 
   return (
