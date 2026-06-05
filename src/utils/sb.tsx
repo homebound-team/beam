@@ -12,28 +12,38 @@ export function withRouter(url?: string, route?: string): Decorator {
   return (Story: () => JSX.Element) => rtlWithRouter(url, route).wrap(<Story />);
 }
 
-/* Models our currently used parameters. */
-type StoryParameters = { chromatic?: { delay?: number }; mockData?: unknown };
+/** Return type of {@link viewportModes}; keys must be built-in Storybook viewport names. */
+export type ChromaticViewportModes<T extends StorybookViewportKey = StorybookViewportKey> = Record<T, { viewport: T }>;
+
+/** Parameters supported by {@link newStory} and our story conventions. */
+export type StoryParameters = {
+  layout?: "centered" | "fullscreen" | "padded" | "none";
+  chromatic?: {
+    delay?: number;
+    modes?: Partial<ChromaticViewportModes>;
+  };
+  mockData?: unknown;
+};
 type PlayFunction = NonNullable<StoryObj["play"]>;
+
+/** Options supported by {@link newStory}. */
+export type StoryOptions = {
+  parameters?: StoryParameters;
+  decorators?: Decorator[];
+  play?: PlayFunction;
+};
 
 /**
  * Chromatic modes that reference built-in Storybook viewports by key
  * (see [Storybook viewports](https://storybook.js.org/docs/essentials/viewport)).
  * https://www.chromatic.com/docs/modes/viewports/
  */
-export function viewportModes<const T extends StorybookViewportKey>(...viewports: T[]): Record<T, { viewport: T }> {
-  return Object.fromEntries(viewports.map((viewport) => [viewport, { viewport }])) as Record<T, { viewport: T }>;
+export function viewportModes<const T extends StorybookViewportKey>(...viewports: T[]): ChromaticViewportModes<T> {
+  return Object.fromEntries(viewports.map((viewport) => [viewport, { viewport }])) as ChromaticViewportModes<T>;
 }
 
 /** A somewhat typesafe way to set `FooStory.story` metadata. */
-export function newStory(
-  storyFn: Function,
-  opts: {
-    parameters?: StoryParameters;
-    decorators?: Decorator[];
-    play?: PlayFunction;
-  },
-): Function {
+export function newStory(storyFn: Function, opts: StoryOptions): Function {
   Object.assign(storyFn, opts);
   return storyFn;
 }

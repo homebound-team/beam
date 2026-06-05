@@ -6,12 +6,22 @@ import { HomeboundLogo } from "src/components/HomeboundLogo";
 import type { NavbarUser } from "src/components/Navbar/Navbar";
 import { Navbar } from "src/components/Navbar/Navbar";
 import { Tokens } from "src/Css";
-import { viewportModes, withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
+import {
+  newStory,
+  type StoryOptions,
+  viewportModes,
+  withBeamDecorator,
+  withDimensions,
+  withRouter,
+} from "src/utils/sb";
 import { action } from "storybook/actions";
 import { userEvent, within } from "storybook/test";
 
 export default {
   component: Navbar,
+} as Meta;
+
+const navbarStoryOpts: StoryOptions = {
   decorators: [withBeamDecorator, withRouter(), withDimensions()],
   parameters: {
     layout: "fullscreen",
@@ -19,36 +29,39 @@ export default {
       modes: viewportModes("desktop", "mobile1"),
     },
   },
-} as Meta;
+};
 
-export function Example() {
-  return (
+export const Example = newStory(
+  () => (
     <Navbar
       brand={createBrand()}
       items={createGlobalNavItems({ activeLabel: "Finances" })}
       rightSlot={createDefaultRightSlot()}
       user={createDefaultUser()}
     />
-  );
-}
+  ),
+  navbarStoryOpts,
+);
 
-export function WithOpenNav() {
-  return (
+export const WithOpenNav = newStory(
+  () => (
     <Navbar
       brand={createBrand()}
       items={createGlobalNavItems({ activeLabel: "Finances", librariesMenuOpen: true })}
       rightSlot={createDefaultRightSlot()}
       user={createDefaultUser()}
     />
-  );
-}
-
-WithOpenNav.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-  const mobileMenu = within(canvasElement).queryByTestId("navbar_mobileMenu");
-  if (mobileMenu) {
-    await userEvent.click(mobileMenu);
-  }
-};
+  ),
+  {
+    ...navbarStoryOpts,
+    play: async ({ canvasElement }) => {
+      const mobileMenu = within(canvasElement).queryByTestId("navbar_mobileMenu");
+      if (mobileMenu) {
+        await userEvent.click(mobileMenu);
+      }
+    },
+  },
+);
 
 function createBrand() {
   return (
