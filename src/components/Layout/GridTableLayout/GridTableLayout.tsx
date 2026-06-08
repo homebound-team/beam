@@ -10,7 +10,7 @@ import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
+import { useBreakpoint, useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -327,6 +327,8 @@ function Header(props: HeaderProps) {
 function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
   const [{ search: initialValue }, setQueryParams] = useQueryParams({ search: StringParam });
   const [value, setValue] = useState<string>(initialValue || "");
+  const [isOpen, setIsOpen] = useState(false);
+  const { sm } = useBreakpoint();
 
   const [debouncedSearch] = useDebounce(value, 300);
 
@@ -335,17 +337,34 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
     setQueryParams({ search: debouncedSearch || undefined }, "replaceIn");
   }, [debouncedSearch, onSearch, setQueryParams]);
 
+  const textField = (
+    <TextField
+      label="Search"
+      labelStyle="hidden"
+      value={value}
+      onChange={(v) => setValue(v ?? "")}
+      placeholder="Search"
+      clearable
+      startAdornment={<Icon icon="search" color={Palette.Gray700} />}
+    />
+  );
+
+  if (!sm) {
+    return <div css={Css.wPx(244).$}>{textField}</div>;
+  }
+
   return (
-    <div css={Css.wPx(244).$}>
-      <TextField
-        label="Search"
-        labelStyle="hidden"
-        value={value}
-        onChange={(v) => setValue(v ?? "")}
-        placeholder={"Search"}
-        clearable
-        startAdornment={<Icon icon="search" color={Palette.Gray700} />}
+    <>
+      <Button
+        label=""
+        icon="search"
+        size="md"
+        endAdornment={<Icon icon={isOpen ? "chevronUp" : "chevronDown"} />}
+        variant="secondaryBlack"
+        onClick={() => setIsOpen(!isOpen)}
+        active={isOpen}
       />
-    </div>
+      {isOpen && <div css={Css.w100.$}>{textField}</div>}
+    </>
   );
 }
