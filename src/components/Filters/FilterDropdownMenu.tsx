@@ -5,6 +5,7 @@ import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } fro
 import { Icon } from "src/components/Icon";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
+import { useBreakpoint } from "src/hooks";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
@@ -40,6 +41,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   const { filter, onChange, filterDefs, groupBy } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
+  const { sm } = useBreakpoint();
   const [isOpen, setIsOpen] = useState(false);
 
   // Calculate the number of active filters for badge count
@@ -64,7 +66,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   return (
     <>
       <Button
-        label="Filter"
+        label={sm ? "" : "Filter"}
         icon="filter"
         size="md"
         endAdornment={
