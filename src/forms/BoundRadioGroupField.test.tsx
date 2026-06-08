@@ -18,6 +18,14 @@ describe("BoundRadioGroupField", () => {
     expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport");
   });
 
+  it("shows the required suffix when the field is required", async () => {
+    // Given a field with a `required` rule
+    const author = createObjectState(formConfig, {});
+    const r = await render(<BoundRadioGroupField field={author.favoriteSport} options={sports} />);
+    // Then the label shows the required suffix
+    expect(r.favoriteSport_label).toHaveTextContent("Favorite Sport *");
+  });
+
   it("trigger onFocus and onBlur callbacks", async () => {
     const onBlur = vi.fn();
     const onFocus = vi.fn();

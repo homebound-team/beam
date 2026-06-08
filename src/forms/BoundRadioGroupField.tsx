@@ -30,6 +30,7 @@ export function BoundRadioGroupField<K extends string>(props: BoundRadioGroupFie
       {() => (
         <RadioGroupField<K>
           label={label}
+          required={field.required}
           value={field.value || undefined}
           onChange={(value) => {
             onChange(value);
