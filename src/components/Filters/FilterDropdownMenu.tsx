@@ -70,10 +70,12 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
         icon="filter"
         size="md"
         endAdornment={
-          <div css={Css.df.aic.gap1.$}>
-            {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
-            <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
-          </div>
+          !sm && (
+            <div css={Css.df.aic.gap1.$}>
+              {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
+              <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
+            </div>
+          )
         }
         variant="secondaryBlack"
         onClick={() => setIsOpen(!isOpen)}

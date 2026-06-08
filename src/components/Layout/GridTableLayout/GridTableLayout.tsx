@@ -10,7 +10,14 @@ import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Palette } from "src/Css";
-import { useBreakpoint, useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
+import {
+  useBreakpoint,
+  useComputed,
+  useGroupBy,
+  usePersistedFilter,
+  UsePersistedFilterProps,
+  useSessionStorage,
+} from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
@@ -359,7 +366,6 @@ function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
         label=""
         icon="search"
         size="md"
-        endAdornment={<Icon icon={isOpen ? "chevronUp" : "chevronDown"} />}
         variant="secondaryBlack"
         onClick={() => setIsOpen(!isOpen)}
         active={isOpen}
