@@ -13,7 +13,7 @@ import {
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
 import { Css } from "src/Css";
-import { useComputed } from "src/hooks";
+import { useBreakpoint, useComputed } from "src/hooks";
 import { Switch } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -40,6 +40,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           ? trigger.icon
           : trigger.name,
   );
+  const { sm } = useBreakpoint();
 
   const options = useMemo(
     () =>
@@ -76,7 +77,14 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   );
 
   return (
-    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
+    <OverlayTrigger
+      {...props}
+      menuTriggerProps={menuTriggerProps}
+      state={state}
+      buttonRef={buttonRef}
+      hideEndAdornment={sm}
+      {...tid}
+    >
       <div css={Css.dg.gtc("1fr auto").gap2.bgWhite.p2.maxwPx(326).onHover.bshHover.$}>
         {options.map((option) => (
           <Fragment key={option.value}>

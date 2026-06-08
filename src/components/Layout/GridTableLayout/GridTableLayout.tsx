@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
@@ -25,7 +26,6 @@ import { StringParam, useQueryParams } from "use-query-params";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
-import { ScrollableContent } from "../ScrollableContent";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 
 // Omit to force all action button menus to look the same
@@ -110,6 +110,7 @@ function GridTableLayoutComponent<
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
+  const { sm } = useBreakpoint();
 
   const hasHideableColumns = useMemo(() => {
     if (hideEditColumns) return false;
