@@ -179,6 +179,26 @@ export function OnlyLabels() {
   );
 }
 
+export function Required() {
+  const [state, setState] = useState<string | undefined>();
+  return (
+    <RadioGroupField
+      label="Favorite cheese"
+      required
+      value={state}
+      onChange={setState}
+      options={[
+        { label: "Asiago", value: "a" },
+        { label: "Burratta", value: "b" },
+        { label: "Camembert", value: "c" },
+        { label: "Roquefort", value: "d" },
+      ]}
+      onBlur={action("onBlur")}
+      onFocus={action("onFocus")}
+    />
+  );
+}
+
 export function LabelsAndDescriptions() {
   const [state, setState] = useState<string | undefined>();
   return (

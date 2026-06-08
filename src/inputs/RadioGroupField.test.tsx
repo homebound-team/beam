@@ -50,6 +50,37 @@ describe("RadioGroupField", () => {
     expect(tooltip).toHaveAttribute("title", "some reason");
   });
 
+  it("shows the required suffix on the label when required", async () => {
+    const r = await render(
+      <RadioGroupField
+        label="Favorite cheese"
+        required
+        value="a"
+        onChange={() => {}}
+        options={[
+          { value: "a", label: "Asiago" },
+          { value: "b", label: "Burratta" },
+        ]}
+      />,
+    );
+    expect(r.favoriteCheese_label).toHaveTextContent("Favorite cheese *");
+  });
+
+  it("does not show the required suffix when not required", async () => {
+    const r = await render(
+      <RadioGroupField
+        label="Favorite cheese"
+        value="a"
+        onChange={() => {}}
+        options={[
+          { value: "a", label: "Asiago" },
+          { value: "b", label: "Burratta" },
+        ]}
+      />,
+    );
+    expect(r.favoriteCheese_label).not.toHaveTextContent("*");
+  });
+
   it("supports horizontal layout", async () => {
     const r = await render(
       <RadioGroupField
