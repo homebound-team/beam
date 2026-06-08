@@ -1,30 +1,43 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { ToggleChip } from "src/components/ToggleChip";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import { SelectField } from "src/inputs/SelectField";
+import { TextField } from "src/inputs/TextField";
 import { Value } from "src/inputs/Value";
 import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
+import { useDebounce } from "use-debounce";
+import { StringParam, useQueryParams } from "use-query-params";
+
+/** Props for the search box integrated into FilterDropdownMenu. */
+export interface SearchBoxProps {
+  onSearch: (filter: string) => void;
+}
 
 /**
  * FilterDropdownMenu is a newer filter UI pattern that shows a "Filter" button
  * which expands to reveal filter controls in a row below, with chips displayed
  * when closed to indicate active filters.
  *
+ * When `searchProps` is provided, a search box is rendered before the filter controls:
+ * - On larger screens: as a visible text field inline before the filter button
+ * - On smaller screens: as an icon button inline with the filter button, expanding to a
+ *   full-width text field below (which appears before any open filter controls)
+ *
  * Note: We expect the existing `Filters` component to eventually become
  * `FilterDropdownMenu`, but it hasn't been rolled out everywhere yet.
  */
 interface FilterDropdownMenuProps<F extends Record<string, unknown>, G extends Value = string> {
-  /** List of filters */
-  filterDefs: FilterDefs<F>;
+  /** List of filters. When omitted, no filter UI is rendered. */
+  filterDefs?: FilterDefs<F>;
   /** The current filter value. */
-  filter: F;
+  filter?: F;
   /** Called when the filters have changed. */
-  onChange: (filter: F) => void;
+  onChange?: (filter: F) => void;
   groupBy?: {
     /** The current group by value. */
     value: G;
@@ -33,25 +46,43 @@ interface FilterDropdownMenuProps<F extends Record<string, unknown>, G extends V
     /** The list of group by options. */
     options: Array<{ id: G; name: string }>;
   };
+  /** When provided, renders a search box before the filter controls. */
+  searchProps?: SearchBoxProps;
 }
 
 function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value = string>(
   props: FilterDropdownMenuProps<F, G>,
 ) {
-  const { filter, onChange, filterDefs, groupBy } = props;
+  const { filter, onChange, filterDefs, groupBy, searchProps } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { sm } = useBreakpoint();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchIsOpen, setSearchIsOpen] = useState(false);
+
+  const [{ search: initialValue }, setQueryParams] = useQueryParams({ search: StringParam });
+  const [searchValue, setSearchValue] = useState<string>(initialValue || "");
+  const [debouncedSearch] = useDebounce(searchValue, 300);
+
+  useEffect(() => {
+    if (searchProps) {
+      searchProps.onSearch(debouncedSearch);
+      setQueryParams({ search: debouncedSearch || undefined }, "replaceIn");
+    }
+  }, [debouncedSearch, searchProps, setQueryParams]);
+
+  const hasSearch = !!searchProps;
+  const hasFilters = !!filterDefs && Object.keys(filterDefs ?? {}).length > 0;
 
   // Calculate the number of active filters for badge count
-  const activeFilterCount = useMemo(() => getActiveFilterCount(filter), [filter]);
+  const activeFilterCount = useMemo(() => (filter ? getActiveFilterCount(filter) : 0), [filter]);
 
   // Convert FilterDefs to FilterImpls
-  const filterImpls = useMemo(() => buildFilterImpls(filterDefs), [filterDefs]);
+  const filterImpls = useMemo(() => (filterDefs ? buildFilterImpls(filterDefs) : ({} as FilterImpls<F>)), [filterDefs]);
 
   // Render all filters, with non-checkbox filters first, then checkbox filters
   const renderFilters = () => {
+    if (!filter || !onChange) return null;
     const entries = safeEntries(filterImpls);
     const nonCheckbox = entries.filter(([_, f]) => !f.hideLabelInModal);
     const checkbox = entries.filter(([_, f]) => f.hideLabelInModal);
@@ -63,28 +94,61 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
     ));
   };
 
+  const searchTextField = (
+    <TextField
+      label="Search"
+      labelStyle="hidden"
+      value={searchValue}
+      onChange={(v) => setSearchValue(v ?? "")}
+      placeholder="Search"
+      clearable
+      startAdornment={<Icon icon="search" color={Palette.Gray700} />}
+    />
+  );
+
   return (
     <>
-      <Button
-        label={sm ? "" : "Filter"}
-        icon="filter"
-        size="md"
-        endAdornment={
-          !sm && (
-            <div css={Css.df.aic.gap1.$}>
-              {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
-              <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
-            </div>
-          )
-        }
-        variant="secondaryBlack"
-        onClick={() => setIsOpen(!isOpen)}
-        active={isOpen}
-        {...testId.button}
-      />
+      {/* Large screen: search field visible inline before filter button */}
+      {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
+
+      {/* Small screen: search icon button inline with filter button */}
+      {sm && hasSearch && (
+        <Button
+          label=""
+          icon="search"
+          size="md"
+          variant="secondaryBlack"
+          onClick={() => setSearchIsOpen(!searchIsOpen)}
+          active={searchIsOpen}
+        />
+      )}
+
+      {/* Filter button (only rendered when filterDefs are provided) */}
+      {hasFilters && (
+        <Button
+          label={sm ? "" : "Filter"}
+          icon="filter"
+          size="md"
+          endAdornment={
+            !sm && (
+              <div css={Css.df.aic.gap1.$}>
+                {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
+                <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
+              </div>
+            )
+          }
+          variant="secondaryBlack"
+          onClick={() => setIsOpen(!isOpen)}
+          active={isOpen}
+          {...testId.button}
+        />
+      )}
+
+      {/* Small screen: search text field row — rendered before filter controls */}
+      {sm && searchIsOpen && <div css={Css.w100.$}>{searchTextField}</div>}
 
       {/* When open, show all filter controls in a new row below */}
-      {isOpen && (
+      {hasFilters && isOpen && (
         <div css={Css.df.aic.fww.gap1.w100.$}>
           {groupBy && (
             <SelectField
@@ -99,18 +163,17 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
             />
           )}
 
-          {/* Render all filters (non-checkbox first, then checkbox) */}
           {renderFilters()}
 
           {/* Clear button at end of filter controls */}
           {activeFilterCount > 0 && (
-            <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
+            <Button label="Clear" variant="tertiary" onClick={() => onChange?.({} as F)} {...testId.clearBtn} />
           )}
         </div>
       )}
 
       {/* Filter chips (and clear button) shown when dropdown is closed */}
-      {!isOpen && (
+      {hasFilters && !isOpen && filter && onChange && (
         <FilterChips
           filter={filter}
           filterImpls={filterImpls}

@@ -3,26 +3,15 @@ import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
-import { Icon } from "src/components/Icon";
 import { OffsetAndLimit, Pagination } from "src/components/Pagination";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only, Palette } from "src/Css";
-import {
-  useBreakpoint,
-  useComputed,
-  useGroupBy,
-  usePersistedFilter,
-  UsePersistedFilterProps,
-  useSessionStorage,
-} from "src/hooks";
-import { TextField } from "src/inputs/TextField";
+import { Css, Only } from "src/Css";
+import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
 import { useTestIds } from "src/utils";
-import { useDebounce } from "use-debounce";
-import { StringParam, useQueryParams } from "use-query-params";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
@@ -110,7 +99,6 @@ function GridTableLayoutComponent<
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
-  const { sm } = useBreakpoint();
 
   const hasHideableColumns = useMemo(() => {
     if (hideEditColumns) return false;
@@ -163,13 +151,13 @@ function GridTableLayoutComponent<
             )
           }
         >
-          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-          {layoutState?.filterDefs && (
+          {layoutState && (layoutState.filterDefs || layoutState.search) && (
             <FilterDropdownMenu
               filterDefs={layoutState.filterDefs}
               filter={layoutState.filter}
               onChange={layoutState.setFilter}
               groupBy={layoutState.groupBy}
+              searchProps={layoutState.search ? { onSearch: layoutState.setSearchString } : undefined}
             />
           )}
         </TableActions>
@@ -329,49 +317,5 @@ function Header(props: HeaderProps) {
         </div>
       </header>
     </FullBleed>
-  );
-}
-
-function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
-  const [{ search: initialValue }, setQueryParams] = useQueryParams({ search: StringParam });
-  const [value, setValue] = useState<string>(initialValue || "");
-  const [isOpen, setIsOpen] = useState(false);
-  const { sm } = useBreakpoint();
-
-  const [debouncedSearch] = useDebounce(value, 300);
-
-  useEffect(() => {
-    onSearch(debouncedSearch);
-    setQueryParams({ search: debouncedSearch || undefined }, "replaceIn");
-  }, [debouncedSearch, onSearch, setQueryParams]);
-
-  const textField = (
-    <TextField
-      label="Search"
-      labelStyle="hidden"
-      value={value}
-      onChange={(v) => setValue(v ?? "")}
-      placeholder="Search"
-      clearable
-      startAdornment={<Icon icon="search" color={Palette.Gray700} />}
-    />
-  );
-
-  if (!sm) {
-    return <div css={Css.wPx(244).$}>{textField}</div>;
-  }
-
-  return (
-    <>
-      <Button
-        label=""
-        icon="search"
-        size="md"
-        variant="secondaryBlack"
-        onClick={() => setIsOpen(!isOpen)}
-        active={isOpen}
-      />
-      {isOpen && <div css={Css.w100.$}>{textField}</div>}
-    </>
   );
 }
