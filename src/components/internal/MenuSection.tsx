@@ -21,7 +21,7 @@ export function MenuSectionImpl(props: MenuSectionProps) {
 
   return (
     <>
-      {isPersistentSection && <li {...separatorProps} css={Css.bt.bcGray200.$} />}
+      {isPersistentSection && <li {...separatorProps} css={Css.bt.bc(Tokens.SurfaceSeparator).$} />}
       <li {...itemProps} css={Css.color(Tokens.OnSurface).if(!isPersistentSection).oa.$}>
         <ul css={Css.listReset.$} {...groupProps} {...tid[isPersistentSection ? "persistentItems" : "menuItems"]}>
           {[...section.childNodes].map((item) => (

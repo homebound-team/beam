@@ -6,6 +6,7 @@ import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
+import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
@@ -36,6 +37,8 @@ export type RadioGroupFieldProps<K extends string> = {
   /** The list of options. */
   options: RadioFieldOption<K>[];
   disabled?: boolean;
+  /** Whether the field is required. When true, renders the required suffix (i.e. "*") next to the label. */
+  required?: boolean;
   errorMsg?: string;
   helperText?: string | ReactNode;
   onBlur?: () => void;
@@ -59,6 +62,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     onChange,
     options,
     disabled = false,
+    required,
     errorMsg,
     helperText,
     layout = "vertical",
@@ -75,15 +79,16 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     isReadOnly: false,
   });
   const tid = useTestIds(props, defaultTestId(label));
+  const labelSuffix = useLabelSuffix(required, false);
 
   // We use useRadioGroup b/c it does neat keyboard up/down stuff
-  // TODO: Pass read only, required, error message to useRadioGroup
-  const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled }, state);
+  // TODO: Pass read only, error message to useRadioGroup
+  const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled, isRequired: required }, state);
 
   return (
     // default styling to position `<Label />` above.
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
-      <Label label={label} {...labelProps} {...tid.label} hidden={labelStyle === "hidden"} />
+      <Label label={label} {...labelProps} {...tid.label} suffix={labelSuffix} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
         <div css={Css.df.if(layout === "horizontal").fdr.fww.gap3.else.fdc.gap1.$}>
           {options.map((option) => {
