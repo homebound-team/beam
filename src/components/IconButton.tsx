@@ -35,6 +35,8 @@ export type IconButtonProps = {
    * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
    */
   preventTooltip?: boolean;
+  /** Whether to display the square variant */
+  outline?: boolean;
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -58,6 +60,7 @@ export function IconButton(props: IconButtonProps) {
     forceFocusStyles = false,
     label,
     preventTooltip = false,
+    outline = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -77,14 +80,14 @@ export function IconButton(props: IconButtonProps) {
   const styles = useMemo(
     () => ({
       ...iconButtonStylesReset,
-      ...(circle ? iconButtonCircle : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered && (circle ? iconButtonCircleStylesHover : iconButtonTokenHover)),
+      ...(circle ? iconButtonCircle : compact ? iconButtonCompact : outline ? iconButtonOutline : iconButtonNormal),
+      ...(isHovered && (circle || outline ? iconButtonCircleStylesHover : iconButtonTokenHover)),
       ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
-      ...(active && (circle ? activeStylesCircle : iconButtonTokenHover)),
+      ...(active && (circle || outline ? activeStylesCircle : iconButtonTokenHover)),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     }),
-    [isHovered, isFocusVisible, isDisabled, compact, circle, active, bgColor, forceFocusStyles],
+    [isHovered, isFocusVisible, isDisabled, compact, circle, active, bgColor, forceFocusStyles, outline],
   );
   const iconColor = circle ? circleIconColor : defaultIconColor;
 
@@ -129,6 +132,7 @@ const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
+const iconButtonOutline = Css.br8.wPx(48).hPx(40).pxPx(12).py1.bcGray300.ba.bw1.df.jcc.aic.$;
 /** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
 const iconButtonTokenHover = Css.bgColor(Tokens.NeutralFillHoverStrong).$;
 export const iconButtonStylesHover = Css.bgGray200.$;

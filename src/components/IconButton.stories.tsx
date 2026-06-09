@@ -88,6 +88,10 @@ export const Circle = Template.bind({});
 // @ts-ignore
 Circle.args = { circle: true };
 
+export const Outline = Template.bind({});
+// @ts-ignore
+Outline.args = { outline: true };
+
 export function WithTooltip() {
   return (
     <div css={Css.dg.fdc.gap2.jcfs.$}>
@@ -140,13 +144,13 @@ export function IconButtonLink() {
 
 /** Hover styled version of the IconButton — uses a scoped stylesheet to force hover styles for visual testing. */
 function HoveredIconButton(args: IconButtonStoryArgs) {
-  const { storyContrast = false, circle, ...iconArgs } = args;
-  const bg = storyContrast ? Palette.Gray700 : circle ? Palette.Blue100 : Palette.Gray200;
-  const borderColor = circle ? Palette.Blue200 : undefined;
+  const { storyContrast = false, circle, outline, ...iconArgs } = args;
+  const bg = storyContrast ? Palette.Gray700 : circle || outline ? Palette.Blue100 : Palette.Gray200;
+  const borderColor = circle || outline ? Palette.Blue200 : undefined;
   const hoverBlock = (
     <div className="hovered-icon-button">
       <style>{`.hovered-icon-button button { background-color: ${bg};${borderColor ? ` border-color: ${borderColor};` : ""} }`}</style>
-      <IconButton {...iconArgs} circle={circle} active={circle} />
+      <IconButton {...iconArgs} circle={circle} outline={outline} active={circle} />
     </div>
   );
   return storyContrast ? <ContrastScope>{hoverBlock}</ContrastScope> : hoverBlock;
