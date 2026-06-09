@@ -18,19 +18,6 @@ describe("NavbarLayout", () => {
     // And the navbar's own content renders inside the slot
     expect(r.getByText("Dashboard")).toBeInTheDocument();
   });
-
-  it("omits the navbar slot when the navbar prop is undefined", async () => {
-    // When rendered without a navbar prop
-    const r = await render(
-      <NavbarLayout>
-        <span>Body only</span>
-      </NavbarLayout>,
-    );
-
-    // Then there's no navbar placeholder, but the body still renders
-    expect(r.query.navbarLayout_navbar).toBeNull();
-    expect(r.navbarLayout_body).toHaveTextContent("Body only");
-  });
 });
 
 function createItems(): AppNavItem[] {

@@ -12,9 +12,9 @@ This document is the **canonical contract** for structural page layouts in Beam.
 
 | Layout | Renders | Props |
 |--------|---------|-------|
-| `NavbarLayout` | `Navbar` | `navbar?: NavbarProps`; body → **`children`** |
-| `SideNavLayout` | `SideNav` | `sideNav?: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?` |
-| `PageHeaderLayout` | `PageHeader` | `pageHeader?: PageHeaderProps`; body → **`children`** |
+| `NavbarLayout` | `Navbar` | `navbar: NavbarProps`; body → **`children`** |
+| `SideNavLayout` | `SideNav` | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?` |
+| `PageHeaderLayout` | `PageHeader` | `pageHeader: PageHeaderProps`; body → **`children`** |
 
 The navbar and page header **always auto-hide** — they scroll away on scroll-down and slide back in on
 scroll-up.
@@ -37,8 +37,9 @@ The layouts share a **document-scroll** model: the navbar, side nav rail, and pa
 `position: sticky/fixed` and communicate through CSS custom properties so wide content (e.g. large
 tables) uses the document scrollbars while chrome stays in place:
 
-- `NavbarLayout` measures and publishes the navbar height (`--beam-navbar-layout-height`) and the
+- `DocumentScrollLayoutProvider` (via each layout's outermost wrapper) measures and publishes the
   visible viewport size (`--beam-layout-viewport-width` / `--beam-layout-viewport-height`).
+- `NavbarLayout` measures and publishes the navbar height (`--beam-navbar-layout-height`).
 - `SideNavLayout` publishes its rail width (`--beam-side-nav-layout-width`) for sticky column offsets.
 - `PageHeaderLayout` reads those and publishes its own height (`--beam-page-header-layout-height`).
 - `GridTable` reads these vars so its sticky header sits below the navbar + page header and its sticky

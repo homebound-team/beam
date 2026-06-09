@@ -1,18 +1,67 @@
-import { createContext, ReactNode, useContext } from "react";
+import { useResizeObserver } from "@react-aria/utils";
+import {
+  createContext,
+  type CSSProperties,
+  ReactNode,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { Css } from "src/Css";
+import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "./layoutVars";
 
 const DocumentScrollLayoutContext = createContext(false);
 
-/**
- * Marks the subtree as a document-scroll Beam layout (`NavbarLayout` / `SideNavLayout` / `PageHeaderLayout`),
- * whose chrome coordinates through the document scrollbars. Components with their own scroll container
- * (notably a virtualized `GridTable`) read {@link useDocumentScrollLayout} to delegate scrolling to the
- * window. The value is a constant `true`, so nesting the layouts is a no-op.
- */
-export function DocumentScrollLayoutProvider({ children }: { children: ReactNode }) {
-  return <DocumentScrollLayoutContext.Provider value={true}>{children}</DocumentScrollLayoutContext.Provider>;
+/** Outermost document-scroll layout root; nested providers bypass. Publishes viewport CSS vars. */
+export function DocumentScrollLayoutProvider({ children }: { children: ReactNode }): JSX.Element {
+  const inDocumentScrollLayout = useContext(DocumentScrollLayoutContext);
+  // Nested layouts already sit under an outer measurement root.
+  if (inDocumentScrollLayout) return <>{children}</>;
+
+  return (
+    <DocumentScrollLayoutContext.Provider value={true}>
+      <DocumentScrollLayoutViewportRoot>{children}</DocumentScrollLayoutViewportRoot>
+    </DocumentScrollLayoutContext.Provider>
+  );
 }
 
-/** True when rendered inside a document-scroll Beam layout. Defaults to `false` outside one. */
+/** True when inside a document-scroll Beam layout (e.g. for virtualized `GridTable` scroll delegation). */
 export function useDocumentScrollLayout(): boolean {
   return useContext(DocumentScrollLayoutContext);
+}
+
+function DocumentScrollLayoutViewportRoot({ children }: { children: ReactNode }) {
+  const docElementRef = useRef<HTMLElement | null>(typeof document !== "undefined" ? document.documentElement : null);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+
+  const syncViewportSize = useCallback(() => {
+    const el = docElementRef.current;
+    if (!el) return;
+    const width = el.clientWidth;
+    const height = el.clientHeight;
+    // Bail when unchanged so a ResizeObserver fire with no size delta doesn't re-render.
+    setViewportSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }));
+  }, []);
+
+  useResizeObserver({ ref: docElementRef, onResize: syncViewportSize });
+  useLayoutEffect(() => {
+    syncViewportSize();
+  }, [syncViewportSize]);
+
+  const style: Record<string, string> = {};
+  if (viewportSize.width > 0) {
+    style[beamLayoutViewportWidthVar] = `${viewportSize.width}px`;
+  }
+  if (viewportSize.height > 0) {
+    style[beamLayoutViewportHeightVar] = `${viewportSize.height}px`;
+  }
+
+  return (
+    // `display: contents` keeps vars inheritable without adding a layout box.
+    <div css={Css.display("contents").$} style={Object.keys(style).length > 0 ? (style as CSSProperties) : undefined}>
+      {children}
+    </div>
+  );
 }

@@ -18,9 +18,8 @@ export type SideNavLayoutProps = {
   /**
    * Props for the {@link SideNav} rendered in the rail. The layout owns the rail's width, surface
    * chrome, and collapse toggle; `SideNav` reacts to collapse state via `useSideNavLayoutContext()`.
-   * Omit to render no rail.
    */
-  sideNav?: SideNavProps;
+  sideNav: SideNavProps;
   children?: ReactNode;
   /** Width of the rail when `navState === "expanded"` on `mdAndUp`. On mobile the expanded rail fills the viewport. Defaults to `260`. */
   railWidthPx?: number;
@@ -62,7 +61,7 @@ function SideNavLayoutContent(props: SideNavLayoutProps) {
   const railCollapsedWidthPx = 56;
 
   const collapsed = navState === "collapse";
-  const showRail = sideNav !== undefined && navState !== "hidden";
+  const showRail = navState !== "hidden";
 
   // Width the rail reserves in content space (feeds the sticky-offset var). On mobile the rail overlays,
   // so it only reserves the collapsed icon-strip footprint (an expanded overlay covers the content anyway).
@@ -103,7 +102,7 @@ function SideNavLayoutContent(props: SideNavLayoutProps) {
         </div>
       )}
       <div css={Css.fg1.mh0.df.fdc.$} {...tid.sideNavContent}>
-        {sideNav != null ? <SideNav {...sideNav} /> : null}
+        <SideNav {...sideNav} />
       </div>
     </div>
   );

@@ -78,15 +78,6 @@ describe("SideNavLayout", () => {
     expect(r.queryByText("Dashboard")).toBeNull();
   });
 
-  it("does not render the rail when sideNav prop is undefined", async () => {
-    // When the layout is rendered without a sideNav prop
-    const r = await render(<SideNavLayout>page</SideNavLayout>);
-
-    // Then no rail container, no toggle
-    expect(r.queryByTestId("sideNavLayout_sideNav")).toBeNull();
-    expect(r.queryByTestId("sideNavLayout_toggle")).toBeNull();
-  });
-
   it("renders the collapse toggle and flips nav state on click", async () => {
     // Given a layout with the default toggle visible
     const r = await render(<SideNavLayout sideNav={{ items }} />);

@@ -16,17 +16,4 @@ describe("PageHeaderLayout", () => {
     expect(r.getByText("Page title")).toBeInTheDocument();
     expect(r.pageHeaderLayout_body).toHaveTextContent("Body content");
   });
-
-  it("omits the header slot when the pageHeader prop is undefined", async () => {
-    // When rendered without a pageHeader prop
-    const r = await render(
-      <PageHeaderLayout>
-        <span>Body only</span>
-      </PageHeaderLayout>,
-    );
-
-    // Then there's no header placeholder, but the body still renders
-    expect(r.query.pageHeaderLayout_pageHeader).toBeNull();
-    expect(r.pageHeaderLayout_body).toHaveTextContent("Body only");
-  });
 });

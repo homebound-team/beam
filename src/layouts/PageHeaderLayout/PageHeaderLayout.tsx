@@ -16,8 +16,8 @@ import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 
 export type PageHeaderLayoutProps<V extends string, X> = {
-  /** Props for the {@link PageHeader} rendered as the page-level header. Omit to render no header. */
-  pageHeader?: PageHeaderProps<V, X>;
+  /** Props for the {@link PageHeader} rendered as the page-level header. */
+  pageHeader: PageHeaderProps<V, X>;
   /** Slot: main page body (tables, forms, etc.). */
   children?: ReactNode;
 };
@@ -46,15 +46,13 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
 
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
-  const headerHeight = useMeasuredHeight(headerMetricsRef, pageHeader != null);
+  const headerHeight = useMeasuredHeight(headerMetricsRef, true);
 
-  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, pageHeader != null, getNavbarBottom);
+  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true, getNavbarBottom);
   const headerOccupiesPosition = autoHideState === "revealed" || atTop;
 
   const cssVars: Record<string, string> | undefined =
-    pageHeader != null && headerHeight > 0 && headerOccupiesPosition
-      ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` }
-      : undefined;
+    headerHeight > 0 && headerOccupiesPosition ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
 
   const headerLeft = `var(${beamSideNavLayoutWidthVar}, 0px)`;
   const headerWidth = `calc(var(${beamLayoutViewportWidthVar}, 100vw) - var(${beamSideNavLayoutWidthVar}, 0px))`;
@@ -77,20 +75,18 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
 
   // Memoize the PageHeader element so the layout's scroll-state re-renders (and the navbar-height
   // context changing) only update the wrapper's css/style, not re-render the PageHeader itself.
-  const pageHeaderEl = useMemo(() => (pageHeader != null ? <PageHeader {...pageHeader} /> : null), [pageHeader]);
+  const pageHeaderEl = useMemo(() => <PageHeader {...pageHeader} />, [pageHeader]);
 
   return (
     <DocumentScrollLayoutProvider>
       <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
-        {pageHeaderEl != null && (
-          // Outer placeholder always reserves the header height so content never jumps when the inner
-          // flips to `position: fixed`.
-          <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }}>
-            <div ref={headerMetricsRef} css={innerCss} style={innerStyle} {...tid.pageHeader}>
-              {pageHeaderEl}
-            </div>
+        {/* Outer placeholder always reserves the header height so content never jumps when the inner
+            flips to `position: fixed`. */}
+        <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }}>
+          <div ref={headerMetricsRef} css={innerCss} style={innerStyle} {...tid.pageHeader}>
+            {pageHeaderEl}
           </div>
-        )}
+        </div>
         <div css={Css.df.fdc.fg1.mh0.w100.$} {...tid.body}>
           {children}
         </div>
