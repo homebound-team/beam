@@ -3,7 +3,8 @@ import { render } from "src/utils/rtl";
 
 describe("NavbarLayout", () => {
   it("renders the navbar slot and body children", async () => {
-    // When rendered with a navbar and children
+    // Given a navbar and body content
+    // When rendered
     const r = await render(
       <NavbarLayout
         navbar={{

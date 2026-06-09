@@ -12,8 +12,8 @@ export type AutoHideResult = {
   atTop: boolean;
 };
 
-/** Scroll distance before committing to fixed positioning. */
-const THRESHOLD = 80;
+/** Scroll distance before committing to fixed positioning. Exported for tests. */
+export const THRESHOLD = 80;
 
 export function useAutoHideOnScroll(
   spacerRef: RefObject<HTMLElement | null>,

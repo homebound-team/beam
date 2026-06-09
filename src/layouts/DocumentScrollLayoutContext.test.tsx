@@ -5,6 +5,7 @@ import { render } from "src/utils/rtl";
 
 describe("DocumentScrollLayoutProvider", () => {
   it("publishes viewport CSS vars on the measurement root when rendered standalone", async () => {
+    // Given a measured document viewport
     mockDocumentViewport(1024, 768);
 
     // When wrapped in the outermost provider
@@ -21,6 +22,7 @@ describe("DocumentScrollLayoutProvider", () => {
   });
 
   it("creates only one measurement root when nested inside another provider", async () => {
+    // Given a measured document viewport
     mockDocumentViewport(1024, 768);
 
     // When an inner layout wraps itself in a second provider (bypasses re-measurement)
@@ -41,6 +43,7 @@ describe("DocumentScrollLayoutProvider", () => {
 
 describe("PageHeaderLayout viewport coordination", () => {
   it("wraps content in a viewport measurement root when rendered standalone", async () => {
+    // Given a measured document viewport
     mockDocumentViewport(1024, 768);
 
     // When rendered without a NavbarLayout ancestor

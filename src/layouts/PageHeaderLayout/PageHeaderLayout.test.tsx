@@ -3,7 +3,8 @@ import { render } from "src/utils/rtl";
 
 describe("PageHeaderLayout", () => {
   it("renders the page header slot and body children", async () => {
-    // When rendered with a pageHeader and children
+    // Given a page header and body content
+    // When rendered
     const r = await render(
       <PageHeaderLayout pageHeader={{ title: "Page title" }}>
         <span>Body content</span>
