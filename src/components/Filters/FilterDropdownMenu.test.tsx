@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { click, render, withRouter } from "src/utils/rtl";
-import { QueryParamProvider } from "use-query-params";
-import { ReactRouter6Adapter } from "use-query-params/adapters/react-router-6";
 import { FilterDropdownMenu } from "./FilterDropdownMenu";
 import { singleFilter } from "./SingleFilter";
 import { FilterDefs } from "./types";
@@ -132,7 +130,7 @@ function TestFilterDropdownMenu<F extends Record<string, unknown>>(props: {
 }) {
   const [filter, setFilter] = useState<F>(props.initialFilter || ({} as F));
   return (
-    <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <>
       <FilterDropdownMenu
         filterDefs={props.filterDefs}
         filter={filter}
@@ -141,6 +139,6 @@ function TestFilterDropdownMenu<F extends Record<string, unknown>>(props: {
         searchProps={props.searchProps}
       />
       <div data-testid="filterValue">{JSON.stringify(filter)}</div>
-    </QueryParamProvider>
+    </>
   );
 }
