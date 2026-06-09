@@ -17,15 +17,7 @@ export type NavbarLayoutProps = {
   children?: ReactNode;
 };
 
-/**
- * Vertical shell: navbar + body. Slots have no intrinsic sizing — fill the parent from the app.
- *
- * The navbar auto-hides: it scrolls away on scroll-down and slides back in pinned past a threshold on
- * scroll-up, with an outer placeholder reserving its height so content never jumps. Publishes the navbar
- * height ({@link beamNavbarLayoutHeightVar}) as a CSS var for chrome below it.
- *
- * Canonical contract: `docs/layouts.md`.
- */
+/** Navbar + body shell with auto-hide chrome. Contract: `docs/layouts.md`. */
 export function NavbarLayout(props: NavbarLayoutProps) {
   const { navbar, children } = props;
   const tid = useTestIds(props, "navbarLayout");
@@ -36,7 +28,7 @@ export function NavbarLayout(props: NavbarLayoutProps) {
   const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true);
   const navOccupiesViewportTop = autoHideState === "revealed" || atTop;
 
-  // Occupying height (else 0), published as a CSS var (CSS consumers) and via context (PageHeaderLayout).
+  // Occupying height (else 0) — CSS var + context for PageHeaderLayout.
   const navbarOffsetPx = navHeight > 0 && navOccupiesViewportTop ? navHeight : 0;
 
   const cssVars: Record<string, string> | undefined =
@@ -46,25 +38,22 @@ export function NavbarLayout(props: NavbarLayoutProps) {
 
   const innerCss =
     autoHideState === "static"
-      ? // Sticky w/ only `left` (no `top`) — scrolls away vertically with the document, but stays pinned
-        // to the viewport left during horizontal scroll on wide pages.
+      ? // Sticky horizontally; scrolls away vertically with the document.
         Css.sticky.left0.z(zIndices.navbar).w(innerWidth).$
-      : // Detached: `position: fixed`; `top` (set inline below) slides it between hidden/revealed.
+      : // Fixed; inline `top` slides between hidden/revealed.
         Css.fixed.left0.z(zIndices.navbar).w(innerWidth).add("transition", "top 200ms ease").$;
 
   const innerStyle: CSSProperties | undefined =
     autoHideState !== "static" ? { top: autoHideState === "revealed" ? 0 : -navHeight } : undefined;
 
-  // Memoize the Navbar element so the layout's scroll-state re-renders (which only change the wrapper's
-  // css/style below) don't re-render the Navbar itself.
+  // Memoize so scroll-state re-renders don't re-render Navbar.
   const navbarEl = useMemo(() => <Navbar {...navbar} />, [navbar]);
 
   return (
     <DocumentScrollLayoutProvider>
       <NavbarLayoutHeightProvider value={navbarOffsetPx}>
         <div css={Css.df.fdc.wfc.mw100.$} style={cssVars} {...tid}>
-          {/* Outer placeholder always reserves the navbar height so content never jumps when the inner
-              flips to `position: fixed`. */}
+          {/* Spacer reserves height when inner flips to fixed. */}
           <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: navHeight }}>
             <div ref={navMetricsRef} css={innerCss} style={innerStyle} {...tid.navbar}>
               {navbarEl}

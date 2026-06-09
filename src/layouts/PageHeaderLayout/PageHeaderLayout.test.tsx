@@ -10,10 +10,8 @@ describe("PageHeaderLayout", () => {
       </PageHeaderLayout>,
     );
 
-    // Then the layout root, header slot, and body slot all render
-    expect(r.pageHeaderLayout).toBeInTheDocument();
-    expect(r.pageHeaderLayout_pageHeader).toBeInTheDocument();
-    expect(r.getByText("Page title")).toBeInTheDocument();
+    // Then the header slot and body slot render
+    expect(r.pageHeaderLayout_pageHeader).toHaveTextContent("Page title");
     expect(r.pageHeaderLayout_body).toHaveTextContent("Body content");
   });
 });

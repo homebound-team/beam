@@ -22,23 +22,14 @@ export type PageHeaderLayoutProps<V extends string, X> = {
   children?: ReactNode;
 };
 
-/**
- * Vertical shell: page header + body. Slots have no intrinsic sizing — fill the parent from the app.
- *
- * The header auto-hides below the {@link NavbarLayout} navbar (scrolls away on scroll-down, slides back in
- * pinned past a threshold on scroll-up) and stays horizontally sticky beside the side nav. Publishes its
- * height ({@link beamPageHeaderLayoutHeightVar}) as a CSS var for sticky chrome below it.
- *
- * Canonical contract: `docs/layouts.md`.
- */
+/** Page header + body shell with auto-hide chrome. Contract: `docs/layouts.md`. */
 export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss, X>>(
   props: PageHeaderLayoutProps<V, X>,
 ) {
   const { pageHeader, children } = props;
   const tid = useTestIds(props, "pageHeaderLayout");
 
-  // The navbar's visible height (px) — the y-coordinate the header pins to when revealed. Read from the
-  // NavbarLayout context (mirrored into a ref) so the scroll handler avoids a per-scroll `getComputedStyle`.
+  // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
   const navbarHeight = useNavbarLayoutHeight();
   const navbarHeightRef = useRef(navbarHeight);
   navbarHeightRef.current = navbarHeight;
@@ -60,28 +51,21 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
 
   const innerCss =
     autoHideState === "static"
-      ? // Sticky w/ only `left` (no `top`) — scrolls away vertically, but stays pinned beside the side
-        // nav during horizontal scroll on wide pages.
-        Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$
-      : // Detached: `position: fixed`; the dynamic `top` (set inline below) slides it in/out below the navbar.
-        Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).add("transition", "top 200ms ease").$;
+      ? Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$
+      : Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).add("transition", "top 200ms ease").$;
 
-  // Hidden = revealed minus headerHeight, so the slide always travels exactly headerHeight regardless of
-  // where the navbar puts the revealed baseline — keeping it in lockstep with the navbar's own slide.
+  // Hidden top = revealed top minus headerHeight so the slide matches navbar lockstep.
   const innerStyle: CSSProperties | undefined =
     autoHideState !== "static"
       ? { top: autoHideState === "revealed" ? outerTop : `calc(${outerTop} - ${headerHeight}px)` }
       : undefined;
 
-  // Memoize the PageHeader element so the layout's scroll-state re-renders (and the navbar-height
-  // context changing) only update the wrapper's css/style, not re-render the PageHeader itself.
   const pageHeaderEl = useMemo(() => <PageHeader {...pageHeader} />, [pageHeader]);
 
   return (
     <DocumentScrollLayoutProvider>
       <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
-        {/* Outer placeholder always reserves the header height so content never jumps when the inner
-            flips to `position: fixed`. */}
+        {/* Spacer reserves height when inner flips to fixed. */}
         <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }}>
           <div ref={headerMetricsRef} css={innerCss} style={innerStyle} {...tid.pageHeader}>
             {pageHeaderEl}

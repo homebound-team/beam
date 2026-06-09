@@ -16,6 +16,12 @@ Match the existing conventions when adding files:
 - **Utility / constant modules** — camelCase: `zIndices.ts`, `layoutVars.ts`.
 - Co-locate `*.test.tsx` and `*.stories.tsx` beside the file they cover.
 
+## Comments
+
+- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md)).
+- **Inline comments:** Use for non-obvious logic near the code. Keep them **short** — one line when possible.
+- **Avoid:** Multi-paragraph JSDoc, restating what the code already says, and duplicating docs that live elsewhere.
+
 ## Testing
 
 Use **vitest**, not Jest. Example:

@@ -1,11 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { RefObject, useCallback, useLayoutEffect, useState } from "react";
 
-/**
- * Rounded pixel height of `ref`'s element, kept current via a `ResizeObserver`; `0` when the element is
- * absent. `enabled` re-runs the initial pre-paint measure when the chrome appears/disappears. The setter
- * bails on an unchanged height so a no-op observer fire doesn't re-render.
- */
+/** Rounded pixel height of `ref`'s element; `0` when absent or disabled. */
 export function useMeasuredHeight(ref: RefObject<HTMLElement | null>, enabled: boolean): number {
   const [height, setHeight] = useState(0);
 
