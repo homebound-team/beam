@@ -5,16 +5,16 @@ import { RefObject, useCallback, useLayoutEffect, useState } from "react";
 export function useMeasuredHeight(ref: RefObject<HTMLElement | null>, enabled: boolean): number {
   const [height, setHeight] = useState(0);
 
-  const sync = useCallback(() => {
+  const syncElementHeight = useCallback(() => {
     const el = ref.current;
     const next = el ? Math.round(el.getBoundingClientRect().height) : 0;
     setHeight((prev) => (prev === next ? prev : next));
   }, [ref]);
 
-  useResizeObserver({ ref, onResize: sync });
+  useResizeObserver({ ref, onResize: syncElementHeight });
   useLayoutEffect(() => {
-    sync();
-  }, [enabled, sync]);
+    syncElementHeight();
+  }, [enabled, syncElementHeight]);
 
   return height;
 }

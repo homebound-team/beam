@@ -41,7 +41,7 @@ export function NavbarLayout(props: NavbarLayoutProps) {
       ? // Sticky horizontally; scrolls away vertically with the document.
         Css.sticky.left0.z(zIndices.navbar).w(innerWidth).$
       : // Fixed; inline `top` slides between hidden/revealed.
-        Css.fixed.left0.z(zIndices.navbar).w(innerWidth).add("transition", "top 200ms ease").$;
+        Css.fixed.left0.z(zIndices.navbar).w(innerWidth).transitionTop.$;
 
   const innerStyle: CSSProperties | undefined =
     autoHideState !== "static" ? { top: autoHideState === "revealed" ? 0 : -navHeight } : undefined;

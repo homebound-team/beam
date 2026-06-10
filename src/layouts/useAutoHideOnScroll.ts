@@ -52,7 +52,7 @@ export function useAutoHideOnScroll(
       }
     };
 
-    const update = () => {
+    const updateAutoHideState = () => {
       const el = spacerRef.current;
       if (!el) return;
 
@@ -86,9 +86,9 @@ export function useAutoHideOnScroll(
       commit(next, nextAtTop);
     };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
+    updateAutoHideState();
+    window.addEventListener("scroll", updateAutoHideState, { passive: true });
+    return () => window.removeEventListener("scroll", updateAutoHideState);
   }, [enabled, spacerRef]);
 
   return { state, atTop };

@@ -52,7 +52,7 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const innerCss =
     autoHideState === "static"
       ? Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$
-      : Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).add("transition", "top 200ms ease").$;
+      : Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).transitionTop.$;
 
   // Hidden top = revealed top minus headerHeight so the slide matches navbar lockstep.
   const innerStyle: CSSProperties | undefined =
