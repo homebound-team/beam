@@ -1,24 +1,20 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
-import { Icon } from "src/components/Icon";
 import { OffsetAndLimit, Pagination } from "src/components/Pagination";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only, Palette } from "src/Css";
+import { Css, Only } from "src/Css";
 import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
-import { TextField } from "src/inputs/TextField";
 import { useTestIds } from "src/utils";
-import { useDebounce } from "use-debounce";
-import { StringParam, useQueryParams } from "use-query-params";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
-import { ScrollableContent } from "../ScrollableContent";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 
 // Omit to force all action button menus to look the same
@@ -41,7 +37,7 @@ export type GridTableLayoutProps<
   X extends Only<GridTableXss, X>,
   QData,
 > = {
-  pageTitle: ReactNode;
+  pageTitle?: ReactNode;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
@@ -131,14 +127,16 @@ function GridTableLayoutComponent<
 
   return (
     <>
-      <Header
-        pageTitle={pageTitle}
-        breadCrumb={breadCrumb}
-        primaryAction={primaryAction}
-        secondaryAction={secondaryAction}
-        tertiaryAction={tertiaryAction}
-        actionMenu={actionMenu}
-      />
+      {pageTitle && (
+        <Header
+          pageTitle={pageTitle}
+          breadCrumb={breadCrumb}
+          primaryAction={primaryAction}
+          secondaryAction={secondaryAction}
+          tertiaryAction={tertiaryAction}
+          actionMenu={actionMenu}
+        />
+      )}
       {showTableActions && (
         <TableActions
           right={
@@ -153,13 +151,13 @@ function GridTableLayoutComponent<
             )
           }
         >
-          {layoutState?.search && <SearchBox onSearch={layoutState.setSearchString} />}
-          {layoutState?.filterDefs && (
+          {layoutState && (layoutState.filterDefs || layoutState.search) && (
             <FilterDropdownMenu
               filterDefs={layoutState.filterDefs}
               filter={layoutState.filter}
               onChange={layoutState.setFilter}
               groupBy={layoutState.groupBy}
+              searchProps={layoutState.search ? { onSearch: layoutState.setSearchString } : undefined}
             />
           )}
         </TableActions>
@@ -319,31 +317,5 @@ function Header(props: HeaderProps) {
         </div>
       </header>
     </FullBleed>
-  );
-}
-
-function SearchBox({ onSearch }: { onSearch(filter: string): void }) {
-  const [{ search: initialValue }, setQueryParams] = useQueryParams({ search: StringParam });
-  const [value, setValue] = useState<string>(initialValue || "");
-
-  const [debouncedSearch] = useDebounce(value, 300);
-
-  useEffect(() => {
-    onSearch(debouncedSearch);
-    setQueryParams({ search: debouncedSearch || undefined }, "replaceIn");
-  }, [debouncedSearch, onSearch, setQueryParams]);
-
-  return (
-    <div css={Css.wPx(244).$}>
-      <TextField
-        label="Search"
-        labelStyle="hidden"
-        value={value}
-        onChange={(v) => setValue(v ?? "")}
-        placeholder={"Search"}
-        clearable
-        startAdornment={<Icon icon="search" color={Palette.Gray700} />}
-      />
-    </div>
   );
 }
