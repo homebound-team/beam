@@ -1,5 +1,4 @@
 import { memo, useEffect, useMemo, useState } from "react";
-import { IconButton } from "src/components";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
@@ -114,45 +113,36 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
       {/* Small screen: search icon button inline with filter button */}
       {sm && hasSearch && (
-        <IconButton
-          label="Search"
+        <Button
+          label=""
+          aria-label="Search"
           icon="search"
           onClick={() => setSearchIsOpen(!searchIsOpen)}
           active={searchIsOpen}
-          outline
+          variant="secondaryBlack"
           {...testId.searchButton}
         />
       )}
 
       {/* Filter button (only rendered when filterDefs are provided) */}
-      {hasFilters &&
-        (sm ? (
-          <IconButton
-            label="Filter"
-            icon="filter"
-            onClick={() => setIsOpen(!isOpen)}
-            active={isOpen}
-            circle
-            {...testId.button}
-          />
-        ) : (
-          <Button
-            label={sm ? "" : "Filter"}
-            aria-label={"Filter"}
-            icon="filter"
-            size="md"
-            endAdornment={
-              <div css={Css.df.aic.gap1.$}>
-                {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
-                <Icon xss={Css.if(sm).visuallyHidden.$} icon={isOpen ? "chevronUp" : "chevronDown"} />
-              </div>
-            }
-            variant="secondaryBlack"
-            onClick={() => setIsOpen(!isOpen)}
-            active={isOpen}
-            {...testId.button}
-          />
-        ))}
+      {hasFilters && (
+        <Button
+          label={sm ? "" : "Filter"}
+          aria-label="Filter"
+          icon="filter"
+          size="md"
+          endAdornment={
+            <div css={Css.df.aic.gap1.$}>
+              {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
+              <Icon xss={Css.if(sm).visuallyHidden.$} icon={isOpen ? "chevronUp" : "chevronDown"} />
+            </div>
+          }
+          variant="secondaryBlack"
+          onClick={() => setIsOpen(!isOpen)}
+          active={isOpen}
+          {...testId.button}
+        />
+      )}
 
       {/* Small screen: search text field row — rendered before filter controls */}
       {searchIsOpen && <div css={Css.w100.if(!sm).visuallyHidden.$}>{searchTextField}</div>}
