@@ -10,6 +10,8 @@ import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
+export type IconButtonVariant = "default" | "circle" | "outline";
+
 export type IconButtonProps = {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
@@ -22,8 +24,8 @@ export type IconButtonProps = {
   buttonRef?: RefObject<HTMLButtonElement>;
   /** Whether to show a 16x16px version of the IconButton */
   compact?: boolean;
-  /** Whether to display the circle variant */
-  circle?: boolean;
+  /** Visual variant of the button. Defaults to "default". */
+  variant?: IconButtonVariant;
   /** Indicates that the button is active/selected */
   active?: boolean;
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
@@ -35,8 +37,6 @@ export type IconButtonProps = {
    * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
    */
   preventTooltip?: boolean;
-  /** Whether to display the square variant */
-  outline?: boolean;
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -55,12 +55,11 @@ export function IconButton(props: IconButtonProps) {
     openInNew,
     active = false,
     compact = false,
-    circle = false,
+    variant = "default",
     download = false,
     forceFocusStyles = false,
     label,
     preventTooltip = false,
-    outline = false,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -77,19 +76,21 @@ export function IconButton(props: IconButtonProps) {
   const { hoverProps, isHovered } = useHover(ariaProps);
   const testIds = useTestIds(props, icon);
 
+  const isCircle = variant === "circle";
+  const isOutline = variant === "outline";
   const styles = useMemo(
     () => ({
       ...iconButtonStylesReset,
-      ...(circle ? iconButtonCircle : compact ? iconButtonCompact : outline ? iconButtonOutline : iconButtonNormal),
-      ...(isHovered && (circle || outline ? iconButtonCircleStylesHover : iconButtonTokenHover)),
-      ...(isFocusVisible || forceFocusStyles ? (circle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
-      ...(active && (circle || outline ? activeStylesCircle : iconButtonTokenHover)),
+      ...(isCircle ? iconButtonCircle : isOutline ? iconButtonOutline : compact ? iconButtonCompact : iconButtonNormal),
+      ...(isHovered && (isCircle || isOutline ? iconButtonCircleStylesHover : iconButtonTokenHover)),
+      ...(isFocusVisible || forceFocusStyles ? (isCircle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
+      ...(active && (isCircle || isOutline ? activeStylesCircle : iconButtonTokenHover)),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     }),
-    [isHovered, isFocusVisible, isDisabled, compact, circle, active, bgColor, forceFocusStyles, outline],
+    [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles],
   );
-  const iconColor = circle ? circleIconColor : defaultIconColor;
+  const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
     ...testIds,
@@ -108,12 +109,12 @@ export function IconButton(props: IconButtonProps) {
         color ||
         (isDisabled
           ? Tokens.TextDisabled
-          : circle && (isHovered || active || isFocusVisible)
+          : isCircle && (isHovered || active || isFocusVisible)
             ? defaultIconColor
             : iconColor)
       }
       bgColor={bgColor}
-      inc={compact ? 2 : circle ? 2.5 : inc}
+      inc={compact ? 2 : isCircle ? 2.5 : inc}
     />
   );
 
