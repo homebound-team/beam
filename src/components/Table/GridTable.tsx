@@ -41,6 +41,8 @@ import {
 import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
+import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
 import { isPromise } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
@@ -644,8 +646,11 @@ function renderDiv<R extends Kinded>(
       data-testid={id}
     >
       {/* Table Head */}
-      <div css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.tableStickyHeader).$}>{tableHeadRows}</div>
-
+      <div
+        css={Css.if(stickyHeader).sticky.top(stickyNavAndHeaderOffset(stickyOffset)).z(zIndices.tableStickyHeader).$}
+      >
+        {tableHeadRows}
+      </div>
       {/* Table Body */}
       <div>
         {keptSelectedRows}
@@ -700,7 +705,9 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
-      <thead css={Css.if(stickyHeader).sticky.topPx(stickyOffset).z(zIndices.tableStickyHeader).$}>
+      <thead
+        css={Css.if(stickyHeader).sticky.top(stickyNavAndHeaderOffset(stickyOffset)).z(zIndices.tableStickyHeader).$}
+      >
         {tableHeadRows}
       </thead>
       <tbody>
@@ -766,13 +773,18 @@ function renderVirtual<R extends Kinded>(
   virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
   virtuosoRangeRef: MutableRefObject<ListRange | null>,
   tableHeadRows: ReactElement[],
-  _stickyOffset: number,
+  stickyOffset: number,
   infiniteScroll?: InfiniteScroll,
   _tableContainerRef?: MutableRefObject<HTMLElement | null>,
   persistScrollPosition: boolean = infiniteScroll === undefined, // Enabled by default if infinite scroll is not enabled
 ): ReactElement {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const customScrollParent = useVirtualizedScrollParent();
+
+  // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
+  // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const inDocumentScrollLayout = useDocumentScrollLayout();
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
@@ -783,28 +795,36 @@ function renderVirtual<R extends Kinded>(
   const savedScrollIndex = getScrollIndex();
   const topItemCount = stickyHeader ? tableHeadRows.length : 0;
 
-  // Validate that saved scroll index is within bounds of current data.
-  // This handles cases where filters (via query params) reduce the data set,
-  // preventing "Zero-sized element" errors when Virtuoso tries to scroll to a row that doesn't exist.
+  // Saved index is body-relative (excludes pinned head rows). Skip restoration when 0 (at top)
+  // and validate against current data so a stale index doesn't crash Virtuoso with "Zero-sized
+  // element" when filters shrunk the row set.
   const validatedScrollIndex =
-    savedScrollIndex !== undefined && savedScrollIndex < visibleDataRows.length ? savedScrollIndex : undefined;
+    savedScrollIndex !== undefined && savedScrollIndex > 0 && savedScrollIndex < visibleDataRows.length
+      ? savedScrollIndex + topItemCount
+      : undefined;
 
   // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
   const virtuosoKey = !!validatedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
   return (
     <Virtuoso
+      useWindowScroll={inDocumentScrollLayout && !customScrollParent}
       key={virtuosoKey}
       overscan={5}
       ref={virtuosoRef}
       {...(customScrollParent ? { customScrollParent } : {})}
       {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
       components={{
-        // Applying a zIndex: 2 to ensure it stays on top of sticky columns
+        // zIndex keeps the pinned head above sticky columns; `top` matches the offsets used by
+        // the div/table render paths so virtualized tables pin below the global nav + page header.
         TopItemList: React.forwardRef((props, ref) => (
           <div
             {...props}
             ref={ref as MutableRefObject<HTMLDivElement>}
-            style={{ ...props.style, ...{ zIndex: zIndices.tableStickyHeader } }}
+            style={{
+              ...props.style,
+              zIndex: zIndices.tableStickyHeader,
+              top: stickyNavAndHeaderOffset(stickyOffset),
+            }}
           />
         )),
         List: VirtualRoot(style, columns as any, id, xss),
@@ -884,7 +904,10 @@ function renderVirtual<R extends Kinded>(
         // index may point to a row that hasn't been fetched yet (since data loads progressively),
         // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
         if (!infiniteScroll && visibleDataRows.length > 0) {
-          setScrollIndex(newRange.startIndex);
+          // Store body-relative index so "at the top" persists as 0 rather than `topItemCount`.
+          // Without this, Virtuoso reports startIndex === topItemCount when unscrolled, and we'd
+          // self-restore that on the next mount as a scroll-to-row-1, jumping the window.
+          setScrollIndex(Math.max(0, newRange.startIndex - topItemCount));
         }
       }}
       totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}

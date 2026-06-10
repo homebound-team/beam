@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -19,11 +20,7 @@ export type SideNavLayoutContextProps = {
   setNavState: Dispatch<SetStateAction<SideNavLayoutState>>;
 };
 
-/**
- * localStorage key for persisting the user's open/closed choice across sessions.
- * Only "expanded" and "collapse" are written; "hidden" is treated as consumer-driven
- * (typically per-route) programmatic state, not a user toggle to remember.
- */
+/** localStorage key for expanded/collapse toggle; `hidden` is not persisted. */
 export const SIDE_NAV_LAYOUT_STATE_STORAGE_KEY = "beam.sideNavLayout.navState";
 
 function loadStoredNavState(): SideNavLayoutState | undefined {
@@ -35,18 +32,13 @@ function loadStoredNavState(): SideNavLayoutState | undefined {
   }
 }
 
-/** Viewport below the `md` / `mdAndUp` threshold (< 600px). */
+/** Below `md` (< 600px). */
 function isBelowMdBreakpoint(): boolean {
   if (typeof window === "undefined") return false;
   return !window.matchMedia(Breakpoints.mdAndUp.replace("@media ", "")).matches;
 }
 
-/**
- * Initial nav state.
- * - Below `md`: `collapse` (icon strip), ignoring stored/desktop preference, unless the consumer
- *   passes an explicit `defaultNavState` (e.g. tests or programmatic `hidden`).
- * - `mdAndUp`: stored toggle → `defaultNavState` → `expanded`.
- */
+// Mobile: collapse by default. Desktop: stored preference → defaultNavState → expanded.
 function resolveInitialNavState(defaultNavState?: SideNavLayoutState): SideNavLayoutState {
   if (defaultNavState === "hidden") return "hidden";
   if (isBelowMdBreakpoint()) {
@@ -87,17 +79,11 @@ export function SideNavLayoutProvider(props: { children: ReactNode; defaultNavSt
     });
   }, []);
 
-  return (
-    <SideNavLayoutContext.Provider value={{ navState, setNavState }}>{props.children}</SideNavLayoutContext.Provider>
-  );
+  const value = useMemo(() => ({ navState, setNavState }), [navState, setNavState]);
+  return <SideNavLayoutContext.Provider value={value}>{props.children}</SideNavLayoutContext.Provider>;
 }
 
-/**
- * Read the side-nav layout state.
- *
- * Defaults to `expanded` + a noop setter when called outside a provider, so pattern components
- * (e.g. `SideNav`) can render in isolation without crashing.
- */
+/** Side nav layout state; defaults outside a provider so `SideNav` can render standalone. */
 export function useSideNavLayoutContext(): SideNavLayoutContextProps {
   return useContext(SideNavLayoutContext) ?? { navState: "expanded", setNavState: () => {} };
 }

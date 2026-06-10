@@ -33,6 +33,7 @@ import {
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, Palette, Properties } from "src/Css";
+import { beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
@@ -288,7 +289,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               ? {
                   ...Css.sticky.z(zIndices.tableStickyColumn).bgWhite.$,
                   ...(maybeSticky === "left"
-                    ? Css.left(columnIndex === 0 ? 0 : `calc(${columnSizes.slice(0, columnIndex).join(" + ")})`).$
+                    ? Css.left(
+                        columnIndex === 0
+                          ? `var(${beamSideNavLayoutWidthVar}, 0px)`
+                          : `calc(var(${beamSideNavLayoutWidthVar}, 0px) + (${columnSizes.slice(0, columnIndex).join(" + ")}))`,
+                      ).$
                     : {}),
                   ...(maybeSticky === "right"
                     ? Css.right(

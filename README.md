@@ -6,6 +6,10 @@ Homebound's React component design system.
 
 _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System-Refresh?node-id=0%3A1) file._
 
+## Page layout shells
+
+Standard **app shell** composition (global nav + body, sidebar + content, page header + body) is implemented as **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** from this package. Source lives in **`src/layouts/`** (sibling of `src/components/`). Full setup and composition rules: [`docs/layouts.md`](docs/layouts.md) — also published in the npm package at `node_modules/@homebound/beam/docs/layouts.md`.
+
 ## Getting Started
 
 ```bash

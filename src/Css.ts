@@ -3906,6 +3906,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get transitionHeight() {
     return this.add("transition", "height 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   }
+  /** Sets `transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionTop() {
+    return this.add("transition", "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
 
   // buttonBase
   /** Sets `fontWeight: 600; fontSize: "14px"; lineHeight: "20px"; outline: 0; borderRadius: "8px"; display: "inline-flex"; alignItems: "center"; whiteSpace: "nowrap"; transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
