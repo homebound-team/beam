@@ -119,39 +119,40 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
           icon="search"
           onClick={() => setSearchIsOpen(!searchIsOpen)}
           active={searchIsOpen}
-          circle
+          outline
           {...testId.searchButton}
         />
       )}
 
       {/* Filter button (only rendered when filterDefs are provided) */}
-      {hasFilters && sm ? (
-        <IconButton
-          label="Filter"
-          icon="filter"
-          onClick={() => setIsOpen(!isOpen)}
-          active={isOpen}
-          circle
-          {...testId.button}
-        />
-      ) : (
-        <Button
-          label={sm ? "" : "Filter"}
-          aria-label={"Filter"}
-          icon="filter"
-          size="md"
-          endAdornment={
-            <div css={Css.df.aic.gap1.$}>
-              {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
-              <Icon xss={Css.if(sm).visuallyHidden.$} icon={isOpen ? "chevronUp" : "chevronDown"} />
-            </div>
-          }
-          variant="secondaryBlack"
-          onClick={() => setIsOpen(!isOpen)}
-          active={isOpen}
-          {...testId.button}
-        />
-      )}
+      {hasFilters &&
+        (sm ? (
+          <IconButton
+            label="Filter"
+            icon="filter"
+            onClick={() => setIsOpen(!isOpen)}
+            active={isOpen}
+            circle
+            {...testId.button}
+          />
+        ) : (
+          <Button
+            label={sm ? "" : "Filter"}
+            aria-label={"Filter"}
+            icon="filter"
+            size="md"
+            endAdornment={
+              <div css={Css.df.aic.gap1.$}>
+                {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
+                <Icon xss={Css.if(sm).visuallyHidden.$} icon={isOpen ? "chevronUp" : "chevronDown"} />
+              </div>
+            }
+            variant="secondaryBlack"
+            onClick={() => setIsOpen(!isOpen)}
+            active={isOpen}
+            {...testId.button}
+          />
+        ))}
 
       {/* Small screen: search text field row — rendered before filter controls */}
       {searchIsOpen && <div css={Css.w100.if(!sm).visuallyHidden.$}>{searchTextField}</div>}
