@@ -220,6 +220,22 @@ export function WithPagination() {
   );
 }
 
+export function WithoutHeader() {
+  const columns = useMemo(() => getColumns(false), []);
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
 export function GridTableLayoutWithColor() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
   const columns = useMemo(() => getColumns(true), []);
