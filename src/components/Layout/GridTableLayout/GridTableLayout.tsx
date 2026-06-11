@@ -50,7 +50,7 @@ export type GridTableLayoutProps<
   hideEditColumns?: boolean;
   totalCount?: number;
   /** Temporary prop for card views. When provided, shows a view toggle button. Rendered in place of the table when in tile mode. */
-  renderContent?: ReactNode;
+  withCardView?: ReactNode;
   defaultView?: TableView;
 };
 
@@ -99,7 +99,7 @@ function GridTableLayoutComponent<
     actionMenu,
     hideEditColumns = false,
     totalCount,
-    renderContent,
+    withCardView,
     defaultView = "list",
   } = props;
 
@@ -119,7 +119,7 @@ function GridTableLayoutComponent<
   );
   const [view, setView] = useState<TableView>(defaultView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || !!renderContent;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || !!withCardView;
   const isVirtualized = tableProps.as === "virtual";
 
   // Sync API changes back to persisted state when persistedColumns is provided
@@ -157,7 +157,7 @@ function GridTableLayoutComponent<
                   {...tid.editColumnsButton}
                 />
               )}
-              {renderContent && <ViewToggleButton view={view} onChange={setView} />}
+              {withCardView && <ViewToggleButton view={view} onChange={setView} />}
             </div>
           }
         >
@@ -173,8 +173,8 @@ function GridTableLayoutComponent<
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized}>
-        {view === "tile" && renderContent ? (
-          renderContent
+        {view === "card" && withCardView ? (
+          withCardView
         ) : isGridTableProps(tableProps) ? (
           <GridTable
             {...tableProps}

@@ -356,7 +356,7 @@ describe("GridTableLayout", () => {
           columns,
           rows: [simpleHeader, ...rows],
         }}
-        renderContent={<Content />}
+        withCardView={<Content />}
       />,
       withRouter(),
     );

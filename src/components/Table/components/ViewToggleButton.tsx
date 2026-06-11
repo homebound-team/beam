@@ -1,13 +1,8 @@
-import { useRef } from "react";
-import { useMenuTrigger } from "react-aria";
-import { useMenuTriggerState } from "react-stately";
-import { MenuItem } from "src/components/ButtonMenu";
-import { Menu } from "src/components/internal/Menu";
-import { OverlayTrigger } from "src/components/internal/OverlayTrigger";
+import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { useBreakpoint } from "src/hooks";
 import { useTestIds } from "src/utils";
 
-export type TableView = "list" | "tile";
+export type TableView = "list" | "card";
 
 type ViewToggleButtonProps = {
   view: TableView;
@@ -15,34 +10,22 @@ type ViewToggleButtonProps = {
   defaultOpen?: boolean;
 };
 
-const menuItems: MenuItem[] = [
-  { label: "List", icon: "projects", onClick: () => {} },
-  { label: "Tile", icon: "tile", onClick: () => {} },
-];
-
 export function ViewToggleButton({ view, onChange, defaultOpen }: ViewToggleButtonProps) {
-  const state = useMenuTriggerState({ isOpen: defaultOpen });
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const { menuTriggerProps, menuProps } = useMenuTrigger({}, state, buttonRef);
   const { sm } = useBreakpoint();
   const tid = useTestIds({}, "viewToggleButton");
 
+  const menuItems: MenuItem[] = [
+    { label: "List", icon: "projects", onClick: () => onChange("list") },
+    { label: "Card", icon: "tile", onClick: () => onChange("card") },
+  ];
+
   return (
-    <OverlayTrigger
+    <ButtonMenu
       trigger={{ icon: view === "list" ? "projects" : "tile", label: "", size: "md", variant: "secondaryBlack" }}
-      menuTriggerProps={menuTriggerProps}
-      state={state}
-      buttonRef={buttonRef}
+      items={menuItems}
       hideEndAdornment={sm}
+      defaultOpen={defaultOpen}
       {...tid}
-    >
-      <Menu
-        ariaMenuProps={menuProps}
-        onClose={() => state.close()}
-        items={menuItems}
-        selectedItem={view === "list" ? "List" : "Tile"}
-        onChange={(key) => onChange(key.toLowerCase() as TableView)}
-      />
-    </OverlayTrigger>
+    />
   );
 }

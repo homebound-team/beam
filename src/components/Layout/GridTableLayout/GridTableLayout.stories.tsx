@@ -6,14 +6,14 @@ import { collapseColumn, column, numericColumn, selectColumn } from "src/compone
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "../Layout.stories";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
   component: GridTableLayoutComponent,
   decorators: [withBeamDecorator, withRouter()],
-  parameters: { layout: "fullscreen", chromatic: { modes: viewportModes("desktop", "mobile1") } },
+  parameters: { layout: "fullscreen" },
 } satisfies Meta;
 
 type Data = { name: string | undefined; value: number | undefined; status: string; priority: number };
@@ -314,8 +314,8 @@ export function WithViewToggle() {
         rows: [simpleHeader, ...rows],
         sorting: { on: "client", initial: [columns[2].id!, "ASC"] },
       }}
-      renderContent={tileContent}
-      defaultView="tile"
+      withCardView={tileContent}
+      defaultView="card"
     />
   );
 }
