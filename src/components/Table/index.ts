@@ -12,6 +12,8 @@ export type { GridDataRow, GridRowKind } from "src/components/Table/components/R
 export * from "src/components/Table/components/SelectToggle";
 export * from "src/components/Table/components/SortHeader";
 export { SortHeader } from "src/components/Table/components/SortHeader";
+export { ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
+export type { TableView } from "src/components/Table/components/ViewToggleButton";
 export { useGridTableApi } from "src/components/Table/GridTableApi";
 export type { GridTableApi } from "src/components/Table/GridTableApi";
 export * from "src/components/Table/hooks/useSetupColumnSizes";
