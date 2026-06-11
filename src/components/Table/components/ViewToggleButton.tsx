@@ -5,6 +5,7 @@ import { MenuItem } from "src/components/ButtonMenu";
 import { Menu } from "src/components/internal/Menu";
 import { OverlayTrigger } from "src/components/internal/OverlayTrigger";
 import { useBreakpoint } from "src/hooks";
+import { useTestIds } from "src/utils";
 
 export type TableView = "list" | "tile";
 
@@ -24,6 +25,7 @@ export function ViewToggleButton({ view, onChange, defaultOpen }: ViewToggleButt
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger({}, state, buttonRef);
   const { sm } = useBreakpoint();
+  const tid = useTestIds({}, "viewToggleButton");
 
   return (
     <OverlayTrigger
@@ -32,6 +34,7 @@ export function ViewToggleButton({ view, onChange, defaultOpen }: ViewToggleButt
       state={state}
       buttonRef={buttonRef}
       hideEndAdornment={sm}
+      {...tid}
     >
       <Menu
         ariaMenuProps={menuProps}
