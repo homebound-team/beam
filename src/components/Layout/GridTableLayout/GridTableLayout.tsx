@@ -148,7 +148,6 @@ function GridTableLayoutComponent<
         <TableActions
           right={
             <div css={Css.df.gap1.$}>
-              {renderContent && <ViewToggleButton view={view} onChange={setView} />}
               {hasHideableColumns && (
                 <EditColumnsButton
                   columns={columns}
@@ -158,6 +157,7 @@ function GridTableLayoutComponent<
                   {...tid.editColumnsButton}
                 />
               )}
+              {renderContent && <ViewToggleButton view={view} onChange={setView} />}
             </div>
           }
         >
