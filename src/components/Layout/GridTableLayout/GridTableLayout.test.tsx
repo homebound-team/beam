@@ -345,7 +345,7 @@ describe("GridTableLayout", () => {
   });
 
   it("should display view toggle if renderContent is defined", async () => {
-    const Content = () => <span>Content</span>;
+    const Content = () => <span data-testid="cardContent">Content</span>;
 
     const r = await render(
       <TestWrapper
@@ -363,5 +363,11 @@ describe("GridTableLayout", () => {
 
     // Then ViewToggleButton is not rendered
     expect(r.viewToggleButton).toBeInTheDocument();
+    expect(r.query.cardContent).not.toBeInTheDocument();
+
+    click(r.viewToggleButton);
+    click(r.viewToggleButton_card);
+
+    expect(r.cardContent).toBeInTheDocument();
   });
 });
