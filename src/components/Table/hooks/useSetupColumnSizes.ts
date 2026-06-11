@@ -3,7 +3,7 @@ import { MutableRefObject, useCallback, useEffect, useRef, useState } from "reac
 import { GridStyle } from "src/components/Table/TableStyles";
 import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
-import { calcColumnSizes } from "src/components/Table/utils/columns";
+import { calcColumnLayout } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
 /**
@@ -32,9 +32,13 @@ export function useSetupColumnSizes<R extends Kinded>(
   expandedColumnIds: string[],
   visibleColumnsStorageKey: string | undefined,
   disableColumnResizing: boolean,
+  inDocumentScrollLayout: boolean,
 ): {
   columnSizes: string[];
+  /** Container width from the resize probe (unchanged when content expands). */
   tableWidth: number | undefined;
+  /** Row width required by column defs; only expands beyond probe in document-scroll layouts. */
+  contentWidth: number | undefined;
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number) => void;
   setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
@@ -50,20 +54,30 @@ export function useSetupColumnSizes<R extends Kinded>(
   // which is used internally by `useDebounce`, so the frozen clock means the callback is never called.
   const calculateImmediately = useRef<boolean>(true);
   const [tableWidth, setTableWidth] = useState<number | undefined>();
+  const [contentWidth, setContentWidth] = useState<number | undefined>();
+  const [columnSizes, setColumnSizes] = useState<string[]>(
+    () =>
+      calcColumnLayout(columns, undefined, style.minWidthPx, expandedColumnIds, resizedWidths, inDocumentScrollLayout)
+        .columnSizes,
+  );
   // Track previous table width to detect container resize
   const prevTableWidthRef = useRef<number | undefined>(tableWidth);
 
-  // Calc our initial/first render sizes where we won't have a width yet
-  const [columnSizes, setColumnSizes] = useState<string[]>(
-    calcColumnSizes(columns, tableWidth, style.minWidthPx, expandedColumnIds, resizedWidths),
-  );
-
-  const setTableAndColumnWidths = useCallback(
-    (width: number) => {
-      setTableWidth(width);
-      setColumnSizes(calcColumnSizes(columns, width, style.minWidthPx, expandedColumnIds, resizedWidths));
+  const applyColumnLayout = useCallback(
+    (probeWidth: number) => {
+      const layout = calcColumnLayout(
+        columns,
+        probeWidth,
+        style.minWidthPx,
+        expandedColumnIds,
+        resizedWidths,
+        inDocumentScrollLayout,
+      );
+      setTableWidth(probeWidth);
+      setContentWidth(layout.contentWidth);
+      setColumnSizes(layout.columnSizes);
     },
-    [setTableWidth, setColumnSizes, columns, style, expandedColumnIds, resizedWidths],
+    [columns, style.minWidthPx, expandedColumnIds, resizedWidths, inDocumentScrollLayout],
   );
 
   // Scale resized column widths when container width changes
@@ -103,15 +117,15 @@ export function useSetupColumnSizes<R extends Kinded>(
     () => {
       if (!calculateImmediately.current) {
         const width = resizeRef.current?.clientWidth;
-        width && setTableAndColumnWidths(width);
+        width && applyColumnLayout(width);
       }
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [columns, resizedWidths, setTableAndColumnWidths],
+    [columns, resizedWidths, applyColumnLayout],
   );
 
-  const setTableAndColumnWidthsDebounced = useDebouncedCallback(setTableAndColumnWidths, 100);
+  const applyColumnLayoutDebounced = useDebouncedCallback(applyColumnLayout, 100);
 
   const onResize = useCallback(
     () => {
@@ -119,18 +133,26 @@ export function useSetupColumnSizes<R extends Kinded>(
       if (target && target.clientWidth !== tableWidth) {
         if (calculateImmediately.current) {
           calculateImmediately.current = false;
-          setTableAndColumnWidths(target.clientWidth);
+          applyColumnLayout(target.clientWidth);
         } else {
-          setTableAndColumnWidthsDebounced(target.clientWidth);
+          applyColumnLayoutDebounced(target.clientWidth);
         }
       }
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableWidth, setTableAndColumnWidths, setTableAndColumnWidthsDebounced],
+    [tableWidth, applyColumnLayout, applyColumnLayoutDebounced],
   );
 
   useResizeObserver({ ref: resizeRef, onResize });
 
-  return { columnSizes, tableWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths };
+  return {
+    columnSizes,
+    tableWidth,
+    contentWidth,
+    resizedWidths,
+    setResizedWidth,
+    setResizedWidths,
+    resetColumnWidths,
+  };
 }

@@ -100,6 +100,20 @@ describe("useAutoHideOnScroll", () => {
     expect(r.atTop).toHaveTextContent("true");
   });
 
+  it("does not reveal when document height changes", async () => {
+    // Given the chrome is hidden mid-page
+    const r = await render(<Harness />);
+    scrollTo(r.spacer, 0, { scrollHeight: 2000 });
+    scrollTo(r.spacer, 300, { scrollHeight: 2000 });
+    expect(r.state).toHaveTextContent("hidden");
+
+    // When the page grows at the same scroll position (would reveal on scroll-up otherwise)
+    scrollTo(r.spacer, 250, { scrollHeight: 4000 });
+
+    // Then the chrome stays hidden
+    expect(r.state).toHaveTextContent("hidden");
+  });
+
   it("uses getTopOffset (not 0) as the static / atTop threshold", async () => {
     // Given a placeholder below a 100px top offset (e.g. below a navbar)
     const r = await render(<Harness topOffset={100} />);
@@ -142,14 +156,19 @@ function Harness({ enabled = true, topOffset }: { enabled?: boolean; topOffset?:
 }
 
 /** Fakes document scroll; `anchorTop` positions the placeholder, `maxScroll` controls the atBottom check. */
-function scrollTo(spacer: HTMLElement, y: number, opts: { maxScroll?: number; anchorTop?: number } = {}) {
+function scrollTo(
+  spacer: HTMLElement,
+  y: number,
+  opts: { maxScroll?: number; anchorTop?: number; scrollHeight?: number } = {},
+) {
   const maxScroll = opts.maxScroll ?? 1_000_000;
   const anchorTop = opts.anchorTop ?? 0;
   const clientHeight = 800;
+  const scrollHeight = opts.scrollHeight ?? maxScroll + clientHeight;
   Object.defineProperty(window, "scrollY", { value: y, configurable: true });
   Object.defineProperty(document.documentElement, "clientHeight", { value: clientHeight, configurable: true });
   Object.defineProperty(document.documentElement, "scrollHeight", {
-    value: maxScroll + clientHeight,
+    value: scrollHeight,
     configurable: true,
   });
   const top = anchorTop - y;

@@ -42,8 +42,7 @@ tables) uses the document scrollbars while chrome stays in place:
 - `NavbarLayout` measures and publishes the navbar height (`--beam-navbar-layout-height`).
 - `SideNavLayout` publishes its rail width (`--beam-side-nav-layout-width`) for sticky column offsets.
 - `PageHeaderLayout` reads those and publishes its own height (`--beam-page-header-layout-height`).
-- `GridTable` reads these vars so its sticky header sits below the navbar + page header and its sticky
-  columns sit right of the side nav rail.
+- `GridTableLayout` — **inside `DocumentScrollLayoutProvider`** (e.g. under `NavbarLayout` / `PageHeaderLayout`): when filters, search, or edit-columns are shown, measures and publishes the table actions toolbar height (`--beam-table-actions-height`), pins table actions with the other document-scroll chrome, and renders the table inline for document scroll. **`GridTable`** reads these vars so its sticky header sits below the navbar + page header + table actions and its sticky columns sit right of the side nav rail. **Outside document-scroll layouts**, `GridTableLayout` does not publish that var or pin table actions; it wraps the table in **`ScrollableParent` / `ScrollableContent`** (with `virtualized` when `as="virtual"`) so scrolling stays in the legacy page scroll region.
 
 The exported var-name constants (`beamNavbarLayoutHeightVar`, etc.) are available for advanced sticky
 chrome inside a page body.
