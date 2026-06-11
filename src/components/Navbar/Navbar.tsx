@@ -23,6 +23,7 @@ export type NavbarProps = {
    * should navigate (e.g. react-router `Link`, plain `<a href>`, or `NavLink`).
    */
   brand: ReactNode;
+  hideBrandOnMobile?: boolean;
   /** Primary nav entries — same shape as {@link SideNav} `items`. */
   items: AppNavItem[];
   /**
@@ -35,7 +36,7 @@ export type NavbarProps = {
 };
 
 export function Navbar(props: NavbarProps) {
-  const { brand, items, rightSlot, user } = props;
+  const { brand, hideBrandOnMobile = false, items, rightSlot, user } = props;
   const { sm } = useBreakpoint();
   const tid = useTestIds(props, "navbar");
 
@@ -50,7 +51,7 @@ export function Navbar(props: NavbarProps) {
         <div css={Css.df.aic.gap3.fg1.mw0.$}>
           <div css={Css.df.aic.fs0.gap2.$}>
             {showMobile && <NavbarMobileMenu items={items} {...tid} />}
-            <div css={Css.fs0.$} {...tid.brand}>
+            <div css={Css.fs0.if(hideBrandOnMobile && showMobile).dn.$} {...tid.brand}>
               {brand}
             </div>
           </div>
