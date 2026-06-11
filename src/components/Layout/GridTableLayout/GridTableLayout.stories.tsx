@@ -6,14 +6,14 @@ import { collapseColumn, column, numericColumn, selectColumn } from "src/compone
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "../Layout.stories";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
   component: GridTableLayoutComponent,
   decorators: [withBeamDecorator, withRouter()],
-  parameters: { layout: "fullscreen" },
+  parameters: { layout: "fullscreen", chromatic: { modes: viewportModes("desktop", "mobile1") } },
 } satisfies Meta;
 
 type Data = { name: string | undefined; value: number | undefined; status: string; priority: number };
@@ -293,7 +293,7 @@ export function WithViewToggle() {
   const rows = useMemo(() => makeNestedRows(3), []);
 
   const tileContent = (
-    <div css={Css.dg.gtc("repeat(3, 1fr)").gap2.p3.$}>
+    <div css={Css.dg.gtc("repeat(3, 1fr)").gap2.p1.$}>
       {rows
         .filter((r): r is ParentRow => r.kind === "parent")
         .map((row) => (
@@ -315,6 +315,7 @@ export function WithViewToggle() {
         sorting: { on: "client", initial: [columns[2].id!, "ASC"] },
       }}
       renderContent={tileContent}
+      defaultView="tile"
     />
   );
 }
