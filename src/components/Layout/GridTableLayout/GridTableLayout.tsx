@@ -5,6 +5,7 @@ import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { OffsetAndLimit, Pagination } from "src/components/Pagination";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
@@ -48,6 +49,9 @@ export type GridTableLayoutProps<
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
   totalCount?: number;
+  /** Temporary prop for card views. When provided, shows a view toggle button. Rendered in place of the table when in tile mode. */
+  renderContent?: ReactNode;
+  defaultView?: TableView;
 };
 
 /**
@@ -95,6 +99,8 @@ function GridTableLayoutComponent<
     actionMenu,
     hideEditColumns = false,
     totalCount,
+    renderContent,
+    defaultView = "list",
   } = props;
 
   const tid = useTestIds(props);
@@ -111,8 +117,9 @@ function GridTableLayoutComponent<
     () => (tableProps.api as GridTableApiImpl<R>) ?? new GridTableApiImpl(),
     [tableProps.api],
   );
+  const [view, setView] = useState<TableView>(defaultView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns;
+  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || !!renderContent;
   const isVirtualized = tableProps.as === "virtual";
 
   // Sync API changes back to persisted state when persistedColumns is provided
@@ -140,15 +147,18 @@ function GridTableLayoutComponent<
       {showTableActions && (
         <TableActions
           right={
-            hasHideableColumns && (
-              <EditColumnsButton
-                columns={columns}
-                api={api}
-                tooltip="Display columns"
-                trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
-                {...tid.editColumnsButton}
-              />
-            )
+            <div css={Css.df.gap1.$}>
+              {renderContent && <ViewToggleButton view={view} onChange={setView} />}
+              {hasHideableColumns && (
+                <EditColumnsButton
+                  columns={columns}
+                  api={api}
+                  tooltip="Display columns"
+                  trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
+                  {...tid.editColumnsButton}
+                />
+              )}
+            </div>
           }
         >
           {layoutState && (layoutState.filterDefs || layoutState.search) && (
@@ -163,7 +173,9 @@ function GridTableLayoutComponent<
         </TableActions>
       )}
       <ScrollableContent virtualized={isVirtualized}>
-        {isGridTableProps(tableProps) ? (
+        {view === "tile" && renderContent ? (
+          renderContent
+        ) : isGridTableProps(tableProps) ? (
           <GridTable
             {...tableProps}
             api={api}

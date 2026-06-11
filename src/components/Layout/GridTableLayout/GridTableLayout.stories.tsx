@@ -288,6 +288,37 @@ export function GridTableLayoutWithColor() {
   );
 }
 
+export function WithViewToggle() {
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => makeNestedRows(3), []);
+
+  const tileContent = (
+    <div css={Css.dg.gtc("repeat(3, 1fr)").gap2.p3.$}>
+      {rows
+        .filter((r): r is ParentRow => r.kind === "parent")
+        .map((row) => (
+          <div key={row.id} css={Css.bshBasic.br8.p3.bgWhite.df.fdc.gap1.$}>
+            <div css={Css.smSb.$}>{row.data.name}</div>
+            <div css={Css.xs.gray700.$}>Status: {row.data.status}</div>
+            <div css={Css.xs.gray700.$}>Value: {row.data.value}</div>
+            <div css={Css.xs.gray700.$}>Priority: {row.data.priority}</div>
+          </div>
+        ))}
+    </div>
+  );
+
+  return (
+    <GridTableLayoutComponent
+      tableProps={{
+        columns,
+        rows: [simpleHeader, ...rows],
+        sorting: { on: "client", initial: [columns[2].id!, "ASC"] },
+      }}
+      renderContent={tileContent}
+    />
+  );
+}
+
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 
