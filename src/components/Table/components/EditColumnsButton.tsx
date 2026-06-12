@@ -2,52 +2,29 @@ import { Fragment, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { Button } from "src/components/Button";
-import {
-  isIconButton,
-  isNavLinkButton,
-  isTextButton,
-  labelOr,
-  OverlayTrigger,
-  OverlayTriggerProps,
-} from "src/components/internal/OverlayTrigger";
+import { OverlayTrigger, OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useBreakpoint, useComputed } from "src/hooks";
 import { Switch } from "src/inputs";
 import { useTestIds } from "src/utils";
-import { defaultTestId } from "src/utils/defaultTestId";
 
 type EditColumnsButtonProps<R extends Kinded> = {
   columns: GridColumn<R>[];
   api: GridTableApi<R>;
   // for storybook purposes
   defaultOpen?: boolean;
-} & Pick<OverlayTriggerProps, "placement" | "disabled" | "tooltip"> &
-  Partial<Pick<OverlayTriggerProps, "trigger">>;
+} & Pick<OverlayTriggerProps, "placement" | "disabled" | "tooltip">;
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
   const { defaultOpen, disabled, columns, api } = props;
   // Defaults to a compact icon-only trigger; consumers can override it by passing `trigger`.
-  const trigger: OverlayTriggerProps["trigger"] = props.trigger ?? {
-    icon: "kanban",
-    size: "md",
-    label: "",
-    variant: "secondaryBlack",
-  };
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
+
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
-  const tid = useTestIds(
-    props,
-    isTextButton(trigger)
-      ? labelOr(trigger, "editColumnsButton")
-      : isNavLinkButton(trigger)
-        ? defaultTestId(trigger.navLabel)
-        : isIconButton(trigger)
-          ? trigger.icon
-          : trigger.name,
-  );
+  const tid = useTestIds(props, "kanban");
   const { sm } = useBreakpoint();
 
   const options = useMemo(
@@ -87,14 +64,19 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   return (
     <OverlayTrigger
       {...props}
-      trigger={trigger}
+      trigger={{
+        icon: "kanban",
+        size: "md",
+        label: "",
+        variant: "secondaryBlack",
+      }}
       menuTriggerProps={menuTriggerProps}
       state={state}
       buttonRef={buttonRef}
       hideEndAdornment={sm}
       {...tid}
     >
-      <div css={Css.df.fdc.bgWhite.maxwPx(326).maxhPx(512).onHover.bshHover.$}>
+      <div css={Css.df.fdc.bgColor(Tokens.Surface).maxwPx(326).maxhPx(512).onHover.bshHover.$}>
         {/* Scrollable body — mh0 lets the flex child shrink so the option list scrolls internally instead of overflowing the page */}
         <div css={Css.dg.gtc("1fr auto").gap2.p2.fg1.mh0.oya.$}>
           {options.map((option) => (
@@ -116,7 +98,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           ))}
         </div>
         {/* Pinned footer */}
-        <div css={Css.df.jcc.p2.bt.bcGray200.$}>
+        <div css={Css.df.jcc.p2.bt.bc(Tokens.OnSurfaceMuted).$}>
           <Button variant="tertiary" label="Reset Column Widths" onClick={() => api.resetColumnWidths()} />
         </div>
       </div>
