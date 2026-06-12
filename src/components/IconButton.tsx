@@ -133,7 +133,8 @@ const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
-const iconButtonOutline = Css.br8.wPx(48).hPx(40).bcGray300.ba.bw1.df.jcc.aic.$;
+const iconButtonOutline = Css.br8.wPx(48).hPx(40).bgColor(Tokens.Surface).bc(Tokens.SurfaceSeparator).ba.bw1.df.jcc
+  .aic.$;
 /** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
 const iconButtonTokenHover = Css.bgColor(Tokens.NeutralFillHoverStrong).$;
 export const iconButtonStylesHover = Css.bgGray200.$;

@@ -5,7 +5,7 @@ import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } fro
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { ToggleChip } from "src/components/ToggleChip";
-import { Css, Palette, Tokens } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
@@ -120,7 +120,6 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
           label="Search"
           onClick={() => setSearchIsOpen(!searchIsOpen)}
           active={searchIsOpen}
-          bgColor={Tokens.Surface}
           {...testId.searchButton}
         />
       )}
@@ -133,7 +132,6 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
           label="Filter"
           active={isOpen}
           onClick={() => setIsOpen(!isOpen)}
-          bgColor={Tokens.Surface}
           {...testId.button}
         />
       )}
