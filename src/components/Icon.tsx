@@ -50,7 +50,7 @@ export const Icon = React.memo((props: IconProps) => {
       // Overlap a badge on the icon's top-right corner (e.g. a hidden-column count).
       <span css={Css.relative.dib.add("lineHeight", 0).$}>
         {svg}
-        <span css={Css.absolute.topPx(-4).right0.$}>
+        <span css={Css.absolute.topPx(-4).$}>
           {badge.count !== undefined ? (
             <CountBadge count={badge.count} bgColor={badge.color} />
           ) : (
