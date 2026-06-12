@@ -143,13 +143,7 @@ function GridTableLayoutComponent<
         <TableActions
           right={
             hasHideableColumns && (
-              <EditColumnsButton
-                columns={columns}
-                api={api}
-                tooltip="Display columns"
-                trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
-                {...tid.editColumnsButton}
-              />
+              <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
             )
           }
         >

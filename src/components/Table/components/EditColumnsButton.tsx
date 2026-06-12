@@ -23,10 +23,18 @@ type EditColumnsButtonProps<R extends Kinded> = {
   api: GridTableApi<R>;
   // for storybook purposes
   defaultOpen?: boolean;
-} & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip">;
+} & Pick<OverlayTriggerProps, "placement" | "disabled" | "tooltip"> &
+  Partial<Pick<OverlayTriggerProps, "trigger">>;
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
-  const { defaultOpen, disabled, columns, trigger, api } = props;
+  const { defaultOpen, disabled, columns, api } = props;
+  // Defaults to a compact icon-only trigger; consumers can override it by passing `trigger`.
+  const trigger: OverlayTriggerProps["trigger"] = props.trigger ?? {
+    icon: "kanban",
+    size: "md",
+    label: "",
+    variant: "secondaryBlack",
+  };
   const state = useMenuTriggerState({ isOpen: defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -76,26 +84,37 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   );
 
   return (
-    <OverlayTrigger {...props} menuTriggerProps={menuTriggerProps} state={state} buttonRef={buttonRef} {...tid}>
-      <div css={Css.dg.gtc("1fr auto").gap2.bgWhite.p2.maxwPx(326).onHover.bshHover.$}>
-        {options.map((option) => (
-          <Fragment key={option.value}>
-            <div css={Css.sm.truncate.pr1.$}>{option.label}</div>
-            <Switch
-              compact
-              selected={selectedValues.includes(option.value)}
-              onChange={(value) =>
-                setSelectedValues(
-                  value ? [...selectedValues, option.value] : selectedValues.filter((v) => v !== option.value),
-                )
-              }
-              labelStyle="hidden"
-              label={option.label}
-              {...tid[`option${option.value}`]}
-            />
-          </Fragment>
-        ))}
-        <div css={Css.gc("1 / -1").df.jcc.$}>
+    <OverlayTrigger
+      {...props}
+      trigger={trigger}
+      menuTriggerProps={menuTriggerProps}
+      state={state}
+      buttonRef={buttonRef}
+      {...tid}
+    >
+      <div css={Css.df.fdc.bgWhite.maxwPx(326).maxhPx(512).onHover.bshHover.$}>
+        {/* Scrollable body — mh0 lets the flex child shrink so the option list scrolls internally instead of overflowing the page */}
+        <div css={Css.dg.gtc("1fr auto").gap2.p2.fg1.mh0.oya.$}>
+          {options.map((option) => (
+            <Fragment key={option.value}>
+              <div css={Css.sm.truncate.pr1.$}>{option.label}</div>
+              <Switch
+                compact
+                selected={selectedValues.includes(option.value)}
+                onChange={(value) =>
+                  setSelectedValues(
+                    value ? [...selectedValues, option.value] : selectedValues.filter((v) => v !== option.value),
+                  )
+                }
+                labelStyle="hidden"
+                label={option.label}
+                {...tid[`option${option.value}`]}
+              />
+            </Fragment>
+          ))}
+        </div>
+        {/* Pinned footer */}
+        <div css={Css.df.jcc.p2.bt.bcGray200.$}>
           <Button variant="tertiary" label="Reset Column Widths" onClick={() => api.resetColumnWidths()} />
         </div>
       </div>
