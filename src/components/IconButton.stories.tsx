@@ -92,6 +92,14 @@ export const Outline = Template.bind({});
 // @ts-ignore
 Outline.args = { variant: "outline" };
 
+export const WithBadge = Template.bind({});
+// @ts-ignore
+WithBadge.args = { badge: { color: Palette.Blue700, count: 6 } };
+
+export const WithBadgeContrast = Template.bind({});
+// @ts-ignore
+WithBadgeContrast.args = { storyContrast: true, badge: { color: Palette.Blue700, count: 6 } };
+
 export function WithTooltip() {
   return (
     <div css={Css.dg.fdc.gap2.jcfs.$}>

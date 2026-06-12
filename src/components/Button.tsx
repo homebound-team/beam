@@ -15,6 +15,8 @@ export type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: IconProps["icon"] | null;
+  /** Shows a small badge overlapping the button's icon (top-right). Omit `count` for a plain dot. */
+  badge?: IconProps["badge"];
   /** Displays contents after the Button's label. Will be ignored for Buttons rendered as a link with an absolute URL */
   endAdornment?: ReactNode;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
@@ -44,6 +46,7 @@ export function Button(props: ButtonProps) {
     forceFocusStyles = false,
     active = false,
     labelInFlight,
+    badge,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -87,7 +90,7 @@ export function Button(props: ButtonProps) {
 
   const buttonContent = (
     <>
-      {icon && <Icon xss={iconStyles[size]} icon={icon} />}
+      {icon && <Icon xss={iconStyles[size]} icon={icon} badge={badge} />}
       {labelInFlight && asyncInProgress ? labelInFlight : label}
       {(endAdornment || asyncInProgress) && (
         <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} /> : endAdornment}</span>
