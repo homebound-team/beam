@@ -1,5 +1,5 @@
 import { AriaButtonProps } from "@react-types/button";
-import { RefObject, useMemo } from "react";
+import { ReactNode, RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { BeamColor } from "src/colors";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
@@ -10,7 +10,9 @@ import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type IconButtonVariant = "default" | "circle" | "outline";
+type IconButtonVariantProps =
+  | { variant?: "default"; endAdornment?: never }
+  | { variant: "circle" | "outline"; endAdornment?: ReactNode };
 
 export type IconButtonProps = {
   /** The icon to use within the button. */
@@ -24,8 +26,6 @@ export type IconButtonProps = {
   buttonRef?: RefObject<HTMLButtonElement>;
   /** Whether to show a 16x16px version of the IconButton */
   compact?: boolean;
-  /** Visual variant of the button. Defaults to "default". */
-  variant?: IconButtonVariant;
   /** Indicates that the button is active/selected */
   active?: boolean;
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
@@ -37,7 +37,8 @@ export type IconButtonProps = {
    * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
    */
   preventTooltip?: boolean;
-} & BeamButtonProps &
+} & IconButtonVariantProps &
+  BeamButtonProps &
   BeamFocusableProps;
 
 export function IconButton(props: IconButtonProps) {
@@ -60,6 +61,7 @@ export function IconButton(props: IconButtonProps) {
     forceFocusStyles = false,
     label,
     preventTooltip = false,
+    endAdornment,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -81,14 +83,33 @@ export function IconButton(props: IconButtonProps) {
   const styles = useMemo(
     () => ({
       ...iconButtonStylesReset,
-      ...(isCircle ? iconButtonCircle : isOutline ? iconButtonOutline : compact ? iconButtonCompact : iconButtonNormal),
+      ...(isCircle
+        ? iconButtonCircle
+        : isOutline
+          ? endAdornment
+            ? iconButtonOutlineWithAdornment
+            : iconButtonOutline
+          : compact
+            ? iconButtonCompact
+            : iconButtonNormal),
       ...(isHovered && (isCircle || isOutline ? iconButtonCircleStylesHover : iconButtonTokenHover)),
       ...(isFocusVisible || forceFocusStyles ? (isCircle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
       ...(active && (isCircle || isOutline ? activeStylesCircle : iconButtonTokenHover)),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     }),
-    [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles],
+    [
+      isHovered,
+      isFocusVisible,
+      isDisabled,
+      compact,
+      isCircle,
+      isOutline,
+      active,
+      bgColor,
+      forceFocusStyles,
+      endAdornment,
+    ],
   );
   const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
@@ -103,19 +124,22 @@ export function IconButton(props: IconButtonProps) {
     "aria-label": label,
   };
   const buttonContent = (
-    <Icon
-      icon={icon}
-      color={
-        color ||
-        (isDisabled
-          ? Tokens.TextDisabled
-          : isCircle && (isHovered || active || isFocusVisible)
-            ? defaultIconColor
-            : iconColor)
-      }
-      bgColor={bgColor}
-      inc={compact ? 2 : isCircle ? 2.5 : inc}
-    />
+    <>
+      <Icon
+        icon={icon}
+        color={
+          color ||
+          (isDisabled
+            ? Tokens.TextDisabled
+            : isCircle && (isHovered || active || isFocusVisible)
+              ? defaultIconColor
+              : iconColor)
+        }
+        bgColor={bgColor}
+        inc={compact ? 2 : isCircle ? 2.5 : inc}
+      />
+      {endAdornment}
+    </>
   );
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip.
@@ -134,6 +158,7 @@ const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
 const iconButtonOutline = Css.br8.wPx(48).hPx(40).bcGray300.ba.bw1.df.jcc.aic.$;
+const iconButtonOutlineWithAdornment = Css.br8.mwPx(48).hPx(40).bcGray300.ba.bw1.df.aic.gap1.px2.$;
 /** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
 const iconButtonTokenHover = Css.bgColor(Tokens.NeutralFillHoverStrong).$;
 export const iconButtonStylesHover = Css.bgGray200.$;

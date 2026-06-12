@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { ContrastScope, Css, IconButton, IconButtonProps, Icons, Palette } from "src";
+import { ContrastScope, CountBadge, Css, IconButton, IconButtonProps, Icons, Palette } from "src";
 import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -37,6 +37,7 @@ type IconButtonStoryArgs = IconButtonProps & { storyContrast?: boolean };
 
 function Template(args: IconButtonStoryArgs) {
   const { storyContrast = false, ...iconArgs } = args;
+  const { variant } = iconArgs;
   const surface = (
     <div css={Css.if(storyContrast).bgGray800.white.$}>
       <h1 css={Css.xl2.mbPx(30).$}>Icon Only Button</h1>
@@ -69,6 +70,13 @@ function Template(args: IconButtonStoryArgs) {
           <h2>Labeled</h2>
           <IconButton {...iconArgs} label="Download" />
         </div>
+        {(variant === "circle" || variant === "outline") && (
+          <div>
+            <h2>With End Adornment</h2>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <IconButton {...iconArgs} variant={variant} endAdornment={<CountBadge count={3} />} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -152,7 +160,8 @@ function HoveredIconButton(args: IconButtonStoryArgs) {
   const hoverBlock = (
     <div className="hovered-icon-button">
       <style>{`.hovered-icon-button button { background-color: ${bg};${borderColor ? ` border-color: ${borderColor};` : ""} }`}</style>
-      <IconButton {...iconArgs} variant={variant} active={isCircle} />
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <IconButton {...(iconArgs as any)} variant={variant} active={isCircle} />
     </div>
   );
   return storyContrast ? <ContrastScope>{hoverBlock}</ContrastScope> : hoverBlock;
