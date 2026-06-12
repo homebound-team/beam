@@ -10,6 +10,7 @@ export const zIndices = {
   tableExpandableTitle: 20,
   tableStickyColumn: 30,
   tableStickyHeader: 40,
+  tableActions: 45,
 
   // Page chrome - ensure these items sit above the table
   scrollShadow: 50,

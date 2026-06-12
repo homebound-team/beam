@@ -30,7 +30,6 @@ describe("EditColumnsButton", () => {
       return (
         <>
           <EditColumnsButton
-            trigger={{ label: "Columns" }}
             columns={columns.map(({ name, ...c }) => (name === "Value" ? c : { name, ...c }))}
             defaultOpen={true}
             api={_api}
@@ -57,14 +56,14 @@ describe("EditColumnsButton", () => {
       api.current = _api;
       return (
         <>
-          <EditColumnsButton trigger={{ label: "Columns" }} columns={columns} defaultOpen={true} api={_api} />
+          <EditColumnsButton columns={columns} defaultOpen={true} api={_api} />
           <GridTable columns={columns} rows={[]} api={_api} />
         </>
       );
     }
     const r = await render(<Test />);
-    // Then the button renders with the correct label
-    expect(r.columns.textContent).toBe("Columns");
+    // Then the icon trigger renders
+    expect(r.kanban).toBeInTheDocument();
   });
 
   it("should render only hide-able columns", async () => {
@@ -75,7 +74,7 @@ describe("EditColumnsButton", () => {
       api.current = _api;
       return (
         <>
-          <EditColumnsButton trigger={{ label: "Columns" }} columns={columns} defaultOpen={true} api={_api} />
+          <EditColumnsButton columns={columns} defaultOpen={true} api={_api} />
           <GridTable columns={columns} rows={[]} api={_api} />
         </>
       );
@@ -93,7 +92,7 @@ describe("EditColumnsButton", () => {
       api.current = _api;
       return (
         <>
-          <EditColumnsButton trigger={{ label: "Columns" }} columns={columns} defaultOpen={true} api={_api} />
+          <EditColumnsButton columns={columns} defaultOpen={true} api={_api} />
           <GridTable columns={columns} rows={[]} api={_api} />
         </>
       );
@@ -103,7 +102,7 @@ describe("EditColumnsButton", () => {
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
 
     // When click on an option (deselect value)
-    click(r.columns_optionvalue);
+    click(r.kanban_optionvalue);
 
     // Then setColumns should be called (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "actions"]);
@@ -117,7 +116,7 @@ describe("EditColumnsButton", () => {
       api.current = _api;
       return (
         <>
-          <EditColumnsButton trigger={{ label: "Columns" }} columns={columns} defaultOpen={true} api={_api} />
+          <EditColumnsButton columns={columns} defaultOpen={true} api={_api} />
           <GridTable columns={columns} rows={[]} api={_api} />
         </>
       );
@@ -125,8 +124,8 @@ describe("EditColumnsButton", () => {
     const r = await render(<Test />);
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
     // When deselect all hideable columns via the switches
-    click(r.columns_optionname);
-    click(r.columns_optionvalue);
+    click(r.kanban_optionname);
+    click(r.kanban_optionvalue);
     // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
   });

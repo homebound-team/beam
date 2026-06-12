@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { useResizeObserver } from "@react-aria/utils";
+import React, { ReactNode, RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
@@ -10,13 +11,22 @@ import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only } from "src/Css";
+import { Css, Only, Tokens } from "src/Css";
 import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
-import { useTestIds } from "src/utils";
+import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
+import {
+  beamTableActionsHeightVar,
+  documentScrollChromeLeft,
+  documentScrollChromeWidth,
+  stickyNavAndHeaderOffset,
+} from "src/layouts/layoutVars";
+import { noop, useTestIds } from "src/utils";
+import { zIndices } from "src/utils/zIndices";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 import { QueryTable, QueryTableProps } from "./QueryTable";
+import { usePersistedTableView } from "./usePersistedTableView";
 
 // Omit to force all action button menus to look the same
 type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
@@ -117,10 +127,14 @@ function GridTableLayoutComponent<
     () => (tableProps.api as GridTableApiImpl<R>) ?? new GridTableApiImpl(),
     [tableProps.api],
   );
-  const [view, setView] = useState<TableView>(defaultView);
+  const [view, setView] = usePersistedTableView(defaultView, !!withCardView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = layoutState?.filterDefs || layoutState?.search || hasHideableColumns || !!withCardView;
+  const showTableActions = !!(layoutState?.filterDefs || layoutState?.search || hasHideableColumns || withCardView);
   const isVirtualized = tableProps.as === "virtual";
+  const inDocumentScrollLayout = useDocumentScrollLayout();
+  const tableActionsRef = useRef<HTMLDivElement>(null);
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
+  useSetTableActionsHeight(tableWrapperRef, tableActionsRef, inDocumentScrollLayout && showTableActions);
 
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
@@ -131,6 +145,94 @@ function GridTableLayoutComponent<
   }, [visibleColumnIds, layoutState]);
 
   const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
+
+  const tableActionsEl = (
+    <TableActions
+      right={
+        (hasHideableColumns || withCardView) && (
+          <div css={Css.df.gap1.$}>
+            {hasHideableColumns && (
+              <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
+            )}
+            {withCardView && <ViewToggleButton view={view} onChange={setView} />}
+          </div>
+        )
+      }
+      xss={Css.pt3.if(inDocumentScrollLayout).pl3.pr3.$}
+    >
+      {layoutState && (layoutState.filterDefs || layoutState.search) && (
+        <FilterDropdownMenu
+          filterDefs={layoutState.filterDefs}
+          filter={layoutState.filter}
+          onChange={layoutState.setFilter}
+          groupBy={layoutState.groupBy}
+          searchProps={layoutState.search ? { onSearch: layoutState.setSearchString } : undefined}
+        />
+      )}
+    </TableActions>
+  );
+
+  const tableBody = (
+    <>
+      {view === "card" && withCardView ? (
+        withCardView
+      ) : isGridTableProps(tableProps) ? (
+        <GridTable
+          {...tableProps}
+          api={api}
+          filter={clientSearch}
+          style={{ allWhite: true }}
+          stickyHeader
+          disableColumnResizing={false}
+          visibleColumnsStorageKey={visibleColumnsStorageKey}
+        />
+      ) : (
+        <QueryTable
+          {...(tableProps as QueryTableProps<R, QData, X>)}
+          api={api}
+          filter={clientSearch}
+          style={{ allWhite: true }}
+          stickyHeader
+          disableColumnResizing={false}
+          visibleColumnsStorageKey={visibleColumnsStorageKey}
+        />
+      )}
+      {layoutState && totalCount !== undefined && (
+        <Pagination
+          page={[layoutState.page, layoutState._pagination.setPage]}
+          totalCount={totalCount}
+          pageSizes={layoutState._pagination.pageSizes}
+          {...tid.pagination}
+        />
+      )}
+    </>
+  );
+
+  const tableScrollContent = (
+    <>
+      {showTableActions && (
+        <div
+          ref={tableActionsRef}
+          css={
+            Css.if(inDocumentScrollLayout)
+              .transitionTop.sticky.top(stickyNavAndHeaderOffset())
+              .left(documentScrollChromeLeft())
+              .w(documentScrollChromeWidth())
+              .z(zIndices.tableActions)
+              .bgColor(Tokens.Surface).$
+          }
+          {...tid.stickyContent}
+        >
+          {tableActionsEl}
+        </div>
+      )}
+      {inDocumentScrollLayout ? (
+        tableBody
+      ) : (
+        <ScrollableContent virtualized={isVirtualized}>{tableBody}</ScrollableContent>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -144,61 +246,10 @@ function GridTableLayoutComponent<
           actionMenu={actionMenu}
         />
       )}
-      {showTableActions && (
-        <TableActions
-          right={
-            <div css={Css.df.gap1.$}>
-              {hasHideableColumns && (
-                <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
-              )}
-              {withCardView && <ViewToggleButton view={view} onChange={setView} />}
-            </div>
-          }
-        >
-          {layoutState && (layoutState.filterDefs || layoutState.search) && (
-            <FilterDropdownMenu
-              filterDefs={layoutState.filterDefs}
-              filter={layoutState.filter}
-              onChange={layoutState.setFilter}
-              groupBy={layoutState.groupBy}
-              searchProps={layoutState.search ? { onSearch: layoutState.setSearchString } : undefined}
-            />
-          )}
-        </TableActions>
-      )}
-      <ScrollableContent virtualized={isVirtualized}>
-        {view === "card" && withCardView ? (
-          withCardView
-        ) : isGridTableProps(tableProps) ? (
-          <GridTable
-            {...tableProps}
-            api={api}
-            filter={clientSearch}
-            style={{ allWhite: true }}
-            stickyHeader
-            disableColumnResizing={false}
-            visibleColumnsStorageKey={visibleColumnsStorageKey}
-          />
-        ) : (
-          <QueryTable
-            {...(tableProps as QueryTableProps<R, QData, X>)}
-            api={api}
-            filter={clientSearch}
-            style={{ allWhite: true }}
-            stickyHeader
-            disableColumnResizing={false}
-            visibleColumnsStorageKey={visibleColumnsStorageKey}
-          />
-        )}
-        {layoutState && totalCount !== undefined && (
-          <Pagination
-            page={[layoutState.page, layoutState._pagination.setPage]}
-            totalCount={totalCount}
-            pageSizes={layoutState._pagination.pageSizes}
-            {...tid.pagination}
-          />
-        )}
-      </ScrollableContent>
+      {/* Wrapper sets --beam-table-actions-height so GridTable's sticky header can read it. */}
+      <div ref={tableWrapperRef} css={Css.display("contents").$} {...tid.tableWrapper}>
+        {tableScrollContent}
+      </div>
     </>
   );
 }
@@ -301,13 +352,47 @@ type HeaderProps = {
   actionMenu?: ActionButtonMenuProps;
 };
 
+/** Sets `--beam-table-actions-height` on the table wrapper so the sticky header can read it without re-rendering children. */
+function useSetTableActionsHeight(
+  tableWrapperRef: RefObject<HTMLElement | null>,
+  tableActionsRef: RefObject<HTMLElement | null>,
+  enabled: boolean,
+) {
+  const syncHeightVar = useCallback(() => {
+    const tableWrapper = tableWrapperRef.current;
+    if (!tableWrapper) return;
+
+    if (!enabled) {
+      tableWrapper.style.removeProperty(beamTableActionsHeightVar);
+      return;
+    }
+
+    const height = tableActionsRef.current ? Math.round(tableActionsRef.current.getBoundingClientRect().height) : 0;
+
+    if (height > 0) {
+      tableWrapper.style.setProperty(beamTableActionsHeightVar, `${height}px`);
+    } else {
+      tableWrapper.style.removeProperty(beamTableActionsHeightVar);
+    }
+  }, [enabled, tableActionsRef, tableWrapperRef]);
+
+  useResizeObserver({ ref: tableActionsRef, onResize: enabled ? syncHeightVar : noop });
+  useLayoutEffect(() => {
+    syncHeightVar();
+    const tableWrapper = tableWrapperRef.current;
+    return () => {
+      tableWrapper?.style.removeProperty(beamTableActionsHeightVar);
+    };
+  }, [tableWrapperRef, syncHeightVar]);
+}
+
 function Header(props: HeaderProps) {
   const { pageTitle, breadCrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
   const tids = useTestIds(props);
 
   return (
     <FullBleed>
-      <header css={{ ...Css.p3.mb3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
+      <header css={{ ...Css.p3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
         <div>
           {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
           <h1 css={Css.xl2.mt1.$} {...tids.pageTitle}>
