@@ -6,10 +6,10 @@ import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import {
-  beamLayoutViewportWidthVar,
   beamNavbarLayoutHeightVar,
   beamPageHeaderLayoutHeightVar,
-  beamSideNavLayoutWidthVar,
+  documentScrollChromeLeft,
+  documentScrollChromeWidth,
 } from "../layoutVars";
 import { useNavbarLayoutHeight } from "../NavbarLayout/NavbarLayoutHeightContext";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
@@ -45,8 +45,8 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const cssVars: Record<string, string> | undefined =
     headerHeight > 0 && headerOccupiesPosition ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
 
-  const headerLeft = `var(${beamSideNavLayoutWidthVar}, 0px)`;
-  const headerWidth = `calc(var(${beamLayoutViewportWidthVar}, 100vw) - var(${beamSideNavLayoutWidthVar}, 0px))`;
+  const headerLeft = documentScrollChromeLeft();
+  const headerWidth = documentScrollChromeWidth();
   const outerTop = `var(${beamNavbarLayoutHeightVar}, 0px)`;
 
   const innerCss =

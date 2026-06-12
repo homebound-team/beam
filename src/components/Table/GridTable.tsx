@@ -42,7 +42,7 @@ import { Css, Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
+import { stickyTableHeaderOffset } from "src/layouts/layoutVars";
 import { isPromise } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
@@ -296,6 +296,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
+  const inDocumentScrollLayout = useDocumentScrollLayout();
 
   tableState.onRowSelect = onRowSelect;
 
@@ -331,7 +332,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Our column sizes use either `w` or `expandedWidth`, so see which columns are currently expanded
   const expandedColumnIds: string[] = useComputed(() => tableState.expandedColumnIds, [tableState]);
-  const { columnSizes, tableWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } =
+  const { columnSizes, tableWidth, contentWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } =
     useSetupColumnSizes(
       style,
       columns,
@@ -339,6 +340,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       expandedColumnIds,
       visibleColumnsStorageKey,
       disableColumnResizing,
+      inDocumentScrollLayout,
     );
 
   // Store resetColumnWidths on the API instance so it can be called from EditColumnsButton
@@ -579,12 +581,22 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [tableState, tableContainerRef],
   );
 
+  // Document-scroll layouts may need a wider table shell than the resize probe when mw/% columns require it.
+  const tableStyle = useMemo(() => {
+    if (!inDocumentScrollLayout || contentWidth === undefined || tableWidth === undefined) return style;
+
+    const minWidthPx = Math.max(style.minWidthPx ?? 0, contentWidth);
+    if (minWidthPx === style.minWidthPx) return style;
+
+    return { ...style, minWidthPx };
+  }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
+
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual")} />
+        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
         {renders[_as](
-          style,
+          tableStyle,
           id,
           columns,
           visibleDataRows,
@@ -647,7 +659,11 @@ function renderDiv<R extends Kinded>(
     >
       {/* Table Head */}
       <div
-        css={Css.if(stickyHeader).sticky.top(stickyNavAndHeaderOffset(stickyOffset)).z(zIndices.tableStickyHeader).$}
+        css={
+          Css.if(stickyHeader)
+            .sticky.transitionTop.top(stickyTableHeaderOffset(stickyOffset))
+            .z(zIndices.tableStickyHeader).$
+        }
       >
         {tableHeadRows}
       </div>
@@ -706,7 +722,11 @@ function renderTable<R extends Kinded>(
       data-testid={id}
     >
       <thead
-        css={Css.if(stickyHeader).sticky.top(stickyNavAndHeaderOffset(stickyOffset)).z(zIndices.tableStickyHeader).$}
+        css={
+          Css.if(stickyHeader)
+            .sticky.transitionTop.top(stickyTableHeaderOffset(stickyOffset))
+            .z(zIndices.tableStickyHeader).$
+        }
       >
         {tableHeadRows}
       </thead>
@@ -820,10 +840,12 @@ function renderVirtual<R extends Kinded>(
           <div
             {...props}
             ref={ref as MutableRefObject<HTMLDivElement>}
+            css={Css.transitionTop.$}
             style={{
               ...props.style,
+              ...(style.minWidthPx !== undefined ? { minWidth: style.minWidthPx } : {}),
               zIndex: zIndices.tableStickyHeader,
-              top: stickyNavAndHeaderOffset(stickyOffset),
+              top: stickyTableHeaderOffset(stickyOffset),
             }}
           />
         )),
@@ -871,7 +893,7 @@ function renderVirtual<R extends Kinded>(
               // Ensure the fallback message is the same width as the table
               <div
                 css={{
-                  ...getTableRefWidthStyles(true),
+                  ...getTableRefWidthStyles(true, inDocumentScrollLayout),
                   ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
                   ...(visibleDataRows.length === 0 && style.lastRowCss),
                 }}

@@ -99,11 +99,11 @@ export function parseWidthToPx(widthStr: string | undefined, tableWidth: number 
   if (!widthStr) return null;
 
   if (widthStr.endsWith("px")) {
-    const parsed = parseInt(widthStr.replace("px", ""), 10);
+    const parsed = parseFloat(widthStr.replace("px", ""));
     return isNaN(parsed) ? null : parsed;
   }
 
-  if (widthStr.endsWith("%") && tableWidth) {
+  if (widthStr.endsWith("%") && tableWidth !== undefined) {
     const percent = parseFloat(widthStr.replace("%", ""));
     if (isNaN(percent)) return null;
     return Math.round((percent / 100) * tableWidth);
@@ -113,6 +113,61 @@ export function parseWidthToPx(widthStr: string | undefined, tableWidth: number 
   // These should never happen since we've run calcColumnSizes already resolved to px
   // by the time resizing happens
   return null;
+}
+
+/** Sum resolved column sizes in px; returns null when any size is still a calc() expression. */
+export function sumColumnSizesPx(columnSizes: string[], tableWidth: number | undefined): number | null {
+  if (tableWidth === undefined) return null;
+
+  let sum = 0;
+  for (const size of columnSizes) {
+    const px = parseWidthToPx(size, tableWidth);
+    if (px === null) return null;
+    sum += px;
+  }
+
+  return sum;
+}
+
+/** Split resolved column sizes into fixed px vs row-relative % portions. */
+function sumColumnSizeParts(columnSizes: string[]): { pxSum: number; percentSum: number; hasCalc: boolean } {
+  let pxSum = 0;
+  let percentSum = 0;
+  let hasCalc = false;
+
+  for (const size of columnSizes) {
+    if (size.endsWith("px")) {
+      pxSum += parseFloat(size.replace("px", ""));
+    } else if (size.endsWith("%")) {
+      percentSum += parseFloat(size.replace("%", ""));
+    } else {
+      hasCalc = true;
+    }
+  }
+
+  return { pxSum, percentSum, hasCalc };
+}
+
+/** Table content width: at least the measured container and a self-consistent width for literal % columns. */
+export function resolveTableContentWidth(
+  tableWidth: number | undefined,
+  columnSizes: string[],
+  minWidthPx: number = 0,
+): number | undefined {
+  if (tableWidth === undefined) return undefined;
+
+  const { pxSum, percentSum, hasCalc } = sumColumnSizeParts(columnSizes);
+
+  // fixedPx + (percent/100) * rowWidth = rowWidth  →  rowWidth = fixedPx / (1 - percent/100)
+  if (!hasCalc && percentSum > 0 && percentSum < 100) {
+    const selfConsistent = pxSum / (1 - percentSum / 100);
+    return Math.max(tableWidth, minWidthPx, Math.ceil(selfConsistent));
+  }
+
+  const sum = sumColumnSizesPx(columnSizes, tableWidth);
+  if (sum === null) return undefined;
+
+  return Math.max(tableWidth, sum, minWidthPx);
 }
 
 /**
@@ -229,6 +284,50 @@ export function calcColumnSizes<R extends Kinded>(
   });
 
   return sizes;
+}
+
+export type ColumnLayoutResult = {
+  columnSizes: string[];
+  /** Row width required by column defs; equals probe width when no expansion (or legacy path). */
+  contentWidth: number | undefined;
+};
+
+/** Size columns for a measured container; resolves content width when in a document-scroll layout. */
+export function calcColumnLayout<R extends Kinded>(
+  columns: GridColumnWithId<R>[],
+  probeWidth: number | undefined,
+  tableMinWidthPx: number = 0,
+  expandedColumnIds: string[],
+  resizedWidths: ResizedWidths | undefined,
+  inDocumentScrollLayout: boolean,
+): ColumnLayoutResult {
+  if (probeWidth === undefined) {
+    return {
+      columnSizes: calcColumnSizes(columns, undefined, tableMinWidthPx, expandedColumnIds, resizedWidths),
+      contentWidth: undefined,
+    };
+  }
+
+  if (!inDocumentScrollLayout) {
+    return {
+      columnSizes: calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths),
+      contentWidth: probeWidth,
+    };
+  }
+
+  // Pass 1: size columns assuming the row width equals the measured container (probe).
+  let columnSizes = calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths);
+
+  // Literal % columns and mw floors can require a row wider than the probe.
+  const contentWidth = resolveTableContentWidth(probeWidth, columnSizes, tableMinWidthPx) ?? probeWidth;
+
+  // Re-run fr→px at the content width when expansion is meaningful; literal % columns stay as-is.
+  // Skip re-run when expansion is ≤1px (rounding noise from % resolution at the probe).
+  if (contentWidth > probeWidth + 1) {
+    columnSizes = calcColumnSizes(columns, contentWidth, tableMinWidthPx, expandedColumnIds, resizedWidths);
+  }
+
+  return { columnSizes, contentWidth };
 }
 
 /** Assign column ids if missing. */

@@ -1,39 +1,16 @@
 import { checkboxFilter } from "src/components/Filters";
 import { actionColumn, column, numericColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
+import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
 import { noop } from "src/utils";
 import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
+import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
   GridTableLayoutProps,
   useGridTableLayoutState,
 } from "./GridTableLayout";
-
-type Data = { name: string | undefined; value: number | undefined };
-type HeaderRow = { kind: "header"; id: string; data: undefined };
-type DataRow = { kind: "data"; id: string; data: Data };
-type Row = HeaderRow | DataRow;
-
-// Because we also want to test the use of the useGridTableLayoutState hook, we need create a wrapper component
-type TestWrapperProps = Omit<GridTableLayoutProps<any, Row, any, any>, "layoutState"> & {
-  layoutStateProps: Parameters<typeof useGridTableLayoutState>[0];
-};
-function TestWrapper(props: TestWrapperProps) {
-  const layoutState = useGridTableLayoutState(props.layoutStateProps);
-  return <GridTableLayoutComponent {...props} layoutState={layoutState} />;
-}
-
-const columns = [
-  column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name" }),
-  numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value" }),
-  actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
-];
-
-const rows: Row[] = [
-  { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
-  { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
-  { kind: "data", id: "3", data: { name: "Gamma", value: 30 } },
-];
 
 describe("GridTableLayout", () => {
   it("renders with static rows", async () => {
@@ -57,8 +34,8 @@ describe("GridTableLayout", () => {
           { href: "/", label: "Sub Page" },
         ]}
         tableProps={{
-          columns,
-          rows: [simpleHeader, ...rows],
+          columns: getColumns(),
+          rows: [simpleHeader, ...getRows()],
         }}
         totalCount={100}
         primaryAction={{ label: "Primary Action", onClick: noop }}
@@ -113,7 +90,7 @@ describe("GridTableLayout", () => {
           { href: "/", label: "Sub Page" },
         ]}
         tableProps={{
-          columns,
+          columns: getColumns(),
           query: {
             data: [
               { id: "1", name: "Delta", value: 100 },
@@ -158,8 +135,8 @@ describe("GridTableLayout", () => {
           hideEditColumns={true}
           totalCount={100}
           tableProps={{
-            columns,
-            rows: [simpleHeader, ...rows],
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -180,7 +157,7 @@ describe("GridTableLayout", () => {
           totalCount={100}
           tableProps={{
             columns: columnsWithoutId,
-            rows: [simpleHeader, ...rows],
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -202,7 +179,7 @@ describe("GridTableLayout", () => {
           totalCount={100}
           tableProps={{
             columns: columnsWithoutName,
-            rows: [simpleHeader, ...rows],
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -226,7 +203,7 @@ describe("GridTableLayout", () => {
           totalCount={100}
           tableProps={{
             columns: columnsWithoutId,
-            rows: [simpleHeader, ...rows],
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -250,8 +227,8 @@ describe("GridTableLayout", () => {
           hideEditColumns
           totalCount={500}
           tableProps={{
-            columns,
-            rows: [simpleHeader, ...rows],
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -275,8 +252,8 @@ describe("GridTableLayout", () => {
           hideEditColumns
           totalCount={500}
           tableProps={{
-            columns,
-            rows: [simpleHeader, ...rows],
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -305,8 +282,8 @@ describe("GridTableLayout", () => {
           hideEditColumns
           totalCount={500}
           tableProps={{
-            columns,
-            rows: [simpleHeader, ...rows],
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -325,15 +302,15 @@ describe("GridTableLayout", () => {
   });
 
   describe("view toggle", () => {
-    it("should not display a view toggle if renderContent is undefined", async () => {
+    it("should not display a view toggle if withCardView is undefined", async () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
           totalCount={100}
           tableProps={{
-            columns,
-            rows: [simpleHeader, ...rows],
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
           }}
         />,
         withRouter(),
@@ -342,32 +319,133 @@ describe("GridTableLayout", () => {
       // Then ViewToggleButton is not rendered
       expect(r.query.viewToggleButton).not.toBeInTheDocument();
     });
+
+    it("should display view toggle if withCardView is defined", async () => {
+      const Content = () => <span data-testid="cardContent">Content</span>;
+
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+          withCardView={<Content />}
+        />,
+        withRouter(),
+      );
+
+      expect(r.viewToggleButton).toBeInTheDocument();
+      expect(r.query.cardContent).not.toBeInTheDocument();
+
+      click(r.viewToggleButton);
+      click(r.viewToggleButton_card);
+
+      expect(r.cardContent).toBeInTheDocument();
+    });
   });
 
-  it("should display view toggle if renderContent is defined", async () => {
-    const Content = () => <span data-testid="cardContent">Content</span>;
+  describe("document scroll layout", () => {
+    it("sets table actions height CSS var inside DocumentScrollLayoutProvider", async () => {
+      const rectSpy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+        height: 40,
+        width: 800,
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        bottom: 40,
+        right: 800,
+        toJSON: () => ({}),
+      } as DOMRect);
 
-    const r = await render(
-      <TestWrapper
-        layoutStateProps={{}}
-        pageTitle="Test"
-        totalCount={100}
-        tableProps={{
-          columns,
-          rows: [simpleHeader, ...rows],
-        }}
-        withCardView={<Content />}
-      />,
-      withRouter(),
-    );
+      try {
+        // Given a GridTableLayout with filters inside a document-scroll layout
+        // When the layout mounts
+        const r = await render(
+          <DocumentScrollLayoutProvider>
+            <TestWrapper
+              layoutStateProps={getFilterLayoutStateProps("document-scroll-test")}
+              hideEditColumns
+              tableProps={{
+                columns: getColumns(),
+                rows: [simpleHeader, ...getRows()],
+              }}
+            />
+          </DocumentScrollLayoutProvider>,
+          withRouter(),
+        );
 
-    // Then ViewToggleButton is not rendered
-    expect(r.viewToggleButton).toBeInTheDocument();
-    expect(r.query.cardContent).not.toBeInTheDocument();
+        // Then the table actions height var is set for sticky column header coordination
+        expect(r.tableWrapper.style.getPropertyValue(beamTableActionsHeightVar)).toBe("40px");
+      } finally {
+        rectSpy.mockRestore();
+      }
+    });
 
-    click(r.viewToggleButton);
-    click(r.viewToggleButton_card);
+    it("does not set table actions height CSS var outside DocumentScrollLayoutProvider", async () => {
+      // Given a GridTableLayout with filters but no document-scroll layout
+      // When the layout mounts
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={getFilterLayoutStateProps("legacy-layout-test")}
+          hideEditColumns
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
 
-    expect(r.cardContent).toBeInTheDocument();
+      // Then the table actions height var is not set
+      expect(r.tableWrapper.style.getPropertyValue(beamTableActionsHeightVar)).toBe("");
+    });
+
+    function getFilterLayoutStateProps(storageKey: string) {
+      return {
+        persistedFilter: {
+          filterDefs: {
+            needsRevision: checkboxFilter({
+              label: "Needs Revision",
+            }),
+          },
+          storageKey,
+        },
+        search: "client" as const,
+      };
+    }
   });
 });
+
+type Data = { name: string | undefined; value: number | undefined };
+type HeaderRow = { kind: "header"; id: string; data: undefined };
+type DataRow = { kind: "data"; id: string; data: Data };
+type Row = HeaderRow | DataRow;
+
+// Because we also want to test the use of the useGridTableLayoutState hook, we need create a wrapper component
+type TestWrapperProps = Omit<GridTableLayoutProps<any, Row, any, any>, "layoutState"> & {
+  layoutStateProps: Parameters<typeof useGridTableLayoutState>[0];
+};
+function TestWrapper(props: TestWrapperProps) {
+  const layoutState = useGridTableLayoutState(props.layoutStateProps);
+  return <GridTableLayoutComponent {...props} layoutState={layoutState} />;
+}
+
+function getColumns() {
+  return [
+    column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name" }),
+    numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value" }),
+    actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
+  ];
+}
+
+function getRows(): Row[] {
+  return [
+    { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
+    { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
+    { kind: "data", id: "3", data: { name: "Gamma", value: 30 } },
+  ];
+}

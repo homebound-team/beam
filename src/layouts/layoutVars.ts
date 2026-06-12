@@ -13,7 +13,25 @@ export const beamLayoutViewportHeightVar = "--beam-layout-viewport-height";
 /** Side nav rail width (px) for horizontal sticky offsets. */
 export const beamSideNavLayoutWidthVar = "--beam-side-nav-layout-width";
 
+/** Table actions toolbar height (px) while pinned in document-scroll layouts. */
+export const beamTableActionsHeightVar = "--beam-table-actions-height";
+
+/** `left` for document-scroll sticky chrome (below side nav when present). */
+export function documentScrollChromeLeft(): string {
+  return `var(${beamSideNavLayoutWidthVar}, 0px)`;
+}
+
+/** `width` for document-scroll sticky chrome spanning the visible viewport beside the side nav. */
+export function documentScrollChromeWidth(): string {
+  return `calc(var(${beamLayoutViewportWidthVar}, 100vw) - var(${beamSideNavLayoutWidthVar}, 0px))`;
+}
+
 /** `top` offset below auto-hiding navbar + page header (each var collapses to `0` when scrolled away). */
 export function stickyNavAndHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
+}
+
+/** `top` offset for sticky table column headers (navbar + page header + table actions). */
+export function stickyTableHeaderOffset(basePx = 0): string {
+  return `calc(${basePx}px + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
 }

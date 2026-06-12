@@ -4,10 +4,12 @@ import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
-import { GridColumn } from "src/components/Table/types";
+import { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
+  calcColumnLayout,
   calcColumnSizes,
+  collapseColumn,
   column,
   generateColumnId,
   selectColumn,
@@ -1067,6 +1069,53 @@ describe("GridTable", () => {
         ]).join(" "),
       ).toEqual("300px ((100% - 0% - 300px) * (2 / 2))");
     });
+
+    it("expands content width when fr mw mins and % columns exceed measured table width", () => {
+      // Given columns whose mw mins and % widths exceed a narrow probe width
+      const columns = getExpandTestColumns();
+      const tableWidth = 643;
+
+      // When sizing columns in a document-scroll layout
+      const { contentWidth } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
+
+      // Then the resolved content width expands beyond the probe
+      expect(contentWidth).toBe(698);
+    });
+
+    it("does not expand content width on the legacy column layout path", () => {
+      // Given columns that would expand in document-scroll mode
+      const columns = getLegacyGateColumns();
+      const tableWidth = 643;
+
+      // When sizing columns outside a document-scroll layout
+      const legacy = calcColumnLayout(columns, tableWidth, undefined, [], undefined, false);
+
+      // Then content width stays at the probe and column sizes match a single calcColumnSizes pass
+      expect(legacy.contentWidth).toBe(643);
+      expect(legacy.columnSizes).toEqual(calcColumnSizes(columns, tableWidth, undefined, [], undefined));
+    });
+
+    function getExpandTestColumns() {
+      return [
+        collapseColumn(),
+        selectColumn(),
+        column({ id: "name", mw: "200px" }),
+        column({ id: "value", mw: "100px" }),
+        column({ id: "status", w: "20%", mw: "100px" }),
+        column({ id: "priority", mw: "80px" }),
+        actionColumn({ id: "action", w: "100px", mw: "80px" }),
+      ] as GridColumnWithId<any>[];
+    }
+
+    function getLegacyGateColumns() {
+      return [
+        collapseColumn(),
+        selectColumn(),
+        column({ id: "name", mw: "200px" }),
+        column({ id: "status", w: "20%", mw: "100px" }),
+        actionColumn({ id: "action", w: "100px", mw: "80px" }),
+      ] as GridColumnWithId<any>[];
+    }
   });
 
   it("throws error if column min-width definition is set with a non-px value", async () => {

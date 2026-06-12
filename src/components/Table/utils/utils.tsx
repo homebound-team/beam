@@ -8,6 +8,7 @@ import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnBorder, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { Css, Palette, Properties } from "src/Css";
+import { documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
@@ -305,8 +306,15 @@ export function recursivelyGetContainingRow<R extends Kinded>(
   return undefined;
 }
 
-export function getTableRefWidthStyles(isVirtual: boolean) {
-  // If virtualized take some pixels off the width to accommodate when virtuoso's scrollbar is introduced.
-  // Otherwise a horizontal scrollbar will _always_ appear once the vertical scrollbar is needed
-  return Css.w100.if(isVirtual).w("calc(100% - 20px)").$;
+export function getTableRefWidthStyles(isVirtual: boolean, inDocumentScrollLayout: boolean = false) {
+  // When using document-scroll, utilize the documentScrollChromeWidth to get the available width on the page for it.
+  if (inDocumentScrollLayout) {
+    return Css.w(documentScrollChromeWidth()).$;
+  }
+  // Nested scrolling virtual tables reserve space for Virtuoso / ScrollableParent vertical scrollbars.
+  if (isVirtual) {
+    return Css.w("calc(100% - 20px)").$;
+  }
+  // Otherwise, use the full width of the container (nested scroll, non-virtual tables)
+  return Css.w100.$;
 }
