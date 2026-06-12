@@ -11,6 +11,7 @@ import {
   GridTableLayoutProps,
   useGridTableLayoutState,
 } from "./GridTableLayout";
+import { getGridTableViewStorageKey } from "./usePersistedTableView";
 
 describe("GridTableLayout", () => {
   it("renders with static rows", async () => {
@@ -344,6 +345,93 @@ describe("GridTableLayout", () => {
       click(r.viewToggleButton_card);
 
       expect(r.cardContent).toBeInTheDocument();
+    });
+
+    it("persists view selection to localStorage when toggled", async () => {
+      const Content = () => <span data-testid="cardContent">Content</span>;
+      const storageKey = getGridTableViewStorageKey("/");
+
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+          withCardView={<Content />}
+        />,
+        withRouter(),
+      );
+
+      click(r.viewToggleButton);
+      click(r.viewToggleButton_card);
+
+      expect(localStorage.getItem(storageKey)).toBe("card");
+    });
+
+    it("restores view from localStorage on mount and trumps defaultView", async () => {
+      const Content = () => <span data-testid="cardContent">Content</span>;
+      localStorage.setItem(getGridTableViewStorageKey("/"), "card");
+
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+          defaultView="list"
+          withCardView={<Content />}
+        />,
+        withRouter(),
+      );
+
+      expect(r.cardContent).toBeInTheDocument();
+    });
+
+    it("does not persist view when withCardView is undefined", async () => {
+      const storageKey = getGridTableViewStorageKey("/");
+
+      await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      expect(localStorage.getItem(storageKey)).toBeNull();
+    });
+
+    it("falls back to defaultView when localStorage has an invalid value", async () => {
+      const Content = () => <span data-testid="cardContent">Content</span>;
+      localStorage.setItem(getGridTableViewStorageKey("/"), "invalid");
+
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          defaultView="list"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+          withCardView={<Content />}
+        />,
+        withRouter(),
+      );
+
+      expect(r.query.cardContent).not.toBeInTheDocument();
     });
   });
 
