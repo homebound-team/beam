@@ -323,4 +323,51 @@ describe("GridTableLayout", () => {
       expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 500 of 500");
     });
   });
+
+  describe("view toggle", () => {
+    it("should not display a view toggle if renderContent is undefined", async () => {
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          totalCount={100}
+          tableProps={{
+            columns,
+            rows: [simpleHeader, ...rows],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // Then ViewToggleButton is not rendered
+      expect(r.query.viewToggleButton).not.toBeInTheDocument();
+    });
+  });
+
+  it("should display view toggle if renderContent is defined", async () => {
+    const Content = () => <span data-testid="cardContent">Content</span>;
+
+    const r = await render(
+      <TestWrapper
+        layoutStateProps={{}}
+        pageTitle="Test"
+        totalCount={100}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...rows],
+        }}
+        withCardView={<Content />}
+      />,
+      withRouter(),
+    );
+
+    // Then ViewToggleButton is not rendered
+    expect(r.viewToggleButton).toBeInTheDocument();
+    expect(r.query.cardContent).not.toBeInTheDocument();
+
+    click(r.viewToggleButton);
+    click(r.viewToggleButton_card);
+
+    expect(r.cardContent).toBeInTheDocument();
+  });
 });

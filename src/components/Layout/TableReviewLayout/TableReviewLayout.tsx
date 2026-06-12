@@ -132,7 +132,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
               <div css={Css.absolute.topPx(-32).df.fdc.aic.leftPx(-24).z1.$}>
                 <IconButton
                   bgColor={Palette.White}
-                  circle
+                  variant="circle"
                   icon="x"
                   inc={3.5}
                   onClick={handleClosePanel}

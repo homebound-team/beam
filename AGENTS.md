@@ -6,6 +6,22 @@ This file is the **source of truth** for agent-oriented conventions in this repo
 
 Use the `src/` path alias (e.g. `import { Css } from "src/Css"`), not relative paths like `../../utils/...`. This applies repo-wide — components, hooks, tests, and stories.
 
+## File naming
+
+Match the existing conventions when adding files:
+
+- **Components** — PascalCase matching the export: `NavbarLayout.tsx`.
+- **React contexts** — PascalCase with a `Context` suffix: `BeamContext.tsx`, `ModalContext.tsx`, `SideNavLayoutContext.tsx` (even when the file also exports the Provider and hooks).
+- **Hooks** — camelCase `use*`: `useTestIds.tsx`, `useMeasuredHeight.ts`.
+- **Utility / constant modules** — camelCase: `zIndices.ts`, `layoutVars.ts`.
+- Co-locate `*.test.tsx` and `*.stories.tsx` beside the file they cover.
+
+## Comments
+
+- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md)).
+- **Inline comments:** Use for non-obvious logic near the code. Keep them **short** — one line when possible.
+- **Avoid:** Multi-paragraph JSDoc, restating what the code already says, and duplicating docs that live elsewhere.
+
 ## Testing
 
 Use **vitest**, not Jest. Example:
@@ -83,7 +99,7 @@ Example tests: [`DateField.test.tsx`](src/inputs/DateFields/DateField.test.tsx),
 
 ## Storybook
 
-- Primary development surface for components; utilities in [`src/utils/sb.tsx`](src/utils/sb.tsx).
+- Primary development surface for components; Storybook **helpers** (decorators, viewport modes) in [`src/utils/sb.tsx`](src/utils/sb.tsx); shared story **fixtures** in [`src/utils/sbComponents.tsx`](src/utils/sbComponents.tsx) — do not export reusable fixtures from `*.stories.tsx` or Storybook will register them as stories.
 - Every feature should have at least one story; use `PlayFunction` for interaction states (hover, focus, etc.).
 - Chromatic snapshots stories for visual regression. When a Chromatic mode name matches a built-in Storybook viewport key, use [`viewportModes()`](src/utils/sb.tsx) (e.g. `modes: viewportModes("desktop", "iphone12")`). Keys are type-checked against Storybook's [`INITIAL_VIEWPORTS`](https://storybook.js.org/docs/essentials/viewport#use-a-detailed-set-of-devices) and default [`MINIMAL_VIEWPORTS`](https://storybook.js.org/docs/essentials/viewport#use-a-detailed-set-of-devices) sets via the `StorybookViewportKey` type.
 - **Helper placement:** Local helpers in `*.stories.tsx` go **at the bottom of the file**, after meta, story exports, and play functions.

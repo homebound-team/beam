@@ -23,6 +23,10 @@ export const zIndices = {
   // snackbar so toasts still land on top.
   sideNav: 100,
 
+  // App navbar (NavbarLayout) — above the side nav and page sticky headers; full-page overlays and
+  // toasts still clear it.
+  navbar: 120,
+
   // Full-page overlays — high enough to clear consuming-app nav bars (~999).
   // Both layouts own their Toast internally so it renders inside the overlay header.
   pageOverlay: 1000,

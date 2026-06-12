@@ -58,7 +58,7 @@ export function RightSidebar({ content, headerHeightPx }: RightSidebarProps) {
                 <div css={Css.absolute.leftPx(-24).top0.df.fdc.aic.$}>
                   <IconButton
                     bgColor={Palette.White}
-                    circle
+                    variant="circle"
                     onClick={() => setSelectedIcon(undefined)}
                     icon="x"
                     inc={3.5}
@@ -100,7 +100,7 @@ function IconButtonList({ content, selectedIcon, onIconClick }: IconButtonListPr
         <IconButton
           // selectedIcon is added to key to reset the active state
           key={`${icon}-${selectedIcon}`}
-          circle
+          variant="circle"
           active={icon === selectedIcon}
           onClick={() => onIconClick(icon)}
           icon={icon}

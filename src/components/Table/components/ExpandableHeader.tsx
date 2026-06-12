@@ -4,6 +4,7 @@ import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
+import { beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import { isFunction } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { Loader } from "../../Loader";
@@ -45,7 +46,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
         css={
           Css.df.aic
             .if(applyStickyStyles)
-            .sticky.leftPx(minStickyLeftOffset + 12)
+            .sticky.left(`calc(var(${beamSideNavLayoutWidthVar}, 0px) + ${minStickyLeftOffset + 12}px)`)
             .pr2.mr2.bgWhite.z(zIndices.tableExpandableTitle)
             .if(isHovered).bgGray100.$
         }

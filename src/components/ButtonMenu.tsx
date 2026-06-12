@@ -20,7 +20,10 @@ type ButtonMenuBaseProps = {
   searchable?: boolean;
   // for storybook purposes
   defaultOpen?: boolean;
-} & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder">;
+} & Pick<
+  OverlayTriggerProps,
+  "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder" | "hideEndAdornment"
+>;
 
 type SelectionButtonMenuProps = {
   /** Display a menu item as selected based. Use the Menu Item's label to identify */
