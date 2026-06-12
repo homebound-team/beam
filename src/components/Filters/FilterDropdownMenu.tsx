@@ -133,7 +133,6 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
           label="Filter"
           active={isOpen}
           onClick={() => setIsOpen(!isOpen)}
-          endAdornment={activeFilterCount > 0 ? <CountBadge count={activeFilterCount} /> : undefined}
           bgColor={Tokens.Surface}
           {...testId.button}
         />
