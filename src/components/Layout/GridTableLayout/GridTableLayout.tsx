@@ -26,6 +26,7 @@ import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 import { QueryTable, QueryTableProps } from "./QueryTable";
+import { usePersistedTableView } from "./usePersistedTableView";
 
 // Omit to force all action button menus to look the same
 type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
@@ -126,7 +127,7 @@ function GridTableLayoutComponent<
     () => (tableProps.api as GridTableApiImpl<R>) ?? new GridTableApiImpl(),
     [tableProps.api],
   );
-  const [view, setView] = useState<TableView>(defaultView);
+  const [view, setView] = usePersistedTableView(defaultView, !!withCardView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = !!(layoutState?.filterDefs || layoutState?.search || hasHideableColumns || withCardView);
   const isVirtualized = tableProps.as === "virtual";
@@ -151,13 +152,7 @@ function GridTableLayoutComponent<
         (hasHideableColumns || withCardView) && (
           <div css={Css.df.gap1.$}>
             {hasHideableColumns && (
-              <EditColumnsButton
-                columns={columns}
-                api={api}
-                tooltip="Display columns"
-                trigger={{ icon: "kanban", size: "md", label: "", variant: "secondaryBlack" }}
-                {...tid.editColumnsButton}
-              />
+              <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
             )}
             {withCardView && <ViewToggleButton view={view} onChange={setView} />}
           </div>
