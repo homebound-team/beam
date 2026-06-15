@@ -68,7 +68,7 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
   }, [data, createRows]);
 
   const handleEndReached = useCallback(
-    async (index: number) => {
+    async (_: number) => {
       if (!query.fetchMore || !infiniteScroll || !accumulatedRows) return;
       const offset = accumulatedRows.filter((r) => r.kind !== "header").length;
       const pageSize = infiniteScroll.pageSize ?? 50;
