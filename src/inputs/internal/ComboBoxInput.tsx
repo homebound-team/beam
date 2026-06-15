@@ -47,6 +47,8 @@ type ComboBoxInputProps<O, V extends Value> = {
   isTree?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
+  /** Only supported on single Select fields. See ComboBoxBaseProps.onEnter. */
+  onEnter?: (inputValue: string) => void;
 } & PresentationFieldProps;
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
@@ -71,6 +73,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     inputRef,
     inputWrapRef,
     multiline = false,
+    onEnter,
     ...otherProps
   } = props;
 
@@ -103,7 +106,27 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     value: inputProps.value,
   });
 
-  return (
+  function onEnterKeyDownCapture(e: React.KeyboardEvent) {
+    if (!onEnter) return;
+    if (e.key !== "Enter") return;
+    if (inputProps.readOnly || inputProps.disabled) return;
+    if (!(e.target instanceof HTMLInputElement)) return;
+
+    const input = e.target;
+
+    // User arrowed to a dropdown row — let react-aria select that option (including "Add New").
+    if (input.getAttribute("aria-activedescendant")) return;
+
+    const typedValue = input.value.trim();
+    if (!typedValue) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    onEnter(typedValue);
+    input.blur();
+  }
+
+  const field = (
     <TextFieldBase
       {...otherProps}
       {...multilineProps}
@@ -246,6 +269,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       }}
     />
   );
+
+  return onEnter ? <div onKeyDownCapture={onEnterKeyDownCapture}>{field}</div> : field;
 }
 
 function SelectedOptionBullets({ labels = [] }: { labels: string[] | undefined }) {

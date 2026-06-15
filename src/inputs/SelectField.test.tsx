@@ -493,6 +493,51 @@ describe("SelectFieldTest", () => {
     expect(onSelect.mock.calls[2][0]).toBe(undefined);
   });
 
+  it("calls onEnter when pressing Enter with typed text and no keyboard-focused list item", async () => {
+    // Given a SelectField with onEnter
+    const onEnter = vi.fn();
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={undefined}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onEnter={onEnter}
+      />,
+    );
+    // When we type and press Enter without arrowing to a list item
+    focus(r.age);
+    fireEvent.change(r.age, { target: { value: "New Value" } });
+    fireEvent.keyDown(r.age, { key: "Enter", code: "Enter" });
+    // Then onEnter is called with the trimmed input value
+    expect(onEnter).toHaveBeenCalledTimes(1);
+    expect(onEnter).toHaveBeenCalledWith("New Value");
+  });
+
+  it("does not call onEnter when a list item is keyboard-focused", async () => {
+    // Given a SelectField with onEnter
+    const onEnter = vi.fn();
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={undefined}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onEnter={onEnter}
+      />,
+    );
+    // When we type, arrow to an option, and press Enter
+    focus(r.age);
+    fireEvent.change(r.age, { target: { value: "One" } });
+    fireEvent.keyDown(r.age, { key: "ArrowDown", code: "ArrowDown" });
+    fireEvent.keyDown(r.age, { key: "Enter", code: "Enter" });
+    // Then onEnter is not called and the focused option is selected instead
+    expect(onEnter).not.toHaveBeenCalled();
+    expect(r.age).toHaveValue("One");
+  });
+
   it("allows to add a new option", async () => {
     // Given a SelectField
     const onAddNew = vi.fn();

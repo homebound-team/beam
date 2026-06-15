@@ -66,6 +66,11 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   /* Only supported on single Select fields */
   onAddNew?: (v: string) => void;
   /**
+   * Called when Enter is pressed in the filter input with typed text and no keyboard-focused list item.
+   * Only supported on single Select fields.
+   */
+  onEnter?: (inputValue: string) => void;
+  /**
    * When true (default), options are sorted alphabetically by their label.
    * Set to false to maintain the original order of options.
    */
@@ -102,6 +107,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     fullWidth = fieldProps?.fullWidth ?? false,
     onSearch,
     onAddNew,
+    onEnter,
     autoSort = true,
     ...otherProps
   } = props;
@@ -387,6 +393,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
+        onEnter={multiselect ? undefined : onEnter}
       />
       {state.isOpen && (
         <Popover
