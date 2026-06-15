@@ -3,6 +3,7 @@ import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
+import { IconButton } from "src/components/IconButton";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css, Palette } from "src/Css";
 import { useBreakpoint } from "src/hooks";
@@ -113,28 +114,38 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
 
       {/* Small screen: search icon button inline with filter button */}
       {sm && hasSearch && (
-        <Button
-          label=""
-          aria-label="Search"
+        <IconButton
+          variant="outline"
           icon="search"
+          label="Search"
           onClick={() => setSearchIsOpen(!searchIsOpen)}
           active={searchIsOpen}
-          variant="secondaryBlack"
           {...testId.searchButton}
         />
       )}
 
-      {/* Filter button (only rendered when filterDefs are provided) */}
-      {hasFilters && (
+      {/* Small screen: filter icon button with optional active count badge */}
+      {sm && hasFilters && (
+        <IconButton
+          variant="outline"
+          icon="filter"
+          label="Filter"
+          active={isOpen}
+          onClick={() => setIsOpen(!isOpen)}
+          {...testId.button}
+        />
+      )}
+
+      {/* Large screen: full filter button with label, badge, and chevron */}
+      {!sm && hasFilters && (
         <Button
-          label={sm ? "" : "Filter"}
-          aria-label="Filter"
+          label="Filter"
           icon="filter"
           size="md"
           endAdornment={
             <div css={Css.df.aic.gap1.$}>
               {activeFilterCount > 0 && <CountBadge count={activeFilterCount} />}
-              <Icon xss={Css.if(sm).visuallyHidden.$} icon={isOpen ? "chevronUp" : "chevronDown"} />
+              <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
             </div>
           }
           variant="secondaryBlack"
