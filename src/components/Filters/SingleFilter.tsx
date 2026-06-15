@@ -1,5 +1,6 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { TestIds } from "src/utils/useTestIds";
@@ -17,6 +18,11 @@ export function singleFilter<O, V extends Value>(props: SingleFilterProps<O, V>)
 const allOption = {} as any;
 
 class SingleFilter<O, V extends Value> extends BaseFilter<V, SingleFilterProps<O, V>> implements Filter<V> {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<V>): string | undefined {
+    const { options, getOptionValue, getOptionLabel } = this.props;
+    return resolveOptionSelectedFilterLabel(options, getOptionValue, getOptionLabel, value as V);
+  }
+
   render(
     value: V | undefined,
     setValue: (value: V | undefined) => void,

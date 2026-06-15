@@ -1,5 +1,5 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Switch } from "src/inputs/Switch";
 import { TestIds } from "src/utils/useTestIds";
 
@@ -31,6 +31,11 @@ export function toggleFilter<V = boolean>(props: ToggleFilterProps<V>): (key: st
 }
 
 class ToggleFilter<V> extends BaseFilter<V, ToggleFilterProps<V>> implements Filter<V> {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<V>): string | undefined {
+    const { onValue = true as any as V } = this.props;
+    return value === onValue ? this.label : undefined;
+  }
+
   render(
     value: V | undefined,
     setValue: (value: V | undefined) => void,

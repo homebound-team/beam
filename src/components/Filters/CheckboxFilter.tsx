@@ -1,5 +1,5 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Checkbox } from "src/inputs";
 import { TestIds } from "src/utils/useTestIds";
 
@@ -31,6 +31,11 @@ export function checkboxFilter<V = boolean>(props: CheckboxFilterProps<V>): (key
 }
 
 class CheckboxFilter<V> extends BaseFilter<V, CheckboxFilterProps<V>> implements Filter<V> {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<V>): string | undefined {
+    const { onValue = true as any as V } = this.props;
+    return value === onValue ? this.label : undefined;
+  }
+
   render(
     value: V | undefined,
     setValue: (value: V | undefined) => void,

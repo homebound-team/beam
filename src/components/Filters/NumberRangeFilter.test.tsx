@@ -119,6 +119,44 @@ describe("NumberRangeFilter", () => {
     // And we expect the min / max filter to be set in cents
     expect(r.filter_value).toHaveTextContent(JSON.stringify({ numberRange: { max: 5000, min: 1000 } }));
   });
+
+  it("returns min and max joined when both are set", () => {
+    // Given a numberRangeFilter
+    const filter = numberRangeFilter({ label: "Price" })("price");
+
+    // When formatting the label for a full range
+    const label = filter.formatSelectedFilterLabel({ min: 10, max: 50 });
+
+    // Then min and max are joined
+    expect(label).toBe("10 – 50");
+  });
+
+  it("returns only the set bound when one side is missing", () => {
+    // Given a numberRangeFilter
+    const filter = numberRangeFilter({ label: "Price" })("price");
+
+    // When formatting the label for a partial range
+    const minOnly = filter.formatSelectedFilterLabel({ min: 10, max: undefined as unknown as number });
+    const maxOnly = filter.formatSelectedFilterLabel({ min: undefined as unknown as number, max: 50 });
+
+    // Then only the set bound is returned
+    expect(minOnly).toBe("10");
+    expect(maxOnly).toBe("50");
+  });
+
+  it("returns undefined when no bounds are set", () => {
+    // Given a numberRangeFilter
+    const filter = numberRangeFilter({ label: "Price" })("price");
+
+    // When formatting the label with no bounds
+    const label = filter.formatSelectedFilterLabel({
+      min: undefined as unknown as number,
+      max: undefined as unknown as number,
+    });
+
+    // Then no chip label is produced
+    expect(label).toBeUndefined();
+  });
 });
 
 function TestFilters(props: TestFilterProps) {
@@ -132,8 +170,8 @@ function TestFilters(props: TestFilterProps) {
   );
 }
 
-interface TestFilterProps {
+type TestFilterProps = {
   defs: FilterDefs<ProjectFilter>;
   showVertical?: boolean;
   defaultValue?: NumberRangeFilterValue;
-}
+};

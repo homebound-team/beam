@@ -85,6 +85,28 @@ describe("CheckboxFilter", () => {
     expect(r.filter_filter).not.toBeChecked();
     expect(r.value).toHaveTextContent("undefined");
   });
+
+  it("returns the filter label when the value matches onValue", () => {
+    // Given a checkboxFilter with default onValue
+    const filter = checkboxFilter({ label: "Needs Revision" })("needsRevision");
+
+    // When formatting the label for the active value
+    const label = filter.formatSelectedFilterLabel(true);
+
+    // Then the filter label is returned
+    expect(label).toBe("Needs Revision");
+  });
+
+  it("returns undefined when the value does not match onValue", () => {
+    // Given a checkboxFilter with a custom onValue
+    const filter = checkboxFilter({ label: "Needs Revision", onValue: "active" })("needsRevision");
+
+    // When formatting the label for a non-active value
+    const label = filter.formatSelectedFilterLabel("inactive");
+
+    // Then no chip label is produced
+    expect(label).toBeUndefined();
+  });
 });
 
 function TestFilter<V>(props: { checkboxFilter: CheckboxFilterProps<V>; persistedValue?: V }) {

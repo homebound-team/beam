@@ -1,5 +1,6 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { resolveTreeSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { TreeSelectField, TreeSelectFieldProps, Value } from "src/inputs";
 import { TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
 import { TestIds } from "src/utils";
@@ -19,6 +20,11 @@ export function treeFilter<O, V extends Value>(props: TreeFilterProps<O, V>): (k
 }
 
 class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, V>> implements Filter<V[]> {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<V[]>): string | undefined {
+    const { options, getOptionValue, getOptionLabel } = this.props;
+    return resolveTreeSelectedFilterLabel(options, getOptionValue, getOptionLabel, value);
+  }
+
   render(
     value: V[] | undefined,
     setValue: (value: V[] | undefined) => void,

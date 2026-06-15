@@ -1,21 +1,27 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { SelectField } from "src/inputs/SelectField";
 import { TestIds } from "src/utils/useTestIds";
 
 export type BooleanOption = [boolean | undefined, string];
 
-export interface BooleanFilterProps {
+export type BooleanFilterProps = {
   options?: BooleanOption[];
   label?: string;
   defaultValue?: undefined | boolean;
-}
+};
 
 export function booleanFilter(props: BooleanFilterProps): (key: string) => Filter<boolean> {
   return (key) => new BooleanFilter(key, props);
 }
 
 class BooleanFilter extends BaseFilter<boolean, BooleanFilterProps> implements Filter<boolean> {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<boolean>): string | undefined {
+    const { options = defaultBooleanOptions } = this.props;
+    const match = options.find(([optionValue]) => optionValue === value);
+    return match ? match[1] : String(value);
+  }
+
   render(
     value: boolean | undefined,
     setValue: (value: boolean | undefined) => void,
