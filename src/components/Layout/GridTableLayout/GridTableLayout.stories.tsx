@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridDataRow } from "src/components/Table";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
@@ -317,6 +317,44 @@ export function WithViewToggle() {
       withCardView={tileContent}
       defaultView="card"
     />
+  );
+}
+
+export function WithInfiniteScroll() {
+  const loadRows = useCallback((offset: number) => {
+    return zeroTo(50).map((i) => ({
+      kind: "data" as const,
+      id: String(i + offset),
+      data: {
+        name: `row ${i + offset}`,
+        value: i + offset,
+        status: Math.floor(Math.random() * 3) > 1 ? "active" : "inactive",
+        priority: Math.floor(Math.random() * 3) + 1,
+        actions: "actions",
+      },
+    }));
+  }, []);
+
+  const [data, setData] = useState(loadRows(0));
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => [simpleHeader, ...data], [data]);
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table Layout with Infinite Scroll"
+        tableProps={{
+          as: "virtual",
+          rows,
+          columns,
+          infiniteScroll: {
+            onEndReached(index) {
+              setData([...data, ...loadRows(index)]);
+            },
+          },
+        }}
+      />
+    </TestProjectLayout>
   );
 }
 
