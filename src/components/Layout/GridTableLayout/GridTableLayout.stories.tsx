@@ -142,16 +142,10 @@ export function QueryTableLayout() {
       storageKey: "grid-table-layout",
     },
     search: "server",
-    pagination: {
-      pageSizes: [25, 50, 100],
-      storageKey: "query-table-pagination",
-    },
   });
 
-  // In this example, we set up server-side search and pagination using `searchString` and `page` from the layout state,
-  // in combination with the "QueryTable" behavior for loading/error states.
   const query = useExampleQuery({
-    filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
+    filter: { ...layoutState.filter, search: layoutState.searchString },
   });
 
   return (
@@ -162,9 +156,6 @@ export function QueryTableLayout() {
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page A" },
           { href: "/", label: "Sub Page B" },
-          { href: "/", label: "Sub Page C" },
-          { href: "/", label: "Sub Page D" },
-          { href: "/", label: "Sub Page E" },
         ]}
         layoutState={layoutState}
         tableProps={{
@@ -177,7 +168,6 @@ export function QueryTableLayout() {
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
-        totalCount={100}
       />
     </TestProjectLayout>
   );
@@ -358,6 +348,29 @@ export function WithInfiniteScroll() {
   );
 }
 
+export function WithQueryTableInfiniteScroll() {
+  const query = useExamplePaginatedQuery({ filter: {} });
+  const columns = useMemo(() => getColumns(false), []);
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Query Table with Infinite Scroll"
+        tableProps={{
+          as: "virtual",
+          query,
+          columns,
+          createRows: (data) => [
+            simpleHeader,
+            ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
+          ],
+          infiniteScroll: { pageSize: 50 },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 
@@ -383,6 +396,49 @@ function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
     data,
     loading,
   };
+}
+
+function useExamplePaginatedQuery({ filter }: { filter: Record<string, unknown> }) {
+  const filterString = JSON.stringify(filter);
+  const pageSize = 50;
+
+  const fakedb = useMemo(
+    () =>
+      zeroTo(200).map((index) => ({
+        id: String(index),
+        name: `Row ${index}`,
+        value: index,
+        status: Math.floor(Math.random() * 3) > 1 ? "active" : "inactive",
+        priority: Math.floor(Math.random() * 3) + 1,
+      })),
+    [],
+  );
+
+  const [loading, setLoading] = useState(true);
+  const [data, setData] =
+    useState<Array<{ id: string; name: string; value: number; status: string; priority: number }>>();
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setData(fakedb.slice(0, pageSize));
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filterString, fakedb, pageSize]);
+
+  const fetchMore = useCallback(
+    async ({ offset, limit }: { offset: number; limit: number }) => {
+      return new Promise<{ data: typeof data }>((resolve) => {
+        setTimeout(() => {
+          resolve({ data: fakedb.slice(offset, offset + limit) });
+        }, 800);
+      });
+    },
+    [fakedb],
+  );
+
+  return { data, loading, fetchMore };
 }
 
 function getFilterDefs() {
