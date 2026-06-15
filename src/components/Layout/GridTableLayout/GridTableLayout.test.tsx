@@ -38,7 +38,6 @@ describe("GridTableLayout", () => {
           columns: getColumns(),
           rows: [simpleHeader, ...getRows()],
         }}
-        totalCount={100}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}
         tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
@@ -104,7 +103,6 @@ describe("GridTableLayout", () => {
             ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
           ],
         }}
-        totalCount={100}
         primaryAction={{ label: "Primary Action", onClick: noop }}
       />,
       withRouter(),
@@ -134,7 +132,6 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           hideEditColumns={true}
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -155,7 +152,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: columnsWithoutId,
             rows: [simpleHeader, ...getRows()],
@@ -177,7 +173,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: columnsWithoutName,
             rows: [simpleHeader, ...getRows()],
@@ -201,7 +196,6 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           hideEditColumns={true}
-          totalCount={100}
           tableProps={{
             columns: columnsWithoutId,
             rows: [simpleHeader, ...getRows()],
@@ -214,101 +208,12 @@ describe("GridTableLayout", () => {
     });
   });
 
-  describe("pagination", () => {
-    it("renders pagination when totalCount is provided", async () => {
-      // Given a GridTableLayout with totalCount
-      const r = await render(
-        <TestWrapper
-          layoutStateProps={{
-            pagination: {
-              pageSizes: [100, 500, 1000],
-            },
-          }}
-          pageTitle="Test With Pagination"
-          hideEditColumns
-          totalCount={500}
-          tableProps={{
-            columns: getColumns(),
-            rows: [simpleHeader, ...getRows()],
-          }}
-        />,
-        withRouter(),
-      );
-
-      // Then the pagination component is rendered
-      expect(r.pagination).toBeInTheDocument();
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-    });
-
-    it("updates page state when clicking next", async () => {
-      // Given a GridTableLayout with pagination
-      const r = await render(
-        <TestWrapper
-          layoutStateProps={{
-            pagination: {
-              pageSizes: [100, 500, 1000],
-            },
-          }}
-          pageTitle="Test Pagination Navigation"
-          hideEditColumns
-          totalCount={500}
-          tableProps={{
-            columns: getColumns(),
-            rows: [simpleHeader, ...getRows()],
-          }}
-        />,
-        withRouter(),
-      );
-
-      // Initially on page 1
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-
-      // When clicking next
-      click(r.pagination_nextIcon);
-
-      // Then page 2 is shown
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("101 - 200 of 500");
-    });
-
-    it("updates page size when selecting a new size", async () => {
-      // Given a GridTableLayout with pagination
-      const r = await render(
-        <TestWrapper
-          layoutStateProps={{
-            pagination: {
-              pageSizes: [100, 500, 1000],
-            },
-          }}
-          pageTitle="Test Page Size"
-          hideEditColumns
-          totalCount={500}
-          tableProps={{
-            columns: getColumns(),
-            rows: [simpleHeader, ...getRows()],
-          }}
-        />,
-        withRouter(),
-      );
-
-      // Initially page size is 100
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-
-      // When changing page size to 500
-      click(r.pagination_pageSize);
-      click(r.getByRole("option", { name: "500" }));
-
-      // Then the page info reflects new size
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 500 of 500");
-    });
-  });
-
   describe("view toggle", () => {
     it("should not display a view toggle if withCardView is undefined", async () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -328,7 +233,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -355,7 +259,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -379,7 +282,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -400,7 +302,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -420,7 +321,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           defaultView="list"
           tableProps={{
             columns: getColumns(),
