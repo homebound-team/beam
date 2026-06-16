@@ -1,4 +1,6 @@
+import { act } from "@testing-library/react";
 import { checkboxFilter } from "src/components/Filters";
+import { setRunningInJest } from "src/components/Table/GridTable";
 import { actionColumn, column, numericColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
@@ -405,6 +407,39 @@ describe("GridTableLayout", () => {
         search: "client" as const,
       };
     }
+  });
+
+  it("passes infiniteScroll prop to the underlying table", async () => {
+    setRunningInJest();
+    // Given a GridTableLayout with infiniteScroll configured
+    const onEndReached = vi.fn();
+    const r = await render(
+      <TestWrapper
+        layoutStateProps={{ search: "client" as const }}
+        tableProps={{
+          as: "virtual",
+          columns: getColumns(),
+          rows: [simpleHeader, ...getRows()],
+          infiniteScroll: { onEndReached },
+        }}
+      />,
+      withRouter(),
+    );
+    // When the table renders, it should display the rows without error
+    expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | Name  | Value | Action  |
+      | ----- | ----- | ------- |
+      | Alpha | 10    | Actions |
+      | Beta  | 20    | Actions |
+      | Gamma | 30    | Actions |
+      "
+    `);
+    // And onEndReached can be called as Virtuoso would call it at runtime
+    act(() => {
+      onEndReached(3);
+    });
+    expect(onEndReached).toHaveBeenCalledWith(3);
   });
 });
 
