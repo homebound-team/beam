@@ -3,7 +3,7 @@ import { GridDataRow } from "src/components/Table";
 import { GridTableProps } from "src/components/Table/GridTable";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Only } from "src/Css";
-import { QueryInfiniteScroll, QueryResult } from "./GridTableLayout/QueryTable";
+import { QueryResult } from "./GridTableLayout/QueryTable";
 
 /** Shared action button props used across layout header and panel components. */
 export type ActionButtonProps = Pick<ButtonProps, "onClick" | "label" | "disabled" | "tooltip" | "icon">;
@@ -22,14 +22,10 @@ export type GridTablePropsWithRows<R extends Kinded, X extends Only<GridTableXss
   createRows?: never;
 };
 
-export type BaseQueryTableProps<R extends Kinded, X extends Only<GridTableXss, X>, QData> = Omit<
-  BaseTableProps<R, X>,
-  "infiniteScroll"
-> & {
+export type BaseQueryTableProps<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseTableProps<R, X> & {
   query: QueryResult<QData>;
   createRows: (data: QData | undefined) => GridDataRow<R>[];
   rows?: never;
-  infiniteScroll?: QueryInfiniteScroll;
 };
 
 export function isGridTableProps<R extends Kinded, X extends Only<GridTableXss, X>, Q extends { rows?: never }>(

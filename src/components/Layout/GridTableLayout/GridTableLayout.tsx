@@ -24,20 +24,20 @@ import { zIndices } from "src/utils/zIndices";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
-import { QueryInfiniteScroll, QueryTable, QueryTableProps } from "./QueryTable";
+import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
 
 // Omit to force all action button menus to look the same
 type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
 // GridTableLayout-specific query props extend the shared base with display extras.
-type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = Omit<
-  BaseQueryTableProps<R, X, QData>,
-  "infiniteScroll"
+type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseQueryTableProps<
+  R,
+  X,
+  QData
 > & {
   emptyFallback?: string;
   keepHeaderWhenLoading?: boolean;
-  infiniteScroll?: QueryInfiniteScroll;
 };
 
 export type GridTableLayoutProps<

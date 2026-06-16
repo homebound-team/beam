@@ -325,6 +325,15 @@ export function WithQueryTableInfiniteScroll() {
 
   const query = useExamplePaginatedQuery({ filter: layoutState.filter });
 
+  const maybeHasMore = useCallback(
+    async (index: number) => {
+      if (query.data?.pageInfo.hasNextPage) {
+        await query.fetchMore({ variables: { page: { offset: index, limit: 50 } } });
+      }
+    },
+    [query],
+  );
+
   return (
     <TestProjectLayout>
       <GridTableLayoutComponent
@@ -335,9 +344,9 @@ export function WithQueryTableInfiniteScroll() {
           columns,
           createRows: (data) => [
             simpleHeader,
-            ...(data?.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
+            ...(data?.simpleData.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
           ],
-          infiniteScroll: { pageSize: 50 },
+          infiniteScroll: { onEndReached: maybeHasMore },
         }}
         layoutState={layoutState}
       />
@@ -372,6 +381,11 @@ function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   };
 }
 
+type ExampleQueryData = {
+  simpleData: Array<{ id: string; name: string; value: number; status: string; priority: number }>;
+  pageInfo: { hasNextPage: boolean };
+};
+
 function useExamplePaginatedQuery({ filter }: { filter: { status: string[] } }) {
   const filterString = JSON.stringify(filter);
   const pageSize = 50;
@@ -394,23 +408,41 @@ function useExamplePaginatedQuery({ filter }: { filter: { status: string[] } }) 
   );
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] =
-    useState<Array<{ id: string; name: string; value: number; status: string; priority: number }>>();
+  const [data, setData] = useState<ExampleQueryData>();
 
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {
-      setData(filteredDatabase.slice(0, pageSize));
+      console.log(filteredDatabase);
+      setData({
+        simpleData: filteredDatabase.slice(0, pageSize),
+        pageInfo: { hasNextPage: pageSize < filteredDatabase.length },
+      });
       setLoading(false);
     }, 500);
     return () => clearTimeout(timer);
   }, [filterString, filteredDatabase, pageSize, filter]);
 
   const fetchMore = useCallback(
-    async ({ offset, limit }: { offset: number; limit: number }) => {
-      return new Promise<{ data: typeof data }>((resolve) => {
+    async ({
+      variables: {
+        page: { offset, limit },
+      },
+    }: {
+      variables: { page: { offset: number; limit: number } };
+    }) => {
+      return new Promise<boolean>((resolve) => {
         setTimeout(() => {
-          resolve({ data: filteredDatabase.slice(offset, offset + limit) });
+          setData((prev) => {
+            const previousData = prev?.simpleData ?? [];
+
+            return {
+              simpleData: [...previousData, ...filteredDatabase.slice(offset, offset + limit)],
+              pageInfo: { hasNextPage: offset + limit < filteredDatabase.length },
+            };
+          });
+
+          resolve(true);
         }, 800);
       });
     },
