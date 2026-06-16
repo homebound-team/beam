@@ -413,7 +413,6 @@ function useExamplePaginatedQuery({ filter }: { filter: { status: string[] } }) 
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {
-      console.log(filteredDatabase);
       setData({
         simpleData: filteredDatabase.slice(0, pageSize),
         pageInfo: { hasNextPage: pageSize < filteredDatabase.length },
