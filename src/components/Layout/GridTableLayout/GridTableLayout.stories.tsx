@@ -281,8 +281,8 @@ export function WithInfiniteScroll() {
       data: {
         name: `row ${i + offset}`,
         value: i + offset,
-        status: Math.floor(Math.random() * 3) > 1 ? "active" : "inactive",
-        priority: Math.floor(Math.random() * 3) + 1,
+        status: i === 0 || i % 3 === 0 ? "active" : "inactive",
+        priority: Math.floor(i % 3) + 1,
         actions: "actions",
       },
     }));
@@ -396,8 +396,8 @@ function useExamplePaginatedQuery({ filter }: { filter: { status: string[] } }) 
         id: String(index),
         name: `Row ${index}`,
         value: index,
-        status: Math.floor(Math.random() * 3) > 1 ? "active" : "inactive",
-        priority: Math.floor(Math.random() * 3) + 1,
+        status: index === 0 || index % 3 === 0 ? "active" : "inactive",
+        priority: Math.floor(index % 3) + 1,
       })),
     [],
   );
