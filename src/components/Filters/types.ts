@@ -9,19 +9,25 @@ import { TestIds } from "src/utils/useTestIds";
  * Each filter is typically created by a factory function, i.e. `singleFilter`,
  * `multiFilter`, etc.
  */
+/** A set filter field value — null and undefined excluded (matches the `V` in `Filter<V>` for that field). */
+export type DefinedFilterValue<F, K extends keyof F> = Exclude<F[K], null | undefined>;
+
 export type FilterDefs<F> = {
   // Filter values can still be `null | undefined`, but extract it out for clarity in `FilterDef`
-  [K in keyof F]: (key: string) => Filter<Exclude<F[K], null | undefined>>;
+  [K in keyof F]: (key: string) => Filter<DefinedFilterValue<F, K>>;
 };
 
 // Like FilterDefs but with the key lambda eval'd, i.e. values are the actual Filter instance
 export type FilterImpls<F> = {
   // Filter values can still be `null | undefined`, but extract it out for clarity in `FilterDef`
-  [K in keyof F]: Filter<Exclude<F[K], null | undefined>>;
+  [K in keyof F]: Filter<DefinedFilterValue<F, K>>;
 };
 
+/** Value shape passed when resolving a display label for one active selection (array filters: a single element). */
+export type SelectedFilterLabelValue<V> = V extends readonly (infer E)[] ? E : V;
+
 /** A filter instance that knows how to render itself within the `Filters` component. */
-export interface Filter<V> {
+export type Filter<V> = {
   label: string;
 
   hideLabelInModal?: boolean;
@@ -45,6 +51,9 @@ export interface Filter<V> {
    */
   dehydrate?(value: V | undefined): unknown;
 
+  /** Returns the human-readable label for an active filter value, or undefined when the value should not produce a chip. */
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<V>): string | undefined;
+
   /** Renders the filter into either the page or the modal. */
   render(
     value: V | undefined,
@@ -53,4 +62,4 @@ export interface Filter<V> {
     inModal: boolean,
     vertical: boolean,
   ): JSX.Element;
-}
+};

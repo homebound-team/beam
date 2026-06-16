@@ -79,6 +79,48 @@ describe("TreeFilter", () => {
     // Then the value is undefined
     expect(r.value).toHaveTextContent("{}");
   });
+
+  it("returns the option label for a nested value", () => {
+    // Given a treeFilter with nested options
+    const options: NestedOption<{ id: string; name: string }>[] = [
+      {
+        id: "parent",
+        name: "Parent",
+        children: [{ id: "child", name: "Child Region" }],
+      },
+    ];
+    const filter = treeFilter({
+      options,
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+      label: "Region",
+    })("region");
+
+    // When formatting the label for a nested value
+    const label = filter.formatSelectedFilterLabel("child");
+
+    // Then the option label is returned
+    expect(label).toBe("Child Region");
+  });
+
+  it("resolves labels from current when tree options are not loaded yet", () => {
+    // Given a treeFilter with lazy options and current set to the selection
+    const filter = treeFilter({
+      options: {
+        current: [{ id: "child", name: "Child Region" }],
+        load: async () => ({ options: [{ id: "child", name: "Child Region" }] }),
+      },
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+      label: "Region",
+    })("region");
+
+    // When formatting the label for the selected value
+    const label = filter.formatSelectedFilterLabel("child");
+
+    // Then the label from current is returned
+    expect(label).toBe("Child Region");
+  });
 });
 
 function TestFilter(props: Partial<TreeFilterProps<HasIdAndName, string>>) {

@@ -1,5 +1,5 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
 import { TestIds } from "src/utils";
@@ -27,6 +27,11 @@ class NumberRangeFilter<DV extends NumberRangeFilterValue>
   extends BaseFilter<DV, NumberRangeFilterProps<DV>>
   implements Filter<DV>
 {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<DV>): string | undefined {
+    const parts = [value.min, value.max].filter((n) => n !== undefined);
+    return parts.length > 0 ? parts.join(" – ") : undefined;
+  }
+
   render(value: DV, setValue: (value: DV | undefined) => void, tid: TestIds, inModal: boolean, vertical: boolean) {
     const { label, numberFieldType, numberFormatOptions } = this.props;
     const min = value?.min ?? undefined;

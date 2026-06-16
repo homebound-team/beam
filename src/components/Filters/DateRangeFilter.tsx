@@ -1,7 +1,8 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Label } from "src/components/Label";
 import { DateRangeField } from "src/inputs";
+import { formatDateRange } from "src/inputs/DateFields/utils";
 import { type DateMatcher, type DateRange } from "src/types";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -45,6 +46,11 @@ class DateRangeFilter<O extends string>
             : undefined,
         }
       : undefined;
+  }
+
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<DateRangeFilterValue<O>>): string | undefined {
+    const formatted = formatDateRange(value.value, "date");
+    return formatted ? formatted : undefined;
   }
 
   render(

@@ -86,6 +86,28 @@ describe("ToggleFilter", () => {
     expect(r.filter_filter).not.toBeChecked();
     expect(r.value).toHaveTextContent("undefined");
   });
+
+  it("returns the filter label when the value matches onValue", () => {
+    // Given a toggleFilter with default onValue
+    const filter = toggleFilter({ label: "Show Archived" })("showArchived");
+
+    // When formatting the label for the active value
+    const label = filter.formatSelectedFilterLabel(true);
+
+    // Then the filter label is returned
+    expect(label).toBe("Show Archived");
+  });
+
+  it("returns undefined when the value does not match onValue", () => {
+    // Given a toggleFilter with a custom onValue
+    const filter = toggleFilter({ label: "Show Archived", onValue: "yes" })("showArchived");
+
+    // When formatting the label for a non-active value
+    const label = filter.formatSelectedFilterLabel("no");
+
+    // Then no chip label is produced
+    expect(label).toBeUndefined();
+  });
 });
 
 function TestFilter<V>(props: { toggleFilter: ToggleFilterProps<V>; persistedValue?: V }) {

@@ -549,9 +549,9 @@ function getManyFilterDefs() {
     }),
     category: multiFilter({
       options: [
-        { label: "TypeA", value: "typeA" },
-        { label: "TypeB", value: "typeB" },
-        { label: "TypeC", value: "typeC" },
+        { label: "TypeA", value: "type:1" },
+        { label: "TypeB", value: "type:2" },
+        { label: "TypeC", value: "type:3" },
       ],
       getOptionLabel: (c) => c.label,
       getOptionValue: (c) => c.value,
@@ -559,10 +559,10 @@ function getManyFilterDefs() {
     }),
     region: multiFilter({
       options: [
-        { label: "North", value: "north" },
-        { label: "South", value: "south" },
-        { label: "East", value: "east" },
-        { label: "West", value: "west" },
+        { label: "North", value: "region:north" },
+        { label: "South", value: "region:south" },
+        { label: "East", value: "region:east" },
+        { label: "West", value: "region:west" },
       ],
       getOptionLabel: (r) => r.label,
       getOptionValue: (r) => r.value,
@@ -570,9 +570,9 @@ function getManyFilterDefs() {
     }),
     department: multiFilter({
       options: [
-        { label: "Engineering", value: "engineering" },
-        { label: "Sales", value: "sales" },
-        { label: "Marketing", value: "marketing" },
+        { label: "Engineering", value: "department:engineering" },
+        { label: "Sales", value: "department:sales" },
+        { label: "Marketing", value: "department:marketing" },
       ],
       getOptionLabel: (d) => d.label,
       getOptionValue: (d) => d.value,
@@ -580,10 +580,10 @@ function getManyFilterDefs() {
     }),
     source: multiFilter({
       options: [
-        { label: "Web", value: "web" },
-        { label: "Mobile", value: "mobile" },
-        { label: "API", value: "api" },
-        { label: "Import", value: "import" },
+        { label: "Web", value: "source:web" },
+        { label: "Mobile", value: "source:mobile" },
+        { label: "API", value: "source:api" },
+        { label: "Import", value: "source:import" },
       ],
       getOptionLabel: (s) => s.label,
       getOptionValue: (s) => s.value,
@@ -591,9 +591,9 @@ function getManyFilterDefs() {
     }),
     assignee: multiFilter({
       options: [
-        { label: "John Doe", value: "john doe" },
-        { label: "Jane Smith", value: "jane smith" },
-        { label: "Bob Johnson", value: "bob johnson" },
+        { label: "John Doe", value: "u:1" },
+        { label: "Jane Smith", value: "u:2" },
+        { label: "Bob Johnson", value: "u:3" },
       ],
       getOptionLabel: (a) => a.label,
       getOptionValue: (a) => a.value,
@@ -601,9 +601,9 @@ function getManyFilterDefs() {
     }),
     projectType: multiFilter({
       options: [
-        { label: "Internal", value: "internal" },
-        { label: "External", value: "external" },
-        { label: "Partner", value: "partner" },
+        { label: "Internal", value: "pt:1" },
+        { label: "External", value: "pt:2" },
+        { label: "Partner", value: "pt:3" },
       ],
       getOptionLabel: (pt) => pt.label,
       getOptionValue: (pt) => pt.value,

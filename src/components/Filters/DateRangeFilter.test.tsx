@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
+import { dateRangeFilter } from "src/components/Filters/DateRangeFilter";
 import { ProjectFilter, taskCompleteFilter } from "src/components/Filters/testDomain";
 import { click, render, type } from "src/utils/rtl";
+import { jan19, jan2 } from "src/utils/testDates";
 
 describe("DateRangeFilter", () => {
   it("shows date placeholder text when not given an initial value", async () => {
@@ -32,6 +34,34 @@ describe("DateRangeFilter", () => {
     expect(r.xCircle).toBeTruthy();
     click(r.filter_taskCompleted_dateField);
     expect(r.queryByTestId("xCircle")).toBeNull();
+  });
+
+  it("returns the formatted date range", () => {
+    // Given a dateRangeFilter
+    const filter = dateRangeFilter({ label: "Task Completed" })("taskCompleted");
+
+    // When formatting the label for a selected date range
+    const label = filter.formatSelectedFilterLabel({
+      op: "between",
+      value: { from: jan2, to: jan19 },
+    });
+
+    // Then the formatted range is returned
+    expect(label).toBe("01/02/2020 - 01/19/2020");
+  });
+
+  it("returns undefined when the range has no dates", () => {
+    // Given a dateRangeFilter
+    const filter = dateRangeFilter({ label: "Task Completed" })("taskCompleted");
+
+    // When formatting the label with an empty date range
+    const label = filter.formatSelectedFilterLabel({
+      op: "between",
+      value: { from: undefined, to: undefined },
+    });
+
+    // Then no chip label is produced
+    expect(label).toBeUndefined();
   });
 });
 

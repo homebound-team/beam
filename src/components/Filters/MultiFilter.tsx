@@ -1,5 +1,6 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { MultiSelectField, MultiSelectFieldProps } from "src/inputs/MultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
@@ -20,6 +21,11 @@ export function multiFilter<O, V extends Value>(props: MultiFilterProps<O, V>): 
 }
 
 class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O, V>> implements Filter<V[]> {
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<V[]>): string | undefined {
+    const { options, getOptionValue, getOptionLabel } = this.props;
+    return resolveOptionSelectedFilterLabel(options, getOptionValue, getOptionLabel, value);
+  }
+
   render(
     value: V[] | undefined,
     setValue: (value: V[] | undefined) => void,
