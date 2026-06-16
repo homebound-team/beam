@@ -2,6 +2,7 @@ import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { FilterDefs, Filters } from "src/components/Filters";
+import { singleFilter } from "src/components/Filters/SingleFilter";
 import {
   ProjectFilter,
   stageFilterWithNothingSelectedText,
@@ -31,6 +32,39 @@ describe("SingleSelectFilter", () => {
   it("shows nothigSelectedText when no value is selected", async () => {
     const r = await render(<TestFilters defs={{ stageSingle: stageFilterWithNothingSelectedText }} />);
     expect(r.filter_stageSingle).toHaveValue("All Stages");
+  });
+
+  it("returns the option label for a matching value", () => {
+    // Given a singleFilter with static options
+    const filter = singleFilter({
+      options: [
+        { id: "active", name: "Active" },
+        { id: "inactive", name: "Inactive" },
+      ],
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+    })("status");
+
+    // When formatting the label for a selected value
+    const label = filter.formatSelectedFilterLabel("active");
+
+    // Then the option label is returned
+    expect(label).toBe("Active");
+  });
+
+  it("falls back to String(value) when the option is not found", () => {
+    // Given a singleFilter whose options do not include the value
+    const filter = singleFilter({
+      options: [{ id: "active", name: "Active" }],
+      getOptionValue: (o) => o.id,
+      getOptionLabel: (o) => o.name,
+    })("status");
+
+    // When formatting the label for an unknown value
+    const label = filter.formatSelectedFilterLabel("missing");
+
+    // Then the raw value is stringified as fallback
+    expect(label).toBe("missing");
   });
 });
 

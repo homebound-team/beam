@@ -1,7 +1,15 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import { Filter, FilterDefs, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
+import {
+  DefinedFilterValue,
+  Filter,
+  FilterDefs,
+  FilterImpls,
+  filterTestIdPrefix,
+  SelectedFilterLabelValue,
+  updateFilter,
+} from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { ToggleChip } from "src/components/ToggleChip";
@@ -15,9 +23,9 @@ import { useDebounce } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 
 /** Props for the search box integrated into FilterDropdownMenu. */
-export interface SearchBoxProps {
+export type SearchBoxProps = {
   onSearch: (filter: string) => void;
-}
+};
 
 /**
  * FilterDropdownMenu is a newer filter UI pattern that shows a "Filter" button
@@ -32,7 +40,7 @@ export interface SearchBoxProps {
  * Note: We expect the existing `Filters` component to eventually become
  * `FilterDropdownMenu`, but it hasn't been rolled out everywhere yet.
  */
-interface FilterDropdownMenuProps<F extends Record<string, unknown>, G extends Value = string> {
+type FilterDropdownMenuProps<F extends Record<string, unknown>, G extends Value = string> = {
   /** List of filters. When omitted, no filter UI is rendered. */
   filterDefs?: FilterDefs<F>;
   /** The current filter value. */
@@ -49,7 +57,7 @@ interface FilterDropdownMenuProps<F extends Record<string, unknown>, G extends V
   };
   /** When provided, renders a search box before the filter controls. */
   searchProps?: SearchBoxProps;
-}
+};
 
 function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value = string>(
   props: FilterDropdownMenuProps<F, G>,
@@ -197,13 +205,13 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
   );
 }
 
-interface FilterChipsProps<F extends Record<string, unknown>> {
+type FilterChipsProps<F extends Record<string, unknown>> = {
   filter: F;
   filterImpls: ReturnType<typeof buildFilterImpls<F>>;
   onChange: (filter: F) => void;
   onClear: () => void;
   testId: ReturnType<typeof useTestIds>;
-}
+};
 
 function FilterChips<F extends Record<string, unknown>>({
   filter,
@@ -212,34 +220,7 @@ function FilterChips<F extends Record<string, unknown>>({
   onClear,
   testId,
 }: FilterChipsProps<F>) {
-  const chips = safeEntries(filterImpls).flatMap(([key]) => {
-    const value = filter[key];
-    if (!isDefined(value)) return [];
-
-    if (Array.isArray(value)) {
-      return value.map((item) => {
-        const chipKey = `${String(key)}_${item}`;
-        const newArray = value.filter((v) => v !== item);
-        return (
-          <ToggleChip
-            key={chipKey}
-            text={titleCase(String(item))}
-            onClick={() => onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as any) : undefined))}
-            {...testId[`chip_${chipKey}`]}
-          />
-        );
-      });
-    }
-
-    return (
-      <ToggleChip
-        key={String(key)}
-        text={titleCase(String(value))}
-        onClick={() => onChange(updateFilter(filter, key, undefined))}
-        {...testId[`chip_${String(key)}`]}
-      />
-    );
-  });
+  const chips = safeEntries(filterImpls).flatMap(([key, f]) => chipsForFilterKey(key, f, filter, onChange, testId));
 
   if (chips.length === 0) return null;
 
@@ -251,17 +232,50 @@ function FilterChips<F extends Record<string, unknown>>({
   );
 }
 
+function chipsForFilterKey<F extends Record<string, unknown>, K extends keyof F>(
+  key: K,
+  f: FilterImpls<F>[K],
+  filter: F,
+  onChange: (filter: F) => void,
+  testId: ReturnType<typeof useTestIds>,
+) {
+  const value = filter[key];
+  if (!isDefined(value)) return [];
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => {
+      const label = f.formatSelectedFilterLabel(item as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
+      if (!isDefined(label)) return [];
+
+      const chipKey = `${String(key)}_${item}`;
+      const newArray = value.filter((v) => v !== item);
+      return (
+        <ToggleChip
+          key={chipKey}
+          text={label}
+          onClick={() => onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as F[K]) : undefined))}
+          {...testId[`chip_${chipKey}`]}
+        />
+      );
+    });
+  }
+
+  const label = f.formatSelectedFilterLabel(value as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
+  if (!isDefined(label)) return [];
+
+  return (
+    <ToggleChip
+      key={String(key)}
+      text={label}
+      onClick={() => onChange(updateFilter(filter, key, undefined))}
+      {...testId[`chip_${String(key)}`]}
+    />
+  );
+}
+
 /** Convert FilterDefs to FilterImpls by evaluating the factory functions */
 function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
   return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
-}
-
-/** Capitalize the first letter of each word */
-function titleCase(str: string): string {
-  return str
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
 }
 
 /** Calculate the number of active (non-undefined) filters */

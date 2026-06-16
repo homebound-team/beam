@@ -1,8 +1,9 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter } from "src/components/Filters/types";
+import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
 import { DateField, SelectField, Value } from "src/inputs";
+import { formatDate } from "src/inputs/DateFields/utils";
 import { type PlainDate } from "src/types";
 import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -39,6 +40,13 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
 
   dehydrate(value: DV | undefined): unknown {
     return value ? { op: value.op, value: dehydratePlainDate(value.value) } : undefined;
+  }
+
+  formatSelectedFilterLabel(value: SelectedFilterLabelValue<DV>): string | undefined {
+    const { operations, getOperationValue, getOperationLabel } = this.props;
+    const operation = operations.find((o) => getOperationValue(o) === value.op);
+    const opLabel = operation ? getOperationLabel(operation) : String(value.op);
+    return `${opLabel} ${formatDate(value.value, "date")}`;
   }
 
   render(value: DV, setValue: (value: DV | undefined) => void, tid: TestIds, inModal: boolean, vertical: boolean) {

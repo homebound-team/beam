@@ -49,6 +49,25 @@ describe("DateFilter", () => {
     // And it is unset
     expect(r.filter_value).toHaveTextContent(`{}`);
   });
+
+  it("returns the operation label and formatted date", () => {
+    // Given a dateFilter with operations
+    const filter = dateFilter({
+      label: "Task Due",
+      operations: [
+        { label: "On", value: "ON" },
+        { label: "Before", value: "BEFORE" },
+      ],
+      getOperationLabel: (o) => o.label,
+      getOperationValue: (o) => o.value,
+    })("taskDue");
+
+    // When formatting the label for a selected date filter value
+    const label = filter.formatSelectedFilterLabel({ op: "ON", value: jan29 });
+
+    // Then the operation and formatted date are returned
+    expect(label).toBe("On 01/29/2020");
+  });
 });
 
 function TestFilters(props: { defs: FilterDefs<ProjectFilter> }) {
