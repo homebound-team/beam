@@ -1,7 +1,16 @@
 import { act } from "@testing-library/react";
 import { checkboxFilter } from "src/components/Filters";
 import { setRunningInJest } from "src/components/Table/GridTable";
-import { actionColumn, column, numericColumn } from "src/components/Table/utils/columns";
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import {
+  actionColumn,
+  collapseColumn,
+  column,
+  layoutGutterLeftColumnId,
+  layoutGutterRightColumnId,
+  numericColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
@@ -392,6 +401,48 @@ describe("GridTableLayout", () => {
 
       // Then the table actions height var is not set
       expect(r.tableWrapper.style.getPropertyValue(beamTableActionsHeightVar)).toBe("");
+    });
+
+    it("injects layout gutter columns inside DocumentScrollLayoutProvider", async () => {
+      const api = new GridTableApiImpl<Row>();
+
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            hideEditColumns
+            layoutStateProps={{}}
+            tableProps={{
+              api,
+              columns: [collapseColumn<Row>(), selectColumn<Row>(), ...getColumns()],
+              rows: [simpleHeader, ...getRows()],
+            }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      expect(api.getVisibleColumnIds()[0]).toBe(layoutGutterLeftColumnId);
+      expect(api.getVisibleColumnIds().at(-1)).toBe(layoutGutterRightColumnId);
+      expect(r.gridTable).toBeInTheDocument();
+    });
+
+    it("does not inject layout gutter columns outside DocumentScrollLayoutProvider", async () => {
+      const api = new GridTableApiImpl<Row>();
+
+      await render(
+        <TestWrapper
+          hideEditColumns
+          layoutStateProps={{}}
+          tableProps={{
+            api,
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      expect(api.getVisibleColumnIds()[0]).toBe("name");
     });
 
     function getFilterLayoutStateProps(storageKey: string) {

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
-import { parseWidthToPx } from "src/components/Table/utils/columns";
+import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 
 type ColumnWidthInfo = {
   id: string;
@@ -82,8 +82,8 @@ export function useColumnResizeHandlers<R extends Kinded>(
 
       for (let i = columnIndex + 1; i < columns.length; i++) {
         const col = columns[i];
-        // Skip action columns
-        if (col.isAction) {
+        // Skip action and layout gutter columns
+        if (!isContentColumn(col)) {
           continue;
         }
 
@@ -161,8 +161,8 @@ export function useColumnResizeHandlers<R extends Kinded>(
         columnSizes.forEach((sizeStr, idx) => {
           const col = columns[idx];
 
-          // Don't resize action col
-          if (col.isAction) return;
+          // Don't lock action or layout gutter columns to resized widths
+          if (!isContentColumn(col)) return;
           const currentWidth = parseWidthToPx(sizeStr, tableWidth) ?? 0;
           lockedWidths[col.id] = currentWidth;
         });

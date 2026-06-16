@@ -1,6 +1,7 @@
 import { camelCase } from "change-case";
 import { makeAutoObservable } from "mobx";
 import { GridColumnWithId, Kinded } from "src";
+import { isContentColumn } from "src/components/Table/utils/columns";
 import { ColumnState } from "src/components/Table/utils/ColumnState";
 import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
 
@@ -68,7 +69,7 @@ export class ColumnStates<R extends Kinded> {
     return this.columns
       .flatMap((cs) => cs.maybeSelfAndChildren)
       .filter((cs) => !cs.column.showIn || cs.column.showIn === showIn)
-      .filter((cs) => (showIn === "csv" ? !cs.column.isAction : true));
+      .filter((cs) => (showIn === "csv" ? isContentColumn(cs.column) : true));
   }
 
   setVisibleColumns(ids: string[]): void {

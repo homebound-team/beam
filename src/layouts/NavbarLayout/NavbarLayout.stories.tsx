@@ -69,6 +69,7 @@ export const ComposedWithoutSideNav = () => (
  * `NavbarLayout` → `PageHeaderLayout` → `GridTableLayout` without a side nav. Page title and actions live in
  * `PageHeaderLayout`; filters and search live in `GridTableLayout` (no `pageTitle`). The virtualized table uses
  * document scroll so the navbar and page header auto-hide on scroll-down and the sticky table header pins below them.
+ * Layout gutter columns (12px left/right) align table content with page padding.
  */
 export function ComposedGridTableWithoutSideNav() {
   const filterDefs = useMemo(() => getGridTableFilterDefs(), []);

@@ -13,7 +13,7 @@ import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
 import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
-import { parseWidthToPx } from "src/components/Table/utils/columns";
+import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -202,9 +202,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           // If we're rendering the Expandable Header row, then we might need to render the previous column's `expandHeader` property in the case where the column is hidden on expand.
           column = isExpandableHeader ? maybeExpandedColumn : column;
 
-          const { wrapAction = true, isAction = false } = column;
+          const { wrapAction = true } = column;
 
-          const isFirstContentColumn = !isAction && !foundFirstContentColumn;
+          const isFirstContentColumn = isContentColumn(column) && !foundFirstContentColumn;
           const applyFirstContentColumnStyles = !isHeader && isFirstContentColumn;
           foundFirstContentColumn ||= applyFirstContentColumnStyles;
 
@@ -386,6 +386,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
               })`,
             ).$,
+            // Gutter columns are budgeted at 12px; strip cell padding so flex min-content does not exceed that width.
+            ...(column.isLayoutGutter && Css.px0.mw0.$),
           };
 
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
@@ -404,13 +406,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
           // Add resize handle for header rows when resizing is enabled
           // Only add handle on the right border (not for the last column)
-          // Skip action columns (selectColumn, collapseColumn, actionColumn) as they should not be resizable
+          // Skip action and layout gutter columns as they should not be resizable
           if (
             !disableColumnResizing &&
             isHeader &&
             columnIndex < columns.length - 1 &&
             currentColspan === 1 &&
-            !column.isAction
+            !isContentColumn(column)
           ) {
             // Parse current width - if not in pixels, use a fallback or skip resize handle
             const currentSizeStr = columnSizes[columnIndex];

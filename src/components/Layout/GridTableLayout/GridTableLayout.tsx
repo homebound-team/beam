@@ -175,20 +175,22 @@ function GridTableLayoutComponent<
           {...tableProps}
           api={api}
           filter={clientSearch}
-          style={{ allWhite: true }}
+          style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
+          columnGutter={inDocumentScrollLayout}
         />
       ) : (
         <QueryTable
           {...(tableProps as QueryTableProps<R, QData, X>)}
           api={api}
           filter={clientSearch}
-          style={{ allWhite: true }}
+          style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
+          columnGutter={inDocumentScrollLayout}
         />
       )}
     </>
