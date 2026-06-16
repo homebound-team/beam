@@ -1,5 +1,5 @@
 import { act, fireEvent } from "@testing-library/react";
-import { MutableRefObject, useContext, useMemo, useState } from "react";
+import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
@@ -2536,6 +2536,192 @@ describe("GridTable", () => {
     await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
     // Then we get nothing back
     expect(rowLookup.current!.lookup(r1)).toMatchObject({ data: {} });
+  });
+
+  describe("infinite scroll", () => {
+    it("appends new rows when onEndReached updates state", async () => {
+      setRunningInJest();
+      // Given a stateful Test component that appends rows when onEndReached fires
+      const onEndReachedRef: MutableRefObject<((index: number) => void) | undefined> = { current: undefined };
+      function Test() {
+        const [data, setData] = useState([
+          { kind: "data" as const, id: "1", data: { name: "row 1", value: 1 } },
+          { kind: "data" as const, id: "2", data: { name: "row 2", value: 2 } },
+        ]);
+        const tableRows = useMemo(() => [simpleHeader, ...data], [data]);
+        onEndReachedRef.current = useCallback((index: number) => {
+          if (index === 0) return;
+          setData((prev) => [
+            ...prev,
+            {
+              kind: "data" as const,
+              id: `${prev.length + 1}`,
+              data: { name: `row ${prev.length + 1}`, value: prev.length + 1 },
+            },
+          ]);
+        }, []);
+        return (
+          <GridTable
+            as="virtual"
+            columns={[nameColumn, valueColumn]}
+            rows={tableRows}
+            infiniteScroll={{ onEndReached: onEndReachedRef.current }}
+          />
+        );
+      }
+      const r = await render(<Test />);
+      // When the table initially renders with 2 rows
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value |
+        | ----- | ----- |
+        | row 1 | 1     |
+        | row 2 | 2     |
+        "
+      `);
+      // And onEndReached fires (as Virtuoso's endReached would in production)
+      act(() => {
+        onEndReachedRef.current!(2);
+      });
+      // Then a new row is appended
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value |
+        | ----- | ----- |
+        | row 1 | 1     |
+        | row 2 | 2     |
+        | row 3 | 3     |
+        "
+      `);
+    });
+
+    it("supports async onEndReached and appends rows after resolving", async () => {
+      setRunningInJest();
+      let resolveLoad!: () => void;
+      const onEndReachedRef: MutableRefObject<((index: number) => void | Promise<void>) | undefined> = {
+        current: undefined,
+      };
+      function Test() {
+        const [data, setData] = useState([{ kind: "data" as const, id: "1", data: { name: "row 1", value: 1 } }]);
+        const tableRows = useMemo(() => [simpleHeader, ...data], [data]);
+        onEndReachedRef.current = useCallback(async (index: number) => {
+          if (index === 0) return;
+          // Simulate an async fetch (e.g. fetchMore)
+          await new Promise<void>((resolve) => {
+            resolveLoad = resolve;
+          });
+          setData((prev) => [...prev, { kind: "data" as const, id: "2", data: { name: "row 2", value: 2 } }]);
+        }, []);
+        return (
+          <GridTable
+            as="virtual"
+            columns={[nameColumn, valueColumn]}
+            rows={tableRows}
+            infiniteScroll={{ onEndReached: onEndReachedRef.current }}
+          />
+        );
+      }
+      const r = await render(<Test />);
+      // When onEndReached fires and starts an async fetch
+      // Note: the loading <Loader> footer is not assertable here — it lives inside renderVirtual,
+      // which doesn't mount under setRunningInJest(). Integration tests cover that.
+      void onEndReachedRef.current!(1);
+      await wait();
+
+      // Then rows are unchanged while the fetch is pending
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value |
+        | ----- | ----- |
+        | row 1 | 1     |
+        "
+      `);
+      // When the fetch resolves
+      resolveLoad();
+      await wait();
+      // Then the new row appears
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value |
+        | ----- | ----- |
+        | row 1 | 1     |
+        | row 2 | 2     |
+        "
+      `);
+    });
+
+    it("stops fetching when hasNextPage is false", async () => {
+      setRunningInJest();
+      // Given a stateful component that guards fetches with hasNextPage (mirrors WithQueryTableInfiniteScroll story)
+      const onEndReachedRef: MutableRefObject<((index: number) => void) | undefined> = { current: undefined };
+      function Test() {
+        const [data, setData] = useState([{ kind: "data" as const, id: "1", data: { name: "row 1", value: 1 } }]);
+        const [hasNextPage, setHasNextPage] = useState(true);
+        const tableRows = useMemo(() => [simpleHeader, ...data], [data]);
+        onEndReachedRef.current = useCallback(
+          (index: number) => {
+            if (index === 0 || !hasNextPage) return;
+            setData((prev) => [...prev, { kind: "data" as const, id: "2", data: { name: "row 2", value: 2 } }]);
+            setHasNextPage(false);
+          },
+          [hasNextPage],
+        );
+        return (
+          <GridTable
+            as="virtual"
+            columns={[nameColumn, valueColumn]}
+            rows={tableRows}
+            infiniteScroll={{ onEndReached: onEndReachedRef.current }}
+          />
+        );
+      }
+      const r = await render(<Test />);
+      // When onEndReached fires the first time it loads the next page
+      act(() => {
+        onEndReachedRef.current!(1);
+      });
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value |
+        | ----- | ----- |
+        | row 1 | 1     |
+        | row 2 | 2     |
+        "
+      `);
+      // When onEndReached fires again, hasNextPage is false so nothing changes
+      act(() => {
+        onEndReachedRef.current!(2);
+      });
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value |
+        | ----- | ----- |
+        | row 1 | 1     |
+        | row 2 | 2     |
+        "
+      `);
+    });
+
+    it("accepts endOffsetPx without error", async () => {
+      setRunningInJest();
+      // endOffsetPx controls Virtuoso's increaseViewportBy.bottom — only affects real scroll in production
+      const r = await render(
+        <GridTable
+          as="virtual"
+          columns={[nameColumn, valueColumn]}
+          rows={rows}
+          infiniteScroll={{ onEndReached: vi.fn(), endOffsetPx: 200 }}
+        />,
+      );
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name | Value |
+        | ---- | ----- |
+        | foo  | 1     |
+        | bar  | 2     |
+        "
+      `);
+    });
   });
 
   it("supports as=virtual in tests", async () => {

@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridDataRow } from "src/components/Table";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
@@ -142,16 +142,10 @@ export function QueryTableLayout() {
       storageKey: "grid-table-layout",
     },
     search: "server",
-    pagination: {
-      pageSizes: [25, 50, 100],
-      storageKey: "query-table-pagination",
-    },
   });
 
-  // In this example, we set up server-side search and pagination using `searchString` and `page` from the layout state,
-  // in combination with the "QueryTable" behavior for loading/error states.
   const query = useExampleQuery({
-    filter: { ...layoutState.filter, search: layoutState.searchString, page: layoutState.page },
+    filter: { ...layoutState.filter, search: layoutState.searchString },
   });
 
   return (
@@ -162,9 +156,6 @@ export function QueryTableLayout() {
           { href: "/", label: "Home" },
           { href: "/", label: "Sub Page A" },
           { href: "/", label: "Sub Page B" },
-          { href: "/", label: "Sub Page C" },
-          { href: "/", label: "Sub Page D" },
-          { href: "/", label: "Sub Page E" },
         ]}
         layoutState={layoutState}
         tableProps={{
@@ -177,44 +168,6 @@ export function QueryTableLayout() {
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
         primaryAction={{ label: "Primary Action", onClick: noop }}
-        totalCount={100}
-      />
-    </TestProjectLayout>
-  );
-}
-
-export function WithPagination() {
-  const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(), []);
-
-  const layoutState = useGridTableLayoutState({
-    persistedFilter: {
-      filterDefs,
-      storageKey: "grid-table-layout",
-    },
-    search: "client",
-    pagination: {
-      pageSizes: [25, 50, 100, 500],
-      storageKey: "grid-table-pagination",
-    },
-  });
-
-  return (
-    <TestProjectLayout>
-      <GridTableLayoutComponent
-        pageTitle="Grid Table With Pagination"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Product Offerings" },
-        ]}
-        layoutState={layoutState}
-        totalCount={543}
-        tableProps={{
-          columns,
-          rows: [simpleHeader, ...makeNestedRows(10)],
-          sorting: { on: "client", initial: [columns[0].id!, "ASC"] },
-        }}
-        primaryAction={{ label: "Add Product", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -320,6 +273,87 @@ export function WithViewToggle() {
   );
 }
 
+export function WithInfiniteScroll() {
+  const loadRows = useCallback((offset: number) => {
+    return zeroTo(50).map((i) => ({
+      kind: "data" as const,
+      id: String(i + offset),
+      data: {
+        name: `row ${i + offset}`,
+        value: i + offset,
+        status: i === 0 || i % 3 === 0 ? "active" : "inactive",
+        priority: Math.floor(i % 3) + 1,
+        actions: "actions",
+      },
+    }));
+  }, []);
+
+  const [data, setData] = useState(loadRows(0));
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => [simpleHeader, ...data], [data]);
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Grid Table Layout with Infinite Scroll"
+        tableProps={{
+          as: "virtual",
+          rows,
+          columns,
+          infiniteScroll: {
+            onEndReached(index) {
+              setData([...data, ...loadRows(index)]);
+            },
+          },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function WithQueryTableInfiniteScroll() {
+  const columns = useMemo(() => getColumns(false), []);
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout",
+    },
+    search: "client",
+  });
+
+  const query = useExamplePaginatedQuery({ filter: layoutState.filter });
+
+  const maybeHasMore = useCallback(
+    async (index: number) => {
+      if (query.data?.pageInfo.hasNextPage) {
+        await query.fetchMore({ variables: { page: { offset: index, limit: 50 } } });
+      }
+    },
+    [query],
+  );
+
+  return (
+    <TestProjectLayout>
+      <GridTableLayoutComponent
+        pageTitle="Query Table with Infinite Scroll"
+        tableProps={{
+          as: "virtual",
+          query,
+          columns,
+          createRows: (data) => [
+            simpleHeader,
+            ...(data?.simpleData.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
+          ],
+          infiniteScroll: { onEndReached: maybeHasMore },
+        }}
+        layoutState={layoutState}
+      />
+    </TestProjectLayout>
+  );
+}
+
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 
@@ -345,6 +379,76 @@ function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
     data,
     loading,
   };
+}
+
+type ExampleQueryData = {
+  simpleData: Array<{ id: string; name: string; value: number; status: string; priority: number }>;
+  pageInfo: { hasNextPage: boolean };
+};
+
+function useExamplePaginatedQuery({ filter }: { filter: { status: string[] } }) {
+  const filterString = JSON.stringify(filter);
+  const pageSize = 50;
+
+  const fakeDatabase = useMemo(
+    () =>
+      zeroTo(200).map((index) => ({
+        id: String(index),
+        name: `Row ${index}`,
+        value: index,
+        status: index === 0 || index % 3 === 0 ? "active" : "inactive",
+        priority: Math.floor(index % 3) + 1,
+      })),
+    [],
+  );
+
+  const filteredDatabase = useMemo(
+    () => (filter.status ? fakeDatabase.filter((row) => filter.status.includes(row.status)) : fakeDatabase),
+    [fakeDatabase, filter],
+  );
+
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<ExampleQueryData>();
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setData({
+        simpleData: filteredDatabase.slice(0, pageSize),
+        pageInfo: { hasNextPage: pageSize < filteredDatabase.length },
+      });
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filterString, filteredDatabase, pageSize, filter]);
+
+  const fetchMore = useCallback(
+    async ({
+      variables: {
+        page: { offset, limit },
+      },
+    }: {
+      variables: { page: { offset: number; limit: number } };
+    }) => {
+      return new Promise<boolean>((resolve) => {
+        setTimeout(() => {
+          setData((prev) => {
+            const previousData = prev?.simpleData ?? [];
+
+            return {
+              simpleData: [...previousData, ...filteredDatabase.slice(offset, offset + limit)],
+              pageInfo: { hasNextPage: offset + limit < filteredDatabase.length },
+            };
+          });
+
+          resolve(true);
+        }, 800);
+      });
+    },
+    [filteredDatabase],
+  );
+
+  return { data, loading, fetchMore };
 }
 
 function getFilterDefs() {
