@@ -25,4 +25,14 @@ describe("GridStyleDef", () => {
     // Then they are still equal
     expect(highlightAndGrouped).toBe(highlightAndGrouped2);
   });
+
+  it("omits first head-row corner radii when roundedHeader is false", () => {
+    const rounded = getTableStyles({ roundedHeader: true });
+    const square = getTableStyles({ roundedHeader: false });
+
+    expect(rounded.firstRowFirstCellCss).toBeDefined();
+    expect(rounded.firstRowLastCellCss).toBeDefined();
+    expect(square.firstRowFirstCellCss).toBeUndefined();
+    expect(square.firstRowLastCellCss).toBeUndefined();
+  });
 });

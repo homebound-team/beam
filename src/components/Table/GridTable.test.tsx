@@ -7,12 +7,17 @@ import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
 import { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
+  assignDefaultColumnIds,
   calcColumnLayout,
   calcColumnSizes,
   collapseColumn,
   column,
   generateColumnId,
+  layoutGutterLeftColumnId,
+  layoutGutterRightColumnId,
   selectColumn,
+  sumColumnSizesPx,
+  withColumnGutters,
 } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
@@ -21,6 +26,7 @@ import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { useComputed } from "src/hooks";
 import { SelectField, TextField } from "src/inputs";
+import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { isDefined, noop } from "src/utils";
 import {
   cell,
@@ -1095,6 +1101,19 @@ describe("GridTable", () => {
       expect(legacy.columnSizes).toEqual(calcColumnSizes(columns, tableWidth, undefined, [], undefined));
     });
 
+    it("sums column widths to probe width when layout gutters are injected", () => {
+      const tableWidth = 800;
+      const columns = assignDefaultColumnIds(
+        withColumnGutters([collapseColumn<Row>(), selectColumn<Row>(), nameColumn, { ...valueColumn, w: 2 }]),
+      );
+
+      const { columnSizes } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
+
+      expect(sumColumnSizesPx(columnSizes, tableWidth)).toBe(tableWidth);
+      expect(columnSizes[0]).toBe("12px");
+      expect(columnSizes[columnSizes.length - 1]).toBe("12px");
+    });
+
     function getExpandTestColumns() {
       return [
         collapseColumn(),
@@ -1116,6 +1135,37 @@ describe("GridTable", () => {
         actionColumn({ id: "action", w: "100px", mw: "80px" }),
       ] as GridColumnWithId<any>[];
     }
+  });
+
+  it("injects layout gutter columns when columnGutter is enabled in document-scroll layout", async () => {
+    const api = new GridTableApiImpl();
+    await render(
+      <DocumentScrollLayoutProvider>
+        <GridTable
+          api={api}
+          columnGutter
+          columns={[collapseColumn(), selectColumn(), { header: () => "Name", data: () => "a", id: "name" }]}
+          rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a" } }]}
+        />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    expect(api.getVisibleColumnIds()[0]).toBe(layoutGutterLeftColumnId);
+    expect(api.getVisibleColumnIds().at(-1)).toBe(layoutGutterRightColumnId);
+  });
+
+  it("does not inject layout gutter columns outside document-scroll layout", async () => {
+    const api = new GridTableApiImpl();
+    await render(
+      <GridTable
+        api={api}
+        columnGutter
+        columns={[collapseColumn(), selectColumn(), { header: () => "Name", data: () => "a", id: "name" }]}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a" } }]}
+      />,
+    );
+
+    expect(api.getVisibleColumnIds()[0]).toBe("beamCollapseColumn");
   });
 
   it("throws error if column min-width definition is set with a non-px value", async () => {

@@ -98,7 +98,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           ))}
         </div>
         {/* Pinned footer */}
-        <div css={Css.df.jcc.p2.bt.bc(Tokens.OnSurfaceMuted).$}>
+        <div css={Css.df.jcc.p2.bt.bc(Tokens.SurfaceSeparator).$}>
           <Button variant="tertiary" label="Reset Column Widths" onClick={() => api.resetColumnWidths()} />
         </div>
       </div>

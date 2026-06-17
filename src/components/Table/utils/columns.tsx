@@ -90,6 +90,39 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
   }) as any;
 }
 
+/** Hardcoded to match page content inset (pl3/pr3). Unifying layout spacing is a separate effort. */
+const columnGutterPx = 12;
+
+export const layoutGutterLeftColumnId = "beamLayoutGutterLeft";
+export const layoutGutterRightColumnId = "beamLayoutGutterRight";
+
+/** True for columns that display row data (not action controls or layout gutters). */
+export function isContentColumn(column: Pick<GridColumn<Kinded>, "isAction" | "isLayoutGutter">): boolean {
+  return !column.isAction && !column.isLayoutGutter;
+}
+
+/** Empty fixed-width column inset for document-scroll table layouts. */
+function layoutGutterColumn<T extends Kinded>(side: "left" | "right"): GridColumn<T> {
+  const id = side === "left" ? layoutGutterLeftColumnId : layoutGutterRightColumnId;
+  const base = {
+    ...nonKindDefaults(),
+    id,
+    clientSideSort: false,
+    w: `${columnGutterPx}px`,
+    wrapAction: false,
+    isLayoutGutter: true,
+    canHide: false,
+    expandableHeader: emptyCell,
+    totals: emptyCell,
+  };
+  return newMethodMissingProxy(base, () => () => emptyCell) as GridColumn<T>;
+}
+
+/** Prepends and appends layout gutter columns for document-scroll table alignment. */
+export function withColumnGutters<T extends Kinded>(columns: GridColumn<T>[]): GridColumn<T>[] {
+  return [layoutGutterColumn("left"), ...columns, layoutGutterColumn("right")];
+}
+
 // Keep keys like `w` and `mw` from hitting the method missing proxy
 function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));

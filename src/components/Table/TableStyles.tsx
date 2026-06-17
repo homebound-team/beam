@@ -115,6 +115,8 @@ export type GridStyleDef = {
   cellTypography?: Typography;
   /** Defines if the table should highlight the row on hover. Defaults to true */
   highlightOnHover?: boolean;
+  /** Rounds the top corners of the first head-row cells. Defaults to true */
+  roundedHeader?: boolean;
 };
 
 // Returns a "blessed" style of GridTable
@@ -131,6 +133,7 @@ function memoizedTableStyles() {
       vAlign = "center",
       cellTypography = "xs" as const,
       highlightOnHover = true,
+      roundedHeader = true,
     } = props;
 
     const key = safeKeys(props)
@@ -189,8 +192,8 @@ function memoizedTableStyles() {
         lastCellCss: bordered ? Css.br.bcGray200.$ : undefined,
         borderStyle: Css.bcGray200.$,
         firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
-        firstRowFirstCellCss: Css.borderRadius("8px 0 0 0 ").$,
-        firstRowLastCellCss: Css.borderRadius("0 8px 0 0").$,
+        firstRowFirstCellCss: roundedHeader ? Css.borderRadius("8px 0 0 0 ").$ : undefined,
+        firstRowLastCellCss: roundedHeader ? Css.borderRadius("0 8px 0 0").$ : undefined,
         // Keep `betweenRowsCss` on all body rows, but on the final body row
         // remove the inset shadow and, when bordered, replace it with a true bottom border.
         lastRowCellCss: bordered ? Css.bsh0.bb.bcGray200.$ : Css.bsh0.$,
@@ -281,6 +284,7 @@ export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
     vAlign: true,
     cellTypography: true,
     highlightOnHover: true,
+    roundedHeader: true,
   };
   const keys = safeKeys(style);
   const defKeys = safeKeys(defKeysRecord);
