@@ -9,7 +9,7 @@ export function resolveOptionSelectedFilterLabel<O, V extends Value>(
   getOptionLabel: (o: O) => string,
   value: V,
 ): string {
-  const options = initializeOptions(optionsOrLoad, getOptionValue, getOptionLabel, undefined, false, false);
+  const options = initializeOptions(optionsOrLoad, getOptionValue, getOptionLabel, undefined, false);
   const match = options.find((o) => getOptionValue(o) === value);
   return match ? getOptionLabel(match) : String(value);
 }

@@ -493,23 +493,155 @@ describe("SelectFieldTest", () => {
     expect(onSelect.mock.calls[2][0]).toBe(undefined);
   });
 
-  it("allows to add a new option", async () => {
-    // Given a SelectField
-    const onAddNew = vi.fn();
-    const r = await render(
-      <TestSelectField
-        label="Age"
-        value={undefined}
-        options={options}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => o.id}
-        onAddNew={onAddNew}
-      />,
-    );
-    // When we select Add New option
-    select(r.age, "Add New");
-    // Then onAddNew was called
-    expect(onAddNew).toHaveBeenCalledTimes(1);
+  describe("onAddNew", () => {
+    const fruitOptions: HasIdAndName[] = [
+      { id: "1", name: "Apple" },
+      { id: "2", name: "Banana" },
+      { id: "3", name: "White Oak" },
+    ];
+
+    function typeToFilter(input: HTMLElement, value: string) {
+      click(input);
+      fireEvent.input(input, { target: { value } });
+    }
+
+    function optionLabels(r: Awaited<ReturnType<typeof render>>) {
+      return r.getAllByRole("option").map((o) => o.textContent);
+    }
+
+    it("calls onAddNew with the trimmed value when the add-new row is selected", async () => {
+      // Given a SelectField with onAddNew
+      const onAddNew = vi.fn();
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={onAddNew}
+        />,
+      );
+      // When we type a new value and select the add-new row
+      typeToFilter(r.fruit, "Kiwi");
+      select(r.fruit, 'Add "Kiwi"');
+      // Then onAddNew is called with the trimmed text
+      expect(onAddNew).toHaveBeenCalledOnce();
+      expect(onAddNew).toHaveBeenCalledWith("Kiwi");
+    });
+
+    it("does not show an add-new row when the input exactly matches an existing option", async () => {
+      // Given a SelectField with onAddNew and a Banana option
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={vi.fn()}
+        />,
+      );
+      // When we type an exact match (case-insensitive)
+      typeToFilter(r.fruit, "banana");
+      // Then only the existing option is shown
+      expect(optionLabels(r)).toEqual(["Banana"]);
+    });
+
+    it("shows an add-new row for partial input that does not exactly match an existing label", async () => {
+      // Given a SelectField with onAddNew and an Apple option
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={vi.fn()}
+        />,
+      );
+      // When we type a partial match that is not an exact label
+      typeToFilter(r.fruit, "ap");
+      // Then the filtered option and add-new row are both shown
+      expect(optionLabels(r)).toEqual(["Apple", 'Add "ap"']);
+    });
+
+    it("shows an add-new row for a distinct value similar to an existing option", async () => {
+      // Given a SelectField with onAddNew and a White Oak option
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={vi.fn()}
+        />,
+      );
+      // When we type a different but related value
+      typeToFilter(r.fruit, "White Maple");
+      // Then only the add-new row is shown
+      expect(optionLabels(r)).toEqual(['Add "White Maple"']);
+    });
+
+    it("resets the input to the selected value on blur when add-new was not selected", async () => {
+      // Given a SelectField with a selected value and onAddNew
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={"1"}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={vi.fn()}
+        />,
+      );
+      // When we type a new value without selecting it and blur
+      typeToFilter(r.fruit, "Kiwi");
+      fireEvent.blur(r.fruit);
+      // Then the input reverts to the selected option label
+      expect(r.fruit).toHaveValue("Apple");
+    });
+
+    it("resets the input on Escape when add-new was not selected", async () => {
+      // Given a SelectField with a selected value and onAddNew
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={"1"}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={vi.fn()}
+        />,
+      );
+      // When we type a new value and press Escape
+      typeToFilter(r.fruit, "Kiwi");
+      fireEvent.keyDown(r.fruit, { key: "Escape" });
+      // Then the input reverts to the selected option label
+      await wait();
+      expect(r.fruit).toHaveValue("Apple");
+    });
+
+    it("does not call onAddNew when Enter is pressed without selecting the add-new row", async () => {
+      // Given a SelectField with onAddNew
+      const onAddNew = vi.fn();
+      const r = await render(
+        <TestSelectField
+          label="Fruit"
+          value={undefined}
+          options={fruitOptions}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onAddNew={onAddNew}
+        />,
+      );
+      // When we type a partial match and press Enter without explicitly choosing the add-new row
+      typeToFilter(r.fruit, "ap");
+      fireEvent.keyDown(r.fruit, { key: "Enter" });
+      // Then onAddNew is not called
+      expect(onAddNew).not.toHaveBeenCalled();
+    });
   });
 
   it("calls onSearch when searching in a select field", async () => {

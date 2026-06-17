@@ -391,6 +391,35 @@ LoadingState.play = async ({ canvasElement }: { canvasElement: HTMLElement }) =>
   canvas.getByTestId("project").click();
 };
 
+export function OnAddNew() {
+  const [options, setOptions] = useState(autoSortOptions);
+  const [selectedValue, setSelectedValue] = useState<string | undefined>("1");
+  const [lastAdded, setLastAdded] = useState<string>();
+
+  return (
+    <div css={Css.df.fdc.gap2.p2.$}>
+      <SelectField
+        label="Category"
+        value={selectedValue}
+        onSelect={setSelectedValue}
+        options={options}
+        placeholder="Select or type to add"
+        onAddNew={(value) => {
+          action("onAddNew")(value);
+          const newOption = { id: String(options.length + 1), name: value.trim() };
+          setOptions((prev) => [...prev, newOption]);
+          setSelectedValue(newOption.id);
+          setLastAdded(value);
+        }}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <div>selected = {selectedValue ?? "(none)"}</div>
+      {lastAdded && <div>last added = {lastAdded}</div>}
+    </div>
+  );
+}
+
 export function InTable() {
   return (
     <GridTable
