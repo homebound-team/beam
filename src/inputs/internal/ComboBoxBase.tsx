@@ -533,7 +533,7 @@ function sortOptions<O>(options: O[], getOptionLabel: (opt: O) => string): O[] {
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
 export const unsetOption = {};
-const addNewOptionId = "new";
+const addNewOptionId = "beam_new";
 
 function isAddNewOption(o: unknown): o is { id: string; name: string } {
   return typeof o === "object" && o !== null && "id" in o && (o as { id: string }).id === addNewOptionId;
