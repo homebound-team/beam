@@ -112,7 +112,7 @@ export const TableCardView = (props: TableCardViewProps) => {
   );
 
   const dataElement = (
-    <div css={Css.dg.gtc("1fr 1fr").$}>
+    <div css={Css.dg.gtc("1fr 1fr").sm.$}>
       {data.map((d, idx) => (
         <p key={`${d.header}-${d.value}`} css={Css.gc((idx % 2) + 1).$}>{`${d.header}: ${d.value}`}</p>
       ))}
@@ -137,7 +137,7 @@ export const TableCardView = (props: TableCardViewProps) => {
         {data && data?.length > 0 && dataElement}
         {progress && (
           <div css={Css.df.fdc.gap1.$}>
-            <div css={Css.df.aic.gap2.sm.$}>
+            <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
               <div css={Css.w25.hPx(8).br4.bgGray200.$}>
                 <div css={Css.h100.br4.bgBlue500.w(`${progress.value}%`).$} />
               </div>
