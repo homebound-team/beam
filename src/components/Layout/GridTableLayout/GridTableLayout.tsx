@@ -59,8 +59,8 @@ export type GridTableLayoutProps<
   tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
   totalCount?: number;
-  /** Temporary prop for card views. When provided, shows a view toggle button. Rendered in place of the table when in tile mode. */
-  withCardView?: ReactNode;
+  /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
+  withCardView?: boolean;
   defaultView?: TableView;
 };
 
@@ -130,7 +130,7 @@ function GridTableLayoutComponent<
   const [view, setView] = usePersistedTableView(defaultView, !!withCardView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
   const showTableActions = !!(layoutState?.filterDefs || layoutState?.search || hasHideableColumns || withCardView);
-  const isVirtualized = tableProps.as === "virtual";
+  const isVirtualized = tableProps.as === "virtual" || (!!withCardView && view === "card");
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const tableActionsRef = useRef<HTMLDivElement>(null);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
@@ -172,13 +172,13 @@ function GridTableLayoutComponent<
     </TableActions>
   );
 
+  const cardAs = withCardView && view === "card" ? ("card" as const) : undefined;
   const tableBody = (
     <>
-      {view === "card" && withCardView ? (
-        withCardView
-      ) : isGridTableProps(tableProps) ? (
+      {isGridTableProps(tableProps) ? (
         <GridTable
           {...tableProps}
+          {...(cardAs ? { as: cardAs } : {})}
           api={api}
           filter={clientSearch}
           style={{ allWhite: true }}
@@ -189,6 +189,7 @@ function GridTableLayoutComponent<
       ) : (
         <QueryTable
           {...(tableProps as QueryTableProps<R, QData, X>)}
+          {...(cardAs ? { as: cardAs } : {})}
           api={api}
           filter={clientSearch}
           style={{ allWhite: true }}

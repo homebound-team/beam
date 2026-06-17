@@ -1,7 +1,8 @@
 import { Meta } from "@storybook/react-vite";
 import { useEffect, useMemo, useState } from "react";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
-import { GridDataRow } from "src/components/Table";
+import { GridDataRow, SimpleHeaderAndData } from "src/components/Table";
+import { CardProperty } from "src/components/Table/types";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
@@ -288,35 +289,153 @@ export function GridTableLayoutWithColor() {
   );
 }
 
+type PlanData = {
+  offeringName: string;
+  planCode: string;
+  version: string;
+  sqft: string;
+  beds: string;
+  baths: string;
+  elevations: string;
+  width: string;
+  depth: string;
+  bidOut: number;
+};
+type PlanRow = SimpleHeaderAndData<PlanData>;
+
+const planColumns = [
+  column<PlanRow>({
+    id: "offering-name",
+    name: "Offering Name",
+    header: "Offering Name",
+    data: ({ offeringName }) => offeringName,
+    cardProperty: CardProperty.Title,
+  }),
+  column<PlanRow>({
+    id: "plan-code",
+    name: "Plan Code",
+    header: "Plan Code",
+    data: ({ planCode }) => planCode,
+    cardProperty: CardProperty.Eyebrow,
+  }),
+  column<PlanRow>({
+    id: "version",
+    name: "Version",
+    header: "Version",
+    data: ({ version }) => version,
+    cardProperty: CardProperty.Badge,
+  }),
+  column<PlanRow>({
+    id: "sqft",
+    name: "Sq ft",
+    header: "Sq ft",
+    data: ({ sqft }) => sqft,
+    cardProperty: CardProperty.DataBlock,
+  }),
+  column<PlanRow>({
+    id: "beds",
+    name: "Bed",
+    header: "Bed",
+    data: ({ beds }) => beds,
+    cardProperty: CardProperty.DataBlock,
+  }),
+  column<PlanRow>({
+    id: "baths",
+    name: "Bath",
+    header: "Bath",
+    data: ({ baths }) => baths,
+    cardProperty: CardProperty.DataBlock,
+  }),
+  column<PlanRow>({
+    id: "elevations",
+    name: "Elevations",
+    header: "Elevations",
+    data: ({ elevations }) => elevations,
+    cardProperty: CardProperty.DataBlock,
+  }),
+  column<PlanRow>({
+    id: "width",
+    name: "Width",
+    header: "Width",
+    data: ({ width }) => width,
+    cardProperty: CardProperty.DataBlock,
+  }),
+  column<PlanRow>({
+    id: "depth",
+    name: "Depth",
+    header: "Depth",
+    data: ({ depth }) => depth,
+    cardProperty: CardProperty.DataBlock,
+  }),
+  column<PlanRow>({
+    id: "bid-out",
+    name: "Bid out",
+    header: "Bid out",
+    data: ({ bidOut }) => bidOut,
+    cardProperty: CardProperty.Progress,
+  }),
+];
+
+const planRows: GridDataRow<PlanRow>[] = [
+  simpleHeader,
+  {
+    kind: "data",
+    id: "1",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "The Conroy",
+      planCode: "SFH-001",
+      version: "v2.1",
+      sqft: "2,400",
+      beds: "4",
+      baths: "3",
+      elevations: "3",
+      width: "52'",
+      depth: "68'",
+      bidOut: 75,
+    },
+  },
+  {
+    kind: "data",
+    id: "2",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "The Aldridge",
+      planCode: "SFH-002",
+      version: "v1.4",
+      sqft: "3,100",
+      beds: "5",
+      baths: "4",
+      elevations: "2",
+      width: "58'",
+      depth: "72'",
+      bidOut: 30,
+    },
+  },
+  {
+    kind: "data",
+    id: "3",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "The Waverly",
+      planCode: "TH-003",
+      version: "v3.0",
+      sqft: "1,850",
+      beds: "3",
+      baths: "2",
+      elevations: "4",
+      width: "44'",
+      depth: "60'",
+      bidOut: 90,
+    },
+  },
+];
+
 export function WithViewToggle() {
-  const columns = useMemo(() => getColumns(false), []);
-  const rows = useMemo(() => makeNestedRows(3), []);
-
-  const tileContent = (
-    <div css={Css.dg.gtc("repeat(3, 1fr)").gap2.p1.$}>
-      {rows
-        .filter((r): r is ParentRow => r.kind === "parent")
-        .map((row) => (
-          <div key={row.id} css={Css.bshBasic.br8.p3.bgWhite.df.fdc.gap1.$}>
-            <div css={Css.smSb.$}>{row.data.name}</div>
-            <div css={Css.xs.gray700.$}>Status: {row.data.status}</div>
-            <div css={Css.xs.gray700.$}>Value: {row.data.value}</div>
-            <div css={Css.xs.gray700.$}>Priority: {row.data.priority}</div>
-          </div>
-        ))}
-    </div>
-  );
-
   return (
-    <GridTableLayoutComponent
-      tableProps={{
-        columns,
-        rows: [simpleHeader, ...rows],
-        sorting: { on: "client", initial: [columns[2].id!, "ASC"] },
-      }}
-      withCardView={tileContent}
-      defaultView="card"
-    />
+    <TestProjectLayout>
+      <GridTableLayoutComponent tableProps={{ columns: planColumns, rows: planRows }} withCardView defaultView="card" />
+    </TestProjectLayout>
   );
 }
 

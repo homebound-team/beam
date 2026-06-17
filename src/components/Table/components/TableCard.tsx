@@ -26,6 +26,7 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
   let eyebrow: string | undefined;
   let badge: string | undefined;
   const dataBlocks: CardData[] = [];
+  let progress: AriaProgressBarProps | undefined;
 
   for (const col of cardColumns) {
     const raw = applyRowFn(col, rs.row, rs.api, rs.level, false);
@@ -44,7 +45,10 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
       case CardProperty.DataBlock:
         dataBlocks.push({ header: col.name ?? col.id ?? "", value });
         break;
-      // Status and Progress require structured prop shapes (TagProps, AriaProgressBarProps) — left for future extension.
+      case CardProperty.Progress:
+        progress = { label: col.name ?? "", value: Number(value) || 0, minValue: 0, maxValue: 100 };
+        break;
+      // Status requires a structured TagProps shape — left for future extension.
     }
   }
 
@@ -57,6 +61,7 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
       eyebrow={eyebrow}
       badge={badge}
       data={dataBlocks}
+      progress={progress}
     />
   );
 
@@ -92,12 +97,14 @@ export type TableCardViewProps = {
 export const TableCardView = (props: TableCardViewProps) => {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
 
-  const imageElement = <img css={Css.w("100%").objectFit("contain").$} src={imgSrc} alt={title} />;
+  const imageElement = <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={title} />;
 
   const titleElement = (
-    <h4 css={Css.md.fwb.$}>
-      {title} {badge && <span css={Css.sm.$}>{badge}</span>}
-    </h4>
+    <div>
+      <h4 css={Css.xl.fwb.$}>
+        {title} {badge && <span css={Css.sm.$}>{badge}</span>}
+      </h4>
+    </div>
   );
 
   const dataElement = (
@@ -109,13 +116,32 @@ export const TableCardView = (props: TableCardViewProps) => {
   );
 
   return (
-    <div css={Css.p3.w("396px").bshBasic.bgColor(Tokens.Surface).$}>
-      {status && <Tag {...status} />}
-      {imgSrc && imageElement}
-      {eyebrow && <p css={Css.sm.$}>{eyebrow}</p>}
-      {title && titleElement}
-      {data && data?.length > 0 && dataElement}
-      {progress && <p>Progress here</p>}
+    <div css={Css.p3.w("396px").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$}>
+      <div css={Css.relative.$}>
+        {imageElement}
+        {status && (
+          <div css={Css.absolute.top1.left1.$}>
+            <Tag {...status} />
+          </div>
+        )}
+      </div>
+      <div css={Css.df.fdc.gap2.$}>
+        <div>
+          {eyebrow && <p css={Css.sm.$}>{eyebrow}</p>}
+          {title && titleElement}
+        </div>
+        {data && data?.length > 0 && dataElement}
+        {progress && (
+          <div css={Css.df.fdc.gap1.$}>
+            <div css={Css.df.aic.gap2.sm.$}>
+              <div css={Css.w25.hPx(8).br4.bgGray200.$}>
+                <div css={Css.h100.br4.bgBlue500.w(`${progress.value}%`).$} />
+              </div>
+              <span>{progress.value}%</span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

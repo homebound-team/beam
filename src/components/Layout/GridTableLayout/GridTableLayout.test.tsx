@@ -322,8 +322,6 @@ describe("GridTableLayout", () => {
     });
 
     it("should display view toggle if withCardView is defined", async () => {
-      const Content = () => <span data-testid="cardContent">Content</span>;
-
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
@@ -333,22 +331,20 @@ describe("GridTableLayout", () => {
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
-          withCardView={<Content />}
+          withCardView
         />,
         withRouter(),
       );
 
       expect(r.viewToggleButton).toBeInTheDocument();
-      expect(r.query.cardContent).not.toBeInTheDocument();
 
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
-      expect(r.cardContent).toBeInTheDocument();
+      expect(localStorage.getItem(getGridTableViewStorageKey("/"))).toBe("card");
     });
 
     it("persists view selection to localStorage when toggled", async () => {
-      const Content = () => <span data-testid="cardContent">Content</span>;
       const storageKey = getGridTableViewStorageKey("/");
 
       const r = await render(
@@ -360,7 +356,7 @@ describe("GridTableLayout", () => {
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
-          withCardView={<Content />}
+          withCardView
         />,
         withRouter(),
       );
@@ -372,7 +368,6 @@ describe("GridTableLayout", () => {
     });
 
     it("restores view from localStorage on mount and trumps defaultView", async () => {
-      const Content = () => <span data-testid="cardContent">Content</span>;
       localStorage.setItem(getGridTableViewStorageKey("/"), "card");
 
       const r = await render(
@@ -385,12 +380,12 @@ describe("GridTableLayout", () => {
             rows: [simpleHeader, ...getRows()],
           }}
           defaultView="list"
-          withCardView={<Content />}
+          withCardView
         />,
         withRouter(),
       );
 
-      expect(r.cardContent).toBeInTheDocument();
+      expect(r.viewToggleButton_list).toBeInTheDocument();
     });
 
     it("does not persist view when withCardView is undefined", async () => {
@@ -413,7 +408,6 @@ describe("GridTableLayout", () => {
     });
 
     it("falls back to defaultView when localStorage has an invalid value", async () => {
-      const Content = () => <span data-testid="cardContent">Content</span>;
       localStorage.setItem(getGridTableViewStorageKey("/"), "invalid");
 
       const r = await render(
@@ -426,12 +420,12 @@ describe("GridTableLayout", () => {
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
-          withCardView={<Content />}
+          withCardView
         />,
         withRouter(),
       );
 
-      expect(r.query.cardContent).not.toBeInTheDocument();
+      expect(r.viewToggleButton_card).toBeInTheDocument();
     });
   });
 
