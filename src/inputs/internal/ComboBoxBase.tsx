@@ -150,7 +150,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         return propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption, isAddNew);
       }
       const label = getOptionLabel(o);
-      return isAddNew ? <span css={Css.add("fontStyle", "italic").$}>{label}</span> : label;
+      return isAddNew ? <span css={Css.fsyi.$}>{label}</span> : label;
     },
     // propOptionMenuLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
