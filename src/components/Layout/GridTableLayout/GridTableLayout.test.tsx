@@ -262,6 +262,35 @@ describe("GridTableLayout", () => {
       expect(r.cardContent).toBeInTheDocument();
     });
 
+    it("shows EditColumnsButton in list view and hides it in card view", async () => {
+      const Content = () => <span data-testid="cardContent">Content</span>;
+
+      // Given a GridTableLayout with hideable columns and card view enabled
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+          withCardView={<Content />}
+        />,
+        withRouter(),
+      );
+
+      // Then EditColumnsButton is visible in list view
+      expect(r.editColumnsButton).toBeInTheDocument();
+
+      // When switching to card view
+      click(r.viewToggleButton);
+      click(r.viewToggleButton_card);
+
+      // Then card content is shown and EditColumnsButton is hidden
+      expect(r.cardContent).toBeInTheDocument();
+      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+    });
+
     it("persists view selection to localStorage when toggled", async () => {
       const Content = () => <span data-testid="cardContent">Content</span>;
       const storageKey = getGridTableViewStorageKey("/");
