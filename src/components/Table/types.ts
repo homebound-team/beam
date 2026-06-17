@@ -32,6 +32,16 @@ export type GridTableScrollOptions =
  */
 export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
 
+export enum CardProperty {
+  Status = "status",
+  Eyebrow = "eyebrow",
+  Badge = "badge",
+  Title = "title",
+  DataBlock = "data-block",
+  Progress = "progress",
+  Image = "image",
+}
+
 /**
  * Defines how a single column will render each given row `kind` in `R`.
  *
@@ -102,6 +112,10 @@ export type GridColumn<R extends Kinded> = {
   hideOnExpand?: boolean;
   /** Determines whether a column is csv-only or web-only. */
   showIn?: "csv" | "web";
+  /** Determines which location on the card the column data goes */
+  cardProperty?: CardProperty;
+  /** Determines if the column is only present in the card view */
+  cardOnly?: boolean;
 };
 
 /**

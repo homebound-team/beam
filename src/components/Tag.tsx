@@ -6,7 +6,7 @@ import { useTestIds } from "src/utils";
 
 type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
-interface TagProps<X> {
+export interface TagProps<X> {
   text: ReactNode;
   // Defaults to "neutral"
   type?: TagType;
