@@ -1,7 +1,7 @@
 import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
-import { Components, ListRange, Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { Components, ListRange, Virtuoso, VirtuosoGrid, VirtuosoHandle } from "react-virtuoso";
 import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -958,6 +958,10 @@ function renderVirtual<R extends Kinded>(
         : {})}
     />
   );
+}
+
+function renderCardView() {
+  return <VirtuosoGrid />;
 }
 
 /**

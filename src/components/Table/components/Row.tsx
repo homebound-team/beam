@@ -530,6 +530,8 @@ export type GridDataRow<R extends Kinded> = {
   inferSelectedState?: false;
   /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
   draggable?: boolean;
+  /** Image src for the row, to be used for card view */
+  imgSrc?: string;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Used by TextFieldBase to set a border when the row is being hovered over

@@ -37,7 +37,7 @@ export enum CardProperty {
   Eyebrow = "eyebrow",
   Badge = "badge",
   Title = "title",
-  DataBlock = "data-block",
+  DataBlock = "data",
   Progress = "progress",
   Image = "image",
 }
@@ -114,8 +114,6 @@ export type GridColumn<R extends Kinded> = {
   showIn?: "csv" | "web";
   /** Determines which location on the card the column data goes */
   cardProperty?: CardProperty;
-  /** Determines if the column is only present in the card view */
-  cardOnly?: boolean;
 };
 
 /**
