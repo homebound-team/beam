@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import type { GridRowKind } from "src/components/Table/components/Row";
 import { GridRowApi } from "src/components/Table/GridTableApi";
+import type { TagType } from "src/components/Tag";
 import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
@@ -114,6 +115,8 @@ export type GridColumn<R extends Kinded> = {
   showIn?: "csv" | "web";
   /** Determines which location on the card the column data goes */
   cardProperty?: CardProperty;
+  /** Maps the raw cell string value to a TagType for card Status rendering */
+  cardStatusMapper?: (value: string) => TagType;
 };
 
 /**
@@ -145,6 +148,7 @@ export const nonKindGridColumnKeys = [
   "hideOnExpand",
   "showIn",
   "cardProperty",
+  "cardStatusMapper",
 ];
 
 /**

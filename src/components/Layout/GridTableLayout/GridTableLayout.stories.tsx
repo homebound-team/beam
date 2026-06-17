@@ -300,6 +300,7 @@ type PlanData = {
   width: string;
   depth: string;
   bidOut: number;
+  status: string;
 };
 type PlanRow = SimpleHeaderAndData<PlanData>;
 
@@ -374,6 +375,14 @@ const planColumns = [
     data: ({ bidOut }) => bidOut,
     cardProperty: CardProperty.Progress,
   }),
+  column<PlanRow>({
+    id: "status",
+    name: "Status",
+    header: "Status",
+    data: ({ status }) => status,
+    cardProperty: CardProperty.Status,
+    cardStatusMapper: (v) => (v === "Active" ? "success" : v === "Archived" ? "warning" : "neutral"),
+  }),
 ];
 
 const planRows: GridDataRow<PlanRow>[] = [
@@ -393,6 +402,7 @@ const planRows: GridDataRow<PlanRow>[] = [
       width: "52'",
       depth: "68'",
       bidOut: 75,
+      status: "Active",
     },
   },
   {
@@ -410,6 +420,7 @@ const planRows: GridDataRow<PlanRow>[] = [
       width: "58'",
       depth: "72'",
       bidOut: 30,
+      status: "Draft",
     },
   },
   {
@@ -427,6 +438,7 @@ const planRows: GridDataRow<PlanRow>[] = [
       width: "44'",
       depth: "60'",
       bidOut: 90,
+      status: "Archived",
     },
   },
 ];

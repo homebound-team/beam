@@ -25,6 +25,7 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
   let title = "";
   let eyebrow: string | undefined;
   let badge: string | undefined;
+  let status: TagProps<any> | undefined;
   const dataBlocks: CardData[] = [];
   let progress: AriaProgressBarProps | undefined;
 
@@ -48,7 +49,9 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
       case CardProperty.Progress:
         progress = { label: col.name ?? "", value: Number(value) || 0, minValue: 0, maxValue: 100 };
         break;
-      // Status requires a structured TagProps shape — left for future extension.
+      case CardProperty.Status:
+        status = { text: value, type: col.cardStatusMapper ? col.cardStatusMapper(value) : "neutral" };
+        break;
     }
   }
 
@@ -60,6 +63,7 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
       title={title}
       eyebrow={eyebrow}
       badge={badge}
+      status={status}
       data={dataBlocks}
       progress={progress}
     />
