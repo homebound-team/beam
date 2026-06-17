@@ -145,7 +145,7 @@ function GridTableLayoutComponent<
       right={
         (hasHideableColumns || withCardView) && (
           <div css={Css.df.gap1.$}>
-            {hasHideableColumns && (
+            {hasHideableColumns && view === "list" && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
             )}
             {withCardView && <ViewToggleButton view={view} onChange={setView} />}
