@@ -1,6 +1,6 @@
 import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
-import React, { MutableRefObject, ReactElement, useEffect, useMemo, useRef, useState } from "react";
+import React, { MutableRefObject, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Components, ListRange, Virtuoso, VirtuosoGrid, VirtuosoHandle } from "react-virtuoso";
 import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
@@ -19,6 +19,7 @@ import {
 } from "src/components/Table/TableStyles";
 import type { DiscriminateUnion } from "src/components/Table/types";
 import {
+  CardProperty,
   Direction,
   GridColumn,
   GridColumnWithId,
@@ -31,10 +32,12 @@ import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
+  applyRowFn,
   EXPANDABLE_HEADER,
   getTableRefWidthStyles,
   HEADER,
   isCursorBelowMidpoint,
+  isGridCellContent,
   KEPT_GROUP,
   TOTALS,
 } from "src/components/Table/utils/utils";
@@ -47,7 +50,8 @@ import { isPromise } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
-import { DraggedOver } from "./utils/RowState";
+import { CardData, TableCard, TableCardProps } from "./components/TableCard";
+import { DraggedOver, RowState } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -462,6 +466,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     ReactElement[],
     boolean,
   ] = useComputed(() => {
+    // Card view builds its own items from raw row data; skip Row element creation.
+    if (as === "card") return [[], [], [], false];
+
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: ReactElement[] = [];
     const expandableHeaderRows: ReactElement[] = [];
@@ -595,30 +602,32 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
-        {renders[_as](
-          tableStyle,
-          id,
-          columns,
-          visibleDataRows,
-          keptSelectedRows,
-          firstRowMessage,
-          stickyHeader,
-          xss,
-          virtuosoRef,
-          virtuosoRangeRef,
-          tableHeadRows,
-          stickyOffset,
-          infiniteScroll,
-          tableContainerRef,
-          persistScrollPosition,
-        )}
+        {as === "card"
+          ? renderCardView(columns, tableState.visibleRows, id)
+          : renders[_as as Exclude<RenderAs, "card">](
+              tableStyle,
+              id,
+              columns,
+              visibleDataRows,
+              keptSelectedRows,
+              firstRowMessage,
+              stickyHeader,
+              xss,
+              virtuosoRef,
+              virtuosoRangeRef,
+              tableHeadRows,
+              stickyOffset,
+              infiniteScroll,
+              tableContainerRef,
+              persistScrollPosition,
+            )}
       </PresentationProvider>
     </TableStateContext.Provider>
   );
 }
 
-// Determine which HTML element to use to build the GridTable
-const renders: Record<RenderAs, typeof renderTable> = {
+// Determine which HTML element to use to build the GridTable (card mode is handled separately)
+const renders: Record<Exclude<RenderAs, "card">, typeof renderTable> = {
   table: renderTable,
   div: renderDiv,
   virtual: renderVirtual,
@@ -960,8 +969,75 @@ function renderVirtual<R extends Kinded>(
   );
 }
 
-function renderCardView() {
-  return <VirtuosoGrid />;
+function buildCardProps<R extends Kinded>(rs: RowState<R>, cardColumns: GridColumnWithId<R>[]): TableCardProps | null {
+  let title = "";
+  let eyebrow: string | undefined;
+  let badge: string | undefined;
+  const dataBlocks: CardData[] = [];
+
+  for (const col of cardColumns) {
+    const raw = applyRowFn(col, rs.row, rs.api, rs.level, false);
+    const value = isGridCellContent(raw) ? String(raw.value ?? raw.content ?? "") : String(raw ?? "");
+
+    switch (col.cardProperty) {
+      case CardProperty.Title:
+        title = value;
+        break;
+      case CardProperty.Eyebrow:
+        eyebrow = value;
+        break;
+      case CardProperty.Badge:
+        badge = value;
+        break;
+      case CardProperty.DataBlock:
+        dataBlocks.push({ header: col.name ?? col.id ?? "", value });
+        break;
+      // Status and Progress require structured prop shapes (TagProps, AriaProgressBarProps) — left for future extension.
+    }
+  }
+
+  if (!title) return null;
+
+  return {
+    imgSrc: (rs.row as any).imgSrc ?? "",
+    title,
+    eyebrow,
+    badge,
+    data: dataBlocks,
+  };
+}
+
+function renderCardView<R extends Kinded>(
+  columns: GridColumnWithId<R>[],
+  visibleRows: RowState<R>[],
+  id: string,
+): ReactElement {
+  const cardColumns = columns.filter((c) => c.cardProperty !== undefined);
+
+  const cardItems = visibleRows
+    .filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind))
+    .map((rs) => buildCardProps(rs, cardColumns))
+    .filter(Boolean) as TableCardProps[];
+
+  return (
+    <VirtuosoGrid
+      data-testid={id}
+      totalCount={cardItems.length}
+      itemContent={(index) => <TableCard {...cardItems[index]} />}
+      components={{
+        List: React.forwardRef<HTMLDivElement, { style?: React.CSSProperties; children?: ReactNode }>(function CardList(
+          { style, children },
+          ref,
+        ) {
+          return (
+            <div ref={ref} style={style} css={Css.dg.gtc("1fr").gap3.p3.$}>
+              {children}
+            </div>
+          );
+        }),
+      }}
+    />
+  );
 }
 
 /**

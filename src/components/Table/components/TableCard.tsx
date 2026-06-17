@@ -38,7 +38,7 @@ export const TableCard = (props: TableCardProps) => {
   );
 
   return (
-    <div css={Css.p3.w("396px").boxShadow("2px black").bgColor(Tokens.Surface).$}>
+    <div css={Css.p3.w("396px").bshBasic.bgColor(Tokens.Surface).$}>
       {status && <Tag {...status} />}
       {imgSrc && imageElement}
       {eyebrow && <p css={Css.sm.$}>{eyebrow}</p>}

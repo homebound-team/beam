@@ -30,6 +30,7 @@ import {
   SimpleHeaderAndData,
   useGridTableApi,
 } from "src/components/index";
+import { CardProperty } from "src/components/Table/types";
 import { Css, Palette } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -2416,6 +2417,119 @@ export function MultipleStickyColumns() {
   return (
     <div css={Css.m2.wPx(800).add("overflow", "auto").$}>
       <GridTable columns={columns} rows={rows} />
+    </div>
+  );
+}
+
+type HomeData = {
+  address: string;
+  lot: string;
+  city: string;
+  sqft: string;
+  beds: string;
+  baths: string;
+  closeDate: string;
+  status: string;
+};
+type HomeRow = SimpleHeaderAndData<HomeData>;
+
+export function CardView() {
+  const columns: GridColumn<HomeRow>[] = [
+    {
+      header: "Address",
+      data: ({ address }) => address,
+      cardProperty: CardProperty.Title,
+    },
+    {
+      header: "Lot",
+      data: ({ lot }) => lot,
+      cardProperty: CardProperty.Eyebrow,
+    },
+    {
+      header: "City",
+      data: ({ city }) => city,
+      cardProperty: CardProperty.Badge,
+    },
+    {
+      header: "Sq Ft",
+      name: "Sq Ft",
+      data: ({ sqft }) => sqft,
+      cardProperty: CardProperty.DataBlock,
+    },
+    {
+      header: "Beds",
+      name: "Beds",
+      data: ({ beds }) => beds,
+      cardProperty: CardProperty.DataBlock,
+    },
+    {
+      header: "Baths",
+      name: "Baths",
+      data: ({ baths }) => baths,
+      cardProperty: CardProperty.DataBlock,
+    },
+    {
+      header: "Close Date",
+      name: "Close Date",
+      data: ({ closeDate }) => closeDate,
+      cardProperty: CardProperty.DataBlock,
+    },
+  ];
+
+  const rows: GridDataRow<HomeRow>[] = [
+    simpleHeader,
+    {
+      kind: "data",
+      id: "1",
+      imgSrc: "https://placehold.co/396x200",
+      data: {
+        address: "123 Main Street",
+        lot: "Lot 4",
+        city: "Austin, TX",
+        sqft: "2,400",
+        beds: "4",
+        baths: "3",
+        closeDate: "Aug 2026",
+        status: "In Progress",
+      },
+    },
+    {
+      kind: "data",
+      id: "2",
+      imgSrc: "https://placehold.co/396x200",
+      data: {
+        address: "456 Oak Avenue",
+        lot: "Lot 7",
+        city: "Denver, CO",
+        sqft: "3,100",
+        beds: "5",
+        baths: "4",
+        closeDate: "Oct 2026",
+        status: "Planning",
+      },
+    },
+    {
+      kind: "data",
+      id: "3",
+      imgSrc: "https://placehold.co/396x200",
+      data: {
+        address: "789 Pine Road",
+        lot: "Lot 2",
+        city: "Nashville, TN",
+        sqft: "1,850",
+        beds: "3",
+        baths: "2",
+        closeDate: "Dec 2026",
+        status: "Complete",
+      },
+    },
+  ];
+
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable as="card" columns={columns} rows={rows} />
+      </div>
     </div>
   );
 }
