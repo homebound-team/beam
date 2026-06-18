@@ -137,28 +137,10 @@ export type TableCardViewProps<X> = {
 export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardViewProps<X>) {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
 
-  const imageElement = <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={String(title)} />;
-
-  const titleElement = (
-    <div>
-      <h4 css={Css.xl.fwb.$}>
-        {toDisplay(title)} {badge && <span css={Css.sm.$}>{toDisplay(badge)}</span>}
-      </h4>
-    </div>
-  );
-
-  const dataElement = (
-    <div css={Css.dg.gtc("1fr 1fr").sm.$}>
-      {data.map((d, idx) => (
-        <p key={`${d.header}-${d.value}`} css={Css.gc((idx % 2) + 1).$}>{`${d.header}: ${d.value}`}</p>
-      ))}
-    </div>
-  );
-
   return (
     <div css={Css.p3.w("330px").h("100%").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$}>
       <div css={Css.relative.$}>
-        {imageElement}
+        <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={String(title)} />
         {status && (
           <div css={Css.absolute.top1.left1.$}>
             <Tag {...status} />
@@ -168,9 +150,21 @@ export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardVi
       <div css={Css.df.fdc.gap2.$}>
         <div>
           {eyebrow && <p css={Css.sm.$}>{toDisplay(eyebrow)}</p>}
-          {title && titleElement}
+          {title && (
+            <div>
+              <h4 css={Css.xl.fwb.$}>
+                {toDisplay(title)} {badge && <span css={Css.sm.$}>{toDisplay(badge)}</span>}
+              </h4>
+            </div>
+          )}
         </div>
-        {data && data?.length > 0 && dataElement}
+        {data && data?.length > 0 && (
+          <div css={Css.dg.gtc("1fr 1fr").sm.$}>
+            {data.map((d, idx) => (
+              <p key={`${d.header}-${d.value}`} css={Css.gc((idx % 2) + 1).$}>{`${d.header}: ${d.value}`}</p>
+            ))}
+          </div>
+        )}
         {progress && (
           <div css={Css.df.fdc.gap1.$}>
             <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
