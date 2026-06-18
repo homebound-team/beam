@@ -600,7 +600,16 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
         {as === "card"
-          ? renderCardView(columns, tableState.visibleRows, id, rowStyles, tableState.api)
+          ? renderCardView(
+              columns,
+              tableState.visibleRows,
+              id,
+              rowStyles,
+              tableState.api,
+              virtuosoRangeRef,
+              infiniteScroll,
+              persistScrollPosition,
+            )
           : renders[_as as Exclude<RenderAs, "card">](
               tableStyle,
               id,
@@ -972,12 +981,48 @@ function renderCardView<R extends Kinded>(
   id: string,
   rowStyles: RowStyles<R> | undefined,
   api: GridTableApi<R>,
+  virtuosoRangeRef: MutableRefObject<ListRange | null>,
+  infiniteScroll?: InfiniteScroll,
+  persistScrollPosition: boolean = infiniteScroll === undefined,
 ): ReactElement {
   const cardColumns = columns.filter((c) => c.cardProperty !== undefined);
   const bodyRows = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind));
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const customScrollParent = useVirtualizedScrollParent();
+
+  // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
+  // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const inDocumentScrollLayout = useDocumentScrollLayout();
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
+
+  const savedScrollIndex = getScrollIndex();
+  // const topItemCount = stickyHeader ? tableHeadRows.length : 0;
+
+  // Saved index is body-relative (excludes pinned head rows). Skip restoration when 0 (at top)
+  // and validate against current data so a stale index doesn't crash Virtuoso with "Zero-sized
+  // element" when filters shrunk the row set.
+  const validatedScrollIndex =
+    savedScrollIndex !== undefined && savedScrollIndex > 0 && savedScrollIndex < bodyRows.length
+      ? savedScrollIndex
+      : undefined;
+
+  // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
+  const virtuosoKey = !!validatedScrollIndex && bodyRows.length > 0 ? "with-data" : "virtuoso";
+
   return (
     <VirtuosoGrid
+      useWindowScroll={inDocumentScrollLayout && !customScrollParent}
+      {...(customScrollParent ? { customScrollParent } : {})}
+      {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
+      key={virtuosoKey}
+      overscan={5}
       data-testid={id}
       totalCount={bodyRows.length}
       itemContent={(index) => {
@@ -997,7 +1042,38 @@ function renderCardView<R extends Kinded>(
             </div>
           );
         }),
+        Footer: () => (
+          <div>
+            {fetchMoreInProgress && (
+              <div css={Css.h5.df.aic.jcc.$}>
+                <Loader size="xs" />
+              </div>
+            )}
+          </div>
+        ),
       }}
+      rangeChanged={(newRange) => {
+        virtuosoRangeRef.current = newRange;
+        // Don't persist scroll position for infinite scroll tables. On page refresh, the saved
+        // index may point to a row that hasn't been fetched yet (since data loads progressively),
+        // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
+        if (!infiniteScroll && bodyRows.length > 0) {
+          setScrollIndex(newRange.startIndex);
+        }
+      }}
+      {...(infiniteScroll
+        ? {
+            increaseViewportBy: { bottom: infiniteScroll.endOffsetPx ?? 500, top: 0 },
+            endReached: (index) => {
+              if (index === 0) return;
+              const result = infiniteScroll.onEndReached(index);
+              if (isPromise(result)) {
+                setFetchMoreInProgress(true);
+                void result.finally(() => setFetchMoreInProgress(false));
+              }
+            },
+          }
+        : {})}
     />
   );
 }

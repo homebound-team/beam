@@ -5,7 +5,7 @@ export default {
   component: TableCardView,
 } as Meta;
 
-const imgSrc = "https://placehold.co/300x200";
+const imgSrc = "plan-exterior.png";
 const data = [
   { header: "Sq Ft", value: "2,400" },
   { header: "Beds", value: "4" },

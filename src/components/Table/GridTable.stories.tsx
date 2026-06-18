@@ -2481,7 +2481,7 @@ export function CardView() {
     {
       kind: "data",
       id: "1",
-      imgSrc: "https://placehold.co/396x200",
+      imgSrc: "plan-exterior.png",
       data: {
         address: "123 Main Street",
         lot: "Lot 4",
@@ -2496,7 +2496,7 @@ export function CardView() {
     {
       kind: "data",
       id: "2",
-      imgSrc: "https://placehold.co/396x200",
+      imgSrc: "plan-exterior.png",
       data: {
         address: "456 Oak Avenue",
         lot: "Lot 7",
@@ -2511,7 +2511,7 @@ export function CardView() {
     {
       kind: "data",
       id: "3",
-      imgSrc: "https://placehold.co/396x200",
+      imgSrc: "plan-exterior.png",
       data: {
         address: "789 Pine Road",
         lot: "Lot 2",
@@ -2529,6 +2529,67 @@ export function CardView() {
     <div css={Css.df.fdc.vh100.$}>
       <div css={Css.fg1.$}>
         <GridTable as="card" columns={columns} rows={rows} />
+      </div>
+    </div>
+  );
+}
+
+export function CardViewInfiniteScroll() {
+  const cities = ["Austin, TX", "Denver, CO", "Nashville, TN", "Phoenix, AZ", "Charlotte, NC"];
+  const statuses = ["In Progress", "Planning", "Complete"];
+
+  const makeRows = useCallback(
+    (offset: number, count: number): GridDataRow<HomeRow>[] =>
+      zeroTo(count).map((i) => {
+        const n = offset + i;
+        return {
+          kind: "data" as const,
+          id: String(n),
+          imgSrc: "plan-exterior.png",
+          data: {
+            address: `${100 + n} Elm Street`,
+            lot: `Lot ${n + 1}`,
+            city: cities[n % cities.length],
+            sqft: String(1_500 + (n % 20) * 100),
+            beds: String(2 + (n % 4)),
+            baths: String(1 + (n % 3)),
+            closeDate: `${["Jan", "Mar", "Jun", "Sep", "Nov"][n % 5]} 2027`,
+            status: statuses[n % statuses.length],
+          },
+        };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const [data, setData] = useState<GridDataRow<HomeRow>[]>(() => makeRows(0, 50));
+  const rows = useMemo(() => [simpleHeader, ...data], [data]);
+
+  const columns: GridColumn<HomeRow>[] = useMemo(
+    () => [
+      { header: "Address", data: ({ address }) => address, cardProperty: CardProperty.Title },
+      { header: "Lot", data: ({ lot }) => lot, cardProperty: CardProperty.Eyebrow },
+      { header: "City", data: ({ city }) => city, cardProperty: CardProperty.Badge },
+      { header: "Sq Ft", name: "Sq Ft", data: ({ sqft }) => sqft, cardProperty: CardProperty.DataBlock },
+      { header: "Beds", name: "Beds", data: ({ beds }) => beds, cardProperty: CardProperty.DataBlock },
+      { header: "Baths", name: "Baths", data: ({ baths }) => baths, cardProperty: CardProperty.DataBlock },
+    ],
+    [],
+  );
+
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="card"
+          columns={columns}
+          rows={rows}
+          infiniteScroll={{
+            onEndReached() {
+              setData((prev) => [...prev, ...makeRows(prev.length, 50)]);
+            },
+          }}
+        />
       </div>
     </div>
   );
