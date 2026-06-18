@@ -48,7 +48,7 @@ import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
 import { TableCard } from "./components/TableCard";
-import { DraggedOver, RowState } from "./utils/RowState";
+import { DraggedOver } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -463,8 +463,21 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     ReactElement[],
     boolean,
   ] = useComputed(() => {
-    // Card view builds its own items from raw row data; skip Row element creation.
-    if (as === "card") return [[], [], [], false];
+    if (as === "card") {
+      const cardColumns = columns.filter((c) => c.cardProperty !== undefined);
+      const cardElements = tableState.visibleRows
+        .filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind))
+        .map((rs) => (
+          <TableCard
+            key={rs.key}
+            rs={rs}
+            cardColumns={cardColumns}
+            rowStyle={rowStyles?.[rs.row.kind as R["kind"]]}
+            api={tableState.api}
+          />
+        ));
+      return [[], cardElements, [], false];
+    }
 
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: ReactElement[] = [];
@@ -599,34 +612,33 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
-        {as === "card"
-          ? renderCardView(
-              columns,
-              tableState.visibleRows,
-              id,
-              rowStyles,
-              tableState.api,
-              virtuosoRangeRef,
-              infiniteScroll,
-              persistScrollPosition,
-            )
-          : renders[_as as Exclude<RenderAs, "card">](
-              tableStyle,
-              id,
-              columns,
-              visibleDataRows,
-              keptSelectedRows,
-              firstRowMessage,
-              stickyHeader,
-              xss,
-              virtuosoRef,
-              virtuosoRangeRef,
-              tableHeadRows,
-              stickyOffset,
-              infiniteScroll,
-              tableContainerRef,
-              persistScrollPosition,
-            )}
+        {as === "card" ? (
+          <CardView
+            cardRows={visibleDataRows}
+            id={id}
+            virtuosoRangeRef={virtuosoRangeRef}
+            infiniteScroll={infiniteScroll}
+            persistScrollPosition={persistScrollPosition}
+          />
+        ) : (
+          renders[_as as Exclude<RenderAs, "card">](
+            tableStyle,
+            id,
+            columns,
+            visibleDataRows,
+            keptSelectedRows,
+            firstRowMessage,
+            stickyHeader,
+            xss,
+            virtuosoRef,
+            virtuosoRangeRef,
+            tableHeadRows,
+            stickyOffset,
+            infiniteScroll,
+            tableContainerRef,
+            persistScrollPosition,
+          )
+        )}
       </PresentationProvider>
     </TableStateContext.Provider>
   );
@@ -975,106 +987,94 @@ function renderVirtual<R extends Kinded>(
   );
 }
 
-function renderCardView<R extends Kinded>(
-  columns: GridColumnWithId<R>[],
-  visibleRows: RowState<R>[],
-  id: string,
-  rowStyles: RowStyles<R> | undefined,
-  api: GridTableApi<R>,
-  virtuosoRangeRef: MutableRefObject<ListRange | null>,
-  infiniteScroll?: InfiniteScroll,
-  persistScrollPosition: boolean = infiniteScroll === undefined,
-): ReactElement {
-  const cardColumns = columns.filter((c) => c.cardProperty !== undefined);
-  const bodyRows = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind));
+type CardViewProps = {
+  cardRows: ReactElement[];
+  id: string;
+  virtuosoRangeRef: MutableRefObject<ListRange | null>;
+  infiniteScroll?: InfiniteScroll;
+  persistScrollPosition?: boolean;
+};
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+function CardView({
+  cardRows,
+  id,
+  virtuosoRangeRef,
+  infiniteScroll,
+  persistScrollPosition = infiniteScroll === undefined,
+}: CardViewProps): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
 
   // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
   // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const inDocumentScrollLayout = useDocumentScrollLayout();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
 
   const savedScrollIndex = getScrollIndex();
-  // const topItemCount = stickyHeader ? tableHeadRows.length : 0;
 
-  // Saved index is body-relative (excludes pinned head rows). Skip restoration when 0 (at top)
-  // and validate against current data so a stale index doesn't crash Virtuoso with "Zero-sized
-  // element" when filters shrunk the row set.
   const validatedScrollIndex =
-    savedScrollIndex !== undefined && savedScrollIndex > 0 && savedScrollIndex < bodyRows.length
+    savedScrollIndex !== undefined && savedScrollIndex > 0 && savedScrollIndex < cardRows.length
       ? savedScrollIndex
       : undefined;
 
-  // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
-  const virtuosoKey = !!validatedScrollIndex && bodyRows.length > 0 ? "with-data" : "virtuoso";
+  const virtuosoKey = !!validatedScrollIndex && cardRows.length > 0 ? "with-data" : "virtuoso";
 
   return (
-    <VirtuosoGrid
-      useWindowScroll={inDocumentScrollLayout && !customScrollParent}
-      {...(customScrollParent ? { customScrollParent } : {})}
-      {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
-      key={virtuosoKey}
-      overscan={5}
-      data-testid={id}
-      totalCount={bodyRows.length}
-      itemContent={(index) => {
-        const rs = bodyRows[index];
-        return (
-          <TableCard rs={rs} cardColumns={cardColumns} rowStyle={rowStyles?.[rs.row.kind as R["kind"]]} api={api} />
-        );
-      }}
-      components={{
-        List: React.forwardRef<HTMLDivElement, { style?: React.CSSProperties; children?: ReactNode }>(function CardList(
-          { style, children },
-          ref,
-        ) {
-          return (
-            <div ref={ref} style={style} css={Css.dg.gtc("repeat(auto-fill, 330px)").jcc.gap3.p3.$}>
-              {children}
-            </div>
-          );
-        }),
-        Footer: () => (
-          <div>
-            {fetchMoreInProgress && (
-              <div css={Css.h5.df.aic.jcc.$}>
-                <Loader size="xs" />
-              </div>
-            )}
-          </div>
-        ),
-      }}
-      rangeChanged={(newRange) => {
-        virtuosoRangeRef.current = newRange;
-        // Don't persist scroll position for infinite scroll tables. On page refresh, the saved
-        // index may point to a row that hasn't been fetched yet (since data loads progressively),
-        // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
-        if (!infiniteScroll && bodyRows.length > 0) {
-          setScrollIndex(newRange.startIndex);
-        }
-      }}
-      {...(infiniteScroll
-        ? {
-            increaseViewportBy: { bottom: infiniteScroll.endOffsetPx ?? 500, top: 0 },
-            endReached: (index) => {
-              if (index === 0) return;
-              const result = infiniteScroll.onEndReached(index);
-              if (isPromise(result)) {
-                setFetchMoreInProgress(true);
-                void result.finally(() => setFetchMoreInProgress(false));
-              }
+    <div css={Css.py2.$}>
+      <VirtuosoGrid
+        useWindowScroll={inDocumentScrollLayout && !customScrollParent}
+        {...(customScrollParent ? { customScrollParent } : {})}
+        {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
+        key={virtuosoKey}
+        data-testid={id}
+        totalCount={cardRows.length}
+        itemContent={(index) => cardRows[index]}
+        components={{
+          List: React.forwardRef<HTMLDivElement, { style?: React.CSSProperties; children?: ReactNode }>(
+            function CardList({ style, children }, ref) {
+              return (
+                <div ref={ref} style={style} css={Css.dg.gtc("repeat(auto-fill, 330px)").jcc.gap3.p3.$}>
+                  {children}
+                </div>
+              );
             },
+          ),
+          Footer: () => (
+            <div>
+              {fetchMoreInProgress && (
+                <div css={Css.h5.df.aic.jcc.$}>
+                  <Loader size="xs" />
+                </div>
+              )}
+            </div>
+          ),
+        }}
+        rangeChanged={(newRange) => {
+          virtuosoRangeRef.current = newRange;
+          // Don't persist scroll position for infinite scroll tables. On page refresh, the saved
+          // index may point to a row that hasn't been fetched yet (since data loads progressively),
+          // causing Virtuoso to fail with "Zero-sized element" when it tries to scroll to that index.
+          if (!infiniteScroll && cardRows.length > 0) {
+            setScrollIndex(newRange.startIndex);
           }
-        : {})}
-    />
+        }}
+        {...(infiniteScroll
+          ? {
+              increaseViewportBy: { bottom: infiniteScroll.endOffsetPx ?? 500, top: 0 },
+              endReached: (index) => {
+                if (index === 0) return;
+                const result = infiniteScroll.onEndReached(index);
+                if (isPromise(result)) {
+                  setFetchMoreInProgress(true);
+                  void result.finally(() => setFetchMoreInProgress(false));
+                }
+              },
+            }
+          : {})}
+      />
+    </div>
   );
 }
 

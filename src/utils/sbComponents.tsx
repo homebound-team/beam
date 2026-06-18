@@ -1,6 +1,19 @@
 import { useMemo } from "react";
-import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "src/index";
+import { Link } from "react-router-dom";
+import { AppNavItems } from "src/components/AppNav/AppNavItems";
+import {
+  GridColumn,
+  GridDataRow,
+  GridTable,
+  HomeboundLogo,
+  type NavbarProps,
+  type NavbarUser,
+  simpleHeader,
+  SimpleHeaderAndData,
+  Tokens,
+} from "src/index";
 import { zeroTo } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 type Row = SimpleHeaderAndData<{ name: string; value: number }>;
 
@@ -45,4 +58,39 @@ export function TableExample({
       style={{ rowHeight: "fixed" }}
     />
   );
+}
+
+export function createNavbar(): NavbarProps {
+  return {
+    brand: (
+      <Link to="/">
+        <HomeboundLogo fill={Tokens.OnSurface} width={5} />
+      </Link>
+    ),
+    items: [
+      { label: "Dashboard", onClick: "/", active: true },
+      { label: "Projects", onClick: "/projects" },
+      { label: "Finances", onClick: "/finances" },
+      { label: "Warranty", onClick: "/warranty" },
+    ],
+    rightSlot: (
+      <AppNavItems
+        variant="global"
+        items={[
+          { label: "Help", onClick: "/help", icon: "helpCircle", iconOnly: true },
+          { label: "Notifications", onClick: "/notifications", icon: "bell", iconOnly: true },
+        ]}
+      />
+    ),
+    user: createUser(),
+  };
+}
+
+function createUser(): NavbarUser {
+  return {
+    name: "Tony Stark",
+    picture: "tony-stark.jpg",
+    menuItems: [{ label: "Profile", onClick: action("Profile clicked") }],
+    persistentItems: [{ label: "Sign out", onClick: action("Sign out clicked") }],
+  };
 }

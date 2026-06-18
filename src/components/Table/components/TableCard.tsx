@@ -120,7 +120,7 @@ export const TableCardView = (props: TableCardViewProps) => {
   );
 
   return (
-    <div css={Css.p3.w("330px").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$}>
+    <div css={Css.p3.w("330px").h("100%").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$}>
       <div css={Css.relative.$}>
         {imageElement}
         {status && (

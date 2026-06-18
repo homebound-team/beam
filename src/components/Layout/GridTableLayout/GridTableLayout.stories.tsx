@@ -6,8 +6,10 @@ import { CardProperty } from "src/components/Table/types";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
+import { NavbarLayout, PageHeaderLayout } from "src/layouts";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { createNavbar } from "src/utils/sbComponents";
 import { TestProjectLayout } from "../Layout.stories";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
@@ -384,7 +386,6 @@ const planColumns = [
     cardStatusMapper: (v) => (v === "Active" ? "success" : v === "Archived" ? "warning" : "neutral"),
   }),
 ];
-
 const planRows: GridDataRow<PlanRow>[] = [
   simpleHeader,
   {
@@ -518,7 +519,7 @@ const planRows: GridDataRow<PlanRow>[] = [
     id: "8",
     imgSrc: "plan-exterior.png",
     data: {
-      offeringName: "The Calloway",
+      offeringName: "The Calloway With a way longer title",
       planCode: "SFH-008",
       version: "v2.0",
       sqft: "2,950",
@@ -571,9 +572,19 @@ const planRows: GridDataRow<PlanRow>[] = [
 
 export function WithViewToggle() {
   return (
-    <TestProjectLayout>
-      <GridTableLayoutComponent tableProps={{ columns: planColumns, rows: planRows }} withCardView defaultView="card" />
-    </TestProjectLayout>
+    <NavbarLayout navbar={createNavbar()}>
+      <PageHeaderLayout pageHeader={{ title: "With View Toggle" }}>
+        <GridTableLayoutComponent
+          tableProps={{
+            columns: planColumns,
+            rows: planRows,
+            rowStyles: { data: { rowLink: () => "https://www.homebound.com" } },
+          }}
+          withCardView
+          defaultView="card"
+        />
+      </PageHeaderLayout>
+    </NavbarLayout>
   );
 }
 
