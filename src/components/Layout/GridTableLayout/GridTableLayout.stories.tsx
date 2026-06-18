@@ -375,15 +375,20 @@ const planColumns = [
     name: "Bid out",
     header: "Bid out",
     data: ({ bidOut }) => bidOut,
-    cardProperty: CardProperty.Progress,
+    cardProperty: { kind: CardProperty.Progress, getValue: ({ bidOut }) => bidOut },
   }),
   column<PlanRow>({
     id: "status",
     name: "Status",
     header: "Status",
     data: ({ status }) => status,
-    cardProperty: CardProperty.Status,
-    cardStatusMapper: (v) => (v === "Active" ? "success" : v === "Archived" ? "warning" : "neutral"),
+    cardProperty: {
+      kind: CardProperty.Status,
+      getValue: ({ status }) => ({
+        text: status,
+        type: status === "Active" ? "success" : status === "Archived" ? "warning" : "neutral",
+      }),
+    },
   }),
 ];
 const planRows: GridDataRow<PlanRow>[] = [

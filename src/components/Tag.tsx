@@ -4,9 +4,9 @@ import { Icon, IconKey, maybeTooltip } from "src/components";
 import { Css, Margin, Only, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-type TagXss = Margin | "backgroundColor" | "color";
+export type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
-export interface TagProps<X> {
+export type TagProps<X> = {
   text: ReactNode;
   // Defaults to "neutral"
   type?: TagType;
@@ -15,7 +15,7 @@ export interface TagProps<X> {
   /** A tooltip will automatically be displayed if the text is truncated. Set to true to prevent this behavior.
    * @default false */
   preventTooltip?: boolean;
-}
+};
 
 /** Tag used for indicating a status */
 export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {

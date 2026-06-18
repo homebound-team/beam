@@ -7,7 +7,15 @@ import { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "
 import { Css, Properties, Typography } from "src/Css";
 import { Temporal } from "temporal-polyfill";
 
-type GridCellValue = number | string | Date | boolean | Temporal.PlainDate | Temporal.ZonedDateTime | null | undefined;
+export type GridCellValue =
+  | number
+  | string
+  | Date
+  | boolean
+  | Temporal.PlainDate
+  | Temporal.ZonedDateTime
+  | null
+  | undefined;
 
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or

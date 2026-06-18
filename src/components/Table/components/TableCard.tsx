@@ -1,17 +1,19 @@
+import { ReactNode } from "react";
 import { AriaProgressBarProps } from "react-aria";
 import { Link } from "react-router-dom";
-import { Tag, TagProps } from "src/components";
+import { Tag, TagProps, TagXss } from "src/components";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
 import { CardProperty, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
-import { Css, Tokens } from "src/Css";
+import { Css, Only, Tokens, Xss } from "src/Css";
 import { navLink } from "src/css/CssReset";
+import { GridCellValue } from "./cell";
 
 export type CardData = {
   header: string;
-  value: string;
+  value: GridCellValue;
 };
 
 export type TableCardProps<R extends Kinded> = {
@@ -22,35 +24,64 @@ export type TableCardProps<R extends Kinded> = {
 };
 
 export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: TableCardProps<R>) {
-  let title = "";
-  let eyebrow: string | undefined;
-  let badge: string | undefined;
+  let title: GridCellValue = "";
+  let eyebrow: GridCellValue;
+  let badge: GridCellValue;
   let status: TagProps<any> | undefined;
   const dataBlocks: CardData[] = [];
   let progress: AriaProgressBarProps | undefined;
 
   for (const col of cardColumns) {
+    const prop = col.cardProperty;
+    if (!prop) continue;
+    const kind = typeof prop === "object" ? prop.kind : prop;
     const raw = applyRowFn(col, rs.row, rs.api, rs.level, false);
-    const value = isGridCellContent(raw) ? String(raw.value ?? raw.content ?? "") : String(raw ?? "");
+    const maybeValue = isGridCellContent(raw) ? raw.value : undefined;
+    const cellValue: GridCellValue =
+      typeof maybeValue === "function"
+        ? maybeValue()
+        : (maybeValue ??
+          (typeof raw === "string" || typeof raw === "number" || typeof raw === "boolean" ? raw : undefined));
 
-    switch (col.cardProperty) {
+    if (
+      cellValue === undefined &&
+      kind !== CardProperty.Progress &&
+      kind !== CardProperty.Status &&
+      process.env.NODE_ENV !== "production"
+    ) {
+      console.warn(
+        `[GridTable] cardProperty "${kind}" on column "${col.id}" produced no GridCellValue. ` +
+          `Set a value field on GridCellContent when using cardProperty.`,
+      );
+    }
+
+    switch (kind) {
       case CardProperty.Title:
-        title = value;
+        title = cellValue;
         break;
       case CardProperty.Eyebrow:
-        eyebrow = value;
+        eyebrow = cellValue;
         break;
       case CardProperty.Badge:
-        badge = value;
+        badge = cellValue;
         break;
-      case CardProperty.DataBlock:
-        dataBlocks.push({ header: col.name ?? col.id ?? "", value });
+      case CardProperty.DataBlock: {
+        const label =
+          typeof prop === "object" && "label" in prop
+            ? (prop.label ?? col.name ?? col.id ?? "")
+            : (col.name ?? col.id ?? "");
+        dataBlocks.push({ header: label, value: cellValue });
         break;
+      }
       case CardProperty.Progress:
-        progress = { label: col.name ?? "", value: Number(value) || 0, minValue: 0, maxValue: 100 };
+        if (typeof prop === "object" && prop.kind === CardProperty.Progress) {
+          progress = { label: col.name ?? "", value: prop.getValue(rs.row.data as any), minValue: 0, maxValue: 100 };
+        }
         break;
       case CardProperty.Status:
-        status = { text: value, type: col.cardStatusMapper ? col.cardStatusMapper(value) : "neutral" };
+        if (typeof prop === "object" && prop.kind === CardProperty.Status) {
+          status = prop.getValue(rs.row.data as any);
+        }
         break;
     }
   }
@@ -87,26 +118,31 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
   return card;
 }
 
-// TODO: handle generic typing
-export type TableCardViewProps = {
+function toDisplay(value: GridCellValue): ReactNode {
+  if (value == null) return null;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
+  return String(value);
+}
+
+export type TableCardViewProps<X> = {
   imgSrc: string;
-  eyebrow?: string;
-  title: string;
-  badge?: string;
+  eyebrow?: GridCellValue;
+  title: GridCellValue;
+  badge?: GridCellValue;
   data: CardData[];
-  status?: TagProps<any>;
+  status?: TagProps<X>;
   progress?: AriaProgressBarProps;
 };
 
-export const TableCardView = (props: TableCardViewProps) => {
+export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardViewProps<X>) {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
 
-  const imageElement = <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={title} />;
+  const imageElement = <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={String(title)} />;
 
   const titleElement = (
     <div>
       <h4 css={Css.xl.fwb.$}>
-        {title} {badge && <span css={Css.sm.$}>{badge}</span>}
+        {toDisplay(title)} {badge && <span css={Css.sm.$}>{toDisplay(badge)}</span>}
       </h4>
     </div>
   );
@@ -131,7 +167,7 @@ export const TableCardView = (props: TableCardViewProps) => {
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <div>
-          {eyebrow && <p css={Css.sm.$}>{eyebrow}</p>}
+          {eyebrow && <p css={Css.sm.$}>{toDisplay(eyebrow)}</p>}
           {title && titleElement}
         </div>
         {data && data?.length > 0 && dataElement}
@@ -148,4 +184,4 @@ export const TableCardView = (props: TableCardViewProps) => {
       </div>
     </div>
   );
-};
+}
