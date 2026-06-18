@@ -992,7 +992,7 @@ function renderCardView<R extends Kinded>(
           ref,
         ) {
           return (
-            <div ref={ref} style={style} css={Css.dg.gtc("1fr").jic.gap3.p3.$}>
+            <div ref={ref} style={style} css={Css.dg.gtc("repeat(auto-fill, 330px)").jcc.gap3.p3.$}>
               {children}
             </div>
           );
