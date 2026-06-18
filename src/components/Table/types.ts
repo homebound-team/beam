@@ -40,7 +40,6 @@ export enum CardProperty {
   Title = "title",
   DataBlock = "data",
   Progress = "progress",
-  Image = "image",
 }
 
 type CardPropertyDef<R extends Kinded> =
