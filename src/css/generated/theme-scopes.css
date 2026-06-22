@@ -18,6 +18,10 @@
   --b-button-tertiary-fg-pressed: rgba(30, 64, 175, 1);
   --b-danger: rgba(220, 38, 38, 1);
   --b-danger-pressed: rgba(153, 27, 27, 1);
+  --b-env-brand-dev: rgba(88, 206, 32, 1);
+  --b-env-brand-local-prod: rgba(239, 68, 68, 1);
+  --b-env-brand-prod: rgba(32, 206, 200, 1);
+  --b-env-brand-qa: rgba(255, 128, 0, 1);
   --b-field-bg-default: rgba(255, 255, 255, 1);
   --b-field-bg-disabled: rgba(247, 245, 245, 1);
   --b-field-bg-hover: rgba(247, 245, 245, 1);

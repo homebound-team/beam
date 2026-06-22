@@ -1,3 +1,6 @@
+/** Effective environment banner height (px); `0` when hidden. */
+export const beamEnvironmentBannerLayoutHeightVar = "--beam-environment-banner-height";
+
 /** Effective navbar height (px) while pinned; `0` when scrolled away. */
 export const beamNavbarLayoutHeightVar = "--beam-navbar-layout-height";
 
@@ -26,12 +29,17 @@ export function documentScrollChromeWidth(): string {
   return `calc(var(${beamLayoutViewportWidthVar}, 100vw) - var(${beamSideNavLayoutWidthVar}, 0px))`;
 }
 
-/** `top` offset below auto-hiding navbar + page header (each var collapses to `0` when scrolled away). */
-export function stickyNavAndHeaderOffset(basePx = 0): string {
-  return `calc(${basePx}px + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
+/** CSS `top` offset below the environment banner + auto-hiding navbar. */
+export function bannerAndNavbarChromeTop(): string {
+  return `calc(var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px))`;
 }
 
-/** `top` offset for sticky table column headers (navbar + page header + table actions). */
+/** `top` offset below environment banner + auto-hiding navbar + page header (each var collapses to `0` when scrolled away). */
+export function stickyNavAndHeaderOffset(basePx = 0): string {
+  return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
+}
+
+/** `top` offset for sticky table column headers (environment banner + navbar + page header + table actions). */
 export function stickyTableHeaderOffset(basePx = 0): string {
-  return `calc(${basePx}px + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
+  return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
 }
