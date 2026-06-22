@@ -2,6 +2,7 @@ import { act } from "@testing-library/react";
 import { checkboxFilter } from "src/components/Filters";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import { CardProperty } from "src/components/Table/types";
 import {
   actionColumn,
   collapseColumn,
@@ -11,7 +12,7 @@ import {
   numericColumn,
   selectColumn,
 } from "src/components/Table/utils/columns";
-import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
 import { noop } from "src/utils";
@@ -260,18 +261,16 @@ describe("GridTableLayout", () => {
     });
 
     it("shows EditColumnsButton in list view and hides it in card view", async () => {
-      const Content = () => <span data-testid="cardContent">Content</span>;
-
       // Given a GridTableLayout with hideable columns and card view enabled
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
           tableProps={{
-            columns: getColumns(),
+            columns: getHideableColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
-          withCardView={<Content />}
+          withCardView
         />,
         withRouter(),
       );
@@ -283,8 +282,7 @@ describe("GridTableLayout", () => {
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
-      // Then card content is shown and EditColumnsButton is hidden
-      expect(r.cardContent).toBeInTheDocument();
+      // Then EditColumnsButton is hidden in card view
       expect(r.query.editColumnsButton).not.toBeInTheDocument();
     });
 
@@ -318,7 +316,7 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           tableProps={{
-            columns: getColumns(),
+            columns: getHideableColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
           defaultView="list"
@@ -327,7 +325,8 @@ describe("GridTableLayout", () => {
         withRouter(),
       );
 
-      expect(r.viewToggleButton_list).toBeInTheDocument();
+      // Card view is restored from localStorage — EditColumnsButton is hidden in card view
+      expect(r.query.editColumnsButton).not.toBeInTheDocument();
     });
 
     it("does not persist view when withCardView is undefined", async () => {
@@ -357,7 +356,7 @@ describe("GridTableLayout", () => {
           pageTitle="Test"
           defaultView="list"
           tableProps={{
-            columns: getColumns(),
+            columns: getHideableColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
           withCardView
@@ -365,7 +364,60 @@ describe("GridTableLayout", () => {
         withRouter(),
       );
 
-      expect(r.viewToggleButton_card).toBeInTheDocument();
+      // Falls back to defaultView="list" — EditColumnsButton is visible in list view
+      expect(r.editColumnsButton).toBeInTheDocument();
+    });
+
+    it("renders card content using cardProperty columns when switched to card view", async () => {
+      setRunningInJest();
+      type CardTestData = { name: string; status: string };
+      type CardTestRow = SimpleHeaderAndData<CardTestData>;
+      const cardCols = [
+        column<CardTestRow>({
+          id: "name",
+          name: "Name",
+          header: "Name",
+          data: ({ name }) => name,
+          cardProperty: CardProperty.Title,
+        }),
+        column<CardTestRow>({
+          id: "status",
+          name: "Status",
+          header: "Status",
+          data: ({ status }) => status,
+          cardProperty: {
+            kind: CardProperty.Status,
+            getValue: ({ status }) => ({ text: status, type: "success" as const }),
+          },
+        }),
+      ];
+
+      function CardViewWrapper() {
+        const layoutState = useGridTableLayoutState({});
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            withCardView
+            tableProps={{
+              columns: cardCols,
+              rows: [
+                simpleHeader,
+                { kind: "data" as const, id: "row1", data: { name: "The Conroy", status: "Active" } },
+              ],
+            }}
+          />
+        );
+      }
+
+      const r = await render(<CardViewWrapper />, withRouter());
+
+      // When switching to card view
+      click(r.viewToggleButton);
+      click(r.viewToggleButton_card);
+
+      // Then actual card content is visible
+      expect(r.card_row1_title).toHaveTextContent("The Conroy");
+      expect(r.card_row1_status).toHaveTextContent("Active");
     });
   });
 
@@ -544,5 +596,13 @@ function getRows(): Row[] {
     { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
     { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
     { kind: "data", id: "3", data: { name: "Gamma", value: 30 } },
+  ];
+}
+
+function getHideableColumns() {
+  return [
+    column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name", canHide: true }),
+    numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value", canHide: true }),
+    actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
   ];
 }

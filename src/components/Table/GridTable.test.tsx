@@ -4,7 +4,7 @@ import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
-import { GridColumn, GridColumnWithId } from "src/components/Table/types";
+import { CardProperty, GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
   assignDefaultColumnIds,
@@ -4500,3 +4500,155 @@ function TestFilterAndSelect(props: {
     </div>
   );
 }
+
+// ---- Card view ----
+
+type CardData = { address: string; city: string; beds: string; bidOut: number; status: string };
+type CardRow = SimpleHeaderAndData<CardData>;
+
+const addressCol = column<CardRow>({
+  id: "address",
+  name: "Address",
+  header: "Address",
+  data: ({ address }) => address,
+  cardProperty: CardProperty.Title,
+});
+const cityCol = column<CardRow>({
+  id: "city",
+  name: "City",
+  header: "City",
+  data: ({ city }) => city,
+  cardProperty: CardProperty.Eyebrow,
+});
+const bedsCol = column<CardRow>({
+  id: "beds",
+  name: "Beds",
+  header: "Beds",
+  data: ({ beds }) => beds,
+  cardProperty: CardProperty.DataBlock,
+});
+const progressCol = column<CardRow>({
+  id: "progress",
+  name: "Bid Out",
+  header: "Bid Out",
+  data: ({ bidOut }) => bidOut,
+  cardProperty: { kind: CardProperty.Progress, getValue: ({ bidOut }) => bidOut },
+});
+const statusCol = column<CardRow>({
+  id: "status",
+  name: "Status",
+  header: "Status",
+  data: ({ status }) => status,
+  cardProperty: {
+    kind: CardProperty.Status,
+    getValue: ({ status }) => ({ text: status, type: status === "Active" ? "success" : "neutral" }),
+  },
+});
+const cardColumns = [addressCol, cityCol, bedsCol, progressCol, statusCol];
+const cardRows: GridDataRow<CardRow>[] = [
+  simpleHeader,
+  {
+    kind: "data",
+    id: "row1",
+    data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+  },
+  {
+    kind: "data",
+    id: "row2",
+    data: { address: "456 Oak Ave", city: "Dallas", beds: "4", bidOut: 30, status: "Pending" },
+  },
+];
+
+describe("card view", () => {
+  beforeEach(() => {
+    setRunningInJest();
+  });
+
+  it("renders a card for each data row", async () => {
+    const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    expect(r.card_row1_title).toHaveTextContent("123 Main St");
+    expect(r.card_row2_title).toHaveTextContent("456 Oak Ave");
+  });
+
+  it("does not render the header row as a card", async () => {
+    const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    // Only the two data rows produce cards; the header row does not
+    expect(r.card_row1_title).toBeInTheDocument();
+    expect(r.card_row2_title).toBeInTheDocument();
+  });
+
+  it("renders CardProperty.Eyebrow from column value", async () => {
+    const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    expect(r.card_row1_eyebrow).toHaveTextContent("Austin");
+  });
+
+  it("renders CardProperty.DataBlock with col.name as header", async () => {
+    const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    expect(r.card_row1_beds).toHaveTextContent("Beds: 3");
+  });
+
+  it("renders CardProperty.DataBlock with custom label override", async () => {
+    const customLabelCol = column<CardRow>({
+      id: "beds-custom",
+      name: "Beds",
+      header: "Beds",
+      data: ({ beds }) => beds,
+      cardProperty: { kind: CardProperty.DataBlock, label: "Bedrooms" },
+    });
+    const r = await render(
+      <GridTable as="card" columns={[addressCol, customLabelCol]} rows={[cardRows[0], cardRows[1]]} />,
+    );
+    expect(r.card_row1_bedrooms).toHaveTextContent("Bedrooms: 3");
+  });
+
+  it("renders CardProperty.Progress via getValue callback", async () => {
+    const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    expect(r.card_row1_progressValue).toHaveTextContent("65%");
+  });
+
+  it("renders CardProperty.Status Tag via getValue callback", async () => {
+    const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    expect(r.card_row1_status).toHaveTextContent("Active");
+  });
+
+  it("skips rows that produce no title", async () => {
+    const r = await render(<GridTable as="card" columns={[cityCol, bedsCol]} rows={cardRows} />);
+    expect(r.query.card_row1_title).not.toBeInTheDocument();
+    expect(r.query.card_row2_title).not.toBeInTheDocument();
+  });
+
+  it("warns in dev when a card property column produces no GridCellValue", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(noop);
+    const noValueCol = column<CardRow>({
+      id: "address-no-value",
+      header: "Address",
+      data: ({ address }) => ({ content: <span>{address}</span> }),
+      cardProperty: CardProperty.Title,
+    });
+    await render(<GridTable as="card" columns={[noValueCol]} rows={cardRows} />);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("[GridTable] cardProperty"));
+    warnSpy.mockRestore();
+  });
+
+  it("wraps card in Link when rowStyle.rowLink is set", async () => {
+    const r = await render(
+      <GridTable
+        as="card"
+        columns={cardColumns}
+        rows={cardRows}
+        rowStyles={{ data: { rowLink: () => "/detail/1" } }}
+      />,
+      withRouter(),
+    );
+    expect(r.container.querySelectorAll("a").length).toBeGreaterThan(0);
+  });
+
+  it("calls onClick handler when card is clicked", async () => {
+    const handler = vi.fn();
+    const r = await render(
+      <GridTable as="card" columns={cardColumns} rows={cardRows} rowStyles={{ data: { onClick: handler } }} />,
+    );
+    click(r.card_row1_title);
+    expect(handler).toHaveBeenCalled();
+  });
+});

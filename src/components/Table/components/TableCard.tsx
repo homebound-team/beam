@@ -9,6 +9,8 @@ import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
 import { Css, Only, Tokens, Xss } from "src/Css";
 import { navLink } from "src/css/CssReset";
+import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { GridCellValue } from "./cell";
 
 export type CardData = {
@@ -90,6 +92,7 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
 
   const card = (
     <TableCardView
+      data-testid={`card_${rs.row.id}`}
       imgSrc={(rs.row as any).imgSrc ?? ""}
       title={title}
       eyebrow={eyebrow}
@@ -136,24 +139,34 @@ export type TableCardViewProps<X> = {
 
 export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardViewProps<X>) {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
+  const tid = useTestIds(props, "tableCardView");
 
   return (
-    <div css={Css.p3.w("330px").h("100%").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$}>
+    <div css={Css.p3.w("330px").h("100%").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
       <div css={Css.relative.$}>
-        <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={String(title)} />
+        <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={String(title)} {...tid.image} />
         {status && (
-          <div css={Css.absolute.top1.left1.$}>
+          <div css={Css.absolute.top1.left1.$} {...tid.status}>
             <Tag {...status} />
           </div>
         )}
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <div>
-          {eyebrow && <p css={Css.sm.$}>{toDisplay(eyebrow)}</p>}
+          {eyebrow && (
+            <p css={Css.sm.$} {...tid.eyebrow}>
+              {toDisplay(eyebrow)}
+            </p>
+          )}
           {title && (
             <div>
-              <h4 css={Css.xl.fwb.$}>
-                {toDisplay(title)} {badge && <span css={Css.sm.$}>{toDisplay(badge)}</span>}
+              <h4 css={Css.xl.fwb.$} {...tid.title}>
+                {toDisplay(title)}{" "}
+                {badge && (
+                  <span css={Css.sm.$} {...tid.badge}>
+                    {toDisplay(badge)}
+                  </span>
+                )}
               </h4>
             </div>
           )}
@@ -161,7 +174,11 @@ export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardVi
         {data && data?.length > 0 && (
           <div css={Css.dg.gtc("1fr 1fr").sm.$}>
             {data.map((d, idx) => (
-              <p key={`${d.header}-${d.value}`} css={Css.gc((idx % 2) + 1).$}>{`${d.header}: ${d.value}`}</p>
+              <p
+                key={`${d.header}-${d.value}`}
+                css={Css.gc((idx % 2) + 1).$}
+                {...tid[defaultTestId(d.header)]}
+              >{`${d.header}: ${d.value}`}</p>
             ))}
           </div>
         )}
@@ -171,7 +188,7 @@ export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardVi
               <div css={Css.w25.hPx(8).br4.bgGray200.$}>
                 <div css={Css.h100.br4.bgBlue500.w(`${progress.value}%`).$} />
               </div>
-              <span>{progress.value}%</span>
+              <span {...tid.progressValue}>{progress.value}%</span>
             </div>
           </div>
         )}

@@ -620,13 +620,20 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
         {as === "card" ? (
-          <CardView
-            cardRows={visibleDataRows}
-            id={id}
-            virtuosoRangeRef={virtuosoRangeRef}
-            infiniteScroll={infiniteScroll}
-            persistScrollPosition={persistScrollPosition}
-          />
+          // VirtuosoGrid requires layout measurement; in jsdom fall back to a plain div so tests can render cards.
+          runningInJest ? (
+            <div css={Css.py2.$}>
+              <div css={Css.dg.gtc("repeat(auto-fill, 330px)").jcc.gap3.p3.$}>{visibleDataRows}</div>
+            </div>
+          ) : (
+            <CardView
+              cardRows={visibleDataRows}
+              id={id}
+              virtuosoRangeRef={virtuosoRangeRef}
+              infiniteScroll={infiniteScroll}
+              persistScrollPosition={persistScrollPosition}
+            />
+          )
         ) : (
           renders[_as as Exclude<RenderAs, "card">](
             tableStyle,
