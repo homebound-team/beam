@@ -2,11 +2,12 @@ import { Meta } from "@storybook/react-vite";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
+import { EnvironmentBannerLayout } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
-import { createNavbar, TableExample } from "src/utils/sbComponents";
+import { createNavbar, GridTableLayoutExample } from "src/utils/sbComponents";
 
 export default {
   component: NavbarLayout,
