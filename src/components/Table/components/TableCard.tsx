@@ -159,15 +159,15 @@ export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardVi
             </p>
           )}
           {title && (
-            <div>
+            <div css={Css.dif.w100.jcsb.aic.$}>
               <h4 css={Css.xl.fwb.$} {...tid.title}>
                 {toDisplay(title)}{" "}
-                {badge && (
-                  <span css={Css.sm.$} {...tid.badge}>
-                    {toDisplay(badge)}
-                  </span>
-                )}
               </h4>
+              {badge && (
+                <span css={Css.sm.wsnw.$} {...tid.badge}>
+                  {toDisplay(badge)}
+                </span>
+              )}
             </div>
           )}
         </div>

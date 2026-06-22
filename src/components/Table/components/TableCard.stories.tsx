@@ -47,3 +47,17 @@ export function AllProps() {
     />
   );
 }
+
+export function LongTitle() {
+  return (
+    <TableCardView
+      imgSrc={imgSrc}
+      eyebrow="Home"
+      title="This is a long title example"
+      badge="Austin, TX"
+      status={{ text: "Archived", type: "warning" }}
+      data={data}
+      progress={{ label: "Construction", value: 65, minValue: 0, maxValue: 100 }}
+    />
+  );
+}
