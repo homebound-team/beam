@@ -164,6 +164,8 @@ export function select(select: HTMLElement, value: string | string[]) {
   optionValues.forEach((optionValue) => selectOption(select, optionValue));
 }
 
+export type SelectAndWaitOpts = { addNew?: boolean };
+
 /**
  * Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components.
  *
@@ -172,8 +174,6 @@ export function select(select: HTMLElement, value: string | string[]) {
  *
  * When `{ addNew: true }`, types the value and selects the `Add "<value>"` creatable row.
  */
-export type SelectAndWaitOpts = { addNew?: boolean };
-
 export async function selectAndWait(
   select: HTMLElement,
   value: string | string[],
@@ -189,7 +189,7 @@ export async function selectAndWait(
       throw new Error("selectAndWait addNew option does not support multi-select");
     }
     await typeForAddNew(select, value);
-    return allowAndWaitForAsyncBehavior(() => selectOption(select, addNewOptionLabel(value)));
+    return allowAndWaitForAsyncBehavior(() => selectOption(select, `Add "${value.trim()}"`));
   }
   if (!Array.isArray(value)) {
     await maybeAutoSearch(select, value);
@@ -198,10 +198,6 @@ export async function selectAndWait(
   return allowAndWaitForAsyncBehavior(() => {
     optionValues.forEach((optionValue) => selectOption(select, optionValue));
   });
-}
-
-function addNewOptionLabel(value: string): string {
-  return `Add "${value.trim()}"`;
 }
 
 async function typeForAddNew(select: HTMLElement, value: string): Promise<void> {
