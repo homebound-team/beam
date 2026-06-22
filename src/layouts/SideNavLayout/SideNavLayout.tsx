@@ -5,6 +5,8 @@ import { SideNav, SideNavProps } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import {
+  bannerAndNavbarChromeTop,
+  beamEnvironmentBannerLayoutHeightVar,
   beamLayoutViewportHeightVar,
   beamNavbarLayoutHeightVar,
   beamSideNavLayoutWidthVar,
@@ -51,8 +53,8 @@ function SideNavLayoutContent(props: SideNavLayoutProps) {
   // Rail width reserved in content space (mobile overlay only reserves the collapsed strip).
   const railOffsetPx = !showRail ? 0 : !bp.mdAndUp || collapsed ? railCollapsedWidthPx : railWidthPx;
 
-  const navTop = `var(${beamNavbarLayoutHeightVar}, 0px)`;
-  const railViewportHeight = `calc(var(${beamLayoutViewportHeightVar}, 100vh) - var(${beamNavbarLayoutHeightVar}, 0px))`;
+  const navTop = bannerAndNavbarChromeTop();
+  const railViewportHeight = `calc(var(${beamLayoutViewportHeightVar}, 100vh) - var(${beamEnvironmentBannerLayoutHeightVar}, 0px) - var(${beamNavbarLayoutHeightVar}, 0px))`;
 
   const rail = showRail && (
     <div
