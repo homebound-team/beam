@@ -11,7 +11,7 @@ import {
   allowAndWaitForAsyncBehavior,
   RenderResult,
 } from "@homebound/rtl-utils";
-import { prettyDOM } from "@testing-library/react";
+import { fireEvent, prettyDOM } from "@testing-library/react";
 import { fail } from "src/utils/index";
 
 export {
@@ -164,14 +164,48 @@ export function select(select: HTMLElement, value: string | string[]) {
   optionValues.forEach((optionValue) => selectOption(select, optionValue));
 }
 
+/**
+ * Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components.
+ *
+ * When `value` is a single string and the listbox opens empty, types the value to trigger async
+ * search before selecting. Multi-select (`value` array) assumes options are already loaded.
+ */
 export async function selectAndWait(select: HTMLElement, value: string | string[]): Promise<void> {
   // To work with React 18, we need to execute these as separate steps, otherwise
   // the `ensureListBoxOpen` async render won't flush, and the `selectOption` will fail.
+  const optionValues = Array.isArray(value) ? value : [value];
+
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+  if (!Array.isArray(value)) {
+    await maybeAutoSearch(select, value);
+  }
+
   return allowAndWaitForAsyncBehavior(() => {
-    const optionValues = Array.isArray(value) ? value : [value];
     optionValues.forEach((optionValue) => selectOption(select, optionValue));
   });
+}
+
+/** When a combobox opens with no options, type the target label to trigger async search. */
+async function maybeAutoSearch(select: HTMLElement, searchText: string): Promise<void> {
+  if (!hasZeroOptions(select)) return;
+
+  // Give lazy-load or debounced search a chance to populate options before typing.
+  await _wait();
+  await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+  if (!hasZeroOptions(select)) return;
+
+  fireEvent.input(select, { target: { value: searchText } });
+  await _wait();
+  await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+}
+
+function getListBoxOptions(select: HTMLElement): HTMLElement[] {
+  const listbox = findListBox(select);
+  return Array.from(listbox.querySelectorAll("[role=option]")) as HTMLElement[];
+}
+
+function hasZeroOptions(select: HTMLElement): boolean {
+  return getListBoxOptions(select).length === 0;
 }
 
 function ensureListBoxOpen(select: HTMLElement): void {

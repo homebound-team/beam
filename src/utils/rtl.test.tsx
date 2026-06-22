@@ -127,6 +127,38 @@ describe("rtl", () => {
     expect(onSelect).toHaveBeenCalledWith("2", { id: "2", name: "Two" });
   });
 
+  it("auto-searches async search-driven SelectField when the listbox is empty", async () => {
+    const onSelect = vi.fn();
+    const allOptions = [
+      { id: "1", name: "Apple Pie" },
+      { id: "2", name: "Banana Bread" },
+      { id: "3", name: "Apricot Tart" },
+    ];
+    // Given a SelectField that only loads matching options after the user searches
+    function Test() {
+      const [value, setValue] = useState<string | undefined>();
+      const [search, setSearch] = useState<string>();
+      const options = search ? allOptions.filter((o) => o.name.toLowerCase().includes(search.toLowerCase())) : [];
+      return (
+        <SelectField
+          label="Food"
+          value={value}
+          onSelect={(nextValue, option) => {
+            setValue(nextValue);
+            onSelect(nextValue, option);
+          }}
+          onSearch={setSearch}
+          options={options}
+        />
+      );
+    }
+    const r = await render(<Test />);
+    // When selecting on an async search-driven field with no initial options
+    await selectAndWait(r.food, "Apple Pie");
+    // Then the onSelect handler is called with the correct value
+    expect(onSelect).toHaveBeenCalledWith("1", { id: "1", name: "Apple Pie" });
+  });
+
   it("can use select helpers and select an option via value on MultiSelectField", async () => {
     const onSelect = vi.fn();
     // Given the MultiSelectField
