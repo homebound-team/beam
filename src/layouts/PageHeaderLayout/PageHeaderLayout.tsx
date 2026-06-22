@@ -6,13 +6,13 @@ import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import {
-  beamNavbarLayoutHeightVar,
+  bannerAndNavbarChromeTop,
   beamPageHeaderLayoutHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
 } from "../layoutVars";
-import { useNavbarLayoutHeight } from "../NavbarLayout/NavbarLayoutHeightContext";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
+import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 
 export type PageHeaderLayoutProps<V extends string, X> = {
@@ -30,16 +30,16 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const tid = useTestIds(props, "pageHeaderLayout");
 
   // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
-  const navbarHeight = useNavbarLayoutHeight();
-  const navbarHeightRef = useRef(navbarHeight);
-  navbarHeightRef.current = navbarHeight;
-  const getNavbarBottom = useCallback(() => navbarHeightRef.current, []);
+  const bannerAndNavbarHeight = useBannerAndNavbarHeight();
+  const bannerAndNavbarHeightRef = useRef(bannerAndNavbarHeight);
+  bannerAndNavbarHeightRef.current = bannerAndNavbarHeight;
+  const getBannerAndNavbarHeight = useCallback(() => bannerAndNavbarHeightRef.current, []);
 
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
 
-  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true, getNavbarBottom);
+  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
   const headerOccupiesPosition = autoHideState === "revealed" || atTop;
 
   const cssVars: Record<string, string> | undefined =
@@ -47,7 +47,7 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
 
   const headerLeft = documentScrollChromeLeft();
   const headerWidth = documentScrollChromeWidth();
-  const outerTop = `var(${beamNavbarLayoutHeightVar}, 0px)`;
+  const outerTop = bannerAndNavbarChromeTop();
 
   const innerCss =
     autoHideState === "static"
