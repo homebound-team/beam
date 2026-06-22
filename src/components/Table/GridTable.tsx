@@ -615,6 +615,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return { ...style, minWidthPx };
   }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
 
+  console.log(visibleDataRows);
+
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
@@ -1036,7 +1038,7 @@ function CardView({
   const virtuosoKey = !!validatedScrollIndex && cardRows.length > 0 ? "with-data" : "virtuoso";
 
   return (
-    <div css={Css.py2.$}>
+    <div css={Css.py2.h100.$}>
       <VirtuosoGrid
         useWindowScroll={inDocumentScrollLayout && !customScrollParent}
         {...(customScrollParent ? { customScrollParent } : {})}
