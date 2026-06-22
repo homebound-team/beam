@@ -614,8 +614,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return { ...style, minWidthPx };
   }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
 
-  console.log(visibleDataRows);
-
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>

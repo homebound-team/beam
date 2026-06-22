@@ -85,9 +85,9 @@ export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: Tabl
   }
   if (rowStyle?.onClick) {
     return (
-      <div onClick={() => rowStyle.onClick!(rs.row as any, api)} css={Css.cursorPointer.$}>
+      <button onClick={() => rowStyle.onClick!(rs.row as any, api)} css={Css.cursorPointer.$}>
         {card}
-      </div>
+      </button>
     );
   }
   return card;
@@ -104,21 +104,14 @@ export type TableCardViewProps = {
   progress?: number;
 };
 
-function clampProgress(value: number): number {
-  if (process.env.NODE_ENV !== "production" && (value < 0 || value > 100)) {
-    console.warn(`[TableCard] progress value ${value} is outside the expected range [0, 100] and will be clamped.`);
-  }
-  return Math.min(100, Math.max(0, value));
-}
-
 export function TableCardView(props: TableCardViewProps) {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
   const tid = useTestIds(props, "tableCardView");
 
   return (
-    <div css={Css.p3.w("330px").h("100%").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
+    <div css={Css.p3.wPx(330).h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
       <div css={Css.relative.$}>
-        <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
+        <img css={Css.hPx(184).w100.objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
           <div css={Css.absolute.top1.left1.$} {...tid.status}>
             <Tag {...status} />
@@ -146,7 +139,7 @@ export function TableCardView(props: TableCardViewProps) {
           )}
         </div>
         {data && data?.length > 0 && (
-          <div css={Css.dg.gtc("1fr 1fr").sm.$}>
+          <div css={Css.dg.gtc("repeat(2, minmax(0, 1fr))").sm.$}>
             {data.map((d, idx) => (
               <p key={`${d.header}`} css={Css.gc((idx % 2) + 1).$} {...tid[defaultTestId(d.header)]}>
                 {d.header}: {d.value}
@@ -167,4 +160,11 @@ export function TableCardView(props: TableCardViewProps) {
       </div>
     </div>
   );
+}
+
+function clampProgress(value: number): number {
+  if (process.env.NODE_ENV !== "production" && (value < 0 || value > 100)) {
+    console.warn(`[TableCard] progress value ${value} is outside the expected range [0, 100] and will be clamped.`);
+  }
+  return Math.min(100, Math.max(0, value));
 }

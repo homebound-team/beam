@@ -370,6 +370,7 @@ describe("GridTableLayout", () => {
 
     it("renders card content using cardSlot columns when switched to card view", async () => {
       setRunningInJest();
+      // Given a layout with cardSlot columns and a single data row
       type CardTestData = { name: string; status: string };
       type CardTestRow = SimpleHeaderAndData<CardTestData>;
       const cardCols = [
@@ -414,7 +415,7 @@ describe("GridTableLayout", () => {
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
-      // Then actual card content is visible
+      // Then the card shows the title and status
       expect(r.card_row1_title).toHaveTextContent("The Conroy");
       expect(r.card_row1_status).toHaveTextContent("Active");
     });

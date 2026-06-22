@@ -4572,29 +4572,41 @@ describe("card view", () => {
   });
 
   it("renders a card for each data row", async () => {
+    // Given card columns and two data rows
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    // Then each data row produces a card with its title
     expect(r.card_row1_title).toHaveTextContent("123 Main St");
     expect(r.card_row2_title).toHaveTextContent("456 Oak Ave");
   });
 
   it("does not render the header row as a card", async () => {
+    // Given rows that include a header row and two data rows
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
-    // Only the two data rows produce cards; the header row does not
+    // Then only the data rows produce cards
     expect(r.card_row1_title).toBeInTheDocument();
     expect(r.card_row2_title).toBeInTheDocument();
   });
 
   it("renders cardEyebrowSlot text", async () => {
+    // Given a column with a cardEyebrowSlot
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    // Then the eyebrow text appears on the card
     expect(r.card_row1_eyebrow).toHaveTextContent("Austin");
   });
 
   it("renders cardDataBlockSlot with provided label", async () => {
+    // Given a column with a cardDataBlockSlot
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    // Then the data block shows the label and value
     expect(r.card_row1_beds).toHaveTextContent("Beds: 3");
   });
 
   it("renders cardDataBlockSlot with custom label", async () => {
+    // Given a column with a cardDataBlockSlot using a custom label
     const customLabelCol = column<CardRow>({
       id: "beds-custom",
       name: "Beds",
@@ -4605,39 +4617,55 @@ describe("card view", () => {
         cardSlot: cardDataBlockSlot({ label: "Bedrooms", value: beds }),
       }),
     });
+    // When rendered as card
     const r = await render(
       <GridTable as="card" columns={[addressCol, customLabelCol]} rows={[cardRows[0], cardRows[1]]} />,
     );
+    // Then the custom label is used instead of the column name
     expect(r.card_row1_bedrooms).toHaveTextContent("Bedrooms: 3");
   });
 
   it("renders cardProgressSlot value", async () => {
+    // Given a column with a cardProgressSlot
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    // Then the progress percentage is displayed
     expect(r.card_row1_progressValue).toHaveTextContent("65%");
   });
 
   it("renders cardStatusSlot as Tag", async () => {
+    // Given a column with a cardStatusSlot
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={cardColumns} rows={cardRows} />);
+    // Then the status Tag shows the text
     expect(r.card_row1_status).toHaveTextContent("Active");
   });
 
   it("skips rows that produce no title", async () => {
+    // Given columns with no title slot
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={[cityCol, bedsCol]} rows={cardRows} />);
+    // Then no cards are rendered
     expect(r.query.card_row1_title).not.toBeInTheDocument();
     expect(r.query.card_row2_title).not.toBeInTheDocument();
   });
 
   it("skips columns that return GridCellContent without cardSlot", async () => {
+    // Given a column that returns GridCellContent without a cardSlot
     const noSlotCol = column<CardRow>({
       id: "address-no-slot",
       header: "Address",
       data: ({ address }) => ({ content: <span>{address}</span>, value: address }),
     });
+    // When rendered as card
     const r = await render(<GridTable as="card" columns={[noSlotCol]} rows={cardRows} />);
+    // Then no card title is produced
     expect(r.query.card_row1_title).not.toBeInTheDocument();
   });
 
   it("wraps card in Link when rowStyle.rowLink is set", async () => {
+    // Given rowStyles with a rowLink
+    // When rendered as card
     const r = await render(
       <GridTable
         as="card"
@@ -4647,15 +4675,19 @@ describe("card view", () => {
       />,
       withRouter(),
     );
+    // Then each card is wrapped in an anchor tag
     expect(r.container.querySelectorAll("a").length).toBeGreaterThan(0);
   });
 
   it("calls onClick handler when card is clicked", async () => {
+    // Given rowStyles with an onClick handler
     const handler = vi.fn();
     const r = await render(
       <GridTable as="card" columns={cardColumns} rows={cardRows} rowStyles={{ data: { onClick: handler } }} />,
     );
+    // When a card is clicked
     click(r.card_row1_title);
+    // Then the handler is called
     expect(handler).toHaveBeenCalled();
   });
 });
