@@ -4538,7 +4538,7 @@ const progressCol = column<CardRow>({
   data: ({ bidOut }) => ({
     content: bidOut,
     value: bidOut,
-    cardSlot: cardProgressSlot({ label: "Bid Out", value: bidOut }),
+    cardSlot: cardProgressSlot(bidOut),
   }),
 });
 const statusCol = column<CardRow>({

@@ -8,7 +8,7 @@ export type CardEyebrowSlot = CardSlotBase<"eyebrow"> & { text: string };
 export type CardBadgeSlot = CardSlotBase<"badge"> & { text: string };
 export type CardStatusSlot = CardSlotBase<"status"> & { tag: CardTag };
 export type CardDataBlockSlot = CardSlotBase<"dataBlock"> & { label: string; value: ReactNode | string | number };
-export type CardProgressSlot = CardSlotBase<"progress"> & { label: string; value: number };
+export type CardProgressSlot = CardSlotBase<"progress"> & { value: number };
 
 export type CardSlot =
   | CardTitleSlot
@@ -38,6 +38,6 @@ export function cardDataBlockSlot(props: { label: string; value: ReactNode | str
   return { kind: "dataBlock", ...props };
 }
 
-export function cardProgressSlot(props: { label: string; value: number }): CardProgressSlot {
-  return { kind: "progress", ...props };
+export function cardProgressSlot(value: number): CardProgressSlot {
+  return { kind: "progress", value };
 }

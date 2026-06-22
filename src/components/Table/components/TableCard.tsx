@@ -148,7 +148,7 @@ export function TableCardView(props: TableCardViewProps) {
         {data && data?.length > 0 && (
           <div css={Css.dg.gtc("1fr 1fr").sm.$}>
             {data.map((d, idx) => (
-              <p key={`${d.header}-${idx}`} css={Css.gc((idx % 2) + 1).$} {...tid[defaultTestId(d.header)]}>
+              <p key={`${d.header}`} css={Css.gc((idx % 2) + 1).$} {...tid[defaultTestId(d.header)]}>
                 {d.header}: {d.value}
               </p>
             ))}

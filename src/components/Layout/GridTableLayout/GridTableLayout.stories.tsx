@@ -346,7 +346,7 @@ const planColumns = [
     data: ({ bidOut }) => ({
       content: bidOut,
       value: bidOut,
-      cardSlot: cardProgressSlot({ label: "Bid out", value: bidOut }),
+      cardSlot: cardProgressSlot(bidOut),
     }),
   }),
   column<PlanRow>({
