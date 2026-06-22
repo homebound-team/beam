@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import {
+  type AppNavItem,
   GridColumn,
   GridDataRow,
   GridTable,
@@ -12,6 +13,7 @@ import {
   SimpleHeaderAndData,
   Tokens,
 } from "src/index";
+import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
 import { zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
 
@@ -60,6 +62,16 @@ export function TableExample({
   );
 }
 
+export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string; children: ReactNode }) {
+  return (
+    <NavbarLayout navbar={createNavbar()}>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>
+        <PageHeaderLayout pageHeader={{ title: pageTitle ?? "" }}>{children}</PageHeaderLayout>
+      </SideNavLayout>
+    </NavbarLayout>
+  );
+}
+
 export function createNavbar(): NavbarProps {
   return {
     brand: (
@@ -84,6 +96,22 @@ export function createNavbar(): NavbarProps {
     ),
     user: createUser(),
   };
+}
+
+export function sideNavItems(): AppNavItem[] {
+  return [
+    {
+      section: true,
+      label: "Main",
+      items: [
+        { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+        { label: "Schedule", icon: "calendar", onClick: "/schedule" },
+        { label: "Commitments", icon: "fileBlank", onClick: "/commitments" },
+        { label: "Documents", icon: "comment", onClick: "/documents" },
+        { label: "Settings", icon: "pencil", onClick: "/settings" },
+      ],
+    },
+  ];
 }
 
 function createUser(): NavbarUser {
