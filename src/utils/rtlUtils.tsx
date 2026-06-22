@@ -169,13 +169,28 @@ export function select(select: HTMLElement, value: string | string[]) {
  *
  * When `value` is a single string and the listbox opens empty, types the value to trigger async
  * search before selecting. Multi-select (`value` array) assumes options are already loaded.
+ *
+ * When `{ addNew: true }`, types the value and selects the `Add "<value>"` creatable row.
  */
-export async function selectAndWait(select: HTMLElement, value: string | string[]): Promise<void> {
+export type SelectAndWaitOpts = { addNew?: boolean };
+
+export async function selectAndWait(
+  select: HTMLElement,
+  value: string | string[],
+  opts?: SelectAndWaitOpts,
+): Promise<void> {
   // To work with React 18, we need to execute these as separate steps, otherwise
   // the `ensureListBoxOpen` async render won't flush, and the `selectOption` will fail.
   const optionValues = Array.isArray(value) ? value : [value];
 
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+  if (opts?.addNew) {
+    if (Array.isArray(value)) {
+      throw new Error("selectAndWait addNew option does not support multi-select");
+    }
+    await typeForAddNew(select, value);
+    return allowAndWaitForAsyncBehavior(() => selectOption(select, addNewOptionLabel(value)));
+  }
   if (!Array.isArray(value)) {
     await maybeAutoSearch(select, value);
   }
@@ -183,6 +198,16 @@ export async function selectAndWait(select: HTMLElement, value: string | string[
   return allowAndWaitForAsyncBehavior(() => {
     optionValues.forEach((optionValue) => selectOption(select, optionValue));
   });
+}
+
+function addNewOptionLabel(value: string): string {
+  return `Add "${value.trim()}"`;
+}
+
+async function typeForAddNew(select: HTMLElement, value: string): Promise<void> {
+  fireEvent.input(select, { target: { value } });
+  await _wait();
+  await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
 }
 
 /** When a combobox opens with no options, type the target label to trigger async search. */

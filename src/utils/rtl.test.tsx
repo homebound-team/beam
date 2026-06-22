@@ -159,6 +159,29 @@ describe("rtl", () => {
     expect(onSelect).toHaveBeenCalledWith("1", { id: "1", name: "Apple Pie" });
   });
 
+  it("can select the add-new row with addNew option", async () => {
+    const onAddNew = vi.fn();
+    function Test() {
+      return (
+        <SelectField
+          value={undefined as any}
+          onSelect={(value, option) => {
+            onAddNew(value, option);
+          }}
+          label="Fruit"
+          options={[
+            { id: "1", name: "Apple" },
+            { id: "2", name: "Banana" },
+          ]}
+          onAddNew={onAddNew}
+        />
+      );
+    }
+    const r = await render(<Test />);
+    await selectAndWait(r.fruit, "Kiwi", { addNew: true });
+    expect(onAddNew).toHaveBeenCalledWith("Kiwi");
+  });
+
   it("can use select helpers and select an option via value on MultiSelectField", async () => {
     const onSelect = vi.fn();
     // Given the MultiSelectField
