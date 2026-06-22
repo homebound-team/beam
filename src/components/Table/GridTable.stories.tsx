@@ -30,14 +30,7 @@ import {
   SimpleHeaderAndData,
   useGridTableApi,
 } from "src/components/index";
-import {
-  cardBadgeSlot,
-  cardDataBlockSlot,
-  cardEyebrowSlot,
-  cardProgressSlot,
-  cardStatusSlot,
-  cardTitleSlot,
-} from "src/components/Table/cardSlots";
+import { cardBadgeSlot, cardDataBlockSlot, cardEyebrowSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { Css, Palette } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -2457,7 +2450,11 @@ export function CardView() {
     {
       header: "Sq Ft",
       name: "Sq Ft",
-      data: ({ sqft }) => ({ content: sqft, value: sqft, cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }) }),
+      data: ({ sqft }) => ({
+        content: sqft,
+        value: sqft,
+        cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }),
+      }),
     },
     {
       header: "Beds",
@@ -2467,7 +2464,11 @@ export function CardView() {
     {
       header: "Baths",
       name: "Baths",
-      data: ({ baths }) => ({ content: baths, value: baths, cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }) }),
+      data: ({ baths }) => ({
+        content: baths,
+        value: baths,
+        cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }),
+      }),
     },
     {
       header: "Close Date",
@@ -2580,12 +2581,20 @@ export function CardViewInfiniteScroll() {
       {
         header: "Sq Ft",
         name: "Sq Ft",
-        data: ({ sqft }) => ({ content: sqft, value: sqft, cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }) }),
+        data: ({ sqft }) => ({
+          content: sqft,
+          value: sqft,
+          cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }),
+        }),
       },
       {
         header: "Beds",
         name: "Beds",
-        data: ({ beds }) => ({ content: beds, value: beds, cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }) }),
+        data: ({ beds }) => ({
+          content: beds,
+          value: beds,
+          cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }),
+        }),
       },
       {
         header: "Baths",

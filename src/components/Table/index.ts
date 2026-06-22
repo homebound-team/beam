@@ -1,27 +1,27 @@
 export {
+  cardBadgeSlot,
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
+export type {
+  CardBadgeSlot,
+  CardDataBlockSlot,
+  CardEyebrowSlot,
+  CardProgressSlot,
+  CardSlot,
+  CardStatusSlot,
+  CardTitleSlot,
+} from "src/components/Table/cardSlots";
+export {
   defaultRenderFn,
   headerRenderFn,
   rowClickRenderFn,
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "src/components/Table/components/cell";
-export type {
-  CardSlot,
-  CardTitleSlot,
-  CardEyebrowSlot,
-  CardBadgeSlot,
-  CardStatusSlot,
-  CardDataBlockSlot,
-  CardProgressSlot,
-} from "src/components/Table/cardSlots";
-export {
-  cardTitleSlot,
-  cardEyebrowSlot,
-  cardBadgeSlot,
-  cardStatusSlot,
-  cardDataBlockSlot,
-  cardProgressSlot,
-} from "src/components/Table/cardSlots";
 export * from "src/components/Table/components/CollapseToggle";
 export { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 export { Row } from "src/components/Table/components/Row";

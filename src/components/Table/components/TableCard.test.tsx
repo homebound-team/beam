@@ -38,14 +38,7 @@ describe("TableCardView", () => {
   });
 
   it("renders progress bar with percentage label", async () => {
-    const r = await render(
-      <TableCardView
-        imgSrc={imgSrc}
-        title="123 Main St"
-        data={[]}
-        progress={65}
-      />,
-    );
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} progress={65} />);
     expect(r.tableCardView_progressValue).toHaveTextContent("65%");
   });
 

@@ -1,10 +1,5 @@
 import { act, fireEvent } from "@testing-library/react";
 import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
-import { GridDataRow } from "src/components/Table/components/Row";
-import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
-import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
-import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
-import { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   cardDataBlockSlot,
   cardEyebrowSlot,
@@ -12,6 +7,11 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
+import { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
+import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
+import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
+import { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
   assignDefaultColumnIds,
