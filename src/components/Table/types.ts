@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import type { GridRowKind } from "src/components/Table/components/Row";
 import { GridRowApi } from "src/components/Table/GridTableApi";
-import type { TagProps } from "src/components/Tag";
 import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
@@ -32,21 +31,6 @@ export type GridTableScrollOptions =
  * See https://stackoverflow.com/a/50125960/355031
  */
 export type DiscriminateUnion<T, K extends keyof T, V extends T[K]> = T extends Record<K, V> ? T : never;
-
-export enum CardProperty {
-  Status = "status",
-  Eyebrow = "eyebrow",
-  Badge = "badge",
-  Title = "title",
-  DataBlock = "data",
-  Progress = "progress",
-}
-
-type CardPropertyDef<R extends Kinded> =
-  | Exclude<CardProperty, CardProperty.Progress | CardProperty.Status>
-  | { kind: CardProperty.DataBlock; label?: string }
-  | { kind: CardProperty.Progress; getValue: (data: R extends { data: infer D } ? D : never) => number }
-  | { kind: CardProperty.Status; getValue: (data: R extends { data: infer D } ? D : never) => TagProps<any> };
 
 /**
  * Defines how a single column will render each given row `kind` in `R`.
@@ -120,8 +104,6 @@ export type GridColumn<R extends Kinded> = {
   hideOnExpand?: boolean;
   /** Determines whether a column is csv-only or web-only. */
   showIn?: "csv" | "web";
-  /** Determines which location on the card the column data goes */
-  cardProperty?: CardPropertyDef<R>;
 };
 
 /**
@@ -153,7 +135,6 @@ export const nonKindGridColumnKeys = [
   "initExpanded",
   "hideOnExpand",
   "showIn",
-  "cardProperty",
 ];
 
 /**

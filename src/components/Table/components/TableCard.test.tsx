@@ -43,7 +43,7 @@ describe("TableCardView", () => {
         imgSrc={imgSrc}
         title="123 Main St"
         data={[]}
-        progress={{ label: "Construction", value: 65, minValue: 0, maxValue: 100 }}
+        progress={65}
       />,
     );
     expect(r.tableCardView_progressValue).toHaveTextContent("65%");

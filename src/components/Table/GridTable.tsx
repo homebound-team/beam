@@ -471,14 +471,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     boolean,
   ] = useComputed(() => {
     if (as === "card") {
-      const cardColumns = columns.filter((c) => c.cardProperty !== undefined);
       const cardElements = tableState.visibleRows
         .filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind))
         .map((rs) => (
           <TableCard
             key={rs.key}
             rs={rs}
-            cardColumns={cardColumns}
+            columns={columns}
             rowStyle={rowStyles?.[rs.row.kind as R["kind"]]}
             api={tableState.api}
           />

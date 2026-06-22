@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import type { CardSlot } from "src/components/Table/cardSlots";
 import { navLink } from "src/components";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
@@ -28,6 +29,8 @@ export type GridCellValue =
 export type GridCellContent = {
   /** The JSX content of the cell. Virtual tables that client-side sort should use a function to avoid perf overhead. */
   content: MaybeFn<ReactNode>;
+  /** Optional card-view payload. List rendering ignores this field. */
+  cardSlot?: CardSlot;
   alignment?: GridCellAlignment;
   /** Allow value to be a function in case it's a dynamic value i.e. reading from an inline-edited proxy. */
   value?: MaybeFn<GridCellValue>;

@@ -2,7 +2,7 @@ import { act } from "@testing-library/react";
 import { checkboxFilter } from "src/components/Filters";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { CardProperty } from "src/components/Table/types";
+import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import {
   actionColumn,
   collapseColumn,
@@ -368,7 +368,7 @@ describe("GridTableLayout", () => {
       expect(r.editColumnsButton).toBeInTheDocument();
     });
 
-    it("renders card content using cardProperty columns when switched to card view", async () => {
+    it("renders card content using cardSlot columns when switched to card view", async () => {
       setRunningInJest();
       type CardTestData = { name: string; status: string };
       type CardTestRow = SimpleHeaderAndData<CardTestData>;
@@ -377,18 +377,17 @@ describe("GridTableLayout", () => {
           id: "name",
           name: "Name",
           header: "Name",
-          data: ({ name }) => name,
-          cardProperty: CardProperty.Title,
+          data: ({ name }) => ({ content: name, value: name, cardSlot: cardTitleSlot(name) }),
         }),
         column<CardTestRow>({
           id: "status",
           name: "Status",
           header: "Status",
-          data: ({ status }) => status,
-          cardProperty: {
-            kind: CardProperty.Status,
-            getValue: ({ status }) => ({ text: status, type: "success" as const }),
-          },
+          data: ({ status }) => ({
+            content: status,
+            value: status,
+            cardSlot: cardStatusSlot({ text: status, type: "success" }),
+          }),
         }),
       ];
 

@@ -43,7 +43,7 @@ export function AllProps() {
       badge="Austin, TX"
       status={{ text: "Archived", type: "warning" }}
       data={data}
-      progress={{ label: "Construction", value: 65, minValue: 0, maxValue: 100 }}
+      progress={65}
     />
   );
 }
@@ -57,7 +57,7 @@ export function LongTitle() {
       badge="Austin, TX"
       status={{ text: "Archived", type: "warning" }}
       data={data}
-      progress={{ label: "Construction", value: 65, minValue: 0, maxValue: 100 }}
+      progress={65}
     />
   );
 }

@@ -30,7 +30,14 @@ import {
   SimpleHeaderAndData,
   useGridTableApi,
 } from "src/components/index";
-import { CardProperty } from "src/components/Table/types";
+import {
+  cardBadgeSlot,
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
 import { Css, Palette } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -2437,42 +2444,39 @@ export function CardView() {
   const columns: GridColumn<HomeRow>[] = [
     {
       header: "Address",
-      data: ({ address }) => address,
-      cardProperty: CardProperty.Title,
+      data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
     },
     {
       header: "Lot",
-      data: ({ lot }) => lot,
-      cardProperty: CardProperty.Eyebrow,
+      data: ({ lot }) => ({ content: lot, value: lot, cardSlot: cardEyebrowSlot(lot) }),
     },
     {
       header: "City",
-      data: ({ city }) => city,
-      cardProperty: CardProperty.Badge,
+      data: ({ city }) => ({ content: city, value: city, cardSlot: cardBadgeSlot(city) }),
     },
     {
       header: "Sq Ft",
       name: "Sq Ft",
-      data: ({ sqft }) => sqft,
-      cardProperty: CardProperty.DataBlock,
+      data: ({ sqft }) => ({ content: sqft, value: sqft, cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }) }),
     },
     {
       header: "Beds",
       name: "Beds",
-      data: ({ beds }) => beds,
-      cardProperty: CardProperty.DataBlock,
+      data: ({ beds }) => ({ content: beds, value: beds, cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }) }),
     },
     {
       header: "Baths",
       name: "Baths",
-      data: ({ baths }) => baths,
-      cardProperty: CardProperty.DataBlock,
+      data: ({ baths }) => ({ content: baths, value: baths, cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }) }),
     },
     {
       header: "Close Date",
       name: "Close Date",
-      data: ({ closeDate }) => closeDate,
-      cardProperty: CardProperty.DataBlock,
+      data: ({ closeDate }) => ({
+        content: closeDate,
+        value: closeDate,
+        cardSlot: cardDataBlockSlot({ label: "Close Date", value: closeDate }),
+      }),
     },
   ];
 
@@ -2567,12 +2571,31 @@ export function CardViewInfiniteScroll() {
 
   const columns: GridColumn<HomeRow>[] = useMemo(
     () => [
-      { header: "Address", data: ({ address }) => address, cardProperty: CardProperty.Title },
-      { header: "Lot", data: ({ lot }) => lot, cardProperty: CardProperty.Eyebrow },
-      { header: "City", data: ({ city }) => city, cardProperty: CardProperty.Badge },
-      { header: "Sq Ft", name: "Sq Ft", data: ({ sqft }) => sqft, cardProperty: CardProperty.DataBlock },
-      { header: "Beds", name: "Beds", data: ({ beds }) => beds, cardProperty: CardProperty.DataBlock },
-      { header: "Baths", name: "Baths", data: ({ baths }) => baths, cardProperty: CardProperty.DataBlock },
+      {
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      },
+      { header: "Lot", data: ({ lot }) => ({ content: lot, value: lot, cardSlot: cardEyebrowSlot(lot) }) },
+      { header: "City", data: ({ city }) => ({ content: city, value: city, cardSlot: cardBadgeSlot(city) }) },
+      {
+        header: "Sq Ft",
+        name: "Sq Ft",
+        data: ({ sqft }) => ({ content: sqft, value: sqft, cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }) }),
+      },
+      {
+        header: "Beds",
+        name: "Beds",
+        data: ({ beds }) => ({ content: beds, value: beds, cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }) }),
+      },
+      {
+        header: "Baths",
+        name: "Baths",
+        data: ({ baths }) => ({
+          content: baths,
+          value: baths,
+          cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }),
+        }),
+      },
     ],
     [],
   );

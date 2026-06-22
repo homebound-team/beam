@@ -1,89 +1,61 @@
 import { ReactNode } from "react";
-import { AriaProgressBarProps } from "react-aria";
 import { Link } from "react-router-dom";
-import { Tag, TagProps, TagXss } from "src/components";
+import { Tag } from "src/components";
+import { CardTag } from "src/components/Card";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
-import { CardProperty, GridColumnWithId, Kinded } from "src/components/Table/types";
+import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
-import { Css, Only, Tokens, Xss } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { GridCellValue } from "./cell";
 
 export type CardData = {
   header: string;
-  value: GridCellValue;
+  value: ReactNode | string | number;
 };
 
 export type TableCardProps<R extends Kinded> = {
   rs: RowState<R>;
-  cardColumns: GridColumnWithId<R>[];
+  columns: GridColumnWithId<R>[];
   rowStyle: RowStyle<any> | undefined;
   api: GridTableApi<R>;
 };
 
-export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: TableCardProps<R>) {
-  let title: GridCellValue = "";
-  let eyebrow: GridCellValue;
-  let badge: GridCellValue;
-  let status: TagProps<any> | undefined;
+export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: TableCardProps<R>) {
+  let title: string | undefined;
+  let eyebrow: string | undefined;
+  let badge: string | undefined;
+  let status: CardTag | undefined;
   const dataBlocks: CardData[] = [];
-  let progress: AriaProgressBarProps | undefined;
+  let progress: number | undefined;
 
-  for (const col of cardColumns) {
-    const prop = col.cardProperty;
-    if (!prop) continue;
-    const kind = typeof prop === "object" ? prop.kind : prop;
+  for (const col of columns) {
     const raw = applyRowFn(col, rs.row, rs.api, rs.level, false);
-    const maybeValue = isGridCellContent(raw) ? raw.value : undefined;
-    const cellValue: GridCellValue =
-      typeof maybeValue === "function"
-        ? maybeValue()
-        : (maybeValue ??
-          (typeof raw === "string" || typeof raw === "number" || typeof raw === "boolean" ? raw : undefined));
+    if (!isGridCellContent(raw)) continue;
+    const slot = raw.cardSlot;
+    if (!slot) continue;
 
-    if (
-      cellValue === undefined &&
-      kind !== CardProperty.Progress &&
-      kind !== CardProperty.Status &&
-      process.env.NODE_ENV !== "production"
-    ) {
-      console.warn(
-        `[GridTable] cardProperty "${kind}" on column "${col.id}" produced no GridCellValue. ` +
-          `Set a value field on GridCellContent when using cardProperty.`,
-      );
-    }
-
-    switch (kind) {
-      case CardProperty.Title:
-        title = cellValue;
+    switch (slot.kind) {
+      case "title":
+        title = slot.text;
         break;
-      case CardProperty.Eyebrow:
-        eyebrow = cellValue;
+      case "eyebrow":
+        eyebrow = slot.text;
         break;
-      case CardProperty.Badge:
-        badge = cellValue;
+      case "badge":
+        badge = slot.text;
         break;
-      case CardProperty.DataBlock: {
-        const label =
-          typeof prop === "object" && "label" in prop
-            ? (prop.label ?? col.name ?? col.id ?? "")
-            : (col.name ?? col.id ?? "");
-        dataBlocks.push({ header: label, value: cellValue });
+      case "status":
+        status = slot.tag;
         break;
-      }
-      case CardProperty.Progress:
-        if (typeof prop === "object" && prop.kind === CardProperty.Progress) {
-          progress = { label: col.name ?? "", value: prop.getValue(rs.row.data as any), minValue: 0, maxValue: 100 };
-        }
+      case "dataBlock":
+        dataBlocks.push({ header: slot.label, value: slot.value });
         break;
-      case CardProperty.Status:
-        if (typeof prop === "object" && prop.kind === CardProperty.Status) {
-          status = prop.getValue(rs.row.data as any);
-        }
+      case "progress":
+        progress = slot.value;
         break;
     }
   }
@@ -121,30 +93,32 @@ export function TableCard<R extends Kinded>({ rs, cardColumns, rowStyle, api }: 
   return card;
 }
 
-function toDisplay(value: GridCellValue): ReactNode {
-  if (value == null) return null;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
-  return String(value);
-}
-
-export type TableCardViewProps<X> = {
+export type TableCardViewProps = {
   imgSrc: string;
-  eyebrow?: GridCellValue;
-  title: GridCellValue;
-  badge?: GridCellValue;
+  eyebrow?: string;
+  title: string;
+  badge?: string;
   data: CardData[];
-  status?: TagProps<X>;
-  progress?: AriaProgressBarProps;
+  status?: CardTag;
+  /** A number between 0 and 100. Values outside this range are clamped. */
+  progress?: number;
 };
 
-export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardViewProps<X>) {
+function clampProgress(value: number): number {
+  if (process.env.NODE_ENV !== "production" && (value < 0 || value > 100)) {
+    console.warn(`[TableCard] progress value ${value} is outside the expected range [0, 100] and will be clamped.`);
+  }
+  return Math.min(100, Math.max(0, value));
+}
+
+export function TableCardView(props: TableCardViewProps) {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
   const tid = useTestIds(props, "tableCardView");
 
   return (
     <div css={Css.p3.w("330px").h("100%").bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
       <div css={Css.relative.$}>
-        <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={String(title)} {...tid.image} />
+        <img css={Css.h("184px").w("100%").objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
           <div css={Css.absolute.top1.left1.$} {...tid.status}>
             <Tag {...status} />
@@ -155,17 +129,17 @@ export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardVi
         <div>
           {eyebrow && (
             <p css={Css.sm.$} {...tid.eyebrow}>
-              {toDisplay(eyebrow)}
+              {eyebrow}
             </p>
           )}
           {title && (
             <div css={Css.dif.w100.jcsb.aic.$}>
               <h4 css={Css.xl.fwb.$} {...tid.title}>
-                {toDisplay(title)}{" "}
+                {title}{" "}
               </h4>
               {badge && (
                 <span css={Css.sm.wsnw.$} {...tid.badge}>
-                  {toDisplay(badge)}
+                  {badge}
                 </span>
               )}
             </div>
@@ -174,21 +148,19 @@ export function TableCardView<X extends Only<Xss<TagXss>, X>>(props: TableCardVi
         {data && data?.length > 0 && (
           <div css={Css.dg.gtc("1fr 1fr").sm.$}>
             {data.map((d, idx) => (
-              <p
-                key={`${d.header}-${d.value}`}
-                css={Css.gc((idx % 2) + 1).$}
-                {...tid[defaultTestId(d.header)]}
-              >{`${d.header}: ${d.value}`}</p>
+              <p key={`${d.header}-${idx}`} css={Css.gc((idx % 2) + 1).$} {...tid[defaultTestId(d.header)]}>
+                {d.header}: {d.value}
+              </p>
             ))}
           </div>
         )}
-        {progress && (
+        {progress !== undefined && (
           <div css={Css.df.fdc.gap1.$}>
             <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
               <div css={Css.w25.hPx(8).br4.bgGray200.$}>
-                <div css={Css.h100.br4.bgBlue500.w(`${progress.value}%`).$} />
+                <div css={Css.h100.br4.bgBlue500.w(`${clampProgress(progress)}%`).$} />
               </div>
-              <span {...tid.progressValue}>{progress.value}%</span>
+              <span {...tid.progressValue}>{clampProgress(progress)}%</span>
             </div>
           </div>
         )}

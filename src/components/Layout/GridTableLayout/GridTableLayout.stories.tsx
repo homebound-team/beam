@@ -2,7 +2,14 @@ import { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridDataRow, SimpleHeaderAndData } from "src/components/Table";
-import { CardProperty } from "src/components/Table/types";
+import {
+  cardBadgeSlot,
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
@@ -262,84 +269,98 @@ const planColumns = [
     id: "offering-name",
     name: "Offering Name",
     header: "Offering Name",
-    data: ({ offeringName }) => offeringName,
-    cardProperty: CardProperty.Title,
+    data: ({ offeringName }) => ({
+      content: offeringName,
+      value: offeringName,
+      cardSlot: cardTitleSlot(offeringName),
+    }),
   }),
   column<PlanRow>({
     id: "plan-code",
     name: "Plan Code",
     header: "Plan Code",
-    data: ({ planCode }) => planCode,
-    cardProperty: CardProperty.Eyebrow,
+    data: ({ planCode }) => ({ content: planCode, value: planCode, cardSlot: cardEyebrowSlot(planCode) }),
   }),
   column<PlanRow>({
     id: "version",
     name: "Version",
     header: "Version",
-    data: ({ version }) => version,
-    cardProperty: CardProperty.Badge,
+    data: ({ version }) => ({ content: version, value: version, cardSlot: cardBadgeSlot(version) }),
   }),
   column<PlanRow>({
     id: "sqft",
     name: "Sq ft",
     header: "Sq ft",
-    data: ({ sqft }) => sqft,
-    cardProperty: CardProperty.DataBlock,
+    data: ({ sqft }) => ({ content: sqft, value: sqft, cardSlot: cardDataBlockSlot({ label: "Sq ft", value: sqft }) }),
   }),
   column<PlanRow>({
     id: "beds",
     name: "Bed",
     header: "Bed",
-    data: ({ beds }) => beds,
-    cardProperty: CardProperty.DataBlock,
+    data: ({ beds }) => ({ content: beds, value: beds, cardSlot: cardDataBlockSlot({ label: "Bed", value: beds }) }),
   }),
   column<PlanRow>({
     id: "baths",
     name: "Bath",
     header: "Bath",
-    data: ({ baths }) => baths,
-    cardProperty: CardProperty.DataBlock,
+    data: ({ baths }) => ({
+      content: baths,
+      value: baths,
+      cardSlot: cardDataBlockSlot({ label: "Bath", value: baths }),
+    }),
   }),
   column<PlanRow>({
     id: "elevations",
     name: "Elevations",
     header: "Elevations",
-    data: ({ elevations }) => elevations,
-    cardProperty: CardProperty.DataBlock,
+    data: ({ elevations }) => ({
+      content: elevations,
+      value: elevations,
+      cardSlot: cardDataBlockSlot({ label: "Elevations", value: elevations }),
+    }),
   }),
   column<PlanRow>({
     id: "width",
     name: "Width",
     header: "Width",
-    data: ({ width }) => width,
-    cardProperty: CardProperty.DataBlock,
+    data: ({ width }) => ({
+      content: width,
+      value: width,
+      cardSlot: cardDataBlockSlot({ label: "Width", value: width }),
+    }),
   }),
   column<PlanRow>({
     id: "depth",
     name: "Depth",
     header: "Depth",
-    data: ({ depth }) => depth,
-    cardProperty: CardProperty.DataBlock,
+    data: ({ depth }) => ({
+      content: depth,
+      value: depth,
+      cardSlot: cardDataBlockSlot({ label: "Depth", value: depth }),
+    }),
   }),
   column<PlanRow>({
     id: "bid-out",
     name: "Bid out",
     header: "Bid out",
-    data: ({ bidOut }) => bidOut,
-    cardProperty: { kind: CardProperty.Progress, getValue: ({ bidOut }) => bidOut },
+    data: ({ bidOut }) => ({
+      content: bidOut,
+      value: bidOut,
+      cardSlot: cardProgressSlot({ label: "Bid out", value: bidOut }),
+    }),
   }),
   column<PlanRow>({
     id: "status",
     name: "Status",
     header: "Status",
-    data: ({ status }) => status,
-    cardProperty: {
-      kind: CardProperty.Status,
-      getValue: ({ status }) => ({
+    data: ({ status }) => ({
+      content: status,
+      value: status,
+      cardSlot: cardStatusSlot({
         text: status,
         type: status === "Active" ? "success" : status === "Archived" ? "warning" : "neutral",
       }),
-    },
+    }),
   }),
 ];
 const planRows: GridDataRow<PlanRow>[] = [
