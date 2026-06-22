@@ -27,7 +27,7 @@ import {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
+import { assignDefaultColumnIds, withColumnGutters } from "src/components/Table/utils/columns";
 import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
@@ -209,6 +209,8 @@ export type GridTableProps<R extends Kinded, X> = {
   onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
   /** Disable column resizing functionality. Defaults to false. */
   disableColumnResizing?: boolean;
+  /** Injects fixed left/right gutter columns when inside a document-scroll layout. */
+  columnGutter?: boolean;
 };
 
 /**
@@ -257,9 +259,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     onRowDrop: droppedCallback,
     csvPrefixRows,
     disableColumnResizing = false,
+    columnGutter = false,
   } = props;
 
-  const columnsWithIds = useMemo(() => assignDefaultColumnIds(_columns), [_columns]);
+  const inDocumentScrollLayout = useDocumentScrollLayout();
+
+  const columnsWithIds = useMemo(() => {
+    const columns = columnGutter && inDocumentScrollLayout ? withColumnGutters(_columns) : _columns;
+    return assignDefaultColumnIds(columns);
+  }, [_columns, columnGutter, inDocumentScrollLayout]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -297,7 +305,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   const style = resolveStyles(maybeStyle);
   const { tableState } = api;
-  const inDocumentScrollLayout = useDocumentScrollLayout();
 
   tableState.onRowSelect = onRowSelect;
 

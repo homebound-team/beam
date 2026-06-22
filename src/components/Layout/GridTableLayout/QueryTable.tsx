@@ -16,9 +16,6 @@ export type QueryTableProps<R extends Kinded, QData, X> = Omit<GridTableProps<R,
   emptyFallback?: string;
   /** Creates the rows given the data; needs to accept undefined so we can create the header row. */
   createRows: (data: QData | undefined) => GridDataRow<R>[];
-  getPageInfo?: (data: QData) => {
-    hasNextPage: boolean;
-  };
   keepHeaderWhenLoading?: boolean;
 };
 
@@ -31,7 +28,7 @@ export type QueryTableProps<R extends Kinded, QData, X> = Omit<GridTableProps<R,
 export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss, X> = any>(
   props: QueryTableProps<R, QData, X>,
 ) {
-  const { emptyFallback, query, createRows, getPageInfo, columns, keepHeaderWhenLoading, ...others } = props;
+  const { emptyFallback, query, createRows, columns, keepHeaderWhenLoading, ...others } = props;
 
   // Always call createRows to get the header, even if we're loading/error'd. We do force data=undefined
   // if loading/error though b/c while making/loading a 2nd query, Apollo will keep the 1st query's data.
@@ -39,10 +36,6 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
   // old-results-are-still-here at the same time.
   const data = query.loading || query.error ? undefined : query.data;
   const rows = useMemo(() => createRows(data), [createRows, data]);
-
-  // Detect our `pageInfo` response pattern
-  const hasNextPage = data && getPageInfo && getPageInfo(data).hasNextPage;
-  const infoMessage = hasNextPage ? "Too many rows" : undefined;
 
   // loading/error/empty can all use the one fallback prop.
   const fallbackMessage = query.loading ? "Loading…" : query.error ? `Error: ${query.error.message}` : emptyFallback;
@@ -58,7 +51,7 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
       )}
     </div>
   ) : (
-    <GridTable {...{ rows, columns, fallbackMessage, infoMessage, ...others }} />
+    <GridTable {...{ rows, columns, fallbackMessage, ...others }} />
   );
 }
 

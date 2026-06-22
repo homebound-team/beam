@@ -1,5 +1,16 @@
+import { act } from "@testing-library/react";
 import { checkboxFilter } from "src/components/Filters";
-import { actionColumn, column, numericColumn } from "src/components/Table/utils/columns";
+import { setRunningInJest } from "src/components/Table/GridTable";
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import {
+  actionColumn,
+  collapseColumn,
+  column,
+  layoutGutterLeftColumnId,
+  layoutGutterRightColumnId,
+  numericColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
@@ -38,7 +49,6 @@ describe("GridTableLayout", () => {
           columns: getColumns(),
           rows: [simpleHeader, ...getRows()],
         }}
-        totalCount={100}
         primaryAction={{ label: "Primary Action", onClick: noop }}
         secondaryAction={{ label: "Secondary Action", onClick: noop }}
         tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
@@ -104,7 +114,6 @@ describe("GridTableLayout", () => {
             ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
           ],
         }}
-        totalCount={100}
         primaryAction={{ label: "Primary Action", onClick: noop }}
       />,
       withRouter(),
@@ -134,7 +143,6 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           hideEditColumns={true}
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -155,7 +163,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: columnsWithoutId,
             rows: [simpleHeader, ...getRows()],
@@ -177,7 +184,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: columnsWithoutName,
             rows: [simpleHeader, ...getRows()],
@@ -201,7 +207,6 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           hideEditColumns={true}
-          totalCount={100}
           tableProps={{
             columns: columnsWithoutId,
             rows: [simpleHeader, ...getRows()],
@@ -214,101 +219,12 @@ describe("GridTableLayout", () => {
     });
   });
 
-  describe("pagination", () => {
-    it("renders pagination when totalCount is provided", async () => {
-      // Given a GridTableLayout with totalCount
-      const r = await render(
-        <TestWrapper
-          layoutStateProps={{
-            pagination: {
-              pageSizes: [100, 500, 1000],
-            },
-          }}
-          pageTitle="Test With Pagination"
-          hideEditColumns
-          totalCount={500}
-          tableProps={{
-            columns: getColumns(),
-            rows: [simpleHeader, ...getRows()],
-          }}
-        />,
-        withRouter(),
-      );
-
-      // Then the pagination component is rendered
-      expect(r.pagination).toBeInTheDocument();
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-    });
-
-    it("updates page state when clicking next", async () => {
-      // Given a GridTableLayout with pagination
-      const r = await render(
-        <TestWrapper
-          layoutStateProps={{
-            pagination: {
-              pageSizes: [100, 500, 1000],
-            },
-          }}
-          pageTitle="Test Pagination Navigation"
-          hideEditColumns
-          totalCount={500}
-          tableProps={{
-            columns: getColumns(),
-            rows: [simpleHeader, ...getRows()],
-          }}
-        />,
-        withRouter(),
-      );
-
-      // Initially on page 1
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-
-      // When clicking next
-      click(r.pagination_nextIcon);
-
-      // Then page 2 is shown
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("101 - 200 of 500");
-    });
-
-    it("updates page size when selecting a new size", async () => {
-      // Given a GridTableLayout with pagination
-      const r = await render(
-        <TestWrapper
-          layoutStateProps={{
-            pagination: {
-              pageSizes: [100, 500, 1000],
-            },
-          }}
-          pageTitle="Test Page Size"
-          hideEditColumns
-          totalCount={500}
-          tableProps={{
-            columns: getColumns(),
-            rows: [simpleHeader, ...getRows()],
-          }}
-        />,
-        withRouter(),
-      );
-
-      // Initially page size is 100
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 100 of 500");
-
-      // When changing page size to 500
-      click(r.pagination_pageSize);
-      click(r.getByRole("option", { name: "500" }));
-
-      // Then the page info reflects new size
-      expect(r.pagination_pageInfoLabel).toHaveTextContent("1 - 500 of 500");
-    });
-  });
-
   describe("view toggle", () => {
     it("should not display a view toggle if withCardView is undefined", async () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -326,7 +242,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -344,6 +259,35 @@ describe("GridTableLayout", () => {
       expect(localStorage.getItem(getGridTableViewStorageKey("/"))).toBe("card");
     });
 
+    it("shows EditColumnsButton in list view and hides it in card view", async () => {
+      const Content = () => <span data-testid="cardContent">Content</span>;
+
+      // Given a GridTableLayout with hideable columns and card view enabled
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          pageTitle="Test"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+          withCardView={<Content />}
+        />,
+        withRouter(),
+      );
+
+      // Then EditColumnsButton is visible in list view
+      expect(r.editColumnsButton).toBeInTheDocument();
+
+      // When switching to card view
+      click(r.viewToggleButton);
+      click(r.viewToggleButton_card);
+
+      // Then card content is shown and EditColumnsButton is hidden
+      expect(r.cardContent).toBeInTheDocument();
+      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+    });
+
     it("persists view selection to localStorage when toggled", async () => {
       const storageKey = getGridTableViewStorageKey("/");
 
@@ -351,7 +295,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -374,7 +317,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -395,7 +337,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -414,7 +355,6 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           pageTitle="Test"
-          totalCount={100}
           defaultView="list"
           tableProps={{
             columns: getColumns(),
@@ -486,6 +426,48 @@ describe("GridTableLayout", () => {
       expect(r.tableWrapper.style.getPropertyValue(beamTableActionsHeightVar)).toBe("");
     });
 
+    it("injects layout gutter columns inside DocumentScrollLayoutProvider", async () => {
+      const api = new GridTableApiImpl<Row>();
+
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            hideEditColumns
+            layoutStateProps={{}}
+            tableProps={{
+              api,
+              columns: [collapseColumn<Row>(), selectColumn<Row>(), ...getColumns()],
+              rows: [simpleHeader, ...getRows()],
+            }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      expect(api.getVisibleColumnIds()[0]).toBe(layoutGutterLeftColumnId);
+      expect(api.getVisibleColumnIds().at(-1)).toBe(layoutGutterRightColumnId);
+      expect(r.gridTable).toBeInTheDocument();
+    });
+
+    it("does not inject layout gutter columns outside DocumentScrollLayoutProvider", async () => {
+      const api = new GridTableApiImpl<Row>();
+
+      await render(
+        <TestWrapper
+          hideEditColumns
+          layoutStateProps={{}}
+          tableProps={{
+            api,
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      expect(api.getVisibleColumnIds()[0]).toBe("name");
+    });
+
     function getFilterLayoutStateProps(storageKey: string) {
       return {
         persistedFilter: {
@@ -499,6 +481,39 @@ describe("GridTableLayout", () => {
         search: "client" as const,
       };
     }
+  });
+
+  it("passes infiniteScroll prop to the underlying table", async () => {
+    setRunningInJest();
+    // Given a GridTableLayout with infiniteScroll configured
+    const onEndReached = vi.fn();
+    const r = await render(
+      <TestWrapper
+        layoutStateProps={{ search: "client" as const }}
+        tableProps={{
+          as: "virtual",
+          columns: getColumns(),
+          rows: [simpleHeader, ...getRows()],
+          infiniteScroll: { onEndReached },
+        }}
+      />,
+      withRouter(),
+    );
+    // When the table renders, it should display the rows without error
+    expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+      "
+      | Name  | Value | Action  |
+      | ----- | ----- | ------- |
+      | Alpha | 10    | Actions |
+      | Beta  | 20    | Actions |
+      | Gamma | 30    | Actions |
+      "
+    `);
+    // And onEndReached can be called as Virtuoso would call it at runtime
+    act(() => {
+      onEndReached(3);
+    });
+    expect(onEndReached).toHaveBeenCalledWith(3);
   });
 });
 

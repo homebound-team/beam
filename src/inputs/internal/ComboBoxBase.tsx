@@ -63,7 +63,22 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   multiline?: boolean;
   /* Callback for user searches */
   onSearch?: (search: string) => void;
-  /* Only supported on single Select fields */
+  /**
+   * Called when the user explicitly selects the synthetic add-new row from the dropdown.
+   * Only supported on single-select fields.
+   *
+   * While the user types, a pseudo-option (e.g. `Add "my value"`) appears at the bottom of the
+   * filtered list when the trimmed input does not exactly match an existing option label
+   * (case-insensitive). It is not shown when the input is empty, or when the input exactly matches
+   * an existing label (e.g. typing "banana" when "Banana" exists).
+   *
+   * The user must focus that row (e.g. arrow down) and confirm with Enter or click; pressing Enter
+   * on the typed text alone does not invoke this callback.
+   *
+   * This callback does not update the field value or call `onSelect` — callers create the new
+   * option (often async) and set `value` themselves, same as before. Beam cannot auto-select here
+   * because the new option's id typically comes from the caller's save/create logic after this fires.
+   */
   onAddNew?: (v: string) => void;
   /**
    * When true (default), options are sorted alphabetically by their label.
@@ -110,45 +125,47 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // Memoize the callback functions and handle the `unset` option if provided.
   const getOptionLabel = useCallback(
     (o: O) =>
-      unsetLabel && o === unsetOption
-        ? unsetLabel
-        : onAddNew && o === addNewOption
-          ? addNewOption.name
-          : propOptionLabel(o),
+      unsetLabel && o === unsetOption ? unsetLabel : onAddNew && isAddNewOption(o) ? o.name : propOptionLabel(o),
     // propOptionLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unsetLabel],
+    [unsetLabel, onAddNew],
   );
+
   const getOptionValue = useCallback(
     (o: O) =>
       unsetLabel && o === unsetOption
         ? (undefined as V)
-        : onAddNew && o === addNewOption
-          ? (addNewOption.id as V)
+        : onAddNew && isAddNewOption(o)
+          ? (o.id as V)
           : propOptionValue(o),
     // propOptionValue is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unsetLabel],
+    [unsetLabel, onAddNew],
   );
+
   const getOptionMenuLabel = useCallback(
-    (o: O) =>
-      propOptionMenuLabel
-        ? propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption, Boolean(onAddNew) && o === addNewOption)
-        : getOptionLabel(o),
+    (o: O) => {
+      const isAddNew = Boolean(onAddNew) && isAddNewOption(o);
+      if (propOptionMenuLabel) {
+        return propOptionMenuLabel(o, Boolean(unsetLabel) && o === unsetOption, isAddNew);
+      }
+      const label = getOptionLabel(o);
+      return isAddNew ? <span css={Css.fsyi.$}>{label}</span> : label;
+    },
     // propOptionMenuLabel is basically always a lambda, so don't dep on it
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unsetLabel, getOptionLabel],
+    [unsetLabel, getOptionLabel, onAddNew],
   );
 
   // Call `initializeOptions` to prepend the `unset` option if the `unsetLabel` was provided.
   const options = useMemo(
-    () => initializeOptions(propOptions, getOptionValue, getOptionLabel, unsetLabel, !!onAddNew, autoSort),
+    () => initializeOptions(propOptions, getOptionValue, getOptionLabel, unsetLabel, autoSort),
     // If the caller is using { current, load, options }, memoize on only `current` and `options` values.
     // ...and don't bother on memoizing on getOptionValue b/c it's basically always a lambda
     // eslint-disable-next-line react-hooks/exhaustive-deps
     Array.isArray(propOptions)
-      ? [propOptions, unsetLabel, onAddNew, autoSort]
-      : [propOptions.current, propOptions.options, unsetLabel, onAddNew, autoSort],
+      ? [propOptions, unsetLabel, autoSort]
+      : [propOptions.current, propOptions.options, unsetLabel, autoSort],
   );
 
   const values = useMemo(() => propValues ?? [], [propValues]);
@@ -173,12 +190,21 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   });
 
   const { searchValue } = fieldState;
-  const filteredOptions = useMemo(() => {
-    return !searchValue
-      ? options
-      : options.filter((o) => contains(getOptionLabel(o), searchValue) || o === addNewOption);
-  }, [options, searchValue, getOptionLabel, contains]);
 
+  const addNewOption = useMemo(
+    () => getAddNewOption(searchValue, options, getOptionLabel, onAddNew),
+    [searchValue, options, getOptionLabel, onAddNew],
+  );
+
+  const filteredOptions = useMemo(
+    () =>
+      !searchValue
+        ? options
+        : addNewOption
+          ? [...options.filter((o) => contains(getOptionLabel(o), searchValue)), addNewOption as O]
+          : options.filter((o) => contains(getOptionLabel(o), searchValue)),
+    [options, searchValue, getOptionLabel, contains, addNewOption],
+  );
   /** Resets field's input value and filtered options list for cases where the user exits the field without making changes (on Escape, or onBlur) */
   function resetField() {
     setFieldState((prevState) => ({ ...prevState, searchValue: undefined }));
@@ -278,9 +304,11 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
           onSelect([], []);
           return;
         }
-        const selectedOption = options.find((o) => valueToKey(getOptionValue(o)) === key);
-        if (selectedOption === addNewOption && onAddNew) {
-          onAddNew(fieldState.inputValue);
+        const selectedOption = filteredOptions.find((o) => valueToKey(getOptionValue(o)) === key);
+        // Intentionally does not call `onSelect`: callers own post-create value/options updates
+        // (often async, e.g. a server-assigned id).
+        if (onAddNew && isAddNewOption(selectedOption) && fieldState.inputValue) {
+          onAddNew(fieldState.inputValue.trim());
           return;
         }
         onSelect([keyToValue(key)] as V[], selectedOption ? [selectedOption] : []);
@@ -436,8 +464,6 @@ export type OptionsOrLoad<O> =
       options: O[] | undefined;
     };
 
-type UnsetOption = { id: undefined; name: string };
-
 function getInputValue<O>(
   selectedOptions: O[],
   getOptionLabel: (o: O) => string,
@@ -460,7 +486,6 @@ export function initializeOptions<O, V extends Value>(
   getOptionValue: (opt: O) => V,
   getOptionLabel: (opt: O) => string,
   unsetLabel: string | undefined,
-  addNew: boolean,
   autoSort: boolean,
 ): O[] {
   const result: O[] = [];
@@ -469,7 +494,7 @@ export function initializeOptions<O, V extends Value>(
   }
 
   // Collect user options in a separate array so we can sort them independently
-  // while keeping special options (unsetOption, addNewOption) at their fixed positions
+  // while keeping special options (e.g. unsetOption) at their fixed positions
   const userOptions: O[] = [];
   if (Array.isArray(optionsOrLoad)) {
     userOptions.push(...optionsOrLoad);
@@ -494,9 +519,6 @@ export function initializeOptions<O, V extends Value>(
   // Sort user options if autoSort is enabled
   result.push(...(autoSort ? sortOptions(userOptions, getOptionLabel) : userOptions));
 
-  if (addNew) {
-    result.push(addNewOption as unknown as O);
-  }
   return result;
 }
 
@@ -511,7 +533,30 @@ function sortOptions<O>(options: O[], getOptionLabel: (opt: O) => string): O[] {
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
 export const unsetOption = {};
-export const addNewOption = { id: "new", name: "Add New" };
+const addNewOptionId = "beam_new";
+
+function isAddNewOption(o: unknown): o is { id: string; name: string } {
+  return typeof o === "object" && o !== null && "id" in o && (o as { id: string }).id === addNewOptionId;
+}
+
+function getAddNewOption<O>(
+  searchValue: string | undefined,
+  options: O[],
+  getOptionLabel: (o: O) => string,
+  onAddNew?: (v: string) => void,
+): { id: string; name: string } | undefined {
+  if (!onAddNew) return undefined;
+  const normalizedSearch = searchValue?.trim().toLowerCase();
+  if (!normalizedSearch) return undefined;
+  const trimmedSearch = searchValue!.trim();
+  const matchesExistingOption = options.some((o) => {
+    if (o === unsetOption) return false;
+    // Compare label — what the user is typing
+    return getOptionLabel(o).trim().toLowerCase() === normalizedSearch;
+  });
+  if (matchesExistingOption) return undefined;
+  return { id: addNewOptionId, name: `Add "${trimmedSearch}"` };
+}
 
 export function disabledOptionToKeyedTuple(
   disabledOption: Value | { value: Value; reason: string },

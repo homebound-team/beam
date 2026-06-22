@@ -3,6 +3,7 @@ import { ListRange, VirtuosoHandle } from "react-virtuoso";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { DiscriminateUnion, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import { isContentColumn } from "src/components/Table/utils/columns";
 
 /**
  * Allows a caller to ask for the currently shown rows, given the current sorting/filtering.
@@ -10,7 +11,7 @@ import { DiscriminateUnion, GridColumnWithId, Kinded, nonKindGridColumnKeys } fr
  * We will probably end up generalizing this into a GridTableApi that exposes more
  * actions i.e. scrolling to a row and selection state.
  */
-export interface GridRowLookup<R extends Kinded> {
+export type GridRowLookup<R extends Kinded> = {
   /** Returns both the immediate next/prev rows, as well as `[kind].next/prev` values, ignoring headers. */
   lookup(
     row: GridDataRow<R>,
@@ -27,12 +28,12 @@ export interface GridRowLookup<R extends Kinded> {
    * Will skip re-scrolling to a row if it's already visible.
    */
   scrollTo(kind: R["kind"], id: string): void;
-}
+};
 
-interface NextPrev<R extends Kinded> {
+type NextPrev<R extends Kinded> = {
   next: GridDataRow<R> | undefined;
   prev: GridDataRow<R> | undefined;
-}
+};
 
 export function createRowLookup<R extends Kinded>(
   api: GridTableApiImpl<R>,
@@ -87,7 +88,7 @@ export function createRowLookup<R extends Kinded>(
 }
 
 export function getKinds<R extends Kinded>(columns: GridColumnWithId<R>[]): R[] {
-  return Object.keys(columns.find((c) => !c.isAction) || {}).filter(
+  return Object.keys(columns.find((c) => isContentColumn(c)) || {}).filter(
     (key) => !nonKindGridColumnKeys.includes(key),
   ) as any;
 }

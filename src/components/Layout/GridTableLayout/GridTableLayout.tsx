@@ -4,7 +4,6 @@ import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
-import { OffsetAndLimit, Pagination } from "src/components/Pagination";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
@@ -31,13 +30,12 @@ import { usePersistedTableView } from "./usePersistedTableView";
 // Omit to force all action button menus to look the same
 type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
-// GridTableLayout-specific query props extend the shared base with pagination/display extras.
+// GridTableLayout-specific query props extend the shared base with display extras.
 type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseQueryTableProps<
   R,
   X,
   QData
 > & {
-  getPageInfo?: (data: QData) => { hasNextPage: boolean };
   emptyFallback?: string;
   keepHeaderWhenLoading?: boolean;
 };
@@ -65,7 +63,7 @@ export type GridTableLayoutProps<
 };
 
 /**
- * A layout component that combines a table with a header, actions buttons, filters, and pagination.
+ * A layout component that combines a table with a header, actions buttons, filters, and infinite scroll.
  *
  * This component can render either a `GridTable` or wrapped `QueryTable` based on the provided props:
  *
@@ -89,8 +87,6 @@ export type GridTableLayoutProps<
  *   }}
  * />
  * ```
- *
- * Pagination is rendered when `totalCount` is provided. Use `layoutState.page` for server query variables.
  */
 function GridTableLayoutComponent<
   F extends Record<string, unknown>,
@@ -108,7 +104,6 @@ function GridTableLayoutComponent<
     tertiaryAction,
     actionMenu,
     hideEditColumns = false,
-    totalCount,
     withCardView,
     defaultView = "list",
   } = props;
@@ -151,7 +146,7 @@ function GridTableLayoutComponent<
       right={
         (hasHideableColumns || withCardView) && (
           <div css={Css.df.gap1.$}>
-            {hasHideableColumns && (
+            {hasHideableColumns && view === "list" && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
             )}
             {withCardView && <ViewToggleButton view={view} onChange={setView} />}
@@ -181,10 +176,11 @@ function GridTableLayoutComponent<
           {...(cardAs ? { as: cardAs } : {})}
           api={api}
           filter={clientSearch}
-          style={{ allWhite: true }}
+          style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
+          columnGutter={inDocumentScrollLayout}
         />
       ) : (
         <QueryTable
@@ -192,18 +188,11 @@ function GridTableLayoutComponent<
           {...(cardAs ? { as: cardAs } : {})}
           api={api}
           filter={clientSearch}
-          style={{ allWhite: true }}
+          style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
-        />
-      )}
-      {layoutState && totalCount !== undefined && (
-        <Pagination
-          page={[layoutState.page, layoutState._pagination.setPage]}
-          totalCount={totalCount}
-          pageSizes={layoutState._pagination.pageSizes}
-          {...tid.pagination}
+          columnGutter={inDocumentScrollLayout}
         />
       )}
     </>
@@ -266,33 +255,21 @@ function validateColumns(columns: readonly { id?: string; name?: string }[]): vo
   }
 }
 
-/** Configuration for pagination in GridTableLayout */
-export type PaginationConfig = {
-  /** Available page size options */
-  pageSizes?: number[];
-  /** Storage key for persisting page size preference */
-  storageKey?: string;
-};
-
 /**
- * A wrapper around standard filter, grouping, search, and pagination state hooks.
+ * A wrapper around standard filter, grouping, search, and column state hooks.
  * * `client` search will use the built-in grid table search functionality.
  * * `server` search will return `searchString` as a debounced search string to query the server.
- * * Use `pagination` config to customize page sizes or storage key. Use `page` for server query variables.
  */
 export function useGridTableLayoutState<F extends Record<string, unknown>>({
   persistedFilter,
   persistedColumns,
   search,
   groupBy: maybeGroupBy,
-  pagination,
 }: {
   persistedFilter?: UsePersistedFilterProps<F>;
   persistedColumns?: { storageKey: string };
   search?: "client" | "server";
   groupBy?: Record<string, string>;
-  /** Customize pagination page sizes or storage key */
-  pagination?: PaginationConfig;
 }) {
   // Because we can't conditionally render a hook, we still call it with a fallback value.
   const filterFallback = { filterDefs: {}, storageKey: "unset-filter" } as UsePersistedFilterProps<F>;
@@ -307,25 +284,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     undefined,
   );
 
-  // Pagination state
-  const paginationFallbackKey = "unset-pagination";
-  const pageSizes = pagination?.pageSizes ?? [100, 500, 1000];
-  const [persistedPageSize, setPersistedPageSize] = useSessionStorage<number>(
-    pagination?.storageKey ?? paginationFallbackKey,
-    100, // default page size
-  );
-
-  const [page, setPage] = useState<OffsetAndLimit>({
-    offset: 0,
-    limit: persistedPageSize,
-  });
-
-  // Persist page size and reset to first page when filters/search change
-  useEffect(() => {
-    if (page.limit !== persistedPageSize) setPersistedPageSize(page.limit);
-    setPage((prev) => (prev.offset === 0 ? prev : { ...prev, offset: 0 }));
-  }, [page.limit, persistedPageSize, setPersistedPageSize, filter, searchString]);
-
   return {
     filter,
     setFilter,
@@ -337,10 +295,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
     setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
     persistedColumnsStorageKey: persistedColumns?.storageKey,
-    /** Current page offset/limit - use this for server query variables */
-    page,
-    /** @internal Used by GridTableLayout component */
-    _pagination: { setPage, pageSizes },
   };
 }
 
