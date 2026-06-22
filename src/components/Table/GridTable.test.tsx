@@ -15,6 +15,7 @@ import {
   generateColumnId,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
+  pinColumn,
   selectColumn,
   sumColumnSizesPx,
   withColumnGutters,
@@ -1029,6 +1030,106 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("b");
       expect(cell(r, 2, 0)).toHaveTextContent("c");
       expect(cell(r, 3, 0)).toHaveTextContent("a");
+    });
+  });
+
+  describe("row pinning", () => {
+    const pinRows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "3", data: { name: "zaz", value: 3 } },
+    ];
+
+    it("pins a row via the api, hoisting it to the top and de-duplicating it", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+
+      // Nothing pinned initially
+      expect(api.getPinnedRowIds()).toEqual([]);
+      expect(api.isPinnedRow("2")).toBe(false);
+
+      // When we pin row 2 (bar)
+      act(() => api.pinRow("2"));
+
+      // Then it's reported as pinned
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      expect(api.isPinnedRow("2")).toBe(true);
+      // And hoisted to the top (row 1, under the header), with the body now just foo/zaz — i.e.
+      // "bar" is not duplicated back into the body (positional layout, like the filter tests above).
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(cell(r, 3, 0)).toHaveTextContent("zaz");
+      // And the pinned row gets the green highlight (`Green50` = #ecfdf5)
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Green50 });
+    });
+
+    it("keeps a pinned row visible even when a filter would hide it", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+      act(() => api.pinRow("2")); // bar
+
+      // When a filter matches only "foo"
+      await r.rerender(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} filter="foo" />);
+
+      // Then the pinned "bar" stays visible at the top despite the filter, "foo" shows in the body,
+      // and the unpinned non-match "zaz" is hidden.
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(r.queryByText("zaz")).not.toBeInTheDocument();
+    });
+
+    it("can unpin and toggle a row's pin", async () => {
+      const api = new GridTableApiImpl<Row>();
+      await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+
+      act(() => api.pinRow("2"));
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      act(() => api.unpinRow("2"));
+      expect(api.getPinnedRowIds()).toEqual([]);
+
+      act(() => api.togglePinnedRow("3"));
+      expect(api.getPinnedRowIds()).toEqual(["3"]);
+      act(() => api.togglePinnedRow("3"));
+      expect(api.getPinnedRowIds()).toEqual([]);
+    });
+
+    it("pins a row on initial load via initPinned", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+            { kind: "data", id: "2", initPinned: "top", data: { name: "bar", value: 2 } },
+            { kind: "data", id: "3", data: { name: "zaz", value: 3 } },
+          ]}
+        />,
+      );
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+    });
+
+    it("renders pinColumn toggles on data rows (not the header) and toggles on click", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row> api={api} columns={[pinColumn<Row>(), nameColumn, valueColumn]} rows={pinRows} />,
+      );
+
+      // The header has no pin toggle (emptyCell), but each data row has a row-scoped one
+      expect(r.query.pin_header).toBeNull();
+      expect(r.query.pin_1).toBeTruthy();
+
+      // When we click row 1's toggle, it pins + hoists to the top
+      click(r.pin_1);
+      expect(api.getPinnedRowIds()).toEqual(["1"]);
+      expect(cell(r, 1, 1)).toHaveTextContent("foo");
+
+      // And clicking again unpins (the testid is row-scoped, so it stays stable despite the move)
+      click(r.pin_1);
+      expect(api.getPinnedRowIds()).toEqual([]);
     });
   });
 

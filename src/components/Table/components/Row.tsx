@@ -104,7 +104,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const { tableState } = useContext(TableStateContext);
   // We're wrapped in observer, so can access these without useComputeds
   const { api, visibleColumns: columns } = tableState;
-  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, level } = rs;
+  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, isPinnedTop, level } = rs;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === HEADER;
@@ -377,6 +377,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
             ...(isLastKeptRow && style.keptLastRowCss),
+            // Apply the green highlight to every runtime-pinned row's cells (wins over `isActive`)
+            ...(isPinnedTop && style.pinnedRowCss),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.
@@ -526,6 +528,12 @@ export type GridDataRow<R extends Kinded> = {
   initCollapsed?: boolean;
   /** Whether to have the row selected on initial load. This will be ignore in subsequent re-renders of the table */
   initSelected?: boolean;
+  /**
+   * Whether to pin this row to the top at runtime on initial load, hoisting it into a sticky
+   * pinned section that stays visible while the body scrolls. This is ignored on subsequent
+   * re-renders (like `initSelected`/`initCollapsed`), and is distinct from the declarative `pin` prop.
+   */
+  initPinned?: "top" | "bottom";
   /** Whether row can be selected */
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */

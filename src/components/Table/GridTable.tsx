@@ -47,7 +47,7 @@ import { isPromise } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
-import { DraggedOver } from "./utils/RowState";
+import { DraggedOver, RowState } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -463,7 +463,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   };
 
   // Flatten, hide-if-filtered, hide-if-collapsed, and component-ize the sorted rows.
-  const [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows]: [
+  const [tableHeadRows, visibleDataRows, keptSelectedRows, pinnedRows, tooManyClientSideRows]: [
+    ReactElement[],
     ReactElement[],
     ReactElement[],
     ReactElement[],
@@ -476,8 +477,46 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const keptSelectedRows: ReactElement[] = [];
     let visibleDataRows: ReactElement[] = [];
 
-    const { visibleRows } = tableState;
+    // Exclude runtime-pinned rows here; they render in their own pinned section (built below) joined
+    // to the sticky head block, so they must not also appear in their normal body position.
+    const visibleRows = tableState.visibleRows.filter((rs) => !rs.isPinnedTop);
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+
+    // Builds a `<Row>` element; shared by the partition loop and the pinned section so they stay in sync.
+    const makeRow = (
+      rs: RowState<R>,
+      isFirstHeadRow: boolean,
+      isFirstBodyRow: boolean,
+      isLastBodyRow: boolean,
+    ): ReactElement => (
+      <Row
+        key={rs.key}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDragEnd={onDragEnd}
+        onDrop={onDrop}
+        onDragEnter={onDragEnter}
+        {...{
+          as,
+          rs,
+          style,
+          rowStyles,
+          columnSizes,
+          getCount,
+          cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
+          omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+          hasExpandableHeader,
+          isFirstHeadRow,
+          isFirstBodyRow,
+          isLastBodyRow,
+          resizedWidths,
+          setResizedWidth: handleColumnResize,
+          disableColumnResizing,
+          calculatePreviewWidth,
+        }}
+      />
+    );
+
     const bodyRowsCount = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind)).length;
     const onlyKeptBodyRows =
       bodyRowsCount > 0 &&
@@ -501,34 +540,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       if (isBodyRow) foundFirstBodyRow = true;
       const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount && !onlyKeptBodyRows;
 
-      const row = (
-        <Row
-          key={rs.key}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
-          onDrop={onDrop}
-          onDragEnter={onDragEnter}
-          {...{
-            as,
-            rs,
-            style,
-            rowStyles,
-            columnSizes,
-            getCount,
-            cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
-            omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
-            hasExpandableHeader,
-            isFirstHeadRow,
-            isFirstBodyRow,
-            isLastBodyRow,
-            resizedWidths,
-            setResizedWidth: handleColumnResize,
-            disableColumnResizing,
-            calculatePreviewWidth,
-          }}
-        />
-      );
+      const row = makeRow(rs, isFirstHeadRow, isFirstBodyRow, isLastBodyRow);
       if (rs.kind === "header") {
         headerRows.push(row);
       } else if (rs.kind === "expandableHeader") {
@@ -545,19 +557,25 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // Once our header rows are created we can organize them in expected order.
     const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
 
+    // Build the runtime pinned section from all states, so pins that the current filter would
+    // otherwise hide still show (mirrors how kept rows are sourced).
+    const pinnedRows = tableState.pinnedTopRows.map((rs) => makeRow(rs, false, false, false));
+
     const tooManyClientSideRows = !!filterMaxRows && visibleDataRows.length > filterMaxRows;
     if (tooManyClientSideRows) {
       visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
     }
 
-    return [tableHeadRows, visibleDataRows, keptSelectedRows, tooManyClientSideRows];
+    return [tableHeadRows, visibleDataRows, keptSelectedRows, pinnedRows, tooManyClientSideRows];
   }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount, filterMaxRows]);
 
   // Push back to the caller a way to ask us where a row is.
   // Refs are cheap to assign to, so we don't bother doing this in a useEffect
   if (props.rowLookup) props.rowLookup.current = api.lookup;
 
-  const noData = visibleDataRows.length === 0;
+  // Pinned rows still count as "data on screen", so don't show the empty fallback when only the
+  // body is empty but pins remain visible (e.g. a filter hid every un-pinned row).
+  const noData = visibleDataRows.length === 0 && pinnedRows.length === 0;
   const firstRowMessage =
     (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
 
@@ -608,6 +626,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           columns,
           visibleDataRows,
           keptSelectedRows,
+          pinnedRows,
           firstRowMessage,
           stickyHeader,
           xss,
@@ -638,6 +657,7 @@ function renderDiv<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   visibleDataRows: ReactElement[],
   keptSelectedRows: ReactElement[],
+  pinnedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -664,15 +684,18 @@ function renderDiv<R extends Kinded>(
       }}
       data-testid={id}
     >
-      {/* Table Head */}
+      {/* Table Head — pinned rows join the head block so they sit in the same sticky container.
+          Pinning forces the block sticky even when `stickyHeader` is false, so the header tags
+          along to give the pinned rows column-alignment context. */}
       <div
         css={
-          Css.if(stickyHeader)
+          Css.if(stickyHeader || pinnedRows.length > 0)
             .sticky.transitionTop.top(stickyTableHeaderOffset(stickyOffset))
             .z(zIndices.tableStickyHeader).$
         }
       >
         {tableHeadRows}
+        {pinnedRows}
       </div>
       {/* Table Body */}
       <div>
@@ -706,6 +729,7 @@ function renderTable<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   visibleDataRows: ReactElement[],
   keptSelectedRows: ReactElement[],
+  pinnedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -728,14 +752,20 @@ function renderTable<R extends Kinded>(
       }}
       data-testid={id}
     >
+      {/* Pinned rows join the `<thead>` so they sit in the same sticky container as the header
+          (parity with the div/virtual paths). Pinning forces the thead sticky even when
+          `stickyHeader` is false, so the header tags along for column-alignment context.
+          Note: `<thead>` repeats on each printed page, so pinned rows reprint per page in
+          `as="table"` — intended, since pins are "important rows" much like the header. */}
       <thead
         css={
-          Css.if(stickyHeader)
+          Css.if(stickyHeader || pinnedRows.length > 0)
             .sticky.transitionTop.top(stickyTableHeaderOffset(stickyOffset))
             .z(zIndices.tableStickyHeader).$
         }
       >
         {tableHeadRows}
+        {pinnedRows}
       </thead>
       <tbody>
         {keptSelectedRows}
@@ -794,6 +824,7 @@ function renderVirtual<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   visibleDataRows: ReactElement[],
   keptSelectedRows: ReactElement[],
+  pinnedRows: ReactElement[],
   firstRowMessage: string | undefined,
   stickyHeader: boolean,
   xss: any,
@@ -820,7 +851,9 @@ function renderVirtual<R extends Kinded>(
   const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
 
   const savedScrollIndex = getScrollIndex();
-  const topItemCount = stickyHeader ? tableHeadRows.length : 0;
+  // Pinned rows join the sticky top block; when there are pins we also sticky the head rows so they
+  // tag along (matching the div/table paths), even if `stickyHeader` is false.
+  const topItemCount = (stickyHeader || pinnedRows.length > 0 ? tableHeadRows.length : 0) + pinnedRows.length;
 
   // Saved index is body-relative (excludes pinned head rows). Skip restoration when 0 (at top)
   // and validate against current data so a stale index doesn't crash Virtuoso with "Zero-sized
@@ -876,7 +909,8 @@ function renderVirtual<R extends Kinded>(
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={topItemCount}
       itemContent={(index) => {
-        // Since we have 3 arrays of rows: `tableHeadRows` and `visibleDataRows` and `keptSelectedRows` we must determine which one to render.
+        // We render several stacked arrays — head rows, pinned rows, kept rows, an optional
+        // first-row message, then the body rows — so map the flat virtuoso index onto each in order.
 
         if (index < tableHeadRows.length) {
           return tableHeadRows[index];
@@ -884,6 +918,14 @@ function renderVirtual<R extends Kinded>(
 
         // Reset index
         index -= tableHeadRows.length;
+
+        // Show pinned rows next (they're part of the sticky top block via `topItemCount`)
+        if (index < pinnedRows.length) {
+          return pinnedRows[index];
+        }
+
+        // Reset index
+        index -= pinnedRows.length;
 
         // Show keptSelectedRows if there are any
         if (index < keptSelectedRows.length) {
@@ -939,7 +981,13 @@ function renderVirtual<R extends Kinded>(
           setScrollIndex(Math.max(0, newRange.startIndex - topItemCount));
         }
       }}
-      totalCount={tableHeadRows.length + (firstRowMessage ? 1 : 0) + visibleDataRows.length + keptSelectedRows.length}
+      totalCount={
+        tableHeadRows.length +
+        pinnedRows.length +
+        (firstRowMessage ? 1 : 0) +
+        visibleDataRows.length +
+        keptSelectedRows.length
+      }
       // When implementing infinite scroll, default the bottom `increaseViewportBy` to 500px. This creates the "infinite"
       // effect such that the next page of data is (hopefully) loaded before the user reaches the true bottom
       // Spreading these props due to virtuoso erroring when `increaseViewportBy` is undefined

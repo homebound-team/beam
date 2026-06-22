@@ -91,6 +91,8 @@ export type GridStyle = {
   keptGroupRowCss?: Properties;
   /** Defines styles for the last row `keptGroup` to provide separation from the rest of the table */
   keptLastRowCss?: Properties;
+  /** Applied to every cell of a runtime-pinned row — the green highlight for the pinned section. */
+  pinnedRowCss?: Properties;
 };
 
 // If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
@@ -210,6 +212,9 @@ function memoizedTableStyles() {
         rowHoverColor: Palette.Blue50,
         keptGroupRowCss: Css.bgYellow100.gray900.xsSb.df.aic.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
+        // Pinned rows get a green highlight; the standard `betweenRowsCss` bottom border (not a
+        // shadow) already separates the pinned section from the body.
+        pinnedRowCss: Css.bgColor(Palette.Green50).$,
       };
     }
 

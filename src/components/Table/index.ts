@@ -7,6 +7,7 @@ export {
 export type { GridCellContent, RenderCellFn } from "src/components/Table/components/cell";
 export * from "src/components/Table/components/CollapseToggle";
 export { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+export * from "src/components/Table/components/PinToggle";
 export { Row } from "src/components/Table/components/Row";
 export type { GridDataRow, GridRowKind } from "src/components/Table/components/Row";
 export * from "src/components/Table/components/SelectToggle";

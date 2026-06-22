@@ -1,5 +1,6 @@
 import { Icon } from "src";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
+import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
@@ -86,6 +87,39 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
       content: <CollapseToggle row={row} compact={level > 0} />,
+    });
+  }) as any;
+}
+
+/**
+ * Provides a GridColumn containing a {@link PinToggle} to pin/unpin rows to the top at runtime.
+ *
+ * Like `selectColumn`/`collapseColumn`, this accepts no `columnDef` or a partial one. The toggle is
+ * rendered for data rows by default; header/totals/expandableHeader get an `emptyCell` since there's
+ * no "pin all" concept and reserved rows aren't pinnable.
+ *
+ * Note: pinning a parent row hoists only that row into the sticky pinned section — its children stay in place.
+ */
+export function pinColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
+  const base = {
+    ...nonKindDefaults(),
+    id: "beamPinColumn",
+    clientSideSort: false,
+    align: "center",
+    // 40px to accommodate the pin IconButton + padding, matching selectColumn.
+    w: "40px",
+    wrapAction: false,
+    isAction: true,
+    header: emptyCell,
+    expandableHeader: emptyCell,
+    totals: emptyCell,
+    // Use any of the user's per-row kind methods if they have them.
+    ...columnDef,
+  };
+  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Pin... `
+  return newMethodMissingProxy(base, (key) => {
+    return (data: any, { row }: { row: GridDataRow<any> }) => ({
+      content: <PinToggle id={row.id} />,
     });
   }) as any;
 }

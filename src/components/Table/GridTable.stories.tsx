@@ -23,6 +23,7 @@ import {
   IconButton,
   insertAtIndex,
   numericColumn,
+  pinColumn,
   recursivelyGetContainingRow,
   RowStyles,
   selectColumn,
@@ -527,6 +528,123 @@ export function StickyHeader() {
           })),
         ]}
       />
+    </div>
+  );
+}
+
+/** Demonstrates interactive, user-driven row pinning via the `pinColumn` toggle (div render). */
+export function InteractiveRowPinning() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  return (
+    <div css={Css.vh100.$}>
+      some other top of page content
+      <GridTable
+        columns={[pinColumn<Row>(), nameColumn, valueColumn]}
+        stickyHeader
+        rows={[
+          simpleHeader,
+          ...zeroTo(200).map((i) => ({
+            kind: "data" as const,
+            id: `${i}`,
+            data: { name: `row ${i}`, value: i },
+            // Pre-pin a couple rows so the sticky pinned section (and its separator) shows in the snapshot;
+            // any row can be pinned/unpinned via the pin column.
+            ...(i === 3 || i === 8 ? { initPinned: "top" as const } : {}),
+          })),
+        ]}
+      />
+    </div>
+  );
+}
+
+/** Same as InteractiveRowPinning but `as="virtual"`, exercising the react-virtuoso topItemCount path. */
+export function InteractiveRowPinningVirtual() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  return (
+    <div css={Css.vh100.$}>
+      <GridTable
+        as="virtual"
+        columns={[pinColumn<Row>(), nameColumn, valueColumn]}
+        stickyHeader
+        rows={[
+          simpleHeader,
+          ...zeroTo(200).map((i) => ({
+            kind: "data" as const,
+            id: `${i}`,
+            data: { name: `row ${i}`, value: i },
+            ...(i === 3 || i === 8 ? { initPinned: "top" as const } : {}),
+          })),
+        ]}
+      />
+    </div>
+  );
+}
+
+/**
+ * Demonstrates a "pin the whole group" button living inside a groupBy/parent row.
+ *
+ * The parent row shows its own info plus a pin toggle; clicking it cascades `api.pinRow` to the
+ * parent *and* its child(ren) (`row.children`), so the group hoists into the sticky pinned section as a unit.
+ * This is the recommended pattern when you want a control other than `pinColumn`.
+ */
+export function InteractiveGroupRowPinning() {
+  const nameColumn: GridColumn<NestedRow> = {
+    header: () => "Name",
+    parent: (data, { row, api }) => {
+      // Pin the parent + all of its children together. `isPinned` is read here (inside the
+      // observer-wrapped Row), so the button's active state stays reactive.
+      //
+      // NOTE: this cascades manually. If this "pin the whole group" pattern shows up across several
+      // tables, we could add a library convenience instead — e.g. `api.pinRow(id, { withChildren: true })`
+      // (and a matching `unpinRow`) that pins the row's subtree — so callers don't repeat this.
+      const ids = [row.id, ...(row.children ?? []).map((c) => c.id)];
+      const isPinned = api.isPinnedRow(row.id);
+      return {
+        content: (
+          <div css={Css.df.aic.jcsb.w100.$}>
+            <span css={Css.xsSb.$}>{data.name}</span>
+            <IconButton
+              icon="pin"
+              active={isPinned}
+              label={isPinned ? "Unpin group" : "Pin group"}
+              onClick={() => ids.forEach((id) => (isPinned ? api.unpinRow(id) : api.pinRow(id)))}
+            />
+          </div>
+        ),
+        value: data.name,
+      };
+    },
+    child: (data) => ({ content: <div css={Css.ml2.$}>{data.name}</div>, value: data.name }),
+    // Unused kinds in this story, but GridColumn<NestedRow> requires a handler for every kind.
+    grandChild: (data) => data.name,
+    add: () => "",
+  };
+
+  const rows: GridDataRow<NestedRow>[] = [
+    simpleHeader,
+    ...zeroTo(40).map((i) => ({
+      kind: "parent" as const,
+      id: `g${i}`,
+      data: { name: `Group ${i}` },
+      // Pre-pin one whole group (parent + child) so the pinned section shows in the snapshot.
+      ...(i === 2 ? { initPinned: "top" as const } : {}),
+      children: [
+        {
+          kind: "child" as const,
+          id: `g${i}c1`,
+          data: { name: `Group ${i} — detail row` },
+          ...(i === 2 ? { initPinned: "top" as const } : {}),
+        },
+      ],
+    })),
+  ];
+
+  return (
+    <div css={Css.vh100.$}>
+      some other top of page content
+      <GridTable columns={[nameColumn]} stickyHeader rows={rows} />
     </div>
   );
 }

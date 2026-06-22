@@ -155,6 +155,16 @@ export class RowStates<R extends Kinded> {
     return this.allStates.filter((rs) => rs.collapsed);
   }
 
+  /**
+   * Returns rows pinned to the top at runtime.
+   *
+   * Sourced from `allStates` and not `visibleRows` so pinned rows stay visible even when the
+   * current filter would otherwise hide them (like`keptRows`). Reserved rows are never pinnable.
+   */
+  get pinnedTopRows(): RowState<R>[] {
+    return this.allStates.filter((rs) => rs.isPinnedTop && !rs.isReservedKind);
+  }
+
   private createHeaderRow(): RowState<R> {
     // We'll switch the rs.row from the `missingHeader` to the real header from the props.rows later
     return new RowState(this, undefined, missingHeader as GridDataRow<R>);
