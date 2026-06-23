@@ -49,8 +49,8 @@ describe("TableCardView", () => {
     // When rendered
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={data} />);
     // Then each block is displayed as a label: value pair
-    expect(r.tableCardView_beds).toHaveTextContent("Beds: 3");
-    expect(r.tableCardView_baths).toHaveTextContent("Baths: 2");
+    expect(r.tableCardView_beds).toHaveTextContent("Beds:3");
+    expect(r.tableCardView_baths).toHaveTextContent("Baths:2");
   });
 
   it("renders progress bar with percentage label", async () => {

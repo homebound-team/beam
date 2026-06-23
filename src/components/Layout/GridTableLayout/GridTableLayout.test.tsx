@@ -411,8 +411,8 @@ describe("GridTableLayout", () => {
       click(r.viewToggleButton_card);
 
       // Then the card shows the title and status
-      expect(r.card_row1_title).toHaveTextContent("The Conroy");
-      expect(r.card_row1_status).toHaveTextContent("Active");
+      expect(r.tableCard_title).toHaveTextContent("The Conroy");
+      expect(r.tableCard_status).toHaveTextContent("Active");
     });
   });
 
