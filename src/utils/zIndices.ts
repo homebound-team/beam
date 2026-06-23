@@ -28,6 +28,13 @@ export const zIndices = {
   // toasts still clear it.
   navbar: 120,
 
+  // Navbar mobile drawer + scrim — above navbar; below environment banner.
+  navbarMobileMenuScrim: 124,
+  navbarMobileMenu: 125,
+
+  // Environment banner (EnvironmentBannerLayout) — above navbar mobile menu; below snackbar.
+  environmentBanner: 130,
+
   // Full-page overlays — high enough to clear consuming-app nav bars (~999).
   // Both layouts own their Toast internally so it renders inside the overlay header.
   pageOverlay: 1000,

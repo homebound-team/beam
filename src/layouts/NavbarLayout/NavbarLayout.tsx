@@ -5,7 +5,11 @@ import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
-import { beamLayoutViewportWidthVar, beamNavbarLayoutHeightVar } from "../layoutVars";
+import {
+  beamEnvironmentBannerLayoutHeightVar,
+  beamLayoutViewportWidthVar,
+  beamNavbarLayoutHeightVar,
+} from "../layoutVars";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { NavbarLayoutHeightProvider } from "./NavbarLayoutHeightContext";
@@ -43,8 +47,14 @@ export function NavbarLayout(props: NavbarLayoutProps) {
       : // Fixed; inline `top` slides between hidden/revealed.
         Css.fixed.left0.z(zIndices.navbar).w(innerWidth).transitionTop.$;
 
+  const bannerTop = `var(${beamEnvironmentBannerLayoutHeightVar}, 0px)`;
+
   const innerStyle: CSSProperties | undefined =
-    autoHideState !== "static" ? { top: autoHideState === "revealed" ? 0 : -navHeight } : undefined;
+    autoHideState !== "static"
+      ? {
+          top: autoHideState === "revealed" ? bannerTop : `calc(${bannerTop} - ${navHeight}px)`,
+        }
+      : undefined;
 
   // Memoize so scroll-state re-renders don't re-render Navbar.
   const navbarEl = useMemo(() => <Navbar {...navbar} />, [navbar]);
