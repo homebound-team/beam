@@ -23,6 +23,7 @@ export * from "./ContrastScope";
 export * from "./Copy";
 export * from "./CountBadge";
 export * from "./DnDGrid";
+export * from "./DocumentTitle";
 export * from "./EnvironmentBanner/EnvironmentBanner";
 export type { AppEnvironment, EnvironmentBannerProps, ImpersonatedUser } from "./EnvironmentBanner/EnvironmentBanner";
 export { setEnvironmentFavicon } from "./EnvironmentBanner/setEnvironmentFavicon";
