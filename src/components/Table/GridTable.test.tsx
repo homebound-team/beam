@@ -4792,6 +4792,11 @@ describe("card view", () => {
         id: "row1",
         data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
       },
+      {
+        kind: "data",
+        id: "row2",
+        data: { address: "456 Oak Ave", city: "Dallas", beds: "4", bidOut: 30, status: "Pending" },
+      },
     ];
     // When rendered as card with a rowLink
     const r = await render(
