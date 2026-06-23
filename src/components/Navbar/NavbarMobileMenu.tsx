@@ -8,6 +8,7 @@ import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { ContrastScope } from "src/components/ContrastScope";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
+import { useEnvironmentBannerLayoutHeight } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 
@@ -62,13 +63,19 @@ function NavbarMobileDrawer({
   onClose: VoidFunction;
   tid: ReturnType<typeof useTestIds>;
 }) {
+  // Portal renders on `document.body`; read banner height from context (CSS vars are not inherited there).
+  const bannerHeightPx = useEnvironmentBannerLayoutHeight();
+  const overlayTopStyle = { top: bannerHeightPx };
+
   return (
     <>
       <motion.div
         key="navbarMobileMenuScrim"
         css={
-          Css.fixed.top0.right0.bottom0.left0.z(zIndices.modalUnderlay).add("backgroundColor", "rgba(36,36,36,0.2)").$
+          Css.fixed.right0.bottom0.left0.z(zIndices.navbarMobileMenuScrim).add("backgroundColor", "rgba(36,36,36,0.2)")
+            .$
         }
+        style={overlayTopStyle}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -82,7 +89,8 @@ function NavbarMobileDrawer({
           role="dialog"
           aria-modal="true"
           aria-label="Navigation"
-          css={Css.fixed.top0.bottom0.left0.df.fdc.fs0.w100.oh.z(zIndices.sideNav).bgColor(Tokens.Surface).$}
+          css={Css.fixed.bottom0.left0.df.fdc.fs0.w100.oh.z(zIndices.navbarMobileMenu).bgColor(Tokens.Surface).$}
+          style={overlayTopStyle}
           initial={{ x: "-100%" }}
           animate={{ x: 0 }}
           exit={{ x: "-100%" }}

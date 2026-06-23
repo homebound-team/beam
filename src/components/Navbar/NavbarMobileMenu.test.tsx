@@ -1,6 +1,9 @@
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
+import { environmentBannerSizePx } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { NavbarMobileMenu } from "src/components/Navbar/NavbarMobileMenu";
+import { EnvironmentBannerLayoutHeightProvider } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import { click, render, withRouter } from "src/utils/rtl";
+import { zIndices } from "src/utils/zIndices";
 
 describe("NavbarMobileMenu", () => {
   it("toggles the drawer open and closed via the hamburger", async () => {
@@ -59,6 +62,29 @@ describe("NavbarMobileMenu", () => {
     // The link group trigger is a <button>, not an <a>, so toggling it must not close the drawer.
     click(r.navbar_linkGroup_trigger);
     expect(r.navbar_mobileMenuPanel).toBeInTheDocument();
+  });
+
+  it("positions the drawer below the environment banner and above the navbar", async () => {
+    // Given a displayed environment banner height in context
+    const r = await render(
+      <EnvironmentBannerLayoutHeightProvider value={environmentBannerSizePx}>
+        <NavbarMobileMenu items={createItems()} />
+      </EnvironmentBannerLayoutHeightProvider>,
+      withRouter(),
+    );
+
+    // When the mobile drawer opens
+    click(r.navbar_mobileMenu);
+
+    // Then the overlay clears the navbar and starts below the banner
+    expect(r.navbar_mobileMenuDrawer).toHaveStyle({
+      top: `${environmentBannerSizePx}px`,
+      zIndex: String(zIndices.navbarMobileMenu),
+    });
+    expect(r.navbar_mobileMenuScrim).toHaveStyle({
+      top: `${environmentBannerSizePx}px`,
+      zIndex: String(zIndices.navbarMobileMenuScrim),
+    });
   });
 });
 

@@ -35,7 +35,7 @@ type TooltipProps = {
 const gapCrossingDelay = 100;
 
 export function Tooltip(props: TooltipProps) {
-  const { placement, children, title, disabled, delay = 0, bgColor, xss } = props;
+  const { placement, children, title, disabled, delay = 150, bgColor, xss } = props;
 
   const state = useTooltipTriggerState({ delay, closeDelay: gapCrossingDelay, isDisabled: disabled });
   const triggerRef = useRef<HTMLElement>(null);
