@@ -232,7 +232,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   private getPinnedRowIdsImpl(): string[] {
-    return this.tableState.getPinnedRowIds();
+    return this.tableState.pinnedRows.map((rs) => rs.row.id);
   }
 
   public setVisibleColumns(ids: string[]) {

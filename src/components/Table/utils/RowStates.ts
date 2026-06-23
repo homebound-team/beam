@@ -161,7 +161,7 @@ export class RowStates<R extends Kinded> {
    * Sourced from `allStates` and not `visibleRows` so pinned rows stay visible even when the
    * current filter would otherwise hide them (like`keptRows`). Reserved rows are never pinnable.
    */
-  get pinnedTopRows(): RowState<R>[] {
+  get pinnedRows(): RowState<R>[] {
     return this.allStates.filter((rs) => rs.pinned && !rs.isReservedKind);
   }
 

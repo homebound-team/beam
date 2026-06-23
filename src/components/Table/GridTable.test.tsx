@@ -1131,6 +1131,18 @@ describe("GridTable", () => {
       click(r.pin_1);
       expect(api.getPinnedRowIds()).toEqual([]);
     });
+
+    it("does not hoist (or hide) a reserved row when it is pinned", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+
+      // Pinning a reserved row (e.g. the header) is excluded from the pinned section, and the body
+      // de-dup is sourced from that same set — so the header stays in place rather than vanishing.
+      act(() => api.pinRow("header"));
+      expect(api.getPinnedRowIds()).toEqual([]);
+      expect(cell(r, 0, 0)).toHaveTextContent("Name");
+      expect(cell(r, 1, 0)).toHaveTextContent("foo");
+    });
   });
 
   describe("column sizes", () => {

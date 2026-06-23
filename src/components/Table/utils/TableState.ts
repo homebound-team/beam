@@ -260,8 +260,8 @@ export class TableState<R extends Kinded> {
   }
 
   /** Returns rows pinned to the top, as RowStates for rendering. */
-  get pinnedTopRows(): RowState<R>[] {
-    return this.rowStates.pinnedTopRows;
+  get pinnedRows(): RowState<R>[] {
+    return this.rowStates.pinnedRows;
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders
@@ -279,10 +279,6 @@ export class TableState<R extends Kinded> {
 
   togglePinned(id: string): void {
     this.rowStates.get(id).togglePinned();
-  }
-
-  getPinnedRowIds(): string[] {
-    return this.rowStates.pinnedTopRows.map((rs) => rs.row.id);
   }
 
   deleteRows(ids: string[]): void {

@@ -477,9 +477,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const keptSelectedRows: ReactElement[] = [];
     let visibleDataRows: ReactElement[] = [];
 
-    // Exclude runtime-pinned rows here; they render in their own pinned section (built below) joined
-    // to the sticky head block, so they must not also appear in their normal body position.
-    const visibleRows = tableState.visibleRows.filter((rs) => !rs.pinned);
+    // The pinned section (built below) renders these rows joined to the sticky head block, so exclude
+    // them from their normal body position. Source the exclusion from `pinnedRows` so the body de-dup
+    // and the pinned section can never disagree.
+    const pinnedRowStates = tableState.pinnedRows;
+    const pinnedIds = new Set(pinnedRowStates.map((rs) => rs.row.id));
+    const visibleRows = tableState.visibleRows.filter((rs) => !pinnedIds.has(rs.row.id));
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
     // Builds a `<Row>` element; shared by the partition loop and the pinned section so they stay in sync.
@@ -557,9 +560,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // Once our header rows are created we can organize them in expected order.
     const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
 
-    // Build the runtime pinned section from all states, so pins that the current filter would
-    // otherwise hide still show (mirrors how kept rows are sourced).
-    const pinnedRows = tableState.pinnedTopRows.map((rs) => makeRow(rs, false, false, false));
+    // Build the runtime pinned section from `pinnedRowStates` (sourced from all states, so pins the
+    // current filter would otherwise hide still show — mirroring how kept rows are sourced).
+    const pinnedRows = pinnedRowStates.map((rs) => makeRow(rs, false, false, false));
 
     const tooManyClientSideRows = !!filterMaxRows && visibleDataRows.length > filterMaxRows;
     if (tooManyClientSideRows) {

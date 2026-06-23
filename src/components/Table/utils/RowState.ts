@@ -276,7 +276,7 @@ export class RowState<R extends Kinded> {
           // Reserved rows are always visible, even though they're not considered matched.
           // ...except for the kept group: its `isMatched` will become true whenever it has
           // any kept row children, as they will cause its hasDirectlyMatchedChildren to be true.
-          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isPinned,
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isAlwaysVisible,
       ) ?? []
     );
   }
@@ -302,7 +302,7 @@ export class RowState<R extends Kinded> {
           (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) ||
           rs.isDirectlyMatched ||
           rs.hasDirectlyMatchedChildren ||
-          rs.isPinned,
+          rs.isAlwaysVisible,
       ) ?? []
     );
   }
@@ -337,7 +337,18 @@ export class RowState<R extends Kinded> {
     return !!this.children && (this.children.length > 0 || this.row.id === KEPT_GROUP) && this.inferSelectedState;
   }
 
-  private get isPinned(): boolean {
+  /**
+   * Whether the declarative `row.pin` keeps this row visible through client-side filtering.
+   *
+   * NOTE: declarative `row.pin: "first" | "last"` predates the interactive row-pinning added
+   * and is a *different* feature — it reorders a row within its sibling group and (here)
+   * exempts it from the filter; it is NOT the sticky "pin to top". The shared "pin" vocabulary is
+   * confusing (`row.pin` / this getter vs the runtime `pinned` / `pinRow` / `pinColumn`). Renaming
+   * this getter from `isPinned` -> `isAlwaysVisible` avoids the `isPinned` vs `pinned` clash without a
+   * breaking change. A larger follow-up could rename the declarative prop itself (e.g. `pin` ->
+   * `anchor`) to free up "pin" for the sticky feature — see the PR description.
+   */
+  private get isAlwaysVisible(): boolean {
     return typeof this.row.pin === "string" || (!!this.row.pin && this.row.pin.filter !== true);
   }
 
