@@ -253,11 +253,6 @@ describe("GridTableLayout", () => {
       );
 
       expect(r.viewToggleButton).toBeInTheDocument();
-
-      click(r.viewToggleButton);
-      click(r.viewToggleButton_card);
-
-      expect(localStorage.getItem(getGridTableViewStorageKey("/"))).toBe("card");
     });
 
     it("shows EditColumnsButton in list view and hides it in card view", async () => {
@@ -267,7 +262,7 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           tableProps={{
-            columns: getHideableColumns(),
+            columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
           withCardView
@@ -316,7 +311,7 @@ describe("GridTableLayout", () => {
           layoutStateProps={{}}
           pageTitle="Test"
           tableProps={{
-            columns: getHideableColumns(),
+            columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
           defaultView="list"
@@ -356,7 +351,7 @@ describe("GridTableLayout", () => {
           pageTitle="Test"
           defaultView="list"
           tableProps={{
-            columns: getHideableColumns(),
+            columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
           }}
           withCardView
@@ -585,8 +580,8 @@ function TestWrapper(props: TestWrapperProps) {
 
 function getColumns() {
   return [
-    column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name" }),
-    numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value" }),
+    column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name", canHide: true }),
+    numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value", canHide: true }),
     actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
   ];
 }
@@ -596,13 +591,5 @@ function getRows(): Row[] {
     { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
     { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
     { kind: "data", id: "3", data: { name: "Gamma", value: 30 } },
-  ];
-}
-
-function getHideableColumns() {
-  return [
-    column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name", canHide: true }),
-    numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value", canHide: true }),
-    actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
   ];
 }

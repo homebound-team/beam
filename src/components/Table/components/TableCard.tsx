@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Tag } from "src/components";
 import { CardTag } from "src/components/Card";
@@ -13,7 +13,7 @@ import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export type CardData = {
-  header: string;
+  label: string;
   value: ReactNode | string | number;
 };
 
@@ -24,7 +24,10 @@ export type TableCardProps<R extends Kinded> = {
   api: GridTableApi<R>;
 };
 
-export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: TableCardProps<R>) {
+export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
+  const { rs, columns, rowStyle, api } = props;
+  const tid = useTestIds(props, "tableCard");
+
   let title: string | undefined;
   let eyebrow: string | undefined;
   let badge: string | undefined;
@@ -52,7 +55,7 @@ export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: Tabl
         status = slot.tag;
         break;
       case "dataBlock":
-        dataBlocks.push({ header: slot.label, value: slot.value });
+        dataBlocks.push({ label: slot.label, value: slot.value });
         break;
       case "progress":
         progress = slot.value;
@@ -64,8 +67,8 @@ export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: Tabl
 
   const card = (
     <TableCardView
-      data-testid={`card_${rs.row.id}`}
-      imgSrc={(rs.row as any).imgSrc ?? ""}
+      {...tid}
+      imgSrc={rs.row.imgSrc ?? ""}
       title={title}
       eyebrow={eyebrow}
       badge={badge}
@@ -75,7 +78,7 @@ export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: Tabl
     />
   );
 
-  const to = rowStyle?.rowLink?.(rs.row as any);
+  const to = rowStyle?.rowLink?.(rs.row);
   if (to) {
     return (
       <Link to={to} css={Css.tdn.color("unset").$} className={navLink}>
@@ -85,7 +88,7 @@ export function TableCard<R extends Kinded>({ rs, columns, rowStyle, api }: Tabl
   }
   if (rowStyle?.onClick) {
     return (
-      <button onClick={() => rowStyle.onClick!(rs.row as any, api)} css={Css.cursorPointer.$}>
+      <button onClick={() => rowStyle.onClick!(rs.row, api)} css={Css.cursorPointer.$}>
         {card}
       </button>
     );
@@ -107,6 +110,8 @@ export type TableCardViewProps = {
 export function TableCardView(props: TableCardViewProps) {
   const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
   const tid = useTestIds(props, "tableCardView");
+
+  const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
 
   return (
     <div css={Css.p3.wPx(330).h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
@@ -139,21 +144,22 @@ export function TableCardView(props: TableCardViewProps) {
           )}
         </div>
         {data && data?.length > 0 && (
-          <div css={Css.dg.gtc("repeat(2, minmax(0, 1fr))").sm.$}>
+          <dl css={Css.dg.gtc("repeat(2, minmax(0, 1fr))").sm.$}>
             {data.map((d, idx) => (
-              <p key={`${d.header}`} css={Css.gc((idx % 2) + 1).$} {...tid[defaultTestId(d.header)]}>
-                {d.header}: {d.value}
-              </p>
+              <div key={d.label} css={Css.df.gapPx(4).gc((idx % 2) + 1).$} {...tid[defaultTestId(d.label)]}>
+                <dt>{d.label}:</dt>
+                <dd>{d.value}</dd>
+              </div>
             ))}
-          </div>
+          </dl>
         )}
         {progress !== undefined && (
           <div css={Css.df.fdc.gap1.$}>
             <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
               <div css={Css.w25.hPx(8).br4.bgGray200.$}>
-                <div css={Css.h100.br4.bgBlue500.w(`${clampProgress(progress)}%`).$} />
+                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
               </div>
-              <span {...tid.progressValue}>{clampProgress(progress)}%</span>
+              <span {...tid.progressValue}>{progressValue}%</span>
             </div>
           </div>
         )}

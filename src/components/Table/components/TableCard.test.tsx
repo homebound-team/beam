@@ -3,10 +3,6 @@ import { render } from "src/utils/rtl";
 
 describe("TableCardView", () => {
   const imgSrc = "home.jpg";
-  const data = [
-    { header: "Beds", value: "3" },
-    { header: "Baths", value: "2" },
-  ];
 
   it("renders title and image with title as alt text", async () => {
     // Given a card with only required props
@@ -45,6 +41,11 @@ describe("TableCardView", () => {
 
   it("renders data blocks as 'header: value' pairs", async () => {
     // Given a card with data blocks
+    const data = [
+      { label: "Beds", value: "3" },
+      { label: "Baths", value: "2" },
+    ];
+
     // When rendered
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={data} />);
     // Then each block is displayed as a label: value pair

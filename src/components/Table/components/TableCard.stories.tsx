@@ -5,14 +5,6 @@ export default {
   component: TableCardView,
 } as Meta;
 
-const imgSrc = "plan-exterior.png";
-const data = [
-  { header: "Sq Ft", value: "2,400" },
-  { header: "Beds", value: "4" },
-  { header: "Baths", value: "3" },
-  { header: "Close Date", value: "Aug 2026" },
-];
-
 export function Default() {
   return <TableCardView imgSrc={imgSrc} title="123 Main Street" data={data} />;
 }
@@ -61,3 +53,11 @@ export function LongTitle() {
     />
   );
 }
+
+const imgSrc = "plan-exterior.png";
+const data = [
+  { label: "Sq Ft", value: "2,400" },
+  { label: "Beds", value: "4" },
+  { label: "Baths", value: "3" },
+  { label: "Close Date", value: "Aug 2026" },
+];
