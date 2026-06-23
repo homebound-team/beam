@@ -1,4 +1,21 @@
 export {
+  cardBadgeSlot,
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
+export type {
+  CardBadgeSlot,
+  CardDataBlockSlot,
+  CardEyebrowSlot,
+  CardProgressSlot,
+  CardSlot,
+  CardStatusSlot,
+  CardTitleSlot,
+} from "src/components/Table/cardSlots";
+export {
   defaultRenderFn,
   headerRenderFn,
   rowClickRenderFn,

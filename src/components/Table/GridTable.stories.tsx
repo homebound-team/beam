@@ -30,6 +30,7 @@ import {
   SimpleHeaderAndData,
   useGridTableApi,
 } from "src/components/index";
+import { cardBadgeSlot, cardDataBlockSlot, cardEyebrowSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { Css, Palette } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -2416,6 +2417,212 @@ export function MultipleStickyColumns() {
   return (
     <div css={Css.m2.wPx(800).add("overflow", "auto").$}>
       <GridTable columns={columns} rows={rows} />
+    </div>
+  );
+}
+
+type HomeData = {
+  address: string;
+  lot: string;
+  city: string;
+  sqft: string;
+  beds: string;
+  baths: string;
+  closeDate: string;
+  status: string;
+};
+type HomeRow = SimpleHeaderAndData<HomeData>;
+
+export function CardView() {
+  const columns: GridColumn<HomeRow>[] = [
+    {
+      header: "Address",
+      data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+    },
+    {
+      header: "Lot",
+      data: ({ lot }) => ({ content: lot, value: lot, cardSlot: cardEyebrowSlot(lot) }),
+    },
+    {
+      header: "City",
+      data: ({ city }) => ({ content: city, value: city, cardSlot: cardBadgeSlot(city) }),
+    },
+    {
+      header: "Sq Ft",
+      name: "Sq Ft",
+      data: ({ sqft }) => ({
+        content: sqft,
+        value: sqft,
+        cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }),
+      }),
+    },
+    {
+      header: "Beds",
+      name: "Beds",
+      data: ({ beds }) => ({ content: beds, value: beds, cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }) }),
+    },
+    {
+      header: "Baths",
+      name: "Baths",
+      data: ({ baths }) => ({
+        content: baths,
+        value: baths,
+        cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }),
+      }),
+    },
+    {
+      header: "Close Date",
+      name: "Close Date",
+      data: ({ closeDate }) => ({
+        content: closeDate,
+        value: closeDate,
+        cardSlot: cardDataBlockSlot({ label: "Close Date", value: closeDate }),
+      }),
+    },
+  ];
+
+  const rows: GridDataRow<HomeRow>[] = [
+    simpleHeader,
+    {
+      kind: "data",
+      id: "1",
+      imgSrc: "plan-exterior.png",
+      data: {
+        address: "123 Main Street",
+        lot: "Lot 4",
+        city: "Austin, TX",
+        sqft: "2,400",
+        beds: "4",
+        baths: "3",
+        closeDate: "Aug 2026",
+        status: "In Progress",
+      },
+    },
+    {
+      kind: "data",
+      id: "2",
+      imgSrc: "plan-exterior.png",
+      data: {
+        address: "456 Oak Avenue",
+        lot: "Lot 7",
+        city: "Denver, CO",
+        sqft: "3,100",
+        beds: "5",
+        baths: "4",
+        closeDate: "Oct 2026",
+        status: "Planning",
+      },
+    },
+    {
+      kind: "data",
+      id: "3",
+      imgSrc: "plan-exterior.png",
+      data: {
+        address: "789 Pine Road",
+        lot: "Lot 2",
+        city: "Nashville, TN",
+        sqft: "1,850",
+        beds: "3",
+        baths: "2",
+        closeDate: "Dec 2026",
+        status: "Complete",
+      },
+    },
+  ];
+
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable as="card" columns={columns} rows={rows} />
+      </div>
+    </div>
+  );
+}
+
+export function CardViewInfiniteScroll() {
+  const cities = ["Austin, TX", "Denver, CO", "Nashville, TN", "Phoenix, AZ", "Charlotte, NC"];
+  const statuses = ["In Progress", "Planning", "Complete"];
+
+  const makeRows = useCallback(
+    (offset: number, count: number): GridDataRow<HomeRow>[] =>
+      zeroTo(count).map((i) => {
+        const n = offset + i;
+        return {
+          kind: "data" as const,
+          id: String(n),
+          imgSrc: "plan-exterior.png",
+          data: {
+            address: `${100 + n} Elm Street`,
+            lot: `Lot ${n + 1}`,
+            city: cities[n % cities.length],
+            sqft: String(1_500 + (n % 20) * 100),
+            beds: String(2 + (n % 4)),
+            baths: String(1 + (n % 3)),
+            closeDate: `${["Jan", "Mar", "Jun", "Sep", "Nov"][n % 5]} 2027`,
+            status: statuses[n % statuses.length],
+          },
+        };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const [data, setData] = useState<GridDataRow<HomeRow>[]>(() => makeRows(0, 50));
+  const rows = useMemo(() => [simpleHeader, ...data], [data]);
+
+  const columns: GridColumn<HomeRow>[] = useMemo(
+    () => [
+      {
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      },
+      { header: "Lot", data: ({ lot }) => ({ content: lot, value: lot, cardSlot: cardEyebrowSlot(lot) }) },
+      { header: "City", data: ({ city }) => ({ content: city, value: city, cardSlot: cardBadgeSlot(city) }) },
+      {
+        header: "Sq Ft",
+        name: "Sq Ft",
+        data: ({ sqft }) => ({
+          content: sqft,
+          value: sqft,
+          cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }),
+        }),
+      },
+      {
+        header: "Beds",
+        name: "Beds",
+        data: ({ beds }) => ({
+          content: beds,
+          value: beds,
+          cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }),
+        }),
+      },
+      {
+        header: "Baths",
+        name: "Baths",
+        data: ({ baths }) => ({
+          content: baths,
+          value: baths,
+          cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }),
+        }),
+      },
+    ],
+    [],
+  );
+
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable
+          as="card"
+          columns={columns}
+          rows={rows}
+          infiniteScroll={{
+            onEndReached() {
+              setData((prev) => [...prev, ...makeRows(prev.length, 50)]);
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }

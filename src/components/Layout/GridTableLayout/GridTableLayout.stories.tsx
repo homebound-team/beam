@@ -1,13 +1,21 @@
 import { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
-import { GridDataRow } from "src/components/Table";
+import { GridDataRow, SimpleHeaderAndData } from "src/components/Table";
+import {
+  cardBadgeSlot,
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
-import { TestProjectLayout } from "../Layout.stories";
+import { TestProjectLayout } from "src/utils/sbComponents";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
@@ -35,7 +43,7 @@ export function GridTableLayout() {
   });
 
   return (
-    <TestProjectLayout>
+    <TestProjectLayout pageTitle="Grid Table Layout">
       <GridTableLayoutComponent
         pageTitle="Grid Table Layout Example"
         breadCrumb={[
@@ -242,34 +250,321 @@ export function GridTableLayoutWithColor() {
 }
 
 export function WithViewToggle() {
-  const columns = useMemo(() => getColumns(false), []);
-  const rows = useMemo(() => makeNestedRows(3), []);
-
-  const tileContent = (
-    <div css={Css.dg.gtc("repeat(3, 1fr)").gap2.p1.$}>
-      {rows
-        .filter((r): r is ParentRow => r.kind === "parent")
-        .map((row) => (
-          <div key={row.id} css={Css.bshBasic.br8.p3.bgWhite.df.fdc.gap1.$}>
-            <div css={Css.smSb.$}>{row.data.name}</div>
-            <div css={Css.xs.gray700.$}>Status: {row.data.status}</div>
-            <div css={Css.xs.gray700.$}>Value: {row.data.value}</div>
-            <div css={Css.xs.gray700.$}>Priority: {row.data.priority}</div>
-          </div>
-        ))}
-    </div>
-  );
+  type PlanData = {
+    offeringName: string;
+    planCode: string;
+    version: string;
+    sqft: string;
+    beds: string;
+    baths: string;
+    elevations: string;
+    width: string;
+    depth: string;
+    bidOut: number;
+    status: string;
+  };
+  type PlanRow = SimpleHeaderAndData<PlanData>;
 
   return (
-    <GridTableLayoutComponent
-      tableProps={{
-        columns,
-        rows: [simpleHeader, ...rows],
-        sorting: { on: "client", initial: [columns[2].id!, "ASC"] },
-      }}
-      withCardView={tileContent}
-      defaultView="card"
-    />
+    <TestProjectLayout pageTitle="With View Toggle">
+      <GridTableLayoutComponent
+        tableProps={{
+          columns: [
+            column<PlanRow>({
+              id: "offering-name",
+              name: "Offering Name",
+              header: "Offering Name",
+              data: ({ offeringName }) => ({
+                content: offeringName,
+                value: offeringName,
+                cardSlot: cardTitleSlot(offeringName),
+              }),
+            }),
+            column<PlanRow>({
+              id: "plan-code",
+              name: "Plan Code",
+              header: "Plan Code",
+              data: ({ planCode }) => ({ content: planCode, value: planCode, cardSlot: cardEyebrowSlot(planCode) }),
+            }),
+            column<PlanRow>({
+              id: "version",
+              name: "Version",
+              header: "Version",
+              data: ({ version }) => ({ content: version, value: version, cardSlot: cardBadgeSlot(version) }),
+            }),
+            column<PlanRow>({
+              id: "sqft",
+              name: "Sq ft",
+              header: "Sq ft",
+              data: ({ sqft }) => ({
+                content: sqft,
+                value: sqft,
+                cardSlot: cardDataBlockSlot({ label: "Sq ft", value: sqft }),
+              }),
+            }),
+            column<PlanRow>({
+              id: "beds",
+              name: "Bed",
+              header: "Bed",
+              data: ({ beds }) => ({
+                content: beds,
+                value: beds,
+                cardSlot: cardDataBlockSlot({ label: "Bed", value: beds }),
+              }),
+            }),
+            column<PlanRow>({
+              id: "baths",
+              name: "Bath",
+              header: "Bath",
+              data: ({ baths }) => ({
+                content: baths,
+                value: baths,
+                cardSlot: cardDataBlockSlot({ label: "Bath", value: baths }),
+              }),
+            }),
+            column<PlanRow>({
+              id: "elevations",
+              name: "Elevations",
+              header: "Elevations",
+              data: ({ elevations }) => ({
+                content: elevations,
+                value: elevations,
+                cardSlot: cardDataBlockSlot({ label: "Elevations", value: elevations }),
+              }),
+            }),
+            column<PlanRow>({
+              id: "width",
+              name: "Width",
+              header: "Width",
+              data: ({ width }) => ({
+                content: width,
+                value: width,
+                cardSlot: cardDataBlockSlot({ label: "Width", value: width }),
+              }),
+            }),
+            column<PlanRow>({
+              id: "depth",
+              name: "Depth",
+              header: "Depth",
+              data: ({ depth }) => ({
+                content: depth,
+                value: depth,
+                cardSlot: cardDataBlockSlot({ label: "Depth", value: depth }),
+              }),
+            }),
+            column<PlanRow>({
+              id: "bid-out",
+              name: "Bid out",
+              header: "Bid out",
+              data: ({ bidOut }) => ({
+                content: bidOut,
+                value: bidOut,
+                cardSlot: cardProgressSlot(bidOut),
+              }),
+            }),
+            column<PlanRow>({
+              id: "status",
+              name: "Status",
+              header: "Status",
+              data: ({ status }) => ({
+                content: status,
+                value: status,
+                cardSlot: cardStatusSlot({
+                  text: status,
+                  type: status === "Active" ? "success" : status === "Archived" ? "warning" : "neutral",
+                }),
+              }),
+            }),
+          ],
+          rows: [
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Conroy",
+                planCode: "SFH-001",
+                version: "v2.1",
+                sqft: "2,400",
+                beds: "4",
+                baths: "3",
+                elevations: "3",
+                width: "52'",
+                depth: "68'",
+                bidOut: 75,
+                status: "Active",
+              },
+            },
+            {
+              kind: "data",
+              id: "2",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Aldridge",
+                planCode: "SFH-002",
+                version: "v1.4",
+                sqft: "3,100",
+                beds: "5",
+                baths: "4",
+                elevations: "2",
+                width: "58'",
+                depth: "72'",
+                bidOut: 30,
+                status: "Draft",
+              },
+            },
+            {
+              kind: "data",
+              id: "3",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Waverly",
+                planCode: "TH-003",
+                version: "v3.0",
+                sqft: "1,850",
+                beds: "3",
+                baths: "2",
+                elevations: "4",
+                width: "44'",
+                depth: "60'",
+                bidOut: 90,
+                status: "Archived",
+              },
+            },
+            {
+              kind: "data",
+              id: "4",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Pemberton",
+                planCode: "SFH-004",
+                version: "v1.0",
+                sqft: "2,750",
+                beds: "4",
+                baths: "3.5",
+                elevations: "2",
+                width: "54'",
+                depth: "70'",
+                bidOut: 55,
+                status: "Active",
+              },
+            },
+            {
+              kind: "data",
+              id: "5",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Harlow",
+                planCode: "TH-005",
+                version: "v2.3",
+                sqft: "1,620",
+                beds: "2",
+                baths: "2",
+                elevations: "3",
+                width: "38'",
+                depth: "56'",
+                bidOut: 10,
+                status: "Draft",
+              },
+            },
+            {
+              kind: "data",
+              id: "6",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Stanton",
+                planCode: "SFH-006",
+                version: "v4.1",
+                sqft: "3,400",
+                beds: "5",
+                baths: "4",
+                elevations: "2",
+                width: "62'",
+                depth: "76'",
+                bidOut: 80,
+                status: "Active",
+              },
+            },
+            {
+              kind: "data",
+              id: "7",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Meridian",
+                planCode: "TH-007",
+                version: "v1.2",
+                sqft: "2,100",
+                beds: "3",
+                baths: "2.5",
+                elevations: "5",
+                width: "46'",
+                depth: "64'",
+                bidOut: 45,
+                status: "Archived",
+              },
+            },
+            {
+              kind: "data",
+              id: "8",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Calloway With a way longer title",
+                planCode: "SFH-008",
+                version: "v2.0",
+                sqft: "2,950",
+                beds: "4",
+                baths: "3",
+                elevations: "3",
+                width: "56'",
+                depth: "74'",
+                bidOut: 65,
+                status: "Draft",
+              },
+            },
+            {
+              kind: "data",
+              id: "9",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Ashford",
+                planCode: "SFH-009",
+                version: "v3.2",
+                sqft: "3,250",
+                beds: "5",
+                baths: "4.5",
+                elevations: "2",
+                width: "60'",
+                depth: "80'",
+                bidOut: 95,
+                status: "Active",
+              },
+            },
+            {
+              kind: "data",
+              id: "10",
+              imgSrc: "plan-exterior.png",
+              data: {
+                offeringName: "The Ellison",
+                planCode: "TH-010",
+                version: "v1.8",
+                sqft: "1,980",
+                beds: "3",
+                baths: "2",
+                elevations: "4",
+                width: "42'",
+                depth: "62'",
+                bidOut: 20,
+                status: "Archived",
+              },
+            },
+          ],
+          rowStyles: { data: { rowLink: () => "https://www.homebound.com" } },
+        }}
+        withCardView
+        defaultView="card"
+      />
+    </TestProjectLayout>
   );
 }
 
