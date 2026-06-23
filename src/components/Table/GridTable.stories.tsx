@@ -550,7 +550,7 @@ export function InteractiveRowPinning() {
             data: { name: `row ${i}`, value: i },
             // Pre-pin a couple rows so the sticky pinned section (and its separator) shows in the snapshot;
             // any row can be pinned/unpinned via the pin column.
-            ...(i === 3 || i === 8 ? { initPinned: "top" as const } : {}),
+            ...(i === 3 || i === 8 ? { initPinned: true } : {}),
           })),
         ]}
       />
@@ -574,7 +574,7 @@ export function InteractiveRowPinningVirtual() {
             kind: "data" as const,
             id: `${i}`,
             data: { name: `row ${i}`, value: i },
-            ...(i === 3 || i === 8 ? { initPinned: "top" as const } : {}),
+            ...(i === 3 || i === 8 ? { initPinned: true } : {}),
           })),
         ]}
       />
@@ -629,13 +629,13 @@ export function InteractiveGroupRowPinning() {
       id: `g${i}`,
       data: { name: `Group ${i}` },
       // Pre-pin one whole group (parent + child) so the pinned section shows in the snapshot.
-      ...(i === 2 ? { initPinned: "top" as const } : {}),
+      ...(i === 2 ? { initPinned: true } : {}),
       children: [
         {
           kind: "child" as const,
           id: `g${i}c1`,
           data: { name: `Group ${i} — detail row` },
-          ...(i === 2 ? { initPinned: "top" as const } : {}),
+          ...(i === 2 ? { initPinned: true } : {}),
         },
       ],
     })),

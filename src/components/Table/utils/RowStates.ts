@@ -162,7 +162,7 @@ export class RowStates<R extends Kinded> {
    * current filter would otherwise hide them (like`keptRows`). Reserved rows are never pinnable.
    */
   get pinnedTopRows(): RowState<R>[] {
-    return this.allStates.filter((rs) => rs.isPinnedTop && !rs.isReservedKind);
+    return this.allStates.filter((rs) => rs.pinned && !rs.isReservedKind);
   }
 
   private createHeaderRow(): RowState<R> {

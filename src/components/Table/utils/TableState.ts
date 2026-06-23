@@ -266,15 +266,15 @@ export class TableState<R extends Kinded> {
 
   // Should be called in an Observer/useComputed to trigger re-renders
   isPinnedRow(id: string): boolean {
-    return this.rowStates.get(id).isPinnedTop;
+    return this.rowStates.get(id).pinned;
   }
 
   pinRow(id: string): void {
-    this.rowStates.get(id).setPinned("top");
+    this.rowStates.get(id).setPinned(true);
   }
 
   unpinRow(id: string): void {
-    this.rowStates.get(id).setPinned(undefined);
+    this.rowStates.get(id).setPinned(false);
   }
 
   togglePinned(id: string): void {

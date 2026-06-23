@@ -30,14 +30,11 @@ export class RowState<R extends Kinded> {
   /** Whether we are collapsed. */
   collapsed = false;
   /**
-   * Whether this row is pinned to the top/bottom at runtime.
-   *
-   * This is distinct from the declarative `row.pin` (see `isPinned`): `pin`
-   * reorders a row within its sibling group, while `pinnedTo` hoists the row into a sticky pinned
-   * section that stays visible while the body scrolls. Stored as `"top" | "bottom"` for forward-compat,
-   * though only `"top"` is currently rendered.
+   * Whether this row is pinned to the top at runtime — distinct from the declarative `row.pin`,
+   * which only reorders within a group. Boolean for now; maybe someday we implement bottom pinning,
+   * at which point this would become `"top" | "bottom"`.
    */
-  pinnedTo: "top" | "bottom" | undefined = undefined;
+  pinned = false;
   /** Whether we are dragged over. */
   isDraggedOver: DraggedOver = DraggedOver.None;
   /**
@@ -69,7 +66,7 @@ export class RowState<R extends Kinded> {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
-    this.pinnedTo = row.initPinned;
+    this.pinned = !!row.initPinned;
     makeAutoObservable(
       this,
       // 'as any' because the fields are private so don't show up in the type
@@ -209,14 +206,14 @@ export class RowState<R extends Kinded> {
     this.collapsed = !this.collapsed;
   }
 
-  /** Pin/unpin this row at runtime; pass `undefined` to clear the pin. */
-  setPinned(pinnedTo: "top" | "bottom" | undefined): void {
-    this.pinnedTo = pinnedTo;
+  /** Pin/unpin this row at runtime. */
+  setPinned(pinned: boolean): void {
+    this.pinned = pinned;
   }
 
-  /** Toggle this row's runtime pin for the given location (defaults to "top"). */
-  togglePinned(at: "top" | "bottom" = "top"): void {
-    this.pinnedTo = this.pinnedTo === at ? undefined : at;
+  /** Toggle this row's runtime pin. */
+  togglePinned(): void {
+    this.pinned = !this.pinned;
   }
 
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */
@@ -237,11 +234,6 @@ export class RowState<R extends Kinded> {
     if (!this.isKept) return false;
     const { keptRows } = this.states.table;
     return keptRows[keptRows.length - 1] === this;
-  }
-
-  /** Whether this row is pinned to the top at runtime (distinct from the declarative `isPinned`). */
-  get isPinnedTop(): boolean {
-    return this.pinnedTo === "top";
   }
 
   get key(): string {

@@ -1103,7 +1103,7 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-            { kind: "data", id: "2", initPinned: "top", data: { name: "bar", value: 2 } },
+            { kind: "data", id: "2", initPinned: true, data: { name: "bar", value: 2 } },
             { kind: "data", id: "3", data: { name: "zaz", value: 3 } },
           ]}
         />,

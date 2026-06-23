@@ -22,7 +22,6 @@ export function PinToggle({ id }: PinToggleProps) {
     <IconButton
       {...tid[id]}
       icon="pin"
-      // When pinned, show a green (`Green300`) fill to mark the active state.
       bgColor={isPinned ? Palette.Green300 : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
       onClick={() => tableState.togglePinned(id)}

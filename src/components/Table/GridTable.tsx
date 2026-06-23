@@ -479,7 +479,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Exclude runtime-pinned rows here; they render in their own pinned section (built below) joined
     // to the sticky head block, so they must not also appear in their normal body position.
-    const visibleRows = tableState.visibleRows.filter((rs) => !rs.isPinnedTop);
+    const visibleRows = tableState.visibleRows.filter((rs) => !rs.pinned);
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
     // Builds a `<Row>` element; shared by the partition loop and the pinned section so they stay in sync.
