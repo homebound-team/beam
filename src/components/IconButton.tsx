@@ -78,25 +78,19 @@ export function IconButton(props: IconButtonProps) {
 
   const isCircle = variant === "circle";
   const isOutline = variant === "outline";
-  const styles = useMemo(
-    () => ({
+  const styles = useMemo(() => {
+    const variantKey = isCircle ? "circle" : isOutline ? "outline" : compact ? "compact" : "default";
+    const vs = variantStyles[variantKey];
+    return {
       ...iconButtonStylesReset,
-      ...(isCircle ? iconButtonCircle : isOutline ? iconButtonOutline : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered &&
-        (isCircle ? iconButtonCircleStylesHover : isOutline ? iconButtonOutlineStylesHover : iconButtonTokenHover)),
-      ...(isFocusVisible || forceFocusStyles
-        ? isCircle
-          ? iconButtonCircleStylesFocus
-          : isOutline
-            ? iconButtonOutlineStylesFocus
-            : iconButtonStylesFocus
-        : {}),
-      ...(active && (isCircle ? activeStylesCircle : isOutline ? activeStylesOutline : iconButtonTokenHover)),
+      ...vs.base,
+      ...(isHovered && vs.hover),
+      ...((isFocusVisible || forceFocusStyles) && vs.focus),
+      ...(active && vs.pressed),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
-    }),
-    [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles],
-  );
+    };
+  }, [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles]);
   const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
@@ -153,3 +147,29 @@ const iconButtonCircleStylesFocus = Css.bgBlue100.bcBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
 const activeStylesCircle = Css.bgGray200.bcGray200.$;
 const activeStylesOutline = Css.bgGray200.$;
+const variantStyles = {
+  default: {
+    base: iconButtonNormal,
+    hover: iconButtonTokenHover,
+    focus: iconButtonStylesFocus,
+    pressed: iconButtonTokenHover,
+  },
+  compact: {
+    base: iconButtonCompact,
+    hover: iconButtonTokenHover,
+    focus: iconButtonStylesFocus,
+    pressed: iconButtonTokenHover,
+  },
+  circle: {
+    base: iconButtonCircle,
+    hover: iconButtonCircleStylesHover,
+    focus: iconButtonCircleStylesFocus,
+    pressed: activeStylesCircle,
+  },
+  outline: {
+    base: iconButtonOutline,
+    hover: iconButtonOutlineStylesHover,
+    focus: iconButtonOutlineStylesFocus,
+    pressed: activeStylesOutline,
+  },
+} as const;
