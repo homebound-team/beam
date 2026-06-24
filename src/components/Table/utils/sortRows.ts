@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { GridCellContent } from "src/components/Table/components/cell";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { GridColumnWithId, Kinded, Pin } from "src/components/Table/types";
+import { FixedSort, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
 import { Temporal } from "temporal-polyfill";
@@ -43,14 +43,14 @@ export function sortFn<R extends Kinded>(
   const primaryColumn = persistentSortColumnId && columns.find((c) => c.id! === persistentSortColumnId);
 
   return (a, b) => {
-    if (a.pin || b.pin) {
-      // If both rows are pinned, we don't sort within them, because by pinning the page is taking
-      // explicit ownership over the order of the rows (and we also don't support "levels of pins",
-      // i.e. for change events putting "just added" rows `pin: last` and the "add new" row `pin: lastest`).
-      const aPin = getPin(a.pin);
-      const bPin = getPin(b.pin);
-      const ap = aPin === "first" ? -1 : aPin === "last" ? 1 : 0;
-      const bp = bPin === "first" ? -1 : bPin === "last" ? 1 : 0;
+    if (a.fixedSort || b.fixedSort) {
+      // If both rows are fixed-sorted, we don't sort within them, because the page is taking
+      // explicit ownership over the order of the rows (and we also don't support "levels", i.e.
+      // for change events putting "just added" rows `fixedSort: last` and the "add new" row first).
+      const aFixedSort = getFixedSort(a.fixedSort);
+      const bFixedSort = getFixedSort(b.fixedSort);
+      const ap = aFixedSort === "first" ? -1 : aFixedSort === "last" ? 1 : 0;
+      const bp = bFixedSort === "first" ? -1 : bFixedSort === "last" ? 1 : 0;
       return ap === bp ? 0 : ap < bp ? -1 : 1;
     } else if (primaryColumn) {
       // When primary key exist sort that priority first
@@ -63,8 +63,8 @@ export function sortFn<R extends Kinded>(
   };
 }
 
-function getPin(pin: string | Pin | undefined) {
-  return typeof pin === "string" ? pin : pin?.at;
+function getFixedSort(fixedSort: string | FixedSort | undefined) {
+  return typeof fixedSort === "string" ? fixedSort : fixedSort?.at;
 }
 
 function compare<R extends Kinded>(

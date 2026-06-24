@@ -155,6 +155,16 @@ export class RowStates<R extends Kinded> {
     return this.allStates.filter((rs) => rs.collapsed);
   }
 
+  /**
+   * Returns rows pinned to the top at runtime.
+   *
+   * Sourced from `allStates` and not `visibleRows` so pinned rows stay visible even when the
+   * current filter would otherwise hide them (like`keptRows`). Reserved rows are never pinnable.
+   */
+  get pinnedRows(): RowState<R>[] {
+    return this.allStates.filter((rs) => rs.pinned && !rs.isReservedKind);
+  }
+
   private createHeaderRow(): RowState<R> {
     // We'll switch the rs.row from the `missingHeader` to the real header from the props.rows later
     return new RowState(this, undefined, missingHeader as GridDataRow<R>);
@@ -170,7 +180,7 @@ export class RowStates<R extends Kinded> {
       selectable: false,
       data: undefined,
       children: [],
-      pin: { at: "first", filter: true },
+      fixedSort: { at: "first", filter: true },
     };
     const rs = new RowState(this, header, keptGroupRow);
     // Make the RowState behave like a parent, even though we calc its visibleChildren.
