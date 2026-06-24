@@ -36,7 +36,7 @@ export function EnvironmentBanner(props: EnvironmentBannerProps) {
       {getInvertedCorner("left", bgColorVar)}
       {getInvertedCorner("right", bgColorVar)}
 
-      <div css={Css.relative.z2.df.aic.jcsb.h100.px2.ifMdAndUp.px6.$} {...tid.content}>
+      <div css={Css.relative.z2.df.aic.jcsb.h100.px1.ifMdAndUp.px5.$} {...tid.content}>
         <span css={Css.df.aic.gap2.fg1.mh0.oh.$} {...tid.left}>
           <Tag text={badgeLabel} xss={Css.bgColor("#FFFFFF90").$} {...tid.badge} />
           <span
@@ -149,4 +149,4 @@ function getInvertedCorner(side: "left" | "right", bgColorVar: string): ReactNod
 }
 
 /** Fixed banner height (px); {@link EnvironmentBannerLayout} reads this for spacer/CSS var offsets. */
-export const environmentBannerSizePx = 32;
+export const environmentBannerSizePx = 34;
