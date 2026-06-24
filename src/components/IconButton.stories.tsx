@@ -147,8 +147,14 @@ function HoveredIconButton(args: IconButtonStoryArgs) {
   const { storyContrast = false, variant = "default", ...iconArgs } = args;
   const isCircle = variant === "circle";
   const isOutline = variant === "outline";
-  const bg = storyContrast ? Palette.Gray700 : isCircle || isOutline ? Palette.Blue100 : Palette.Gray200;
-  const borderColor = isCircle || isOutline ? Palette.Blue200 : undefined;
+  const bg = storyContrast
+    ? Palette.Gray700
+    : isCircle
+      ? Palette.Blue100
+      : isOutline
+        ? Palette.Gray100
+        : Palette.Gray200;
+  const borderColor = isCircle ? Palette.Blue200 : undefined;
   const hoverBlock = (
     <div className="hovered-icon-button">
       <style>{`.hovered-icon-button button { background-color: ${bg};${borderColor ? ` border-color: ${borderColor};` : ""} }`}</style>

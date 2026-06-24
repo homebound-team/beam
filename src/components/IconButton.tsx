@@ -82,9 +82,16 @@ export function IconButton(props: IconButtonProps) {
     () => ({
       ...iconButtonStylesReset,
       ...(isCircle ? iconButtonCircle : isOutline ? iconButtonOutline : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered && (isCircle || isOutline ? iconButtonCircleStylesHover : iconButtonTokenHover)),
-      ...(isFocusVisible || forceFocusStyles ? (isCircle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
-      ...(active && (isCircle || isOutline ? activeStylesCircle : iconButtonTokenHover)),
+      ...(isHovered &&
+        (isCircle ? iconButtonCircleStylesHover : isOutline ? iconButtonOutlineStylesHover : iconButtonTokenHover)),
+      ...(isFocusVisible || forceFocusStyles
+        ? isCircle
+          ? iconButtonCircleStylesFocus
+          : isOutline
+            ? iconButtonOutlineStylesFocus
+            : iconButtonStylesFocus
+        : {}),
+      ...(active && (isCircle ? activeStylesCircle : isOutline ? activeStylesOutline : iconButtonTokenHover)),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     }),
@@ -133,14 +140,16 @@ const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.
 const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
 const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
 const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
-const iconButtonOutline = Css.br8.wPx(48).hPx(40).bgColor(Tokens.Surface).bc(Tokens.SurfaceSeparator).ba.bw1.df.jcc
-  .aic.$;
+const iconButtonOutline = Css.br8.wPx(42).hPx(40).bgColor(Tokens.Surface).bcGray300.ba.bw1.df.jcc.aic.$;
 /** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
 const iconButtonTokenHover = Css.bgColor(Tokens.NeutralFillHoverStrong).$;
 export const iconButtonStylesHover = Css.bgGray200.$;
 export const iconButtonContrastStylesHover = iconButtonTokenHover;
 export const iconButtonCircleStylesHover = Css.bgBlue100.bcBlue200.$;
+const iconButtonOutlineStylesHover = Css.bgGray100.$;
+const iconButtonOutlineStylesFocus = Css.boxShadow(`0 0 0 2px #ffffff, 0 0 0 5px var(${Tokens.Primary})`).$;
 const iconButtonStylesFocus = Css.bcBlue700.$;
 const iconButtonCircleStylesFocus = Css.bgBlue100.bcBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
 const activeStylesCircle = Css.bgGray200.bcGray200.$;
+const activeStylesOutline = Css.bgGray200.$;
