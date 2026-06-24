@@ -30,7 +30,7 @@ export class RowState<R extends Kinded> {
   /** Whether we are collapsed. */
   collapsed = false;
   /**
-   * Whether this row is pinned to the top at runtime — distinct from the declarative `row.pin`,
+   * Whether this row is pinned to the top at runtime — distinct from the declarative `row.fixedSort`,
    * which only reorders within a group. Boolean for now; maybe someday we implement bottom pinning,
    * at which point this would become `"top" | "bottom"`.
    */
@@ -338,18 +338,13 @@ export class RowState<R extends Kinded> {
   }
 
   /**
-   * Whether the declarative `row.pin` keeps this row visible through client-side filtering.
+   * Whether the declarative `row.fixedSort` keeps this row visible through client-side filtering.
    *
-   * NOTE: declarative `row.pin: "first" | "last"` predates the interactive row-pinning added
-   * and is a *different* feature — it reorders a row within its sibling group and (here)
-   * exempts it from the filter; it is NOT the sticky "pin to top". The shared "pin" vocabulary is
-   * confusing (`row.pin` / this getter vs the runtime `pinned` / `pinRow` / `pinColumn`). Renaming
-   * this getter from `isPinned` -> `isAlwaysVisible` avoids the `isPinned` vs `pinned` clash without a
-   * breaking change. A larger follow-up could rename the declarative prop itself (e.g. `pin` ->
-   * `anchor`) to free up "pin" for the sticky feature — see the PR description.
+   * Named for the behavior (not the prop): `fixedSort` reorders a row within its sibling group and
+   * (here) exempts it from the filter — distinct from the runtime sticky `pinned`.
    */
   private get isAlwaysVisible(): boolean {
-    return typeof this.row.pin === "string" || (!!this.row.pin && this.row.pin.filter !== true);
+    return typeof this.row.fixedSort === "string" || (!!this.row.fixedSort && this.row.fixedSort.filter !== true);
   }
 
   // mobx will cache this getter for us

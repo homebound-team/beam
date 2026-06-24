@@ -180,7 +180,7 @@ export class RowStates<R extends Kinded> {
       selectable: false,
       data: undefined,
       children: [],
-      pin: { at: "first", filter: true },
+      fixedSort: { at: "first", filter: true },
     };
     const rs = new RowState(this, header, keptGroupRow);
     // Make the RowState behave like a parent, even though we calc its visibleChildren.

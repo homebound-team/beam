@@ -270,9 +270,19 @@ export function VirtualFilteringWithFilterablePin() {
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
       simpleHeader,
-      { kind: "data", id: "1", data: { name: "first, filter true", value: 1 }, pin: { at: "first", filter: true } },
-      { kind: "data", id: "2", data: { name: "first, filter false", value: 2 }, pin: { at: "first", filter: false } },
-      { kind: "data", id: "3", data: { name: "first, no filter", value: 3 }, pin: "first" },
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "first, filter true", value: 1 },
+        fixedSort: { at: "first", filter: true },
+      },
+      {
+        kind: "data",
+        id: "2",
+        data: { name: "first, filter false", value: 2 },
+        fixedSort: { at: "first", filter: false },
+      },
+      { kind: "data", id: "3", data: { name: "first, no filter", value: 3 }, fixedSort: "first" },
     ],
     [],
   );
@@ -1104,7 +1114,7 @@ function makeNestedRows(repeat: number = 1, draggable: boolean = false): GridDat
           // Put this "grandchild" in the 2nd level to show heterogeneous levels
           { kind: "grandChild", id: `${p1}g1`, data: { name: `grandchild ${prefix}p1g1` }, draggable },
           // Put this "kind" into the 2nd level to show it doesn't have to be a card
-          { kind: "add", id: `${p1}add`, pin: "last", data: {}, draggable },
+          { kind: "add", id: `${p1}add`, fixedSort: "last", data: {}, draggable },
         ],
       },
       // a parent with just a child

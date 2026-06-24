@@ -851,7 +851,7 @@ describe("GridTable", () => {
       ).rejects.toThrow("Column 0 passed an unsortable value, use GridCellContent or clientSideSort=false");
     });
 
-    it("can pin rows and filter - filterable pin", async () => {
+    it("can fixedSort rows and filter (filterable)", async () => {
       // Given the table with 3 rows with pins
       const r = await render(
         <GridTable<Row>
@@ -861,11 +861,11 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // pin that is filterable
-            { kind: "data", id: "1", pin: { at: "first", filter: true }, data: { name: "a", value: 11 } },
+            { kind: "data", id: "1", fixedSort: { at: "first", filter: true }, data: { name: "a", value: 11 } },
             // pin that is not filterable
-            { kind: "data", id: "2", pin: { at: "first", filter: false }, data: { name: "b", value: 10 } },
+            { kind: "data", id: "2", fixedSort: { at: "first", filter: false }, data: { name: "b", value: 10 } },
             // traditional pin that by default is not filterable
-            { kind: "data", id: "3", pin: "first", data: { name: "c", value: 3 } },
+            { kind: "data", id: "3", fixedSort: "first", data: { name: "c", value: 3 } },
           ]}
         />,
       );
@@ -980,7 +980,7 @@ describe("GridTable", () => {
       expect(r.sortHeader_icon_0).toBeVisible();
     });
 
-    it("can pin rows first", async () => {
+    it("can fixedSort rows first", async () => {
       // Given the table is using client-side sorting
       const r = await render(
         <GridTable<Row>
@@ -989,14 +989,14 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the 1st row is pinned first
-            { kind: "data", id: "1", pin: "first", data: { name: "a", value: 11 } },
-            { kind: "data", id: "2", pin: "first", data: { name: "b", value: 10 } },
+            { kind: "data", id: "1", fixedSort: "first", data: { name: "a", value: 11 } },
+            { kind: "data", id: "2", fixedSort: "first", data: { name: "b", value: 10 } },
             // And the middle rows need sorted
             { kind: "data", id: "3", data: { name: "c", value: 3 } },
             { kind: "data", id: "4", data: { name: "d", value: 1 } },
             // And the last rows are pinned last
-            { kind: "data", id: "5", pin: "last", data: { name: "e", value: 20 } },
-            { kind: "data", id: "6", pin: "last", data: { name: "f", value: 21 } },
+            { kind: "data", id: "5", fixedSort: "last", data: { name: "e", value: 20 } },
+            { kind: "data", id: "6", fixedSort: "last", data: { name: "f", value: 21 } },
           ]}
         />,
       );
@@ -1011,7 +1011,7 @@ describe("GridTable", () => {
       expect(cell(r, 6, 0)).toHaveTextContent("f");
     });
 
-    it("can pin rows last", async () => {
+    it("can fixedSort rows last", async () => {
       // Given the table is using client-side sorting
       const r = await render(
         <GridTable<Row>
@@ -1022,7 +1022,7 @@ describe("GridTable", () => {
             { kind: "data", id: "3", data: { name: "c", value: 3 } },
             { kind: "data", id: "2", data: { name: "b", value: 2 } },
             // And the last row is pinned first
-            { kind: "data", id: "1", pin: "last", data: { name: "a", value: 1 } },
+            { kind: "data", id: "1", fixedSort: "last", data: { name: "a", value: 1 } },
           ]}
         />,
       );

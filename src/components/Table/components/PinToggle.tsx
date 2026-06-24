@@ -6,7 +6,7 @@ import { useComputed } from "src/hooks";
 import { useTestIds } from "src/utils";
 
 type PinToggleProps = {
-  id: string;
+  rowId: string;
 };
 
 /**
@@ -14,17 +14,17 @@ type PinToggleProps = {
  *
  * The pinned row is hoisted into a sticky pinned section that stays visible while the body scrolls.
  */
-export function PinToggle({ id }: PinToggleProps) {
+export function PinToggle({ rowId }: PinToggleProps) {
   const { tableState } = useContext(TableStateContext);
-  const isPinned = useComputed(() => tableState.isPinnedRow(id), [tableState, id]);
+  const isPinned = useComputed(() => tableState.isPinnedRow(rowId), [tableState, rowId]);
   const tid = useTestIds({}, "pin");
   return (
     <IconButton
-      {...tid[id]}
+      {...tid[rowId]}
       icon="pin"
       bgColor={isPinned ? Palette.Green300 : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
-      onClick={() => tableState.togglePinned(id)}
+      onClick={() => tableState.togglePinned(rowId)}
     />
   );
 }

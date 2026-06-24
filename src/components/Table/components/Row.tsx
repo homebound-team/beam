@@ -12,7 +12,7 @@ import { ColumnResizeHandle } from "src/components/Table/components/ColumnResize
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { DiscriminateUnion, FixedSort, GridColumnWithId, IfAny, Kinded, RenderAs } from "src/components/Table/types";
 import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
@@ -516,13 +516,14 @@ export type GridDataRow<R extends Kinded> = {
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
   /**
-   * Whether to pin this sort to the first/last of its parent's children.
+   * Forces this row to sort to the first/last of its parent's children.
    *
-   * By default, pinned rows are always shown/not filtered out, however providing
-   * the pin `filter: true` property will allow pinned rows to be hidden
-   * while filtering.
+   * By default, fixed-sorted rows are always shown/not filtered out; providing the
+   * `filter: true` property allows them to be hidden while filtering. This is the
+   * in-group ordering override, distinct from the runtime sticky "pin to top" feature
+   * (`api.pinRow` / `pinColumn`).
    */
-  pin?: "first" | "last" | Pin;
+  fixedSort?: "first" | "last" | FixedSort;
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
   initCollapsed?: boolean;

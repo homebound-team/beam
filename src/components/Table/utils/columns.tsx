@@ -119,7 +119,7 @@ export function pinColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>):
   // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Pin... `
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row }: { row: GridDataRow<any> }) => ({
-      content: <PinToggle id={row.id} />,
+      content: <PinToggle rowId={row.id} />,
     });
   }) as any;
 }
