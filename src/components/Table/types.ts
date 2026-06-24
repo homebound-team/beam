@@ -6,7 +6,7 @@ import { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
 export type GridTableXss = Xss<Margin>;
-export type RenderAs = "div" | "table" | "virtual";
+export type RenderAs = "div" | "table" | "virtual" | "card";
 export type Direction = "ASC" | "DESC";
 
 export type MaybeFn<T> = T | (() => T);

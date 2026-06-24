@@ -1,5 +1,12 @@
 import { act, fireEvent } from "@testing-library/react";
 import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
+import {
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
 import { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
@@ -4613,3 +4620,334 @@ function TestFilterAndSelect(props: {
     </div>
   );
 }
+
+// ---- Card view ----
+
+type CardData = { address: string; city: string; beds: string; bidOut: number; status: string };
+type CardRow = SimpleHeaderAndData<CardData>;
+
+describe("card view", () => {
+  beforeEach(() => {
+    setRunningInJest();
+  });
+
+  it("renders a card for each data row", async () => {
+    // Given a title column and two data rows
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+      {
+        kind: "data",
+        id: "row2",
+        data: { address: "456 Oak Ave", city: "Dallas", beds: "4", bidOut: 30, status: "Pending" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then each data row produces a card with its title
+    expect(r.tableCard_title_0).toHaveTextContent("123 Main St");
+    expect(r.tableCard_title_1).toHaveTextContent("456 Oak Ave");
+  });
+
+  it("does not render the header row as a card", async () => {
+    // Given a title column with a header row and one data row
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then only the data row produces a card, not the header
+    expect(r.tableCard_title).toBeInTheDocument();
+    expect(r.queryAllByTestId("tableCard").length).toBe(1);
+  });
+
+  it("renders cardEyebrowSlot text", async () => {
+    // Given a title column and an eyebrow column
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+      column<CardRow>({
+        id: "city",
+        header: "City",
+        data: ({ city }) => ({ content: city, value: city, cardSlot: cardEyebrowSlot(city) }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then the eyebrow text appears on the card
+    expect(r.tableCard_eyebrow).toHaveTextContent("Austin");
+  });
+
+  it("renders cardDataBlockSlot with provided label", async () => {
+    // Given a title column and a data block column
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+      column<CardRow>({
+        id: "beds",
+        header: "Beds",
+        data: ({ beds }) => ({
+          content: beds,
+          value: beds,
+          cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }),
+        }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then the data block shows the label and value
+    expect(r.tableCard_beds).toHaveTextContent("Beds:3");
+  });
+
+  it("renders cardDataBlockSlot with custom label", async () => {
+    // Given a title column and a data block column using a custom label
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+      column<CardRow>({
+        id: "beds-custom",
+        header: "Beds",
+        data: ({ beds }) => ({
+          content: beds,
+          value: beds,
+          cardSlot: cardDataBlockSlot({ label: "Bedrooms", value: beds }),
+        }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then the custom label is used instead of the column header
+    expect(r.tableCard_bedrooms).toHaveTextContent("Bedrooms:3");
+  });
+
+  it("renders cardProgressSlot value", async () => {
+    // Given a title column and a progress column
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+      column<CardRow>({
+        id: "progress",
+        header: "Bid Out",
+        data: ({ bidOut }) => ({ content: bidOut, value: bidOut, cardSlot: cardProgressSlot(bidOut) }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then the progress percentage is displayed
+    expect(r.tableCard_progressValue).toHaveTextContent("65%");
+  });
+
+  it("renders cardStatusSlot as Tag", async () => {
+    // Given a title column and a status column
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+      column<CardRow>({
+        id: "status",
+        header: "Status",
+        data: ({ status }) => ({
+          content: status,
+          value: status,
+          cardSlot: cardStatusSlot({ text: status, type: "success" }),
+        }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then the status Tag shows the text
+    expect(r.tableCard_status).toHaveTextContent("Active");
+  });
+
+  it("skips rows that produce no title", async () => {
+    // Given columns with no title slot
+    const columns = [
+      column<CardRow>({
+        id: "city",
+        header: "City",
+        data: ({ city }) => ({ content: city, value: city, cardSlot: cardEyebrowSlot(city) }),
+      }),
+      column<CardRow>({
+        id: "beds",
+        header: "Beds",
+        data: ({ beds }) => ({
+          content: beds,
+          value: beds,
+          cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }),
+        }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
+    // Then no cards are rendered
+    expect(r.queryAllByTestId("tableCard").length).equal(0);
+  });
+
+  it("skips columns that return GridCellContent without cardSlot", async () => {
+    // Given a column that returns GridCellContent without a cardSlot
+    const noSlotCol = column<CardRow>({
+      id: "address-no-slot",
+      header: "Address",
+      data: ({ address }) => ({ content: <span>{address}</span>, value: address }),
+    });
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={[noSlotCol]} rows={rows} />);
+    // Then no card title is produced
+    expect(r.query.tableCard).not.toBeInTheDocument();
+  });
+
+  it("wraps card in Link when rowStyle.rowLink is set", async () => {
+    // Given a title column and a rowLink style
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+      {
+        kind: "data",
+        id: "row2",
+        data: { address: "456 Oak Ave", city: "Dallas", beds: "4", bidOut: 30, status: "Pending" },
+      },
+    ];
+    // When rendered as card with a rowLink
+    const r = await render(
+      <GridTable as="card" columns={columns} rows={rows} rowStyles={{ data: { rowLink: () => "/detail/1" } }} />,
+      withRouter(),
+    );
+    // Then the card is wrapped in an anchor tag
+    const cards = r.queryAllByTestId("tableCard");
+    for (const card of cards) {
+      expect(card.parentElement?.tagName).toBe("A");
+      expect(card.parentElement).toHaveAttribute("href", "/detail/1");
+    }
+  });
+
+  it("calls onClick handler when card is clicked", async () => {
+    // Given a title column and an onClick handler
+    const handler = vi.fn();
+    const columns = [
+      column<CardRow>({
+        id: "address",
+        header: "Address",
+        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      }),
+    ];
+    const rows: GridDataRow<CardRow>[] = [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "row1",
+        data: { address: "123 Main St", city: "Austin", beds: "3", bidOut: 65, status: "Active" },
+      },
+    ];
+    // When a card is clicked
+    const r = await render(
+      <GridTable as="card" columns={columns} rows={rows} rowStyles={{ data: { onClick: handler } }} />,
+    );
+    click(r.tableCard);
+    // Then the handler is called
+    expect(handler).toHaveBeenCalled();
+  });
+});

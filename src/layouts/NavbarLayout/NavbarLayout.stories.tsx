@@ -1,18 +1,13 @@
 import { Meta } from "@storybook/react-vite";
-import { Link } from "react-router-dom";
-import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
-import { HomeboundLogo } from "src/components/HomeboundLogo";
-import type { NavbarProps, NavbarUser } from "src/components/Navbar/Navbar";
-import { Css, Tokens } from "src/Css";
-import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
+import { Css } from "src/Css";
+import { EnvironmentBannerLayout } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
-import { GridTableLayoutExample } from "src/utils/sbComponents";
-import { action } from "storybook/actions";
+import { createNavbar, GridTableLayoutExample } from "src/utils/sbComponents";
 
 export default {
   component: NavbarLayout,
@@ -92,41 +87,6 @@ export function ComposedGridTableWithoutSideNav() {
       </PageHeaderLayout>
     </NavbarLayout>
   );
-}
-
-function createNavbar(): NavbarProps {
-  return {
-    brand: (
-      <Link to="/">
-        <HomeboundLogo fill={Tokens.OnSurface} width={5} />
-      </Link>
-    ),
-    items: [
-      { label: "Dashboard", onClick: "/", active: true },
-      { label: "Projects", onClick: "/projects" },
-      { label: "Finances", onClick: "/finances" },
-      { label: "Warranty", onClick: "/warranty" },
-    ],
-    rightSlot: (
-      <AppNavItems
-        variant="global"
-        items={[
-          { label: "Help", onClick: "/help", icon: "helpCircle", iconOnly: true },
-          { label: "Notifications", onClick: "/notifications", icon: "bell", iconOnly: true },
-        ]}
-      />
-    ),
-    user: createUser(),
-  };
-}
-
-function createUser(): NavbarUser {
-  return {
-    name: "Tony Stark",
-    picture: "tony-stark.jpg",
-    menuItems: [{ label: "Profile", onClick: action("Profile clicked") }],
-    persistentItems: [{ label: "Sign out", onClick: action("Sign out clicked") }],
-  };
 }
 
 function sideNavItems(): AppNavItem[] {

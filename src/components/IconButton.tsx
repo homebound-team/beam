@@ -78,18 +78,19 @@ export function IconButton(props: IconButtonProps) {
 
   const isCircle = variant === "circle";
   const isOutline = variant === "outline";
-  const styles = useMemo(
-    () => ({
+  const styles = useMemo(() => {
+    const variantKey = isCircle ? "circle" : isOutline ? "outline" : compact ? "compact" : "default";
+    const { base, hover, focus, pressed } = variantStyles[variantKey];
+    return {
       ...iconButtonStylesReset,
-      ...(isCircle ? iconButtonCircle : isOutline ? iconButtonOutline : compact ? iconButtonCompact : iconButtonNormal),
-      ...(isHovered && (isCircle || isOutline ? iconButtonCircleStylesHover : iconButtonTokenHover)),
-      ...(isFocusVisible || forceFocusStyles ? (isCircle ? iconButtonCircleStylesFocus : iconButtonStylesFocus) : {}),
-      ...(active && (isCircle || isOutline ? activeStylesCircle : iconButtonTokenHover)),
+      ...base,
+      ...(isHovered && hover),
+      ...((isFocusVisible || forceFocusStyles) && focus),
+      ...(active && pressed),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
-    }),
-    [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles],
-  );
+    };
+  }, [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles]);
   const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
@@ -130,17 +131,30 @@ export function IconButton(props: IconButtonProps) {
 const defaultIconColor = Tokens.OnSurface;
 const circleIconColor = Palette.Gray700;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
-const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
-const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
-const iconButtonCircle = Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$;
-const iconButtonOutline = Css.br8.wPx(48).hPx(40).bgColor(Tokens.Surface).bc(Tokens.SurfaceSeparator).ba.bw1.df.jcc
-  .aic.$;
-/** Semantic hover fill; contrast is driven by `--b-*` when inside {@link ContrastScope}. */
-const iconButtonTokenHover = Css.bgColor(Tokens.NeutralFillHoverStrong).$;
-export const iconButtonStylesHover = Css.bgGray200.$;
-export const iconButtonContrastStylesHover = iconButtonTokenHover;
-export const iconButtonCircleStylesHover = Css.bgBlue100.bcBlue200.$;
-const iconButtonStylesFocus = Css.bcBlue700.$;
-const iconButtonCircleStylesFocus = Css.bgBlue100.bcBlue700.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
-const activeStylesCircle = Css.bgGray200.bcGray200.$;
+const variantStyles = {
+  default: {
+    base: Css.hPx(28).wPx(28).br8.bw2.$,
+    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+    focus: Css.bcBlue700.$,
+    pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+  },
+  compact: {
+    base: Css.hPx(18).wPx(18).br4.bw1.$,
+    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+    focus: Css.bcBlue700.$,
+    pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+  },
+  circle: {
+    base: Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$,
+    hover: Css.bgBlue100.bcBlue200.$,
+    focus: Css.bgBlue100.bcBlue700.$,
+    pressed: Css.bgGray200.bcGray200.$,
+  },
+  outline: {
+    base: Css.br8.wPx(42).hPx(40).bgColor(Tokens.Surface).bcGray300.ba.bw1.df.jcc.aic.$,
+    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+    focus: Css.bshFocus.$,
+    pressed: Css.bgGray200.$,
+  },
+} as const;

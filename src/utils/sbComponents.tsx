@@ -1,9 +1,24 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
-import { GridColumn, GridDataRow, GridTable, simpleHeader, SimpleHeaderAndData } from "src/index";
+import {
+  type AppNavItem,
+  GridColumn,
+  GridDataRow,
+  GridTable,
+  HomeboundLogo,
+  type NavbarProps,
+  type NavbarUser,
+  simpleHeader,
+  SimpleHeaderAndData,
+  Tokens,
+} from "src/index";
+import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
 import { zeroTo } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 type Row = SimpleHeaderAndData<{ name: string; value: number }>;
 
@@ -48,6 +63,67 @@ export function TableExample({
       style={{ rowHeight: "fixed" }}
     />
   );
+}
+
+export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string; children: ReactNode }) {
+  return (
+    <NavbarLayout navbar={createNavbar()}>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>
+        <PageHeaderLayout pageHeader={{ title: pageTitle ?? "" }}>{children}</PageHeaderLayout>
+      </SideNavLayout>
+    </NavbarLayout>
+  );
+}
+
+export function createNavbar(): NavbarProps {
+  return {
+    brand: (
+      <Link to="/">
+        <HomeboundLogo fill={Tokens.OnSurface} width={5} />
+      </Link>
+    ),
+    items: [
+      { label: "Dashboard", onClick: "/", active: true },
+      { label: "Projects", onClick: "/projects" },
+      { label: "Finances", onClick: "/finances" },
+      { label: "Warranty", onClick: "/warranty" },
+    ],
+    rightSlot: (
+      <AppNavItems
+        variant="global"
+        items={[
+          { label: "Help", onClick: "/help", icon: "helpCircle", iconOnly: true },
+          { label: "Notifications", onClick: "/notifications", icon: "bell", iconOnly: true },
+        ]}
+      />
+    ),
+    user: createUser(),
+  };
+}
+
+export function sideNavItems(): AppNavItem[] {
+  return [
+    {
+      section: true,
+      label: "Main",
+      items: [
+        { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+        { label: "Schedule", icon: "calendar", onClick: "/schedule" },
+        { label: "Commitments", icon: "fileBlank", onClick: "/commitments" },
+        { label: "Documents", icon: "comment", onClick: "/documents" },
+        { label: "Settings", icon: "pencil", onClick: "/settings" },
+      ],
+    },
+  ];
+}
+
+function createUser(): NavbarUser {
+  return {
+    name: "Tony Stark",
+    picture: "tony-stark.jpg",
+    menuItems: [{ label: "Profile", onClick: action("Profile clicked") }],
+    persistentItems: [{ label: "Sign out", onClick: action("Sign out clicked") }],
+  };
 }
 
 type GridTableLayoutData = { name: string | undefined; value: number | undefined; status: string; priority: number };
