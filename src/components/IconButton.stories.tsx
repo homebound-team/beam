@@ -146,14 +146,7 @@ export function IconButtonLink() {
 function HoveredIconButton(args: IconButtonStoryArgs) {
   const { storyContrast = false, variant = "default", ...iconArgs } = args;
   const isCircle = variant === "circle";
-  const isOutline = variant === "outline";
-  const bg = storyContrast
-    ? Palette.Gray700
-    : isCircle
-      ? Palette.Blue100
-      : isOutline
-        ? Palette.Gray100
-        : Palette.Gray200;
+  const bg = storyContrast ? Palette.Gray700 : isCircle ? Palette.Blue100 : Palette.Gray100;
   const borderColor = isCircle ? Palette.Blue200 : undefined;
   const hoverBlock = (
     <div className="hovered-icon-button">
