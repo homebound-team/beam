@@ -14,6 +14,7 @@ beforeEach(() => {
   localStorage.clear();
   // Reset to a desktop viewport so a viewport set in one test can't leak into the next.
   resetViewport();
+  vi.restoreAllMocks();
 });
 afterEach(() => vi.useRealTimers());
 
