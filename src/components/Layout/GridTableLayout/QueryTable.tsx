@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { LoadingSkeleton, LoadingSkeletonProps } from "src/components/LoadingSkeleton";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, GridTableProps } from "src/components/Table/GridTable";
+import { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Only } from "src/Css";
 
@@ -28,7 +29,15 @@ export type QueryTableProps<R extends Kinded, QData, X> = Omit<GridTableProps<R,
 export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss, X> = any>(
   props: QueryTableProps<R, QData, X>,
 ) {
-  const { emptyFallback, query, createRows, columns, keepHeaderWhenLoading, ...others } = props;
+  const {
+    emptyFallback,
+    query,
+    createRows,
+    columns,
+    keepHeaderWhenLoading,
+    emptyState: emptyStateProp,
+    ...others
+  } = props;
 
   // Always call createRows to get the header, even if we're loading/error'd. We do force data=undefined
   // if loading/error though b/c while making/loading a 2nd query, Apollo will keep the 1st query's data.
@@ -37,8 +46,14 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
   const data = query.loading || query.error ? undefined : query.data;
   const rows = useMemo(() => createRows(data), [createRows, data]);
 
-  // loading/error/empty can all use the one fallback prop.
-  const fallbackMessage = query.loading ? "Loading…" : query.error ? `Error: ${query.error.message}` : emptyFallback;
+  const fallbackMessage = query.loading ? "Loading…" : query.error ? `Error: ${query.error.message}` : undefined;
+
+  const emptyState: GridTableEmptyStateProps | undefined = useMemo(() => {
+    if (query.loading || query.error) return undefined;
+    if (emptyStateProp) return emptyStateProp;
+    if (emptyFallback) return { title: emptyFallback };
+    return undefined;
+  }, [emptyFallback, emptyStateProp, query.error, query.loading]);
 
   const headers = rows.filter((row) => row.kind === "header");
 
@@ -51,7 +66,7 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
       )}
     </div>
   ) : (
-    <GridTable {...{ rows, columns, fallbackMessage, ...others }} />
+    <GridTable {...{ rows, columns, fallbackMessage, emptyState, ...others }} />
   );
 }
 

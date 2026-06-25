@@ -1,3 +1,4 @@
+export * from "./useBodyBackgroundColor";
 export * from "./useBreakpoint";
 export * from "./useComputed";
 export * from "./useContentOverflow";

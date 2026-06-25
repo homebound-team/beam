@@ -31,6 +31,11 @@ export type StoryOptions = {
   parameters?: StoryParameters;
   decorators?: Decorator[];
   play?: PlayFunction;
+  globals?: {
+    backgrounds?: {
+      value?: string;
+    };
+  };
 };
 
 /**

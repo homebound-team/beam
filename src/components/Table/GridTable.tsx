@@ -48,6 +48,7 @@ import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
 import { TableCard } from "./components/TableCard";
+import { GridTableEmptyState, GridTableEmptyStateProps } from "./GridTableEmptyState";
 import { DraggedOver, RowState } from "./utils/RowState";
 
 let runningInJest = false;
@@ -149,6 +150,8 @@ export type GridTableProps<R extends Kinded, X> = {
   sorting?: GridSortConfig;
   /** Shown in the first row slot, if there are no rows to show, i.e. 'No rows found'. */
   fallbackMessage?: string;
+  /** Replaces the entire table when there are no data rows. */
+  emptyState?: GridTableEmptyStateProps;
   /** Shown in the first row, kinda-like the fallbackMessage, but shown even if there are rows as well. */
   infoMessage?: string;
   /** Applies a client-side filter to rows, using either it's text value or `GridCellContent.value`. */
@@ -249,6 +252,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     filter,
     filterMaxRows,
     fallbackMessage = "No rows found.",
+    emptyState,
     infoMessage,
     persistCollapse,
     persistScrollPosition,
@@ -599,7 +603,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // body is empty but pins remain visible (e.g. a filter hid every un-pinned row).
   const noData = visibleDataRows.length === 0 && pinnedRows.length === 0;
   const firstRowMessage =
-    (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
+    (noData && !emptyState && fallbackMessage) ||
+    (tooManyClientSideRows && "Hiding some rows, use filter...") ||
+    infoMessage;
 
   const borderless = style?.presentationSettings?.borderless;
   const typeScale = style?.presentationSettings?.typeScale;
@@ -637,6 +643,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     return { ...style, minWidthPx };
   }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
+
+  if (noData && emptyState) {
+    return <GridTableEmptyState {...emptyState} />;
+  }
 
   return (
     <TableStateContext.Provider value={rowStateContext}>

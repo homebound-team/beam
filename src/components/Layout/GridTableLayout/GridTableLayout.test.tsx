@@ -16,7 +16,7 @@ import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/si
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
 import { noop } from "src/utils";
-import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
+import { click, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
@@ -528,6 +528,101 @@ describe("GridTableLayout", () => {
         search: "client" as const,
       };
     }
+  });
+
+  describe("empty state", () => {
+    it("shows empty state instead of the table when there are no data rows", async () => {
+      // Given a layout with emptyFallback and only a header row (no data rows)
+      // When the layout renders
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          emptyFallback="No product offerings found"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // Then the empty state is shown instead of the table
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No product offerings found");
+      expect(r.query.gridTable).toBeNull();
+    });
+
+    it("shows filter description and clear action when client search filters out all rows", async () => {
+      // Given a layout with client search, filters, and data rows
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey: "empty-state-test",
+            },
+            search: "client",
+          }}
+          emptyFallback="No product offerings found"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // When the search string filters out all rows
+      await typeAndWait(r.search, "zzz-no-match");
+      expect(r.gridTableEmptyState_title).toBeInTheDocument();
+
+      // Then the empty state shows filter guidance and a clear action
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No product offerings found");
+      expect(r.gridTableEmptyState_description).toHaveTextContent("Try adjusting your search or filters.");
+      expect(r.gridTableEmptyState_actions).toHaveTextContent("Clear Filters");
+    });
+
+    it("clears filters from the empty state clear action", async () => {
+      // Given a layout with client search, filters, and data rows
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey: "empty-state-clear-test",
+            },
+            search: "client",
+          }}
+          emptyFallback="No product offerings found"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      await typeAndWait(r.search, "zzz-no-match");
+      expect(r.clearFilters).toBeInTheDocument();
+
+      // When the clear-filters action is clicked
+      click(r.clearFilters);
+      expect(r.gridTable).toBeInTheDocument();
+
+      // Then the table shows the data rows again
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value | Action  |
+        | ----- | ----- | ------- |
+        | Alpha | 10    | Actions |
+        | Beta  | 20    | Actions |
+        | Gamma | 30    | Actions |
+        "
+      `);
+    });
   });
 
   it("passes infiniteScroll prop to the underlying table", async () => {

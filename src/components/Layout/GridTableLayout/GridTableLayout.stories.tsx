@@ -14,7 +14,7 @@ import { collapseColumn, column, numericColumn, selectColumn } from "src/compone
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
@@ -196,6 +196,42 @@ export function WithoutHeader() {
     </TestProjectLayout>
   );
 }
+
+export const EmptyState = newStory(
+  () => {
+    const filterDefs = useMemo(() => getFilterDefs(), []);
+    const columns = useMemo(() => getColumns(false), []);
+
+    const layoutState = useGridTableLayoutState({
+      persistedFilter: {
+        filterDefs,
+        storageKey: "grid-table-layout-empty-state",
+      },
+      search: "client",
+    });
+
+    useEffect(() => {
+      layoutState.setSearchString("no-match");
+    }, [layoutState]);
+
+    return (
+      <TestProjectLayout pageTitle="Product Offerings">
+        <GridTableLayoutComponent
+          pageTitle="Product Offerings"
+          layoutState={layoutState}
+          emptyFallback="No product offerings found"
+          primaryAction={{ label: "Create New", onClick: noop }}
+          tableProps={{
+            columns,
+            rows: [simpleHeader, ...makeNestedRows(3)],
+            sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          }}
+        />
+      </TestProjectLayout>
+    );
+  },
+  { globals: { backgrounds: { value: "white" } } },
+);
 
 export function GridTableLayoutWithColor() {
   const filterDefs = useMemo(() => getFilterDefs(), []);

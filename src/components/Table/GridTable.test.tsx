@@ -1388,6 +1388,50 @@ describe("GridTable", () => {
     expect(r.firstElement).toHaveTextContent("No rows found.");
   });
 
+  it("replaces the table with emptyState when there are no data rows", async () => {
+    // Given a table with only a header row and an emptyState prop
+    const r = await render(
+      <GridTable
+        {...{ columns, rows: [simpleHeader] }}
+        emptyState={{ title: "No product offerings found", description: "Try adjusting your search or filters." }}
+      />,
+    );
+
+    // Then the empty state is shown instead of the table
+    expect(r.gridTableEmptyState_title).toHaveTextContent("No product offerings found");
+    expect(r.gridTableEmptyState_description).toHaveTextContent("Try adjusting your search or filters.");
+    expect(r.query.gridTable).toBeNull();
+  });
+
+  it("renders emptyState actions when provided", async () => {
+    // Given a table with only a header row and emptyState actions
+    const onClear = vi.fn();
+    const r = await render(
+      <GridTable
+        {...{ columns, rows: [simpleHeader] }}
+        emptyState={{
+          title: "No rows found",
+          actions: <button data-testid="clearFilters" onClick={onClear} />,
+        }}
+      />,
+    );
+
+    // When the empty state action is clicked
+    click(r.clearFilters);
+
+    // Then the action handler is called
+    expect(onClear).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows data rows instead of emptyState when rows exist", async () => {
+    // Given a table with data rows and an emptyState prop
+    const r = await render(<GridTable {...{ columns, rows }} emptyState={{ title: "No product offerings found" }} />);
+
+    // Then the table shows data rows instead of the empty state
+    expect(r.query.gridTableEmptyState_title).toBeNull();
+    expect(cell(r, 1, 0)).toHaveTextContent("foo");
+  });
+
   it("displays an info message", async () => {
     const infoMessage = "Too many rows";
     const r = await render(<GridTable {...{ columns, rows, infoMessage }} />);
