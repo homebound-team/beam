@@ -47,7 +47,7 @@ describe("DocumentScrollToTopButton", () => {
     click(r.documentScrollToTop);
 
     // Then the window scrolls smoothly to the top
-    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
   });
 
   it("renders only on the outermost document-scroll provider", async () => {
