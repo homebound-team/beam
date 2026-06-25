@@ -1,16 +1,11 @@
-import { act } from "@testing-library/react";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";
-import { click, render } from "src/utils/rtl";
+import { click, mockDocumentViewport, render, scrollWindow } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("DocumentScrollToTopButton", () => {
   beforeEach(() => {
     vi.spyOn(window, "scrollTo").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    Object.defineProperty(window, "scrollY", { value: 0, configurable: true });
   });
 
   it("stays hidden until the user scrolls past one viewport height", async () => {
@@ -71,15 +66,3 @@ describe("DocumentScrollToTopButton", () => {
     expect(r.getAllByTestId("documentScrollToTop")).toHaveLength(1);
   });
 });
-
-function mockDocumentViewport(width: number, height: number): void {
-  Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: () => width });
-  Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: () => height });
-}
-
-function scrollWindow(y: number): void {
-  Object.defineProperty(window, "scrollY", { value: y, configurable: true });
-  act(() => {
-    window.dispatchEvent(new Event("scroll"));
-  });
-}
