@@ -16,6 +16,10 @@ Match the existing conventions when adding files:
 - **Utility / constant modules** — camelCase: `zIndices.ts`, `layoutVars.ts`.
 - Co-locate `*.test.tsx` and `*.stories.tsx` beside the file they cover.
 
+## Utility modules
+
+In camelCase utility files (e.g. `formatDocumentTitle.ts`), put **types first**, then the **primary exported function** the file exists for, then other exports and private helpers. Do not bury the main export below unrelated helpers.
+
 ## Comments
 
 - **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md)).
@@ -36,7 +40,7 @@ After editing a test file, run `yarn lint:fix:files` on that path (see **Linting
 
 ### Structure
 
-- Follow Given/When/Then with clear comments when it helps readability.
+- **Given/When/Then:** In each `it` block, use `// Given …` for setup, `// When …` for the action (render, click, rerender, etc.), and `// Then …` before assertions. Omit `When` only when there is no separate action step after setup. See [`PageHeaderLayout.test.tsx`](src/layouts/PageHeaderLayout/PageHeaderLayout.test.tsx).
 - Each test should focus on one behavior; cover happy path and important edge cases.
 - Use descriptive `it` names.
 - **Inline test data:** Define props, items, and other fixtures **inside the `it` body** when only that test needs them. Extract a shared factory only when **multiple tests** need the same shape and duplicating it would hurt maintainability.
