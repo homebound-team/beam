@@ -43,11 +43,15 @@ export function SelectCard(props: SelectCardProps) {
   const styles = useMemo(
     () => ({
       ...baseStyles,
-      ...(isHovered && !isDisabled && selectCardStylesHover),
+      // The two layouts are meaningfully different: a label-only card is a fixed, compact,
+      // center-aligned box (the original IconCard sizing), while a card with a description
+      // fills the row evenly, stretches to a shared height, and top-aligns its content.
+      ...(description ? withDescriptionStyles : withoutDescriptionStyles),
+      ...(isHovered && !isDisabled && hoverStyles),
       ...(isSelected && !isDisabled && selectedStyles),
       ...(isDisabled && (isSelected ? disabledSelectedStyles : disabledStyles)),
     }),
-    [isDisabled, isHovered, isSelected],
+    [description, isDisabled, isHovered, isSelected],
   );
 
   const tid = useTestIds(props, defaultTestId(label));
@@ -70,10 +74,15 @@ export function SelectCard(props: SelectCardProps) {
   });
 }
 
-const baseStyles = Css.df.fdc.aic.jcfs.wPx(187).ba.br12.bgWhite.add("borderColor", "rgba(53, 53, 53, 0.16)").gap1.px2
-  .py3.tac.$;
+// Shared visuals for both layouts (flex column, border, radius, bg, padding, gap, centered text).
+const baseStyles = Css.df.fdc.aic.ba.br12.bgWhite.bcGray300.gap1.px2.py3.tac.$;
+// Label-only card: fixed, compact, center-aligned box (matches the original IconCard sizing).
+const withoutDescriptionStyles = Css.jcc.wPx(130).hPx(114).$;
+// Card with a description: fill the row evenly (`flex: 1 0 0`), stretch to a shared height,
+// and top-align content so multi-line descriptions line up across the row.
+const withDescriptionStyles = Css.jcfs.fb(0).fg1.fs0.asStretch.mwPx(187).$;
 const copyStyles = Css.df.fdc.aic.gap("4px").w100.$;
-export const selectCardStylesHover = Css.bw2.bcBlue600.$;
-export const selectedStyles = Css.bw2.bcBlue600.bgBlue50.$;
-const disabledStyles = Css.bgGray50.add("borderColor", "rgba(53, 53, 53, 0.16)").$;
-const disabledSelectedStyles = Css.bw2.bgGray100.add("borderColor", "rgba(53, 53, 53, 0.16)").$;
+const hoverStyles = Css.bw2.bcBlue600.$;
+const selectedStyles = Css.bw2.bcBlue600.bgBlue50.$;
+const disabledStyles = Css.bgGray50.bcGray300.$;
+const disabledSelectedStyles = Css.bw2.bgGray100.bcGray300.$;
