@@ -11,7 +11,7 @@ import {
   allowAndWaitForAsyncBehavior,
   RenderResult,
 } from "@homebound/rtl-utils";
-import { fireEvent, prettyDOM } from "@testing-library/react";
+import { act, fireEvent, prettyDOM } from "@testing-library/react";
 import { fail } from "src/utils/index";
 
 export {
@@ -148,6 +148,71 @@ function getTextFromTableCellNode(node: ChildNode) {
   }
 
   return node.textContent;
+}
+
+export type ScrollWindowOpts = {
+  clientHeight?: number;
+  scrollHeight?: number;
+};
+
+export type ScrollWindowWithAnchorOpts = ScrollWindowOpts & {
+  /** getBoundingClientRect().top when scrollY is 0. Default 0. */
+  anchorTop?: number;
+  /** Used to derive default scrollHeight and atBottom checks. Default 1_000_000. */
+  maxScroll?: number;
+  /** Height of the mocked anchor element (rect height/bottom). Default 50. */
+  elementHeight?: number;
+};
+
+function setWindowScrollMetrics(y: number, opts?: ScrollWindowOpts): void {
+  Object.defineProperty(window, "scrollY", { value: y, configurable: true });
+  if (opts?.clientHeight != null) {
+    Object.defineProperty(document.documentElement, "clientHeight", { value: opts.clientHeight, configurable: true });
+  }
+  if (opts?.scrollHeight != null) {
+    Object.defineProperty(document.documentElement, "scrollHeight", { value: opts.scrollHeight, configurable: true });
+  }
+}
+
+/** Sets window.scrollY, optionally document scroll metrics, and dispatches a scroll event. */
+export function scrollWindow(y: number, opts?: ScrollWindowOpts): void {
+  setWindowScrollMetrics(y, opts);
+  act(() => {
+    window.dispatchEvent(new Event("scroll"));
+  });
+}
+
+/** scrollWindow plus a fake getBoundingClientRect on an anchor/spacer element. */
+export function scrollWindowWithAnchor(anchor: HTMLElement, y: number, opts: ScrollWindowWithAnchorOpts = {}): void {
+  const clientHeight = opts.clientHeight ?? 800;
+  const maxScroll = opts.maxScroll ?? 1_000_000;
+  const scrollHeight = opts.scrollHeight ?? maxScroll + clientHeight;
+  const anchorTop = opts.anchorTop ?? 0;
+  const elementHeight = opts.elementHeight ?? 50;
+
+  setWindowScrollMetrics(y, { clientHeight, scrollHeight });
+  const top = anchorTop - y;
+  anchor.getBoundingClientRect = () =>
+    ({
+      top,
+      bottom: top + elementHeight,
+      left: 0,
+      right: 0,
+      width: 0,
+      height: elementHeight,
+      x: 0,
+      y: top,
+      toJSON() {},
+    }) as DOMRect;
+  act(() => {
+    window.dispatchEvent(new Event("scroll"));
+  });
+}
+
+/** Mocks document.documentElement clientWidth/clientHeight for viewport measurement tests. */
+export function mockDocumentViewport(width: number, height: number): void {
+  Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: () => width });
+  Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: () => height });
 }
 
 /**
