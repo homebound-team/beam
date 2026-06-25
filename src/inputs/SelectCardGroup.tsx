@@ -16,6 +16,8 @@ export type SelectCardGroupItemOption<V extends Value> = {
   /** Optional secondary copy shown beneath the label. */
   description?: string;
   disabled?: boolean;
+  /** Tooltip shown on hover, i.e. to explain why the option is disabled. */
+  tooltip?: string;
   /** The value of the SelectCardGroup item, stored in value array in state. */
   value: V;
   /** Exclusive: if true, this option will override all other options when selected. */
@@ -97,7 +99,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
       )}
       <div css={Css.df.gap2.add("flexWrap", "wrap").$}>
         {options.map((option) => {
-          const { icon, label, description, disabled } = option;
+          const { icon, label, description, disabled, tooltip } = option;
           const isSelected = selected.includes(option.value);
           return (
             <SelectCard
@@ -107,6 +109,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
               description={description}
               selected={isSelected}
               disabled={disabled}
+              tooltip={tooltip}
               onChange={() => toggleValue(option.value)}
               {...tid[option.label]}
             />

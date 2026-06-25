@@ -70,8 +70,8 @@ export function SelectCard(props: SelectCardProps) {
   });
 }
 
-const baseStyles = Css.df.fdc.aic.jcc.wPx(187).ba.br12.bgWhite.add("borderColor", "rgba(53, 53, 53, 0.16)").gap1.px2.py3
-  .tac.$;
+const baseStyles = Css.df.fdc.aic.jcfs.wPx(187).ba.br12.bgWhite.add("borderColor", "rgba(53, 53, 53, 0.16)").gap1.px2
+  .py3.tac.$;
 const copyStyles = Css.df.fdc.aic.gap("4px").w100.$;
 export const selectCardStylesHover = Css.bw2.bcBlue600.$;
 export const selectedStyles = Css.bw2.bcBlue600.bgBlue50.$;

@@ -50,18 +50,23 @@ const optionTypes: SelectCardGroupItemOption<string>[] = [
     label: "Single",
     description: "Slots share the same options, but each slot can have its own selection.",
     value: "single",
+    exclusive: true,
   },
   {
     icon: "linked",
     label: "Linked",
     description: "Slots share the same options and always have the same selection.",
     value: "linked",
+    exclusive: true,
+    disabled: true,
+    tooltip: "Type cannot be modified for existing options",
   },
   {
     icon: "package",
     label: "Package",
-    description: "Slots are grouped and selected together as one package.",
+    description: "Selections come in preconfigured bundles.",
     value: "package",
+    exclusive: true,
   },
 ];
 
