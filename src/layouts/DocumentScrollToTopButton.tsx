@@ -27,7 +27,7 @@ export function DocumentScrollToTopButton({ viewportHeight }: DocumentScrollToTo
   }, [syncVisibility]);
 
   const scrollToTop = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }, []);
 
   return (
