@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { Css } from "src/Css";
+import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "./layoutVars";
 
 const DocumentScrollLayoutContext = createContext(false);
@@ -62,6 +63,7 @@ function DocumentScrollLayoutViewportRoot({ children }: { children: ReactNode })
     // `display: contents` keeps vars inheritable without adding a layout box.
     <div css={Css.display("contents").$} style={Object.keys(style).length > 0 ? (style as CSSProperties) : undefined}>
       {children}
+      <DocumentScrollToTopButton viewportHeight={viewportSize.height} />
     </div>
   );
 }
