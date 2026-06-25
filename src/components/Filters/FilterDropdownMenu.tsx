@@ -111,6 +111,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
       onChange={(v) => setSearchValue(v ?? "")}
       placeholder="Search"
       clearable
+      fullWidth
       startAdornment={<Icon icon="search" color={Palette.Gray700} />}
     />
   );

@@ -3,12 +3,10 @@ import React, { ReactNode, RefObject, useCallback, useEffect, useLayoutEffect, u
 import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
-import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Tokens } from "src/Css";
 import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
@@ -24,6 +22,7 @@ import { zIndices } from "src/utils/zIndices";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
+import { GridTableLayoutActions } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
 
@@ -142,29 +141,23 @@ function GridTableLayoutComponent<
   const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
 
   const tableActionsEl = (
-    <TableActions
+    <GridTableLayoutActions
+      filterDefs={layoutState?.filterDefs}
+      filter={layoutState?.filter}
+      onChange={layoutState?.setFilter}
+      groupBy={layoutState?.groupBy}
+      searchProps={layoutState?.search ? { onSearch: layoutState.setSearchString } : undefined}
       right={
-        (hasHideableColumns || withCardView) && (
+        hasHideableColumns || withCardView ? (
           <div css={Css.df.gap1.$}>
             {hasHideableColumns && view === "list" && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
             )}
             {withCardView && <ViewToggleButton view={view} onChange={setView} />}
           </div>
-        )
+        ) : undefined
       }
-      xss={Css.pt3.if(inDocumentScrollLayout).pl3.pr3.$}
-    >
-      {layoutState && (layoutState.filterDefs || layoutState.search) && (
-        <FilterDropdownMenu
-          filterDefs={layoutState.filterDefs}
-          filter={layoutState.filter}
-          onChange={layoutState.setFilter}
-          groupBy={layoutState.groupBy}
-          searchProps={layoutState.search ? { onSearch: layoutState.setSearchString } : undefined}
-        />
-      )}
-    </TableActions>
+    />
   );
 
   const cardAs = withCardView && view === "card" ? ("card" as const) : undefined;
