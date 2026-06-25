@@ -6,34 +6,36 @@ import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { Value } from "src/inputs";
-import { IconCard } from "src/inputs/IconCard";
+import { SelectCard } from "src/inputs/SelectCard";
 import { useTestIds } from "src/utils";
 import { ErrorMessage } from "./ErrorMessage";
 
-export interface IconCardGroupItemOption<V extends Value> {
+export type SelectCardGroupItemOption<V extends Value> = {
   icon: IconProps["icon"];
   label: string;
+  /** Optional secondary copy shown beneath the label. */
+  description?: string;
   disabled?: boolean;
-  /** The value of the IconCardGroup item, stored in value array in state. */
+  /** The value of the SelectCardGroup item, stored in value array in state. */
   value: V;
   /** Exclusive: if true, this option will override all other options when selected. */
   exclusive?: boolean;
-}
+};
 
-export interface IconCardGroupProps<V extends Value> extends Pick<PresentationFieldProps, "labelStyle"> {
+export type SelectCardGroupProps<V extends Value> = {
   label: string;
   /** Called when a card is selected */
   onChange: (values: V[]) => void;
-  /** Options for the cards contained within the IconCardGroup. */
-  options: IconCardGroupItemOption<V>[];
+  /** Options for the cards contained within the SelectCardGroup. */
+  options: SelectCardGroupItemOption<V>[];
   /** The values currently selected. */
   values: V[];
   errorMsg?: string;
   helperText?: string | ReactNode;
   disabled?: boolean;
-}
+} & Pick<PresentationFieldProps, "labelStyle">;
 
-export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
+export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();
   const {
     options,
@@ -95,13 +97,14 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
       )}
       <div css={Css.df.gap2.add("flexWrap", "wrap").$}>
         {options.map((option) => {
-          const { icon, label, disabled } = option;
+          const { icon, label, description, disabled } = option;
           const isSelected = selected.includes(option.value);
           return (
-            <IconCard
+            <SelectCard
               key={option.label}
               icon={icon}
               label={label}
+              description={description}
               selected={isSelected}
               disabled={disabled}
               onChange={() => toggleValue(option.value)}

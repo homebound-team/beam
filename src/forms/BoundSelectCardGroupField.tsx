@@ -1,12 +1,12 @@
 import { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { Value } from "src/inputs";
-import { IconCardGroup, IconCardGroupProps } from "src/inputs/IconCardGroup";
+import { SelectCardGroup, SelectCardGroupProps } from "src/inputs/SelectCardGroup";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 
-export type BoundIconCardGroupFieldProps<V extends Value> = Omit<
-  IconCardGroupProps<V>,
+export type BoundSelectCardGroupFieldProps<V extends Value> = Omit<
+  SelectCardGroupProps<V>,
   "label" | "values" | "onChange"
 > & {
   field: FieldState<V[] | null | undefined>;
@@ -15,14 +15,14 @@ export type BoundIconCardGroupFieldProps<V extends Value> = Omit<
   label?: string;
 };
 
-/** Wraps `IconCardGroup` and binds it to a form field. */
-export function BoundIconCardGroupField<V extends Value>(props: BoundIconCardGroupFieldProps<V>) {
+/** Wraps `SelectCardGroup` and binds it to a form field. */
+export function BoundSelectCardGroupField<V extends Value>(props: BoundSelectCardGroupFieldProps<V>) {
   const { field, onChange = (value) => field.set(value), label = defaultLabel(field.key), ...others } = props;
   const testId = useTestIds(props, field.key);
   return (
     <Observer>
       {() => (
-        <IconCardGroup
+        <SelectCardGroup
           label={label}
           values={field.value || []}
           onChange={(values) => {

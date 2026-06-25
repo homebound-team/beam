@@ -1,8 +1,8 @@
 import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
+import { SelectCardGroupItemOption } from "src/inputs/SelectCardGroup";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
-import { BoundIconCardGroupField } from "./BoundIconCardGroupField";
+import { BoundSelectCardGroupField } from "./BoundSelectCardGroupField";
 import { AuthorInput } from "./formStateDomain";
 
 enum Category {
@@ -14,8 +14,8 @@ enum Category {
   Media,
 }
 
-const categories: IconCardGroupItemOption<Category>[] = [
-  { icon: "abacus", label: "Math", value: Category.Math },
+const categories: SelectCardGroupItemOption<Category>[] = [
+  { icon: "abacus", label: "Math", description: "Numbers and equations", value: Category.Math },
   { icon: "archive", label: "History", value: Category.History },
   { icon: "dollar", label: "Finance", value: Category.Finance },
   { icon: "hardHat", label: "Engineering", value: Category.Engineering },
@@ -25,21 +25,26 @@ const categories: IconCardGroupItemOption<Category>[] = [
 
 type NewAuthor = Omit<AuthorInput, "favoriteGenres"> & { favoriteGenres?: Category[] | null };
 
-describe("BoundIconCardGroupField", () => {
+describe("BoundSelectCardGroupField", () => {
   it("shows the label", async () => {
     const author = createObjectState(formConfig, { favoriteGenres: [Category.Math] });
-    const r = await render(<BoundIconCardGroupField field={author.favoriteGenres} options={categories} />);
+    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
     expect(r.favoriteGenres_label).toHaveTextContent("Favorite Genres");
+  });
+  it("renders option descriptions", async () => {
+    const author = createObjectState(formConfig, { favoriteGenres: [Category.Math] });
+    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
+    expect(r.favoriteGenres_Math).toHaveTextContent("Numbers and equations");
   });
   it("triggers 'maybeAutoSave' on change", async () => {
     const autoSave = vi.fn();
-    // Given a BoundIconCardGroupField with auto save
+    // Given a BoundSelectCardGroupField with auto save
     const author: ObjectState<NewAuthor> = createObjectState(
       formConfig,
       {},
       { maybeAutoSave: () => autoSave(author.favoriteGenres.value) },
     );
-    const r = await render(<BoundIconCardGroupField field={author.favoriteGenres} options={categories} />);
+    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
 
     // When toggling the checkbox off
     click(r.favoriteGenres_Math);
