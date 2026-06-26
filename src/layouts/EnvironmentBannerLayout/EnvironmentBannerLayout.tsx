@@ -23,7 +23,12 @@ export function EnvironmentBannerLayout(props: EnvironmentBannerLayoutProps) {
   const { environmentBanner, children } = props;
   const tid = useTestIds(props, "environmentBannerLayout");
   const showBanner =
-    environmentBanner != null && shouldShowEnvironmentBanner(environmentBanner.env, environmentBanner.impersonating);
+    environmentBanner != null &&
+    shouldShowEnvironmentBanner(
+      environmentBanner.env,
+      environmentBanner.impersonating,
+      environmentBanner.showProdWarning ?? false,
+    );
   const bannerHeightPx = showBanner ? environmentBannerSizePx : 0;
 
   const style = {

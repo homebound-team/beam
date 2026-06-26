@@ -10,14 +10,14 @@ This document is the **canonical contract** for structural page layouts in Beam.
 
 ## React (`@homebound/beam`)
 
-| Layout | Renders | Props |
-|--------|---------|-------|
-| `EnvironmentBannerLayout` | `EnvironmentBanner` (optional) | `environmentBanner?: EnvironmentBannerProps`; body → **`children`** |
-| `NavbarLayout` | `Navbar` | `navbar: NavbarProps`; body → **`children`** |
-| `SideNavLayout` | `SideNav` | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?` |
-| `PageHeaderLayout` | `PageHeader` | `pageHeader: PageHeaderProps`; body → **`children`** |
+| Layout                    | Renders                        | Props                                                                                                     |
+| ------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `EnvironmentBannerLayout` | `EnvironmentBanner` (optional) | `environmentBanner?: EnvironmentBannerProps`; body → **`children`**                                       |
+| `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                              |
+| `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?` |
+| `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                      |
 
-`EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation). The banner does **not** auto-hide.
+`EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating, showProdWarning)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating or with `showProdWarning`); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation or `showProdWarning`). The banner does **not** auto-hide.
 
 The navbar and page header **always auto-hide** — they scroll away on scroll-down and slide back in on
 scroll-up.
@@ -45,7 +45,9 @@ import {
 
 <EnvironmentBannerLayout
   environmentBanner={
-    shouldShowEnvironmentBanner(env, impersonating) ? { env, impersonating } : undefined
+    shouldShowEnvironmentBanner(env, impersonating, showProdWarning)
+      ? { env, impersonating, showProdWarning }
+      : undefined
   }
 >
   <NavbarLayout navbar={{ brand, items, user }}>
