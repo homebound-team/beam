@@ -58,6 +58,7 @@
     "@homebound/form-state": "^2.28.0",
     "@internationalized/number": "^3.0.3",
     "@popperjs/core": "^2.11.6",
+    "@react-aria/interactions": "^3.28.1",
     "@react-aria/utils": "^3.33.1",
     "change-case": "^5.4.4",
     "date-fns": "^2.28.0",
