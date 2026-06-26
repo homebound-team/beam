@@ -352,14 +352,14 @@ export function HiddenControls() {
   );
 }
 
-interface TestDrawerContentProps {
+type TestDrawerContentProps = {
   book: Book;
   hasActions?: boolean;
   title: string;
   leftContent?: ReactNode;
   rightContent?: ReactNode;
   hideControls?: boolean;
-}
+};
 
 /** Example component to render inside the SuperDrawer */
 function TestDrawerContent(props: TestDrawerContentProps) {

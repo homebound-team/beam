@@ -1,11 +1,22 @@
-import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
+import {
+  createContext,
+  MutableRefObject,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { OverlayProvider } from "react-aria";
 import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
+import { BeamOverlaysContent } from "src/components/BeamOverlaysContent";
 import { DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
-import { Modal, ModalProps } from "src/components/Modal/Modal";
+import { ModalProps } from "src/components/Modal/Modal";
+import { OverlayHostContext, OverlayHostContextValue } from "src/components/OverlayHostContext";
 import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
-import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
 import { EmptyRef } from "src/utils/index";
@@ -49,6 +60,7 @@ type BeamProviderProps = {
   documentTitleConfig?: DocumentTitleConfig;
 } & PropsWithChildren<PresentationContextProps>;
 
+/** Root provider for Beam globals. See [`docs/overlays.md`](../../docs/overlays.md) for {@link BeamOverlays} placement. */
 export function BeamProvider({ children, documentTitleConfig, ...presentationProps }: BeamProviderProps) {
   // We want the identity of these to be stable, b/c they end up being used as dependencies
   // in both useModal's and useSuperDrawer's return values, which means the end-application's
@@ -88,23 +100,45 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
     };
   }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
 
+  const [overlayHostCount, setOverlayHostCount] = useState(0);
+  const hasOverlayHost = overlayHostCount > 0;
+
+  const registerOverlayHost = useCallback(() => {
+    setOverlayHostCount((count) => {
+      if (process.env.NODE_ENV !== "production" && count >= 1) {
+        console.warn("BeamOverlays: multiple overlay hosts mounted; mount BeamOverlays once per BeamProvider.");
+      }
+      return count + 1;
+    });
+  }, []);
+
+  const unregisterOverlayHost = useCallback(() => {
+    setOverlayHostCount((count) => Math.max(0, count - 1));
+  }, []);
+
+  const overlayHostContext = useMemo<OverlayHostContextValue>(
+    () => ({ registerOverlayHost, unregisterOverlayHost }),
+    [registerOverlayHost, unregisterOverlayHost],
+  );
+
   const beamTree = (
-    <PresentationProvider {...presentationProps}>
-      <RightPaneProvider>
-        <AutoSaveStatusProvider>
-          <SnackbarProvider>
-            {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <ToastProvider>
-              <OverlayProvider>
-                {children}
-                {modalRef.current && <Modal {...modalRef.current} />}
-              </OverlayProvider>
-              <SuperDrawer />
-            </ToastProvider>
-          </SnackbarProvider>
-        </AutoSaveStatusProvider>
-      </RightPaneProvider>
-    </PresentationProvider>
+    <OverlayHostContext.Provider value={overlayHostContext}>
+      <PresentationProvider {...presentationProps}>
+        <RightPaneProvider>
+          <AutoSaveStatusProvider>
+            <SnackbarProvider>
+              {/* OverlayProvider is required for Modals generated via React-Aria */}
+              <ToastProvider>
+                <OverlayProvider>
+                  {children}
+                  {!hasOverlayHost && <BeamOverlaysContent />}
+                </OverlayProvider>
+              </ToastProvider>
+            </SnackbarProvider>
+          </AutoSaveStatusProvider>
+        </RightPaneProvider>
+      </PresentationProvider>
+    </OverlayHostContext.Provider>
   );
 
   return (
