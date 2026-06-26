@@ -71,7 +71,11 @@ export type TreeSelectFieldProps<O, V extends Value> = {
   /** Which selected options to display as chips in the input field when not focused.
    * @default root */
   chipDisplay?: "all" | "leaf" | "root";
-  disabledOptions?: V[];
+  /**
+   * Options to disable. Can be a list of `V` values, or `{ value, reason }` tuples where the
+   * `reason` is shown as a tooltip when the user hovers the disabled option.
+   */
+  disabledOptions?: (V | { value: V; reason: string })[];
   groupOptions?: V[];
 } & BeamFocusableProps &
   PresentationFieldProps;
@@ -664,6 +668,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
             horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
             allowCollapsing={fieldState.allowCollapsing}
+            disabledOptionsWithReasons={disabledOptionsWithReasons}
             isTree
           />
         </Popover>
