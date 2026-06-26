@@ -77,24 +77,25 @@ describe("EnvironmentBanner", () => {
     expect(r.query.environmentBanner).toBeNull();
   });
 
-  it("renders the prod warning banner for developers when showProdWarning is set", async () => {
-    // Given a prod environment without impersonation but with the developer warning opted in
+  it("renders the prod warning banner when showProdWarning is set", async () => {
+    // Given a prod environment without impersonation but with the prod warning set
     const r = await render(<EnvironmentBanner env="prod" showProdWarning />);
 
-    // Then the prod banner renders the developer warning copy
+    // Then the prod banner renders the warning copy with the red local-prod fill
     expect(r.environmentBanner_badge).toHaveTextContent("PROD");
     expect(r.environmentBanner_message).toHaveTextContent("You are in the Production Environment");
     expect(r.query.environmentBanner_impersonating).toBeNull();
-    // Red, matching local-prod urgency rather than the turquoise impersonation fill.
     expect(r.environmentBanner).toHaveStyle({ backgroundColor: Tokens.EnvBrandLocalProd });
   });
 
-  it("prefers impersonation copy over the prod warning when both apply", async () => {
+  it("lets the prod warning trump impersonation when both apply", async () => {
     // Given prod while impersonating and with showProdWarning set
     const r = await render(<EnvironmentBanner env="prod" impersonating={{ name: "Andrea Eppy" }} showProdWarning />);
 
-    // Then the impersonation message wins
-    expect(r.environmentBanner_message).toHaveTextContent("You are impersonating Andrea Eppy");
+    // Then the prod warning copy and red fill win, with impersonation still shown on the right (like local-prod)
+    expect(r.environmentBanner_message).toHaveTextContent("You are in the Production Environment");
+    expect(r.environmentBanner).toHaveStyle({ backgroundColor: Tokens.EnvBrandLocalProd });
+    expect(r.environmentBanner_impersonating).toHaveTextContent("Impersonating Andrea Eppy");
     expect(r.environmentBanner_impersonatingIcon).toBeInTheDocument();
   });
 
@@ -109,19 +110,19 @@ describe("EnvironmentBanner", () => {
 
 describe("shouldShowEnvironmentBanner", () => {
   it("returns true for dev, qa, and local-prod", () => {
-    expect(shouldShowEnvironmentBanner("dev", undefined)).toBe(true);
-    expect(shouldShowEnvironmentBanner("qa", undefined)).toBe(true);
-    expect(shouldShowEnvironmentBanner("local-prod", undefined)).toBe(true);
+    expect(shouldShowEnvironmentBanner("dev", undefined, false)).toBe(true);
+    expect(shouldShowEnvironmentBanner("qa", undefined, false)).toBe(true);
+    expect(shouldShowEnvironmentBanner("local-prod", undefined, false)).toBe(true);
   });
 
   it("returns true for prod when impersonating or showProdWarning is set", () => {
-    expect(shouldShowEnvironmentBanner("prod", undefined)).toBe(false);
-    expect(shouldShowEnvironmentBanner("prod", { name: "Andrea Eppy" })).toBe(true);
+    expect(shouldShowEnvironmentBanner("prod", undefined, false)).toBe(false);
+    expect(shouldShowEnvironmentBanner("prod", { name: "Andrea Eppy" }, false)).toBe(true);
     expect(shouldShowEnvironmentBanner("prod", undefined, true)).toBe(true);
   });
 
   it("returns false for local", () => {
-    expect(shouldShowEnvironmentBanner("local", undefined)).toBe(false);
-    expect(shouldShowEnvironmentBanner("local", { name: "Andrea Eppy" })).toBe(false);
+    expect(shouldShowEnvironmentBanner("local", undefined, false)).toBe(false);
+    expect(shouldShowEnvironmentBanner("local", { name: "Andrea Eppy" }, false)).toBe(false);
   });
 });
