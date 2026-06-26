@@ -92,6 +92,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
                 state={state}
                 // scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
                 allowCollapsing={allowCollapsing}
+                disabledReason={disabledOptionsWithReasons[item.key]}
               />
             );
           }
