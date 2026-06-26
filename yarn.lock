@@ -2418,8 +2418,6 @@ __metadata:
     "@internationalized/number": "npm:^3.0.3"
     "@popperjs/core": "npm:^2.11.6"
     "@react-aria/interactions": "npm:^3.28.1"
-    "@react-aria/numberfield": "npm:^3.13.1"
-    "@react-aria/textfield": "npm:^3.19.1"
     "@react-aria/utils": "npm:^3.33.1"
     "@semantic-release/exec": "npm:^7.1.0"
     "@semantic-release/git": "npm:^10.0.1"
@@ -4077,19 +4075,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-aria/numberfield@npm:^3.13.1":
-  version: 3.13.1
-  resolution: "@react-aria/numberfield@npm:3.13.1"
-  dependencies:
-    "@swc/helpers": "npm:^0.5.0"
-    react-aria: "npm:^3.48.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-    react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-  checksum: 10/0fe74e4121d3160a8bdfb622d6201f4fcbe322d9031c08e002ea2e2907dc551ce260672bc297dc6bde23570781c7d2c8237e5325454694369f3000952affd7fc
-  languageName: node
-  linkType: hard
-
 "@react-aria/overlays@npm:^3.31.2":
   version: 3.31.2
   resolution: "@react-aria/overlays@npm:3.31.2"
@@ -4373,19 +4358,6 @@ __metadata:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
     react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
   checksum: 10/fbad840d923ad9c63462995b9fd7a845775e8e67b8624cee26223a09252f420f5cc3e307e6f08a338fb057dbcc3b18bc6cf4fb1337e27f193efe5ce454beb3bf
-  languageName: node
-  linkType: hard
-
-"@react-aria/textfield@npm:^3.19.1":
-  version: 3.19.1
-  resolution: "@react-aria/textfield@npm:3.19.1"
-  dependencies:
-    "@swc/helpers": "npm:^0.5.0"
-    react-aria: "npm:^3.48.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-    react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-  checksum: 10/734699cd4f227ab8183a9f484917667fcfdc3f91afe9f79e27d52abd803ee26acb46f6be08675fd6ddeb03f0c9b68132f439f548b4e50c51450fc19b5fb62c78
   languageName: node
   linkType: hard
 
