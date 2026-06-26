@@ -93,6 +93,29 @@ describe("TreeSelectField", () => {
     expect(onSelect.mock.calls[0][0].leaf.values).toEqual(["nba"]);
   });
 
+  it("can disable options with tooltips", async () => {
+    const onSelect = vi.fn() as any;
+    // Given a TreeSelectField with a disabled option that has a reason
+    const r = await render(
+      <TreeSelectField
+        onSelect={onSelect}
+        options={getNestedOptions()}
+        disabledOptions={[{ value: "nba", reason: "Example Tooltip" }]}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+
+    // When opening the menu
+    click(r.favoriteLeague);
+    const nbaOption = r.getByRole("option", { name: "NBA" });
+
+    // Then the disabled option is wrapped in the tooltip text
+    expect(nbaOption.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Example Tooltip");
+  });
+
   it("renders readonly", async () => {
     // Given a readonly TreeSelectField
     const r = await render(
