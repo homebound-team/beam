@@ -37,6 +37,8 @@ export const Prod = newStory(
   environmentBannerStoryOpts,
 );
 
+export const ProdWarning = newStory(() => <EnvironmentBanner env="prod" showProdWarning />, environmentBannerStoryOpts);
+
 function createImpersonatedUser(): ImpersonatedUser {
   return { name: "Andrea Eppy" };
 }

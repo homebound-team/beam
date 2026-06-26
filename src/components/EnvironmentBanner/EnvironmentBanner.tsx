@@ -13,14 +13,16 @@ export type ImpersonatedUser = { name: string };
 export type EnvironmentBannerProps = {
   env: AppEnvironment;
   impersonating?: ImpersonatedUser;
+  /** When in prod without impersonation, show a developer "you are in production" warning banner. */
+  showProdWarning?: boolean;
 };
 
 /** Environment banner; horizontal/vertical pinning is owned by {@link EnvironmentBannerLayout}. */
 export function EnvironmentBanner(props: EnvironmentBannerProps) {
-  const { env, impersonating, ...others } = props;
+  const { env, impersonating, showProdWarning, ...others } = props;
   const tid = useTestIds(others, "environmentBanner");
 
-  if (!shouldShowEnvironmentBanner(env, impersonating)) {
+  if (!shouldShowEnvironmentBanner(env, impersonating, showProdWarning)) {
     return null;
   }
 
@@ -70,9 +72,21 @@ export function EnvironmentBanner(props: EnvironmentBannerProps) {
   );
 }
 
-/** True when {@link EnvironmentBanner} should display: `dev`, `qa`, `local-prod`, or `prod` while impersonating. */
-export function shouldShowEnvironmentBanner(env: AppEnvironment, impersonating: ImpersonatedUser | undefined): boolean {
-  return env === "dev" || env === "qa" || env === "local-prod" || (env === "prod" && isDefined(impersonating));
+/**
+ * True when {@link EnvironmentBanner} should display: `dev`, `qa`, `local-prod`, or `prod` while impersonating
+ * or when `showProdWarning` opts a developer session into the prod warning banner.
+ */
+export function shouldShowEnvironmentBanner(
+  env: AppEnvironment,
+  impersonating: ImpersonatedUser | undefined,
+  showProdWarning?: boolean,
+): boolean {
+  return (
+    env === "dev" ||
+    env === "qa" ||
+    env === "local-prod" ||
+    (env === "prod" && (isDefined(impersonating) || !!showProdWarning))
+  );
 }
 
 type EnvironmentBannerConfig = {
@@ -101,14 +115,20 @@ function getEnvironmentBannerConfig(
         message: "You are in the QA Environment",
         tooltip: "You are in the QA Environment. Any changes here will not be reflected in live production data.",
       };
-    // Prod env banner should only be displayed when impersonating
+    // Prod env banner displays when impersonating or when a developer opts in via `showProdWarning`;
+    // impersonation copy takes priority since it is the more specific warning.
     case "prod":
       return {
-        bgColor: Tokens.EnvBrandProd,
+        // Developer prod warning reuses the red local-prod fill to convey the same "live prod data" urgency;
+        // impersonation keeps its own prod fill.
+        bgColor: isDefined(impersonating) ? Tokens.EnvBrandProd : Tokens.EnvBrandLocalProd,
         badgeLabel: "PROD",
-        message: `You are impersonating ${impersonating?.name}`,
-        tooltip:
-          "You are currently viewing the application as another user in Production. Any changes here WILL be reflected in live production data.",
+        message: isDefined(impersonating)
+          ? `You are impersonating ${impersonating.name}`
+          : "You are in the Production Environment",
+        tooltip: isDefined(impersonating)
+          ? "You are currently viewing the application as another user in Production. Any changes here WILL be reflected in live production data."
+          : "You are in the Production Environment. Any changes here WILL be reflected in live production data.",
       };
     case "local-prod":
       return {

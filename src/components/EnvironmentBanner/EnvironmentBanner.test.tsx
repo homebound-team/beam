@@ -77,6 +77,27 @@ describe("EnvironmentBanner", () => {
     expect(r.query.environmentBanner).toBeNull();
   });
 
+  it("renders the prod warning banner for developers when showProdWarning is set", async () => {
+    // Given a prod environment without impersonation but with the developer warning opted in
+    const r = await render(<EnvironmentBanner env="prod" showProdWarning />);
+
+    // Then the prod banner renders the developer warning copy
+    expect(r.environmentBanner_badge).toHaveTextContent("PROD");
+    expect(r.environmentBanner_message).toHaveTextContent("You are in the Production Environment");
+    expect(r.query.environmentBanner_impersonating).toBeNull();
+    // Red, matching local-prod urgency rather than the turquoise impersonation fill.
+    expect(r.environmentBanner).toHaveStyle({ backgroundColor: Tokens.EnvBrandLocalProd });
+  });
+
+  it("prefers impersonation copy over the prod warning when both apply", async () => {
+    // Given prod while impersonating and with showProdWarning set
+    const r = await render(<EnvironmentBanner env="prod" impersonating={{ name: "Andrea Eppy" }} showProdWarning />);
+
+    // Then the impersonation message wins
+    expect(r.environmentBanner_message).toHaveTextContent("You are impersonating Andrea Eppy");
+    expect(r.environmentBanner_impersonatingIcon).toBeInTheDocument();
+  });
+
   it("renders nothing for local", async () => {
     // Given a local environment
     const r = await render(<EnvironmentBanner env="local" />);
@@ -93,9 +114,10 @@ describe("shouldShowEnvironmentBanner", () => {
     expect(shouldShowEnvironmentBanner("local-prod", undefined)).toBe(true);
   });
 
-  it("returns true for prod only when impersonating", () => {
+  it("returns true for prod when impersonating or showProdWarning is set", () => {
     expect(shouldShowEnvironmentBanner("prod", undefined)).toBe(false);
     expect(shouldShowEnvironmentBanner("prod", { name: "Andrea Eppy" })).toBe(true);
+    expect(shouldShowEnvironmentBanner("prod", undefined, true)).toBe(true);
   });
 
   it("returns false for local", () => {
