@@ -91,7 +91,7 @@ const fixedSizeStyles = Css.wPx(130).hPx(114).$;
 // `fixedSizeStyles` when it does.
 export const fillRowStyles = Css.fb(0).fg1.fs0.asStretch.mwPx(187).wa.ha.$;
 const copyStyles = Css.df.fdc.aic.gap("4px").w100.$;
-const hoverStyles = Css.bw2.bcBlue600.$;
-const selectedStyles = Css.bw2.bcBlue600.bgBlue50.$;
+const hoverStyles = Css.bcBlue600.$;
+const selectedStyles = Css.bcBlue600.bgBlue50.$;
 const disabledStyles = Css.bgGray50.bcGray300.$;
-const disabledSelectedStyles = Css.bw2.bgGray100.bcGray300.$;
+const disabledSelectedStyles = Css.bgGray100.bcGray300.$;
