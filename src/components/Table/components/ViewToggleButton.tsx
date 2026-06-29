@@ -19,11 +19,12 @@ export function ViewToggleButton({ view, onChange, defaultOpen }: ViewToggleButt
     { label: "Card", icon: "tile", onClick: () => onChange("card") },
   ];
 
+  const icon = view === "list" ? "projects" : "tile";
+
   return (
     <ButtonMenu
-      trigger={{ icon: view === "list" ? "projects" : "tile", label: "", size: "md", variant: "secondaryBlack" }}
+      trigger={sm ? { icon, variant: "outline" } : { icon, label: "", size: "md", variant: "secondaryBlack" }}
       items={menuItems}
-      hideEndAdornment={sm}
       defaultOpen={defaultOpen}
       {...tid}
     />

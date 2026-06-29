@@ -64,16 +64,14 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   return (
     <OverlayTrigger
       {...props}
-      trigger={{
-        icon: "kanban",
-        size: "md",
-        label: "",
-        variant: "secondaryBlack",
-      }}
+      trigger={
+        sm
+          ? { icon: "kanban", variant: "outline" }
+          : { icon: "kanban", label: "", size: "md", variant: "secondaryBlack" }
+      }
       menuTriggerProps={menuTriggerProps}
       state={state}
       buttonRef={buttonRef}
-      hideEndAdornment={sm}
       {...tid}
     >
       <div css={Css.df.fdc.bgColor(Tokens.Surface).maxwPx(326).maxhPx(512).onHover.bshHover.$}>
