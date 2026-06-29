@@ -171,7 +171,7 @@ function memoizedTableStyles() {
           // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
           // Header's will add `lineClamp2` more locally in their renders.
           // Also `unset`-ing the white-space: nowrap defined in `cellCss` below.
-          ...Css.gray700.xsSb.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
+          ...Css.gray900.xsSb.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
           ...(allWhite && Css.bgWhite.$),
         },
         totalsCellCss: Css.bgWhite.gray700.bgGray100.xsSb.hPx(totalsRowHeight).pPx(12).$,
