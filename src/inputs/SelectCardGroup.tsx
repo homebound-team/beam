@@ -6,7 +6,7 @@ import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { Value } from "src/inputs";
-import { SelectCard } from "src/inputs/SelectCard";
+import { fillRowStyles, SelectCard } from "src/inputs/SelectCard";
 import { useTestIds } from "src/utils";
 import { ErrorMessage } from "./ErrorMessage";
 
@@ -53,6 +53,10 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
   const [selected, setSelected] = useState<V[]>(values);
 
   const exclusiveOptions = useMemo(() => options.filter((o) => o.exclusive), [options]);
+
+  // Description cards stretch to a shared height, so in a mixed group the label-only cards need the
+  // same fill-the-row sizing or they fall out of alignment (see the `xss` override below).
+  const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
 
   const toggleValue = useCallback(
     (value: V) => {
@@ -107,6 +111,9 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
               icon={icon}
               label={label}
               description={description}
+              // When any sibling card has a description, label-only cards would otherwise keep their
+              // fixed compact size and fall out of alignment, so give them the fill-the-row sizing.
+              xss={hasDescription ? fillRowStyles : undefined}
               selected={isSelected}
               disabled={disabled}
               tooltip={tooltip}

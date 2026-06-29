@@ -31,11 +31,13 @@ describe("BoundSelectCardGroupField", () => {
     const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
     expect(r.favoriteGenres_label).toHaveTextContent("Favorite Genres");
   });
+
   it("renders option descriptions", async () => {
     const author = createObjectState(formConfig, { favoriteGenres: [Category.Math] });
     const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
     expect(r.favoriteGenres_Math).toHaveTextContent("Numbers and equations");
   });
+
   it("triggers 'maybeAutoSave' on change", async () => {
     const autoSave = vi.fn();
     // Given a BoundSelectCardGroupField with auto save

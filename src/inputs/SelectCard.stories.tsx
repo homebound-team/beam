@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
-import { Css, Palette, SelectCard, SelectCardProps } from "src";
+import { Css, SelectCard, SelectCardProps } from "src";
+import { userEvent, waitFor, within } from "storybook/test";
 
 export default {
   component: SelectCard,
@@ -23,9 +24,6 @@ export function Default() {
         </State>
         <State title="Selected">
           <SelectCard icon="kanban" label="This is a title" description={description} selected onChange={() => {}} />
-        </State>
-        <State title="Hover">
-          <HoveredSelectCard icon="kanban" label="This is a title" description={description} onChange={() => {}} />
         </State>
         <State title="Disabled">
           <SelectCard icon="kanban" label="This is a title" description={description} disabled onChange={() => {}} />
@@ -50,21 +48,20 @@ export function Default() {
   );
 }
 
+/** Hovers the card so Chromatic snapshots the real `useHover` styles rather than a faked border. */
+export function Hover() {
+  return <SelectCard icon="kanban" label="This is a title" description={description} onChange={() => {}} />;
+}
+Hover.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement);
+  return waitFor(() => userEvent.hover(canvas.getByTestId("thisIsATitle")));
+};
+
 function State({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
       <h3 css={Css.smSb.mb1.$}>{title}</h3>
       {children}
-    </div>
-  );
-}
-
-/** Hover styled version of the SelectCard — uses a scoped stylesheet to force hover styles for visual testing. */
-function HoveredSelectCard(args: SelectCardProps) {
-  return (
-    <div className="hovered-select-card">
-      <style>{`.hovered-select-card button { border-width: 2px; border-color: ${Palette.Blue600}; }`}</style>
-      <SelectCard {...args} />
     </div>
   );
 }

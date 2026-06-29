@@ -85,3 +85,39 @@ export function OptionType() {
     </div>
   );
 }
+
+const mixedOptions: SelectCardGroupItemOption<string>[] = [
+  {
+    icon: "single",
+    label: "Single",
+    description: "Slots share the same options, but each slot can have its own selection.",
+    value: "single",
+  },
+  { icon: "abacus", label: "Math", value: "math" },
+  {
+    icon: "package",
+    label: "Package",
+    description: "Selections come in preconfigured bundles.",
+    value: "package",
+  },
+  { icon: "dollar", label: "Finance", value: "finance" },
+];
+
+/**
+ * Mix of cards with and without descriptions in one group. The description cards grow to fill the
+ * row and stretch to a shared height, while the label-only cards keep their fixed compact size.
+ */
+export function MixedDescriptions() {
+  const [values, setValues] = useState<string[]>(["single"]);
+
+  return (
+    <div css={Css.wPx(640).$}>
+      <SelectCardGroup
+        label="Mixed Descriptions"
+        options={mixedOptions}
+        onChange={(values) => setValues(values)}
+        values={values}
+      />
+    </div>
+  );
+}

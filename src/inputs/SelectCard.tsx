@@ -2,10 +2,13 @@ import { RefObject, useMemo } from "react";
 import { useCheckbox, useHover, VisuallyHidden } from "react-aria";
 import { useToggleState } from "react-stately";
 import { Icon, IconProps, maybeTooltip, resolveTooltip } from "src/components";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Xss } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+
+// Layout properties a parent may override to align a card within a row.
+type SelectCardLayout = "width" | "height" | "flexBasis" | "flexGrow" | "flexShrink" | "alignSelf" | "minWidth";
 
 export type SelectCardProps = {
   /** The icon to use within the card. */
@@ -19,6 +22,8 @@ export type SelectCardProps = {
   cardRef?: RefObject<HTMLInputElement>;
   disabled?: boolean;
   tooltip?: string;
+  /** Layout overrides applied by a parent to align this card within a row (see `fillRowStyles`). */
+  xss?: Xss<SelectCardLayout>;
 };
 
 export function SelectCard(props: SelectCardProps) {
@@ -30,6 +35,7 @@ export function SelectCard(props: SelectCardProps) {
     label,
     description,
     tooltip,
+    xss,
     ...otherProps
   } = props;
   const ref = useGetRef(cardRef);
@@ -43,15 +49,17 @@ export function SelectCard(props: SelectCardProps) {
   const styles = useMemo(
     () => ({
       ...baseStyles,
-      // The two layouts are meaningfully different: a label-only card is a fixed, compact,
-      // center-aligned box (the original IconCard sizing), while a card with a description
-      // fills the row evenly, stretches to a shared height, and top-aligns its content.
-      ...(description ? withDescriptionStyles : withoutDescriptionStyles),
+      // A label-only card is a fixed compact box; a description card fills the row and stretches.
+      ...(description ? fillRowStyles : fixedSizeStyles),
+      // Description cards top-align so multi-line copy lines up; label-only cards center.
+      ...(description ? Css.jcfs.$ : Css.jcc.$),
       ...(isHovered && !isDisabled && hoverStyles),
       ...(isSelected && !isDisabled && selectedStyles),
       ...(isDisabled && (isSelected ? disabledSelectedStyles : disabledStyles)),
+      // Spread last so a parent can override sizing (see `SelectCardGroup`).
+      ...xss,
     }),
-    [description, isDisabled, isHovered, isSelected],
+    [description, isDisabled, isHovered, isSelected, xss],
   );
 
   const tid = useTestIds(props, defaultTestId(label));
@@ -76,11 +84,12 @@ export function SelectCard(props: SelectCardProps) {
 
 // Shared visuals for both layouts (flex column, border, radius, bg, padding, gap, centered text).
 const baseStyles = Css.df.fdc.aic.ba.br12.bgWhite.bcGray300.gap1.px2.py3.tac.$;
-// Label-only card: fixed, compact, center-aligned box (matches the original IconCard sizing).
-const withoutDescriptionStyles = Css.jcc.wPx(130).hPx(114).$;
-// Card with a description: fill the row evenly (`flex: 1 0 0`), stretch to a shared height,
-// and top-align content so multi-line descriptions line up across the row.
-const withDescriptionStyles = Css.jcfs.fb(0).fg1.fs0.asStretch.mwPx(187).$;
+// Fixed compact box, matching the original IconCard sizing.
+const fixedSizeStyles = Css.wPx(130).hPx(114).$;
+// Fill the row evenly and stretch to a shared height; the `mwPx` floor keeps cards equal width.
+// Exported so `SelectCardGroup` can apply it to label-only cards via `xss`; `wa`/`ha` reset
+// `fixedSizeStyles` when it does.
+export const fillRowStyles = Css.fb(0).fg1.fs0.asStretch.mwPx(187).wa.ha.$;
 const copyStyles = Css.df.fdc.aic.gap("4px").w100.$;
 const hoverStyles = Css.bw2.bcBlue600.$;
 const selectedStyles = Css.bw2.bcBlue600.bgBlue50.$;
