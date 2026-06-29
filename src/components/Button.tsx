@@ -84,6 +84,7 @@ export function Button(props: ButtonProps) {
     () => getButtonStyles(variant, size),
     [variant, size],
   );
+
   const buttonContent = (
     <>
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
