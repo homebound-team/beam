@@ -262,6 +262,27 @@ export const GroupOptionsOpen = newStory(
   },
 );
 
+export const DisabledOptionsWithTooltips = newStory(
+  () => (
+    <TestTreeSelectField
+      values={["mlb"]}
+      options={getLeagueOptions()}
+      disabledOptions={[
+        { value: "nba", reason: "The NBA season hasn't started yet" },
+        { value: "milb", reason: "Minor League Baseball is not available in your region" },
+      ]}
+      label="Favorite League"
+      placeholder="Select a league"
+    />
+  ),
+  {
+    play: ({ canvasElement }) => {
+      const canvas = within(canvasElement);
+      canvas.getByTestId("toggleListBox").click();
+    },
+  },
+);
+
 export function Interactive() {
   const options: NestedOption<HasIdAndName>[] = zeroTo(3).map((dIdx) => ({
     id: `d:${dIdx}`,
@@ -286,7 +307,7 @@ export function Interactive() {
       </div>
       <TreeSelectField
         multiline
-        disabledOptions={["p:0"]}
+        disabledOptions={[{ value: "p:0", reason: "Project 0 cannot be selected" }]}
         chipDisplay="leaf"
         values={values}
         options={options}
