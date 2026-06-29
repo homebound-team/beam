@@ -259,6 +259,28 @@ export class TableState<R extends Kinded> {
     this.rowStates.toggleCollapsed(id);
   }
 
+  /** Returns rows pinned to the top, as RowStates for rendering. */
+  get pinnedRows(): RowState<R>[] {
+    return this.rowStates.pinnedRows;
+  }
+
+  // Should be called in an Observer/useComputed to trigger re-renders
+  isPinnedRow(id: string): boolean {
+    return this.rowStates.get(id).pinned;
+  }
+
+  pinRow(id: string): void {
+    this.rowStates.get(id).setPinned(true);
+  }
+
+  unpinRow(id: string): void {
+    this.rowStates.get(id).setPinned(false);
+  }
+
+  togglePinned(id: string): void {
+    this.rowStates.get(id).togglePinned();
+  }
+
   deleteRows(ids: string[]): void {
     this.rows = this.rows.filter((row) => !ids.includes(row.id));
     this.rowStates.delete(ids);

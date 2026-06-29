@@ -1,4 +1,3 @@
-import type { NumberFieldAria } from "@react-aria/numberfield";
 import React, {
   ChangeEvent,
   FocusEvent,
@@ -9,6 +8,7 @@ import React, {
   TextareaHTMLAttributes,
   useState,
 } from "react";
+import type { NumberFieldAria } from "react-aria";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
 import { Icon, IconButton, maybeTooltip, useContrastScope } from "src/components";
 import { HelperText } from "src/components/HelperText";

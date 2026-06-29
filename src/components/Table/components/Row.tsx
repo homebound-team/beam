@@ -12,7 +12,7 @@ import { ColumnResizeHandle } from "src/components/Table/components/ColumnResize
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, GridColumnWithId, IfAny, Kinded, Pin, RenderAs } from "src/components/Table/types";
+import { DiscriminateUnion, FixedSort, GridColumnWithId, IfAny, Kinded, RenderAs } from "src/components/Table/types";
 import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
@@ -104,7 +104,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const { tableState } = useContext(TableStateContext);
   // We're wrapped in observer, so can access these without useComputeds
   const { api, visibleColumns: columns } = tableState;
-  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, level } = rs;
+  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level } = rs;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === HEADER;
@@ -377,6 +377,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
             ...(isLastKeptRow && style.keptLastRowCss),
+            // Apply the green highlight to every runtime-pinned row's cells (wins over `isActive`)
+            ...(pinned && style.pinnedRowCss),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
             // Define the width of the column on each cell. Supports col spans.
@@ -514,18 +516,21 @@ export type GridDataRow<R extends Kinded> = {
   /** A list of parent/grand-parent ids for collapsing parent/child rows. */
   children?: GridDataRow<R>[];
   /**
-   * Whether to pin this sort to the first/last of its parent's children.
+   * Forces this row to sort to the first/last of its parent's children.
    *
-   * By default, pinned rows are always shown/not filtered out, however providing
-   * the pin `filter: true` property will allow pinned rows to be hidden
-   * while filtering.
+   * By default, fixed-sorted rows are always shown/not filtered out; providing the
+   * `filter: true` property allows them to be hidden while filtering. This is the
+   * in-group ordering override, distinct from the runtime sticky "pin to top" feature
+   * (`api.pinRow` / `pinColumn`).
    */
-  pin?: "first" | "last" | Pin;
+  fixedSort?: "first" | "last" | FixedSort;
   data: unknown;
   /** Whether to have the row collapsed (children not visible) on initial load. This will be ignore in subsequent re-renders of the table */
   initCollapsed?: boolean;
   /** Whether to have the row selected on initial load. This will be ignore in subsequent re-renders of the table */
   initSelected?: boolean;
+  /** Whether to pin this row to the top on initial load. Ignored on subsequent re-renders (like `initSelected`). */
+  initPinned?: boolean;
   /** Whether row can be selected */
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */

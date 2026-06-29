@@ -29,6 +29,12 @@ export class RowState<R extends Kinded> {
   selected = false;
   /** Whether we are collapsed. */
   collapsed = false;
+  /**
+   * Whether this row is pinned to the top at runtime — distinct from the declarative `row.fixedSort`,
+   * which only reorders within a group. Boolean for now; maybe someday we implement bottom pinning,
+   * at which point this would become `"top" | "bottom"`.
+   */
+  pinned = false;
   /** Whether we are dragged over. */
   isDraggedOver: DraggedOver = DraggedOver.None;
   /**
@@ -60,6 +66,7 @@ export class RowState<R extends Kinded> {
     this.row = row;
     this.selected = !!row.initSelected;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
+    this.pinned = !!row.initPinned;
     makeAutoObservable(
       this,
       // 'as any' because the fields are private so don't show up in the type
@@ -199,6 +206,16 @@ export class RowState<R extends Kinded> {
     this.collapsed = !this.collapsed;
   }
 
+  /** Pin/unpin this row at runtime. */
+  setPinned(pinned: boolean): void {
+    this.pinned = pinned;
+  }
+
+  /** Toggle this row's runtime pin. */
+  togglePinned(): void {
+    this.pinned = !this.pinned;
+  }
+
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */
   get isKept(): boolean {
     // this row is "kept" if it is selected, and:
@@ -259,7 +276,7 @@ export class RowState<R extends Kinded> {
           // Reserved rows are always visible, even though they're not considered matched.
           // ...except for the kept group: its `isMatched` will become true whenever it has
           // any kept row children, as they will cause its hasDirectlyMatchedChildren to be true.
-          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isPinned,
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isAlwaysVisible,
       ) ?? []
     );
   }
@@ -285,7 +302,7 @@ export class RowState<R extends Kinded> {
           (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) ||
           rs.isDirectlyMatched ||
           rs.hasDirectlyMatchedChildren ||
-          rs.isPinned,
+          rs.isAlwaysVisible,
       ) ?? []
     );
   }
@@ -320,8 +337,14 @@ export class RowState<R extends Kinded> {
     return !!this.children && (this.children.length > 0 || this.row.id === KEPT_GROUP) && this.inferSelectedState;
   }
 
-  private get isPinned(): boolean {
-    return typeof this.row.pin === "string" || (!!this.row.pin && this.row.pin.filter !== true);
+  /**
+   * Whether the declarative `row.fixedSort` keeps this row visible through client-side filtering.
+   *
+   * Named for the behavior (not the prop): `fixedSort` reorders a row within its sibling group and
+   * (here) exempts it from the filter — distinct from the runtime sticky `pinned`.
+   */
+  private get isAlwaysVisible(): boolean {
+    return typeof this.row.fixedSort === "string" || (!!this.row.fixedSort && this.row.fixedSort.filter !== true);
   }
 
   // mobx will cache this getter for us

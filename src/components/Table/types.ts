@@ -138,10 +138,10 @@ export const nonKindGridColumnKeys = [
 ];
 
 /**
- * Used to indicate where to pin the DataRow and if whether it should be filtered or always visible, setting `filter` to `true` will hide this row
- * if it doesn't match the provided filtering search term
+ * Used to indicate where to fixed-sort the DataRow within its group, and whether it should be filtered
+ * or always visible — setting `filter` to `true` will hide this row if it doesn't match the search term.
  */
-export type Pin = { at: "first" | "last"; filter?: boolean };
+export type FixedSort = { at: "first" | "last"; filter?: boolean };
 
 // Use IfAny so that GridDataRow<any> doesn't devolve into any
 export type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N;

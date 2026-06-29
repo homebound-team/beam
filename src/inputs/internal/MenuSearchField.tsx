@@ -1,5 +1,5 @@
-import { useTextField } from "@react-aria/textfield";
 import { useRef } from "react";
+import { useTextField } from "react-aria";
 import { Icon } from "src/components";
 import { Only } from "src/Css";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";

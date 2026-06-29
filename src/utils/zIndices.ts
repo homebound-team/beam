@@ -12,9 +12,12 @@ export const zIndices = {
   tableStickyHeader: 40,
   tableActions: 45,
 
+  // Document-scroll "back to top" — above inline page/table chrome, below every overlay scrim.
+  scrollToTop: 50,
+
   // Page chrome - ensure these items sit above the table
   scrollShadow: 50,
-  superDrawerScrim: 50,
+  superDrawerScrim: 55,
   modalUnderlay: 60,
   pageStickyHeader: 70,
 

@@ -59,6 +59,17 @@ export type GridTableApi<R extends Kinded> = {
   /** Toggle collapse state of a row by id. */
   toggleCollapsedRow(id: string): void;
 
+  /** Whether a row is currently pinned to the top. */
+  isPinnedRow(id: string): boolean;
+  /** Pins a row to the top so it stays visible (sticky) while the body scrolls. */
+  pinRow(id: string): void;
+  /** Removes a row's runtime pin. */
+  unpinRow(id: string): void;
+  /** Toggles a row's runtime pinned state. */
+  togglePinnedRow(id: string): void;
+  /** Returns the ids of currently pinned rows. */
+  getPinnedRowIds(): string[];
+
   /** Sets the internal state of 'activeRowId' */
   setActiveRowId(id: string | undefined): void;
   /** Sets the internal state of 'activeCellId' */
@@ -112,6 +123,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     this.getVisibleRowIdsImpl = computedFn(this.getVisibleRowIdsImpl, { equals: comparer.shallow });
     this.getSelectedRowsImpl = computedFn(this.getSelectedRowsImpl, { equals: comparer.shallow });
     this.getSelectedRowIdsImpl = computedFn(this.getSelectedRowIdsImpl, { equals: comparer.shallow });
+    this.getPinnedRowIdsImpl = computedFn(this.getPinnedRowIdsImpl, { equals: comparer.shallow });
   }
 
   /** Called once by the GridTable when it takes ownership of this api instance. */
@@ -197,6 +209,30 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
 
   public isCollapsedRow(id: string) {
     return this.tableState.isCollapsed(id);
+  }
+
+  public isPinnedRow(id: string): boolean {
+    return this.tableState.isPinnedRow(id);
+  }
+
+  public pinRow(id: string) {
+    this.tableState.pinRow(id);
+  }
+
+  public unpinRow(id: string) {
+    this.tableState.unpinRow(id);
+  }
+
+  public togglePinnedRow(id: string) {
+    this.tableState.togglePinned(id);
+  }
+
+  public getPinnedRowIds(): string[] {
+    return this.getPinnedRowIdsImpl();
+  }
+
+  private getPinnedRowIdsImpl(): string[] {
+    return this.tableState.pinnedRows.map((rs) => rs.row.id);
   }
 
   public setVisibleColumns(ids: string[]) {

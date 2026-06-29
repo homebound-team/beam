@@ -1,69 +1,87 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { ReactNode, useRef, useState } from "react";
 import { Icon, IconKey, maybeTooltip } from "src/components";
-import { Css, Margin, Only, Xss } from "src/Css";
+import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
-export type TagProps<X> = {
+
+type TagPropsBase<X> = {
   text: ReactNode;
   // Defaults to "neutral"
   type?: TagType;
   xss?: X;
-  icon?: IconKey;
   /** A tooltip will automatically be displayed if the text is truncated. Set to true to prevent this behavior.
    * @default false */
   preventTooltip?: boolean;
 };
 
+/** When `iconOnly`, `icon` is required — the tag renders only the icon; `text` stays for tooltip/a11y. */
+export type TagProps<X> = TagPropsBase<X> & ({ iconOnly?: false; icon?: IconKey } | { iconOnly: true; icon: IconKey });
+
 /** Tag used for indicating a status */
 export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
-  const { text, type, xss, preventTooltip = false, ...otherProps } = props;
-  const typeStyles = getStyles(type);
+  const { text, type, xss, preventTooltip = false, iconOnly, icon, ...otherProps } = props;
+  const isIconOnly = !!iconOnly && !!icon;
+  const { background, iconColor } = getStyles(type);
   const tid = useTestIds(otherProps);
   const [showTooltip, setShowTooltip] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   useResizeObserver({
     ref,
     onResize: () => {
-      if (ref.current) {
+      if (!isIconOnly && ref.current) {
         setShowTooltip(ref.current.offsetHeight < ref.current.scrollHeight);
       }
     },
   });
 
+  const tooltipTitle = !preventTooltip ? (isIconOnly ? text : showTooltip ? text : undefined) : undefined;
+
   return maybeTooltip({
-    title: !preventTooltip && showTooltip ? text : undefined,
+    title: tooltipTitle,
     children: (
-      <span {...tid} css={{ ...Css.dif.xs2Sb.ttu.aic.gapPx(4).pxPx(6).pyPx(2).gray900.br4.$, ...typeStyles, ...xss }}>
+      <span
+        {...tid}
+        css={{
+          ...Css.relative.dif.xs2Sb.ttu.aic.gapPx(4).pyPx(2).gray900.br4.$,
+          ...(isIconOnly ? Css.pxPx(2).$ : Css.pxPx(6).$),
+          ...background,
+          ...xss,
+        }}
+      >
         {/* Nesting `lineClamp` styles as the padding bottom set would expose the remainder of the text if applied on the same element */}
         {/* Using `lineClamp1` instead of `truncate` as `truncate` requires a width set to properly truncate and `lineClamp` can smartly do it based on the parent's width */}
-        {otherProps.icon && (
+        {icon && (
           <span css={Css.fs0.$}>
-            <Icon icon={otherProps.icon} inc={1.5} />
+            <Icon icon={icon} inc={1.75} color={iconColor} />
           </span>
         )}
-        <span ref={ref} css={Css.lineClamp1.wbba.$}>
-          {text}
-        </span>
+        {isIconOnly ? (
+          <span css={Css.visuallyHidden.$}>{text}</span>
+        ) : (
+          <span ref={ref} css={Css.lineClamp1.wbba.$}>
+            {text}
+          </span>
+        )}
       </span>
     ),
   });
 }
 
-function getStyles(type?: TagType) {
+function getStyles(type?: TagType): { background: Properties; iconColor: Palette } {
   switch (type) {
     case "info":
-      return Css.bgBlue100.$;
+      return { background: Css.bgBlue100.$, iconColor: Palette.Blue600 };
     case "caution":
-      return Css.bgYellow200.$;
+      return { background: Css.bgYellow200.$, iconColor: Palette.Yellow700 };
     case "warning":
-      return Css.bgRed200.$;
+      return { background: Css.bgRed200.$, iconColor: Palette.Orange700 };
     case "success":
-      return Css.bgGreen200.$;
+      return { background: Css.bgGreen200.$, iconColor: Palette.Green600 };
     default:
       // Neutral case
-      return Css.bgGray200.$;
+      return { background: Css.bgGray200.$, iconColor: Palette.Gray700 };
   }
 }

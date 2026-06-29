@@ -22,6 +22,7 @@ import {
   generateColumnId,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
+  pinColumn,
   selectColumn,
   sumColumnSizesPx,
   withColumnGutters,
@@ -857,7 +858,7 @@ describe("GridTable", () => {
       ).rejects.toThrow("Column 0 passed an unsortable value, use GridCellContent or clientSideSort=false");
     });
 
-    it("can pin rows and filter - filterable pin", async () => {
+    it("can fixedSort rows and filter (filterable)", async () => {
       // Given the table with 3 rows with pins
       const r = await render(
         <GridTable<Row>
@@ -867,11 +868,11 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // pin that is filterable
-            { kind: "data", id: "1", pin: { at: "first", filter: true }, data: { name: "a", value: 11 } },
+            { kind: "data", id: "1", fixedSort: { at: "first", filter: true }, data: { name: "a", value: 11 } },
             // pin that is not filterable
-            { kind: "data", id: "2", pin: { at: "first", filter: false }, data: { name: "b", value: 10 } },
+            { kind: "data", id: "2", fixedSort: { at: "first", filter: false }, data: { name: "b", value: 10 } },
             // traditional pin that by default is not filterable
-            { kind: "data", id: "3", pin: "first", data: { name: "c", value: 3 } },
+            { kind: "data", id: "3", fixedSort: "first", data: { name: "c", value: 3 } },
           ]}
         />,
       );
@@ -986,7 +987,7 @@ describe("GridTable", () => {
       expect(r.sortHeader_icon_0).toBeVisible();
     });
 
-    it("can pin rows first", async () => {
+    it("can fixedSort rows first", async () => {
       // Given the table is using client-side sorting
       const r = await render(
         <GridTable<Row>
@@ -995,14 +996,14 @@ describe("GridTable", () => {
           rows={[
             simpleHeader,
             // And the 1st row is pinned first
-            { kind: "data", id: "1", pin: "first", data: { name: "a", value: 11 } },
-            { kind: "data", id: "2", pin: "first", data: { name: "b", value: 10 } },
+            { kind: "data", id: "1", fixedSort: "first", data: { name: "a", value: 11 } },
+            { kind: "data", id: "2", fixedSort: "first", data: { name: "b", value: 10 } },
             // And the middle rows need sorted
             { kind: "data", id: "3", data: { name: "c", value: 3 } },
             { kind: "data", id: "4", data: { name: "d", value: 1 } },
             // And the last rows are pinned last
-            { kind: "data", id: "5", pin: "last", data: { name: "e", value: 20 } },
-            { kind: "data", id: "6", pin: "last", data: { name: "f", value: 21 } },
+            { kind: "data", id: "5", fixedSort: "last", data: { name: "e", value: 20 } },
+            { kind: "data", id: "6", fixedSort: "last", data: { name: "f", value: 21 } },
           ]}
         />,
       );
@@ -1017,7 +1018,7 @@ describe("GridTable", () => {
       expect(cell(r, 6, 0)).toHaveTextContent("f");
     });
 
-    it("can pin rows last", async () => {
+    it("can fixedSort rows last", async () => {
       // Given the table is using client-side sorting
       const r = await render(
         <GridTable<Row>
@@ -1028,7 +1029,7 @@ describe("GridTable", () => {
             { kind: "data", id: "3", data: { name: "c", value: 3 } },
             { kind: "data", id: "2", data: { name: "b", value: 2 } },
             // And the last row is pinned first
-            { kind: "data", id: "1", pin: "last", data: { name: "a", value: 1 } },
+            { kind: "data", id: "1", fixedSort: "last", data: { name: "a", value: 1 } },
           ]}
         />,
       );
@@ -1036,6 +1037,118 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("b");
       expect(cell(r, 2, 0)).toHaveTextContent("c");
       expect(cell(r, 3, 0)).toHaveTextContent("a");
+    });
+  });
+
+  describe("row pinning", () => {
+    const pinRows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      { kind: "data", id: "3", data: { name: "zaz", value: 3 } },
+    ];
+
+    it("pins a row via the api, hoisting it to the top and de-duplicating it", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+
+      // Nothing pinned initially
+      expect(api.getPinnedRowIds()).toEqual([]);
+      expect(api.isPinnedRow("2")).toBe(false);
+
+      // When we pin row 2 (bar)
+      act(() => api.pinRow("2"));
+
+      // Then it's reported as pinned
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      expect(api.isPinnedRow("2")).toBe(true);
+      // And hoisted to the top (row 1, under the header), with the body now just foo/zaz — i.e.
+      // "bar" is not duplicated back into the body (positional layout, like the filter tests above).
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(cell(r, 3, 0)).toHaveTextContent("zaz");
+      // And the pinned row gets the green highlight (`Green50` = #ecfdf5)
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Green50 });
+    });
+
+    it("keeps a pinned row visible even when a filter would hide it", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+      act(() => api.pinRow("2")); // bar
+
+      // When a filter matches only "foo"
+      await r.rerender(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} filter="foo" />);
+
+      // Then the pinned "bar" stays visible at the top despite the filter, "foo" shows in the body,
+      // and the unpinned non-match "zaz" is hidden.
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(r.queryByText("zaz")).not.toBeInTheDocument();
+    });
+
+    it("can unpin and toggle a row's pin", async () => {
+      const api = new GridTableApiImpl<Row>();
+      await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+
+      act(() => api.pinRow("2"));
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      act(() => api.unpinRow("2"));
+      expect(api.getPinnedRowIds()).toEqual([]);
+
+      act(() => api.togglePinnedRow("3"));
+      expect(api.getPinnedRowIds()).toEqual(["3"]);
+      act(() => api.togglePinnedRow("3"));
+      expect(api.getPinnedRowIds()).toEqual([]);
+    });
+
+    it("pins a row on initial load via initPinned", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+            { kind: "data", id: "2", initPinned: true, data: { name: "bar", value: 2 } },
+            { kind: "data", id: "3", data: { name: "zaz", value: 3 } },
+          ]}
+        />,
+      );
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+    });
+
+    it("renders pinColumn toggles on data rows (not the header) and toggles on click", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row> api={api} columns={[pinColumn<Row>(), nameColumn, valueColumn]} rows={pinRows} />,
+      );
+
+      // The header has no pin toggle (emptyCell), but each data row has a row-scoped one
+      expect(r.query.pin_header).toBeNull();
+      expect(r.query.pin_1).toBeTruthy();
+
+      // When we click row 1's toggle, it pins + hoists to the top
+      click(r.pin_1);
+      expect(api.getPinnedRowIds()).toEqual(["1"]);
+      expect(cell(r, 1, 1)).toHaveTextContent("foo");
+
+      // And clicking again unpins (the testid is row-scoped, so it stays stable despite the move)
+      click(r.pin_1);
+      expect(api.getPinnedRowIds()).toEqual([]);
+    });
+
+    it("does not hoist (or hide) a reserved row when it is pinned", async () => {
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+
+      // Pinning a reserved row (e.g. the header) is excluded from the pinned section, and the body
+      // de-dup is sourced from that same set — so the header stays in place rather than vanishing.
+      act(() => api.pinRow("header"));
+      expect(api.getPinnedRowIds()).toEqual([]);
+      expect(cell(r, 0, 0)).toHaveTextContent("Name");
+      expect(cell(r, 1, 0)).toHaveTextContent("foo");
     });
   });
 

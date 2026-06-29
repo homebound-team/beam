@@ -1,6 +1,7 @@
 import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
 import { OverlayProvider } from "react-aria";
 import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
+import { DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
@@ -12,7 +13,7 @@ import { RightPaneProvider } from "./Layout";
 import { ToastProvider } from "./Toast/ToastContext";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
-export interface BeamContextState {
+export type BeamContextState = {
   modalState: MutableRefObject<ModalProps | undefined>;
   modalCanCloseChecks: MutableRefObject<CheckFn[]>;
   /** The div for ModalHeader to portal into. */
@@ -29,7 +30,7 @@ export interface BeamContextState {
   drawerCanCloseDetailsChecks: MutableRefObject<CanCloseCheck[][]>;
   /** The div for SuperDrawerHeader to portal into. */
   sdHeaderDiv: HTMLDivElement;
-}
+};
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
 export const BeamContext = createContext<BeamContextState>({
@@ -44,9 +45,11 @@ export const BeamContext = createContext<BeamContextState>({
   sdHeaderDiv: undefined!,
 });
 
-interface BeamProviderProps extends PropsWithChildren<PresentationContextProps> {}
+type BeamProviderProps = {
+  documentTitleConfig?: DocumentTitleConfig;
+} & PropsWithChildren<PresentationContextProps>;
 
-export function BeamProvider({ children, ...presentationProps }: BeamProviderProps) {
+export function BeamProvider({ children, documentTitleConfig, ...presentationProps }: BeamProviderProps) {
   // We want the identity of these to be stable, b/c they end up being used as dependencies
   // in both useModal's and useSuperDrawer's return values, which means the end-application's
   // dependencies as well, i.e. things like GridTable rowStyles will memoize on openInDrawer.
@@ -85,24 +88,32 @@ export function BeamProvider({ children, ...presentationProps }: BeamProviderPro
     };
   }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
 
+  const beamTree = (
+    <PresentationProvider {...presentationProps}>
+      <RightPaneProvider>
+        <AutoSaveStatusProvider>
+          <SnackbarProvider>
+            {/* OverlayProvider is required for Modals generated via React-Aria */}
+            <ToastProvider>
+              <OverlayProvider>
+                {children}
+                {modalRef.current && <Modal {...modalRef.current} />}
+              </OverlayProvider>
+              <SuperDrawer />
+            </ToastProvider>
+          </SnackbarProvider>
+        </AutoSaveStatusProvider>
+      </RightPaneProvider>
+    </PresentationProvider>
+  );
+
   return (
     <BeamContext.Provider value={{ ...context }}>
-      <PresentationProvider {...presentationProps}>
-        <RightPaneProvider>
-          <AutoSaveStatusProvider>
-            <SnackbarProvider>
-              {/* OverlayProvider is required for Modals generated via React-Aria */}
-              <ToastProvider>
-                <OverlayProvider>
-                  {children}
-                  {modalRef.current && <Modal {...modalRef.current} />}
-                </OverlayProvider>
-                <SuperDrawer />
-              </ToastProvider>
-            </SnackbarProvider>
-          </AutoSaveStatusProvider>
-        </RightPaneProvider>
-      </PresentationProvider>
+      {documentTitleConfig ? (
+        <DocumentTitleProvider {...documentTitleConfig}>{beamTree}</DocumentTitleProvider>
+      ) : (
+        beamTree
+      )}
     </BeamContext.Provider>
   );
 }

@@ -1,7 +1,7 @@
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "src/layouts/layoutVars";
-import { render } from "src/utils/rtl";
+import { mockDocumentViewport, render } from "src/utils/rtl";
 
 describe("DocumentScrollLayoutProvider", () => {
   it("publishes viewport CSS vars on the measurement root when rendered standalone", async () => {
@@ -59,11 +59,6 @@ describe("PageHeaderLayout viewport coordination", () => {
     expect(r.pageHeaderLayout_pageHeader).toBeInTheDocument();
   });
 });
-
-function mockDocumentViewport(width: number, height: number): void {
-  Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: () => width });
-  Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: () => height });
-}
 
 function findViewportRoot(container: HTMLElement): HTMLElement | undefined {
   return findAllViewportRoots(container)[0];

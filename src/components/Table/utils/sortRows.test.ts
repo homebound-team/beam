@@ -83,15 +83,15 @@ describe("sortRows", () => {
     expect(rowsToIdArray(sorted)).toEqual(["2", "2.2", "2.1", "2.3", "1", "header", "3"]);
   });
 
-  it("does not sort within pinned rows", () => {
+  it("does not sort within fixed-sorted rows", () => {
     // Given a set of unsorted rows
     const rows: GridDataRow<Row>[] = [
-      // And this row is not pinned, so should come last
+      // And this row is not fixed-sorted, so should come last
       { kind: "parent", id: "3", data: { name: "a" } },
-      // And this row is pinned, so should come first
-      { kind: "parent", id: "2", data: { name: "c" }, pin: "first" },
-      // And this row is pinned and also before the other pin
-      { kind: "parent", id: "1", data: { name: "b" }, pin: "first" },
+      // And this row is fixed-sorted, so should come first
+      { kind: "parent", id: "2", data: { name: "c" }, fixedSort: "first" },
+      // And this row is fixed-sorted and also before the other
+      { kind: "parent", id: "1", data: { name: "b" }, fixedSort: "first" },
     ];
     // When sorting them in descending order based on the name property
     const sorted = sortRows([nameColumn], rows, { current: { columnId: nameColumn.id, direction: "ASC" } }, true);

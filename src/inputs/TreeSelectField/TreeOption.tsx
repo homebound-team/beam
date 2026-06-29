@@ -2,7 +2,7 @@ import { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useOption } from "react-aria";
 import { ListState } from "react-stately";
-import { Icon } from "src/components";
+import { Icon, maybeTooltip } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -14,10 +14,12 @@ type TreeOptionProps<O> = {
   item: Node<LeveledOption<O>>;
   state: ListState<O>;
   allowCollapsing?: boolean;
+  /** When the option is disabled, the reason shown as a tooltip on hover. */
+  disabledReason?: string;
 };
 /** Represents a single option within a ListBox - used by SelectField, MultiSelectField, and TreeSelectField */
 export function TreeOption<O>(props: TreeOptionProps<O>) {
-  const { item, state, allowCollapsing = true } = props;
+  const { item, state, allowCollapsing = true, disabledReason } = props;
   const leveledOption = item.value;
   if (!leveledOption) return null;
 
@@ -64,54 +66,58 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
     focus: Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$,
   };
 
-  return (
-    <li
-      {...hoverProps}
-      onClick={(e) => {
-        if (!isGroup) return;
-        e.preventDefault();
-        e.stopPropagation();
-        toggleCollapsed();
-      }}
-      css={{
-        ...Css.df.aic.jcsb.gap1.pl2.mh("42px").outline0.cursorPointer.sm.plPx(16 + level * 8).$,
-        ...listItemStyles.item,
-        ...(isHovered && (!isDisabled || isGroup) ? listItemStyles.hover : {}),
-        ...(isFocused && !isGroup ? listItemStyles.focus : {}),
-        ...(isDisabled && !isGroup ? listItemStyles.disabled : {}),
-      }}
-    >
-      {allowCollapsing && (
-        <span css={Css.wPx(18).fs0.df.aic.$}>
-          {canCollapse && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleCollapsed();
-                return false;
-              }}
-              css={Css.br4.hPx(16).wPx(16).bgTransparent.onHover.bgGray300.$}
-              {...tid[`collapseToggle_${item.key}`]}
-            >
-              <Icon icon={collapsedKeys.includes(item.key) ? "triangleRight" : "triangleDown"} inc={2} />
-            </button>
-          )}
-        </span>
-      )}
-      <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps} data-label={item.textValue}>
-        {!isGroup && (
-          <StyledCheckbox
-            isDisabled={isDisabled}
-            isSelected={isSelected}
-            isIndeterminate={isIndeterminate}
-            {...tid[item.key.toString()]}
-          />
+  return maybeTooltip({
+    title: !isGroup ? disabledReason : undefined,
+    placement: "right",
+    children: (
+      <li
+        {...hoverProps}
+        onClick={(e) => {
+          if (!isGroup) return;
+          e.preventDefault();
+          e.stopPropagation();
+          toggleCollapsed();
+        }}
+        css={{
+          ...Css.df.aic.jcsb.gap1.pl2.mh("42px").outline0.cursorPointer.sm.plPx(16 + level * 8).$,
+          ...listItemStyles.item,
+          ...(isHovered && (!isDisabled || isGroup) ? listItemStyles.hover : {}),
+          ...(isFocused && !isGroup ? listItemStyles.focus : {}),
+          ...(isDisabled && !isGroup ? listItemStyles.disabled : {}),
+        }}
+      >
+        {allowCollapsing && (
+          <span css={Css.wPx(18).fs0.df.aic.$}>
+            {canCollapse && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleCollapsed();
+                  return false;
+                }}
+                css={Css.br4.hPx(16).wPx(16).bgTransparent.onHover.bgGray300.$}
+                {...tid[`collapseToggle_${item.key}`]}
+              >
+                <Icon icon={collapsedKeys.includes(item.key) ? "triangleRight" : "triangleDown"} inc={2} />
+              </button>
+            )}
+          </span>
         )}
-        <div css={Css.pl1.$}>{item.rendered}</div>
-      </span>
-    </li>
-  );
+        <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps} data-label={item.textValue}>
+          {!isGroup && (
+            <StyledCheckbox
+              isDisabled={isDisabled}
+              isSelected={isSelected}
+              isIndeterminate={isIndeterminate}
+              {...tid[item.key.toString()]}
+            />
+          )}
+          <div css={Css.pl1.$}>{item.rendered}</div>
+        </span>
+      </li>
+    ),
+  });
 }
 
 function hasSelectedChildren<O, V extends Value>(

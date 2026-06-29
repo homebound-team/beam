@@ -1,4 +1,5 @@
 import { configure } from "mobx";
+import { resetWindowScroll } from "src/tests/documentScroll";
 import "src/tests/framerMotion";
 import "src/tests/matchers";
 import { resetViewport } from "src/tests/viewport";
@@ -14,6 +15,8 @@ beforeEach(() => {
   localStorage.clear();
   // Reset to a desktop viewport so a viewport set in one test can't leak into the next.
   resetViewport();
+  resetWindowScroll();
+  vi.restoreAllMocks();
 });
 afterEach(() => vi.useRealTimers());
 
