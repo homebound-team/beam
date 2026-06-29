@@ -100,15 +100,12 @@ function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G ex
             />
           )}
 
-          {/* Small screen: filter button (icon + badge, no label text) */}
+          {/* Small screen: filter icon toggle */}
           {sm && hasFilters && (
-            <Button
-              label=""
-              variant="secondaryBlack"
-              size="md"
+            <IconButton
+              variant="outline"
               icon="filter"
-              aria-label="Filter"
-              endAdornment={activeFilterCount > 0 ? <CountBadge count={activeFilterCount} /> : undefined}
+              label="Filter"
               onClick={() => setShowFilters(!showFilters)}
               active={showFilters}
               {...testId.button}

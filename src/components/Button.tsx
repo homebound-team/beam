@@ -84,12 +84,9 @@ export function Button(props: ButtonProps) {
     () => getButtonStyles(variant, size),
     [variant, size],
   );
-  const isIconOnly = !label && !endAdornment;
-  const hasLabel = !!label;
-
   const buttonContent = (
     <>
-      {icon && <Icon xss={hasLabel ? iconStyles[size] : undefined} icon={icon} />}
+      {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {labelInFlight && asyncInProgress ? labelInFlight : label}
       {(endAdornment || asyncInProgress) && (
         <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} /> : endAdornment}</span>
@@ -105,7 +102,7 @@ export function Button(props: ButtonProps) {
     className: asLink ? navLink : undefined,
     ...Css.props({
       ...Css.buttonBase.tt("inherit").$,
-      ...(isIconOnly ? { ...baseStyles, ...iconOnlySizeStyles[size] } : baseStyles),
+      ...baseStyles,
       ...(isHovered && !isPressed && !active ? hoverStyles : {}),
       ...(isPressed || active ? pressedStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
@@ -228,12 +225,6 @@ const sizeStyles: Record<ButtonSize, Properties> = {
   sm: Css.hPx(32).pxPx(12).$,
   md: Css.hPx(40).px2.$,
   lg: Css.hPx(48).px3.$,
-};
-
-const iconOnlySizeStyles: Record<ButtonSize, Properties> = {
-  sm: Css.wPx(34).p0.jcc.$,
-  md: Css.wPx(42).p0.jcc.$,
-  lg: Css.wPx(50).p0.jcc.$,
 };
 
 const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
