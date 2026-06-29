@@ -42,3 +42,15 @@ export function WithAnIcon() {
     </div>
   );
 }
+
+export function IconOnly() {
+  return (
+    <div css={Css.df.fdc.aifs.gap1.$}>
+      <Tag text="Neutral" icon="helpCircle" iconOnly />
+      <Tag text="Information" type="info" icon="infoCircle" iconOnly />
+      <Tag text="Caution" type="caution" icon="infoCircle" iconOnly />
+      <Tag text="Warning" type="warning" icon="error" iconOnly />
+      <Tag text="Success" type="success" icon="checkCircle" iconOnly />
+    </div>
+  );
+}
