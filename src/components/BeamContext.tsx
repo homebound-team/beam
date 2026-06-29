@@ -131,7 +131,7 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
               <ToastProvider>
                 <OverlayProvider>
                   {children}
-                  {!hasOverlayHost && <BeamOverlaysContent />}
+                  {!hasOverlayHost && <BeamOverlaysContent /> // fallback for Overlays when opted-out of <BeamOverlays>}
                 </OverlayProvider>
               </ToastProvider>
             </SnackbarProvider>
