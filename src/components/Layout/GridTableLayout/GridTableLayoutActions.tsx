@@ -135,7 +135,7 @@ function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G ex
       </div>
 
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
-      {sm && showSearch && hasSearch && <div css={Css.pl3.$}>{searchTextField}</div>}
+      {sm && showSearch && hasSearch && <div css={Css.pl3.pr3.$}>{searchTextField}</div>}
 
       {/* Combined filter panel — controls when open, chips when closed */}
       {hasFilters && (
@@ -204,7 +204,10 @@ function FilterPanel<F extends Record<string, unknown>, G extends Value = string
         : null;
 
     return (
-      <div style={{ scrollbarWidth: "auto" }} css={sm ? Css.df.gap1.aic.oxa.mw0.pl3.$ : Css.df.fww.gap1.aic.pl3.$}>
+      <div
+        style={{ scrollbarWidth: "none" }}
+        css={sm ? Css.df.gap1.aic.oxa.mw0.pl3.pr3.$ : Css.df.fww.gap1.aic.pl3.pr3.$}
+      >
         {groupBy && (
           <SelectField
             label="Group by"
@@ -230,7 +233,7 @@ function FilterPanel<F extends Record<string, unknown>, G extends Value = string
   if (chips.length === 0) return null;
 
   return (
-    <div css={Css.df.gap1.fww.aic.$}>
+    <div css={Css.df.gap1.aic.pl3.oxa.mw0.if(!sm).fww.$}>
       {chips}
       <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
     </div>
