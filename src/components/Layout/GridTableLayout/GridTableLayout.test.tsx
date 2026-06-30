@@ -67,7 +67,7 @@ describe("GridTableLayout", () => {
 
     // And the table actions to be rendered
     expect(r.search).toHaveValue("");
-    expect(r.filter_button).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -123,7 +123,7 @@ describe("GridTableLayout", () => {
     // And the search to not be rended
     expect(r.query.search).not.toBeInTheDocument();
     // But the filter button still is
-    expect(r.filter_button).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -271,14 +271,14 @@ describe("GridTableLayout", () => {
       );
 
       // Then EditColumnsButton is visible in list view
-      expect(r.editColumnsButton).toBeInTheDocument();
+      expect(r.kanban).toBeInTheDocument();
 
       // When switching to card view
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
       // Then EditColumnsButton is hidden in card view
-      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+      expect(r.query.kanban).not.toBeInTheDocument();
     });
 
     it("persists view selection to localStorage when toggled", async () => {
@@ -321,7 +321,7 @@ describe("GridTableLayout", () => {
       );
 
       // Card view is restored from localStorage — EditColumnsButton is hidden in card view
-      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+      expect(r.query.kanban).not.toBeInTheDocument();
     });
 
     it("does not persist view when withCardView is undefined", async () => {
@@ -360,7 +360,7 @@ describe("GridTableLayout", () => {
       );
 
       // Falls back to defaultView="list" — EditColumnsButton is visible in list view
-      expect(r.editColumnsButton).toBeInTheDocument();
+      expect(r.kanban).toBeInTheDocument();
     });
 
     it("renders card content using cardSlot columns when switched to card view", async () => {

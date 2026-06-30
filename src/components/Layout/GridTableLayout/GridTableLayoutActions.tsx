@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import { FilterDefs, FilterImpls, filterTestIdPrefix } from "src/components/Filters";
+import { FilterDefs, FilterImpls } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
@@ -62,7 +62,7 @@ function GridTableLayoutActionsComponent<
     view,
     setView,
   } = props;
-  const testId = useTestIds(props, filterTestIdPrefix);
+  const testId = useTestIds(props, "gridTableLayoutActions");
 
   const { sm } = useBreakpoint();
   const inDocumentScrollLayout = useDocumentScrollLayout();

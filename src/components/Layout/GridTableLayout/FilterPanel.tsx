@@ -13,6 +13,7 @@ import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
+import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
 
 type FilterPanelProps<F extends Record<string, unknown>, G extends Value = string> = {
@@ -40,6 +41,7 @@ export function FilterPanel<F extends Record<string, unknown>, G extends Value =
 }: FilterPanelProps<F, G>) {
   const { sm } = useBreakpoint();
   const testId = useTestIds({}, filterTestIdPrefix);
+  const inDocumentScrollLayout = useDocumentScrollLayout();
 
   if (isOpen) {
     const filterControls =
@@ -59,7 +61,11 @@ export function FilterPanel<F extends Record<string, unknown>, G extends Value =
     return (
       <div
         style={{ scrollbarWidth: "none" }}
-        css={sm ? Css.df.gap1.aic.oxa.mw0.pl3.pr3.$ : Css.df.fww.gap1.aic.pl3.pr3.$}
+        css={
+          sm
+            ? Css.df.gap1.aic.oxa.mw0.if(inDocumentScrollLayout).px3.$
+            : Css.df.fww.gap1.aic.if(inDocumentScrollLayout).px3.$
+        }
       >
         {groupBy && (
           <SelectField
@@ -86,7 +92,7 @@ export function FilterPanel<F extends Record<string, unknown>, G extends Value =
   if (chips.length === 0) return null;
 
   return (
-    <div css={Css.df.gap1.aic.pl3.oxa.mw0.if(!sm).fww.$}>
+    <div css={Css.df.gap1.aic.oxa.mw0.fww.if(inDocumentScrollLayout).pl3.$}>
       {chips}
       <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
     </div>
