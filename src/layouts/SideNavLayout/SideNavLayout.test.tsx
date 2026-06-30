@@ -8,7 +8,7 @@ import { setViewport } from "src/tests/viewport";
 import { click, render } from "src/utils/rtl";
 
 const items: AppNavItem[] = [
-  { label: "Dashboard", icon: "kanban", onClick: () => {}, active: true },
+  { label: "Dashboard", icon: "columns", onClick: () => {}, active: true },
   { label: "Projects", icon: "search", onClick: () => {} },
 ];
 

@@ -95,7 +95,7 @@ function sideNavItems(): AppNavItem[] {
       section: true,
       label: "Main",
       items: [
-        { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+        { label: "Dashboard", icon: "columns", onClick: "/", active: true },
         { label: "Schedule", icon: "calendar", onClick: "/schedule" },
         { label: "Commitments", icon: "fileBlank", onClick: "/commitments" },
         { label: "Documents", icon: "comment", onClick: "/documents" },

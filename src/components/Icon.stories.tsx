@@ -51,7 +51,7 @@ export const Icon = (props: IconProps) => {
     "unarchive",
     "duplicate",
     "filter",
-    "kanban",
+    "columns",
     "expand",
     "collapse",
     "undoCircle",
