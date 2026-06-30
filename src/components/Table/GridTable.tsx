@@ -57,6 +57,9 @@ export function setRunningInJest() {
   runningInJest = true;
 }
 
+const CARD_MIN_WIDTH_PX = 280;
+const CARD_MAX_WIDTH_PX = 380;
+
 export type GridTableDefaults = {
   style: GridStyle | GridStyleDef;
   stickyHeader: boolean;
@@ -1083,7 +1086,11 @@ function CardView({
   if (runningInJest) {
     return (
       <div css={Css.py2.$}>
-        <div css={Css.dg.gtc("repeat(auto-fill, 330px)").jcc.gap3.p3.$}>{cardRows}</div>
+        <div
+          css={Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, ${CARD_MAX_WIDTH_PX}px))`).jcc.gap3.p3.$}
+        >
+          {cardRows}
+        </div>
       </div>
     );
   }
@@ -1102,7 +1109,14 @@ function CardView({
           List: React.forwardRef<HTMLDivElement, { style?: React.CSSProperties; children?: ReactNode }>(
             function CardList({ style, children }, ref) {
               return (
-                <div ref={ref} style={style} css={Css.dg.gtc("repeat(auto-fill, 330px)").jcc.gap3.p3.$}>
+                <div
+                  ref={ref}
+                  style={style}
+                  css={
+                    Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, ${CARD_MAX_WIDTH_PX}px))`).jcc.gap3.p3
+                      .$
+                  }
+                >
                   {children}
                 </div>
               );
