@@ -124,7 +124,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
       {sm && hasSearch && (
         <IconButton
           variant="outline"
-          icon="search"
+          icon={searchValue ? "searchWithDot" : "search"}
           label="Search"
           onClick={() => setSearchIsOpen(!searchIsOpen)}
           active={searchIsOpen}
@@ -136,7 +136,7 @@ function FilterDropdownMenu<F extends Record<string, unknown>, G extends Value =
       {sm && hasFilters && (
         <IconButton
           variant="outline"
-          icon="filter"
+          icon={activeFilterCount > 0 ? "filterWithDot" : "filter"}
           label="Filter"
           active={isOpen}
           onClick={() => setIsOpen(!isOpen)}
