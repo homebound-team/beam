@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { Icon as IconComponent, IconProps } from "src";
 import { Css, Palette } from "src/Css";
+import { withBeamDecorator } from "src/utils/sb";
 
 export default {
   component: IconComponent,
@@ -14,6 +15,7 @@ export default {
     },
   },
   parameters: { controls: { exclude: ["xss", "icon", "inc"] } },
+  decorators: [withBeamDecorator],
 } as Meta<IconProps>;
 
 export const Icon = (props: IconProps) => {
@@ -59,6 +61,9 @@ export const Icon = (props: IconProps) => {
     "remove",
     "pin",
     "impersonate",
+    "columnsWithDot",
+    "searchWithDot",
+    "filterWithDot",
   ];
   const alertIcons: IconProps["icon"][] = [
     "errorCircle",
