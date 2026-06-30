@@ -58,7 +58,7 @@ export function setRunningInJest() {
 }
 
 const CARD_MIN_WIDTH_PX = 280;
-const CARD_MAX_WIDTH_PX = 380;
+const CARD_MAX_WIDTH_PX = 330;
 
 export type GridTableDefaults = {
   style: GridStyle | GridStyleDef;
