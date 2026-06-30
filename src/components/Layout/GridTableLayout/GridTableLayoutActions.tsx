@@ -1,50 +1,67 @@
-import { memo, ReactNode, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import {
-  DefinedFilterValue,
-  Filter,
-  FilterDefs,
-  FilterImpls,
-  filterTestIdPrefix,
-  SelectedFilterLabelValue,
-  updateFilter,
-} from "src/components/Filters";
+import { FilterDefs, FilterImpls, filterTestIdPrefix } from "src/components/Filters";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
-import { ToggleChip } from "src/components/ToggleChip";
+import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
+import { GridTableApi } from "src/components/Table/GridTableApi";
+import { GridColumn, Kinded } from "src/components/Table/types";
 import { Css, Palette } from "src/Css";
 import { useBreakpoint } from "src/hooks";
-import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
+import { useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
+import { buildFilterImpls, FilterPanel, getActiveFilterCount } from "./FilterPanel";
 
 export type SearchBoxProps = {
   onSearch: (filter: string) => void;
 };
 
-type GridTableLayoutActionsProps<F extends Record<string, unknown>, G extends Value = string> = {
+type GridTableLayoutActionsProps<
+  F extends Record<string, unknown>,
+  G extends Value = string,
+  R extends Kinded = Kinded,
+> = {
   filterDefs?: FilterDefs<F>;
   filter?: F;
-  onChange?: (filter: F) => void;
+  setFilter?: (filter: F) => void;
   groupBy?: {
     value: G;
     setValue: (groupBy: G) => void;
     options: Array<{ id: G; name: string }>;
   };
   searchProps?: SearchBoxProps;
-  /** Content pinned right in the actions bar (e.g., Edit Columns, View Toggle). */
-  right?: ReactNode;
+  hasHideableColumns?: boolean;
+  columns?: GridColumn<R>[];
+  api?: GridTableApi<R>;
+  withCardView?: boolean;
+  view?: TableView;
+  setView?: (v: TableView) => void;
 };
 
-function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G extends Value = string>(
-  props: GridTableLayoutActionsProps<F, G>,
-) {
-  const { filter, onChange, filterDefs, groupBy, searchProps, right } = props;
+function GridTableLayoutActionsComponent<
+  F extends Record<string, unknown>,
+  G extends Value = string,
+  R extends Kinded = Kinded,
+>(props: GridTableLayoutActionsProps<F, G, R>) {
+  const {
+    filter,
+    setFilter,
+    filterDefs,
+    groupBy,
+    searchProps,
+    hasHideableColumns,
+    columns,
+    api,
+    withCardView,
+    view,
+    setView,
+  } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
   const { sm } = useBreakpoint();
@@ -83,8 +100,8 @@ function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G ex
 
   return (
     <div css={Css.df.fdc.gap1.pb1.$}>
-      <div css={Css.df.gap1.aic.jcsb.aifs.pt3.if(inDocumentScrollLayout).pl3.pr3.$}>
-        <div css={Css.df.gap1.aic.fww.$}>
+      <div css={Css.df.gap1.aic.jcsb.aifs.pt3.if(inDocumentScrollLayout).px3.$}>
+        <div css={Css.df.gap1.aic.$}>
           {/* Large screen: 244px inline search field */}
           {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
 
@@ -108,7 +125,7 @@ function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G ex
               label="Filter"
               onClick={() => setShowFilters(!showFilters)}
               active={showFilters}
-              {...testId.button}
+              {...testId.filterSmallButton}
             />
           )}
 
@@ -127,28 +144,33 @@ function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G ex
               variant="secondaryBlack"
               onClick={() => setShowFilters(!showFilters)}
               active={showFilters}
-              {...testId.button}
+              {...testId.filterButton}
             />
           )}
         </div>
-        {right}
+        {(hasHideableColumns || withCardView) && (
+          <div css={Css.df.gap1.$}>
+            {hasHideableColumns && view === "list" && columns && api && (
+              <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
+            )}
+            {withCardView && view !== undefined && setView && <ViewToggleButton view={view} onChange={setView} />}
+          </div>
+        )}
       </div>
 
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
-      {sm && showSearch && hasSearch && <div css={Css.pl3.pr3.$}>{searchTextField}</div>}
+      {sm && showSearch && <div css={Css.pl3.pr3.$}>{searchTextField}</div>}
 
       {/* Combined filter panel — controls when open, chips when closed */}
       {hasFilters && (
         <FilterPanel
-          sm={sm}
           isOpen={showFilters}
           groupBy={groupBy}
           filterImpls={filterImpls}
           filter={filter}
-          onChange={onChange}
+          setFilter={setFilter}
           activeFilterCount={activeFilterCount}
-          testId={testId}
-          onClear={() => onChange?.({} as F)}
+          onClear={() => setFilter?.({} as F)}
         />
       )}
     </div>
@@ -158,135 +180,3 @@ function GridTableLayoutActionsComponent<F extends Record<string, unknown>, G ex
 // memo doesn't support generic parameters, so cast the result to the correct type
 const _GridTableLayoutActions = memo(GridTableLayoutActionsComponent) as typeof GridTableLayoutActionsComponent;
 export { _GridTableLayoutActions as GridTableLayoutActions };
-
-// --- FilterPanel ---
-
-type FilterPanelProps<F extends Record<string, unknown>, G extends Value = string> = {
-  sm: boolean;
-  isOpen: boolean;
-  groupBy?: {
-    value: G;
-    setValue: (g: G) => void;
-    options: Array<{ id: G; name: string }>;
-  };
-  filterImpls: FilterImpls<F>;
-  filter?: F;
-  onChange?: (filter: F) => void;
-  activeFilterCount: number;
-  testId: ReturnType<typeof useTestIds>;
-  onClear: () => void;
-};
-
-function FilterPanel<F extends Record<string, unknown>, G extends Value = string>({
-  sm,
-  isOpen,
-  groupBy,
-  filterImpls,
-  filter,
-  onChange,
-  activeFilterCount,
-  testId,
-  onClear,
-}: FilterPanelProps<F, G>) {
-  if (isOpen) {
-    const filterControls =
-      filter && onChange
-        ? (() => {
-            const entries = safeEntries(filterImpls);
-            const nonCheckbox = entries.filter(([_, f]) => !f.hideLabelInModal);
-            const checkbox = entries.filter(([_, f]) => f.hideLabelInModal);
-            return [...nonCheckbox, ...checkbox].map(([key, f]: [keyof F, Filter<any>]) => (
-              <div key={key as string}>
-                {f.render(filter[key], (value) => onChange(updateFilter(filter, key, value)), testId, false, false)}
-              </div>
-            ));
-          })()
-        : null;
-
-    return (
-      <div
-        style={{ scrollbarWidth: "none" }}
-        css={sm ? Css.df.gap1.aic.oxa.mw0.pl3.pr3.$ : Css.df.fww.gap1.aic.pl3.pr3.$}
-      >
-        {groupBy && (
-          <SelectField
-            label="Group by"
-            labelStyle="inline"
-            sizeToContent
-            options={groupBy.options}
-            getOptionValue={(o) => o.id}
-            getOptionLabel={(o) => o.name}
-            value={groupBy.value}
-            onSelect={(g) => g && groupBy.setValue(g)}
-          />
-        )}
-        {filterControls}
-        {activeFilterCount > 0 && <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />}
-      </div>
-    );
-  }
-
-  if (!filter || !onChange) return null;
-
-  const chips = safeEntries(filterImpls).flatMap(([key, f]) => chipsForFilterKey(key, f, filter, onChange, testId));
-
-  if (chips.length === 0) return null;
-
-  return (
-    <div css={Css.df.gap1.aic.pl3.oxa.mw0.if(!sm).fww.$}>
-      {chips}
-      <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
-    </div>
-  );
-}
-
-// --- Helpers (adapted from FilterDropdownMenu) ---
-
-function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
-  return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
-}
-
-function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
-  return safeKeys(filter).filter((key) => filter[key] !== undefined).length;
-}
-
-function chipsForFilterKey<F extends Record<string, unknown>, K extends keyof F>(
-  key: K,
-  f: FilterImpls<F>[K],
-  filter: F,
-  onChange: (filter: F) => void,
-  testId: ReturnType<typeof useTestIds>,
-) {
-  const value = filter[key];
-  if (!isDefined(value)) return [];
-
-  if (Array.isArray(value)) {
-    return value.flatMap((item) => {
-      const label = f.formatSelectedFilterLabel(item as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
-      if (!isDefined(label)) return [];
-
-      const chipKey = `${String(key)}_${item}`;
-      const newArray = value.filter((v) => v !== item);
-      return (
-        <ToggleChip
-          key={chipKey}
-          text={label}
-          onClick={() => onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as F[K]) : undefined))}
-          {...testId[`chip_${chipKey}`]}
-        />
-      );
-    });
-  }
-
-  const label = f.formatSelectedFilterLabel(value as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
-  if (!isDefined(label)) return [];
-
-  return (
-    <ToggleChip
-      key={String(key)}
-      text={label}
-      onClick={() => onChange(updateFilter(filter, key, undefined))}
-      {...testId[`chip_${String(key)}`]}
-    />
-  );
-}

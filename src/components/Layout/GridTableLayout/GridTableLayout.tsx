@@ -3,8 +3,7 @@ import React, { ReactNode, RefObject, useCallback, useEffect, useLayoutEffect, u
 import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
-import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
-import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
+import { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { GridTableXss, Kinded } from "src/components/Table/types";
@@ -144,19 +143,15 @@ function GridTableLayoutComponent<
     <GridTableLayoutActions
       filterDefs={layoutState?.filterDefs}
       filter={layoutState?.filter}
-      onChange={layoutState?.setFilter}
+      setFilter={layoutState?.setFilter}
       groupBy={layoutState?.groupBy}
       searchProps={layoutState?.search ? { onSearch: layoutState.setSearchString } : undefined}
-      right={
-        hasHideableColumns || withCardView ? (
-          <div css={Css.df.gap1.$}>
-            {hasHideableColumns && view === "list" && (
-              <EditColumnsButton columns={columns} api={api} tooltip="Display columns" {...tid.editColumnsButton} />
-            )}
-            {withCardView && <ViewToggleButton view={view} onChange={setView} />}
-          </div>
-        ) : undefined
-      }
+      hasHideableColumns={hasHideableColumns}
+      columns={columns}
+      api={api}
+      withCardView={withCardView}
+      view={view}
+      setView={setView}
     />
   );
 
