@@ -31,8 +31,7 @@ type FilterPanelProps<F extends Record<string, unknown>, G extends Value = strin
 export function FilterPanel<F extends Record<string, unknown>, G extends Value = string>(
   props: FilterPanelProps<F, G>,
 ) {
-  if (props.isOpen) return <FilterPanelOpen {...props} />;
-  return <FilterPanelClosed {...props} />;
+  return isOpen ? <FilterPanelOpen {...props} /> : <FilterPanelClosed {...props} />;
 }
 
 function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = string>({
