@@ -100,7 +100,7 @@ function GridTableLayoutActionsComponent<
 
   return (
     <div css={Css.df.fdc.gap1.pb1.$}>
-      <div css={Css.df.gap1.aic.jcsb.aifs.pt3.if(inDocumentScrollLayout).px3.$}>
+      <div css={Css.df.gap1.jcsb.pt3.if(inDocumentScrollLayout).px3.$}>
         <div css={Css.df.gap1.aic.$}>
           {/* Large screen: 244px inline search field */}
           {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
@@ -159,7 +159,7 @@ function GridTableLayoutActionsComponent<
       </div>
 
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
-      {sm && showSearch && <div css={Css.pl3.pr3.$}>{searchTextField}</div>}
+      {sm && showSearch && <div css={Css.px3.$}>{searchTextField}</div>}
 
       {/* Combined filter panel — controls when open, chips when closed */}
       {hasFilters && (
@@ -169,7 +169,6 @@ function GridTableLayoutActionsComponent<
           filterImpls={filterImpls}
           filter={filter}
           setFilter={setFilter}
-          activeFilterCount={activeFilterCount}
           onClear={() => setFilter?.({} as F)}
         />
       )}

@@ -14,14 +14,7 @@ const filterImpls = buildFilterImpls(filterDefs);
 describe("FilterPanel", () => {
   it("renders nothing when closed with no active filters", async () => {
     const r = await render(
-      <FilterPanel
-        isOpen={false}
-        filterImpls={filterImpls}
-        filter={{}}
-        setFilter={vi.fn()}
-        activeFilterCount={0}
-        onClear={vi.fn()}
-      />,
+      <FilterPanel isOpen={false} filterImpls={filterImpls} filter={{}} setFilter={vi.fn()} onClear={vi.fn()} />,
       withRouter(),
     );
     expect(r.query.filter_clearBtn).not.toBeInTheDocument();
@@ -35,7 +28,6 @@ describe("FilterPanel", () => {
         filterImpls={filterImpls}
         filter={{ needsRevision: true }}
         setFilter={vi.fn()}
-        activeFilterCount={1}
         onClear={vi.fn()}
       />,
       withRouter(),
@@ -51,7 +43,6 @@ describe("FilterPanel", () => {
         filterImpls={filterImpls}
         filter={{ needsRevision: true }}
         setFilter={vi.fn()}
-        activeFilterCount={1}
         onClear={vi.fn()}
       />,
       withRouter(),
@@ -59,14 +50,13 @@ describe("FilterPanel", () => {
     expect(r.query.filter_chip_needsRevision).not.toBeInTheDocument();
   });
 
-  it("shows Clear button when open and activeFilterCount > 0", async () => {
+  it("shows Clear button when open and active filters exist", async () => {
     const r = await render(
       <FilterPanel
         isOpen={true}
         filterImpls={filterImpls}
         filter={{ needsRevision: true }}
         setFilter={vi.fn()}
-        activeFilterCount={1}
         onClear={vi.fn()}
       />,
       withRouter(),
@@ -74,16 +64,9 @@ describe("FilterPanel", () => {
     expect(r.filter_clearBtn).toBeInTheDocument();
   });
 
-  it("hides Clear button when open and activeFilterCount is 0", async () => {
+  it("hides Clear button when open and no active filters", async () => {
     const r = await render(
-      <FilterPanel
-        isOpen={true}
-        filterImpls={filterImpls}
-        filter={{}}
-        setFilter={vi.fn()}
-        activeFilterCount={0}
-        onClear={vi.fn()}
-      />,
+      <FilterPanel isOpen={true} filterImpls={filterImpls} filter={{}} setFilter={vi.fn()} onClear={vi.fn()} />,
       withRouter(),
     );
     expect(r.query.filter_clearBtn).not.toBeInTheDocument();
@@ -97,7 +80,6 @@ describe("FilterPanel", () => {
         filterImpls={filterImpls}
         filter={{ needsRevision: true }}
         setFilter={vi.fn()}
-        activeFilterCount={1}
         onClear={onClear}
       />,
       withRouter(),
@@ -115,7 +97,6 @@ describe("FilterPanel", () => {
           filterImpls={filterImpls}
           filter={filter}
           setFilter={setFilter}
-          activeFilterCount={Object.values(filter).filter(Boolean).length}
           onClear={() => setFilter({})}
         />
       );

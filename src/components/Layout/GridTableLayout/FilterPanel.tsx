@@ -10,7 +10,6 @@ import {
 } from "src/components/Filters";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
-import { useBreakpoint } from "src/hooks";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
@@ -26,77 +25,93 @@ type FilterPanelProps<F extends Record<string, unknown>, G extends Value = strin
   filterImpls: FilterImpls<F>;
   filter?: F;
   setFilter?: (filter: F) => void;
-  activeFilterCount: number;
   onClear: () => void;
 };
 
-export function FilterPanel<F extends Record<string, unknown>, G extends Value = string>({
-  isOpen,
+export function FilterPanel<F extends Record<string, unknown>, G extends Value = string>(
+  props: FilterPanelProps<F, G>,
+) {
+  if (props.isOpen) return <FilterPanelOpen {...props} />;
+  return <FilterPanelClosed {...props} />;
+}
+
+function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = string>({
   groupBy,
   filterImpls,
   filter,
   setFilter,
-  activeFilterCount,
   onClear,
-}: FilterPanelProps<F, G>) {
-  const { sm } = useBreakpoint();
-  const testId = useTestIds({}, filterTestIdPrefix);
+}: Omit<FilterPanelProps<F, G>, "isOpen">) {
+  const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const activeFilterCount = getActiveFilterCount(filter ?? {});
+  const filterControls = filter && setFilter ? buildFilterControls(filterImpls, filter, setFilter, tid) : null;
 
-  if (isOpen) {
-    const filterControls =
-      filter && setFilter
-        ? (() => {
-            const entries = safeEntries(filterImpls);
-            const nonCheckbox = entries.filter(([_, f]) => !f.hideLabelInModal);
-            const checkbox = entries.filter(([_, f]) => f.hideLabelInModal);
-            return [...nonCheckbox, ...checkbox].map(([key, f]: [keyof F, Filter<any>]) => (
-              <div key={key as string}>
-                {f.render(filter[key], (value) => setFilter(updateFilter(filter, key, value)), testId, false, false)}
-              </div>
-            ));
-          })()
-        : null;
+  return (
+    <div
+      style={{ scrollbarWidth: "none" }}
+      css={{
+        ...Css.df.aic.gap1.$,
+        ...Css.ifSm.oxa.mw0.$,
+        ...Css.ifMdAndUp.fww.$,
+        ...Css.if(inDocumentScrollLayout).px3.$,
+      }}
+    >
+      {groupBy && (
+        <SelectField
+          label="Group by"
+          labelStyle="inline"
+          sizeToContent
+          options={groupBy.options}
+          getOptionValue={(o) => o.id}
+          getOptionLabel={(o) => o.name}
+          value={groupBy.value}
+          onSelect={(g) => g && groupBy.setValue(g)}
+        />
+      )}
+      {filterControls}
+      {activeFilterCount > 0 && <Button label="Clear" variant="tertiary" onClick={onClear} {...tid.clearBtn} />}
+    </div>
+  );
+}
 
-    return (
-      <div
-        style={{ scrollbarWidth: "none" }}
-        css={
-          sm
-            ? Css.df.gap1.aic.oxa.mw0.if(inDocumentScrollLayout).px3.$
-            : Css.df.fww.gap1.aic.if(inDocumentScrollLayout).px3.$
-        }
-      >
-        {groupBy && (
-          <SelectField
-            label="Group by"
-            labelStyle="inline"
-            sizeToContent
-            options={groupBy.options}
-            getOptionValue={(o) => o.id}
-            getOptionLabel={(o) => o.name}
-            value={groupBy.value}
-            onSelect={(g) => g && groupBy.setValue(g)}
-          />
-        )}
-        {filterControls}
-        {activeFilterCount > 0 && <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />}
-      </div>
-    );
-  }
+function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = string>({
+  filterImpls,
+  filter,
+  setFilter,
+  onClear,
+}: Omit<FilterPanelProps<F, G>, "isOpen" | "groupBy">) {
+  const tid = useTestIds({}, filterTestIdPrefix);
+  const inDocumentScrollLayout = useDocumentScrollLayout();
 
   if (!filter || !setFilter) return null;
 
-  const chips = safeEntries(filterImpls).flatMap(([key, f]) => chipsForFilterKey(key, f, filter, setFilter, testId));
+  const chips = safeEntries(filterImpls).flatMap(([key, f]) => chipsForFilterKey(key, f, filter, setFilter, tid));
 
   if (chips.length === 0) return null;
 
   return (
-    <div css={Css.df.gap1.aic.oxa.mw0.fww.if(inDocumentScrollLayout).pl3.$}>
+    <div css={Css.df.gap1.aic.mw0.fww.if(inDocumentScrollLayout).pl3.$}>
       {chips}
-      <Button label="Clear" variant="tertiary" onClick={onClear} {...testId.clearBtn} />
+      <Button label="Clear" variant="tertiary" onClick={onClear} {...tid.clearBtn} />
     </div>
   );
+}
+
+function buildFilterControls<F extends Record<string, unknown>>(
+  filterImpls: FilterImpls<F>,
+  filter: F,
+  setFilter: (f: F) => void,
+  testId: ReturnType<typeof useTestIds>,
+) {
+  const entries = safeEntries(filterImpls);
+  const nonCheckbox = entries.filter(([_, f]) => !f.hideLabelInModal);
+  const checkbox = entries.filter(([_, f]) => f.hideLabelInModal);
+  return [...nonCheckbox, ...checkbox].map(([key, f]: [keyof F, Filter<any>]) => (
+    <div key={key as string}>
+      {f.render(filter[key], (value) => setFilter(updateFilter(filter, key, value)), testId, false, false)}
+    </div>
+  ));
 }
 
 export function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
