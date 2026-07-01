@@ -31,7 +31,7 @@ type FilterPanelProps<F extends Record<string, unknown>, G extends Value = strin
 export function FilterPanel<F extends Record<string, unknown>, G extends Value = string>(
   props: FilterPanelProps<F, G>,
 ) {
-  return isOpen ? <FilterPanelOpen {...props} /> : <FilterPanelClosed {...props} />;
+  return props.isOpen ? <FilterPanelOpen {...props} /> : <FilterPanelClosed {...props} />;
 }
 
 function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = string>({
@@ -50,7 +50,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
     <div
       style={{ scrollbarWidth: "none" }}
       css={{
-        ...Css.df.aic.gap1.$,
+        ...Css.df.aic.gap1.sbwn.$,
         ...Css.ifSm.oxa.mw0.$,
         ...Css.ifMdAndUp.fww.$,
         ...Css.if(inDocumentScrollLayout).px3.$,

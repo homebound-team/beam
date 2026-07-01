@@ -1829,6 +1829,34 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("position", value);
   }
 
+  // scrollSnap
+  /** Sets `scrollSnapAlign: value`. */
+  ssa(value: Properties["scrollSnapAlign"]) {
+    return this.add("scrollSnapAlign", value);
+  }
+  /** Sets `scrollSnapType: value`. */
+  sst(value: Properties["scrollSnapType"]) {
+    return this.add("scrollSnapType", value);
+  }
+
+  // scrollbarWidth
+  /** Sets `scrollbarWidth: "auto"`. */
+  get sbwa() {
+    return this.add("scrollbarWidth", "auto");
+  }
+  /** Sets `scrollbarWidth: "thin"`. */
+  get sbwt() {
+    return this.add("scrollbarWidth", "thin");
+  }
+  /** Sets `scrollbarWidth: "none"`. */
+  get sbwn() {
+    return this.add("scrollbarWidth", "none");
+  }
+  /** Sets `scrollbarWidth: value`. */
+  sbw(value: Properties["scrollbarWidth"]) {
+    return this.add("scrollbarWidth", value);
+  }
+
   // skins
   /** Sets `color: "rgba(255, 255, 255, 1)"`. */
   get white() {

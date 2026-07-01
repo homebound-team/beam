@@ -530,6 +530,41 @@ describe("GridTableLayout", () => {
     }
   });
 
+  describe("filters", () => {
+    it("removes the filter value when a chip is clicked", async () => {
+      // Given the panel is closed with an active filter
+      sessionStorage.setItem("chip-click-test", JSON.stringify({ needsRevision: true }));
+
+      type ChipFilter = { needsRevision?: boolean };
+      let capturedFilter: ChipFilter = {};
+
+      function FilterChipWrapper() {
+        const layoutState = useGridTableLayoutState<ChipFilter>({
+          persistedFilter: { filterDefs: chipFilterDefs, storageKey: "chip-click-test" },
+        });
+        capturedFilter = layoutState.filter;
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            hideEditColumns
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        );
+      }
+
+      const r = await render(<FilterChipWrapper />, withRouter());
+      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      expect(capturedFilter).toEqual({ needsRevision: true });
+
+      // When the chip is clicked
+      click(r.filter_chip_needsRevision);
+
+      // Then the chip is removed and the filter state is cleared
+      expect(r.query.filter_chip_needsRevision).not.toBeInTheDocument();
+      expect(capturedFilter).toEqual({});
+    });
+  });
+
   it("passes infiniteScroll prop to the underlying table", async () => {
     setRunningInJest();
     // Given a GridTableLayout with infiniteScroll configured
@@ -577,6 +612,10 @@ function TestWrapper(props: TestWrapperProps) {
   const layoutState = useGridTableLayoutState(props.layoutStateProps);
   return <GridTableLayoutComponent {...props} layoutState={layoutState} />;
 }
+
+const chipFilterDefs = {
+  needsRevision: checkboxFilter({ label: "Needs Revision" }),
+};
 
 function getColumns() {
   return [
