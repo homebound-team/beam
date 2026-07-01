@@ -271,14 +271,14 @@ describe("GridTableLayout", () => {
       );
 
       // Then EditColumnsButton is visible in list view
-      expect(r.kanban).toBeInTheDocument();
+      expect(r.columns).toBeInTheDocument();
 
       // When switching to card view
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
       // Then EditColumnsButton is hidden in card view
-      expect(r.query.kanban).not.toBeInTheDocument();
+      expect(r.query.columns).not.toBeInTheDocument();
     });
 
     it("persists view selection to localStorage when toggled", async () => {
@@ -360,7 +360,7 @@ describe("GridTableLayout", () => {
       );
 
       // Falls back to defaultView="list" — EditColumnsButton is visible in list view
-      expect(r.kanban).toBeInTheDocument();
+      expect(r.columns).toBeInTheDocument();
     });
 
     it("renders card content using cardSlot columns when switched to card view", async () => {
