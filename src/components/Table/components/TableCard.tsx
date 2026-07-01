@@ -2,6 +2,7 @@ import { ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Tag } from "src/components";
 import { CardTag } from "src/components/Card";
+import type { CardBadgeTag } from "src/components/Table/cardSlots";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
@@ -31,6 +32,7 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
   let title: string | undefined;
   let eyebrow: string | undefined;
   let badge: string | undefined;
+  let badgeTags: CardBadgeTag[] | undefined;
   let status: CardTag | undefined;
   const dataBlocks: CardData[] = [];
   let progress: number | undefined;
@@ -50,6 +52,7 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
         break;
       case "badge":
         badge = slot.text;
+        badgeTags = slot.tags;
         break;
       case "status":
         status = slot.tag;
@@ -72,6 +75,7 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
       title={title}
       eyebrow={eyebrow}
       badge={badge}
+      badgeTags={badgeTags}
       status={status}
       data={dataBlocks}
       progress={progress}
@@ -101,6 +105,7 @@ export type TableCardViewProps = {
   eyebrow?: string;
   title: string;
   badge?: string;
+  badgeTags?: CardBadgeTag[];
   data: CardData[];
   status?: CardTag;
   /** A number between 0 and 100. Values outside this range are clamped. */
@@ -108,7 +113,7 @@ export type TableCardViewProps = {
 };
 
 export function TableCardView(props: TableCardViewProps) {
-  const { title, imgSrc, eyebrow, badge, data, status, progress } = props;
+  const { title, imgSrc, eyebrow, badge, badgeTags, data, status, progress } = props;
   const tid = useTestIds(props, "tableCardView");
 
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
@@ -135,10 +140,13 @@ export function TableCardView(props: TableCardViewProps) {
               <h4 css={Css.xl.fwb.$} {...tid.title}>
                 {title}{" "}
               </h4>
-              {badge && (
-                <span css={Css.sm.wsnw.$} {...tid.badge}>
-                  {badge}
-                </span>
+              {(badge || badgeTags?.length) && (
+                <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
+                  {badge && <span css={Css.sm.wsnw.$}>{badge}</span>}
+                  {badgeTags?.map((tag) => (
+                    <Tag key={tag.text} {...tag} />
+                  ))}
+                </div>
               )}
             </div>
           )}

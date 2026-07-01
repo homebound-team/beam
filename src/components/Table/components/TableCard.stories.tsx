@@ -13,6 +13,22 @@ export function WithEyebrowAndBadge() {
   return <TableCardView imgSrc={imgSrc} eyebrow="Lot" title="123 Main Street" badge="Austin, TX" data={data} />;
 }
 
+export function WithBadgeTags() {
+  return (
+    <TableCardView
+      imgSrc={imgSrc}
+      eyebrow="Lot"
+      title="123 Main Street"
+      badge="Austin, TX"
+      badgeTags={[
+        { text: "New", type: "success" },
+        { text: "Info", icon: "infoCircle", iconOnly: true },
+      ]}
+      data={data}
+    />
+  );
+}
+
 export function WithStatus() {
   return (
     <TableCardView
