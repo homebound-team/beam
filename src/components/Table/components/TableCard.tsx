@@ -114,7 +114,7 @@ export function TableCardView(props: TableCardViewProps) {
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
 
   return (
-    <div css={Css.p3.wPx(330).h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
+    <div css={Css.p3.wPx(330).h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.br8.$} {...tid}>
       <div css={Css.relative.$}>
         <img css={Css.hPx(184).w100.objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
@@ -145,8 +145,18 @@ export function TableCardView(props: TableCardViewProps) {
         </div>
         {data && data?.length > 0 && (
           <dl css={Css.dg.gtc("repeat(2, minmax(0, 1fr))").sm.$}>
+            {/* TODO: Fix grid calculations */}
             {data.map((d, idx) => (
-              <div key={d.label} css={Css.df.gapPx(4).gc((idx % 2) + 1).$} {...tid[defaultTestId(d.label)]}>
+              <div
+                key={d.label}
+                css={
+                  Css.df
+                    .gapPx(4)
+                    .gc(idx > data.length / 2 ? 2 : 1)
+                    .gr(idx % (data.length / 2)).$
+                }
+                {...tid[defaultTestId(d.label)]}
+              >
                 <dt>{d.label}:</dt>
                 <dd>{d.value}</dd>
               </div>
