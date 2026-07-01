@@ -58,7 +58,6 @@ export function setRunningInJest() {
 }
 
 const CARD_MIN_WIDTH_PX = 280;
-const CARD_MAX_WIDTH_PX = 330;
 
 export type GridTableDefaults = {
   style: GridStyle | GridStyleDef;
@@ -1086,11 +1085,7 @@ function CardView({
   if (runningInJest) {
     return (
       <div css={Css.py2.$}>
-        <div
-          css={Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, ${CARD_MAX_WIDTH_PX}px))`).jcc.gap3.p3.$}
-        >
-          {cardRows}
-        </div>
+        <div css={Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, 1fr))`).jcc.gap3.p3.$}>{cardRows}</div>
       </div>
     );
   }
@@ -1112,10 +1107,7 @@ function CardView({
                 <div
                   ref={ref}
                   style={style}
-                  css={
-                    Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, ${CARD_MAX_WIDTH_PX}px))`).jcc.gap3.p3
-                      .$
-                  }
+                  css={Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, 1fr))`).jcc.gap3.p3.$}
                 >
                   {children}
                 </div>
