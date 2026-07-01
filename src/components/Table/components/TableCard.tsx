@@ -114,7 +114,7 @@ export function TableCardView(props: TableCardViewProps) {
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
 
   return (
-    <div css={Css.p3.wPx(330).h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
+    <div css={Css.p3.w100.h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.$} {...tid}>
       <div css={Css.relative.$}>
         <img css={Css.hPx(184).w100.objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
