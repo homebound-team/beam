@@ -1,57 +1,92 @@
 import { Meta } from "@storybook/react-vite";
 import { TableCardView } from "src/components/Table/components/TableCard";
+import { Css } from "src/Css";
 
 export default {
   component: TableCardView,
 } as Meta;
 
 export function Default() {
-  return <TableCardView imgSrc={imgSrc} title="123 Main Street" data={data} />;
+  return (
+    <CardContainer>
+      <TableCardView imgSrc={imgSrc} title="123 Main Street" data={data} />
+    </CardContainer>
+  );
 }
 
 export function WithEyebrowAndBadge() {
-  return <TableCardView imgSrc={imgSrc} eyebrow="Lot" title="123 Main Street" badge="Austin, TX" data={data} />;
+  return (
+    <CardContainer>
+      <TableCardView imgSrc={imgSrc} eyebrow="Lot" title="123 Main Street" badge="Austin, TX" data={data} />
+    </CardContainer>
+  );
+}
+
+export function WithBadgeTags() {
+  return (
+    <TableCardView
+      imgSrc={imgSrc}
+      eyebrow="Lot"
+      title="123 Main Street"
+      badge="Austin, TX"
+      badgeTags={[
+        { text: "New", type: "success" },
+        { text: "Info", icon: "infoCircle", iconOnly: true },
+      ]}
+      data={data}
+    />
+  );
 }
 
 export function WithStatus() {
   return (
-    <TableCardView
-      imgSrc={imgSrc}
-      eyebrow="Home"
-      title="123 Main Street"
-      badge="Austin, TX"
-      status={{ text: "In Progress", type: "caution" }}
-      data={data}
-    />
+    <CardContainer>
+      <TableCardView
+        imgSrc={imgSrc}
+        eyebrow="Home"
+        title="123 Main Street"
+        badge="Austin, TX"
+        status={{ text: "In Progress", type: "caution" }}
+        data={data}
+      />
+    </CardContainer>
   );
 }
 
 export function AllProps() {
   return (
-    <TableCardView
-      imgSrc={imgSrc}
-      eyebrow="Home"
-      title="123 Main Street"
-      badge="Austin, TX"
-      status={{ text: "Archived", type: "warning" }}
-      data={data}
-      progress={65}
-    />
+    <CardContainer>
+      <TableCardView
+        imgSrc={imgSrc}
+        eyebrow="Home"
+        title="123 Main Street"
+        badge="Austin, TX"
+        status={{ text: "Archived", type: "warning" }}
+        data={data}
+        progress={65}
+      />
+    </CardContainer>
   );
 }
 
 export function LongTitle() {
   return (
-    <TableCardView
-      imgSrc={imgSrc}
-      eyebrow="Home"
-      title="This is a long title example"
-      badge="Austin, TX"
-      status={{ text: "Archived", type: "warning" }}
-      data={data}
-      progress={65}
-    />
+    <CardContainer>
+      <TableCardView
+        imgSrc={imgSrc}
+        eyebrow="Home"
+        title="This is a long title example"
+        badge="Austin, TX"
+        status={{ text: "Archived", type: "warning" }}
+        data={data}
+        progress={65}
+      />
+    </CardContainer>
   );
+}
+
+function CardContainer({ children }: { children: JSX.Element }) {
+  return <div css={Css.wPx(280).$}>{children}</div>;
 }
 
 const imgSrc = "plan-exterior.png";

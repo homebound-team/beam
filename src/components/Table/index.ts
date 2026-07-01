@@ -8,6 +8,7 @@ export {
 } from "src/components/Table/cardSlots";
 export type {
   CardBadgeSlot,
+  CardBadgeTag,
   CardDataBlockSlot,
   CardEyebrowSlot,
   CardProgressSlot,
