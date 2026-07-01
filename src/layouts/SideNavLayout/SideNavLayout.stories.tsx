@@ -20,7 +20,7 @@ const items: AppNavItem[] = [
     section: true,
     label: "Main",
     items: [
-      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Dashboard", icon: "columns", onClick: "/", active: true },
       { label: "Projects", icon: "search", onClick: "/projects" },
     ],
   },

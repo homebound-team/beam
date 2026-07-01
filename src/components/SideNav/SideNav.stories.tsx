@@ -17,7 +17,7 @@ export default {
 } as Meta;
 
 const items: AppNavItem[] = [
-  { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+  { label: "Dashboard", icon: "columns", onClick: "/", active: true },
   { label: "Projects", icon: "search", onClick: "/projects" },
   { label: "Documents", icon: "comment", onClick: "/docs" },
 ];
@@ -27,7 +27,7 @@ const groupedItems: AppNavItem[] = [
     section: true,
     label: "Main",
     items: [
-      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Dashboard", icon: "columns", onClick: "/", active: true },
       { label: "Projects", icon: "search", onClick: "/projects" },
     ],
   },

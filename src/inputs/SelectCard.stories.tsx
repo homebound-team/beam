@@ -20,17 +20,17 @@ export function Default() {
     <div css={Css.df.fdc.gap4.$}>
       <div css={Css.df.gap2.jcfs.aifs.$}>
         <State title="Default">
-          <SelectCard icon="kanban" label="This is a title" description={description} onChange={() => {}} />
+          <SelectCard icon="columns" label="This is a title" description={description} onChange={() => {}} />
         </State>
         <State title="Selected">
-          <SelectCard icon="kanban" label="This is a title" description={description} selected onChange={() => {}} />
+          <SelectCard icon="columns" label="This is a title" description={description} selected onChange={() => {}} />
         </State>
         <State title="Disabled">
-          <SelectCard icon="kanban" label="This is a title" description={description} disabled onChange={() => {}} />
+          <SelectCard icon="columns" label="This is a title" description={description} disabled onChange={() => {}} />
         </State>
         <State title="Disabled selected">
           <SelectCard
-            icon="kanban"
+            icon="columns"
             label="This is a title"
             description={description}
             disabled
@@ -41,7 +41,7 @@ export function Default() {
       </div>
       <div css={Css.df.gap2.jcfs.aifs.$}>
         <State title="Without description">
-          <SelectCard icon="kanban" label="Architectural Design" onChange={() => {}} />
+          <SelectCard icon="columns" label="Architectural Design" onChange={() => {}} />
         </State>
       </div>
     </div>
@@ -50,7 +50,7 @@ export function Default() {
 
 /** Hovers the card so Chromatic snapshots the real `useHover` styles rather than a faked border. */
 export function Hover() {
-  return <SelectCard icon="kanban" label="This is a title" description={description} onChange={() => {}} />;
+  return <SelectCard icon="columns" label="This is a title" description={description} onChange={() => {}} />;
 }
 Hover.play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);

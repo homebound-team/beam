@@ -24,7 +24,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
-  const tid = useTestIds(props, "kanban");
+  const tid = useTestIds(props, "columns");
   const { sm } = useBreakpoint();
 
   const options = useMemo(
@@ -65,7 +65,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     <OverlayTrigger
       {...props}
       trigger={{
-        icon: "kanban",
+        icon: "columns",
         size: "md",
         label: "",
         variant: "secondaryBlack",
