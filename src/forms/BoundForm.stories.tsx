@@ -9,13 +9,13 @@ import {
   boundDateRangeField,
   BoundForm as BoundFormComponent,
   BoundFormInputConfig,
-  boundIconCardField,
-  boundIconCardGroupField,
   boundMultilineSelectField,
   boundMultiSelectField,
   boundNumberField,
   boundRadioGroupField,
   boundRichTextField,
+  boundSelectCardField,
+  boundSelectCardGroupField,
   boundSelectField,
   boundSwitchField,
   boundTextAreaField,
@@ -24,7 +24,7 @@ import {
   boundTreeSelectField,
 } from "src/forms/BoundForm";
 import { NestedOption } from "src/inputs";
-import { IconCardGroupItemOption } from "src/inputs/IconCardGroup";
+import { SelectCardGroupItemOption } from "src/inputs/SelectCardGroup";
 import { HasIdAndName } from "src/types";
 import { withBeamDecorator } from "src/utils/sb";
 import { BoundTextAreaField } from "./BoundTextAreaField";
@@ -110,7 +110,7 @@ export function LoadingBoundForm() {
         middleInitial: "C",
         lastName: "Doe",
         bio: "Some bio",
-        iconCardSelection: true,
+        selectCardSelection: true,
       });
     }, 1000);
   }, [loadedData]);
@@ -159,12 +159,12 @@ const shapesOptions = [
   { value: "shape:3", label: "Circle" },
 ];
 
-const categories: IconCardGroupItemOption<string>[] = [
+const categories: SelectCardGroupItemOption<string>[] = [
   { icon: "abacus", label: "Math", value: "math" },
   { icon: "archive", label: "History", value: "history" },
   { icon: "dollar", label: "Finance", value: "finance" },
   { icon: "hardHat", label: "Engineering", value: "engineering" },
-  { icon: "kanban", label: "Management", value: "management" },
+  { icon: "columns", label: "Management", value: "management" },
   { icon: "camera", label: "Media", value: "media" },
 ];
 
@@ -185,9 +185,9 @@ const genres: NestedOption<HasIdAndName>[] = [
 ];
 
 type AuthorInput = BaseAuthorInput & {
-  // iconCardSelection is required to test against a mapped type regression on `BoundFormRowInputs`
-  iconCardSelection: boolean | null;
-  iconCardGroupExample?: string[] | null;
+  // selectCardSelection is required to test against a mapped type regression on `BoundFormRowInputs`
+  selectCardSelection: boolean | null;
+  selectCardGroupExample?: string[] | null;
   multiLineSelectExample?: string[] | null;
   radioGroupExample?: string | null;
   richTextExample?: string | null;
@@ -217,8 +217,8 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
   { isAvailable: boundCheckboxField({ label: "Is Retired" }) },
   { saleDates: boundDateRangeField() },
   { favoriteShapes: boundCheckboxGroupField({ options: shapesOptions, label: "Checkbox Group" }) },
-  { iconCardSelection: boundIconCardField({ icon: "abacus" }) },
-  { iconCardGroupExample: boundIconCardGroupField({ options: categories }) },
+  { selectCardSelection: boundSelectCardField({ icon: "abacus" }) },
+  { selectCardGroupExample: boundSelectCardGroupField({ options: categories }) },
   {
     multiLineSelectExample: boundMultilineSelectField({
       options: colorOptions,
@@ -276,8 +276,8 @@ const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value" },
   favoriteShapes: { type: "value" },
   saleDates: { type: "value" },
-  iconCardSelection: { type: "value" },
-  iconCardGroupExample: { type: "value" },
+  selectCardSelection: { type: "value" },
+  selectCardGroupExample: { type: "value" },
   multiLineSelectExample: { type: "value" },
   radioGroupExample: { type: "value" },
   richTextExample: { type: "value" },

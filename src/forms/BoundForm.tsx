@@ -10,14 +10,14 @@ import { BoundCheckboxField, BoundCheckboxFieldProps } from "./BoundCheckboxFiel
 import { BoundCheckboxGroupField, BoundCheckboxGroupFieldProps } from "./BoundCheckboxGroupField";
 import { BoundDateField, BoundDateFieldProps } from "./BoundDateField";
 import { BoundDateRangeField, BoundDateRangeFieldProps } from "./BoundDateRangeField";
-import { BoundIconCardField, BoundIconCardFieldProps } from "./BoundIconCardField";
-import { BoundIconCardGroupField, BoundIconCardGroupFieldProps } from "./BoundIconCardGroupField";
 import { isListFieldRow, ListField, ListFieldConfig, ListFieldKey } from "./BoundListField";
 import { BoundMultiLineSelectField, BoundMultiLineSelectFieldProps } from "./BoundMultiLineSelectField";
 import { BoundMultiSelectField, BoundMultiSelectFieldProps } from "./BoundMultiSelectField";
 import { BoundNumberField, BoundNumberFieldProps } from "./BoundNumberField";
 import { BoundRadioGroupField, BoundRadioGroupFieldProps } from "./BoundRadioGroupField";
 import { BoundRichTextField, BoundRichTextFieldProps } from "./BoundRichTextField";
+import { BoundSelectCardField, BoundSelectCardFieldProps } from "./BoundSelectCardField";
+import { BoundSelectCardGroupField, BoundSelectCardGroupFieldProps } from "./BoundSelectCardGroupField";
 import { BoundSelectField, BoundSelectFieldProps } from "./BoundSelectField";
 import { BoundSwitchField, BoundSwitchFieldProps } from "./BoundSwitchField";
 import { BoundTextAreaField, BoundTextAreaFieldProps } from "./BoundTextAreaField";
@@ -232,16 +232,16 @@ export function boundCheckboxGroupField(props: Omit<BoundCheckboxGroupFieldProps
   });
 }
 
-export function boundIconCardField(props: Omit<BoundIconCardFieldProps, KeysToOmit>) {
+export function boundSelectCardField(props: Omit<BoundSelectCardFieldProps, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
-    component: <BoundIconCardField field={field} {...props} />,
+    component: <BoundSelectCardField field={field} {...props} />,
     minWidth: "150px",
   });
 }
 
-export function boundIconCardGroupField<V extends Value>(props: Omit<BoundIconCardGroupFieldProps<V>, KeysToOmit>) {
+export function boundSelectCardGroupField<V extends Value>(props: Omit<BoundSelectCardGroupFieldProps<V>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
-    component: <BoundIconCardGroupField field={field} {...props} />,
+    component: <BoundSelectCardGroupField field={field} {...props} />,
     minWidth: "100%",
   });
 }

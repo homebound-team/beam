@@ -6,34 +6,38 @@ import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { Value } from "src/inputs";
-import { IconCard } from "src/inputs/IconCard";
+import { fillRowStyles, SelectCard } from "src/inputs/SelectCard";
 import { useTestIds } from "src/utils";
 import { ErrorMessage } from "./ErrorMessage";
 
-export interface IconCardGroupItemOption<V extends Value> {
+export type SelectCardGroupItemOption<V extends Value> = {
   icon: IconProps["icon"];
   label: string;
+  /** Optional secondary copy shown beneath the label. */
+  description?: string;
   disabled?: boolean;
-  /** The value of the IconCardGroup item, stored in value array in state. */
+  /** Tooltip shown on hover, i.e. to explain why the option is disabled. */
+  tooltip?: string;
+  /** The value of the SelectCardGroup item, stored in value array in state. */
   value: V;
   /** Exclusive: if true, this option will override all other options when selected. */
   exclusive?: boolean;
-}
+};
 
-export interface IconCardGroupProps<V extends Value> extends Pick<PresentationFieldProps, "labelStyle"> {
+export type SelectCardGroupProps<V extends Value> = {
   label: string;
   /** Called when a card is selected */
   onChange: (values: V[]) => void;
-  /** Options for the cards contained within the IconCardGroup. */
-  options: IconCardGroupItemOption<V>[];
+  /** Options for the cards contained within the SelectCardGroup. */
+  options: SelectCardGroupItemOption<V>[];
   /** The values currently selected. */
   values: V[];
   errorMsg?: string;
   helperText?: string | ReactNode;
   disabled?: boolean;
-}
+} & Pick<PresentationFieldProps, "labelStyle">;
 
-export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
+export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();
   const {
     options,
@@ -49,6 +53,10 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
   const [selected, setSelected] = useState<V[]>(values);
 
   const exclusiveOptions = useMemo(() => options.filter((o) => o.exclusive), [options]);
+
+  // Description cards stretch to a shared height, so in a mixed group the label-only cards need the
+  // same fill-the-row sizing or they fall out of alignment (see the `xss` override below).
+  const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
 
   const toggleValue = useCallback(
     (value: V) => {
@@ -95,15 +103,20 @@ export function IconCardGroup<V extends Value>(props: IconCardGroupProps<V>) {
       )}
       <div css={Css.df.gap2.add("flexWrap", "wrap").$}>
         {options.map((option) => {
-          const { icon, label, disabled } = option;
+          const { icon, label, description, disabled, tooltip } = option;
           const isSelected = selected.includes(option.value);
           return (
-            <IconCard
+            <SelectCard
               key={option.label}
               icon={icon}
               label={label}
+              description={description}
+              // When any sibling card has a description, label-only cards would otherwise keep their
+              // fixed compact size and fall out of alignment, so give them the fill-the-row sizing.
+              xss={hasDescription ? fillRowStyles : undefined}
               selected={isSelected}
               disabled={disabled}
+              tooltip={tooltip}
               onChange={() => toggleValue(option.value)}
               {...tid[option.label]}
             />

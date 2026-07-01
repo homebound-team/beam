@@ -29,6 +29,7 @@ export const Icon = (props: IconProps) => {
     "checkbox",
     "check",
     "search",
+    "searchBadged",
     "comment",
     "commentFilled",
     "plus",
@@ -49,7 +50,9 @@ export const Icon = (props: IconProps) => {
     "unarchive",
     "duplicate",
     "filter",
-    "kanban",
+    "filterBadged",
+    "columns",
+    "columnsBadged",
     "expand",
     "collapse",
     "undoCircle",
@@ -169,6 +172,9 @@ export const Icon = (props: IconProps) => {
     "lot",
     "house",
     "houseFilled",
+    "single",
+    "linked",
+    "package",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
