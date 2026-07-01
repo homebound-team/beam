@@ -109,7 +109,7 @@ function GridTableLayoutActionsComponent<
           {sm && hasSearch && (
             <IconButton
               variant="outline"
-              icon="search"
+              icon={searchValue ? "searchBadged" : "search"}
               label="Search"
               onClick={() => setShowSearch(!showSearch)}
               active={showSearch}
@@ -121,7 +121,7 @@ function GridTableLayoutActionsComponent<
           {sm && hasFilters && (
             <IconButton
               variant="outline"
-              icon="filter"
+              icon={activeFilterCount > 0 ? "filterBadged" : "filter"}
               label="Filter"
               onClick={() => setShowFilters(!showFilters)}
               active={showFilters}
