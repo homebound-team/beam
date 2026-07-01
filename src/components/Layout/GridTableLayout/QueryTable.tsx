@@ -51,8 +51,7 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
   const emptyState: GridTableEmptyStateProps | undefined = useMemo(() => {
     if (query.loading || query.error) return undefined;
     if (emptyStateProp) return emptyStateProp;
-    if (emptyFallback) return { title: emptyFallback };
-    return undefined;
+    return { title: emptyFallback };
   }, [emptyFallback, emptyStateProp, query.error, query.loading]);
 
   const headers = rows.filter((row) => row.kind === "header");

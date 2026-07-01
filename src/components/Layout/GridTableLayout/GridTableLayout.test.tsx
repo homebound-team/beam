@@ -531,6 +531,27 @@ describe("GridTableLayout", () => {
   });
 
   describe("empty state", () => {
+    it("shows default empty state when there are no data rows and no emptyFallback", async () => {
+      // Given a layout with only a header row and no emptyFallback
+      // When the layout renders
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // Then the default structured empty state replaces the table
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No results found");
+      expect(r.query.gridTable).toBeNull();
+      expect(r.query.gridTableEmptyState_description).toBeNull();
+      expect(r.query.gridTableEmptyState_actions).toBeNull();
+    });
+
     it("shows empty state instead of the table when there are no data rows", async () => {
       // Given a layout with emptyFallback and only a header row (no data rows)
       // When the layout renders

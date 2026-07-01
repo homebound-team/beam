@@ -58,8 +58,6 @@ export function setRunningInJest() {
   runningInJest = true;
 }
 
-const CARD_MIN_WIDTH_PX = 280;
-
 export type GridTableDefaults = {
   style: GridStyle | GridStyleDef;
   stickyHeader: boolean;
@@ -318,6 +316,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // way we avoid React warnings when the observable mutations cause downstream
   // components to be marked for re-render. Mobx will ignore setter calls that
   // don't actually change the value, so we can do this in a single useEffect.
+  const tableStateSyncedFromPropsRef = useRef(false);
   useEffect(() => {
     // Use runInAction so mobx delays any reactions until all the mutations happen
     runInAction(() => {
@@ -328,6 +327,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       tableState.activeRowId = activeRowId;
       tableState.activeCellId = activeCellId;
     });
+    tableStateSyncedFromPropsRef.current = true;
   }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
@@ -601,6 +601,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Pinned rows still count as "data on screen", so don't show the empty fallback when only the
   // body is empty but pins remain visible (e.g. a filter hid every un-pinned row).
+  // Intentionally based on TableState (not props.rows): filters/collapse can hide every visible row
+  // while props still contain data.
   const noData = visibleDataRows.length === 0 && pinnedRows.length === 0;
   const firstRowMessage =
     (noData && !emptyState && fallbackMessage) ||
@@ -644,7 +646,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return { ...style, minWidthPx };
   }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
 
-  if (noData && emptyState) {
+  // TableState is updated from props in useEffect; until that runs, noData is stale on the first paint.
+  // Keep the table (and width probe) mounted pre-sync; only swap to emptyState once TableState reflects props.
+  if (noData && emptyState && tableStateSyncedFromPropsRef.current) {
     return <GridTableEmptyState {...emptyState} />;
   }
 
@@ -1227,3 +1231,5 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
+
+const CARD_MIN_WIDTH_PX = 280;

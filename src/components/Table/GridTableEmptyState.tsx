@@ -4,14 +4,14 @@ import { useTestIds } from "src/utils";
 
 /** Structured empty state shown in place of a GridTable when there are no data rows. */
 export type GridTableEmptyStateProps = {
-  title: string;
+  title?: string;
   description?: string;
   /** Optional CTAs, e.g. Clear Filters or Create buttons. */
   actions?: ReactNode;
 };
 
 export function GridTableEmptyState(props: GridTableEmptyStateProps) {
-  const { title, description, actions } = props;
+  const { title = "No results found", description, actions } = props;
   const tid = useTestIds(props, "gridTableEmptyState");
 
   return (

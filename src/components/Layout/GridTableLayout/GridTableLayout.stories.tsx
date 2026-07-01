@@ -197,6 +197,27 @@ export function WithoutHeader() {
   );
 }
 
+export const DefaultEmptyState = newStory(
+  () => {
+    const columns = useMemo(() => getColumns(false), []);
+
+    return (
+      <TestProjectLayout pageTitle="Product Offerings">
+        <GridTableLayoutComponent
+          pageTitle="Product Offerings"
+          primaryAction={{ label: "Create New", onClick: noop }}
+          tableProps={{
+            columns,
+            rows: [simpleHeader],
+            sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          }}
+        />
+      </TestProjectLayout>
+    );
+  },
+  { globals: { backgrounds: { value: "white" } } },
+);
+
 export const EmptyState = newStory(
   () => {
     const filterDefs = useMemo(() => getFilterDefs(), []);
@@ -212,7 +233,9 @@ export const EmptyState = newStory(
 
     useEffect(() => {
       layoutState.setSearchString("no-match");
-    }, [layoutState]);
+      // This is a hack to ensure the empty state is shown initially while still allowing the user to use the search
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
       <TestProjectLayout pageTitle="Product Offerings">

@@ -331,18 +331,15 @@ function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, 
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>,
   layoutState: ReturnType<typeof useGridTableLayoutState<F>> | undefined,
   layoutEmptyFallback: string | undefined,
-): GridTableEmptyStateProps | undefined {
+): GridTableEmptyStateProps {
   const tableEmptyState = "emptyState" in tableProps ? tableProps.emptyState : undefined;
   const tableEmptyFallback = "emptyFallback" in tableProps ? tableProps.emptyFallback : undefined;
-  const baseTitle = tableEmptyState?.title ?? tableEmptyFallback ?? layoutEmptyFallback;
-
-  if (!baseTitle && !tableEmptyState) return undefined;
 
   const filteringActive = layoutState?.filteringActive ?? false;
   const filterEmptyDescription = "Try adjusting your search or filters.";
 
   return {
-    title: baseTitle ?? tableEmptyState!.title,
+    title: tableEmptyState?.title ?? tableEmptyFallback ?? layoutEmptyFallback,
     description: tableEmptyState?.description ?? (filteringActive ? filterEmptyDescription : undefined),
     actions:
       tableEmptyState?.actions ??
