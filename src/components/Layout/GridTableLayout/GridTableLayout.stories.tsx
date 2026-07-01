@@ -269,6 +269,7 @@ export function WithViewToggle() {
     <TestProjectLayout pageTitle="With View Toggle">
       <GridTableLayoutComponent
         tableProps={{
+          as: "virtual",
           columns: [
             column<PlanRow>({
               id: "offering-name",

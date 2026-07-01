@@ -650,8 +650,26 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             infiniteScroll={infiniteScroll}
             persistScrollPosition={persistScrollPosition}
           />
+        ) : _as === "virtual" ? (
+          <VirtualGridTableView
+            style={tableStyle}
+            id={id}
+            columns={columns}
+            visibleDataRows={visibleDataRows}
+            keptSelectedRows={keptSelectedRows}
+            pinnedRows={pinnedRows}
+            firstRowMessage={firstRowMessage}
+            stickyHeader={stickyHeader}
+            xss={xss}
+            virtuosoRef={virtuosoRef}
+            virtuosoRangeRef={virtuosoRangeRef}
+            tableHeadRows={tableHeadRows}
+            stickyOffset={stickyOffset}
+            infiniteScroll={infiniteScroll}
+            persistScrollPosition={persistScrollPosition}
+          />
         ) : (
-          renders[_as as Exclude<RenderAs, "card">](
+          renders[_as as Exclude<RenderAs, "card" | "virtual">](
             tableStyle,
             id,
             columns,
@@ -675,11 +693,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   );
 }
 
-// Determine which HTML element to use to build the GridTable (card mode is handled separately)
-const renders: Record<Exclude<RenderAs, "card">, typeof renderTable> = {
+// Determine which HTML element to use to build the GridTable (card and virtual modes are handled separately)
+const renders: Record<Exclude<RenderAs, "card" | "virtual">, typeof renderTable> = {
   table: renderTable,
   div: renderDiv,
-  virtual: renderVirtual,
 };
 
 /** Renders table using divs with flexbox rows, which is the default render */
@@ -830,6 +847,24 @@ function renderTable<R extends Kinded>(
   );
 }
 
+type VirtualGridTableViewProps<R extends Kinded = Kinded> = {
+  style: GridStyle;
+  id: string;
+  columns: GridColumnWithId<R>[];
+  visibleDataRows: ReactElement[];
+  keptSelectedRows: ReactElement[];
+  pinnedRows: ReactElement[];
+  firstRowMessage: string | undefined;
+  stickyHeader: boolean;
+  xss: any;
+  virtuosoRef: MutableRefObject<VirtuosoHandle | null>;
+  virtuosoRangeRef: MutableRefObject<ListRange | null>;
+  tableHeadRows: ReactElement[];
+  stickyOffset: number;
+  infiniteScroll?: InfiniteScroll;
+  persistScrollPosition?: boolean;
+};
+
 /**
  * Uses react-virtuoso to render rows virtually.
  *
@@ -850,36 +885,31 @@ function renderTable<R extends Kinded>(
  * [2]: https://github.com/tannerlinsley/react-virtual/issues/85
  * [3]: https://github.com/tannerlinsley/react-virtual/issues/108
  */
-function renderVirtual<R extends Kinded>(
-  style: GridStyle,
-  id: string,
-  columns: GridColumnWithId<R>[],
-  visibleDataRows: ReactElement[],
-  keptSelectedRows: ReactElement[],
-  pinnedRows: ReactElement[],
-  firstRowMessage: string | undefined,
-  stickyHeader: boolean,
-  xss: any,
-  virtuosoRef: MutableRefObject<VirtuosoHandle | null>,
-  virtuosoRangeRef: MutableRefObject<ListRange | null>,
-  tableHeadRows: ReactElement[],
-  stickyOffset: number,
-  infiniteScroll?: InfiniteScroll,
-  _tableContainerRef?: MutableRefObject<HTMLElement | null>,
-  persistScrollPosition: boolean = infiniteScroll === undefined, // Enabled by default if infinite scroll is not enabled
-): ReactElement {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+function VirtualGridTableView<R extends Kinded>({
+  style,
+  id,
+  columns,
+  visibleDataRows,
+  keptSelectedRows,
+  pinnedRows,
+  firstRowMessage,
+  stickyHeader,
+  xss,
+  virtuosoRef,
+  virtuosoRangeRef,
+  tableHeadRows,
+  stickyOffset,
+  infiniteScroll,
+  persistScrollPosition = infiniteScroll === undefined,
+}: VirtualGridTableViewProps<R>): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
 
   // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
   // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const inDocumentScrollLayout = useDocumentScrollLayout();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { getScrollIndex, setScrollIndex } = useScrollStorage(id, persistScrollPosition);
 
   const savedScrollIndex = getScrollIndex();
