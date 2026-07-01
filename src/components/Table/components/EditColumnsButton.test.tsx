@@ -63,7 +63,7 @@ describe("EditColumnsButton", () => {
     }
     const r = await render(<Test />);
     // Then the icon trigger renders
-    expect(r.kanban).toBeInTheDocument();
+    expect(r.columns).toBeInTheDocument();
   });
 
   it("should render only hide-able columns", async () => {
@@ -102,7 +102,7 @@ describe("EditColumnsButton", () => {
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
 
     // When click on an option (deselect value)
-    click(r.kanban_optionvalue);
+    click(r.columns_optionvalue);
 
     // Then setColumns should be called (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "actions"]);
@@ -124,8 +124,8 @@ describe("EditColumnsButton", () => {
     const r = await render(<Test />);
     expect(api.current!.getVisibleColumnIds()).toEqual(["name", "value", "actions"]);
     // When deselect all hideable columns via the switches
-    click(r.kanban_optionname);
-    click(r.kanban_optionvalue);
+    click(r.columns_optionname);
+    click(r.columns_optionvalue);
     // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
   });

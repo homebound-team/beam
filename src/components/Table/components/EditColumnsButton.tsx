@@ -24,7 +24,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
-  const tid = useTestIds(props, "kanban");
+  const tid = useTestIds(props, "columns");
   const { sm } = useBreakpoint();
 
   const options = useMemo(
@@ -66,8 +66,8 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       {...props}
       trigger={
         sm
-          ? { icon: "kanban", variant: "outline" }
-          : { icon: "kanban", label: "", size: "md", variant: "secondaryBlack" }
+          ? { icon: "columns", variant: "outline" }
+          : { icon: "columns", label: "", size: "md", variant: "secondaryBlack" }
       }
       menuTriggerProps={menuTriggerProps}
       state={state}
