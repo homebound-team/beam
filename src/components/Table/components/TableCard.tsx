@@ -113,8 +113,11 @@ export function TableCardView(props: TableCardViewProps) {
 
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
 
+  const col1 = data.slice(0, Math.ceil(data.length / 2));
+  const col2 = data.slice(Math.ceil(data.length / 2));
+
   return (
-    <div css={Css.p3.wPx(330).h100.bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.br8.$} {...tid}>
+    <div css={Css.p3.wPx(330).hPx(430).bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.br8.$} {...tid}>
       <div css={Css.relative.$}>
         <img css={Css.hPx(184).w100.objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
@@ -123,7 +126,7 @@ export function TableCardView(props: TableCardViewProps) {
           </div>
         )}
       </div>
-      <div css={Css.df.fdc.gap2.$}>
+      <div css={Css.df.fdc.gap2.jcsb.h100.$}>
         <div>
           {eyebrow && (
             <p css={Css.sm.$} {...tid.eyebrow}>
@@ -132,8 +135,8 @@ export function TableCardView(props: TableCardViewProps) {
           )}
           {title && (
             <div css={Css.dif.w100.jcsb.aic.$}>
-              <h4 css={Css.xl.fwb.$} {...tid.title}>
-                {title}{" "}
+              <h4 css={Css.xl.fwb.lineClamp2.$} {...tid.title}>
+                {title}
               </h4>
               {badge && (
                 <span css={Css.sm.wsnw.$} {...tid.badge}>
@@ -143,36 +146,38 @@ export function TableCardView(props: TableCardViewProps) {
             </div>
           )}
         </div>
-        {data && data?.length > 0 && (
-          <dl css={Css.dg.gtc("repeat(2, minmax(0, 1fr))").sm.$}>
-            {/* TODO: Fix grid calculations */}
-            {data.map((d, idx) => (
-              <div
-                key={d.label}
-                css={
-                  Css.df
-                    .gapPx(4)
-                    .gc(idx > data.length / 2 ? 2 : 1)
-                    .gr(idx % (data.length / 2)).$
-                }
-                {...tid[defaultTestId(d.label)]}
-              >
-                <dt>{d.label}:</dt>
-                <dd>{d.value}</dd>
+        <div css={Css.df.fdc.gap2.$}>
+          {data && data?.length > 0 && (
+            <div css={Css.df.gap2.sm.$}>
+              <div css={Css.df.fdc.fg1.$}>
+                {col1.map((d) => (
+                  <dl key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
+                    <dt>{d.label}:</dt>
+                    <dd>{d.value}</dd>
+                  </dl>
+                ))}
               </div>
-            ))}
-          </dl>
-        )}
-        {progress !== undefined && (
-          <div css={Css.df.fdc.gap1.$}>
-            <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-              <div css={Css.w25.hPx(8).br4.bgGray200.$}>
-                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
+              <div css={Css.df.fdc.fg1.$}>
+                {col2.map((d) => (
+                  <dl key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
+                    <dt>{d.label}:</dt>
+                    <dd>{d.value}</dd>
+                  </dl>
+                ))}
               </div>
-              <span {...tid.progressValue}>{progressValue}%</span>
             </div>
-          </div>
-        )}
+          )}
+          {progress !== undefined && (
+            <div css={Css.df.fdc.gap1.$}>
+              <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
+                <div css={Css.w25.hPx(8).br4.bgGray200.$}>
+                  <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
+                </div>
+                <span {...tid.progressValue}>{progressValue}%</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
