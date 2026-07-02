@@ -59,6 +59,7 @@ export * from "./Table";
 export { TabContent, Tabs, TabsWithContent } from "./Tabs";
 export type { RouteTab, RouteTabWithContent, Tab, TabWithContent } from "./Tabs";
 export * from "./Tag";
+export * from "./TagGroup";
 export * from "./Toast/Toast";
 export { useToast } from "./Toast/useToast";
 export type { UseToastProps } from "./Toast/useToast";

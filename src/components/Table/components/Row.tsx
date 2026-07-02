@@ -414,7 +414,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isHeader &&
             columnIndex < columns.length - 1 &&
             currentColspan === 1 &&
-            !isContentColumn(column)
+            isContentColumn(column)
           ) {
             // Parse current width - if not in pixels, use a fallback or skip resize handle
             const currentSizeStr = columnSizes[columnIndex];
