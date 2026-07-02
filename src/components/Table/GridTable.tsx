@@ -1232,4 +1232,4 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
   },
 );
 
-const CARD_MIN_WIDTH_PX = 280;
+const CARD_MIN_WIDTH_PX = 330;

@@ -31,7 +31,14 @@ import {
   SimpleHeaderAndData,
   useGridTableApi,
 } from "src/components/index";
-import { cardBadgeSlot, cardDataBlockSlot, cardEyebrowSlot, cardTitleSlot } from "src/components/Table/cardSlots";
+import {
+  cardBadgeSlot,
+  cardDataBlockSlot,
+  cardEyebrowSlot,
+  cardProgressSlot,
+  cardStatusSlot,
+  cardTitleSlot,
+} from "src/components/Table/cardSlots";
 import { Css, Palette } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
@@ -2583,39 +2590,146 @@ export function MultipleStickyColumns() {
   );
 }
 
-type HomeData = {
-  address: string;
-  lot: string;
-  city: string;
+type PlanData = {
+  offeringName: string;
+  planCode: string;
+  version: string;
   sqft: string;
   beds: string;
   baths: string;
-  closeDate: string;
+  elevations: string;
+  width: string;
+  depth: string;
+  bidOut: number;
   status: string;
 };
-type HomeRow = SimpleHeaderAndData<HomeData>;
+type PlanRow = SimpleHeaderAndData<PlanData>;
+
+const realPlanExamples: GridDataRow<PlanRow>[] = [
+  {
+    kind: "data",
+    id: "emerson-houston",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "The Emerson Houston",
+      planCode: "226",
+      version: "v23",
+      sqft: "4,274 - 4,496",
+      beds: "5",
+      baths: "4",
+      elevations: "3",
+      width: "39 - 39.92",
+      depth: "70.46 - 71",
+      bidOut: 72,
+      status: "Draft",
+    },
+  },
+  {
+    kind: "data",
+    id: "carriage-house-eaton-adu",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "Carriage House - Eaton ADU",
+      planCode: "526",
+      version: "v16",
+      sqft: "526",
+      beds: "1",
+      baths: "1",
+      elevations: "3",
+      width: "30",
+      depth: "26.25",
+      bidOut: 69,
+      status: "Active",
+    },
+  },
+  {
+    kind: "data",
+    id: "the-conroy",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "The Conroy",
+      planCode: "001",
+      version: "v2",
+      sqft: "4,435 - 5,091",
+      beds: "5 - 6",
+      baths: "5.5",
+      elevations: "2",
+      width: "49 - 69",
+      depth: "76 - 79",
+      bidOut: 24,
+      status: "Archived",
+    },
+  },
+  {
+    kind: "data",
+    id: "plan-5-the-echo",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "Plan 5 - The Echo",
+      planCode: "2733",
+      version: "v180",
+      sqft: "2,845 - 2,877",
+      beds: "3 - 5",
+      baths: "3 - 3.5",
+      elevations: "3",
+      width: "40",
+      depth: "55 - 60.5",
+      bidOut: 74,
+      status: "Active",
+    },
+  },
+  {
+    kind: "data",
+    id: "the-ryan-houston-pof2",
+    imgSrc: "plan-exterior.png",
+    data: {
+      offeringName: "The Ryan - Houston (POF2)",
+      planCode: "418",
+      version: "v4",
+      sqft: "4,189 - 4,214",
+      beds: "4 - 5",
+      baths: "5",
+      elevations: "4",
+      width: "39.9 - 79.8",
+      depth: "74.46 - 161.65",
+      bidOut: 54,
+      status: "Archived",
+    },
+  },
+];
+
+function planStatusCardSlot(status: string) {
+  return cardStatusSlot({
+    text: status,
+    type: status === "Active" ? "success" : status === "Archived" ? "warning" : "neutral",
+  });
+}
 
 export function CardView() {
-  const columns: GridColumn<HomeRow>[] = [
+  const columns: GridColumn<PlanRow>[] = [
     {
-      header: "Address",
-      data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+      header: "Offering Name",
+      data: ({ offeringName }) => ({
+        content: offeringName,
+        value: offeringName,
+        cardSlot: cardTitleSlot(offeringName),
+      }),
     },
     {
-      header: "Lot",
-      data: ({ lot }) => ({ content: lot, value: lot, cardSlot: cardEyebrowSlot(lot) }),
+      header: "Plan Code",
+      data: ({ planCode }) => ({ content: planCode, value: planCode, cardSlot: cardEyebrowSlot(planCode) }),
     },
     {
-      header: "City",
-      data: ({ city }) => ({ content: city, value: city, cardSlot: cardBadgeSlot(city) }),
+      header: "Version",
+      data: ({ version }) => ({ content: version, value: version, cardSlot: cardBadgeSlot(version) }),
     },
     {
-      header: "Sq Ft",
-      name: "Sq Ft",
+      header: "Sqft",
+      name: "Sqft",
       data: ({ sqft }) => ({
         content: sqft,
         value: sqft,
-        cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }),
+        cardSlot: cardDataBlockSlot({ label: "Sqft", value: sqft }),
       }),
     },
     {
@@ -2633,30 +2747,61 @@ export function CardView() {
       }),
     },
     {
-      header: "Close Date",
-      name: "Close Date",
-      data: ({ closeDate }) => ({
-        content: closeDate,
-        value: closeDate,
-        cardSlot: cardDataBlockSlot({ label: "Close Date", value: closeDate }),
+      header: "Elevations",
+      name: "Elevations",
+      data: ({ elevations }) => ({
+        content: elevations,
+        value: elevations,
+        cardSlot: cardDataBlockSlot({ label: "Elevations", value: elevations }),
       }),
+    },
+    {
+      header: "Width",
+      name: "Width",
+      data: ({ width }) => ({
+        content: width,
+        value: width,
+        cardSlot: cardDataBlockSlot({ label: "Width", value: width }),
+      }),
+    },
+    {
+      header: "Depth",
+      name: "Depth",
+      data: ({ depth }) => ({
+        content: depth,
+        value: depth,
+        cardSlot: cardDataBlockSlot({ label: "Depth", value: depth }),
+      }),
+    },
+    {
+      header: "Bid out",
+      name: "Bid out",
+      data: ({ bidOut }) => ({ content: bidOut, value: bidOut, cardSlot: cardProgressSlot(bidOut) }),
+    },
+    {
+      header: "Status",
+      data: ({ status }) => ({ content: status, value: status, cardSlot: planStatusCardSlot(status) }),
     },
   ];
 
-  const rows: GridDataRow<HomeRow>[] = [
+  const rows: GridDataRow<PlanRow>[] = [
     simpleHeader,
+    ...realPlanExamples,
     {
       kind: "data",
       id: "1",
       imgSrc: "plan-exterior.png",
       data: {
-        address: "123 Main Street",
-        lot: "Lot 4",
-        city: "Austin, TX",
+        offeringName: "The Prescott",
+        planCode: "SFH-101",
+        version: "v1.0",
         sqft: "2,400",
         beds: "4",
         baths: "3",
-        closeDate: "Aug 2026",
+        elevations: "2",
+        width: "52",
+        depth: "68",
+        bidOut: 40,
         status: "In Progress",
       },
     },
@@ -2665,13 +2810,16 @@ export function CardView() {
       id: "2",
       imgSrc: "plan-exterior.png",
       data: {
-        address: "456 Oak Avenue",
-        lot: "Lot 7",
-        city: "Denver, CO",
+        offeringName: "The Rosalind",
+        planCode: "SFH-102",
+        version: "v1.2",
         sqft: "3,100",
         beds: "5",
         baths: "4",
-        closeDate: "Oct 2026",
+        elevations: "3",
+        width: "58",
+        depth: "72",
+        bidOut: 15,
         status: "Planning",
       },
     },
@@ -2680,13 +2828,16 @@ export function CardView() {
       id: "3",
       imgSrc: "plan-exterior.png",
       data: {
-        address: "789 Pine Road",
-        lot: "Lot 2",
-        city: "Nashville, TN",
+        offeringName: "The Winslow",
+        planCode: "TH-103",
+        version: "v2.0",
         sqft: "1,850",
         beds: "3",
         baths: "2",
-        closeDate: "Dec 2026",
+        elevations: "2",
+        width: "44",
+        depth: "60",
+        bidOut: 100,
         status: "Complete",
       },
     },
@@ -2702,11 +2853,11 @@ export function CardView() {
 }
 
 export function CardViewInfiniteScroll() {
-  const cities = ["Austin, TX", "Denver, CO", "Nashville, TN", "Phoenix, AZ", "Charlotte, NC"];
-  const statuses = ["In Progress", "Planning", "Complete"];
+  const offeringNames = ["The Prescott", "The Rosalind", "The Winslow", "The Sutton", "The Hartley"];
+  const statuses = ["Active", "Draft", "Archived"];
 
   const makeRows = useCallback(
-    (offset: number, count: number): GridDataRow<HomeRow>[] =>
+    (offset: number, count: number): GridDataRow<PlanRow>[] =>
       zeroTo(count).map((i) => {
         const n = offset + i;
         return {
@@ -2714,13 +2865,16 @@ export function CardViewInfiniteScroll() {
           id: String(n),
           imgSrc: "plan-exterior.png",
           data: {
-            address: `${100 + n} Elm Street`,
-            lot: `Lot ${n + 1}`,
-            city: cities[n % cities.length],
+            offeringName: `${offeringNames[n % offeringNames.length]} ${n}`,
+            planCode: `SFH-${String(100 + n).padStart(3, "0")}`,
+            version: `v${1 + (n % 5)}.${n % 10}`,
             sqft: String(1_500 + (n % 20) * 100),
             beds: String(2 + (n % 4)),
             baths: String(1 + (n % 3)),
-            closeDate: `${["Jan", "Mar", "Jun", "Sep", "Nov"][n % 5]} 2027`,
+            elevations: String(1 + (n % 5)),
+            width: `${30 + (n % 40)}`,
+            depth: `${50 + (n % 40)}`,
+            bidOut: (n * 7) % 100,
             status: statuses[n % statuses.length],
           },
         };
@@ -2729,24 +2883,34 @@ export function CardViewInfiniteScroll() {
     [],
   );
 
-  const [data, setData] = useState<GridDataRow<HomeRow>[]>(() => makeRows(0, 50));
+  const [data, setData] = useState<GridDataRow<PlanRow>[]>(() => [...realPlanExamples, ...makeRows(0, 50)]);
   const rows = useMemo(() => [simpleHeader, ...data], [data]);
 
-  const columns: GridColumn<HomeRow>[] = useMemo(
+  const columns: GridColumn<PlanRow>[] = useMemo(
     () => [
       {
-        header: "Address",
-        data: ({ address }) => ({ content: address, value: address, cardSlot: cardTitleSlot(address) }),
+        header: "Offering Name",
+        data: ({ offeringName }) => ({
+          content: offeringName,
+          value: offeringName,
+          cardSlot: cardTitleSlot(offeringName),
+        }),
       },
-      { header: "Lot", data: ({ lot }) => ({ content: lot, value: lot, cardSlot: cardEyebrowSlot(lot) }) },
-      { header: "City", data: ({ city }) => ({ content: city, value: city, cardSlot: cardBadgeSlot(city) }) },
       {
-        header: "Sq Ft",
-        name: "Sq Ft",
+        header: "Plan Code",
+        data: ({ planCode }) => ({ content: planCode, value: planCode, cardSlot: cardEyebrowSlot(planCode) }),
+      },
+      {
+        header: "Version",
+        data: ({ version }) => ({ content: version, value: version, cardSlot: cardBadgeSlot(version) }),
+      },
+      {
+        header: "Sqft",
+        name: "Sqft",
         data: ({ sqft }) => ({
           content: sqft,
           value: sqft,
-          cardSlot: cardDataBlockSlot({ label: "Sq Ft", value: sqft }),
+          cardSlot: cardDataBlockSlot({ label: "Sqft", value: sqft }),
         }),
       },
       {
@@ -2767,6 +2931,42 @@ export function CardViewInfiniteScroll() {
           cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }),
         }),
       },
+      {
+        header: "Elevations",
+        name: "Elevations",
+        data: ({ elevations }) => ({
+          content: elevations,
+          value: elevations,
+          cardSlot: cardDataBlockSlot({ label: "Elevations", value: elevations }),
+        }),
+      },
+      {
+        header: "Width",
+        name: "Width",
+        data: ({ width }) => ({
+          content: width,
+          value: width,
+          cardSlot: cardDataBlockSlot({ label: "Width", value: width }),
+        }),
+      },
+      {
+        header: "Depth",
+        name: "Depth",
+        data: ({ depth }) => ({
+          content: depth,
+          value: depth,
+          cardSlot: cardDataBlockSlot({ label: "Depth", value: depth }),
+        }),
+      },
+      {
+        header: "Bid out",
+        name: "Bid out",
+        data: ({ bidOut }) => ({ content: bidOut, value: bidOut, cardSlot: cardProgressSlot(bidOut) }),
+      },
+      {
+        header: "Status",
+        data: ({ status }) => ({ content: status, value: status, cardSlot: planStatusCardSlot(status) }),
+      },
     ],
     [],
   );
@@ -2780,7 +2980,7 @@ export function CardViewInfiniteScroll() {
           rows={rows}
           infiniteScroll={{
             onEndReached() {
-              setData((prev) => [...prev, ...makeRows(prev.length, 50)]);
+              setData((prev) => [...prev, ...makeRows(prev.length - realPlanExamples.length, 50)]);
             },
           }}
         />
