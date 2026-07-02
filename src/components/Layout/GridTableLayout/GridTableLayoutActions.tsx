@@ -2,6 +2,7 @@ import { memo, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls } from "src/components/Filters";
+import { getActiveFilterCount } from "src/components/Filters/utils";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
@@ -16,7 +17,7 @@ import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext
 import { useTestIds } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
-import { buildFilterImpls, FilterPanel, getActiveFilterCount } from "./FilterPanel";
+import { buildFilterImpls, FilterPanel } from "./FilterPanel";
 
 export type SearchBoxProps = {
   onSearch: (filter: string) => void;

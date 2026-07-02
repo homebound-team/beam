@@ -5,6 +5,7 @@ import {
   FilterDefs,
   FilterImpls,
   filterTestIdPrefix,
+  getActiveFilterCount,
   SelectedFilterLabelValue,
   updateFilter,
 } from "src/components/Filters";
@@ -13,7 +14,7 @@ import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
+import { isDefined, safeEntries, useTestIds } from "src/utils";
 
 type FilterPanelProps<F extends Record<string, unknown>, G extends Value = string> = {
   isOpen: boolean;
@@ -114,10 +115,6 @@ function buildFilterControls<F extends Record<string, unknown>>(
 
 export function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
   return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
-}
-
-export function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
-  return safeKeys(filter).filter((key) => filter[key] !== undefined).length;
 }
 
 function chipsForFilterKey<F extends Record<string, unknown>, K extends keyof F>(
