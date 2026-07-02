@@ -156,24 +156,24 @@ export function TableCardView(props: TableCardViewProps) {
         </div>
         <div css={Css.df.fdc.gap2.$}>
           {data && data?.length > 0 && (
-            <div css={Css.df.gap2.sm.$}>
+            <dl css={Css.df.gap2.sm.$}>
               <div css={Css.df.fdc.fg1.$}>
                 {col1.map((d) => (
-                  <dl key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
+                  <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
                     <dt>{d.label}:</dt>
                     <dd>{d.value}</dd>
-                  </dl>
+                  </div>
                 ))}
               </div>
               <div css={Css.df.fdc.fg1.$}>
                 {col2.map((d) => (
-                  <dl key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
+                  <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
                     <dt>{d.label}:</dt>
                     <dd>{d.value}</dd>
-                  </dl>
+                  </div>
                 ))}
               </div>
-            </div>
+            </dl>
           )}
           {progress !== undefined && (
             <div css={Css.df.fdc.gap1.$}>
