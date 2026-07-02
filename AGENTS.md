@@ -22,7 +22,7 @@ In camelCase utility files (e.g. `formatDocumentTitle.ts`), put **types first**,
 
 ## Comments
 
-- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md)).
+- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md), [`docs/overlays.md`](docs/overlays.md)).
 - **Inline comments:** Use for non-obvious logic near the code. Keep them **short** — one line when possible.
 - **Avoid:** Multi-paragraph JSDoc, restating what the code already says, and duplicating docs that live elsewhere.
 

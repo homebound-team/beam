@@ -12,7 +12,8 @@
     "dist",
     "!dist/**/*.{stories,test}.*",
     "!dist/setupTests.*",
-    "docs/layout-shells.md"
+    "docs/layout-shells.md",
+    "docs/overlays.md"
   ],
   "engines": {
     "node": "~22.14.0"
@@ -30,7 +31,8 @@
     },
     "./Css.json": "./dist/Css.json",
     "./index.css": "./dist/index.css",
-    "./docs/layout-shells.md": "./docs/layout-shells.md"
+    "./docs/layout-shells.md": "./docs/layout-shells.md",
+    "./docs/overlays.md": "./docs/overlays.md"
   },
   "scripts": {
     "start": "yarn storybook",

@@ -6,10 +6,10 @@ import { BeamProvider } from "src";
 export * from "./rtlUtils";
 export { _withRouter as withRouter };
 
-interface RenderOpts {
+type RenderOpts = {
   at?: { url: string; route?: string };
   omitBeamContext?: boolean;
-}
+};
 
 export function render(
   component: ReactElement,
@@ -27,8 +27,9 @@ export function render(
 ): Promise<RenderResult & Record<string, HTMLElement>> {
   let wrappers: Wrapper[];
   if (wrapperOrOpts && "wrap" in wrapperOrOpts) {
-    // They passed at least single wrapper + maybe more.
-    // We put `withBeamRTL` first so that any `withApollo`s wrap outside of beam, so in-drawer/in-modal content has apollo
+    // withBeamRTL is innermost; wrappers passed here wrap outside BeamProvider.
+    // For overlay context (feature flags, Apollo), nest providers inside BeamProvider
+    // and mount BeamOverlays below them — see docs/overlays.md.
     wrappers = [withBeamRTL, wrapperOrOpts as Wrapper, ...otherWrappers];
   } else if (wrapperOrOpts) {
     const { omitBeamContext, at } = wrapperOrOpts;
@@ -43,7 +44,7 @@ export function render(
   return rtlRender(component, { wrappers, wait: true });
 }
 
-/** RTL wrapper for Beam's SuperDrawer/Modal context. */
+/** RTL wrapper for Beam's SuperDrawer/Modal context (BeamProvider fallback overlays). */
 export const withBeamRTL: Wrapper = {
   wrap: (c) => <BeamProvider>{c}</BeamProvider>,
 };

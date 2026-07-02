@@ -1,6 +1,6 @@
 import { type Decorator, type StoryObj } from "@storybook/react-vite";
 import { ReactNode } from "react";
-import { BeamProvider } from "src/components";
+import { BeamOverlays, BeamProvider } from "src/components";
 import { Css, Properties } from "src/Css";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 import type { InitialViewportKeys, MINIMAL_VIEWPORTS } from "storybook/viewport";
@@ -74,10 +74,11 @@ export function zeroTo(n: number): number[] {
   return [...Array(n).keys()];
 }
 
-/** Storybook decorator utility to wrap a story with a SuperDrawer context */
+/** Storybook decorator: BeamProvider + BeamOverlays (see docs/overlays.md). */
 export const withBeamDecorator: Decorator = (Story) => (
   <BeamProvider>
     <Story />
+    <BeamOverlays />
   </BeamProvider>
 );
 

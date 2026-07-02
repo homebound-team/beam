@@ -10,6 +10,10 @@ _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWU
 
 Standard **app shell** composition (global nav + body, sidebar + content, page header + body) is implemented as **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** from this package. Source lives in **`src/layouts/`** (sibling of `src/components/`). Full setup and composition rules: [`docs/layouts.md`](docs/layouts.md) — also published in the npm package at `node_modules/@homebound/beam/docs/layouts.md`.
 
+## Global overlays (Modal & SuperDrawer)
+
+Apps using `useModal` or `useSuperDrawer` should mount **`<BeamOverlays />`** inside **`BeamProvider`**, below app-wide context providers, so overlay content can access context defined by ancestral providers. Setup and placement rules: [`docs/overlays.md`](docs/overlays.md) — also at `node_modules/@homebound/beam/docs/overlays.md`.
+
 ## Getting Started
 
 ```bash
