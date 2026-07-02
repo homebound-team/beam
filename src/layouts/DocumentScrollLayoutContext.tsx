@@ -9,21 +9,34 @@ import {
   useRef,
   useState,
 } from "react";
-import { Css } from "src/Css";
+import { BeamColor } from "src/colors";
+import { Css, Tokens } from "src/Css";
+import { useBodyBackgroundColor } from "src/hooks/useBodyBackgroundColor";
 import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "./layoutVars";
 
 const DocumentScrollLayoutContext = createContext(false);
 
+export type DocumentScrollLayoutProviderProps = {
+  children: ReactNode;
+  /** Background color applied to `document.body` while this provider is mounted. */
+  bodyBackgroundColor?: BeamColor;
+};
+
 /** Outermost document-scroll layout root; nested providers bypass. Publishes viewport CSS vars. */
-export function DocumentScrollLayoutProvider({ children }: { children: ReactNode }): JSX.Element {
+export function DocumentScrollLayoutProvider({
+  children,
+  bodyBackgroundColor = Tokens.Surface,
+}: DocumentScrollLayoutProviderProps): JSX.Element {
   const inDocumentScrollLayout = useContext(DocumentScrollLayoutContext);
   // Nested layouts already sit under an outer measurement root.
   if (inDocumentScrollLayout) return <>{children}</>;
 
   return (
     <DocumentScrollLayoutContext.Provider value={true}>
-      <DocumentScrollLayoutViewportRoot>{children}</DocumentScrollLayoutViewportRoot>
+      <DocumentScrollLayoutViewportRoot bodyBackgroundColor={bodyBackgroundColor}>
+        {children}
+      </DocumentScrollLayoutViewportRoot>
     </DocumentScrollLayoutContext.Provider>
   );
 }
@@ -33,7 +46,15 @@ export function useDocumentScrollLayout(): boolean {
   return useContext(DocumentScrollLayoutContext);
 }
 
-function DocumentScrollLayoutViewportRoot({ children }: { children: ReactNode }) {
+function DocumentScrollLayoutViewportRoot({
+  children,
+  bodyBackgroundColor,
+}: {
+  children: ReactNode;
+  bodyBackgroundColor: BeamColor;
+}) {
+  useBodyBackgroundColor(bodyBackgroundColor);
+
   const docElementRef = useRef<HTMLElement | null>(typeof document !== "undefined" ? document.documentElement : null);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 

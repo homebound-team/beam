@@ -48,6 +48,7 @@ import { zIndices } from "src/utils/zIndices";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
 import { TableCard } from "./components/TableCard";
+import { GridTableEmptyState, GridTableEmptyStateProps } from "./GridTableEmptyState";
 import { DraggedOver, RowState } from "./utils/RowState";
 
 let runningInJest = false;
@@ -56,8 +57,6 @@ let runningInJest = false;
 export function setRunningInJest() {
   runningInJest = true;
 }
-
-const CARD_MIN_WIDTH_PX = 280;
 
 export type GridTableDefaults = {
   style: GridStyle | GridStyleDef;
@@ -149,6 +148,8 @@ export type GridTableProps<R extends Kinded, X> = {
   sorting?: GridSortConfig;
   /** Shown in the first row slot, if there are no rows to show, i.e. 'No rows found'. */
   fallbackMessage?: string;
+  /** Replaces the entire table when there are no data rows. */
+  emptyState?: GridTableEmptyStateProps;
   /** Shown in the first row, kinda-like the fallbackMessage, but shown even if there are rows as well. */
   infoMessage?: string;
   /** Applies a client-side filter to rows, using either it's text value or `GridCellContent.value`. */
@@ -249,6 +250,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     filter,
     filterMaxRows,
     fallbackMessage = "No rows found.",
+    emptyState,
     infoMessage,
     persistCollapse,
     persistScrollPosition,
@@ -314,6 +316,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // way we avoid React warnings when the observable mutations cause downstream
   // components to be marked for re-render. Mobx will ignore setter calls that
   // don't actually change the value, so we can do this in a single useEffect.
+  const tableStateSyncedFromPropsRef = useRef(false);
   useEffect(() => {
     // Use runInAction so mobx delays any reactions until all the mutations happen
     runInAction(() => {
@@ -324,6 +327,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       tableState.activeRowId = activeRowId;
       tableState.activeCellId = activeCellId;
     });
+    tableStateSyncedFromPropsRef.current = true;
   }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
@@ -597,9 +601,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Pinned rows still count as "data on screen", so don't show the empty fallback when only the
   // body is empty but pins remain visible (e.g. a filter hid every un-pinned row).
+  // Intentionally based on TableState (not props.rows): filters/collapse can hide every visible row
+  // while props still contain data.
   const noData = visibleDataRows.length === 0 && pinnedRows.length === 0;
   const firstRowMessage =
-    (noData && fallbackMessage) || (tooManyClientSideRows && "Hiding some rows, use filter...") || infoMessage;
+    (noData && !emptyState && fallbackMessage) ||
+    (tooManyClientSideRows && "Hiding some rows, use filter...") ||
+    infoMessage;
 
   const borderless = style?.presentationSettings?.borderless;
   const typeScale = style?.presentationSettings?.typeScale;
@@ -637,6 +645,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     return { ...style, minWidthPx };
   }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
+
+  // TableState is updated from props in useEffect; until that runs, noData is stale on the first paint.
+  // Keep the table (and width probe) mounted pre-sync; only swap to emptyState once TableState reflects props.
+  if (noData && emptyState && tableStateSyncedFromPropsRef.current) {
+    return <GridTableEmptyState {...emptyState} />;
+  }
 
   return (
     <TableStateContext.Provider value={rowStateContext}>
@@ -1217,3 +1231,5 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
+
+const CARD_MIN_WIDTH_PX = 280;
