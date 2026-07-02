@@ -48,7 +48,7 @@ export function WithStatus() {
         eyebrow="Home"
         title="123 Main Street"
         badge="Austin, TX"
-        status={{ text: "In Progress", type: "caution" }}
+        status={{ text: "In Progress", type: "update" }}
         data={data}
       />
     </CardContainer>

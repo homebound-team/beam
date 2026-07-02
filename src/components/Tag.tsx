@@ -5,7 +5,7 @@ import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type TagXss = Margin | "backgroundColor" | "color";
-export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
+export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral";
 export type TagVariant = "primary" | "secondary";
 
 type TagPropsBase<X> = {
@@ -102,12 +102,14 @@ function getPrimaryStyles(type?: TagType): Pick<TagVariantStyles, "background" |
   switch (type) {
     case "info":
       return { background: Css.bgBlue100.$, iconColor: Palette.Blue600 };
-    case "caution":
+    case "update":
       return { background: Css.bgYellow200.$, iconColor: Palette.Yellow700 };
     case "warning":
-      return { background: Css.bgRed200.$, iconColor: Palette.Orange700 };
+      return { background: Css.bgOrange100.$, iconColor: Palette.Orange700 };
+    case "error":
+      return { background: Css.bgRed100.$, iconColor: Palette.Orange700 };
     case "success":
-      return { background: Css.bgGreen200.$, iconColor: Palette.Green600 };
+      return { background: Css.bgGreen100.$, iconColor: Palette.Green600 };
     default:
       // Neutral case
       return { background: Css.bgGray200.$, iconColor: Palette.Gray700 };
