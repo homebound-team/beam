@@ -77,7 +77,7 @@ export function LongTitle() {
       <TableCardView
         imgSrc={imgSrc}
         eyebrow="Home"
-        title="This is a long title example"
+        title="This is a long title example (it can go even longer)"
         badge="Austin, TX"
         status={{ text: "Archived", type: "warning" }}
         data={data}
