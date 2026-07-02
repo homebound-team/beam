@@ -5,7 +5,7 @@ import { Button } from "src/components/Button";
 import { OverlayTrigger, OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
-import { Css, Tokens } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { useBreakpoint, useComputed } from "src/hooks";
 import { Switch } from "src/inputs";
 import { useTestIds } from "src/utils";
@@ -61,6 +61,11 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     [columns, api],
   );
 
+  // Count of *visible* hideable columns. The badge only appears once at least one hideable column
+  // is hidden, is absent when all columns are shown, and shows 0 when all are hidden.
+  const shownCount = options.filter((o) => selectedValues.includes(o.value)).length;
+  const anyHidden = shownCount < options.length;
+
   return (
     <OverlayTrigger
       {...props}
@@ -69,6 +74,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
         size: "md",
         label: "",
         variant: "secondaryBlack",
+        ...(anyHidden ? { badge: { color: Palette.Blue700, count: shownCount } } : {}),
       }}
       menuTriggerProps={menuTriggerProps}
       state={state}

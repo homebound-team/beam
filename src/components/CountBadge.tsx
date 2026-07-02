@@ -1,5 +1,6 @@
 import { BeamColor } from "src/colors";
-import { Css, Only, Palette, Xss } from "src/Css";
+import { Badge } from "src/components/internal/Badge";
+import { Only, Palette, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type CountBadgeXss = "color";
@@ -22,16 +23,10 @@ export function CountBadge<X extends Only<Xss<CountBadgeXss>, X>>(props: CountBa
 
   if (hideIfZero && count === 0) return null;
 
+  // Use larger size for counts > 100
   return (
-    <span
-      {...tid}
-      css={{
-        ...Css.sqPx(count > 100 ? 18 : 16).$, // Use larger size for counts > 100
-        ...Css.fs0.br100.xs2Sb.df.aic.jcc.bgColor(bgColor).$,
-        ...Css.color(color).$,
-      }}
-    >
+    <Badge {...tid} color={bgColor} textColor={color} sizePx={count > 100 ? 18 : 16}>
       {count}
-    </span>
+    </Badge>
   );
 }

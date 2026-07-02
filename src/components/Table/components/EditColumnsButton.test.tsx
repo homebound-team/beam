@@ -129,6 +129,34 @@ describe("EditColumnsButton", () => {
     // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
   });
+
+  it("badges the visible hideable-column count, only while some are hidden", async () => {
+    // Given an edit columns button opted into a badge (two hideable columns: name, value)
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return (
+        <>
+          <EditColumnsButton columns={columns} defaultOpen={true} api={_api} />
+          <GridTable columns={columns} rows={[]} api={_api} />
+        </>
+      );
+    }
+    const r = await render(<Test />);
+    // Given all hideable columns are shown, there is no badge
+    expect(r.query.countBadge).toBeFalsy();
+    // When one of the two hideable columns is hidden, the badge shows the visible count (1)
+    click(r.kanban_optionvalue);
+    expect(r.countBadge).toHaveTextContent("1");
+    // When the other is also hidden, the badge shows 0 (still visible because columns are hidden)
+    click(r.kanban_optionname);
+    expect(r.countBadge).toHaveTextContent("0");
+    // When all hideable columns are shown again, the badge disappears
+    click(r.kanban_optionname);
+    click(r.kanban_optionvalue);
+    expect(r.query.countBadge).toBeFalsy();
+  });
 });
 
 type Data = { name: string | undefined; value: number | undefined };

@@ -1,3 +1,4 @@
+export * from "./Badge";
 export * from "./DatePicker";
 export * from "./Menu";
 export * from "./MenuItem";

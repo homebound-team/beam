@@ -1,6 +1,8 @@
 import { DOMProps } from "@react-types/shared";
 import React, { AriaAttributes, ReactNode } from "react";
 import { BeamColor } from "src/colors";
+import { CountBadge } from "src/components/CountBadge";
+import { Badge } from "src/components/internal/Badge";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, increment, Margin, Tokens, Xss } from "src/Css";
 
@@ -15,32 +17,49 @@ export type IconProps = {
   /** Styles overrides */
   xss?: Xss<Margin | "visibility" | "flexShrink">;
   tooltip?: ReactNode;
+  /** Shows a small badge overlapping the icon's top-right. Omit `count` for a plain dot. */
+  badge?: { color: BeamColor; count?: number };
 } & AriaAttributes &
   DOMProps;
 
 export const Icon = React.memo((props: IconProps) => {
-  const { icon, inc = 3, color = "currentColor", bgColor, xss, tooltip, ...other } = props;
+  const { icon, inc = 3, color = "currentColor", bgColor, xss, tooltip, badge, ...other } = props;
   const size = increment(inc);
+  const svg = (
+    <svg
+      aria-hidden={true}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      css={{
+        ...Css.fill(color).$,
+        ...(bgColor && Css.bgColor(bgColor).$),
+        ...xss,
+      }}
+      data-icon={icon}
+      {...other}
+    >
+      {Icons[icon]}
+    </svg>
+  );
   return maybeTooltip({
     title: tooltip,
     placement: "top",
-    children: (
-      <svg
-        aria-hidden={true}
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        css={{
-          ...Css.fill(color).$,
-          ...(bgColor && Css.bgColor(bgColor).$),
-          ...xss,
-        }}
-        data-icon={icon}
-        {...other}
-      >
-        {Icons[icon]}
-      </svg>
+    children: badge ? (
+      // Overlap a badge on the icon's top-right corner (e.g. a hidden-column count).
+      <span css={Css.relative.dib.add("lineHeight", 0).$}>
+        {svg}
+        <span css={Css.absolute.topPx(-4).$}>
+          {badge.count !== undefined ? (
+            <CountBadge count={badge.count} bgColor={badge.color} />
+          ) : (
+            <Badge color={badge.color} />
+          )}
+        </span>
+      </span>
+    ) : (
+      svg
     ),
   });
 });

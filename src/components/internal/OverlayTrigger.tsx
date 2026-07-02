@@ -14,8 +14,8 @@ import { Css } from "src/Css";
 import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-type TextButtonTriggerProps = Pick<ButtonProps, "label" | "variant" | "size" | "icon">;
-type IconButtonTriggerProps = Pick<IconButtonProps, "icon" | "color" | "compact" | "inc">;
+type TextButtonTriggerProps = Pick<ButtonProps, "label" | "variant" | "size" | "icon" | "badge">;
+type IconButtonTriggerProps = Pick<IconButtonProps, "icon" | "color" | "compact" | "inc" | "badge">;
 type AvatarButtonTriggerProps = Pick<AvatarButtonProps, "src" | "name" | "size" | "preventTooltip">;
 type NavLinkButtonTriggerProps = {
   navLabel: string;

@@ -1,4 +1,5 @@
 import { IconButton } from "src/components/IconButton";
+import { Palette } from "src/Css";
 import { noop } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
@@ -29,6 +30,28 @@ describe("IconButton", () => {
     const testIds = useTestIds({}, "page1");
     const r = await render(<IconButton icon="trash" {...testIds.remove} onClick={noop} />);
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("page1_remove");
+  });
+
+  it("renders a count badge over the icon", async () => {
+    const r = await render(
+      <IconButton icon="kanban" label="Columns" badge={{ color: Palette.Blue700, count: 6 }} onClick={noop} />,
+    );
+    expect(r.countBadge).toHaveTextContent("6");
+  });
+
+  it("renders a plain dot badge when no count is given", async () => {
+    const r = await render(
+      <IconButton icon="kanban" label="Columns" badge={{ color: Palette.Blue700 }} onClick={noop} />,
+    );
+    // The dot variant renders the base Badge (not a CountBadge)
+    expect(r.badge).toBeInTheDocument();
+    expect(r.query.countBadge).toBeNull();
+  });
+
+  it("renders no badge when badge is omitted", async () => {
+    const r = await render(<IconButton icon="kanban" label="Columns" onClick={noop} />);
+    expect(r.query.badge).toBeNull();
+    expect(r.query.countBadge).toBeNull();
   });
 
   it("fires onClick method", async () => {

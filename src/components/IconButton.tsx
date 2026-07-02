@@ -37,6 +37,8 @@ export type IconButtonProps = {
    * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
    */
   preventTooltip?: boolean;
+  /** Shows a small badge overlapping the icon's top-right. Omit `count` for a plain dot. */
+  badge?: { color: BeamColor; count?: number };
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -60,6 +62,7 @@ export function IconButton(props: IconButtonProps) {
     forceFocusStyles = false,
     label,
     preventTooltip = false,
+    badge,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
@@ -116,6 +119,7 @@ export function IconButton(props: IconButtonProps) {
       }
       bgColor={bgColor}
       inc={compact ? 2 : isCircle ? 2.5 : inc}
+      badge={badge}
     />
   );
 
