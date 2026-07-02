@@ -6,11 +6,14 @@ import { useTestIds } from "src/utils";
 
 export type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "caution" | "warning" | "success" | "neutral";
+export type TagVariant = "primary" | "secondary";
 
 type TagPropsBase<X> = {
   text: ReactNode;
   // Defaults to "neutral"
   type?: TagType;
+  /** Defaults to "primary". Secondary is intended for use in TagGroup. */
+  variant?: TagVariant;
   xss?: X;
   /** A tooltip will automatically be displayed if the text is truncated. Set to true to prevent this behavior.
    * @default false */
@@ -22,9 +25,9 @@ export type TagProps<X> = TagPropsBase<X> & ({ iconOnly?: false; icon?: IconKey 
 
 /** Tag used for indicating a status */
 export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
-  const { text, type, xss, preventTooltip = false, iconOnly, icon, ...otherProps } = props;
+  const { text, type, variant = "primary", xss, preventTooltip = false, iconOnly, icon, ...otherProps } = props;
   const isIconOnly = !!iconOnly && !!icon;
-  const { background, iconColor } = getStyles(type);
+  const { background, iconColor, typography, padding } = getVariantStyles(variant, type);
   const tid = useTestIds(otherProps);
   const [showTooltip, setShowTooltip] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -45,8 +48,9 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
       <span
         {...tid}
         css={{
-          ...Css.relative.dif.xs2Sb.ttu.aic.gapPx(4).pyPx(2).gray900.br4.$,
-          ...(isIconOnly ? Css.pxPx(2).$ : Css.pxPx(6).$),
+          ...Css.relative.dif.aic.gapPx(4).pyPx(2).gray900.br4.$,
+          ...typography,
+          ...(isIconOnly ? Css.pxPx(2).$ : padding),
           ...background,
           ...xss,
         }}
@@ -70,7 +74,31 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
   });
 }
 
-function getStyles(type?: TagType): { background: Properties; iconColor: Palette } {
+type TagVariantStyles = {
+  background: Properties;
+  iconColor: Palette;
+  typography: Properties;
+  padding: Properties;
+};
+
+function getVariantStyles(variant: TagVariant, type?: TagType): TagVariantStyles {
+  if (variant === "secondary") {
+    return {
+      background: Css.bgWhite.bcGray300.bw1.ba.$,
+      iconColor: Palette.Gray700,
+      typography: Css.xs.$,
+      padding: Css.pxPx(8).$,
+    };
+  }
+
+  return {
+    ...getPrimaryStyles(type),
+    typography: Css.xs2Sb.ttu.$,
+    padding: Css.pxPx(6).$,
+  };
+}
+
+function getPrimaryStyles(type?: TagType): Pick<TagVariantStyles, "background" | "iconColor"> {
   switch (type) {
     case "info":
       return { background: Css.bgBlue100.$, iconColor: Palette.Blue600 };

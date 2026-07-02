@@ -27,10 +27,16 @@ export type StoryParameters = {
 type PlayFunction = NonNullable<StoryObj["play"]>;
 
 /** Options supported by {@link newStory}. */
-export type StoryOptions = {
+export type StoryOptions<TArgs = Record<string, unknown>> = {
   parameters?: StoryParameters;
   decorators?: Decorator[];
   play?: PlayFunction;
+  globals?: {
+    backgrounds?: {
+      value?: string;
+    };
+  };
+  args?: Partial<TArgs>;
 };
 
 /**
@@ -42,10 +48,14 @@ export function viewportModes<const T extends StorybookViewportKey>(...viewports
   return Object.fromEntries(viewports.map((viewport) => [viewport, { viewport }])) as ChromaticViewportModes<T>;
 }
 
-/** A somewhat typesafe way to set `FooStory.story` metadata. */
-export function newStory(storyFn: Function, opts: StoryOptions): Function {
-  Object.assign(storyFn, opts);
-  return storyFn;
+/**
+ * Attach story metadata (args, decorators, play, etc.) when defining a CSF3 story export.
+ * Prefer passing options here over mutating `.args` on the export afterward.
+ */
+export function newStory<TFn extends Function>(storyFn: TFn, opts: StoryOptions): TFn {
+  const story = ((...args: unknown[]) => storyFn(...args)) as unknown as TFn;
+  Object.assign(story, opts);
+  return story;
 }
 
 /** Renders a number of small samples within a single story. */

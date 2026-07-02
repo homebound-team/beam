@@ -19,7 +19,7 @@ const categories: SelectCardGroupItemOption<Category>[] = [
   { icon: "archive", label: "History", value: Category.History },
   { icon: "dollar", label: "Finance", value: Category.Finance },
   { icon: "hardHat", label: "Engineering", value: Category.Engineering },
-  { icon: "kanban", label: "Management", value: Category.Management },
+  { icon: "columns", label: "Management", value: Category.Management },
   { icon: "camera", label: "Media", value: Category.Media },
 ];
 

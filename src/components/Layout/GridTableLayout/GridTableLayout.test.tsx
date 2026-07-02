@@ -16,7 +16,7 @@ import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/si
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
 import { noop } from "src/utils";
-import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
+import { click, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
@@ -67,7 +67,7 @@ describe("GridTableLayout", () => {
 
     // And the table actions to be rendered
     expect(r.search).toHaveValue("");
-    expect(r.filter_button).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -123,7 +123,7 @@ describe("GridTableLayout", () => {
     // And the search to not be rended
     expect(r.query.search).not.toBeInTheDocument();
     // But the filter button still is
-    expect(r.filter_button).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -271,14 +271,14 @@ describe("GridTableLayout", () => {
       );
 
       // Then EditColumnsButton is visible in list view
-      expect(r.editColumnsButton).toBeInTheDocument();
+      expect(r.columns).toBeInTheDocument();
 
       // When switching to card view
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
       // Then EditColumnsButton is hidden in card view
-      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+      expect(r.query.columns).not.toBeInTheDocument();
     });
 
     it("persists view selection to localStorage when toggled", async () => {
@@ -321,7 +321,7 @@ describe("GridTableLayout", () => {
       );
 
       // Card view is restored from localStorage — EditColumnsButton is hidden in card view
-      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+      expect(r.query.kanban).not.toBeInTheDocument();
     });
 
     it("does not persist view when withCardView is undefined", async () => {
@@ -360,7 +360,7 @@ describe("GridTableLayout", () => {
       );
 
       // Falls back to defaultView="list" — EditColumnsButton is visible in list view
-      expect(r.editColumnsButton).toBeInTheDocument();
+      expect(r.columns).toBeInTheDocument();
     });
 
     it("renders card content using cardSlot columns when switched to card view", async () => {
@@ -528,6 +528,162 @@ describe("GridTableLayout", () => {
         search: "client" as const,
       };
     }
+  });
+
+  describe("filters", () => {
+    it("removes the filter value when a chip is clicked", async () => {
+      // Given the panel is closed with an active filter
+      const storageKey = "chip-click-test";
+      sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
+
+      type ChipFilter = { needsRevision?: boolean };
+      let capturedFilter: ChipFilter = {};
+
+      function FilterChipWrapper() {
+        const layoutState = useGridTableLayoutState<ChipFilter>({
+          persistedFilter: {
+            filterDefs: {
+              needsRevision: checkboxFilter({ label: "Needs Revision" }),
+            },
+            storageKey: storageKey,
+          },
+        });
+        capturedFilter = layoutState.filter;
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        );
+      }
+
+      const r = await render(<FilterChipWrapper />, withRouter());
+      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      expect(capturedFilter).toEqual({ needsRevision: true });
+
+      // When the chip is clicked
+      click(r.filter_chip_needsRevision);
+
+      // Then the chip is removed and the filter state is cleared
+      expect(r.query.filter_chip_needsRevision).not.toBeInTheDocument();
+      expect(capturedFilter).toEqual({});
+    });
+  });
+
+  describe("empty state", () => {
+    it("shows default empty state when there are no data rows and no emptyFallback", async () => {
+      // Given a layout with only a header row and no emptyFallback
+      // When the layout renders
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // Then the default structured empty state replaces the table
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No results found");
+      expect(r.query.gridTable).toBeNull();
+      expect(r.query.gridTableEmptyState_description).toBeNull();
+      expect(r.query.gridTableEmptyState_actions).toBeNull();
+    });
+
+    it("shows empty state instead of the table when there are no data rows", async () => {
+      // Given a layout with emptyFallback and only a header row (no data rows)
+      // When the layout renders
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          emptyFallback="No product offerings found"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // Then the empty state is shown instead of the table
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No product offerings found");
+      expect(r.query.gridTable).toBeNull();
+    });
+
+    it("shows filter description and clear action when client search filters out all rows", async () => {
+      // Given a layout with client search, filters, and data rows
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey: "empty-state-test",
+            },
+            search: "client",
+          }}
+          emptyFallback="No product offerings found"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // When the search string filters out all rows
+      await typeAndWait(r.search, "zzz-no-match");
+      expect(r.gridTableEmptyState_title).toBeInTheDocument();
+
+      // Then the empty state shows filter guidance and a clear action
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No product offerings found");
+      expect(r.gridTableEmptyState_description).toHaveTextContent("Try adjusting your search or filters.");
+      expect(r.gridTableEmptyState_actions).toHaveTextContent("Clear Filters");
+    });
+
+    it("clears filters from the empty state clear action", async () => {
+      // Given a layout with client search, filters, and data rows
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey: "empty-state-clear-test",
+            },
+            search: "client",
+          }}
+          emptyFallback="No product offerings found"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      await typeAndWait(r.search, "zzz-no-match");
+      expect(r.clearFilters).toBeInTheDocument();
+
+      // When the clear-filters action is clicked
+      click(r.clearFilters);
+      expect(r.gridTable).toBeInTheDocument();
+
+      // Then the table shows the data rows again
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value | Action  |
+        | ----- | ----- | ------- |
+        | Alpha | 10    | Actions |
+        | Beta  | 20    | Actions |
+        | Gamma | 30    | Actions |
+        "
+      `);
+    });
   });
 
   it("passes infiniteScroll prop to the underlying table", async () => {

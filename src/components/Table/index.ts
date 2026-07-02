@@ -8,6 +8,7 @@ export {
 } from "src/components/Table/cardSlots";
 export type {
   CardBadgeSlot,
+  CardBadgeTag,
   CardDataBlockSlot,
   CardEyebrowSlot,
   CardProgressSlot,
@@ -50,3 +51,5 @@ export * from "src/components/Table/utils/utils";
 export * from "src/components/Table/utils/visitor";
 export { GridTable, setDefaultStyle, setGridTableDefaults } from "./GridTable";
 export type { GridSortConfig, GridTableDefaults, GridTableProps, setRunningInJest } from "./GridTable";
+export { GridTableEmptyState } from "./GridTableEmptyState";
+export type { GridTableEmptyStateProps } from "./GridTableEmptyState";

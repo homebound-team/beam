@@ -418,6 +418,40 @@ export function NoRowsFallback() {
   );
 }
 
+export function EmptyState() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  return (
+    <div css={Css.wPx(500).$}>
+      <GridTable
+        columns={[nameColumn, valueColumn]}
+        style={{ bordered: true, allWhite: true }}
+        rows={[simpleHeader]}
+        emptyState={{ title: "No product offerings found" }}
+      />
+    </div>
+  );
+}
+
+export function EmptyStateWithActions() {
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  return (
+    <div css={Css.wPx(500).$}>
+      <GridTable
+        columns={[nameColumn, valueColumn]}
+        style={{ bordered: true, allWhite: true }}
+        rows={[simpleHeader]}
+        emptyState={{
+          title: "No product offerings found",
+          description: "Try adjusting your search or filters.",
+          actions: <Button label="Clear Filters" variant="tertiary" onClick={noop} />,
+        }}
+      />
+    </div>
+  );
+}
+
 // Make a `Row` ADT for a table with a header + 3 levels of nesting
 type HeaderRow = { kind: "header"; data: undefined };
 type ParentRow = { kind: "parent"; id: string; data: { name: string } };

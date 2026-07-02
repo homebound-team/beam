@@ -52,7 +52,7 @@ export function Composed() {
               {
                 section: true,
                 label: "Main",
-                items: [{ label: "Dashboard", icon: "kanban", onClick: "/", active: true }],
+                items: [{ label: "Dashboard", icon: "columns", onClick: "/", active: true }],
               },
             ],
           }}

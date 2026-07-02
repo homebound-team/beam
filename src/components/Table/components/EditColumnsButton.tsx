@@ -24,7 +24,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
-  const tid = useTestIds(props, "kanban");
+  const tid = useTestIds(props, "columns");
   const { sm } = useBreakpoint();
 
   const options = useMemo(
@@ -60,20 +60,23 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     },
     [columns, api],
   );
+  const hasHiddenColumn = useMemo(() => {
+    const selectableOptionValues = options.map((option) => option.value);
+
+    return selectableOptionValues.some((option) => !selectedValues.includes(option));
+  }, [options, selectedValues]);
 
   return (
     <OverlayTrigger
       {...props}
-      trigger={{
-        icon: "kanban",
-        size: "md",
-        label: "",
-        variant: "secondaryBlack",
-      }}
+      trigger={
+        sm
+          ? { icon: hasHiddenColumn ? "columnsBadged" : "columns", variant: "outline" }
+          : { icon: hasHiddenColumn ? "columnsBadged" : "columns", label: "", size: "md", variant: "secondaryBlack" }
+      }
       menuTriggerProps={menuTriggerProps}
       state={state}
       buttonRef={buttonRef}
-      hideEndAdornment={sm}
       {...tid}
     >
       <div css={Css.df.fdc.bgColor(Tokens.Surface).maxwPx(326).maxhPx(512).onHover.bshHover.$}>

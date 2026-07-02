@@ -8,7 +8,7 @@ import { click, render, withRouter } from "src/utils/rtl";
 describe("SideNav", () => {
   it("renders top, items, and footer when expanded", async () => {
     const items: AppNavItem[] = [
-      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Dashboard", icon: "columns", onClick: "/", active: true },
       { label: "Reports", icon: "search", onClick: "/reports" },
       {
         label: "Workspace",
@@ -33,7 +33,7 @@ describe("SideNav", () => {
 
   it("hides labels and section headings when collapsed", async () => {
     const items: AppNavItem[] = [
-      { label: "Dashboard", icon: "kanban", onClick: "/", active: true },
+      { label: "Dashboard", icon: "columns", onClick: "/", active: true },
       { label: "Reports", icon: "search", onClick: "/reports" },
       {
         section: true,
