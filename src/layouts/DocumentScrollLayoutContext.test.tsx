@@ -1,9 +1,35 @@
+import { Tokens } from "src/Css";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "src/layouts/layoutVars";
 import { mockDocumentViewport, render } from "src/utils/rtl";
 
 describe("DocumentScrollLayoutProvider", () => {
+  beforeEach(() => {
+    document.body.style.backgroundColor = "";
+  });
+
+  it("sets document.body background to the surface token while mounted", async () => {
+    // Given a measured document viewport and no prior inline body background
+    mockDocumentViewport(1024, 768);
+
+    // When wrapped in the outermost provider
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <div data-testid="child" />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // Then document.body uses the default surface background
+    expect(document.body.style.backgroundColor).toBe(`var(${Tokens.Surface})`);
+
+    // When the provider unmounts
+    r.unmount();
+
+    // Then the prior inline body background is restored
+    expect(document.body.style.backgroundColor).toBe("");
+  });
+
   it("publishes viewport CSS vars on the measurement root when rendered standalone", async () => {
     // Given a measured document viewport
     mockDocumentViewport(1024, 768);

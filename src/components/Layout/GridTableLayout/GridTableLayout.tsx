@@ -4,10 +4,12 @@ import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { FilterDropdownMenu } from "src/components/Filters/FilterDropdownMenu";
+import { getActiveFilterCount } from "src/components/Filters/utils";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
 import { TableActions } from "src/components/Table/TableActions";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Tokens } from "src/Css";
@@ -50,6 +52,8 @@ export type GridTableLayoutProps<
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
   breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
+  /** Title for the empty state when the table has no data rows. */
+  emptyFallback?: string;
   /** Renders a ButtonMenu with "verticalDots" icon as trigger */
   actionMenu?: ActionButtonMenuProps;
   primaryAction?: ActionButtonProps;
@@ -106,6 +110,7 @@ function GridTableLayoutComponent<
     hideEditColumns = false,
     withCardView,
     defaultView = "list",
+    emptyFallback: layoutEmptyFallback,
   } = props;
 
   const tid = useTestIds(props);
@@ -141,6 +146,16 @@ function GridTableLayoutComponent<
 
   const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
 
+  const filterSearchProps = useMemo(
+    () => (layoutState?.search ? { onSearch: layoutState.setSearchString } : undefined),
+    [layoutState?.search, layoutState?.setSearchString],
+  );
+
+  const emptyState = useMemo(
+    () => composeEmptyState(tableProps, layoutState, layoutEmptyFallback),
+    [layoutEmptyFallback, layoutState, tableProps],
+  );
+
   const tableActionsEl = (
     <TableActions
       right={
@@ -161,7 +176,7 @@ function GridTableLayoutComponent<
           filter={layoutState.filter}
           onChange={layoutState.setFilter}
           groupBy={layoutState.groupBy}
-          searchProps={layoutState.search ? { onSearch: layoutState.setSearchString } : undefined}
+          searchProps={filterSearchProps}
         />
       )}
     </TableActions>
@@ -175,6 +190,7 @@ function GridTableLayoutComponent<
           {...tableProps}
           {...(cardAs ? { as: cardAs } : {})}
           api={api}
+          emptyState={emptyState}
           filter={clientSearch}
           style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
           stickyHeader
@@ -187,6 +203,7 @@ function GridTableLayoutComponent<
           {...(tableProps as QueryTableProps<R, QData, X>)}
           {...(cardAs ? { as: cardAs } : {})}
           api={api}
+          emptyState={emptyState}
           filter={clientSearch}
           style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
           stickyHeader
@@ -284,6 +301,13 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     undefined,
   );
 
+  const filteringActive = getActiveFilterCount(filter) > 0 || !!searchString;
+
+  const clearFilters = useCallback(() => {
+    setFilter({} as F);
+    setSearchString("");
+  }, [setFilter]);
+
   return {
     filter,
     setFilter,
@@ -295,6 +319,38 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
     setVisibleColumnIds: persistedColumns ? setVisibleColumnIds : undefined,
     persistedColumnsStorageKey: persistedColumns?.storageKey,
+    filteringActive,
+    clearFilters,
+  };
+}
+
+/** Composes the empty state for the table based on the table props and layout state.
+ * By default the empty state assumes filters or search are the reason for the empty state.
+ */
+function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, X extends Only<GridTableXss, X>, QData>(
+  tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>,
+  layoutState: ReturnType<typeof useGridTableLayoutState<F>> | undefined,
+  layoutEmptyFallback: string | undefined,
+): GridTableEmptyStateProps {
+  const tableEmptyState = "emptyState" in tableProps ? tableProps.emptyState : undefined;
+  const tableEmptyFallback = "emptyFallback" in tableProps ? tableProps.emptyFallback : undefined;
+
+  const filteringActive = layoutState?.filteringActive ?? false;
+  const filterEmptyDescription = "Try adjusting your search or filters.";
+
+  return {
+    title: tableEmptyState?.title ?? tableEmptyFallback ?? layoutEmptyFallback,
+    description: tableEmptyState?.description ?? (filteringActive ? filterEmptyDescription : undefined),
+    actions:
+      tableEmptyState?.actions ??
+      (filteringActive && layoutState ? (
+        <Button
+          label="Clear Filters"
+          variant="tertiary"
+          onClick={layoutState.clearFilters}
+          data-testid="clearFilters"
+        />
+      ) : undefined),
   };
 }
 

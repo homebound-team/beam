@@ -1,4 +1,9 @@
-import { omitKey } from "src/utils";
+import { isDefined, omitKey, safeKeys } from "src/utils";
+
+/** Count of filter keys with a defined value. */
+export function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
+  return safeKeys(filter).filter((key) => isDefined(filter[key])).length;
+}
 
 export function updateFilter<F, K extends keyof F>(currentFilter: F, key: K, value: F[K] | undefined): F {
   if (value === undefined) {

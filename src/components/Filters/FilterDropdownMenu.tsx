@@ -10,6 +10,7 @@ import {
   SelectedFilterLabelValue,
   updateFilter,
 } from "src/components/Filters";
+import { getActiveFilterCount } from "src/components/Filters/utils";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { ToggleChip } from "src/components/ToggleChip";
@@ -18,7 +19,7 @@ import { useBreakpoint } from "src/hooks";
 import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import { Value } from "src/inputs/Value";
-import { isDefined, safeEntries, safeKeys, useTestIds } from "src/utils";
+import { isDefined, safeEntries, useTestIds } from "src/utils";
 import { useDebounce } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 
@@ -276,11 +277,6 @@ function chipsForFilterKey<F extends Record<string, unknown>, K extends keyof F>
 /** Convert FilterDefs to FilterImpls by evaluating the factory functions */
 function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: FilterDefs<F>): FilterImpls<F> {
   return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
-}
-
-/** Calculate the number of active (non-undefined) filters */
-function getActiveFilterCount<F extends Record<string, unknown>>(filter: F): number {
-  return safeKeys(filter).filter((key) => filter[key] !== undefined).length;
 }
 
 // memo doesn't support generic parameters, so cast the result to the correct type
