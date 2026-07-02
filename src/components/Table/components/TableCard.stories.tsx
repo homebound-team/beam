@@ -9,7 +9,7 @@ export default {
 export function Default() {
   return (
     <CardContainer>
-      <TableCardView imgSrc={imgSrc} title="123 Main Street" data={data} />
+      <TableCardView imgSrc={imgSrc} title="The Emerson Houston" data={data} />
     </CardContainer>
   );
 }
@@ -17,7 +17,7 @@ export function Default() {
 export function WithEyebrowAndBadge() {
   return (
     <CardContainer>
-      <TableCardView imgSrc={imgSrc} eyebrow="Lot" title="123 Main Street" badge="Austin, TX" data={data} />
+      <TableCardView imgSrc={imgSrc} eyebrow="226" title="The Emerson Houston" badge="v23" data={data} />
     </CardContainer>
   );
 }
@@ -27,9 +27,9 @@ export function WithBadgeTags() {
     <CardContainer>
       <TableCardView
         imgSrc={imgSrc}
-        eyebrow="Lot"
-        title="123 Main Street"
-        badge="Austin, TX"
+        eyebrow="226"
+        title="The Emerson Houston"
+        badge="v23"
         badgeTags={[
           { text: "New", type: "success" },
           { text: "Info", icon: "infoCircle", iconOnly: true },
@@ -45,10 +45,10 @@ export function WithStatus() {
     <CardContainer>
       <TableCardView
         imgSrc={imgSrc}
-        eyebrow="Home"
-        title="123 Main Street"
-        badge="Austin, TX"
-        status={{ text: "In Progress", type: "update" }}
+        eyebrow="226"
+        title="The Emerson Houston"
+        badge="v23"
+        status={{ text: "Draft", type: "neutral" }}
         data={data}
       />
     </CardContainer>
@@ -60,12 +60,12 @@ export function AllProps() {
     <CardContainer>
       <TableCardView
         imgSrc={imgSrc}
-        eyebrow="Home"
-        title="123 Main Street"
-        badge="Austin, TX"
-        status={{ text: "Archived", type: "warning" }}
+        eyebrow="226"
+        title="The Emerson Houston"
+        badge="v23"
+        status={{ text: "Draft", type: "neutral" }}
         data={data}
-        progress={65}
+        progress={72}
       />
     </CardContainer>
   );
@@ -76,25 +76,27 @@ export function LongTitle() {
     <CardContainer>
       <TableCardView
         imgSrc={imgSrc}
-        eyebrow="Home"
+        eyebrow="226"
         title="This is a long title example (it can go even longer)"
-        badge="Austin, TX"
-        status={{ text: "Archived", type: "warning" }}
+        badge="v23"
+        status={{ text: "Draft", type: "neutral" }}
         data={data}
-        progress={65}
+        progress={72}
       />
     </CardContainer>
   );
 }
 
 function CardContainer({ children }: { children: JSX.Element }) {
-  return <div css={Css.wPx(280).$}>{children}</div>;
+  return <div css={Css.wPx(330).$}>{children}</div>;
 }
 
 const imgSrc = "plan-exterior.png";
 const data = [
-  { label: "Sq Ft", value: "2,400" },
-  { label: "Beds", value: "4" },
-  { label: "Baths", value: "3" },
-  { label: "Close Date", value: "Aug 2026" },
+  { label: "Sqft", value: "4,274 - 4,496" },
+  { label: "Beds", value: "5" },
+  { label: "Baths", value: "4" },
+  { label: "Elevations", value: "3" },
+  { label: "Width", value: "39 - 39.92" },
+  { label: "Depth", value: "70.46 - 71" },
 ];
