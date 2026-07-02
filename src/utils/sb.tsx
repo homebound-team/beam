@@ -49,12 +49,13 @@ export function viewportModes<const T extends StorybookViewportKey>(...viewports
 }
 
 /**
- * A somewhat typesafe way to set `FooStory.story` metadata.
- * Pass `args` here rather than assigning to `.args` afterward — `bind({})` stories are typed as `Function`.
+ * Attach story metadata (args, decorators, play, etc.) when defining a CSF3 story export.
+ * Prefer passing options here over mutating `.args` on the export afterward.
  */
 export function newStory<TFn extends Function>(storyFn: TFn, opts: StoryOptions): TFn {
-  Object.assign(storyFn, opts);
-  return storyFn;
+  const story = ((...args: unknown[]) => storyFn(...args)) as unknown as TFn;
+  Object.assign(story, opts);
+  return story;
 }
 
 /** Renders a number of small samples within a single story. */

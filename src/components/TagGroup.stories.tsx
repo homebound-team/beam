@@ -6,6 +6,8 @@ import { TagGroup, TagGroupProps } from "./TagGroup";
 
 export default {
   component: TagGroup,
+  // Explicit undefined avoids Storybook auto-injecting an `on*` action handler (see preview `actions.argTypesRegex`).
+  args: { onEdit: undefined },
   parameters: {
     design: {
       type: "figma",
@@ -14,18 +16,18 @@ export default {
   },
 } as Meta<TagGroupProps>;
 
-export const List = newStory(Template.bind({}), {});
+export const List = newStory(TagGroupStory, {});
 
-export const WithEditButton = newStory(Template.bind({}), {
+export const WithEditButton = newStory(TagGroupStory, {
   args: { onEdit: action("onEdit") },
 });
 
-export const WithEditLink = newStory(Template.bind({}), {
+export const WithEditLink = newStory(TagGroupStory, {
   args: { onEdit: "/edit-path" },
   decorators: [withRouter()],
 });
 
-function Template(args: TagGroupProps) {
+function TagGroupStory(args: TagGroupProps) {
   const tags = [
     { text: "Plan 6 - The Elm" },
     { text: "Plan 6X - The Glenview" },
@@ -37,7 +39,6 @@ function Template(args: TagGroupProps) {
     { text: "Two Story ADU" },
     { text: "Secondary Label" },
   ];
-
   return (
     <div css={Css.wPx(667).$}>
       <TagGroup {...args} tags={tags} />
