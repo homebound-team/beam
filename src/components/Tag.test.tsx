@@ -43,4 +43,12 @@ describe("Tag", () => {
     // Then no tooltip wrapper is rendered
     expect(r.query.tooltip).toBeNull();
   });
+
+  it("secondary variant does not uppercase text", async () => {
+    // Given a secondary tag
+    const r = await render(<Tag text="Secondary Label" variant="secondary" data-testid="tag" />);
+
+    // Then text is not transformed to uppercase
+    expect(r.tag).not.toHaveStyle({ textTransform: "uppercase" });
+  });
 });
