@@ -3725,6 +3725,47 @@ describe("GridTable", () => {
       expect(sessionStorage.setItem).toHaveBeenCalledWith("columnWidths_testStorageKey", "{}");
     });
 
+    it("adds resize handles on content columns only", async () => {
+      // Given action and content columns (matches GridTableLayout-style tables)
+      const columns: GridColumn<Row>[] = [
+        collapseColumn<Row>(),
+        selectColumn<Row>(),
+        column<Row>({ id: "name-col", header: "Name", data: ({ name }) => name }),
+        column<Row>({ id: "value-col", header: "Value", data: ({ value }) => value }),
+      ];
+
+      // When the table renders with resizing enabled
+      const r = await render(<GridTable columns={columns} rows={rows} />);
+
+      // Then handles appear on content columns, not action columns (value is last, so no handle)
+      const handleColumnIds = r
+        .queryAllByTestId("columnResizeHandle_handle")
+        .map((el) => el.getAttribute("data-column-id"));
+      expect(handleColumnIds).toEqual(["name-col"]);
+    });
+
+    it("does not add resize handles on layout gutter columns", async () => {
+      // Given document-scroll gutters
+      const columns: GridColumn<Row>[] = [
+        column<Row>({ id: "name-col", header: "Name", data: ({ name }) => name }),
+        column<Row>({ id: "value-col", header: "Value", data: ({ value }) => value }),
+      ];
+
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <GridTable columns={columns} rows={rows} columnGutter />
+        </DocumentScrollLayoutProvider>,
+      );
+
+      // Then gutters are excluded; content columns before the last still get handles
+      const handleColumnIds = r
+        .queryAllByTestId("columnResizeHandle_handle")
+        .map((el) => el.getAttribute("data-column-id"));
+      expect(handleColumnIds).toEqual(["name-col", "value-col"]);
+      expect(handleColumnIds).not.toContain(layoutGutterLeftColumnId);
+      expect(handleColumnIds).not.toContain(layoutGutterRightColumnId);
+    });
+
     it("respects setting inferSelectState to false", async () => {
       // Given nested rows
       const rows: GridDataRow<NestedRow>[] = [
