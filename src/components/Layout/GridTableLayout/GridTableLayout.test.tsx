@@ -533,20 +533,25 @@ describe("GridTableLayout", () => {
   describe("filters", () => {
     it("removes the filter value when a chip is clicked", async () => {
       // Given the panel is closed with an active filter
-      sessionStorage.setItem("chip-click-test", JSON.stringify({ needsRevision: true }));
+      const storageKey = "chip-click-test";
+      sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
 
       type ChipFilter = { needsRevision?: boolean };
       let capturedFilter: ChipFilter = {};
 
       function FilterChipWrapper() {
         const layoutState = useGridTableLayoutState<ChipFilter>({
-          persistedFilter: { filterDefs: chipFilterDefs, storageKey: "chip-click-test" },
+          persistedFilter: {
+            filterDefs: {
+              needsRevision: checkboxFilter({ label: "Needs Revision" }),
+            },
+            storageKey: storageKey,
+          },
         });
         capturedFilter = layoutState.filter;
         return (
           <GridTableLayoutComponent
             layoutState={layoutState}
-            hideEditColumns
             tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
           />
         );
@@ -612,10 +617,6 @@ function TestWrapper(props: TestWrapperProps) {
   const layoutState = useGridTableLayoutState(props.layoutStateProps);
   return <GridTableLayoutComponent {...props} layoutState={layoutState} />;
 }
-
-const chipFilterDefs = {
-  needsRevision: checkboxFilter({ label: "Needs Revision" }),
-};
 
 function getColumns() {
   return [

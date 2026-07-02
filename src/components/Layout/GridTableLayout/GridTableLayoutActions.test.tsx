@@ -27,15 +27,6 @@ describe("GridTableLayoutActions", () => {
       expect(r.query.search).not.toBeInTheDocument();
     });
 
-    it("calls onSearch on mount with the initial search value", async () => {
-      // Given searchProps is provided
-      const onSearch = vi.fn();
-      // When the component mounts
-      await render(<GridTableLayoutActions searchProps={{ onSearch }} />, withRouter());
-      // Then onSearch is called with an empty string
-      expect(onSearch).toHaveBeenCalledWith("");
-    });
-
     it("calls onSearch after typing a value", async () => {
       // Given the search field is rendered
       const onSearch = vi.fn();

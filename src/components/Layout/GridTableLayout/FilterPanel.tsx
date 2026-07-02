@@ -48,7 +48,6 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
 
   return (
     <div
-      style={{ scrollbarWidth: "none" }}
       css={{
         ...Css.df.aic.gap1.sbwn.$,
         ...Css.ifSm.oxa.mw0.$,

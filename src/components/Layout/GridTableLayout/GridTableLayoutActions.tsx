@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls } from "src/components/Filters";
@@ -14,7 +14,7 @@ import { TextField } from "src/inputs/TextField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { useTestIds } from "src/utils";
-import { useDebounce } from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 import { buildFilterImpls, FilterPanel, getActiveFilterCount } from "./FilterPanel";
 
@@ -71,14 +71,12 @@ function GridTableLayoutActionsComponent<
 
   const [{ search: initialValue }, setQueryParams] = useQueryParams({ search: StringParam });
   const [searchValue, setSearchValue] = useState<string>(initialValue || "");
-  const [debouncedSearch] = useDebounce(searchValue, 300);
-
-  useEffect(() => {
+  const handleSearchDebounced = useDebouncedCallback((value: string) => {
     if (searchProps) {
-      searchProps.onSearch(debouncedSearch);
-      setQueryParams({ search: debouncedSearch || undefined }, "replaceIn");
+      searchProps.onSearch(value);
+      setQueryParams({ search: value || undefined }, "replaceIn");
     }
-  }, [debouncedSearch, searchProps, setQueryParams]);
+  }, 300);
 
   const hasSearch = !!searchProps;
   const hasFilters = !!filterDefs && Object.keys(filterDefs ?? {}).length > 0;
@@ -90,7 +88,10 @@ function GridTableLayoutActionsComponent<
       label="Search"
       labelStyle="hidden"
       value={searchValue}
-      onChange={(v) => setSearchValue(v ?? "")}
+      onChange={(v) => {
+        setSearchValue(v ?? "");
+        handleSearchDebounced(v ?? "");
+      }}
       placeholder="Search"
       clearable
       fullWidth
