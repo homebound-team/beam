@@ -67,7 +67,7 @@ describe("GridTableLayout", () => {
 
     // And the table actions to be rendered
     expect(r.search).toHaveValue("");
-    expect(r.filter_button).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -123,7 +123,7 @@ describe("GridTableLayout", () => {
     // And the search to not be rended
     expect(r.query.search).not.toBeInTheDocument();
     // But the filter button still is
-    expect(r.filter_button).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -271,14 +271,14 @@ describe("GridTableLayout", () => {
       );
 
       // Then EditColumnsButton is visible in list view
-      expect(r.editColumnsButton).toBeInTheDocument();
+      expect(r.columns).toBeInTheDocument();
 
       // When switching to card view
       click(r.viewToggleButton);
       click(r.viewToggleButton_card);
 
       // Then EditColumnsButton is hidden in card view
-      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+      expect(r.query.columns).not.toBeInTheDocument();
     });
 
     it("persists view selection to localStorage when toggled", async () => {
@@ -321,7 +321,7 @@ describe("GridTableLayout", () => {
       );
 
       // Card view is restored from localStorage — EditColumnsButton is hidden in card view
-      expect(r.query.editColumnsButton).not.toBeInTheDocument();
+      expect(r.query.kanban).not.toBeInTheDocument();
     });
 
     it("does not persist view when withCardView is undefined", async () => {
@@ -360,7 +360,7 @@ describe("GridTableLayout", () => {
       );
 
       // Falls back to defaultView="list" — EditColumnsButton is visible in list view
-      expect(r.editColumnsButton).toBeInTheDocument();
+      expect(r.columns).toBeInTheDocument();
     });
 
     it("renders card content using cardSlot columns when switched to card view", async () => {
@@ -528,6 +528,46 @@ describe("GridTableLayout", () => {
         search: "client" as const,
       };
     }
+  });
+
+  describe("filters", () => {
+    it("removes the filter value when a chip is clicked", async () => {
+      // Given the panel is closed with an active filter
+      const storageKey = "chip-click-test";
+      sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
+
+      type ChipFilter = { needsRevision?: boolean };
+      let capturedFilter: ChipFilter = {};
+
+      function FilterChipWrapper() {
+        const layoutState = useGridTableLayoutState<ChipFilter>({
+          persistedFilter: {
+            filterDefs: {
+              needsRevision: checkboxFilter({ label: "Needs Revision" }),
+            },
+            storageKey: storageKey,
+          },
+        });
+        capturedFilter = layoutState.filter;
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        );
+      }
+
+      const r = await render(<FilterChipWrapper />, withRouter());
+      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      expect(capturedFilter).toEqual({ needsRevision: true });
+
+      // When the chip is clicked
+      click(r.filter_chip_needsRevision);
+
+      // Then the chip is removed and the filter state is cleared
+      expect(r.query.filter_chip_needsRevision).not.toBeInTheDocument();
+      expect(capturedFilter).toEqual({});
+    });
   });
 
   describe("empty state", () => {
