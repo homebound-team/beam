@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls } from "src/components/Filters";
@@ -43,6 +43,8 @@ type GridTableLayoutActionsProps<
   withCardView?: boolean;
   view?: TableView;
   setView?: (v: TableView) => void;
+  clearFilters?: () => void;
+  clearFiltersToken?: number;
 };
 
 function GridTableLayoutActionsComponent<
@@ -62,6 +64,8 @@ function GridTableLayoutActionsComponent<
     withCardView,
     view,
     setView,
+    clearFilters,
+    clearFiltersToken,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
 
@@ -99,6 +103,16 @@ function GridTableLayoutActionsComponent<
       startAdornment={<Icon icon="search" color={Palette.Gray700} />}
     />
   );
+
+  // Resync the local search input whenever `clearFilters` runs elsewhere (e.g. the empty state's
+  // "Clear Filters" button), since that can reset `layoutState.searchString` without this component's
+  // knowledge. `clearFiltersToken` starts at 0 and only ever increases, so 0 means "no reset yet".
+  useEffect(() => {
+    if (!clearFiltersToken) return;
+    handleSearchDebounced.cancel();
+    setSearchValue("");
+    setQueryParams({ search: undefined }, "replaceIn");
+  }, [clearFiltersToken, handleSearchDebounced, setQueryParams]);
 
   return (
     <div css={Css.df.fdc.gap1.pb2.$}>
@@ -171,7 +185,7 @@ function GridTableLayoutActionsComponent<
           filterImpls={filterImpls}
           filter={filter}
           setFilter={setFilter}
-          onClear={() => setFilter?.({} as F)}
+          onClear={clearFilters}
         />
       )}
     </div>

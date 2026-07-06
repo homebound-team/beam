@@ -167,6 +167,8 @@ function GridTableLayoutComponent<
       withCardView={withCardView}
       view={view}
       setView={setView}
+      clearFilters={layoutState?.clearFilters}
+      clearFiltersToken={layoutState?.clearFiltersToken}
     />
   );
 
@@ -282,6 +284,9 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   const groupBy = useGroupBy(maybeGroupBy ?? { none: "none" });
 
   const [searchString, setSearchString] = useState<string | undefined>("");
+  // Bumped whenever `clearFilters` runs, so `GridTableLayoutActions` can resync its local search input
+  // even when it's reset from outside (e.g. the empty state's "Clear Filters" button).
+  const [clearFiltersToken, setClearFiltersToken] = useState(0);
 
   const columnsFallback = "unset-columns";
   const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(
@@ -294,6 +299,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   const clearFilters = useCallback(() => {
     setFilter({} as F);
     setSearchString("");
+    setClearFiltersToken((t) => t + 1);
   }, [setFilter]);
 
   return {
@@ -302,6 +308,7 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     filterDefs: persistedFilter?.filterDefs,
     searchString,
     setSearchString,
+    clearFiltersToken,
     search,
     groupBy: maybeGroupBy ? groupBy : undefined,
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,

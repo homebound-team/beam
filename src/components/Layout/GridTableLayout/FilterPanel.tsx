@@ -26,7 +26,7 @@ type FilterPanelProps<F extends Record<string, unknown>, G extends Value = strin
   filterImpls: FilterImpls<F>;
   filter?: F;
   setFilter?: (filter: F) => void;
-  onClear: () => void;
+  onClear?: () => void;
 };
 
 export function FilterPanel<F extends Record<string, unknown>, G extends Value = string>(
@@ -40,7 +40,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
   filterImpls,
   filter,
   setFilter,
-  onClear,
+  onClear = () => {},
 }: Omit<FilterPanelProps<F, G>, "isOpen">) {
   const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
@@ -78,7 +78,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   filterImpls,
   filter,
   setFilter,
-  onClear,
+  onClear = () => {},
 }: Omit<FilterPanelProps<F, G>, "isOpen" | "groupBy">) {
   const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
