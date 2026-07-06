@@ -140,7 +140,7 @@ export function TableCardView(props: TableCardViewProps) {
           )}
           {title && (
             <div css={Css.dif.w100.jcsb.aic.$}>
-              <h4 css={Css.xl.fwb.lineClamp2.$} {...tid.title}>
+              <h4 css={Css.xl.lineClamp2.$} {...tid.title}>
                 {title}
               </h4>
               {(badge || badgeTags?.length) && (
