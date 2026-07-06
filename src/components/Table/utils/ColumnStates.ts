@@ -74,7 +74,8 @@ export class ColumnStates<R extends Kinded> {
 
   setVisibleColumns(ids: string[]): void {
     for (const cs of this.map.values()) {
-      cs.setVisible(ids.includes(cs.column.id));
+      // Handle layout gutters separately as they are not part of the props.columns (gutter columns are automatically added by the table when necessary)
+      cs.setVisible(cs.column.isLayoutGutter ? true : ids.includes(cs.column.id));
     }
   }
 
