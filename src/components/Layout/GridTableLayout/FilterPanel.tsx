@@ -14,7 +14,7 @@ import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { isDefined, safeEntries, useTestIds } from "src/utils";
+import { isDefined, maybeCall, safeEntries, useTestIds } from "src/utils";
 
 type FilterPanelProps<F extends Record<string, unknown>, G extends Value = string> = {
   isOpen: boolean;
@@ -40,7 +40,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
   filterImpls,
   filter,
   setFilter,
-  onClear = () => {},
+  onClear,
 }: Omit<FilterPanelProps<F, G>, "isOpen">) {
   const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
@@ -69,7 +69,9 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
         />
       )}
       {filterControls}
-      {activeFilterCount > 0 && <Button label="Clear" variant="tertiary" onClick={onClear} {...tid.clearBtn} />}
+      {activeFilterCount > 0 && (
+        <Button label="Clear" variant="tertiary" onClick={maybeCall(onClear)} {...tid.clearBtn} />
+      )}
     </div>
   );
 }
@@ -78,7 +80,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   filterImpls,
   filter,
   setFilter,
-  onClear = () => {},
+  onClear,
 }: Omit<FilterPanelProps<F, G>, "isOpen" | "groupBy">) {
   const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
@@ -92,7 +94,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   return (
     <div css={Css.df.gap1.aic.mw0.fww.if(inDocumentScrollLayout).pl3.$}>
       {chips}
-      <Button label="Clear" variant="tertiary" onClick={onClear} {...tid.clearBtn} />
+      <Button label="Clear" variant="tertiary" onClick={maybeCall(onClear)} {...tid.clearBtn} />
     </div>
   );
 }
