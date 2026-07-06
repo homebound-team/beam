@@ -51,7 +51,10 @@
   --b-neutral-surface-pressed: rgba(255, 255, 255, 1);
   --b-on-primary: rgba(255, 255, 255, 1);
   --b-on-surface: rgba(36, 36, 36, 1);
+  --b-on-surface-disabled: rgba(201, 201, 201, 1);
   --b-on-surface-muted: rgba(100, 100, 100, 1);
+  --b-on-surface-raised-hover: rgba(36, 36, 36, 1);
+  --b-on-surface-raised-pressed: rgba(36, 36, 36, 1);
   --b-on-surface-subtle: rgba(100, 100, 100, 1);
   --b-popover-surface: rgba(255, 255, 255, 1);
   --b-primary: rgba(37, 99, 235, 1);
@@ -61,6 +64,10 @@
   --b-selection-indicator: rgba(29, 78, 216, 1);
   --b-status-success-fg: rgba(4, 120, 87, 1);
   --b-surface: rgba(255, 255, 255, 1);
+  --b-surface-disabled: rgba(255, 255, 255, 1);
+  --b-surface-raised: rgba(0,0,0,0);
+  --b-surface-raised-hover: rgba(247, 245, 245, 1);
+  --b-surface-raised-pressed: rgba(236, 235, 235, 1);
   --b-surface-separator: rgba(236, 235, 235, 1);
   --b-surface-subtle: rgba(236, 235, 235, 1);
   --b-text-disabled: rgba(201, 201, 201, 1);
@@ -116,7 +123,10 @@
   --b-neutral-surface-pressed: rgba(255, 255, 255, 1);
   --b-on-primary: rgba(255, 255, 255, 1);
   --b-on-surface: rgba(255, 255, 255, 1);
+  --b-on-surface-disabled: rgba(247, 245, 245, 1);
   --b-on-surface-muted: rgba(175, 175, 175, 1);
+  --b-on-surface-raised-hover: rgba(221, 220, 220, 1);
+  --b-on-surface-raised-pressed: rgba(175, 175, 175, 1);
   --b-on-surface-subtle: rgba(221, 220, 220, 1);
   --b-popover-surface: rgba(100, 100, 100, 1);
   --b-primary-hover: rgba(36, 36, 36, 1);
@@ -124,6 +134,10 @@
   --b-selection-indicator: rgba(255, 255, 255, 1);
   --b-status-success-fg: rgba(236, 253, 245, 1);
   --b-surface: rgba(36, 36, 36, 1);
+  --b-surface-disabled: rgba(141, 141, 141, 1);
+  --b-surface-raised: rgba(53, 53, 53, 1);
+  --b-surface-raised-hover: rgba(36, 36, 36, 1);
+  --b-surface-raised-pressed: rgba(36, 36, 36, 1);
   --b-surface-separator: rgba(100, 100, 100, 1);
   --b-surface-subtle: rgba(100, 100, 100, 1);
   --b-text-disabled: rgba(175, 175, 175, 1);

@@ -37,6 +37,12 @@ export type IconButtonProps = {
    * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
    */
   preventTooltip?: boolean;
+  /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
+  __storyState?: {
+    hovered?: boolean;
+    focusVisible?: boolean;
+    pressed?: boolean;
+  };
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -60,11 +66,12 @@ export function IconButton(props: IconButtonProps) {
     forceFocusStyles = false,
     label,
     preventTooltip = false,
+    __storyState,
   } = props;
   const isDisabled = !!disabled;
   const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
   const ref = useGetRef(buttonRef);
-  const { buttonProps } = useButton(
+  const { buttonProps, isPressed: isPressedFromEvents } = useButton(
     {
       ...ariaProps,
       onPress: typeof onPress === "string" ? noop : onPress,
@@ -72,8 +79,12 @@ export function IconButton(props: IconButtonProps) {
     },
     ref,
   );
-  const { focusProps, isFocusVisible } = useFocusRing(ariaProps);
-  const { hoverProps, isHovered } = useHover(ariaProps);
+  const isPressed = __storyState?.pressed ?? isPressedFromEvents;
+  const isPressing = isPressed || active;
+  const { focusProps, isFocusVisible: isFocusVisibleFromEvents } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover(ariaProps);
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
+  const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
   const testIds = useTestIds(props, icon);
 
   const isCircle = variant === "circle";
@@ -86,11 +97,11 @@ export function IconButton(props: IconButtonProps) {
       ...base,
       ...(isHovered && hover),
       ...((isFocusVisible || forceFocusStyles) && focus),
-      ...(active && pressed),
+      ...(isPressing && pressed),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     };
-  }, [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, active, bgColor, forceFocusStyles]);
+  }, [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, isPressing, bgColor, forceFocusStyles]);
   const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
@@ -109,10 +120,14 @@ export function IconButton(props: IconButtonProps) {
       color={
         color ||
         (isDisabled
-          ? Tokens.TextDisabled
-          : isCircle && (isHovered || active || isFocusVisible)
-            ? defaultIconColor
-            : iconColor)
+          ? Tokens.OnSurfaceDisabled
+          : isOutline && isPressing
+            ? Tokens.OnSurfaceRaisedPressed
+            : isOutline && isHovered
+              ? Tokens.OnSurfaceRaisedHover
+              : isCircle && (isHovered || active || isFocusVisible)
+                ? defaultIconColor
+                : iconColor)
       }
       bgColor={bgColor}
       inc={compact ? 2 : isCircle ? 2.5 : inc}
@@ -131,7 +146,7 @@ export function IconButton(props: IconButtonProps) {
 const defaultIconColor = Tokens.OnSurface;
 const circleIconColor = Palette.Gray700;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
-const iconButtonStylesDisabled = Css.cursorNotAllowed.$;
+const iconButtonStylesDisabled = Css.cursorNotAllowed.bgColor(Tokens.SurfaceDisabled).$;
 const variantStyles = {
   default: {
     base: Css.hPx(28).wPx(28).br8.bw2.$,
@@ -152,9 +167,9 @@ const variantStyles = {
     pressed: Css.bgGray200.bcGray200.$,
   },
   outline: {
-    base: Css.br8.wPx(42).hPx(40).bgColor(Tokens.Surface).bcGray300.ba.bw1.df.jcc.aic.$,
-    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+    base: Css.br8.wPx(42).hPx(40).bcGray300.ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
+    hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
     focus: Css.bshFocus.$,
-    pressed: Css.bgGray200.$,
+    pressed: Css.bgColor(Tokens.SurfaceRaisedPressed).$,
   },
 } as const;
