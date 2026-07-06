@@ -5,7 +5,7 @@ import type { MenuItem } from "src/components/ButtonMenu";
 import { ButtonMenu } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";
 import { NavbarMobileMenu } from "src/components/Navbar/NavbarMobileMenu";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useContentOverflow } from "src/hooks/useContentOverflow";
 import { useTestIds } from "src/utils";
@@ -46,8 +46,7 @@ export function Navbar(props: NavbarProps) {
 
   return (
     <ContrastScope>
-      {/*  // TODO: bgGray800 is the background color of the navbar - no token added to support this yet */}
-      <nav css={Css.bgGray800.fs0.df.aic.jcsb.wsnw.px1.py1.gap2.if(!showMobile).px5.$} {...tid}>
+      <nav css={Css.bgColor(Tokens.SurfaceRaised).fs0.df.aic.jcsb.wsnw.px1.py1.gap2.if(!showMobile).px5.$} {...tid}>
         <div css={Css.df.aic.gap3.fg1.mw0.$}>
           <div css={Css.df.aic.fs0.gap2.$}>
             {showMobile && <NavbarMobileMenu items={items} {...tid} />}
