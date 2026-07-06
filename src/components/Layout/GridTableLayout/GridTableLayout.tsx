@@ -23,7 +23,7 @@ import { zIndices } from "src/utils/zIndices";
 import { FullBleed } from "../FullBleed";
 import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
-import { GridTableLayoutActions } from "./GridTableLayoutActions";
+import { GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
 
@@ -149,9 +149,17 @@ function GridTableLayoutComponent<
     [layoutState?.search, layoutState?.setSearchString],
   );
 
+  // Imperative handle into GridTableLayoutActions' search box, so `clearFilters` can reset the search
+  // input directly even when triggered from outside GridTableLayoutActions (e.g. the empty state below).
+  const searchApiRef = useRef<SearchBoxApi>();
+  const clearFilters = useCallback(() => {
+    layoutState?.clearFilters();
+    searchApiRef.current?.clear();
+  }, [layoutState]);
+
   const emptyState = useMemo(
-    () => composeEmptyState(tableProps, layoutState, layoutEmptyFallback),
-    [layoutEmptyFallback, layoutState, tableProps],
+    () => composeEmptyState(tableProps, layoutState, layoutEmptyFallback, clearFilters),
+    [layoutEmptyFallback, layoutState, tableProps, clearFilters],
   );
 
   const tableActionsEl = (
@@ -167,8 +175,8 @@ function GridTableLayoutComponent<
       withCardView={withCardView}
       view={view}
       setView={setView}
-      clearFilters={layoutState?.clearFilters}
-      clearFiltersToken={layoutState?.clearFiltersToken}
+      clearFilters={clearFilters}
+      searchApi={searchApiRef}
     />
   );
 
@@ -284,9 +292,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   const groupBy = useGroupBy(maybeGroupBy ?? { none: "none" });
 
   const [searchString, setSearchString] = useState<string | undefined>("");
-  // Bumped whenever `clearFilters` runs, so `GridTableLayoutActions` can resync its local search input
-  // even when it's reset from outside (e.g. the empty state's "Clear Filters" button).
-  const [clearFiltersToken, setClearFiltersToken] = useState(0);
 
   const columnsFallback = "unset-columns";
   const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(
@@ -299,7 +304,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   const clearFilters = useCallback(() => {
     setFilter({} as F);
     setSearchString("");
-    setClearFiltersToken((t) => t + 1);
   }, [setFilter]);
 
   return {
@@ -308,7 +312,6 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
     filterDefs: persistedFilter?.filterDefs,
     searchString,
     setSearchString,
-    clearFiltersToken,
     search,
     groupBy: maybeGroupBy ? groupBy : undefined,
     visibleColumnIds: persistedColumns ? visibleColumnIds : undefined,
@@ -326,6 +329,7 @@ function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, 
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>,
   layoutState: ReturnType<typeof useGridTableLayoutState<F>> | undefined,
   layoutEmptyFallback: string | undefined,
+  clearFilters: () => void,
 ): GridTableEmptyStateProps {
   const tableEmptyState = "emptyState" in tableProps ? tableProps.emptyState : undefined;
   const tableEmptyFallback = "emptyFallback" in tableProps ? tableProps.emptyFallback : undefined;
@@ -339,12 +343,7 @@ function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, 
     actions:
       tableEmptyState?.actions ??
       (filteringActive && layoutState ? (
-        <Button
-          label="Clear Filters"
-          variant="tertiary"
-          onClick={layoutState.clearFilters}
-          data-testid="clearFilters"
-        />
+        <Button label="Clear Filters" variant="tertiary" onClick={clearFilters} data-testid="clearFilters" />
       ) : undefined),
   };
 }

@@ -70,7 +70,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
       )}
       {filterControls}
       {activeFilterCount > 0 && (
-        <Button label="Clear" variant="tertiary" onClick={maybeCall(onClear)} {...tid.clearBtn} />
+        <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
       )}
     </div>
   );
@@ -94,7 +94,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   return (
     <div css={Css.df.gap1.aic.mw0.fww.if(inDocumentScrollLayout).pl3.$}>
       {chips}
-      <Button label="Clear" variant="tertiary" onClick={maybeCall(onClear)} {...tid.clearBtn} />
+      <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
     </div>
   );
 }

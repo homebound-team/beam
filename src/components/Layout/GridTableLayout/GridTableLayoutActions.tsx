@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls } from "src/components/Filters";
@@ -23,6 +23,10 @@ export type SearchBoxProps = {
   onSearch: (filter: string) => void;
 };
 
+export type SearchBoxApi = {
+  clear: VoidFunction;
+};
+
 type GridTableLayoutActionsProps<
   F extends Record<string, unknown>,
   G extends Value = string,
@@ -44,7 +48,7 @@ type GridTableLayoutActionsProps<
   view?: TableView;
   setView?: (v: TableView) => void;
   clearFilters?: () => void;
-  clearFiltersToken?: number;
+  searchApi?: MutableRefObject<SearchBoxApi | undefined>;
 };
 
 function GridTableLayoutActionsComponent<
@@ -65,7 +69,7 @@ function GridTableLayoutActionsComponent<
     view,
     setView,
     clearFilters,
-    clearFiltersToken,
+    searchApi,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
 
@@ -104,15 +108,17 @@ function GridTableLayoutActionsComponent<
     />
   );
 
-  // Resync the local search input whenever `clearFilters` runs elsewhere (e.g. the empty state's
-  // "Clear Filters" button), since that can reset `layoutState.searchString` without this component's
-  // knowledge. `clearFiltersToken` starts at 0 and only ever increases, so 0 means "no reset yet".
-  useEffect(() => {
-    if (!clearFiltersToken) return;
-    handleSearchDebounced.cancel();
-    setSearchValue("");
-    setQueryParams({ search: undefined }, "replaceIn");
-  }, [clearFiltersToken, handleSearchDebounced, setQueryParams]);
+  // Construct our SearchBoxApi to give callers (e.g. the empty state's "Clear Filters" button, which
+  // lives outside this component) an imperative way to reset the search box.
+  if (searchApi) {
+    searchApi.current = {
+      clear: () => {
+        handleSearchDebounced.cancel(); // discard any in-flight debounce so it can't reintroduce the stale value
+        setSearchValue("");
+        setQueryParams({ search: undefined }, "replaceIn");
+      },
+    };
+  }
 
   return (
     <div css={Css.df.fdc.gap1.pb2.$}>
