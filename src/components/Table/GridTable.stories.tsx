@@ -659,7 +659,7 @@ export function InteractiveGroupRowPinning() {
             <span css={Css.xsSb.$}>{data.name}</span>
             <IconButton
               icon="pin"
-              active={isPinned}
+              color={isPinned ? Palette.Blue600 : undefined}
               label={isPinned ? "Unpin group" : "Pin group"}
               onClick={() => ids.forEach((id) => (isPinned ? api.unpinRow(id) : api.pinRow(id)))}
             />

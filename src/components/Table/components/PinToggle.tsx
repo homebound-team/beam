@@ -22,7 +22,7 @@ export function PinToggle({ rowId }: PinToggleProps) {
     <IconButton
       {...tid[rowId]}
       icon="pin"
-      bgColor={isPinned ? Palette.Green300 : undefined}
+      color={isPinned ? Palette.Blue600 : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
       onClick={() => tableState.togglePinned(rowId)}
     />
