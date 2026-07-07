@@ -8,6 +8,7 @@ import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { getRadioStateStyles, radioDefault, radioFocus, radioHover, radioReset } from "src/inputs/internal/radioStyles";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -150,6 +151,7 @@ function Radio<K extends string>(props: {
     ref,
   );
   const disabled = isDisabled;
+  const isSelected = !disabled && state.selectedValue === value;
   const { focusProps, isFocusVisible } = useFocusRing();
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 
@@ -161,9 +163,8 @@ function Radio<K extends string>(props: {
         css={{
           ...radioReset,
           ...radioDefault,
-          ...(!disabled && state.selectedValue === value ? radioChecked : radioUnchecked),
-          ...(disabled ? radioDisabled : {}),
-          ...(isHovered ? radioHover : {}),
+          ...getRadioStateStyles({ isDisabled: disabled, isSelected }),
+          ...(isHovered && !disabled ? radioHover : {}),
           ...(isFocusVisible ? radioFocus : {}),
           // Nudge down so the center of the circle lines up with the label text
           ...Css.mtPx(2).mr1.$,
@@ -192,61 +193,3 @@ function Radio<K extends string>(props: {
     </label>
   );
 }
-
-const whiteCircle =
-  "data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='4'/%3e%3c/svg%3e";
-
-// Didn't put these in radioReset yet, are they needed?
-// color-adjust: exact;
-// -webkit-print-color-adjust: exact;
-
-export const radioReset = {
-  ...Css.add("appearance", "none").p0.dib.vam.add("userSelect", "none").fs0.h2.w2.br100.$,
-  ...Css.add("outline", "0px solid transparent").$,
-};
-
-export const radioDefault = {
-  // By default we're a white circle with a gray border
-  ...Css.bgWhite.bcGray300.ba.$,
-  // Set the "selected" color that will be used by background=currentColor + box shadow, but is initially ignored
-  ...Css.blue700.$,
-  // Apply our default transitions
-  ...Css.transition.$,
-};
-
-// Unchecked means a gray border
-export const radioUnchecked = Css.cursorPointer.bcGray300.$;
-
-// Checked means a blue circle (achieved by a blue background + white dot background image)
-export const radioChecked = {
-  // Make the background become the current (blue) color
-  ...Css.add("backgroundColor", "currentColor")
-    .add("backgroundSize", "100% 100%")
-    .add("backgroundPosition", "center")
-    .add("backgroundRepeat", "no-repeat").$,
-  // And use backgroundImage to draw a white dot in the middle of the background
-  ...Css.add("backgroundImage", `url("${whiteCircle}")`).$,
-  // Make our border the same color as the dot
-  ...Css.add("borderColor", "currentColor").$,
-};
-
-// When active draw another circle via boxShadow
-export const radioFocus = {
-  // The box shadow ends up drawing over this afaict?
-  ...Css.add("outline", "2px solid transparent").add("outlineOffset", "2px").$,
-  // Draw 1st box shadow of white/outline, 2nd box current (blue) of another outline
-  ...Css.bshFocus.$,
-};
-
-export const radioHover = {
-  // Change both the dot and the border to a darker blue
-  ...Css.blue900.bcBlue900.$,
-};
-
-export const radioDisabled = {
-  ...Css.cursorNotAllowed.gray100.$,
-  ...Css.add("backgroundColor", "currentColor")
-    .add("backgroundSize", "100% 100%")
-    .add("backgroundPosition", "center")
-    .add("backgroundRepeat", "no-repeat").$,
-};

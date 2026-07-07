@@ -1,25 +1,23 @@
 import { ReactNode, useRef } from "react";
 import { useCheckboxGroup, useCheckboxGroupItem } from "react-aria";
 import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
-import { HelperText } from "src/components/HelperText";
-import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
-import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { LabeledGroupField } from "src/inputs/internal/LabeledGroupField";
 import { useTestIds } from "src/utils";
 
-export interface CheckboxGroupItemOption {
+export type CheckboxGroupItemOption = {
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
   label: string;
   /** The value of the CheckboxGroup item, stored in value array in state. */
   value: string;
-}
+};
 
-export interface CheckboxGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
+export type CheckboxGroupProps = {
   label: string;
   required?: boolean;
   /** Called when a checkbox is selected or deselected */
@@ -36,7 +34,7 @@ export interface CheckboxGroupProps extends Pick<PresentationFieldProps, "labelS
   onFocus?: () => void;
   /** Number of columns to display checkboxes */
   columns?: number;
-}
+} & Pick<PresentationFieldProps, "labelStyle">;
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
   const { fieldProps } = usePresentationContext();
@@ -59,12 +57,18 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   const labelSuffix = useLabelSuffix(required, false);
 
   return (
-    <div {...groupProps} css={Css.if(labelStyle === "left").df.fdr.$} onBlur={onBlur} onFocus={onFocus} {...tid}>
-      {labelStyle !== "hidden" && (
-        <div css={Css.if(labelStyle === "left").w50.$}>
-          <Label label={label} {...labelProps} {...tid.label} suffix={labelSuffix} />
-        </div>
-      )}
+    <LabeledGroupField
+      label={label}
+      labelStyle={labelStyle}
+      labelProps={labelProps}
+      groupProps={groupProps}
+      errorMsg={errorMsg}
+      helperText={helperText}
+      labelSuffix={labelSuffix}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      tid={tid}
+    >
       <div css={Css.dg.gtc(`repeat(${columns}, auto)`).gap2.$}>
         {options.map((option) => (
           <CheckboxGroupItem
@@ -75,13 +79,11 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
           />
         ))}
       </div>
-      {errorMsg && <ErrorMessage errorMsg={errorMsg} {...tid.errorMsg} />}
-      {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-    </div>
+    </LabeledGroupField>
   );
 }
 
-interface CheckboxGroupItemProps {
+type CheckboxGroupItemProps = {
   /** Additional text displayed below label */
   description?: string;
   disabled?: boolean;
@@ -94,7 +96,7 @@ interface CheckboxGroupItemProps {
   label: string;
   value: string;
   groupState: CheckboxGroupState;
-}
+};
 
 function CheckboxGroupItem(props: CheckboxGroupItemProps) {
   const {

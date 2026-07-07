@@ -7,11 +7,11 @@ import {
   radioDefault,
   radioDisabled,
   radioFocus,
-  RadioGroupField,
   radioHover,
   radioReset,
   radioUnchecked,
-} from "src/inputs/RadioGroupField";
+} from "src/inputs/internal/radioStyles";
+import { RadioGroupField } from "src/inputs/RadioGroupField";
 import { action } from "storybook/actions";
 
 export default {

@@ -1,60 +1,47 @@
-import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { SelectCardGroupItemOption } from "src/inputs/SelectCardGroup";
+import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
+import { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
 import { click, render } from "src/utils/rtl";
-import { vi } from "vitest";
 import { BoundSelectCardGroupField } from "./BoundSelectCardGroupField";
-import { AuthorInput } from "./formStateDomain";
 
 enum Category {
   Math,
   History,
-  Finance,
-  Engineering,
-  Management,
-  Media,
+  Na,
 }
 
-const categories: SelectCardGroupItemOption<Category>[] = [
-  { icon: "abacus", label: "Math", description: "Numbers and equations", value: Category.Math },
-  { icon: "archive", label: "History", value: Category.History },
-  { icon: "dollar", label: "Finance", value: Category.Finance },
-  { icon: "hardHat", label: "Engineering", value: Category.Engineering },
-  { icon: "columns", label: "Management", value: Category.Management },
-  { icon: "camera", label: "Media", value: Category.Media },
-];
+function createCategories(): SelectCardGridGroupItemOption<Category>[] {
+  return [
+    { icon: "abacus", label: "Math", description: "Numbers and equations", value: Category.Math },
+    { icon: "archive", label: "History", value: Category.History },
+    { icon: "remove", label: "Not Applicable", value: Category.Na },
+  ];
+}
 
-type NewAuthor = Omit<AuthorInput, "favoriteGenres"> & { favoriteGenres?: Category[] | null };
+type Form = { favoriteGenre?: Category | null };
 
 describe("BoundSelectCardGroupField", () => {
-  it("shows the label", async () => {
-    const author = createObjectState(formConfig, { favoriteGenres: [Category.Math] });
-    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
-    expect(r.favoriteGenres_label).toHaveTextContent("Favorite Genres");
+  it("updates the field value when a radio option is selected", async () => {
+    const author = createObjectState(formConfig, { favoriteGenre: Category.Math });
+    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenre} options={createCategories()} />);
+    // When selecting History
+    click(r.favoriteGenre_history);
+    // Then the field stores History
+    expect(author.favoriteGenre.value).toBe(Category.History);
   });
 
-  it("renders option descriptions", async () => {
-    const author = createObjectState(formConfig, { favoriteGenres: [Category.Math] });
-    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
-    expect(r.favoriteGenres_Math).toHaveTextContent("Numbers and equations");
-  });
-
-  it("triggers 'maybeAutoSave' on change", async () => {
-    const autoSave = vi.fn();
-    // Given a BoundSelectCardGroupField with auto save
-    const author: ObjectState<NewAuthor> = createObjectState(
-      formConfig,
-      {},
-      { maybeAutoSave: () => autoSave(author.favoriteGenres.value) },
-    );
-    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenres} options={categories} />);
-
-    // When toggling the checkbox off
-    click(r.favoriteGenres_Math);
-    // Then the callback should be triggered with the current value
-    expect(autoSave).toBeCalledWith([Category.Math]);
+  it("disables all cards when the field is readOnly", async () => {
+    const author = createObjectState(formConfigReadOnly, { favoriteGenre: Category.Math });
+    const r = await render(<BoundSelectCardGroupField field={author.favoriteGenre} options={createCategories()} />);
+    // Then every option input is disabled
+    expect(r.favoriteGenre_math_value).toBeDisabled();
+    expect(r.favoriteGenre_history_value).toBeDisabled();
   });
 });
 
-const formConfig: ObjectConfig<NewAuthor> = {
-  favoriteGenres: { type: "value", rules: [required], strictOrder: false },
+const formConfigReadOnly: ObjectConfig<Form> = {
+  favoriteGenre: { type: "value", rules: [required], readOnly: true },
+};
+
+const formConfig: ObjectConfig<Form> = {
+  favoriteGenre: { type: "value", rules: [required] },
 };

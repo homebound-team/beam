@@ -22,3 +22,4 @@ export function assertNever(x: never): never {
 }
 export type AnyObject = Record<string, unknown>;
 export type ChildrenOnly = { children: React.ReactNode };
+export type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
