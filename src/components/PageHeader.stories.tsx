@@ -84,3 +84,28 @@ export function WithRightSlotAndTabs() {
     </>
   );
 }
+
+export function WithRightSlotAndTabsAndBreadcrumbs() {
+  const [selected, setSelected] = useState(testTabs[0].value);
+  const breadcrumbs: Breadcrumb[] = [
+    { label: "Test 1", href: "" },
+    { label: "Test 2", href: "" },
+    { label: "Test 3", href: "" },
+  ];
+
+  return (
+    <>
+      <PageHeader
+        title="Test Title"
+        breadcrumbs={{ breadcrumbs }}
+        rightSlot={<Button label="Test Action" variant="primary" onClick={action("clicked")} />}
+        tabs={{
+          tabs: testTabs,
+          selected,
+          onChange: setSelected,
+        }}
+      />
+      <TabContent tabs={testTabs} selected={selected} />
+    </>
+  );
+}

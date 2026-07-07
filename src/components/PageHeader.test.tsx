@@ -49,6 +49,23 @@ describe("PageHeader", () => {
     expect(r.testButton).toBeInTheDocument();
   });
 
+  it("renders breadcrumbs when provided", async () => {
+    const r = await render(
+      <PageHeader
+        title="Test Title"
+        breadcrumbs={{
+          breadcrumbs: [
+            { label: "Home", href: "/" },
+            { label: "Projects", href: "/projects" },
+          ],
+        }}
+      />,
+      {},
+    );
+    expect(r.breadcrumb_link_0.textContent).toEqual("Home");
+    expect(r.breadcrumb_link_1.textContent).toEqual("Projects");
+  });
+
   it("renders with tabs", async () => {
     const tabs: Tab[] = [
       { name: "Tab A", value: "tabA" },
