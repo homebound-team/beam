@@ -101,7 +101,7 @@ function GridTableLayoutActionsComponent<
   );
 
   return (
-    <div css={Css.df.fdc.gap1.pb2.$}>
+    <div css={Css.df.fdc.gap1.pb2.if(view === "card").pb3.$}>
       <div css={Css.df.gap1.jcsb.pt3.if(inDocumentScrollLayout).px3.$}>
         <div css={Css.df.gap1.aic.$}>
           {/* Large screen: 244px inline search field */}
