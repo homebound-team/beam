@@ -26,8 +26,7 @@ export function TruncatesWhenNarrow() {
   const breadcrumbs: Breadcrumb[] = [
     { label: "Home", href: "" },
     { label: "A Really Long Project Name That Should Truncate", href: "" },
-    { label: "Sub Section With An Extremely Long Descriptive Title", href: "" },
-    { label: "Current Page", href: "" },
+    { label: "Sub Section", href: "" },
   ];
 
   return (

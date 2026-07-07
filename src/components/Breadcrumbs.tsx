@@ -17,11 +17,16 @@ export function Breadcrumbs({ breadcrumbs }: BreadcrumbsProps) {
   const items = Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs];
 
   return (
-    <div css={Css.df.aic.gap1.$}>
+    <div css={Css.df.aic.gapPx(4).$}>
       {items.map((bc, i) => (
         <Fragment key={bc.label}>
-          {i > 0 && <span css={Css.gray700.fs0.$}>/</span>}
-          <Link {...tid.link} to={bc.href} title={bc.label} css={Css.xs.gray700.truncate.mw0.onHover.gray800.$}>
+          {i > 0 && <span css={Css.fs0.xs.$}>/</span>}
+          <Link
+            {...tid.link}
+            to={bc.href}
+            title={bc.label}
+            css={Css.xs.gray900.truncate.mw0.maxwPx(120).onHover.gray800.$}
+          >
             {bc.label}
           </Link>
         </Fragment>

@@ -23,7 +23,7 @@ export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(
 
   return (
     <header {...tid} css={Css.df.fdc.pt3.px3.bb.gap2.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
-      <div css={Css.df.jcsb.w100.gap1.ifSm.fdc.$}>
+      <div css={Css.df.jcsb.mb2.w100.gap1.ifSm.fdc.$}>
         <div css={Css.mw0.$}>
           {breadcrumbs && <Breadcrumbs {...breadcrumbs} />}
           <h1 {...tid.title} css={Css.xl.$}>

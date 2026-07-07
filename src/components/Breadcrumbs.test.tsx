@@ -33,9 +33,16 @@ describe("Breadcrumbs", () => {
     expect(r.container.textContent).toBe("Home/Projects/Project 123");
   });
 
-  it("exposes the full label via a title attribute for when it's truncated", async () => {
+  it("caps long labels at a max width so only they truncate", async () => {
     const longLabel = "A Really Long Project Name That Should Truncate Instead Of Wrapping";
     const r = await render(<Breadcrumbs breadcrumbs={{ label: longLabel, href: "/" }} />, {});
+    expect(r.breadcrumb_link).toHaveStyle({ maxWidth: "120px" });
     expect(r.breadcrumb_link).toHaveAttribute("title", longLabel);
+  });
+
+  it("does not clip short labels", async () => {
+    const r = await render(<Breadcrumbs breadcrumbs={{ label: "Home", href: "/" }} />, {});
+    expect(r.breadcrumb_link).toHaveStyle({ maxWidth: "120px" });
+    expect(r.breadcrumb_link).toHaveTextContent("Home");
   });
 });
