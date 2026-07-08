@@ -44,7 +44,7 @@ export function ListSelectCard(props: SelectCardItemProps) {
           </>
         ) : (
           // Styled radio is an input, so we can use the inputProps directly
-          <StyledRadio label={label} isDisabled={isDisabled} isSelected={isSelected} inputProps={inputProps} />
+          <StyledRadio {...tid} label={label} isDisabled={isDisabled} isSelected={isSelected} inputProps={inputProps} />
         )}
         <span css={Css.smSb.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{label}</span>
       </div>

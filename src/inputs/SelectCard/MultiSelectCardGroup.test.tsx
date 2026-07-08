@@ -17,8 +17,8 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // Then Math is selected
-    expect(r.math_value).toBeChecked();
-    expect(r.history_value).not.toBeChecked();
+    expect(r.categories_math_value).toBeChecked();
+    expect(r.categories_history_value).not.toBeChecked();
   });
 
   it("calls onChange with multiple selections", async () => {
@@ -32,7 +32,7 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // When selecting History
-    click(r.history);
+    click(r.categories_history);
     // Then onChange receives both values
     expect(onChange).toHaveBeenCalledWith([Category.Math, Category.History]);
   });
@@ -48,7 +48,7 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // When selecting the exclusive option
-    click(r.notApplicable);
+    click(r.categories_notApplicable);
     // Then onChange receives only N/A
     expect(onChange).toHaveBeenCalledWith([Category.Na]);
   });
@@ -64,7 +64,7 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // When selecting Math
-    click(r.math);
+    click(r.categories_math);
     // Then onChange receives only Math
     expect(onChange).toHaveBeenCalledWith([Category.Math]);
   });
@@ -88,12 +88,12 @@ describe("MultiSelectCardGroup", () => {
     }
 
     const r = await render(<ControlledGroup />);
-    expect(r.math_value).toBeChecked();
+    expect(r.categories_math_value).toBeChecked();
     // When the parent changes values
     click(r.reset);
     // Then the group reflects the new selection
-    expect(r.history_value).toBeChecked();
-    expect(r.math_value).not.toBeChecked();
+    expect(r.categories_history_value).toBeChecked();
+    expect(r.categories_math_value).not.toBeChecked();
   });
 
   it("toggles off a selected value in list view", async () => {
@@ -108,7 +108,7 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // When deselecting Math
-    click(r.math);
+    click(r.categories_math);
     // Then onChange receives an empty selection
     expect(onChange).toHaveBeenCalledWith([]);
   });
@@ -125,7 +125,7 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // When selecting the exclusive option
-    click(r.notApplicable);
+    click(r.categories_notApplicable);
     // Then onChange receives only N/A
     expect(onChange).toHaveBeenCalledWith([Category.Na]);
   });
@@ -141,7 +141,7 @@ describe("MultiSelectCardGroup", () => {
     );
     // Then the group is labelled for assistive tech
     const group = r.getByRole("group");
-    expect(group).toHaveAttribute("aria-labelledby", r.label.id);
+    expect(group).toHaveAttribute("aria-labelledby", r.categories_label.id);
   });
 
   it("disables all cards when the group is disabled", async () => {
@@ -155,9 +155,9 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // Then every option input is disabled
-    expect(r.math_value).toBeDisabled();
-    expect(r.history_value).toBeDisabled();
-    expect(r.notApplicable_value).toBeDisabled();
+    expect(r.categories_math_value).toBeDisabled();
+    expect(r.categories_history_value).toBeDisabled();
+    expect(r.categories_notApplicable_value).toBeDisabled();
   });
 
   it("does not call onChange when the group is disabled", async () => {
@@ -172,7 +172,7 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // When clicking an enabled-looking card in a disabled group
-    click(r.history);
+    click(r.categories_history);
     // Then onChange is not called
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -189,9 +189,9 @@ describe("MultiSelectCardGroup", () => {
       />,
     );
     // Then every option input is disabled
-    expect(r.math_value).toBeDisabled();
-    expect(r.history_value).toBeDisabled();
-    expect(r.notApplicable_value).toBeDisabled();
+    expect(r.categories_math_value).toBeDisabled();
+    expect(r.categories_history_value).toBeDisabled();
+    expect(r.categories_notApplicable_value).toBeDisabled();
   });
 });
 

@@ -233,6 +233,7 @@ export function boundCheckboxGroupField(props: Omit<BoundCheckboxGroupFieldProps
   });
 }
 
+// Use DistributiveOmit so the grid/list view union stays intact when omitting `field`.
 export function boundSelectCardGroupField<V extends Value>(
   props: DistributiveOmit<BoundSelectCardGroupFieldProps<V>, KeysToOmit>,
 ) {
@@ -242,6 +243,7 @@ export function boundSelectCardGroupField<V extends Value>(
   });
 }
 
+// Use DistributiveOmit so the grid/list view union stays intact when omitting `field`.
 export function boundMultiSelectCardGroupField<V extends Value>(
   props: DistributiveOmit<BoundMultiSelectCardGroupFieldProps<V>, KeysToOmit>,
 ) {

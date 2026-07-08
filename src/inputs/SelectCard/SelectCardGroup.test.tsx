@@ -39,8 +39,8 @@ describe("SelectCardGroup", () => {
       />,
     );
     // Then Math is selected
-    expect(r.math_value).toBeChecked();
-    expect(r.history_value).not.toBeChecked();
+    expect(r.categories_math_value).toBeChecked();
+    expect(r.categories_history_value).not.toBeChecked();
   });
 
   it("calls onChange with the selected value", async () => {
@@ -54,7 +54,7 @@ describe("SelectCardGroup", () => {
       />,
     );
     // When selecting History
-    click(r.history);
+    click(r.categories_history);
     // Then onChange receives only History
     expect(onChange).toHaveBeenCalledWith(Category.History);
   });
@@ -73,12 +73,12 @@ describe("SelectCardGroup", () => {
     }
 
     const r = await render(<ControlledRadioGroup />);
-    expect(r.math_value).toBeChecked();
+    expect(r.categories_math_value).toBeChecked();
     // When the parent changes value
     click(r.reset);
     // Then the group reflects the new selection
-    expect(r.history_value).toBeChecked();
-    expect(r.math_value).not.toBeChecked();
+    expect(r.categories_history_value).toBeChecked();
+    expect(r.categories_math_value).not.toBeChecked();
   });
 
   it("supports single-select in list view", async () => {
@@ -93,7 +93,7 @@ describe("SelectCardGroup", () => {
       />,
     );
     // When selecting History
-    click(r.history);
+    click(r.categories_history);
     // Then onChange receives only History
     expect(onChange).toHaveBeenCalledWith(Category.History);
   });
@@ -109,7 +109,7 @@ describe("SelectCardGroup", () => {
     );
     // Then the group is labelled for assistive tech
     const group = r.getByRole("radiogroup");
-    expect(group).toHaveAttribute("aria-labelledby", r.label.id);
+    expect(group).toHaveAttribute("aria-labelledby", r.categories_label.id);
   });
 
   it("disables all cards when the group is disabled", async () => {
@@ -123,9 +123,9 @@ describe("SelectCardGroup", () => {
       />,
     );
     // Then every option input is disabled
-    expect(r.math_value).toBeDisabled();
-    expect(r.history_value).toBeDisabled();
-    expect(r.notApplicable_value).toBeDisabled();
+    expect(r.categories_math_value).toBeDisabled();
+    expect(r.categories_history_value).toBeDisabled();
+    expect(r.categories_notApplicable_value).toBeDisabled();
   });
 
   it("does not call onChange when the group is disabled", async () => {
@@ -140,7 +140,7 @@ describe("SelectCardGroup", () => {
       />,
     );
     // When clicking an enabled-looking card in a disabled group
-    click(r.history);
+    click(r.categories_history);
     // Then onChange is not called
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -157,8 +157,8 @@ describe("SelectCardGroup", () => {
       />,
     );
     // Then every option input is disabled
-    expect(r.math_value).toBeDisabled();
-    expect(r.history_value).toBeDisabled();
-    expect(r.notApplicable_value).toBeDisabled();
+    expect(r.categories_math_value).toBeDisabled();
+    expect(r.categories_history_value).toBeDisabled();
+    expect(r.categories_notApplicable_value).toBeDisabled();
   });
 });
