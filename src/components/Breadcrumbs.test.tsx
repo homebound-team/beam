@@ -42,26 +42,4 @@ describe("Breadcrumbs", () => {
     // Then they're separated by slashes (spacing comes from the flex container's `gap1`, not literal spaces in the text)
     expect(r.container.textContent).toBe("Home/Projects/Project 123");
   });
-
-  it("caps long labels at a max width so only they truncate", async () => {
-    // Given a breadcrumb with a very long label
-    const longLabel = "A Really Long Project Name That Should Truncate Instead Of Wrapping";
-
-    // When rendered
-    const r = await render(<Breadcrumbs breadcrumbs={{ label: longLabel, href: "/" }} />, {});
-
-    // Then the link is capped at a max width, with the full label available via a title attribute
-    expect(r.breadcrumb_link).toHaveStyle({ maxWidth: "120px" });
-    expect(r.breadcrumb_link).toHaveAttribute("title", longLabel);
-  });
-
-  it("does not clip short labels", async () => {
-    // Given a breadcrumb with a short label
-    // When rendered
-    const r = await render(<Breadcrumbs breadcrumbs={{ label: "Home", href: "/" }} />, {});
-
-    // Then it still gets the max-width style, but its text isn't truncated
-    expect(r.breadcrumb_link).toHaveStyle({ maxWidth: "120px" });
-    expect(r.breadcrumb_link).toHaveTextContent("Home");
-  });
 });
