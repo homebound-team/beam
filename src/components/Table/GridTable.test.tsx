@@ -1067,8 +1067,8 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("bar");
       expect(cell(r, 2, 0)).toHaveTextContent("foo");
       expect(cell(r, 3, 0)).toHaveTextContent("zaz");
-      // And the pinned row gets the green highlight (`Green50` = #ecfdf5)
-      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Green50 });
+      // And the pinned row gets the blue highlight (`Blue50`)
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Blue50 });
     });
 
     it("keeps a pinned row visible even when a filter would hide it", async () => {

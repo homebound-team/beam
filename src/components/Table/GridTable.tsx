@@ -1135,7 +1135,7 @@ function CardView({
   }
 
   return (
-    <div css={Css.py2.h100.$}>
+    <div css={Css.pb2.h100.$}>
       <VirtuosoGrid
         useWindowScroll={inDocumentScrollLayout && !customScrollParent}
         {...(customScrollParent ? { customScrollParent } : {})}

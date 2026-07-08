@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { ContrastScope, Css, IconButton, IconButtonProps, Icons, Palette } from "src";
+import { ContrastScope, Css, IconButton, IconButtonProps, Icons, Palette, Tokens } from "src";
 import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -17,9 +17,11 @@ export default {
     icon: { control: { type: "select", options: Object.keys(Icons) } },
     autoFocus: { control: false },
     storyContrast: { control: false },
+    __storyState: { control: false },
   },
 
   parameters: {
+    layout: "fullscreen",
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31586%3A99884",
@@ -37,8 +39,8 @@ type IconButtonStoryArgs = IconButtonProps & { storyContrast?: boolean };
 
 function Template(args: IconButtonStoryArgs) {
   const { storyContrast = false, ...iconArgs } = args;
-  const surface = (
-    <div css={Css.if(storyContrast).bgGray800.white.$}>
+  const content = (
+    <div css={Css.p2.if(storyContrast).color(Tokens.OnSurface).$}>
       <h1 css={Css.xl2.mbPx(30).$}>Icon Only Button</h1>
       <div css={Css.df.gapPx(90).$}>
         <div>
@@ -51,7 +53,7 @@ function Template(args: IconButtonStoryArgs) {
         </div>
         <div>
           <h2>Focused</h2>
-          <IconButton {...iconArgs} autoFocus />
+          <IconButton {...iconArgs} __storyState={{ focusVisible: true }} />
         </div>
         <div>
           <h2>Active</h2>
@@ -72,7 +74,7 @@ function Template(args: IconButtonStoryArgs) {
       </div>
     </div>
   );
-  return storyContrast ? <ContrastScope>{surface}</ContrastScope> : surface;
+  return storyContrast ? <ContrastScope>{content}</ContrastScope> : content;
 }
 export const Regular = Template.bind({});
 
@@ -83,6 +85,8 @@ Compact.args = { compact: true };
 export const Contrast = Template.bind({});
 // @ts-ignore
 Contrast.args = { storyContrast: true };
+// @ts-ignore
+Contrast.globals = { backgrounds: { value: "dark" } };
 
 export const Circle = Template.bind({});
 // @ts-ignore
@@ -92,9 +96,15 @@ export const Outline = Template.bind({});
 // @ts-ignore
 Outline.args = { variant: "outline" };
 
+export const OutlineContrast = Template.bind({});
+// @ts-ignore
+OutlineContrast.args = { variant: "outline", storyContrast: true };
+// @ts-ignore
+OutlineContrast.globals = { backgrounds: { value: "dark" } };
+
 export function WithTooltip() {
   return (
-    <div css={Css.dg.fdc.gap2.jcfs.$}>
+    <div css={Css.p2.dg.fdc.gap2.jcfs.$}>
       <div>
         <h2>Tooltip provided via 'disabled' property</h2>
         <IconButton
@@ -125,7 +135,7 @@ export function WithTooltip() {
 
 export function IconButtonLink() {
   return (
-    <div>
+    <div css={Css.p2.$}>
       <div>
         <h2>Relative Path Link</h2>
         <IconButton icon="plus" onClick="/fakePath" />
@@ -142,17 +152,7 @@ export function IconButtonLink() {
   );
 }
 
-/** Hover styled version of the IconButton — uses a scoped stylesheet to force hover styles for visual testing. */
-function HoveredIconButton(args: IconButtonStoryArgs) {
-  const { storyContrast = false, variant = "default", ...iconArgs } = args;
-  const isCircle = variant === "circle";
-  const bg = storyContrast ? Palette.Gray700 : isCircle ? Palette.Blue100 : Palette.Gray100;
-  const borderColor = isCircle ? Palette.Blue200 : undefined;
-  const hoverBlock = (
-    <div className="hovered-icon-button">
-      <style>{`.hovered-icon-button button { background-color: ${bg};${borderColor ? ` border-color: ${borderColor};` : ""} }`}</style>
-      <IconButton {...iconArgs} variant={variant} active={isCircle} />
-    </div>
-  );
-  return storyContrast ? <ContrastScope>{hoverBlock}</ContrastScope> : hoverBlock;
+/** Drives real `useHover` styles via `__storyState` (ContrastScope is applied by Template). */
+function HoveredIconButton({ storyContrast: _storyContrast, ...iconArgs }: IconButtonStoryArgs) {
+  return <IconButton {...iconArgs} __storyState={{ hovered: true }} />;
 }

@@ -10,7 +10,14 @@ describe("semanticLeafKeyToExpectedCssVar", () => {
     expect(semanticLeafKeyToExpectedCssVar("LoaderFill")).toBe("--b-loader-fill");
     expect(semanticLeafKeyToExpectedCssVar("OnSurfaceMuted")).toBe("--b-on-surface-muted");
     expect(semanticLeafKeyToExpectedCssVar("OnSurfaceSubtle")).toBe("--b-on-surface-subtle");
+    expect(semanticLeafKeyToExpectedCssVar("OnSurfaceDisabled")).toBe("--b-on-surface-disabled");
     expect(semanticLeafKeyToExpectedCssVar("SurfaceSubtle")).toBe("--b-surface-subtle");
+    expect(semanticLeafKeyToExpectedCssVar("SurfaceRaised")).toBe("--b-surface-raised");
+    expect(semanticLeafKeyToExpectedCssVar("SurfaceRaisedHover")).toBe("--b-surface-raised-hover");
+    expect(semanticLeafKeyToExpectedCssVar("SurfaceRaisedPressed")).toBe("--b-surface-raised-pressed");
+    expect(semanticLeafKeyToExpectedCssVar("OnSurfaceRaisedHover")).toBe("--b-on-surface-raised-hover");
+    expect(semanticLeafKeyToExpectedCssVar("OnSurfaceRaisedPressed")).toBe("--b-on-surface-raised-pressed");
+    expect(semanticLeafKeyToExpectedCssVar("SurfaceDisabled")).toBe("--b-surface-disabled");
     expect(semanticLeafKeyToExpectedCssVar("SurfaceSeparator")).toBe("--b-surface-separator");
     expect(semanticLeafKeyToExpectedCssVar("TextLabel")).toBe("--b-text-label");
     expect(semanticLeafKeyToExpectedCssVar("PrimaryHover")).toBe("--b-primary-hover");

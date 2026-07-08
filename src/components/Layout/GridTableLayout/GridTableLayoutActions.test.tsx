@@ -76,18 +76,23 @@ describe("GridTableLayoutActions", () => {
       expect(r.filter_chip_needsRevision).toBeInTheDocument();
     });
 
-    it("calls setFilter with empty object when Clear is clicked in an open panel", async () => {
+    it("calls clearFilters when Clear is clicked in an open panel", async () => {
       // Given the panel is closed with an active filter
-      const setFilter = vi.fn();
+      const clearFilters = vi.fn();
       const r = await render(
-        <GridTableLayoutActions filterDefs={filterDefs} filter={{ needsRevision: true }} setFilter={setFilter} />,
+        <GridTableLayoutActions
+          filterDefs={filterDefs}
+          filter={{ needsRevision: true }}
+          setFilter={vi.fn()}
+          clearFilters={clearFilters}
+        />,
         withRouter(),
       );
       // When the panel is opened and Clear is clicked
       click(r.gridTableLayoutActions_filterButton);
       click(r.filter_clearBtn);
-      // Then setFilter is called with an empty object
-      expect(setFilter).toHaveBeenCalledWith({});
+      // Then clearFilters is called
+      expect(clearFilters).toHaveBeenCalled();
     });
   });
 });
