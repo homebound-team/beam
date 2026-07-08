@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react-vite";
 import { Breadcrumb, Breadcrumbs } from "src/components/Breadcrumbs";
-import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
 export default {
@@ -10,7 +9,6 @@ export default {
 
 export function Default() {
   const breadcrumbs: Breadcrumb[] = [
-    { label: "Home", href: "" },
     { label: "Projects", href: "" },
     { label: "Project 123", href: "" },
   ];
@@ -22,16 +20,23 @@ export function SingleBreadcrumb() {
   return <Breadcrumbs breadcrumbs={{ label: "Home", href: "" }} />;
 }
 
-export function TruncatesWhenNarrow() {
+export function CollapsesAtThreeBreadcrumbs() {
   const breadcrumbs: Breadcrumb[] = [
     { label: "Home", href: "" },
-    { label: "A Really Long Project Name That Should Truncate", href: "" },
-    { label: "Sub Section", href: "" },
+    { label: "Projects", href: "" },
+    { label: "Project 123", href: "" },
   ];
 
-  return (
-    <div css={Css.wPx(320).$}>
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
-    </div>
-  );
+  return <Breadcrumbs breadcrumbs={breadcrumbs} />;
+}
+
+export function CollapsesWithManyLongBreadcrumbs() {
+  const breadcrumbs: Breadcrumb[] = [
+    { label: "Home", href: "" },
+    { label: "A Really Long Project Name - Eastern Subdivision or something", href: "" },
+    { label: "An especially long sub section title", href: "" },
+    { label: "Oh now we're also deep too", href: "" },
+  ];
+
+  return <Breadcrumbs breadcrumbs={breadcrumbs} />;
 }
