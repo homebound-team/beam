@@ -22,17 +22,16 @@ export function getNextSelectCardGroupValues<V extends Value>({
   const option = options.find((o) => o.value === clickedValue);
   if (!option) return currentValues;
 
-  const isExclusive = option.selectionBehavior === "exclusive";
-  const exclusiveValues = new Set(options.filter((o) => o.selectionBehavior === "exclusive").map((o) => o.value));
-
   if (currentValues.includes(clickedValue)) {
     return currentValues.filter((v) => v !== clickedValue);
   }
 
+  const isExclusive = option.selectionBehavior === "exclusive";
   if (isExclusive) {
     return [clickedValue];
   }
 
+  const exclusiveValues = new Set(options.filter((o) => o.selectionBehavior === "exclusive").map((o) => o.value));
   return [...currentValues.filter((v) => !exclusiveValues.has(v)), clickedValue];
 }
 

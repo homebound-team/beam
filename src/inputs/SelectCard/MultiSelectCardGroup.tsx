@@ -29,7 +29,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
   } = props;
 
   const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
-  const tid = useTestIds(props);
+  const tid = useTestIds(props, defaultTestId(label));
 
   // Aria reports the full next selection, not which card was clicked. Diff prev/next to
   // find the toggled value, then apply our rules (e.g. exclusive options) instead of

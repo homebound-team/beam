@@ -8,10 +8,10 @@ export type SelectCardView = "grid" | "list";
 type SelectCardGroupItemOptionBase<V extends Value> = {
   label: string;
   /** Optional secondary copy shown beneath the label. */
-  description?: string;
+  description?: ReactNode;
   disabled?: boolean;
   /** Tooltip shown on hover, i.e. to explain why the option is disabled. */
-  tooltip?: string;
+  tooltip?: ReactNode;
   /** The value of the SelectCardGroup item. */
   value: V;
   /** For checkbox groups, selecting this option clears other options and cannot be combined. */
@@ -74,10 +74,10 @@ export type SelectCardGroupItemProps<V extends Value> = {
 export type SelectCardShared = {
   label: string;
   /** Optional secondary copy shown beneath the label. When present the card grows to fit it. */
-  description?: string;
+  description?: ReactNode;
   selected?: boolean;
   disabled?: boolean;
-  tooltip?: string;
+  tooltip?: ReactNode;
 };
 
 /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */

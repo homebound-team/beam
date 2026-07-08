@@ -7,6 +7,7 @@ import { useLabelSuffix } from "src/forms/labelUtils";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 import { LabeledGroupField } from "src/inputs/internal/LabeledGroupField";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 
 export type CheckboxGroupItemOption = {
   /** Additional text displayed below label */
@@ -53,7 +54,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   const state = useCheckboxGroupState({ ...props, value: values });
   const { groupProps, labelProps } = useCheckboxGroup(props, state);
-  const tid = useTestIds(props);
+  const tid = useTestIds(props, defaultTestId(label));
   const labelSuffix = useLabelSuffix(required, false);
 
   return (

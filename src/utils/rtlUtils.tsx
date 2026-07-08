@@ -341,16 +341,58 @@ export function getSelected(select: HTMLElement): string[] | string | undefined 
   return selections.length > 0 ? (selections.length > 1 ? selections : selections[0]) : undefined;
 }
 
-export function getOptions(select: HTMLElement): string[] {
-  assertListBoxInput(select);
-  ensureListBoxOpen(select);
+/** Returns option labels for a SelectField listbox, or a checkbox/radio group root. */
+export function getOptions(element: HTMLElement): string[] {
+  const group = resolveOptionGroup(element);
+  if (group) return getGroupOptions(group);
 
-  const listbox = findListBox(select);
+  assertListBoxInput(element);
+  ensureListBoxOpen(element);
+
+  const listbox = findListBox(element);
   const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
 
   return Array.from(options)
     .map((o: HTMLElement) => o.dataset.label ?? o.dataset.key ?? "")
     .filter((o) => !!o);
+}
+
+/** Prefer the element itself when it is a group; otherwise look for a nested group. */
+function resolveOptionGroup(element: HTMLElement): HTMLElement | undefined {
+  if (isOptionGroup(element)) return element;
+  const nested =
+    element.querySelector<HTMLElement>('[role="radiogroup"]') ??
+    Array.from(element.querySelectorAll<HTMLElement>('[role="group"]')).find(isCheckboxOrRadioGroup);
+  return nested;
+}
+
+function isOptionGroup(element: HTMLElement): boolean {
+  const role = element.getAttribute("role");
+  if (role === "radiogroup") return true;
+  return role === "group" && isCheckboxOrRadioGroup(element);
+}
+
+function isCheckboxOrRadioGroup(element: HTMLElement): boolean {
+  return !!element.querySelector("input[type=checkbox], input[type=radio]");
+}
+
+function getGroupOptions(group: HTMLElement): string[] {
+  const inputs = Array.from(group.querySelectorAll<HTMLInputElement>("input[type=radio], input[type=checkbox]"));
+  return inputs.map(getInputOptionLabel).filter((label) => !!label);
+}
+
+function getInputOptionLabel(input: HTMLInputElement): string {
+  const ariaLabel = input.getAttribute("aria-label");
+  if (ariaLabel) return ariaLabel;
+
+  const labelledBy = input.getAttribute("aria-labelledby");
+  if (labelledBy) {
+    const labelEl = document.getElementById(labelledBy.split(/\s+/)[0]!);
+    const text = labelEl?.textContent?.trim();
+    if (text) return text;
+  }
+
+  return input.value || "";
 }
 
 function findListBox(select: HTMLElement): HTMLElement {

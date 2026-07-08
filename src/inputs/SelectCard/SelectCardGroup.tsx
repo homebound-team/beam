@@ -25,7 +25,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
   } = props;
 
   const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
-  const tid = useTestIds(props);
+  const tid = useTestIds(props, defaultTestId(label));
 
   const handleChange = useCallback(
     (nextValue: V) => {

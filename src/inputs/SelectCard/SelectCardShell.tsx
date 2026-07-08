@@ -10,7 +10,7 @@ export type SelectCardShellProps = {
   label: string;
   selected?: boolean;
   disabled?: boolean;
-  tooltip?: string;
+  tooltip?: ReactNode;
   __storyState?: SelectCardStoryState;
   children: ReactNode;
   view: SelectCardView;

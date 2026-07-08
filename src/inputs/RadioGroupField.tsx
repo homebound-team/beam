@@ -88,7 +88,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
 
   return (
     // default styling to position `<Label />` above.
-    <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$}>
+    <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$} {...tid}>
       <Label label={label} {...labelProps} {...tid.label} suffix={labelSuffix} hidden={labelStyle === "hidden"} />
       <div {...radioGroupProps}>
         <div css={Css.df.if(layout === "horizontal").fdr.fww.gap3.else.fdc.gap1.$}>
