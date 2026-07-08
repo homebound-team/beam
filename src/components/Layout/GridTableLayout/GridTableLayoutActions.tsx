@@ -123,7 +123,7 @@ function GridTableLayoutActionsComponent<
   return (
     <div css={Css.df.fdc.gap1.pb2.$}>
       <div css={Css.df.gap1.jcsb.pt3.if(inDocumentScrollLayout).px3.$}>
-        <div css={Css.df.gap1.aic.$}>
+        <div css={Css.df.gapPx(12).aic.$}>
           {/* Large screen: 244px inline search field */}
           {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
 
@@ -171,7 +171,7 @@ function GridTableLayoutActionsComponent<
           )}
         </div>
         {(hasHideableColumns || withCardView) && (
-          <div css={Css.df.gap1.$}>
+          <div css={Css.df.gapPx(12).$}>
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}
