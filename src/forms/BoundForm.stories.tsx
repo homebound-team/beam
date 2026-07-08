@@ -10,12 +10,11 @@ import {
   BoundForm as BoundFormComponent,
   BoundFormInputConfig,
   boundMultilineSelectField,
+  boundMultiSelectCardGroupField,
   boundMultiSelectField,
   boundNumberField,
   boundRadioGroupField,
   boundRichTextField,
-  boundSelectCardField,
-  boundSelectCardGroupField,
   boundSelectField,
   boundSwitchField,
   boundTextAreaField,
@@ -24,7 +23,7 @@ import {
   boundTreeSelectField,
 } from "src/forms/BoundForm";
 import { NestedOption } from "src/inputs";
-import { SelectCardGroupItemOption } from "src/inputs/SelectCardGroup";
+import { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
 import { HasIdAndName } from "src/types";
 import { withBeamDecorator } from "src/utils/sb";
 import { BoundTextAreaField } from "./BoundTextAreaField";
@@ -110,7 +109,6 @@ export function LoadingBoundForm() {
         middleInitial: "C",
         lastName: "Doe",
         bio: "Some bio",
-        selectCardSelection: true,
       });
     }, 1000);
   }, [loadedData]);
@@ -159,7 +157,7 @@ const shapesOptions = [
   { value: "shape:3", label: "Circle" },
 ];
 
-const categories: SelectCardGroupItemOption<string>[] = [
+const categories: SelectCardGridGroupItemOption<string>[] = [
   { icon: "abacus", label: "Math", value: "math" },
   { icon: "archive", label: "History", value: "history" },
   { icon: "dollar", label: "Finance", value: "finance" },
@@ -185,8 +183,6 @@ const genres: NestedOption<HasIdAndName>[] = [
 ];
 
 type AuthorInput = BaseAuthorInput & {
-  // selectCardSelection is required to test against a mapped type regression on `BoundFormRowInputs`
-  selectCardSelection: boolean | null;
   selectCardGroupExample?: string[] | null;
   multiLineSelectExample?: string[] | null;
   radioGroupExample?: string | null;
@@ -217,8 +213,7 @@ const inputConfig: BoundFormInputConfig<AuthorInput> = [
   { isAvailable: boundCheckboxField({ label: "Is Retired" }) },
   { saleDates: boundDateRangeField() },
   { favoriteShapes: boundCheckboxGroupField({ options: shapesOptions, label: "Checkbox Group" }) },
-  { selectCardSelection: boundSelectCardField({ icon: "abacus" }) },
-  { selectCardGroupExample: boundSelectCardGroupField({ options: categories }) },
+  { selectCardGroupExample: boundMultiSelectCardGroupField({ options: categories }) },
   {
     multiLineSelectExample: boundMultilineSelectField({
       options: colorOptions,
@@ -276,7 +271,6 @@ const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value" },
   favoriteShapes: { type: "value" },
   saleDates: { type: "value" },
-  selectCardSelection: { type: "value" },
   selectCardGroupExample: { type: "value" },
   multiLineSelectExample: { type: "value" },
   radioGroupExample: { type: "value" },
