@@ -44,5 +44,5 @@ export function findToggledSelectCardGroupValue<V extends Value>(prev: V[], next
 
 export function getSelectCardOptionsCss(view: SelectCardView, hasDescription: boolean) {
   const cardWidth = hasDescription ? 192 : 142;
-  return view === "list" ? Css.df.fdc.gap2.w100.$ : Css.dg.gtc(`repeat(auto-fill, ${cardWidth}px)`).gap2.$;
+  return view === "list" ? Css.df.fdc.gap2.w100.$ : Css.dg.gtc(`repeat(auto-fill, minmax(${cardWidth}px, 1fr))`).gap2.$;
 }

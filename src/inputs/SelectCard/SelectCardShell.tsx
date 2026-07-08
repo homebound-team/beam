@@ -38,7 +38,7 @@ export function SelectCardShell(props: SelectCardShellProps) {
   const styles = useMemo(
     () => ({
       ...Css.df.fdc.ba.br12.bgWhite.bcGray300.w100.$,
-      ...(view === "grid" ? Css.aic.gap1.px2.py3.tac.maxwPx(192).$ : Css.aifs.gapPx(4).p2.$),
+      ...(view === "grid" ? Css.aic.gap1.px2.py3.tac.$ : Css.aifs.gapPx(4).p2.$),
       ...(isHovered && !isDisabled && Css.bgGray100.$),
       ...((isSelected || isPressed) &&
         !isDisabled &&
