@@ -377,7 +377,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
             ...(isLastKeptRow && style.keptLastRowCss),
-            // Apply the green highlight to every runtime-pinned row's cells (wins over `isActive`)
+            // Apply the blue highlight to every runtime-pinned row's cells (wins over `isActive`)
             ...(pinned && style.pinnedRowCss),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,

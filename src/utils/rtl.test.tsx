@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { MultiSelectField, NestedOption, SelectField, TreeSelectField } from "src/inputs";
+import {
+  CheckboxGroup,
+  MultiSelectField,
+  NestedOption,
+  RadioGroupField,
+  SelectField,
+  TreeSelectField,
+} from "src/inputs";
+import { MultiSelectCardGroup } from "src/inputs/SelectCard/MultiSelectCardGroup";
+import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
+import { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
 import { HasIdAndName } from "src/types";
 import { getOptions, getSelected, render, select, selectAndWait } from "src/utils/rtl";
 import { vi } from "vitest";
@@ -437,4 +447,91 @@ describe("rtl", () => {
     // Then the onSelect handler is not called again - no changes occurred.
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
+
+  describe("getOptions for checkbox and radio groups", () => {
+    it("returns option labels from a RadioGroupField root", async () => {
+      // Given a RadioGroupField
+      const r = await render(
+        <RadioGroupField
+          label="Favorite cheese"
+          value="a"
+          onChange={() => {}}
+          options={[
+            { label: "Cheddar", value: "a" },
+            { label: "Gouda", value: "b" },
+            { label: "Swiss", value: "c" },
+          ]}
+        />,
+      );
+      // When calling getOptions on the radiogroup
+      // Then it returns each option label
+      expect(getOptions(r.favoriteCheese)).toEqual(["Cheddar", "Gouda", "Swiss"]);
+    });
+
+    it("returns option labels from a CheckboxGroup root", async () => {
+      // Given a CheckboxGroup
+      const r = await render(
+        <CheckboxGroup
+          label="Favorite shapes"
+          values={["circle"]}
+          onChange={() => {}}
+          options={[
+            { label: "Circle", value: "circle" },
+            { label: "Square", value: "square" },
+            { label: "Triangle", value: "triangle" },
+          ]}
+        />,
+      );
+      // When calling getOptions on the group
+      // Then it returns each option label
+      expect(getOptions(r.favoriteShapes)).toEqual(["Circle", "Square", "Triangle"]);
+    });
+
+    it("returns option labels from a SelectCardGroup root", async () => {
+      // Given a SelectCardGroup
+      const r = await render(
+        <SelectCardGroup label="Categories" options={createSelectCardOptions()} value="math" onChange={() => {}} />,
+      );
+      // Then getOptions returns the card labels
+      expect(getOptions(r.categories)).toEqual(["Math", "History", "Finance"]);
+    });
+
+    it("returns option labels from a MultiSelectCardGroup root", async () => {
+      // Given a MultiSelectCardGroup
+      const r = await render(
+        <MultiSelectCardGroup
+          label="Categories"
+          options={createSelectCardOptions()}
+          values={["math"]}
+          onChange={() => {}}
+        />,
+      );
+      // Then getOptions returns the card labels
+      expect(getOptions(r.categories)).toEqual(["Math", "History", "Finance"]);
+    });
+
+    it("returns option labels when passed the LabeledGroupField test-id root", async () => {
+      // Given a MultiSelectCardGroup whose group role is on the custom test-id root
+      const r = await render(
+        <MultiSelectCardGroup
+          label="Categories"
+          options={createSelectCardOptions()}
+          values={["math"]}
+          onChange={() => {}}
+          data-testid="custom"
+        />,
+      );
+      // When calling getOptions with the component test-id root
+      // Then it finds the group and returns option labels
+      expect(getOptions(r.custom)).toEqual(["Math", "History", "Finance"]);
+    });
+  });
 });
+
+function createSelectCardOptions(): SelectCardGridGroupItemOption<string>[] {
+  return [
+    { icon: "abacus", label: "Math", value: "math" },
+    { icon: "archive", label: "History", value: "history" },
+    { icon: "dollar", label: "Finance", value: "finance" },
+  ];
+}

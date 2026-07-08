@@ -22,3 +22,5 @@ export function assertNever(x: never): never {
 }
 export type AnyObject = Record<string, unknown>;
 export type ChildrenOnly = { children: React.ReactNode };
+/** Like Omit, but applies to each member of a union instead of collapsing the union. */
+export type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
