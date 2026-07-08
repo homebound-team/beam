@@ -31,33 +31,6 @@ export function WithRightSlot() {
   );
 }
 
-export function WithTwoElementRightSlot() {
-  return (
-    <PageHeader
-      title="Test Title"
-      rightSlot={[
-        <Button key="a" label="Action A" variant="secondary" onClick={action("clicked")} />,
-        <Button key="b" label="Action B" variant="primary" onClick={action("clicked")} />,
-      ]}
-    />
-  );
-}
-
-// With more than two elements, the title/breadcrumbs and rightSlot stack on small screens
-// (resize the preview below 600px to see the difference from `WithTwoElementRightSlot`).
-export function WithThreeElementRightSlot() {
-  return (
-    <PageHeader
-      title="Test Title"
-      rightSlot={[
-        <Button key="a" label="Action A" variant="secondary" onClick={action("clicked")} />,
-        <Button key="b" label="Action B" variant="secondary" onClick={action("clicked")} />,
-        <Button key="c" label="Action C" variant="primary" onClick={action("clicked")} />,
-      ]}
-    />
-  );
-}
-
 export function WithTabs() {
   const [selected, setSelected] = useState(testTabs[0].value);
 
