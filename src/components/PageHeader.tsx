@@ -35,7 +35,7 @@ export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(
             {title}
           </h1>
         </div>
-        <div css={Css.fs0.df.gap1.$}>{rightSlot}</div>
+        <div css={Css.fs0.$}>{rightSlot}</div>
       </div>
       {tabs && <Tabs {...tabs} />}
     </header>
