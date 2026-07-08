@@ -673,6 +673,9 @@ describe("GridTableLayout", () => {
       click(r.clearFilters);
       expect(r.gridTable).toBeInTheDocument();
 
+      // Then the search input is also reset, not just the underlying search string
+      expect(r.search).toHaveValue("");
+
       // Then the table shows the data rows again
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "

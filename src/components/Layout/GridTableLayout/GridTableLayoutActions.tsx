@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from "react";
+import { memo, MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls } from "src/components/Filters";
@@ -23,6 +23,10 @@ export type SearchBoxProps = {
   onSearch: (filter: string) => void;
 };
 
+export type SearchBoxApi = {
+  clear: VoidFunction;
+};
+
 type GridTableLayoutActionsProps<
   F extends Record<string, unknown>,
   G extends Value = string,
@@ -43,6 +47,8 @@ type GridTableLayoutActionsProps<
   withCardView?: boolean;
   view?: TableView;
   setView?: (v: TableView) => void;
+  clearFilters?: () => void;
+  searchApi?: MutableRefObject<SearchBoxApi | undefined>;
 };
 
 function GridTableLayoutActionsComponent<
@@ -62,6 +68,8 @@ function GridTableLayoutActionsComponent<
     withCardView,
     view,
     setView,
+    clearFilters,
+    searchApi,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
 
@@ -100,10 +108,22 @@ function GridTableLayoutActionsComponent<
     />
   );
 
+  // Construct our SearchBoxApi to give callers (e.g. the empty state's "Clear Filters" button, which
+  // lives outside this component) an imperative way to reset the search box.
+  if (searchApi) {
+    searchApi.current = {
+      clear: () => {
+        handleSearchDebounced.cancel(); // discard any in-flight debounce so it can't reintroduce the stale value
+        setSearchValue("");
+        setQueryParams({ search: undefined }, "replaceIn");
+      },
+    };
+  }
+
   return (
-    <div css={Css.df.fdc.gap1.pb2.$}>
+    <div css={Css.df.fdc.gap1.pb2.if(view === "card").pb3.$}>
       <div css={Css.df.gap1.jcsb.pt3.if(inDocumentScrollLayout).px3.$}>
-        <div css={Css.df.gap1.aic.$}>
+        <div css={Css.df.gapPx(12).aic.$}>
           {/* Large screen: 244px inline search field */}
           {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
 
@@ -151,7 +171,7 @@ function GridTableLayoutActionsComponent<
           )}
         </div>
         {(hasHideableColumns || withCardView) && (
-          <div css={Css.df.gap1.$}>
+          <div css={Css.df.gapPx(12).$}>
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}
@@ -171,7 +191,7 @@ function GridTableLayoutActionsComponent<
           filterImpls={filterImpls}
           filter={filter}
           setFilter={setFilter}
-          onClear={() => setFilter?.({} as F)}
+          onClear={clearFilters}
         />
       )}
     </div>

@@ -6,6 +6,8 @@ This file is the **source of truth** for agent-oriented conventions in this repo
 
 Use the `src/` path alias (e.g. `import { Css } from "src/Css"`), not relative paths like `../../utils/...`. This applies repo-wide — components, hooks, tests, and stories.
 
+**Do not re-export types through component files.** A `*.tsx` file may export types it defines locally (e.g. `FooProps` beside `Foo`), but do not `export type { … } from "…/types"` (or similar) from a component file just to create a second import path. Put shared types in a dedicated module (e.g. `types.ts`) and expose the public API from the folder barrel (`index.ts`). Consumers import components from the component file (or barrel) and shared types from `types.ts` or the barrel.
+
 ## File naming
 
 Match the existing conventions when adding files:
