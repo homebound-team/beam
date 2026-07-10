@@ -54,6 +54,7 @@ export * from "./SideNav";
 export * from "./Snackbar";
 export * from "./Stepper";
 export type { Step, StepperProps } from "./Stepper";
+export * from "./StepperTabs";
 export * from "./SuperDrawer";
 export * from "./Table";
 export { TabContent, Tabs, TabsWithContent } from "./Tabs";
