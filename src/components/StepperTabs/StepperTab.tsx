@@ -19,7 +19,8 @@ export type StepperTabProps = {
 
 export function StepperTab(props: StepperTabProps) {
   const { label, value, state, onClick, disabled = false, collapsed = false } = props;
-  const ariaProps = { onPress: () => onClick(value), isDisabled: disabled };
+  // Collapsed tabs are a passive indicator bar, not an actionable control — same as `disabled`, they shouldn't be clickable or focusable.
+  const ariaProps = { onPress: () => onClick(value), isDisabled: disabled || collapsed };
   const ref = useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
@@ -37,7 +38,7 @@ export function StepperTab(props: StepperTabProps) {
     <button
       ref={ref}
       {...mergeProps(buttonProps, focusProps, hoverProps)}
-      aria-label={collapsed ? label : undefined}
+      aria-label={label}
       css={{
         ...baseStyles,
         ...stateStyles[state],
@@ -53,7 +54,7 @@ export function StepperTab(props: StepperTabProps) {
           <span css={Css.lineClamp1.$}>{label}</span>
           {showCheck && (
             <span css={Css.fs0.ml1.$}>
-              <Icon icon="check" inc={2.5} />
+              <Icon icon="check" inc={2.5} {...tid.check} />
             </span>
           )}
         </>
@@ -86,10 +87,10 @@ function getStepperTabStyles() {
 
   // When collapsed, every state's border goes gray except "completed" (visited, inactive, completed), which stays blue.
   const collapsedStyles: Record<StepperTabState, Properties> = {
-    notVisited: Css.bcGray300.$,
-    completed: Css.bcBlue600.$,
-    active: Css.bcGray300.$,
-    activeCompleted: Css.bcGray300.$,
+    notVisited: Css.bcGray300.cursor("default").hPx(0).py0.$,
+    completed: Css.bcBlue600.cursor("default").hPx(0).py0.$,
+    active: Css.bcGray300.cursor("default").hPx(0).py0.$,
+    activeCompleted: Css.bcGray300.cursor("default").hPx(0).py0.$,
   };
 
   return {

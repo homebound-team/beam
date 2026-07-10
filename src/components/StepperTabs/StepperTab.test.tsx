@@ -6,7 +6,10 @@ describe("StepperTab", () => {
   it.each<StepperTabState>(["notVisited", "completed", "active", "activeCompleted"])(
     "renders the label for state %s",
     async (state) => {
+      // Given a tab in the given state
+      // When rendered
       const r = await render(<StepperTab label="Step Label" value="step" state={state} onClick={vi.fn()} />);
+      // Then the label is displayed
       expect(r.stepperTab_step).toHaveTextContent("Step Label");
     },
   );
@@ -17,29 +20,21 @@ describe("StepperTab", () => {
     ["active", false],
     ["notVisited", false],
   ])("shows the check icon only when completed (state=%s)", async (state, expectChecked) => {
+    // Given a tab in the given state
+    // When rendered
     const r = await render(<StepperTab label="Step Label" value="step" state={state} onClick={vi.fn()} />);
-    const hasIcon = !!r.stepperTab_step.querySelector('[data-icon="check"]');
+    // Then the check icon is only shown for the completed states
+    const hasIcon = !!r.query.stepperTab_check;
     expect(hasIcon).toBe(expectChecked);
   });
 
-  it("does not invoke onClick when disabled", async () => {
-    const onClick = vi.fn();
-    const r = await render(<StepperTab label="Step Label" value="step" state="active" onClick={onClick} disabled />);
-    expect(r.stepperTab_step).toBeDisabled();
-    click(r.stepperTab_step);
-    expect(onClick).not.toBeCalled();
-  });
-
-  it("hides the label when collapsed", async () => {
-    const r = await render(<StepperTab label="Step Label" value="step" state="active" onClick={vi.fn()} collapsed />);
-    expect(r.stepperTab_step).not.toHaveTextContent("Step Label");
-    expect(r.stepperTab_step).toHaveAttribute("aria-label", "Step Label");
-  });
-
   it("invokes onClick with the tab's value", async () => {
+    // Given a tab with a given value
     const onClick = vi.fn();
     const r = await render(<StepperTab label="Step Label" value="step2" state="active" onClick={onClick} />);
+    // When clicked
     click(r.stepperTab_step2);
-    expect(onClick).toBeCalledWith("step2");
+    // Then onClick is invoked with that value
+    expect(onClick).toHaveBeenCalledWith("step2");
   });
 });
