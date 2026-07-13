@@ -1,7 +1,7 @@
 import { AriaButtonProps } from "@react-types/button";
 import type { PressEvent } from "@react-types/shared";
 import { ReactNode, RefObject, useMemo } from "react";
-import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
+import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import type { IconKey } from "src/components";
 import { navLink } from "src/components";
 import { Icon } from "src/components/Icon";
@@ -30,6 +30,13 @@ export type NavLinkProps = {
    */
   iconOnly?: boolean;
   onClick?: BeamButtonProps["onClick"];
+  nested?: boolean;
+  /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
+  __storyState?: {
+    hovered?: boolean;
+    focusVisible?: boolean;
+    pressed?: boolean;
+  };
 } & BeamFocusableProps;
 
 export function NavLink(props: NavLinkProps) {
@@ -44,14 +51,16 @@ export function NavLink(props: NavLinkProps) {
     active,
     variant,
     icon,
+    nested = false,
+    __storyState,
     ...otherProps
   } = props;
   const asLink = typeof onClick === "string";
   const isIconOnly = !!iconOnly && !!icon;
-  const labelContent = isIconOnly ? <span css={Css.visuallyHidden.$}>{label}</span> : label;
+  const labelContent = isIconOnly ? <VisuallyHidden>{label}</VisuallyHidden> : label;
   const ariaProps = { children: labelContent, isDisabled, ...menuTriggerProps };
   const ref = useGetRef(buttonRef);
-  const { buttonProps, isPressed } = useButton(
+  const { buttonProps, isPressed: isPressedFromEvents } = useButton(
     {
       ...ariaProps,
       onPress: asLink
@@ -67,12 +76,15 @@ export function NavLink(props: NavLinkProps) {
     },
     ref,
   );
-  const { hoverProps, isHovered } = useHover({ isDisabled });
-  const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
+  const { isFocusVisible: isFocusVisibleFromEvents, focusProps } = useFocusRing(ariaProps);
+  const isPressed = __storyState?.pressed ?? isPressedFromEvents;
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
+  const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
 
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, pressedStyles } = useMemo(
-    () => getNavLinkStyles(variant),
-    [variant],
+    () => getNavLinkStyles(variant, nested),
+    [variant, nested],
   );
 
   const linkAttributes = {
@@ -111,11 +123,16 @@ export function NavLink(props: NavLinkProps) {
   );
 }
 
-export function getNavLinkStyles(variant: NavLinkVariant) {
-  return navLinkVariantStyles[variant];
+export function getNavLinkStyles(variant: NavLinkVariant, nested?: boolean) {
+  const styles = navLinkVariantStyles[variant];
+
+  return {
+    ...styles,
+    baseStyles: { ...styles.baseStyles, ...(nested ? Css.pl3.sm.$ : Css.smSb.$) },
+  };
 }
 
-const baseStyles = Css.df.gap1.aic.hPx(32).pyPx(6).px1.br4.smSb.outline0.$;
+const baseStyles = Css.df.gap1.aic.pyPx(6).px1.br4.outline0.$;
 
 const navLinkVariantStyles: Record<
   NavLinkVariant,
@@ -129,15 +146,15 @@ const navLinkVariantStyles: Record<
   }
 > = {
   side: {
-    baseStyles: { ...baseStyles, ...Css.color(Tokens.NavText).$ },
-    activeStyles: Css.color(Tokens.NavTextActive).bgColor(Tokens.NavItemBgActive).$,
+    baseStyles: { ...baseStyles, ...Css.hPx(40).fs0.color(Tokens.NavText).$ },
+    activeStyles: Css.fw6.color(Tokens.NavTextActive).bgColor(Tokens.NavItemBgActive).$,
     disabledStyles: Css.color(Tokens.NavTextDisabled).cursorNotAllowed.$,
-    focusRingStyles: Css.color(Tokens.NavTextFocusVisible).bgColor(Tokens.NavItemBgActive).bshFocus.$,
+    focusRingStyles: Css.bshFocus.$,
     hoverStyles: Css.color(Tokens.NavText).bgColor(Tokens.NavItemBgHover).$,
     pressedStyles: Css.color(Tokens.NavTextPressed).bgColor(Tokens.NavItemBgPressed).$,
   },
   global: {
-    baseStyles: { ...baseStyles, ...Css.add("width", "max-content").gray500.$ },
+    baseStyles: { ...baseStyles, ...Css.hPx(32).add("width", "max-content").gray500.$ },
     activeStyles: Css.white.bgGray900.$,
     disabledStyles: Css.gray400.cursorNotAllowed.$,
     focusRingStyles: Css.gray500.bgGray900.add(
