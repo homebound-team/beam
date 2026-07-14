@@ -28,7 +28,7 @@ export function StepperTab(props: StepperTabProps) {
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props, "stepperTab");
 
-  const { baseStyles, stateStyles, hoverStyles, focusRingStyles, disabledStyles, getCollapsedStyles } = useMemo(
+  const { baseStyles, getStateStyles, hoverStyles, focusRingStyles, disabledStyles, getCollapsedStyles } = useMemo(
     () => getStepperTabStyles(),
     [],
   );
@@ -40,7 +40,7 @@ export function StepperTab(props: StepperTabProps) {
       aria-label={label}
       css={{
         ...baseStyles,
-        ...stateStyles(active, completed),
+        ...getStateStyles(active, completed),
         ...(isHovered && !disabled ? hoverStyles : {}),
         ...(collapsed ? getCollapsedStyles(active, completed) : {}),
         ...(disabled ? disabledStyles : {}),
@@ -64,26 +64,32 @@ export function StepperTab(props: StepperTabProps) {
 }
 
 function getStepperTabStyles() {
-  const withBorderBottom = (color: Properties) => ({
-    ...Css.bb.add("borderBottomWidth", `6px`).$,
-    ...color,
-  });
+  function withBorderBottom(color: Properties) {
+    return {
+      ...Css.bb.add("borderBottomWidth", `6px`).$,
+      ...color,
+    };
+  }
 
-  const stateStyles = (active: boolean, completed: boolean): Properties => ({
-    ...Css.gray400.if(active || completed).blue700.if(active).smSb.$,
-    ...withBorderBottom(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
-  });
+  function getStateStyles(active: boolean, completed: boolean): Properties {
+    return {
+      ...Css.gray400.if(active || completed).blue700.if(active).smSb.$,
+      ...withBorderBottom(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
+    };
+  }
 
   const hoverStyles: Properties = Css.bgGray100.$;
 
-  const getCollapsedStyles = (active: boolean, completed: boolean): Properties => ({
-    ...Css.cursor("default").hPx(0).py0.$,
-    ...(completed && !active ? Css.bcBlue600.$ : Css.bcGray300.$),
-  });
+  function getCollapsedStyles(active: boolean, completed: boolean): Properties {
+    return {
+      ...Css.cursor("default").hPx(0).py0.$,
+      ...(completed && !active ? Css.bcBlue600.$ : Css.bcGray300.$),
+    };
+  }
 
   return {
     baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.br0.$,
-    stateStyles,
+    getStateStyles,
     hoverStyles,
     focusRingStyles: Css.bshFocus.$,
     // Disabled always wins over both the state's and the collapsed border color.
