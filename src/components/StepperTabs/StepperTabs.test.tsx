@@ -3,7 +3,7 @@ import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("StepperTabs", () => {
-  it("derives the correct tab state per step", async () => {
+  it("passes active/completed state through to each tab", async () => {
     // Given three steps, the first completed, the second (current) not completed, and the third not visited
     // When rendered with the second step as current
     const r = await render(<StepperTabs steps={makeSteps()} currentStep="draft" onChange={vi.fn()} />);
@@ -17,6 +17,14 @@ describe("StepperTabs", () => {
     // And the third step shows as not visited
     expect(r.stepperTabs_tab_send).toHaveTextContent("Send Email");
     expect(r.query.stepperTabs_tab_check_2).not.toBeInTheDocument();
+  });
+
+  it("shows the check icon for a step that is both active and completed", async () => {
+    // Given the first step is both completed and current
+    const r = await render(<StepperTabs steps={makeSteps()} currentStep="trade" onChange={vi.fn()} />);
+    // Then it's marked current and still shows its check icon
+    expect(r.stepperTabs_step_0).toHaveAttribute("aria-current", "true");
+    expect(r.stepperTabs_tab_check_0).toBeInTheDocument();
   });
 
   it("invokes onChange with the clicked step's value", async () => {

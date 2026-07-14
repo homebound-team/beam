@@ -1,4 +1,4 @@
-import { StepperTab, StepperTabState } from "src/components/StepperTabs/StepperTab";
+import { StepperTab } from "src/components/StepperTabs/StepperTab";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
@@ -38,7 +38,8 @@ export function StepperTabs(props: StepperTabsProps) {
               <StepperTab
                 label={step.label}
                 value={step.value}
-                state={getTabState(step, isCurrent)}
+                active={isCurrent}
+                completed={step.completed}
                 disabled={step.disabled}
                 collapsed={collapsed}
                 onClick={onChange}
@@ -50,11 +51,6 @@ export function StepperTabs(props: StepperTabsProps) {
       </ol>
     </nav>
   );
-}
-
-function getTabState(step: StepperTabsStep, isCurrent: boolean): StepperTabState {
-  if (isCurrent) return step.completed ? "activeCompleted" : "active";
-  return step.completed ? "completed" : "notVisited";
 }
 
 const maxStepWidthPx = 280;
