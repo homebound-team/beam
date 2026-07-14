@@ -6,7 +6,6 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type JumpLinkProps = {
   label: ReactNode;
-  /** Marks this link as representing the current in-view page section: adds a semibold weight and a left accent bar. */
   active: boolean;
   onClick: (e: PressEvent) => void;
   disabled?: boolean;
