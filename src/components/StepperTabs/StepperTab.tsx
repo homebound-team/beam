@@ -69,16 +69,13 @@ function getStepperTabStyles() {
     ...color,
   });
 
-  // Blue once either completed or active; bold only while active.
   const stateStyles = (active: boolean, completed: boolean): Properties => ({
     ...Css.gray400.if(active || completed).blue700.if(active).smSb.$,
     ...withBorderBottom(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
   });
 
-  // All 4 prior states rendered identically on hover — this was never state-dependent.
   const hoverStyles: Properties = Css.bgGray100.$;
 
-  // Collapsed: only a completed-and-not-currently-active step keeps a blue border.
   const getCollapsedStyles = (active: boolean, completed: boolean): Properties => ({
     ...Css.cursor("default").hPx(0).py0.$,
     ...(completed && !active ? Css.bcBlue600.$ : Css.bcGray300.$),
