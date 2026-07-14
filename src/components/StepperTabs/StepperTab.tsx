@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
+import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Properties } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -27,7 +27,7 @@ export function StepperTab(props: StepperTabProps) {
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props, "stepperTab");
 
-  const { baseStyles, stateStyles, hoverStyles, focusRingStyles, disabledStyles, collapsedStyles } = useMemo(
+  const { baseStyles, stateStyles, hoverStyles, focusRingStyles, disabledStyles, getCollapsedStyles } = useMemo(
     () => getStepperTabStyles(),
     [],
   );
@@ -43,7 +43,7 @@ export function StepperTab(props: StepperTabProps) {
         ...baseStyles,
         ...stateStyles[state],
         ...(isHovered && !disabled ? hoverStyles[state] : {}),
-        ...(collapsed ? collapsedStyles[state] : {}),
+        ...(collapsed ? getCollapsedStyles(state) : {}),
         ...(disabled ? disabledStyles : {}),
         ...(isFocusVisible ? focusRingStyles : {}),
       }}
@@ -57,17 +57,16 @@ export function StepperTab(props: StepperTabProps) {
               <Icon icon="check" inc={2.5} {...tid.check} />
             </span>
           )}
+          <VisuallyHidden>{showCheck ? "Complete" : "Not Complete"}</VisuallyHidden>
         </>
       )}
     </button>
   );
 }
 
-const borderBottomWidthPx = 6;
-
 function getStepperTabStyles() {
   const withBorderBottom = (color: Properties) => ({
-    ...Css.bb.add("borderBottomWidth", `${borderBottomWidthPx}px`).$,
+    ...Css.bb.add("borderBottomWidth", `6px`).$,
     ...color,
   });
 
@@ -86,12 +85,10 @@ function getStepperTabStyles() {
   };
 
   // When collapsed, every state's border goes gray except "completed" (visited, inactive, completed), which stays blue.
-  const collapsedStyles: Record<StepperTabState, Properties> = {
-    notVisited: Css.bcGray300.cursor("default").hPx(0).py0.$,
-    completed: Css.bcBlue600.cursor("default").hPx(0).py0.$,
-    active: Css.bcGray300.cursor("default").hPx(0).py0.$,
-    activeCompleted: Css.bcGray300.cursor("default").hPx(0).py0.$,
-  };
+  const getCollapsedStyles = (state: StepperTabState): Properties => ({
+    ...Css.cursor("default").hPx(0).py0.$,
+    ...(state === "completed" ? Css.bcBlue600.$ : Css.bcGray300.$),
+  });
 
   return {
     baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.br0.$,
@@ -100,6 +97,6 @@ function getStepperTabStyles() {
     focusRingStyles: Css.bshFocus.$,
     // Disabled always wins over both the state's and the collapsed border color.
     disabledStyles: { ...Css.gray400.cursorNotAllowed.$, ...Css.bcGray300.$ },
-    collapsedStyles,
+    getCollapsedStyles,
   };
 }
