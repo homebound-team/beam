@@ -40,21 +40,41 @@ export function States() {
                   disabled
                 />
               </div>
-              <div css={Css.df.fdc.gap1.fg1.$}>
-                <div>Collapsed</div>
-                <StepperTab
-                  label={label}
-                  value={`${key}-collapsed`}
-                  active={active}
-                  completed={completed}
-                  onClick={noop}
-                  collapsed
-                />
-              </div>
             </div>
           </div>
         );
       })}
+      <div>
+        <h2>Collapsed (No Active State Difference)</h2>
+        <div css={Css.df.gap1.maxwPx(600).$}>
+          <div css={Css.df.fdc.gap1.fg1.$}>
+            <div>Completed</div>
+            <div css={Css.h0.df.aife.$}>
+              <StepperTab
+                label="Step Label"
+                value="collapsed-completed"
+                active={false}
+                completed={true}
+                onClick={noop}
+                collapsed
+              />
+            </div>
+          </div>
+          <div css={Css.df.fdc.gap1.fg1.$}>
+            <div>Not Completed</div>
+            <div css={Css.h0.df.aife.$}>
+              <StepperTab
+                label="Step Label"
+                value="collapsed-not-completed"
+                active={false}
+                completed={false}
+                onClick={noop}
+                collapsed
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

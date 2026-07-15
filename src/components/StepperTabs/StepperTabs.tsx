@@ -30,7 +30,7 @@ export function StepperTabs(props: StepperTabsProps) {
           const isCurrent = step.value === currentStep;
           return (
             <li
-              css={Css.df.fg1.fb(0).if(capWidth).maxwPx(maxStepWidthPx).$}
+              css={Css.df.fg1.fb(0).if(collapsed).mw0.if(capWidth).maxwPx(maxStepWidthPx).$}
               key={step.value}
               aria-current={isCurrent}
               {...tid.step}
