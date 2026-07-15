@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Properties } from "src/Css";
@@ -28,72 +28,57 @@ export function StepperTab(props: StepperTabProps) {
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props, "stepperTab");
 
-  const { baseStyles, getStateStyles, hoverStyles, focusRingStyles, disabledStyles, getCollapsedStyles } = useMemo(
-    () => getStepperTabStyles(),
-    [],
-  );
-
   return (
     <button
       ref={ref}
       {...mergeProps(buttonProps, focusProps, hoverProps)}
       aria-label={label}
       css={{
-        ...baseStyles,
+        ...stepperTabStyles.baseStyles,
         ...getStateStyles(active, completed),
-        ...(isHovered && !disabled ? hoverStyles : {}),
+        ...(isHovered && !disabled ? stepperTabStyles.hoverStyles : {}),
         ...(collapsed ? getCollapsedStyles(active, completed) : {}),
-        ...(disabled ? disabledStyles : {}),
-        ...(isFocusVisible ? focusRingStyles : {}),
+        ...(disabled ? stepperTabStyles.disabledStyles : {}),
+        ...(isFocusVisible ? stepperTabStyles.focusRingStyles : {}),
       }}
       {...tid[defaultTestId(value)]}
     >
-      {!collapsed && (
-        <>
-          <span css={Css.lineClamp1.$}>{label}</span>
-          {completed && (
-            <span css={Css.fs0.ml1.$}>
-              <Icon icon="check" inc={2.5} {...tid.check} />
-            </span>
-          )}
-          <VisuallyHidden>{completed ? "Complete" : "Not Complete"}</VisuallyHidden>
-        </>
+      <span css={Css.lineClamp1.$}>{label}</span>
+      {completed && (
+        <span css={Css.fs0.ml1.$}>
+          <Icon icon="check" inc={2.5} {...tid.check} />
+        </span>
       )}
+      <VisuallyHidden>{completed ? "Complete" : "Not Complete"}</VisuallyHidden>
     </button>
   );
 }
 
-function getStepperTabStyles() {
-  function withBorderBottom(color: Properties) {
-    return {
-      ...Css.bb.add("borderBottomWidth", `6px`).$,
-      ...color,
-    };
-  }
-
-  function getStateStyles(active: boolean, completed: boolean): Properties {
-    return {
-      ...Css.gray400.if(active || completed).blue700.if(active).smSb.$,
-      ...withBorderBottom(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
-    };
-  }
-
-  const hoverStyles: Properties = Css.bgGray100.$;
-
-  function getCollapsedStyles(active: boolean, completed: boolean): Properties {
-    return {
-      ...Css.cursor("default").hPx(0).py0.$,
-      ...(completed && !active ? Css.bcBlue600.$ : Css.bcGray300.$),
-    };
-  }
-
+function withBorderBottom(color: Properties) {
   return {
-    baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.br0.$,
-    getStateStyles,
-    hoverStyles,
-    focusRingStyles: Css.bshFocus.$,
-    // Disabled always wins over both the state's and the collapsed border color.
-    disabledStyles: { ...Css.gray400.cursorNotAllowed.$, ...Css.bcGray300.$ },
-    getCollapsedStyles,
+    ...Css.bb.add("borderBottomWidth", `6px`).$,
+    ...color,
   };
 }
+
+function getStateStyles(active: boolean, completed: boolean): Properties {
+  return {
+    ...Css.gray400.if(active || completed).blue700.if(active).smSb.$,
+    ...withBorderBottom(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
+  };
+}
+
+function getCollapsedStyles(active: boolean, completed: boolean): Properties {
+  return {
+    ...Css.cursor("default").hPx(0).py0.$,
+    ...(completed && !active ? Css.bcBlue600.$ : Css.bcGray300.$),
+  };
+}
+
+const stepperTabStyles = {
+  baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.br0.oh.$,
+  hoverStyles: Css.bgGray100.$,
+  focusRingStyles: Css.bshFocus.$,
+  // Disabled always wins over both the state's and the collapsed border color.
+  disabledStyles: { ...Css.gray400.cursorNotAllowed.$, ...Css.bcGray300.$ },
+};
