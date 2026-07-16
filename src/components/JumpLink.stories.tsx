@@ -47,7 +47,7 @@ export function BaseStates() {
 /** Confirms wrapping to 2 lines with an unbroken bar, and clamping/ellipsis beyond that. */
 export function Wrapping() {
   return (
-    <div css={Css.df.fdc.gap2.$}>
+    <div css={Css.df.fdc.gap2.wPx(180).$}>
       <JumpLink active label="A jump link that wraps to two lines" onClick={() => {}} />
       <JumpLink active={false} label="Line Items Long Section Name That Should Truncate" onClick={() => {}} />
     </div>
@@ -57,7 +57,7 @@ export function Wrapping() {
 /** Plain vertical stack usage — no grouping/wrapper component needed. */
 export function ListUsage() {
   return (
-    <div css={Css.df.fdc.gap1.$}>
+    <div css={Css.df.fdc.gap1.wPx(180).$}>
       <JumpLink active label="Jump Link 1" onClick={() => {}} />
       <JumpLink active={false} label="Jump Link 2" onClick={() => {}} />
       <JumpLink active={false} label="Jump Link 3" onClick={() => {}} />

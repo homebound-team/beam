@@ -40,7 +40,7 @@ export function JumpLink(props: JumpLinkProps) {
         ...(isDisabled && disabledStyles),
       }}
     >
-      <span css={Css.wPx(140).lineClamp2.$}>{label}</span>
+      {label}
     </button>
   );
 }
@@ -53,10 +53,11 @@ export function getJumpLinkStyles(): {
   disabledStyles: Properties;
 } {
   return {
-    baseStyles: Css.wPx(184).tal.sm.cursorPointer.px3.py1.color(Tokens.TextLinkDefault).lhPx(24).$,
-    activeStyles: Css.smSb.bl.add("borderLeftWidth", "3px").bcBlue600.lhPx(24).$,
+    baseStyles: Css.w100.tal.md.px3.py1.color(Tokens.TextLinkDefault).bl.add("borderLeftWidth", "3px").bcTransparent
+      .lineClamp2.$,
+    activeStyles: Css.mdSb.bcBlue600.$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).color(Tokens.TextLinkHover).$,
     focusStyles: Css.bshFocus.$,
-    disabledStyles: Css.color(Tokens.TextLinkDisabled).bcBlue200.cursorNotAllowed.$,
+    disabledStyles: Css.color(Tokens.TextLinkDisabled).bcBlue200.cursorNotAllowed.bcTransparent.$,
   };
 }
