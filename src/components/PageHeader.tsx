@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { StepperTabs, StepperTabsProps } from "src/components/StepperTabs/StepperTabs";
 import { RouteTabsProps, Tabs, TabsContentXss, TabsProps } from "src/components/Tabs";
 import { Css, Only, Tokens } from "src/Css";
 import { useDocumentTitle } from "src/hooks/useDocumentTitle";
@@ -12,10 +13,12 @@ export type PageHeaderProps<V extends string, X> = {
   tabs?:
     | Omit<TabsProps<V, X>, "contentXss" | "omitFullBleedPadding" | "includeBottomBorder">
     | Omit<RouteTabsProps<V, X>, "contentXss" | "omitFullBleedPadding" | "includeBottomBorder">;
+  /** Renders a `StepperTabs` strip instead of `tabs` — use at most one of the two. */
+  stepperTabs?: StepperTabsProps;
 };
 
 export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(props: PageHeaderProps<V, X>) {
-  const { title, documentTitleSuffix, rightSlot, tabs, ...otherProps } = props;
+  const { title, documentTitleSuffix, rightSlot, tabs, stepperTabs, ...otherProps } = props;
   const tid = useTestIds(otherProps, "pageHeader");
   useDocumentTitle(title, documentTitleSuffix);
 
@@ -31,6 +34,7 @@ export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(
         <div>{rightSlot}</div>
       </div>
       {tabs && <Tabs {...tabs} />}
+      {stepperTabs && <StepperTabs {...stepperTabs} />}
     </header>
   );
 }

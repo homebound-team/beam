@@ -22,3 +22,5 @@ export { NavbarLayout } from "./NavbarLayout";
 export type { NavbarLayoutProps } from "./NavbarLayout";
 export { PageHeaderLayout } from "./PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./PageHeaderLayout";
+export { StepperLayout } from "./StepperLayout/StepperLayout";
+export type { StepperLayoutProps, StepperLayoutStep } from "./StepperLayout/StepperLayout";

@@ -1,9 +1,11 @@
 import { BeamProvider } from "src/components/BeamContext";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/PageHeader";
+import { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { Tab } from "src/components/Tabs";
 import { noop } from "src/utils";
-import { render, withRouter } from "src/utils/rtl";
+import { click, render, withRouter } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("PageHeader", () => {
   beforeEach(() => {
@@ -69,5 +71,20 @@ describe("PageHeader", () => {
     expect(r.tabs_tabA).toBeInTheDocument();
     expect(r.tabs_tabB).toBeInTheDocument();
     expect(r.tabs_tabC).toBeInTheDocument();
+  });
+
+  it("renders with stepperTabs", async () => {
+    const steps: StepperTabsStep[] = [
+      { label: "Step A", value: "stepA", completed: false },
+      { label: "Step B", value: "stepB", completed: false },
+    ];
+    const onChange = vi.fn();
+    const r = await render(<PageHeader title="Test Title" stepperTabs={{ steps, currentStep: "stepA", onChange }} />);
+
+    expect(r.stepperTabs_tab_stepA).toBeInTheDocument();
+    expect(r.stepperTabs_tab_stepB).toBeInTheDocument();
+
+    click(r.stepperTabs_tab_stepB);
+    expect(onChange).toHaveBeenCalledWith("stepB");
   });
 });

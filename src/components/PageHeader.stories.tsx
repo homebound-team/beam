@@ -2,6 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/PageHeader";
+import { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { TabContent } from "src/components/Tabs";
 import { testTabs } from "src/components/testData";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
@@ -64,5 +65,22 @@ export function WithRightSlotAndTabs() {
       />
       <TabContent tabs={testTabs} selected={selected} />
     </>
+  );
+}
+
+export function WithStepperTabs() {
+  const [currentStep, setCurrentStep] = useState("trade");
+  const steps: StepperTabsStep[] = [
+    { label: "Trade Partners", value: "trade", completed: false },
+    { label: "Draft Email", value: "draft", completed: false, disabled: true },
+    { label: "Send Email", value: "send", completed: false, disabled: true },
+  ];
+
+  return (
+    <PageHeader
+      title="Test Title"
+      rightSlot={<Button label="Test Action" variant="primary" onClick={action("clicked")} />}
+      stepperTabs={{ steps, currentStep, onChange: setCurrentStep }}
+    />
   );
 }

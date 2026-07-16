@@ -15,12 +15,15 @@ export type StepperTabsProps = {
   steps: StepperTabsStep[];
   currentStep: StepperTabsStep["value"];
   onChange: (stepValue: string) => void;
+  /** Forces the condensed look regardless of viewport width (e.g. StepperLayout's scroll-collapse). OR'd with the mobile-breakpoint collapse. */
+  collapsed?: boolean;
 };
 
 export function StepperTabs(props: StepperTabsProps) {
-  const { steps, currentStep, onChange } = props;
+  const { steps, currentStep, onChange, collapsed: forceCollapsed } = props;
   const tid = useTestIds(props, "stepperTabs");
-  const { sm: collapsed } = useBreakpoint();
+  const { sm: isMobile } = useBreakpoint();
+  const collapsed = isMobile || !!forceCollapsed;
   const capWidth = steps.length <= 3;
 
   return (
