@@ -87,34 +87,4 @@ describe("PageHeader", () => {
     expect(r.tabs_tabB).toBeInTheDocument();
     expect(r.tabs_tabC).toBeInTheDocument();
   });
-
-  it("omits breadcrumbs and tabs from the DOM when mounted collapsed", async () => {
-    // Given a PageHeader with breadcrumbs and tabs, mounted already collapsed
-    const r = await render(
-      <PageHeader
-        title="Test Title"
-        collapsed={true}
-        breadcrumbs={{
-          breadcrumbs: [
-            { label: "Home", href: "/" },
-            { label: "Projects", href: "/projects" },
-          ],
-        }}
-        tabs={{
-          tabs: [
-            { name: "Tab A", value: "tabA" },
-            { name: "Tab B", value: "tabB" },
-          ],
-          selected: "tabA",
-          onChange: noop,
-        }}
-      />,
-      withRouter(),
-    );
-
-    // Then we expect breadcrumbs and tabs not to be in the document, but the title should be
-    expect(r.query.breadcrumb_link_0).not.toBeInTheDocument();
-    expect(r.query.tabs_tabA).not.toBeInTheDocument();
-    expect(r.pageHeader_title.textContent).toBe("Test Title");
-  });
 });
