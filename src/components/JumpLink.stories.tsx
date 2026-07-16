@@ -6,7 +6,7 @@ export default {
   component: JumpLink,
   args: {
     label: "Jump Link",
-    onClick: () => {},
+    href: "#jump-link",
   },
 } as Meta<typeof JumpLink>;
 
@@ -28,7 +28,7 @@ export function BaseStates() {
             key={name}
             active={false}
             label={name}
-            onClick={() => {}}
+            href="#jump-link"
             __storyState={storyState}
             disabled={disabled}
           />
@@ -37,7 +37,7 @@ export function BaseStates() {
       <div css={Css.df.fdc.gap2.$}>
         <h2>Active</h2>
         {rows.map(({ name, storyState, disabled }) => (
-          <JumpLink key={name} active label={name} onClick={() => {}} __storyState={storyState} disabled={disabled} />
+          <JumpLink key={name} active label={name} href="#jump-link" __storyState={storyState} disabled={disabled} />
         ))}
       </div>
     </div>
@@ -48,19 +48,28 @@ export function BaseStates() {
 export function Wrapping() {
   return (
     <div css={Css.df.fdc.gap2.wPx(180).$}>
-      <JumpLink active label="A jump link that wraps to two lines" onClick={() => {}} />
-      <JumpLink active={false} label="Line Items Long Section Name That Should Truncate" onClick={() => {}} />
+      <JumpLink active label="A jump link that wraps to two lines" href="#jump-link" />
+      <JumpLink active={false} label="Line Items Long Section Name That Should Truncate" href="#jump-link" />
     </div>
   );
 }
 
-/** Plain vertical stack usage — no grouping/wrapper component needed. */
+/** Plain vertical stack usage — no grouping/wrapper component needed. Sections below demonstrate the smooth scroll-to behavior. */
 export function ListUsage() {
   return (
-    <div css={Css.df.fdc.gap1.wPx(180).$}>
-      <JumpLink active label="Jump Link 1" onClick={() => {}} />
-      <JumpLink active={false} label="Jump Link 2" onClick={() => {}} />
-      <JumpLink active={false} label="Jump Link 3" onClick={() => {}} />
+    <div css={Css.df.gap2.$}>
+      <div css={Css.df.fdc.gap1.wPx(180).$}>
+        <JumpLink active label="Jump Link 1" href="#section-1" />
+        <JumpLink active={false} label="Jump Link 2" href="#section-2" />
+        <JumpLink active={false} label="Jump Link 3" href="#section-3" />
+      </div>
+      <div>
+        {["section-1", "section-2", "section-3"].map((id) => (
+          <div key={id} id={id} css={Css.hPx(400).df.aic.jcc.bt.bcGray200.$}>
+            <h2>{id}</h2>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

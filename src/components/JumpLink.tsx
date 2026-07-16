@@ -1,63 +1,70 @@
-import { PressEvent } from "@react-types/shared";
-import { ReactNode, useMemo, useRef } from "react";
-import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
-import { Css, Properties, Tokens } from "src/Css";
+import { MouseEvent, ReactNode, useRef } from "react";
+import { mergeProps, useFocusRing, useHover } from "react-aria";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type JumpLinkProps = {
   label: ReactNode;
   active: boolean;
-  onClick: (e: PressEvent) => void;
+  /** The section to scroll to on click, e.g. "#section-1" - used as the anchor's href and resolved via `getElementById` for the smooth scroll target. */
+  href: string;
   disabled?: boolean;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
   __storyState?: { hovered?: boolean; focusVisible?: boolean };
 };
 
-/** A link that scrolls the page to a section, e.g. for "on this page" tables of contents. */
+/** A link that smooth-scrolls the page to a section, e.g. for "on this page" tables of contents. */
 export function JumpLink(props: JumpLinkProps) {
-  const { label, active, onClick, disabled, __storyState, ...otherProps } = props;
+  const { label, active, href, disabled, __storyState, ...otherProps } = props;
   const isDisabled = !!disabled;
-  const ref = useRef<HTMLButtonElement>(null);
-  const ariaProps = { isDisabled, onPress: onClick };
-  const { buttonProps } = useButton(ariaProps, ref);
+  const ref = useRef<HTMLAnchorElement>(null);
   const { isFocusVisible: isFocusVisibleFromEvents, focusProps } = useFocusRing();
   const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
   const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
   const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
-  const { baseStyles, activeStyles, hoverStyles, focusStyles, disabledStyles } = useMemo(getJumpLinkStyles, []);
   const tid = useTestIds(otherProps, "jumpLink");
 
+  function handleClick(e: MouseEvent<HTMLAnchorElement>) {
+    if (isDisabled) {
+      e.preventDefault();
+      return;
+    }
+    // Let modifier/non-primary clicks fall through to native anchor behavior (open in new tab, etc).
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    const target = document.getElementById(href.replace(/^#/, ""));
+    if (target) {
+      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: "smooth" });
+    }
+  }
+
   return (
-    <button
+    <a
       ref={ref}
-      {...mergeProps(buttonProps, focusProps, hoverProps)}
+      href={isDisabled ? undefined : href}
+      aria-disabled={isDisabled || undefined}
+      tabIndex={isDisabled ? -1 : 0}
+      onClick={handleClick}
+      {...mergeProps(focusProps, hoverProps)}
       {...tid}
       css={{
-        ...baseStyles,
-        ...(active && activeStyles),
-        ...(isHovered && !isDisabled && hoverStyles),
-        ...(isFocusVisible && focusStyles),
-        ...(isDisabled && disabledStyles),
+        ...jumpLinkStyles.baseStyles,
+        ...(active && jumpLinkStyles.activeStyles),
+        ...(isHovered && !isDisabled && jumpLinkStyles.hoverStyles),
+        ...(isFocusVisible && jumpLinkStyles.focusStyles),
+        ...(isDisabled && jumpLinkStyles.disabledStyles),
       }}
     >
       {label}
-    </button>
+    </a>
   );
 }
 
-export function getJumpLinkStyles(): {
-  baseStyles: Properties;
-  activeStyles: Properties;
-  hoverStyles: Properties;
-  focusStyles: Properties;
-  disabledStyles: Properties;
-} {
-  return {
-    baseStyles: Css.w100.tal.md.px3.py1.color(Tokens.TextLinkDefault).bl.add("borderLeftWidth", "3px").bcTransparent
-      .lineClamp2.$,
-    activeStyles: Css.mdSb.bcBlue600.$,
-    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).color(Tokens.TextLinkHover).$,
-    focusStyles: Css.bshFocus.$,
-    disabledStyles: Css.color(Tokens.TextLinkDisabled).bcBlue200.cursorNotAllowed.bcTransparent.$,
-  };
-}
+const jumpLinkStyles = {
+  baseStyles: Css.w100.tal.md.px3.py1.color(Tokens.TextLinkDefault).bl.add("borderLeftWidth", "3px").bcTransparent
+    .lineClamp2.$,
+  activeStyles: Css.mdSb.bcBlue600.$,
+  hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).color(Tokens.TextLinkHover).$,
+  focusStyles: Css.bshFocus.$,
+  disabledStyles: Css.color(Tokens.TextLinkDisabled).bcBlue200.cursorNotAllowed.bcTransparent.$,
+};
