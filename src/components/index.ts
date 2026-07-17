@@ -36,6 +36,7 @@ export * from "./HelperText";
 export * from "./HomeboundLogo";
 export * from "./Icon";
 export * from "./IconButton";
+export * from "./JumpLink";
 export * from "./Layout";
 export * from "./Loader";
 export * from "./LoadingSkeleton";
