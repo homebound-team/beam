@@ -13,6 +13,7 @@ export * from "./Avatar";
 export * from "./Banner";
 export type { BannerProps } from "./Banner";
 export { BeamProvider } from "./BeamContext";
+export * from "./Breadcrumbs";
 export * from "./Button";
 export * from "./ButtonDatePicker";
 export * from "./ButtonGroup";

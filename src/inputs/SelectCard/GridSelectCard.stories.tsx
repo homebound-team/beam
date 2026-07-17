@@ -57,20 +57,6 @@ export function States() {
   );
 }
 
-/** Mix of cards with and without descriptions in one row. */
-export function MixedDescriptions() {
-  const description = "Slots share the same options, but each slot can have its own selection.";
-
-  return (
-    <div css={{ ...Css.wPx(640).$, ...getSelectCardOptionsCss("grid", true) }}>
-      <GridSelectCardWrapper label="Single" icon="single" description={description} selected />
-      <GridSelectCardWrapper label="Math" icon="abacus" />
-      <GridSelectCardWrapper label="Package" icon="package" description="Selections come in preconfigured bundles." />
-      <GridSelectCardWrapper label="Finance" icon="dollar" />
-    </div>
-  );
-}
-
 type GridSelectCardWrapperProps = Omit<GridSelectCardProps, "inputProps">;
 
 function GridSelectCardWrapper(props: GridSelectCardWrapperProps) {

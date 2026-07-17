@@ -42,7 +42,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
       <Icon icon={icon} inc={4} color={isDisabled ? Tokens.OnSurfaceDisabled : Tokens.OnSurface} />
       <span css={Css.df.fdc.gap("4px").w100.$}>
         <span css={Css.smSb.if(isDisabled).gray600.$}>{label}</span>
-        {description && <span css={Css.xs.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{description}</span>}
+        {description && <span css={Css.sm.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{description}</span>}
       </span>
     </SelectCardShell>
   );
