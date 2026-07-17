@@ -83,13 +83,14 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
           <SnackbarProvider>
             {/* OverlayProvider is required for Modals generated via React-Aria */}
             <ToastProvider>
+              {/* OverlayProvider is required for Modals generated via React-Aria */}
               <OverlayProvider>
                 {children}
                 {/* Beam-internal modal host for SuperDrawer ConfirmCloseModal only — not app useModal. */}
                 <InternalModalHost />
-                {/* Still BeamProvider-owned (not call-site); under OverlayProvider so createPortal keeps overlay context. */}
-                <SuperDrawer />
               </OverlayProvider>
+              {/* Main-style host: sibling under ToastProvider, outside OverlayProvider (not call-site). */}
+              <SuperDrawer />
             </ToastProvider>
           </SnackbarProvider>
         </AutoSaveStatusProvider>
