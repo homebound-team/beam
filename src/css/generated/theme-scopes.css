@@ -118,9 +118,9 @@
   --b-nav-text-focus-visible: rgba(255, 255, 255, 1);
   --b-nav-text-pressed: rgba(53, 53, 53, 1);
   --b-neutral-fill-hover-strong: rgba(100, 100, 100, 1);
-  --b-neutral-fill-hover-subtle: rgba(221, 220, 220, 1);
-  --b-neutral-fill-pressed: rgba(247, 245, 245, 1);
-  --b-neutral-surface-pressed: rgba(255, 255, 255, 1);
+  --b-neutral-fill-hover-subtle: rgba(53, 53, 53, 1);
+  --b-neutral-fill-pressed: rgba(100, 100, 100, 1);
+  --b-neutral-surface-pressed: rgba(100, 100, 100, 1);
   --b-on-primary: rgba(255, 255, 255, 1);
   --b-on-surface: rgba(255, 255, 255, 1);
   --b-on-surface-disabled: rgba(247, 245, 245, 1);
@@ -128,8 +128,8 @@
   --b-on-surface-raised-hover: rgba(221, 220, 220, 1);
   --b-on-surface-raised-pressed: rgba(175, 175, 175, 1);
   --b-on-surface-subtle: rgba(221, 220, 220, 1);
-  --b-popover-surface: rgba(100, 100, 100, 1);
-  --b-primary-hover: rgba(36, 36, 36, 1);
+  --b-popover-surface: rgba(53, 53, 53, 1);
+  --b-primary-hover: rgba(29, 78, 216, 1);
   --b-primary-pressed: rgba(30, 64, 175, 1);
   --b-selection-indicator: rgba(255, 255, 255, 1);
   --b-status-success-fg: rgba(236, 253, 245, 1);
@@ -144,7 +144,7 @@
   --b-text-helper: rgba(247, 245, 245, 1);
   --b-text-label: rgba(255, 255, 255, 1);
   --b-text-link-default: rgba(96, 165, 250, 1);
-  --b-text-link-disabled: rgba(29, 78, 216, 1);
+  --b-text-link-disabled: rgba(100, 100, 100, 1);
   --b-text-link-hover: rgba(147, 197, 253, 1);
   --b-text-link-pressed: rgba(191, 219, 254, 1);
   --b-text-placeholder: rgba(201, 201, 201, 1);

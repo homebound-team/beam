@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { DayProps, useDayRender } from "react-day-picker";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import "./day.css";
 
@@ -36,7 +36,6 @@ export function Day(props: DayProps) {
   // It is possible that we have selected only one day for the range. In this case the date will be both the start and end.
   // When this happens, do not show styling as if there is an existing range.
   const showRangeStyles = !(range_end === true && range_start === true);
-  const showActiveStyles = !disabled;
 
   return (
     <button
@@ -51,10 +50,10 @@ export function Day(props: DayProps) {
     >
       <div
         css={{
-          ...Css.oh.gray900.relative.z1.br4.df.aic.jcc.wPx(28).hPx(30).mtPx(2).br4.$,
-          ...(today && !range_middle && Css.bgGray100.$),
-          ...(selected && !range_middle && Css.white.bgBlue700.$),
-          ...(disabled && Css.gray500.$),
+          ...Css.oh.color(Tokens.OnSurface).relative.z1.br4.df.aic.jcc.wPx(28).hPx(30).mtPx(2).br4.$,
+          ...(today && !range_middle && Css.bgColor(Tokens.ListRowBgHover).$),
+          ...(selected && !range_middle && Css.color(Tokens.OnPrimary).bgColor(Tokens.Primary).$),
+          ...(disabled && Css.color(Tokens.TextDisabled).$),
         }}
       >
         <div css={Css.mtPx(-2).$}>{children}</div>
@@ -66,7 +65,9 @@ export function Day(props: DayProps) {
                 .bottomPx(4)
                 .wPx(4)
                 .hPx(4)
-                .bgBlue700.br4.if(selected && !range_middle).bgWhite.$
+                .bgColor(Tokens.Primary)
+                .br4.if(selected && !range_middle)
+                .bgColor(Tokens.OnPrimary).$
             }
             {...tid.indicatorDot}
           />

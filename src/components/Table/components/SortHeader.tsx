@@ -1,17 +1,17 @@
 import { ReactNode, useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Css, Palette, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface SortHeaderProps {
+type SortHeaderProps = {
   content: string;
   xss?: Properties;
   iconOnLeft?: boolean;
   sortKey: string;
   tooltipEl?: ReactNode;
-}
+};
 
 /**
  * Wraps column header names with up/down sorting icons.
@@ -38,7 +38,7 @@ export function SortHeader(props: SortHeaderProps) {
     <span css={Css.fs0.$}>
       <Icon
         icon={sorted === "DESC" ? "sortDown" : "sortUp"}
-        color={sorted !== undefined ? Palette.Blue700 : Palette.Gray400}
+        color={sorted !== undefined ? Tokens.TextLinkDefault : Tokens.TextDisabled}
         xss={{
           ...Css.ml1.if(iconOnLeft).mr1.ml0.$,
           ...Css.visibility("hidden")

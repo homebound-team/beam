@@ -28,7 +28,7 @@ export function BaseHeader(props: BaseHeaderProps) {
       >
         <div css={Css.mw0.$}>
           {breadcrumbs && <Breadcrumbs {...breadcrumbs} />}
-          <h1 {...tid.title} css={Css.xl.$}>
+          <h1 {...tid.title} css={Css.xl.color(Tokens.OnSurface).$}>
             {title}
           </h1>
         </div>

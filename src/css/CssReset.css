@@ -107,6 +107,9 @@ Remove the margin in all browsers.
 
   body {
     margin: 0;
+    /* Theme-aware page chrome so unmarked text/bg follow Surface / OnSurface (incl. contrast scope). */
+    color: var(--b-on-surface);
+    background-color: var(--b-surface);
   }
 
   /**

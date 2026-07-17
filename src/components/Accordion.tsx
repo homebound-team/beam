@@ -2,12 +2,12 @@ import { useId, useResizeObserver } from "@react-aria/utils";
 import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css, Only, Padding, Palette, Xss } from "src/Css";
+import { Css, Only, Padding, Tokens, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type AccordionXss = Xss<Padding>;
 
-export interface AccordionProps<X = AccordionXss> {
+export type AccordionProps<X = AccordionXss> = {
   title: ReactNode;
   children: ReactNode;
   disabled?: boolean;
@@ -32,7 +32,7 @@ export interface AccordionProps<X = AccordionXss> {
   xss?: X;
   /** Modifies the typography, padding, icon size and background color of the accordion header */
   compact?: boolean;
-}
+};
 
 export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps<X>) {
   const {
@@ -98,11 +98,20 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
 
   const touchableStyle = useMemo(
     () => ({
-      ...Css.df.jcsb.gapPx(12).aic.p2.md.outline("none").onHover.bgGray100.if(!!titleOnClick).onHover.mdSb.$,
-      ...(compact && Css.sm.pl2.prPx(10).py1.bgGray100.mbPx(4).br8.onHover.bgGray200.$),
+      ...Css.df.jcsb
+        .gapPx(12)
+        .aic.p2.md.outline("none")
+        .onHover.bgColor(Tokens.NeutralFillHoverSubtle)
+        .if(!!titleOnClick).onHover.mdSb.$,
+      ...(compact &&
+        Css.sm.pl2
+          .prPx(10)
+          .py1.bgColor(Tokens.NeutralFillHoverSubtle)
+          .mbPx(4)
+          .br8.onHover.bgColor(Tokens.NeutralFillPressed).$),
       ...(compact && !!titleOnClick && Css.br0.$),
-      ...(disabled && Css.gray500.$),
-      ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Palette.Blue700}`).$),
+      ...(disabled && Css.color(Tokens.OnSurfaceMuted).$),
+      ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px var(${Tokens.FocusRingInset})`).$),
       ...xss,
     }),
     [compact, disabled, isFocusVisible, titleOnClick, xss],
@@ -112,7 +121,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
     <div
       {...tid.container}
       css={{
-        ...Css.bcGray300.if(topBorder).bt.if(bottomBorder).bb.$,
+        ...Css.bc(Tokens.FieldBorderDefault).if(topBorder).bt.if(bottomBorder).bb.$,
         ...(size ? Css.wPx(accordionSizes[size]).$ : {}),
       }}
     >

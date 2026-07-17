@@ -8,7 +8,7 @@ import {
 import { Day } from "src/components/internal/DatePicker/Day";
 import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { type DateMatcher, type DateRange } from "src/types";
 import { useTestIds } from "src/utils";
 import { todayPlainDate } from "src/utils/plainDate";
@@ -27,7 +27,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
   const tid = useTestIds(props, "datePicker");
 
   return (
-    <div css={Css.dib.bgWhite.xs.$} {...tid}>
+    <div css={Css.dib.bgColor(Tokens.PopoverSurface).color(Tokens.OnSurface).xs.$} {...tid}>
       <DayPicker
         mode="range"
         selected={dateRangeToJsDateRange(range)}

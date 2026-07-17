@@ -2,10 +2,10 @@ import { ReactNode, useRef, useState } from "react";
 import { useFocusRing, useHover, usePress, useSwitch, VisuallyHidden } from "react-aria";
 import { useToggleState } from "react-stately";
 import { Icon, IconKey, maybeTooltip, resolveTooltip } from "src/components";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { isPromise, useTestIds } from "src/utils";
 
-export interface ToggleButtonProps {
+export type ToggleButtonProps = {
   /** Input label */
   label: string;
   selected?: boolean;
@@ -21,7 +21,7 @@ export interface ToggleButtonProps {
     pressed?: boolean;
     focusVisible?: boolean;
   };
-}
+};
 
 export function ToggleButton(props: ToggleButtonProps) {
   const { selected: isSelected = false, disabled = false, label, onChange, icon, __storyState, ...otherProps } = props;
@@ -58,13 +58,16 @@ export function ToggleButton(props: ToggleButtonProps) {
     ...hoverProps,
     ...pressProps,
     ...Css.props({
-      ...Css.br4.dif.aic.gap1.bgTransparent.gray500.hPx(32).plPx(4).pr1.relative.cursorPointer.w("max-content").sm.usn
-        .$,
+      ...Css.br4.dif.aic.gap1.bgTransparent
+        .color(Tokens.OnSurfaceMuted)
+        .hPx(32)
+        .plPx(4)
+        .pr1.relative.cursorPointer.w("max-content").sm.usn.$,
       ...(isHovered && toggleHoverStyles),
       ...(isPressed && togglePressStyles),
-      ...(isSelected && !isDisabled && Css.blue700.$),
+      ...(isSelected && !isDisabled && Css.color(Tokens.TextLinkDefault).$),
       ...(isFocusVisible && toggleFocusStyles),
-      ...(isDisabled && Css.gray300.cursorNotAllowed.$),
+      ...(isDisabled && Css.color(Tokens.FieldBorderDefault).cursorNotAllowed.$),
     }),
     ...tid,
   };
@@ -85,7 +88,6 @@ export function ToggleButton(props: ToggleButtonProps) {
 }
 
 /** Styles */
-// Toggle element styles
-export const toggleHoverStyles = Css.bgGray100.$;
+export const toggleHoverStyles = Css.bgColor(Tokens.NeutralFillHoverSubtle).$;
 export const toggleFocusStyles = Css.bshFocus.$;
-export const togglePressStyles = Css.bgGray300.$;
+export const togglePressStyles = Css.bgColor(Tokens.FieldBorderDefault).$;

@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, TabWithContent } from "src/components/Tabs";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { FormLines } from "src/forms";
 import {
   Button,
@@ -261,7 +261,7 @@ function TestSideNav() {
   return (
     <ScrollableParent xss={Css.transition.br.bcGray200.fg0.fs0.wPx(224).if(!showNav).mlPx(-186).$} px={2}>
       <div css={Css.relative.$}>
-        <div css={Css.absolute.top1.rightPx(-12).bgGray50.df.aic.jcc.$}>
+        <div css={Css.absolute.top1.rightPx(-12).bgColor(Tokens.Surface).df.aic.jcc.$}>
           <IconButton icon={showNav ? "menuClose" : "menuOpen"} onClick={() => setShowNav(!showNav)} />
         </div>
         {showNav && (

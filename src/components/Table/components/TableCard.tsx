@@ -122,7 +122,16 @@ export function TableCardView(props: TableCardViewProps) {
   const col2 = data.slice(Math.ceil(data.length / 2));
 
   return (
-    <div css={Css.p3.w100.hPx(430).bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.br8.$} {...tid}>
+    <div
+      css={
+        Css.p3.w100
+          .hPx(430)
+          .bshBasic.bgColor(Tokens.SurfaceRaised)
+          .ba.bc(Tokens.FieldBorderDefault)
+          .df.fdc.gap2.br8.color(Tokens.OnSurface).$
+      }
+      {...tid}
+    >
       <div css={Css.relative.$}>
         <img css={Css.hPx(184).w100.objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
@@ -134,18 +143,18 @@ export function TableCardView(props: TableCardViewProps) {
       <div css={Css.df.fdc.gap2.jcsb.h100.$}>
         <div>
           {eyebrow && (
-            <p css={Css.sm.$} {...tid.eyebrow}>
+            <p css={Css.sm.color(Tokens.OnSurfaceMuted).$} {...tid.eyebrow}>
               {eyebrow}
             </p>
           )}
           {title && (
             <div css={Css.dif.w100.jcsb.aic.$}>
-              <h4 css={Css.xl.lineClamp2.$} {...tid.title}>
+              <h4 css={Css.xl.color(Tokens.OnSurface).lineClamp2.$} {...tid.title}>
                 {title}
               </h4>
               {(badge || badgeTags?.length) && (
                 <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
-                  {badge && <span css={Css.sm.wsnw.$}>{badge}</span>}
+                  {badge && <span css={Css.sm.wsnw.color(Tokens.OnSurfaceMuted).$}>{badge}</span>}
                   {badgeTags?.map((tag) => (
                     <Tag key={tag.text} {...tag} />
                   ))}
@@ -156,12 +165,12 @@ export function TableCardView(props: TableCardViewProps) {
         </div>
         <div css={Css.df.fdc.gap2.$}>
           {data && data?.length > 0 && (
-            <dl css={Css.df.gap2.sm.$}>
+            <dl css={Css.df.gap2.sm.color(Tokens.OnSurfaceMuted).$}>
               <div css={Css.df.fdc.fg1.$}>
                 {col1.map((d) => (
                   <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
                     <dt>{d.label}:</dt>
-                    <dd>{d.value}</dd>
+                    <dd css={Css.color(Tokens.OnSurface).$}>{d.value}</dd>
                   </div>
                 ))}
               </div>
@@ -169,7 +178,7 @@ export function TableCardView(props: TableCardViewProps) {
                 {col2.map((d) => (
                   <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
                     <dt>{d.label}:</dt>
-                    <dd>{d.value}</dd>
+                    <dd css={Css.color(Tokens.OnSurface).$}>{d.value}</dd>
                   </div>
                 ))}
               </div>
@@ -177,9 +186,9 @@ export function TableCardView(props: TableCardViewProps) {
           )}
           {progress !== undefined && (
             <div css={Css.df.fdc.gap1.$}>
-              <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-                <div css={Css.w25.hPx(8).br4.bgGray200.$}>
-                  <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
+              <div css={Css.df.aic.gap1.fs("10px").lh("14px").color(Tokens.OnSurfaceMuted).$}>
+                <div css={Css.w25.hPx(8).br4.bgColor(Tokens.SurfaceSubtle).$}>
+                  <div css={Css.h100.br4.bgColor(Tokens.Primary).w(`${progressValue}%`).$} />
                 </div>
                 <span {...tid.progressValue}>{progressValue}%</span>
               </div>

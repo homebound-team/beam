@@ -3,7 +3,7 @@ import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { BeamColor } from "src/colors";
 import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette, Tokens } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { noop } from "src/utils";
@@ -144,30 +144,31 @@ export function IconButton(props: IconButtonProps) {
 }
 
 const defaultIconColor = Tokens.OnSurface;
-const circleIconColor = Palette.Gray700;
+const circleIconColor = Tokens.OnSurfaceMuted;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.bgColor(Tokens.SurfaceDisabled).$;
 const variantStyles = {
   default: {
     base: Css.hPx(28).wPx(28).br8.bw2.$,
     hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
-    focus: Css.bcBlue700.$,
+    focus: Css.bc(Tokens.FieldBorderFocus).$,
     pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
   },
   compact: {
     base: Css.hPx(18).wPx(18).br4.bw1.$,
     hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
-    focus: Css.bcBlue700.$,
+    focus: Css.bc(Tokens.FieldBorderFocus).$,
     pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
   },
   circle: {
-    base: Css.br100.wPx(48).hPx(48).bcGray300.ba.bw1.df.jcc.aic.$,
+    // Blue100/200 hover fills have no semantic tokens — keep palette for those.
+    base: Css.br100.wPx(48).hPx(48).bc(Tokens.FieldBorderDefault).ba.bw1.df.jcc.aic.$,
     hover: Css.bgBlue100.bcBlue200.$,
-    focus: Css.bgBlue100.bcBlue700.$,
-    pressed: Css.bgGray200.bcGray200.$,
+    focus: Css.bgBlue100.bc(Tokens.FieldBorderFocus).$,
+    pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,
   },
   outline: {
-    base: Css.br8.wPx(42).hPx(40).bcGray300.ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
+    base: Css.br8.wPx(42).hPx(40).bc(Tokens.FieldBorderDefault).ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
     hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
     focus: Css.bshFocus.$,
     pressed: Css.bgColor(Tokens.SurfaceRaisedPressed).$,

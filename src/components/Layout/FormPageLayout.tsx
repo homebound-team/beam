@@ -1,7 +1,7 @@
 import { ObjectState } from "@homebound/form-state";
 import React, { createRef, ReactNode, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useFocusRing } from "react-aria";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { BoundForm, BoundFormInputConfig, SubmitButton } from "src/forms";
 import { useHover } from "src/hooks";
 import { useTestIds } from "src/utils";
@@ -67,7 +67,10 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
     // since this layout will be replacing most superdrawers/sidebars, we keep the listing mounted below to preserve the users's
     // scroll position & filters
     // Adding "align-items: start" allows "position: sticky" to work within a grid for the sidebars
-    <div css={Css.fixed.top0.bottom0.left0.right0.z(zIndices.pageOverlay).oya.bgWhite.df.jcc.aifs.$} {...tids}>
+    <div
+      css={Css.fixed.top0.bottom0.left0.right0.z(zIndices.pageOverlay).oya.bgColor(Tokens.Surface).df.jcc.aifs.$}
+      {...tids}
+    >
       <div css={Css.w100.maxwPx(maxContentWidthPx).dg.gtc(gridColumns).gtr("auto 1fr").cg3.ais.$}>
         <PageHeader {...props} {...tids.pageHeader} />
         <LeftNav sectionsWithRefs={sectionsWithRefs} {...tids} />
@@ -91,7 +94,14 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
 
   return (
     <header
-      css={Css.gr(1).gc("1 / 4").sticky.top0.bgWhite.z(zIndices.pageStickyHeader).if(!notice).hPx(headerHeightPx).$}
+      css={
+        Css.gr(1)
+          .gc("1 / 4")
+          .sticky.top0.bgColor(Tokens.Surface)
+          .z(zIndices.pageStickyHeader)
+          .if(!notice)
+          .hPx(headerHeightPx).$
+      }
       {...tids}
     >
       <Toast />
@@ -198,8 +208,9 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
 }
 
 // Use inset box shadow rather than thick border to avoid the button text reflowing when the border is applied
-const activeStyles = Css.smSb.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue600}`).$;
-const hoverStyles = Css.bgBlue50.smSb.blue900.boxShadow(`inset 3px 0px 0 0px ${Palette.Blue900}`).$;
+const activeStyles = Css.smSb.boxShadow(`inset 3px 0px 0 0px var(${Tokens.Primary})`).$;
+// Blue50/Blue900 hover chrome has no full semantic match — keep palette fills; inset uses Primary.
+const hoverStyles = Css.bgBlue50.smSb.blue900.boxShadow(`inset 3px 0px 0 0px var(${Tokens.Primary})`).$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSection: string | null }) {
@@ -226,7 +237,7 @@ function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSe
       {...focusProps}
       {...hoverProps}
       css={{
-        ...Css.buttonBase.wsn.tal.smSb.blue600.px2.py1.br0.h100.$,
+        ...Css.buttonBase.wsn.tal.smSb.color(Tokens.TextLinkDefault).px2.py1.br0.h100.$,
         ...(isFocusVisible ? defaultFocusRingStyles : {}),
         ...(active ? activeStyles : {}),
         ...(isPressed ? activeStyles : isHovered ? hoverStyles : {}),
