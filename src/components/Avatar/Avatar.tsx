@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, Typography } from "src/Css";
+import { Css, Tokens, Typography } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export interface AvatarProps {
+export type AvatarProps = {
   src: string | undefined;
   name?: string;
   size?: AvatarSize;
   showName?: boolean;
   preventTooltip?: boolean;
-}
+};
 
 export function Avatar({ src, name, size = "md", showName = false, preventTooltip = false, ...others }: AvatarProps) {
   const tid = useTestIds(others, "avatar");
@@ -20,7 +20,15 @@ export function Avatar({ src, name, size = "md", showName = false, preventToolti
   const styles = Css.br100.wPx(px).hPx(px).mwPx(px).oh.$;
 
   const img = showFallback ? (
-    <div css={{ ...styles, ...Css.typography(sizeToFallbackTypeScale[size]).bgGray400.gray100.df.aic.jcc.$ }} {...tid}>
+    <div
+      css={{
+        ...styles,
+        ...Css.typography(sizeToFallbackTypeScale[size])
+          .bgColor(Tokens.TextDisabled)
+          .color(Tokens.NeutralFillHoverSubtle).df.aic.jcc.$,
+      }}
+      {...tid}
+    >
       {name ? nameToInitials(name) : <Icon icon="userCircle" inc={sizeToIconInc[size]} />}
     </div>
   ) : (

@@ -5,7 +5,7 @@ import { maybeTooltip, resolveTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getRadioStateStyles, radioDefault, radioFocus, radioHover, radioReset } from "src/inputs/internal/radioStyles";
@@ -179,13 +179,13 @@ function Radio<K extends string>(props: {
       <div>
         <div
           id={labelId}
-          css={Css.sm.gray800.if(disabled).gray400.$}
+          css={Css.sm.color(Tokens.OnSurface).if(disabled).color(Tokens.TextDisabled).$}
           {...(description ? { "aria-describedby": descriptionId } : {})}
         >
           {label}
         </div>
         {description && (
-          <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
+          <div id={descriptionId} css={Css.sm.color(Tokens.OnSurfaceMuted).if(disabled).color(Tokens.TextDisabled).$}>
             {typeof description === "function" ? description() : description}
           </div>
         )}

@@ -85,7 +85,8 @@ Two children:
 
 - Baseline colors live in JSON and emit on **`:root { --b-*: rgba(…) }`** in **`src/css/generated/theme-scopes.css`**.
 - Theme axes on the Beam extension (e.g. `contrast`) resolve to rgba and emit as **`[data-theme="…"] { --b-*: … }`** in the same file (axis keys must align with [`ContrastScope`](../src/components/ContrastScope.tsx)).
-- Wrap subtrees in **`ContrastScope`**. Portaled overlays (e.g. menus from a field) should inherit the preset (`Popover` / `data-theme` when contrast scope is active).
+- Apps stay on light `:root` values; we do **not** follow `prefers-color-scheme` yet. Use **`ContrastScope`** (or Storybook’s **Color scheme → Dark**) to force the contrast axis for verification.
+- Wrap subtrees in **`ContrastScope`** for dark chrome. Portaled overlays (e.g. menus from a field) should inherit the preset (`Popover` / `data-theme` when contrast scope is active).
 - **`CssReset`** imports **`theme-scopes.css`** so rules ship with the app.
 
 ## DTCG references

@@ -2,7 +2,7 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette, Properties, Tokens } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
@@ -151,19 +151,21 @@ const variantStyles: Record<
   },
 
   secondary: {
-    baseStyles: Css.bgWhite.bcGray300.bw1.ba.blue600.$,
+    baseStyles: Css.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).bw1.ba.color(Tokens.TextLinkDefault).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).$,
     pressedStyles: Css.bgColor(Tokens.NeutralFillPressed).$,
-    disabledStyles: Css.bgWhite.blue300.$,
+    disabledStyles: Css.bgColor(Tokens.Surface).color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
 
   secondaryBlack: {
-    baseStyles: Css.bgWhite.bcGray300.bw1.ba.gray900.$,
+    baseStyles: Css.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).bw1.ba.color(Tokens.OnSurface).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).gray900.$,
+    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.OnSurface).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px ${Palette.Gray900}`).$,
+    focusStyles: Css.boxShadow(
+      `0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px var(${Tokens.FocusRingMuted})`,
+    ).$,
   },
 
   tertiary: {
@@ -179,10 +181,12 @@ const variantStyles: Record<
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
     pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.DangerPressed).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px ${Palette.Red500}`).$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px var(${Tokens.Danger})`)
+      .$,
   },
 
   danger: {
+    // Fill ramp has no semantic tokens yet — keep palette; disabled/focus use tokens.
     baseStyles: Css.bgRed600.white.$,
     hoverStyles: Css.bgRed700.$,
     pressedStyles: Css.bgRed800.$,
@@ -193,12 +197,15 @@ const variantStyles: Record<
   quaternary: {
     baseStyles: Css.bgTransparent.color(Tokens.ButtonGhostFg).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).gray900.$,
+    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.OnSurface).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px ${Palette.Gray900}`).$,
+    focusStyles: Css.boxShadow(
+      `0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px var(${Tokens.FocusRingMuted})`,
+    ).$,
   },
 
   caution: {
+    // Fill ramp has no semantic tokens yet — keep palette; disabled/focus use tokens.
     baseStyles: Css.bgYellow200.gray900.$,
     hoverStyles: Css.bgYellow300.$,
     pressedStyles: Css.bgYellow400.$,
@@ -214,11 +221,11 @@ const variantStyles: Record<
     focusStyles: Css.bshFocus.$,
   },
   textSecondary: {
-    baseStyles: Css.blue600.add("fontSize", "inherit").$,
-    hoverStyles: Css.bgGray100.$,
-    pressedStyles: Css.blue600.$,
-    disabledStyles: Css.bgWhite.blue300.$,
-    focusStyles: Css.blue600.$,
+    baseStyles: Css.color(Tokens.TextLinkDefault).add("fontSize", "inherit").$,
+    hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).$,
+    pressedStyles: Css.color(Tokens.TextLinkPressed).$,
+    disabledStyles: Css.bgColor(Tokens.Surface).color(Tokens.TextLinkDisabled).$,
+    focusStyles: Css.color(Tokens.TextLinkDefault).$,
   },
 };
 

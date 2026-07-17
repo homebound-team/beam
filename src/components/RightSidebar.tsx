@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useState } from "react";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { IconKey } from "./Icon";
 import { IconButton } from "./IconButton";
@@ -53,18 +53,20 @@ export function RightSidebar({ content, headerHeightPx }: RightSidebarProps) {
           >
             <>
               {/* Sticky header section */}
-              <div css={Css.sticky.top0.bgWhite.$}>
+              <div css={Css.sticky.top0.bgColor(Tokens.Surface).$}>
                 {/* Close button */}
                 <div css={Css.absolute.leftPx(-24).top0.df.fdc.aic.$}>
                   <IconButton
-                    bgColor={Palette.White}
+                    bgColor={Tokens.Surface}
                     variant="circle"
                     onClick={() => setSelectedIcon(undefined)}
                     icon="x"
                     inc={3.5}
                   />
                   {/* vertical line */}
-                  <div css={Css.absolute.topPx(48).h("calc(100vh - 168px)").wPx(1).bgGray300.$} />
+                  <div
+                    css={Css.absolute.topPx(48).h("calc(100vh - 168px)").wPx(1).bgColor(Tokens.FieldBorderDefault).$}
+                  />
                 </div>
                 {/* Horizontal icons when opened */}
                 <div css={Css.df.aic.jcfe.gap2.mb3.$}>

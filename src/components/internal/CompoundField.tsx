@@ -1,5 +1,5 @@
 import { FocusEvent, cloneElement, useState } from "react";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { TextFieldInternalProps } from "src/interfaces";
 
 /** Internal component to help create compound fields */
@@ -7,7 +7,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
   if (children?.length !== 2) {
     throw new Error("CompoundField requires two children components");
   }
-  const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bcGray300.$;
+  const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bc(Tokens.FieldBorderDefault).$;
   const internalProps: TextFieldInternalProps = { compound: true };
   // TODO(stylex): Replace focus event tracking with stylex.when.ancestor once we migrate to stylex.
   const [hasFocusWithin, setHasFocusWithin] = useState(false);
@@ -30,7 +30,7 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         css={{
           ...commonStyles,
           ...Css.bl.borderRadius("4px 0 0 4px").$,
-          ...(hasFocusWithin && Css.bcBlue700.$),
+          ...(hasFocusWithin && Css.bc(Tokens.FieldBorderFocus).$),
         }}
       >
         {cloneElement(children[0], {
@@ -38,13 +38,18 @@ export function CompoundField({ children }: { children: JSX.Element[] }) {
         })}
       </div>
       {/* Separation line */}
-      <div css={{ ...Css.wPx(1).fn.bgGray300.$, ...(hasFocusWithin && Css.bgBlue700.$) }} />
+      <div
+        css={{
+          ...Css.wPx(1).fn.bgColor(Tokens.FieldBorderDefault).$,
+          ...(hasFocusWithin && Css.bgColor(Tokens.FieldBorderFocus).$),
+        }}
+      />
 
       <div
         css={{
           ...commonStyles,
           ...Css.fg1.br.borderRadius("0 4px 4px 0").$,
-          ...(hasFocusWithin && Css.bcBlue700.$),
+          ...(hasFocusWithin && Css.bc(Tokens.FieldBorderFocus).$),
         }}
       >
         {cloneElement(children[1], {

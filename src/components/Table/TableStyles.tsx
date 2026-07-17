@@ -5,8 +5,11 @@ import type { RenderCellFn } from "src/components/Table/components/cell";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import { DiscriminateUnion, Kinded } from "src/components/Table/types";
-import { Css, Palette, Properties, Typography } from "src/Css";
+import { Css, maybeCssVar, Palette, Properties, Tokens, Typography } from "src/Css";
 import { safeKeys } from "src/utils";
+
+const insetSeparator = `inset 0 -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`;
+const insetSeparatorCorner = `inset -1px -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`;
 
 /** Completely static look & feel, i.e. nothing that is based on row kinds/content. */
 export type GridStyle = {
@@ -86,7 +89,7 @@ export type GridStyle = {
       >
     | ((level: number) => { rowIndent?: number; cellCss?: Properties; firstContentColumn?: Properties });
   /** Allows for customization of the background color used to denote an "active" row */
-  activeBgColor?: Palette;
+  activeBgColor?: BeamColor;
   /** Defines styles for the group row which holds the selected rows that have been filtered out */
   keptGroupRowCss?: Properties;
   /** Defines styles for the last row `keptGroup` to provide separation from the rest of the table */
@@ -148,10 +151,11 @@ function memoizedTableStyles() {
       const groupedLevels = {
         0: {
           cellCss: {
-            ...Css.xsSb.mhPx(56).gray700.bgGray100.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
-            ...(allWhite && Css.bgWhite.$),
+            ...Css.xsSb.mhPx(56).color(Tokens.OnSurfaceMuted).bgColor(Tokens.ListRowBgHover).boxShadow(insetSeparator)
+              .$,
+            ...(allWhite && Css.bgColor(Tokens.Surface).$),
           },
-          firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.gray900.$) },
+          firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.color(Tokens.OnSurface).$) },
         },
         2: { firstContentColumn: Css.xs.pl3.$ },
         // Add 12 more pixels of padding for each level of nesting
@@ -163,42 +167,46 @@ function memoizedTableStyles() {
         emptyCell: "-",
         firstRowMessageCss: {
           ...Css.tac.py3.$,
-          ...(allWhite && Css.bgWhite.$),
-          ...(bordered && Css.bl.br.bcGray200.$),
+          ...(allWhite && Css.bgColor(Tokens.Surface).$),
+          ...(bordered && Css.bl.br.bc(Tokens.SurfaceSeparator).$),
         },
         headerCellCss: {
           // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
           // lineClamp requires `display: webkit-box`, which disables `align-items: center` (requires `display: flex/grid`)
           // Header's will add `lineClamp2` more locally in their renders.
           // Also `unset`-ing the white-space: nowrap defined in `cellCss` below.
-          ...Css.gray900.xsSb.bgGray200.aic.pxPx(12).whiteSpace("unset").hPx(40).$,
-          ...(allWhite && Css.bgWhite.$),
+          ...Css.color(Tokens.OnSurface).xsSb.bgColor(Tokens.SurfaceSubtle).aic.pxPx(12).whiteSpace("unset").hPx(40).$,
+          ...(allWhite && Css.bgColor(Tokens.Surface).$),
         },
-        totalsCellCss: Css.bgWhite.gray700.bgGray100.xsSb.hPx(totalsRowHeight).pPx(12).$,
-        expandableHeaderCss: Css.bgWhite.gray900.xsSb.wsn
-          .hPx(expandableHeaderRowHeight)
+        totalsCellCss: Css.color(Tokens.OnSurfaceMuted).bgColor(Tokens.ListRowBgHover).xsSb.hPx(totalsRowHeight).pPx(12)
+          .$,
+        expandableHeaderCss: Css.bgColor(Tokens.Surface)
+          .color(Tokens.OnSurface)
+          .xsSb.wsn.hPx(expandableHeaderRowHeight)
           .pxPx(12)
-          .py0.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+          .py0.boxShadow(insetSeparator).$,
         // Draw a 1px divider inside the cell on the right edge and bottom edge.
         // Using `inset` keeps the line inside the cell so it doesn't change layout.
-        expandableHeaderNonLastColumnCss: Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$,
+        expandableHeaderNonLastColumnCss: Css.boxShadow(insetSeparatorCorner).$,
         cellCss: {
           ...Css.typography(cellTypography)
-            .gray900.bgWhite.ai(alignItems)
+            .color(Tokens.OnSurface)
+            .bgColor(Tokens.Surface)
+            .ai(alignItems)
             .pxPx(12)
-            .boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$,
+            .boxShadow(insetSeparator).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? Css.onHover.bgGray100.$ : {}),
+          ...(cellHighlight ? Css.onHover.bgColor(Tokens.ListRowBgHover).$ : {}),
         },
-        firstCellCss: bordered ? Css.bl.bcGray200.$ : undefined,
-        lastCellCss: bordered ? Css.br.bcGray200.$ : undefined,
-        borderStyle: Css.bcGray200.$,
-        firstRowCellCss: bordered ? Css.bt.bcGray200.$ : undefined,
+        firstCellCss: bordered ? Css.bl.bc(Tokens.SurfaceSeparator).$ : undefined,
+        lastCellCss: bordered ? Css.br.bc(Tokens.SurfaceSeparator).$ : undefined,
+        borderStyle: Css.bc(Tokens.SurfaceSeparator).$,
+        firstRowCellCss: bordered ? Css.bt.bc(Tokens.SurfaceSeparator).$ : undefined,
         firstRowFirstCellCss: roundedHeader ? Css.borderRadius("8px 0 0 0 ").$ : undefined,
         firstRowLastCellCss: roundedHeader ? Css.borderRadius("0 8px 0 0").$ : undefined,
         // Keep `betweenRowsCss` on all body rows, but on the final body row
         // remove the inset shadow and, when bordered, replace it with a true bottom border.
-        lastRowCellCss: bordered ? Css.bsh0.bb.bcGray200.$ : Css.bsh0.$,
+        lastRowCellCss: bordered ? Css.bsh0.bb.bc(Tokens.SurfaceSeparator).$ : Css.bsh0.$,
         // Only apply bottom corner radii to the final body-row cells when using `bordered`.
         lastRowFirstCellCss: bordered ? Css.borderRadius("0 0 0 8px").$ : undefined,
         lastRowLastCellCss: bordered ? Css.borderRadius("0 0 8px 0").$ : undefined,
@@ -209,11 +217,12 @@ function memoizedTableStyles() {
           borderOnHover: highlightOnHover,
         },
         levels: grouped ? groupedLevels : defaultLevels,
-        rowHoverColor: Palette.Blue50,
-        keptGroupRowCss: Css.bgYellow100.gray900.xsSb.df.aic.$,
+        // Dedicated table-row hover token (neutral); blue selection fills stay palette below.
+        rowHoverColor: Tokens.ListRowBgHover,
+        // Kept-group yellow status fill has no semantic token yet.
+        keptGroupRowCss: Css.bgYellow100.color(Tokens.OnSurface).xsSb.df.aic.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
-        // Pinned rows get a blue highlight; the standard `betweenRowsCss` bottom border (not a
-        // shadow) already separates the pinned section from the body.
+        // Pinned rows keep Blue50 until a selection-surface token exists.
         pinnedRowCss: Css.bgColor(Palette.Blue50).$,
       };
     }
@@ -254,7 +263,7 @@ export const condensedStyle: GridStyle = {
   ...getTableStyles({ rowHeight: "fixed" }),
   firstRowMessageCss: {
     ...getTableStyles({ rowHeight: "fixed" }).firstRowMessageCss,
-    ...Css.xs.gray900.$,
+    ...Css.xs.color(Tokens.OnSurface).$,
   },
 };
 
@@ -264,13 +273,16 @@ export const condensedStyle: GridStyle = {
 export const cardStyle: GridStyle = {
   ...defaultStyle,
   betweenRowsCss: {} as Properties,
-  nonHeaderRowCss: Css.br4.oh.ba.bcGray400.mt2.add("transition", "all 240ms").onHover.bshHover.bcGray700.$,
-  firstRowCss: Css.bl.br.bcGray200.borderRadius("8px 8px 0 0").oh.$,
+  nonHeaderRowCss: Css.br4.oh.ba
+    .bc(Tokens.TextDisabled)
+    .mt2.add("transition", "all 240ms")
+    .onHover.bshHover.bc(Tokens.OnSurfaceMuted).$,
+  firstRowCss: Css.bl.br.bc(Tokens.SurfaceSeparator).borderRadius("8px 8px 0 0").oh.$,
   cellCss: Css.p2.$,
   // Undo the card look & feel for the header
   headerCellCss: {
     ...defaultStyle.headerCellCss,
-    ...Css.p1.m0.xsSb.gray700.$,
+    ...Css.p1.m0.xsSb.color(Tokens.OnSurfaceMuted).$,
   },
   rowHoverColor: "none",
   // this will allow having N amount of nested childs without having to define each level margin

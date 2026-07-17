@@ -1,6 +1,6 @@
 import { Fragment, ReactNode, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type HeaderBreadcrumb = {
@@ -22,8 +22,13 @@ export function PageHeaderBreadcrumbs({ breadcrumb }: PageHeaderBreadcrumbsProps
     return (
       // Adding index to key to prevent rendering issues when multiple items have the same label
       <Fragment key={`${bc.label}-${index}`}>
-        {index > 0 && !hideDivisor && <span css={Css.smSb.gray700.mx1.myPx(2).$}>/</span>}
-        <Link to={bc.href} css={Css.smSb.gray700.onHover.gray900.$} className="navLink" {...tids.navLink}>
+        {index > 0 && !hideDivisor && <span css={Css.smSb.color(Tokens.OnSurfaceMuted).mx1.myPx(2).$}>/</span>}
+        <Link
+          to={bc.href}
+          css={Css.smSb.color(Tokens.OnSurfaceMuted).onHover.color(Tokens.OnSurface).$}
+          className="navLink"
+          {...tids.navLink}
+        >
           {bc.label}
         </Link>
         {bc.right}
@@ -36,7 +41,7 @@ export function PageHeaderBreadcrumbs({ breadcrumb }: PageHeaderBreadcrumbsProps
       {breadcrumbs.length > 3 && collapsed ? (
         <>
           {renderBreadcrumb(breadcrumbs[0], 0)}
-          <button {...tids.expand} css={Css.gray700.pxPx(8).$} onClick={() => setCollapsed(false)}>
+          <button {...tids.expand} css={Css.color(Tokens.OnSurfaceMuted).pxPx(8).$} onClick={() => setCollapsed(false)}>
             ...
           </button>
           {renderBreadcrumb(breadcrumbs[breadcrumbs.length - 2], breadcrumbs.length - 2, true)}

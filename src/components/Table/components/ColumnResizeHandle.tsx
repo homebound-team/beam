@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 
@@ -265,7 +265,8 @@ export function ColumnResizeHandle({
             .mrPx(-2)
             .z(10)
             .cursor("col-resize")
-            .onHover.bgGray700.if(isHovering || isDragging).bgGray700.$
+            .if(isHovering || isDragging)
+            .bgColor(Tokens.OnSurfaceMuted).$
         }
         {...tid.handle}
         data-column-id={columnId}
@@ -279,7 +280,8 @@ export function ColumnResizeHandle({
               .hPx(guideLineHeight)
               .leftPx(guideLineX)
               .wPx(4)
-              .bgGray700.add("pointerEvents", "none")
+              .bgColor(Tokens.OnSurfaceMuted)
+              .add("pointerEvents", "none")
               .z(zIndices.dragHandle)
               .add("transform", "translateX(-50%)").$
           }

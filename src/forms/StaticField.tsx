@@ -1,17 +1,17 @@
 import { useId } from "@react-aria/utils";
 import { ReactNode } from "react";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface StaticFieldProps {
+type StaticFieldProps = {
   label: ReactNode;
   value?: string;
   children?: ReactNode;
   // Does not currently support "inline" or "hidden".
   labelStyle?: PresentationFieldProps["labelStyle"];
-}
+};
 
 export function StaticField(props: StaticFieldProps) {
   const { fieldProps } = usePresentationContext();
@@ -20,10 +20,10 @@ export function StaticField(props: StaticFieldProps) {
   const id = useId();
   return (
     <div css={Css.if(labelStyle === "left").df.jcsb.maxw100.$} {...tid.container}>
-      <label css={Css.db.sm.gray700.mbPx(4).$} htmlFor={id} {...tid.label}>
+      <label css={Css.db.sm.color(Tokens.TextLabel).mbPx(4).$} htmlFor={id} {...tid.label}>
         {label}
       </label>
-      <div id={id} css={Css.sm.gray900.df.aic.if(labelStyle === "left").w50.$} {...tid}>
+      <div id={id} css={Css.sm.color(Tokens.OnSurface).df.aic.if(labelStyle === "left").w50.$} {...tid}>
         {value || children}
       </div>
     </div>

@@ -79,7 +79,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       buttonRef={buttonRef}
       {...tid}
     >
-      <div css={Css.df.fdc.bgColor(Tokens.Surface).maxwPx(326).maxhPx(512).onHover.bshHover.$}>
+      <div css={Css.df.fdc.bgColor(Tokens.Surface).color(Tokens.OnSurface).maxwPx(326).maxhPx(512).onHover.bshHover.$}>
         {/* Scrollable body — mh0 lets the flex child shrink so the option list scrolls internally instead of overflowing the page */}
         <div css={Css.dg.gtc("1fr auto").gap2.p2.fg1.mh0.oya.$}>
           {options.map((option) => (

@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import type { NumberFieldAria } from "react-aria";
 import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
-import { Icon, IconButton, maybeTooltip, useContrastScope } from "src/components";
+import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
 import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
@@ -116,8 +116,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
   const fieldRef = useGetRef(inputRef);
-  const contrastScopeActive = useContrastScope();
-
   const maybeSmaller = compound ? 2 : 0;
   const fieldHeight = 40;
   const compactFieldHeight = 32;
@@ -142,8 +140,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         .df.aic.br8.pxPx(textFieldBasePadding)
         .w100.bgColor(bgColor)
         .color(Tokens.OnSurface)
-        .if(!inputStylePalette && contrastScopeActive)
-        .white.if(labelStyle === "left")
+        .if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
       // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
@@ -170,8 +167,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inputWrapperReadOnly: {
       ...Css.typography(typeScale)
         .df.aic.w100.color(Tokens.OnSurface)
-        .if(!inputStylePalette && contrastScopeActive)
-        .white.if(labelStyle === "left")
+        .if(labelStyle === "left")
         .w(labelLeftFieldWidth).$,
       // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
       ...(labelStyle === "hidden" &&
@@ -338,7 +334,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {isFocused && clearable && onChange && inputProps.value && (
                 <IconButton
                   icon="xCircle"
-                  color={Palette.Gray700}
+                  color={Tokens.OnSurfaceMuted}
                   onClick={() => {
                     onChange(undefined);
                     // Reset focus to input element
@@ -348,7 +344,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               )}
               {errorInTooltip && errorMsg && !hideErrorMessage && (
                 <span css={Css.df.aic.asc.pl1.fs0.$}>
-                  <Icon icon="error" color={Palette.Red600} tooltip={errorMsg} />
+                  <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} />
                 </span>
               )}
               {endAdornment && <span css={Css.df.aic.asc.pl1.fs0.$}>{endAdornment}</span>}

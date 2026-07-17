@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
 /** Structured empty state shown in place of a GridTable when there are no data rows. */
@@ -20,7 +20,7 @@ export function GridTableEmptyState(props: GridTableEmptyStateProps) {
         {title}
       </div>
       {description && (
-        <div css={Css.sm.gray700.$} {...tid.description}>
+        <div css={Css.sm.color(Tokens.OnSurfaceMuted).$} {...tid.description}>
           {description}
         </div>
       )}

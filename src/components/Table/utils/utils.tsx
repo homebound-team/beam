@@ -7,7 +7,7 @@ import { SortHeader } from "src/components/Table/components/SortHeader";
 import { GridRowApi } from "src/components/Table/GridTableApi";
 import { GridStyle } from "src/components/Table/TableStyles";
 import { GridCellAlignment, GridColumnBorder, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
-import { Css, Palette, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
@@ -52,7 +52,7 @@ export function toContent(
   const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
   const tooltipEl = tooltip ? (
     <span css={Css.fs0.mlPx(4).$}>
-      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.Gray600} />
+      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.OnSurfaceMuted} />
     </span>
   ) : null;
 
@@ -61,7 +61,12 @@ export function toContent(
       ? getButtonOrLink(
           content,
           maybeContent.onClick,
-          Css.props(Css.maxw100.blue700.ta("inherit").if(style?.presentationSettings?.wrap === false).truncate.$),
+          Css.props(
+            Css.maxw100
+              .color(Tokens.TextLinkDefault)
+              .ta("inherit")
+              .if(style?.presentationSettings?.wrap === false).truncate.$,
+          ),
         )
       : content;
 

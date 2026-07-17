@@ -2,16 +2,16 @@ import { ReactNode, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-export interface ButtonGroupProps {
+export type ButtonGroupProps = {
   buttons: ButtonGroupButton[];
   /** Disables all buttons in ButtonGroup */
   disabled?: boolean;
   size?: ButtonGroupSize;
-}
+};
 
 export type ButtonGroupButton = {
   icon?: IconProps["icon"];
@@ -49,11 +49,11 @@ export function ButtonGroup(props: ButtonGroupProps) {
   );
 }
 
-interface GroupButtonProps extends ButtonGroupButton {
+type GroupButtonProps = {
   size: ButtonGroupSize;
   isFirst: boolean;
   isLast: boolean;
-}
+} & ButtonGroupButton;
 
 function GroupButton(props: GroupButtonProps) {
   const {
@@ -89,7 +89,9 @@ function GroupButton(props: GroupButtonProps) {
             {...focusProps}
             {...hoverProps}
             css={{
-              ...Css.buttonBase.px2.br0.h100.onDisabled.gray400.cursorNotAllowed.bcGray300.$,
+              ...Css.buttonBase.px2.br0.h100.onDisabled
+                .color(Tokens.TextDisabled)
+                .cursorNotAllowed.bc(Tokens.FieldBorderDefault).$,
               ...(isFocusVisible ? defaultFocusRingStyles : {}),
               ...(active ? activeStyles : {}),
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
@@ -108,14 +110,14 @@ function GroupButton(props: GroupButtonProps) {
   );
 }
 
-const pressedStyles = Css.bgGray200.$;
-const activeStyles = Css.bgGray300.$;
-const hoverStyles = Css.bgGray100.$;
+const pressedStyles = Css.bgColor(Tokens.NeutralFillPressed).$;
+const activeStyles = Css.bgColor(Tokens.FieldBorderDefault).$;
+const hoverStyles = Css.bgColor(Tokens.NeutralFillHoverSubtle).$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function getButtonStyles(isFirst: boolean, isLast: boolean) {
   return {
-    ...Css.z1.bgWhite.bcGray300.bw1.ba.gray900.br0.oh.$,
+    ...Css.z1.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).bw1.ba.color(Tokens.OnSurface).br0.oh.$,
     // Our first button should have a rounded left border.
     ...(isFirst && Css.add("borderRadius", "4px 0 0 4px").$),
     // Our last button should have a rounded right border.

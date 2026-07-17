@@ -46,9 +46,13 @@ export function ListSelectCard(props: SelectCardItemProps) {
           // Styled radio is an input, so we can use the inputProps directly
           <StyledRadio {...tid} label={label} isDisabled={isDisabled} isSelected={isSelected} inputProps={inputProps} />
         )}
-        <span css={Css.smSb.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{label}</span>
+        <span css={Css.smSb.color(Tokens.OnSurface).if(isDisabled).color(Tokens.OnSurfaceDisabled).$}>{label}</span>
       </div>
-      {description && <span css={Css.ml3.sm.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{description}</span>}
+      {description && (
+        <span css={Css.ml3.sm.color(Tokens.OnSurface).if(isDisabled).color(Tokens.OnSurfaceDisabled).$}>
+          {description}
+        </span>
+      )}
     </SelectCardShell>
   );
 }

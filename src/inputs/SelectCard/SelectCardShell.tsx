@@ -37,13 +37,17 @@ export function SelectCardShell(props: SelectCardShellProps) {
 
   const styles = useMemo(
     () => ({
-      ...Css.df.fdc.ba.br12.bgWhite.bcGray300.w100.$,
+      ...Css.df.fdc.ba.br12.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).w100.$,
       ...(view === "grid" ? Css.aic.gap1.px2.py3.tac.$ : Css.aifs.gapPx(4).p2.$),
-      ...(isHovered && !isDisabled && Css.bgGray100.$),
+      ...(isHovered && !isDisabled && Css.bgColor(Tokens.NeutralFillHoverSubtle).$),
+      // Blue50 selected fill has no semantic token — keep palette.
       ...((isSelected || isPressed) &&
         !isDisabled &&
-        Css.bcBlue600.bgBlue50.boxShadow(`inset 0 0 0 1px ${maybeCssVar(Tokens.Primary)}`).$),
-      ...(isDisabled && (isSelected ? Css.bgGray100.bcGray300.$ : Css.bgGray50.bcGray300.$)),
+        Css.bc(Tokens.Primary).bgBlue50.boxShadow(`inset 0 0 0 1px ${maybeCssVar(Tokens.Primary)}`).$),
+      ...(isDisabled &&
+        (isSelected
+          ? Css.bgColor(Tokens.NeutralFillHoverSubtle).bc(Tokens.FieldBorderDefault).$
+          : Css.bgColor(Tokens.NeutralFillHoverSubtle).bc(Tokens.FieldBorderDefault).$)),
       ...(isFocusVisible ? Css.bshFocus.$ : {}),
     }),
     [view, isDisabled, isHovered, isSelected, isFocusVisible, isPressed],

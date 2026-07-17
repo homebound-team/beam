@@ -161,8 +161,7 @@ function emitThemeScopesCss(rows: SemanticCodegenRow[]): string {
     })
     .filter((block): block is string => block !== null);
 
-  const blocks = [rootBlock, ...themeBlocks];
-  return header + blocks.join("\n\n") + "\n";
+  return header + [rootBlock, ...themeBlocks].join("\n\n") + "\n";
 }
 
 type MotionLeafKind = "duration" | "cubicBezier";

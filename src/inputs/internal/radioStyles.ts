@@ -1,4 +1,4 @@
-import { Css, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 
 const whiteCircle =
   "data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='4'/%3e%3c/svg%3e";
@@ -9,12 +9,12 @@ export const radioReset = {
 };
 
 export const radioDefault = {
-  ...Css.bgWhite.bcGray300.ba.$,
-  ...Css.blue700.$,
+  ...Css.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).ba.$,
+  ...Css.color(Tokens.Primary).$,
   ...Css.transition.$,
 };
 
-export const radioUnchecked = Css.cursorPointer.bcGray300.$;
+export const radioUnchecked = Css.cursorPointer.bc(Tokens.FieldBorderDefault).$;
 
 export const radioChecked = {
   ...Css.add("backgroundColor", "currentColor")
@@ -30,10 +30,11 @@ export const radioFocus = {
   ...Css.bshFocus.$,
 };
 
+// Blue900 hover has no semantic token — keep palette.
 export const radioHover = Css.blue900.bcBlue900.$;
 
 export const radioDisabled = {
-  ...Css.cursorNotAllowed.gray100.$,
+  ...Css.cursorNotAllowed.color(Tokens.NeutralFillHoverSubtle).$,
   ...Css.add("backgroundColor", "currentColor")
     .add("backgroundSize", "100% 100%")
     .add("backgroundPosition", "center")
@@ -42,7 +43,7 @@ export const radioDisabled = {
 
 export const radioDisabledSelected = {
   ...radioChecked,
-  ...Css.cursorNotAllowed.gray400.$,
+  ...Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
 };
 
 export type RadioStateStyleProps = {

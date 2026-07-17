@@ -27,7 +27,7 @@ export function Hidden() {
           items: [{ label: "Dashboard", onClick: () => {}, active: true }],
         }}
       >
-        <div css={Css.bgGray50.p3.$}>Body without a displayed banner.</div>
+        <div css={Css.bgColor(Tokens.Surface).p3.$}>Body without a displayed banner.</div>
       </NavbarLayout>
     </EnvironmentBannerLayout>
   );

@@ -3,7 +3,7 @@ import { dateMatchersToDayPickerMatchers, plainDateToJsDate } from "src/componen
 import { Day } from "src/components/internal/DatePicker/Day";
 import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { type DateMatcher, type PlainDate } from "src/types";
 import { useTestIds } from "src/utils";
 import { jsDateToPlainDate, todayPlainDate } from "src/utils/plainDate";
@@ -22,7 +22,7 @@ export function DatePicker(props: DatePickerProps) {
   const tid = useTestIds(props, "datePicker");
 
   return (
-    <div css={Css.dib.bgWhite.xs.$} {...tid}>
+    <div css={Css.dib.bgColor(Tokens.PopoverSurface).color(Tokens.OnSurface).xs.$} {...tid}>
       <DayPicker
         components={{ Caption: useYearPicker ? YearSkipHeader : Header, Head: WeekHeader, Day }}
         // DatePicker only allows for a single date to be `selected` (per our props) though DayPicker expects an array of dates
