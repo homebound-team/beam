@@ -1,23 +1,23 @@
 import { useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-export interface Step {
+export type Step = {
   label: string;
   state: "incomplete" | "complete" | "error";
   disabled?: boolean;
   value: string;
-}
+};
 
-export interface StepperProps {
+export type StepperProps = {
   steps: Step[];
   // The 'value' of the Step that should be displayed
   currentStep: Step["value"];
   onChange: (stepValue: string) => void;
-}
+};
 
 export function Stepper(props: StepperProps) {
   const { steps, currentStep, onChange } = props;
@@ -51,7 +51,8 @@ export function Stepper(props: StepperProps) {
       </ol>
       <div
         css={
-          Css.mt1.bgGray300
+          Css.mt1
+            .bgColor(Tokens.FieldBorderDefault)
             .hPx(4)
             .maxwPx(steps.length * maxStepWidth + (steps.length - 1) * gap)
             .mwPx(steps.length * minStepWidth + (steps.length - 1) * gap).w100.$
@@ -59,8 +60,9 @@ export function Stepper(props: StepperProps) {
       >
         <div
           css={
-            Css.bgBlue600.add("transition", "width 200ms").h100.w(`${((lastCompletedStep + 1) / steps.length) * 100}%`)
-              .$
+            Css.bgColor(Tokens.Primary)
+              .add("transition", "width 200ms")
+              .h100.w(`${((lastCompletedStep + 1) / steps.length) * 100}%`).$
           }
         />
       </div>
@@ -68,10 +70,10 @@ export function Stepper(props: StepperProps) {
   );
 }
 
-interface StepButtonProps extends Step {
+type StepButtonProps = {
   onClick: VoidFunction;
   isCurrent: boolean;
-}
+} & Step;
 
 function StepButton(props: StepButtonProps) {
   const { label, disabled, state, isCurrent, onClick } = props;
@@ -91,11 +93,16 @@ function StepButton(props: StepButtonProps) {
       {...hoverProps}
       css={{
         ...Css.buttonBase.$,
-        ...Css.tal.w100.h100.sm.gray700.add("whiteSpace", "initial").if(state === "error").red600.$,
-        ...(isCurrent ? Css.blue700.if(state === "error").red800.$ : {}),
+        ...Css.tal.w100.h100.sm
+          .color(Tokens.OnSurfaceMuted)
+          .add("whiteSpace", "initial")
+          .if(state === "error")
+          .color(Tokens.Danger).$,
+        // Blue/red press ramps beyond Primary/Danger have no semantic tokens — keep palette.
+        ...(isCurrent ? Css.color(Tokens.TextLinkDefault).if(state === "error").red800.$ : {}),
         ...(isHovered && !isPressed ? Css.blue800.if(state === "error").red500.$ : {}),
         ...(isPressed ? Css.blue500.if(state === "error").red900.$ : {}),
-        ...(disabled ? Css.gray400.cursorNotAllowed.if(state === "error").red200.$ : {}),
+        ...(disabled ? Css.color(Tokens.TextDisabled).cursorNotAllowed.if(state === "error").red200.$ : {}),
         ...(isFocusVisible ? focusRingStyles : {}),
       }}
       {...tid[defaultTestId(label)]}
@@ -108,12 +115,12 @@ function StepButton(props: StepButtonProps) {
   );
 }
 
-interface StepIconProps {
+type StepIconProps = {
   state: StepButtonProps["state"];
   isHovered?: boolean;
   isPressed?: boolean;
   isCurrent?: boolean;
-}
+};
 
 function StepIcon({ state, isHovered = false, isPressed = false, isCurrent = false }: StepIconProps) {
   if (state === "error") {

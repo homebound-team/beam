@@ -3,11 +3,11 @@ import { Button, ButtonProps } from "src/components/Button";
 import { contrastDataTheme } from "src/components/ContrastScope";
 import { Icon, IconProps } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
-import { Css, Palette } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info" | "alert";
-export interface SnackbarNoticeProps {
+export type SnackbarNoticeProps = {
   /** Adds action button to the right of the notice */
   action?: Pick<ButtonProps, "label" | "onClick" | "variant">;
   /** Does not allow the user to close the notice manually. Notice will fade away in 10s. Value will be ignored if 'persistent' is set to 'true'. */
@@ -21,7 +21,7 @@ export interface SnackbarNoticeProps {
   id: string;
   /** Removes the snackbar notice from the stack */
   onClose: () => void;
-}
+};
 
 export function SnackbarNotice(props: SnackbarNoticeProps) {
   const { icon, message, action, hideCloseButton, persistent, onClose } = props;
@@ -29,7 +29,12 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
   // Only allow the "close" button to be hidden if not a `persistent` notice. Otherwise we could get in a state where the user cannot remove the notice from the screen.
   const reallyHideClose = hideCloseButton && !persistent;
   return (
-    <div css={Css.white.bgGray800.br4.md.df.aic.maxwPx(420).$} data-theme={contrastDataTheme} {...tid} role="alert">
+    <div
+      css={Css.color(Tokens.OnSurface).bgColor(Tokens.SurfaceRaised).br4.md.df.aic.maxwPx(420).$}
+      data-theme={contrastDataTheme}
+      {...tid}
+      role="alert"
+    >
       {icon && (
         <span css={Css.fs0.plPx(12).$}>
           <Icon {...typeToIcon[icon]} {...tid.icon} />

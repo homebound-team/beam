@@ -2,6 +2,8 @@
 
 Source of truth: [`tokens.json`](./tokens.json) (DTCG 2025.10–shaped). [`yarn generate:design-tokens`](../scripts/generate-design-tokens.ts) reads it and emits **`truss-token-vars.ts`**, **`truss-palette.ts`**, **`truss-motion.ts`**, and **`src/css/generated/theme-scopes.css`**. Truss uses [`truss-config.ts`](../truss-config.ts); run **`yarn build:truss`** after token edits when you also need regenerated **`src/Css.ts`** / **`src/Css.json`**.
 
+The Foundations/Colors Storybook catalog’s **Used in** column comes from [`yarn generate:token-usages`](../scripts/generate-token-usages.ts) → [`src/foundations/generated/tokenUsages.json`](../src/foundations/generated/tokenUsages.json) (also run automatically by `yarn storybook` / `yarn build-storybook`).
+
 **Palette in `truss-palette.ts`:** primitives only — `White` / `Transparent`, then other `beam.color.primitive.*` keys in JSON order. Semantic roles are **not** in the Truss palette.
 
 **Normative color format:** [Design Tokens Color Module 2025.10](https://www.designtokens.org/tr/2025.10/color/#color-tokens) — for `$type: "color"`, `$value` is `colorSpace: "srgb"`, `components: [r, g, b]` (each **0–1**), optional `alpha`, optional `hex`. Semantic baselines usually reference `{beam.color.primitive.*}`.
@@ -48,20 +50,19 @@ These conventions help humans, agents, and upstream tools (e.g. a future Figma e
 
 | Kind | When to use | Shape | Examples |
 |------|-------------|-------|----------|
-| **Global** | App-wide surfaces, brand, paired foreground roles | Short PascalCase | `Surface`, `PopoverSurface`, `OnSurface`, `OnSurfaceMuted`, `SelectionIndicator`, `Primary`, `PrimaryHover`, `PrimaryPressed`, `OnPrimary`, `Danger`, `Scrim`, … |
+| **Global** | App-wide surfaces, brand, paired foreground roles | Short PascalCase | `Surface`, `SurfaceRaised`, `OnSurface`, `OnSurfaceMuted`, `SelectionIndicator`, `Primary`, `PrimaryHover`, `PrimaryPressed`, `OnPrimary`, `Danger`, `Scrim`, … |
 | **Scoped** | Controls and product-specific patterns | `{Scope}{Aspect}{State?}` | `FieldBorderHover`, `NavTextActive`, `TextLabel`, `ButtonGhostFg`, `TextLinkHover`, `FocusRingInset`, … |
 
-**Pairing:** Prefer **`On*`** for ink on a fill (`OnSurface` on `Surface`). Use purpose-named globals when the role is not “text on a fill” (e.g. `SelectionIndicator` on `PopoverSurface`). Use scoped tokens for product-specific copy (e.g. `TextLabel` for labels).
+**Pairing:** Prefer **`On*`** for ink on a fill (`OnSurface` on `Surface`). Use purpose-named globals when the role is not “text on a fill” (e.g. `SelectionIndicator` on `SurfaceRaised`). Use scoped tokens for product-specific copy (e.g. `TextLabel` for labels).
 
 **Semantic roles (by area)** — illustrative; authoritative set is `beam.color.semantic` in `tokens.json`:
 
-- **Surfaces / ink:** `Surface`, `OnSurface`, `PopoverSurface`, `OnSurfaceMuted`, `Scrim`, …
+- **Surfaces / ink:** `Surface`, `SurfaceHover` (hover on `Surface`, e.g. table rows), `SurfaceRaised`, `SurfaceRaisedHover` (items on raised panels), `OnSurface`, `OnSurfaceMuted`, `Scrim`, …
 - **Brand / actions:** `Primary`, `PrimaryHover`, `PrimaryPressed`, `OnPrimary`, `SelectionIndicator`, `Danger`, …
 - **Typography / form copy:** `TextLabel`, `TextHelper`, `TextPlaceholder`, `TextDisabled`, `FieldTextDisabled`, `TextLink*`, `TextSelection`, …
-- **Fields:** `FieldBg*`, `FieldBorder*`, …
-- **Navigation:** `NavText*`, `NavItemBg*`, …
-- **List / menu:** `ListRowBgHover`, `MenuItemBgHover`, …
-- **Neutrals / buttons / focus / loaders / status:** `Neutral*`, `Button*`, `FocusRing*`, `LoaderFill`, `LoaderSpinner`, `LoaderTrack`, `StatusSuccessFg`, `DangerPressed`, …
+- **Fields / choice:** `FieldBg*`, `FieldBorder*`, `ChoiceSelected` (checkbox, radio, switch fills), …
+- **Navigation:** `NavText*`, `NavItemBg*` (contrast-themed side nav); `NavGlobal*` (fixed dark chrome for Navbar), …
+- **Neutrals / buttons / focus / loaders:** `Neutral*`, `Button*` (incl. `ButtonSecondaryFg`, tertiary/ghost), `FocusRing*`, `LoaderFill`, `LoaderSpinner`, `LoaderTrack`, `DangerPressed`, …
 
 Avoid semantic leaf keys that **collide with Truss `Css` shorthands** (e.g. do not use `Outline` as a color token key).
 
@@ -85,7 +86,8 @@ Two children:
 
 - Baseline colors live in JSON and emit on **`:root { --b-*: rgba(…) }`** in **`src/css/generated/theme-scopes.css`**.
 - Theme axes on the Beam extension (e.g. `contrast`) resolve to rgba and emit as **`[data-theme="…"] { --b-*: … }`** in the same file (axis keys must align with [`ContrastScope`](../src/components/ContrastScope.tsx)).
-- Wrap subtrees in **`ContrastScope`**. Portaled overlays (e.g. menus from a field) should inherit the preset (`Popover` / `data-theme` when contrast scope is active).
+- Apps stay on light `:root` values; we do **not** follow `prefers-color-scheme` yet. Use **`ContrastScope`** (or Storybook’s **Color scheme → Dark**) to force the contrast axis for verification.
+- Wrap subtrees in **`ContrastScope`** for dark chrome. Portaled overlays (e.g. menus from a field) should inherit the preset (`Popover` / `data-theme` when contrast scope is active).
 - **`CssReset`** imports **`theme-scopes.css`** so rules ship with the app.
 
 ## DTCG references

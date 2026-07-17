@@ -1,6 +1,6 @@
 import { ReactNode, useMemo } from "react";
 import { useHover } from "react-aria";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { ButtonMenu, MenuItem } from "./ButtonMenu";
 import { Tag, TagType } from "./Tag";
@@ -12,7 +12,7 @@ export type CardTag = {
   type?: TagType;
 };
 
-export interface CardProps {
+export type CardProps = {
   title: string;
   subtitle: string;
   detailContent?: ReactNode;
@@ -29,7 +29,7 @@ export interface CardProps {
   disabled?: boolean;
   buttonMenuItems?: MenuItem[];
   tag?: CardTag;
-}
+};
 
 export function Card(props: CardProps) {
   const {
@@ -67,7 +67,9 @@ export function Card(props: CardProps) {
       {/* Image */}
       <div
         css={{
-          ...Css.hPx(imgHeight).ba.br8.bcGray300.oh.df.asc.jsc.relative.add("filter", "brightness(1)").$,
+          ...Css.hPx(imgHeight)
+            .ba.br8.bc(Tokens.FieldBorderDefault)
+            .oh.df.asc.jsc.relative.add("filter", "brightness(1)").$,
           // Once the card follows its container, keep the image at its own size so the title wraps instead.
           ...(fullWidth && Css.fs0.$),
           ...(isHovered && !isList && imageHoverStyles),
@@ -79,7 +81,7 @@ export function Card(props: CardProps) {
       {isHovered && buttonMenuItems && (
         <div css={Css.absolute.right1.top1.if(bordered && !isList).right3.top3.$}>
           <ButtonMenu
-            trigger={{ icon: "verticalDots", color: isList ? Palette.Gray700 : Palette.White }}
+            trigger={{ icon: "verticalDots", color: isList ? Tokens.OnSurfaceMuted : Tokens.OnPrimary }}
             items={buttonMenuItems}
           />
         </div>
@@ -93,10 +95,10 @@ export function Card(props: CardProps) {
       {/* Titles and detailContent */}
       <div css={Css.df.fdc.aifs.gap1.$}>
         <div>
-          <div css={Css.xsSb.gray700.$} {...tid.subtitle}>
+          <div css={Css.xsSb.color(Tokens.OnSurfaceMuted).$} {...tid.subtitle}>
             {subtitle}
           </div>
-          <div css={Css.smSb.gray900.if(isHovered).blue700.$} {...tid.title}>
+          <div css={Css.smSb.color(Tokens.OnSurface).if(isHovered).color(Tokens.TextLinkDefault).$} {...tid.title}>
             {title}
           </div>
         </div>
@@ -107,11 +109,13 @@ export function Card(props: CardProps) {
 }
 
 const width = { card: 256, list: 520 };
-const baseStyles = (type: CardType) => Css.wPx(width[type]).bgWhite.df.fdc.gap1.relative.$;
+const baseStyles = (type: CardType) => Css.wPx(width[type]).bgColor(Tokens.Surface).df.fdc.gap1.relative.$;
 // Replaces the fixed width above, so the card follows its container instead of overflowing it.
 const fullWidthStyles = Css.w100.$;
 const listStyles = Css.df.fdr.gap2.$;
-const borderedStyles = Css.ba.br8.bcGray300.p2.$;
+const borderedStyles = Css.ba.br8.bc(Tokens.FieldBorderDefault).p2.$;
 const disabledStyles = Css.add("opacity", 0.5).add("transition", "opacity 0.3s ease").$;
-const cardHoverStyles = Css.bcGray400.cursorPointer.$;
-const imageHoverStyles = Css.bgWhite.add("filter", "brightness(0.3)").add("transition", "filter 0.3s ease").$;
+const cardHoverStyles = Css.bc(Tokens.FieldBorderHover).cursorPointer.$;
+const imageHoverStyles = Css.bgColor(Tokens.Surface)
+  .add("filter", "brightness(0.3)")
+  .add("transition", "filter 0.3s ease").$;

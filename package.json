@@ -37,6 +37,7 @@
     "build": "yarn generate:design-tokens && yarn tsup-node --config tsup.config.ts && yarn copy:truss",
     "build:truss": "yarn generate:design-tokens && truss",
     "generate:design-tokens": "tsx scripts/generate-design-tokens.ts",
+    "generate:token-usages": "tsx scripts/generate-token-usages.ts",
     "validate:tokens": "tsx scripts/validate-tokens.ts",
     "check:token-drift": "tsx scripts/check-token-drift.ts",
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
