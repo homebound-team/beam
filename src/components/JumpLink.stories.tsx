@@ -4,10 +4,6 @@ import { Css } from "src/Css";
 
 export default {
   component: JumpLink,
-  args: {
-    label: "Jump Link",
-    href: "#jump-link",
-  },
 } as Meta<typeof JumpLink>;
 
 /** Replicates the Figma "Jump-Link States" grid: Active/Inactive columns x Default/Hover/Pressed/Focus/Disabled rows. */
