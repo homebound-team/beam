@@ -1,11 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { viewportModes } from "src/utils/sb";
-import { StepperTabs } from "./StepperTabs";
+import { StepperTabs, StepperTabsStep } from "./StepperTabs";
 
 export default {
   component: StepperTabs,

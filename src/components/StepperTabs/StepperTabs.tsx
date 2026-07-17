@@ -1,15 +1,9 @@
-import { StepperTab } from "src/components/StepperTabs/StepperTab";
+import { StepperTab, StepperTabProps } from "src/components/StepperTabs/StepperTab";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
 
-export type StepperTabsStep = {
-  label: string;
-  value: string;
-  /** Whether this step's required fields are filled out. Combined with `currentStep` to derive each tab's visual state. */
-  completed: boolean;
-  disabled?: boolean;
-};
+export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled">;
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];

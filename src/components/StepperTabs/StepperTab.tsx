@@ -56,7 +56,7 @@ export function StepperTab(props: StepperTabProps) {
 
 function withBorderBottom(color: Properties) {
   return {
-    ...Css.bb.add("borderBottomWidth", `6px`).$,
+    ...Css.bb.add("borderBottomWidth", `3px`).$,
     ...color,
   };
 }
@@ -78,7 +78,7 @@ function getCollapsedStyles(active: boolean, completed: boolean): Properties {
 const stepperTabStyles = {
   baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.oh.$,
   hoverStyles: Css.bgGray100.$,
-  focusRingStyles: Css.bshFocus.$,
+  focusRingStyles: Css.bshFocus.outline0.$,
   // Disabled always wins over both the state's and the collapsed border color.
   disabledStyles: Css.gray400.cursorNotAllowed.bcGray300.$,
 };
