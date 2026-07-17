@@ -14,7 +14,7 @@ export type StepperTabProps = {
   completed: boolean;
   onClick: (value: string) => void;
   disabled?: boolean;
-  /** Collapses the tab down to its colored bottom border only, hiding the label — for narrow/many-tab layouts. */
+  /** Collapses the tab down to its colored bottom border only, hiding the label — for the mobile view */
   collapsed?: boolean;
 };
 
@@ -76,9 +76,9 @@ function getCollapsedStyles(active: boolean, completed: boolean): Properties {
 }
 
 const stepperTabStyles = {
-  baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.br0.oh.$,
+  baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.oh.$,
   hoverStyles: Css.bgGray100.$,
   focusRingStyles: Css.bshFocus.$,
   // Disabled always wins over both the state's and the collapsed border color.
-  disabledStyles: { ...Css.gray400.cursorNotAllowed.$, ...Css.bcGray300.$ },
+  disabledStyles: Css.gray400.cursorNotAllowed.bcGray300.$,
 };

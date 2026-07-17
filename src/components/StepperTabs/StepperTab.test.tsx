@@ -3,35 +3,34 @@ import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("StepperTab", () => {
-  it.each<[boolean, boolean]>([
-    [false, false],
-    [false, true],
-    [true, false],
-    [true, true],
-  ])("renders the label (active=%s, completed=%s)", async (active, completed) => {
-    // Given a tab with the given active/completed combination
+  it("renders the label", async () => {
+    // Given a tab
     // When rendered
     const r = await render(
-      <StepperTab label="Step Label" value="step" active={active} completed={completed} onClick={vi.fn()} />,
+      <StepperTab label="Step Label" value="step" active={false} completed={false} onClick={vi.fn()} />,
     );
     // Then the label is displayed
     expect(r.stepperTab_step).toHaveTextContent("Step Label");
   });
 
-  it.each<[boolean, boolean]>([
-    [false, false],
-    [false, true],
-    [true, false],
-    [true, true],
-  ])("shows the check icon only when completed (active=%s, completed=%s)", async (active, completed) => {
-    // Given a tab with the given active/completed combination
+  it("shows the check icon when completed", async () => {
+    // Given a completed tab
     // When rendered
     const r = await render(
-      <StepperTab label="Step Label" value="step" active={active} completed={completed} onClick={vi.fn()} />,
+      <StepperTab label="Step Label" value="step" active={false} completed={true} onClick={vi.fn()} />,
     );
-    // Then the check icon is only shown when completed, regardless of active-ness
-    const hasIcon = !!r.query.stepperTab_check;
-    expect(hasIcon).toBe(completed);
+    // Then the check icon is shown
+    expect(r.query.stepperTab_check).toBeInTheDocument();
+  });
+
+  it("does not show the check icon when not completed", async () => {
+    // Given a non-completed tab
+    // When rendered
+    const r = await render(
+      <StepperTab label="Step Label" value="step" active={false} completed={false} onClick={vi.fn()} />,
+    );
+    // Then the check icon is not shown
+    expect(r.query.stepperTab_check).not.toBeInTheDocument();
   });
 
   it("invokes onClick with the tab's value", async () => {

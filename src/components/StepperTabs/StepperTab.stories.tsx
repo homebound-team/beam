@@ -7,14 +7,14 @@ export default {
   component: StepperTab,
 } as Meta;
 
-const combos: { active: boolean; completed: boolean; label: string }[] = [
-  { active: false, completed: true, label: "Step Label" },
-  { active: true, completed: false, label: "Step Label" },
-  { active: true, completed: true, label: "Step Label" },
-  { active: false, completed: false, label: "Details & Slots" },
-];
-
 export function States() {
+  const combos: { active: boolean; completed: boolean; label: string }[] = [
+    { active: false, completed: true, label: "Step Label" },
+    { active: true, completed: false, label: "Step Label" },
+    { active: true, completed: true, label: "Step Label" },
+    { active: false, completed: false, label: "Details & Slots" },
+  ];
+
   return (
     <div css={Css.df.fdc.gap4.bgWhite.$}>
       {combos.map(({ active, completed, label }) => {
