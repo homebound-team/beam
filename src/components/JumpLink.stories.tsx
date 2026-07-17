@@ -47,7 +47,7 @@ export function BaseStates() {
 /** Confirms wrapping to 2 lines with an unbroken bar, and clamping/ellipsis beyond that. */
 export function Wrapping() {
   return (
-    <div css={Css.df.fdc.gap2.wPx(180).$}>
+    <div css={Css.df.fdc.gap2.wPx(200).$}>
       <JumpLink active label="A jump link that wraps to two lines" href="#jump-link" />
       <JumpLink active={false} label="Line Items Long Section Name That Should Truncate" href="#jump-link" />
     </div>
@@ -57,7 +57,7 @@ export function Wrapping() {
 /** Plain vertical stack usage — no grouping/wrapper component needed. Sections below demonstrate the smooth scroll-to behavior. */
 export function ListUsage() {
   return (
-    <div css={Css.df.gap2.$}>
+    <div css={Css.df.gap2.hPx(2000).$}>
       <div css={Css.df.fdc.gap1.wPx(180).$}>
         <JumpLink active label="Jump Link 1" href="#section-1" />
         <JumpLink active={false} label="Jump Link 2" href="#section-2" />
@@ -65,7 +65,7 @@ export function ListUsage() {
       </div>
       <div>
         {["section-1", "section-2", "section-3"].map((id) => (
-          <div key={id} id={id} css={Css.hPx(400).df.aic.jcc.bt.bcGray200.$}>
+          <div key={id} id={id} css={Css.hPx(400).df.bt.bcGray200.$}>
             <h2>{id}</h2>
           </div>
         ))}
