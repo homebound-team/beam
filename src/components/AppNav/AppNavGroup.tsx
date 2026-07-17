@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppNavGroupTrigger } from "src/components/AppNav/AppNavGroupTrigger";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavGroup } from "src/components/AppNav/appNavTypes";
-import { appNavLinkGroupLinks } from "src/components/AppNav/appNavUtils";
+import { appNavLinkGroupLinks, linkGroupHasActiveLink } from "src/components/AppNav/appNavUtils";
 import { useAppNavGroupExpanded } from "src/components/AppNav/useAppNavGroupExpanded";
 import { NavLink } from "src/components/NavLinks";
 import { Css } from "src/Css";
@@ -67,6 +67,7 @@ function AppNavGroupDisclosure(props: AppNavGroupViewProps) {
         label={linkGroup.label}
         navGroupId={navGroupId}
         expanded={expanded}
+        active={linkGroupHasActiveLink(linkGroup)}
         onClick={onToggle}
         {...tid}
       />
@@ -76,9 +77,10 @@ function AppNavGroupDisclosure(props: AppNavGroupViewProps) {
         aria-hidden={!expanded}
         css={Css.oh.transitionHeight.h(contentHeight).$}
         {...tid.panel}
+        {...(!expanded ? { inert: "true" } : {})}
       >
-        <div ref={setContentEl} css={Css.df.fdc.pl2.$}>
-          <AppNavItems items={linkGroup.items} panelCollapsed={false} {...tid} />
+        <div ref={setContentEl} css={Css.df.fdc.$}>
+          <AppNavItems items={linkGroup.items} panelCollapsed={false} nested {...tid} />
         </div>
       </div>
     </div>
