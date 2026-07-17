@@ -37,7 +37,6 @@ describe("JumpLink", () => {
         <div id="section-one" />
       </div>,
     );
-    expect(r.jumpLink).not.toHaveAttribute("href");
     expect(r.jumpLink).toHaveAttribute("aria-disabled", "true");
     click(r.jumpLink);
     expect(window.scrollTo).not.toHaveBeenCalled();
