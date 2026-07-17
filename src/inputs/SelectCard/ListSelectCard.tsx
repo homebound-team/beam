@@ -48,7 +48,7 @@ export function ListSelectCard(props: SelectCardItemProps) {
         )}
         <span css={Css.smSb.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{label}</span>
       </div>
-      {description && <span css={Css.ml3.xs.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{description}</span>}
+      {description && <span css={Css.ml3.sm.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{description}</span>}
     </SelectCardShell>
   );
 }

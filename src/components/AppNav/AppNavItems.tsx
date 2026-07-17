@@ -17,13 +17,15 @@ export type AppNavItemsProps = {
   variant?: NavLinkVariant;
   /** Side-nav only: collapse links to icon-only rows. Ignored by the `"global"` variant. */
   panelCollapsed?: boolean;
+  /** True when rendering links inside an {@link AppNavGroup} disclosure. */
+  nested?: boolean;
 };
 
 // Results in a section, grouped, or flat list of `<NavLink />` components. The `"side"` variant
 // (SideNav, NavbarMobileMenu) renders groups as disclosures; `"global"` (Navbar toolbar) renders
 // them as dropdown menus.
 export function AppNavItems(props: AppNavItemsProps) {
-  const { items, variant = "side", panelCollapsed = false } = props;
+  const { items, variant = "side", panelCollapsed = false, nested = false } = props;
   const tid = useTestIds(props, "appNav");
 
   return (
@@ -35,6 +37,7 @@ export function AppNavItems(props: AppNavItemsProps) {
               key={appNavItemKey(item)}
               variant={variant}
               {...item}
+              nested={nested}
               iconOnly={item.iconOnly ?? (panelCollapsed && !!item.icon)}
               {...tid[`link_${camelCase(item.label)}`]}
             />
@@ -59,6 +62,7 @@ export function AppNavItems(props: AppNavItemsProps) {
               section={item}
               variant={variant}
               panelCollapsed={panelCollapsed}
+              nested={nested}
               showDivider={idx < items.length - 1}
               {...tid.section}
             />
