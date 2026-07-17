@@ -1,6 +1,6 @@
 /**
  * Codemod: ensure components that call `useModal()` from `@homebound/beam` (or Beam relative
- * imports) render `{modal.portal}` (or `{alias.portal}`) in the same function body.
+ * imports) render `{modal.portal}` (or `{alias.portal}` / `{portal}`) in the same function body.
  *
  * Usage (from a consumer repo, with beam as a sibling):
  *
@@ -9,10 +9,11 @@
  *
  * The transform is conservative:
  * - Handles `const modal = useModal()`, `const { openModal, ... } = useModal()`, and renames.
- * - If the hook result is already a single identifier, appends `{ident.portal}` before the
- *   last return (or at end of function body for arrow-expression conversions).
- * - If the hook is destructured without `portal`, rewrites to keep a `modal` (or existing)
- *   binding that includes portal, or adds `portal` to the destructure and renders it.
+ * - Only inserts a portal outlet into JSX returns (element or fragment).
+ * - If the function returns an ObjectExpression (common for wrapper hooks), adds `portal` to
+ *   that object instead of wrapping in a fragment.
+ * - Skips other non-JSX returns (arrays, identifiers, call expressions, etc.) so callers can
+ *   fix those stragglers manually — never wraps them in `<>...</>`.
  */
 
 export default function transformer(file: any, api: any) {
@@ -34,6 +35,9 @@ export default function transformer(file: any, api: any) {
         .find(j.JSXExpressionContainer)
         .filter((p: any) => {
           const expr = p.value.expression;
+          // {portal}
+          if (j.Identifier.check(expr) && expr.name === portalIdent) return true;
+          // {modal.portal}
           return (
             j.MemberExpression.check(expr) &&
             j.Identifier.check(expr.object) &&
@@ -46,75 +50,106 @@ export default function transformer(file: any, api: any) {
     );
   }
 
-  function insertPortalBeforeReturn(fnPath: any, portalIdent: string) {
+  function hasPortalInReturnedObject(fnPath: any): boolean {
     const body = fnPath.value.body;
     if (!j.BlockStatement.check(body)) {
-      // Arrow with expression body — wrap
-      fnPath.value.body = j.blockStatement([
-        j.returnStatement(
-          j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment(), [
-            j.jsxExpressionContainer(body),
-            j.jsxExpressionContainer(j.memberExpression(j.identifier(portalIdent), j.identifier("portal"))),
-          ]),
-        ),
+      return j.ObjectExpression.check(body) && objectHasPortalProp(body);
+    }
+    return body.body.some((s: any) => {
+      if (!j.ReturnStatement.check(s) || !s.argument) return false;
+      return j.ObjectExpression.check(s.argument) && objectHasPortalProp(s.argument);
+    });
+  }
+
+  function objectHasPortalProp(obj: any): boolean {
+    return obj.properties.some((prop: any) => {
+      if (!j.Property.check(prop) && !j.ObjectProperty.check(prop) && !j.SpreadProperty.check(prop)) return false;
+      if (j.SpreadProperty.check(prop) || prop.type === "SpreadElement") return false;
+      const key = prop.key;
+      return (j.Identifier.check(key) && key.name === "portal") || (j.Literal.check(key) && key.value === "portal");
+    });
+  }
+
+  function portalJsxExpr(portalIdent: string, asMember: boolean) {
+    const expr = asMember
+      ? j.memberExpression(j.identifier(portalIdent), j.identifier("portal"))
+      : j.identifier(portalIdent);
+    return j.jsxExpressionContainer(expr);
+  }
+
+  function insertPortalIntoJsxReturn(lastReturn: any, portalIdent: string, asMember: boolean): boolean {
+    const arg = lastReturn.argument;
+    if (!arg) return false;
+    const portalExpr = portalJsxExpr(portalIdent, asMember);
+
+    if (j.JSXFragment.check(arg)) {
+      arg.children.push(portalExpr);
+      return true;
+    }
+    if (j.JSXElement.check(arg)) {
+      lastReturn.argument = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment(), [
+        j.jsxElement(arg.openingElement, arg.closingElement, arg.children),
+        portalExpr,
       ]);
-      dirty = true;
-      return;
+      return true;
+    }
+    return false;
+  }
+
+  function addPortalToObjectReturn(lastReturn: any, portalIdent: string): boolean {
+    const arg = lastReturn.argument;
+    if (!arg || !j.ObjectExpression.check(arg)) return false;
+    if (objectHasPortalProp(arg)) return false;
+    arg.properties.push(j.property("init", j.identifier("portal"), j.identifier(portalIdent)));
+    return true;
+  }
+
+  /** Returns true if portal was placed (JSX or object). False = straggler, skip mutating destructure. */
+  function placePortalOutlet(fnPath: any, portalIdent: string, asMember: boolean): boolean {
+    const body = fnPath.value.body;
+
+    // Arrow with expression body
+    if (!j.BlockStatement.check(body)) {
+      if (j.JSXElement.check(body) || j.JSXFragment.check(body)) {
+        const portalExpr = portalJsxExpr(portalIdent, asMember);
+        if (j.JSXFragment.check(body)) {
+          body.children.push(portalExpr);
+        } else {
+          fnPath.value.body = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment(), [
+            j.jsxElement(body.openingElement, body.closingElement, body.children),
+            portalExpr,
+          ]);
+        }
+        return true;
+      }
+      if (j.ObjectExpression.check(body)) {
+        if (!objectHasPortalProp(body)) {
+          body.properties.push(j.property("init", j.identifier("portal"), j.identifier(portalIdent)));
+        }
+        return true;
+      }
+      // Non-JSX expression body — leave alone
+      return false;
     }
 
     const returns = body.body.filter((s: any) => j.ReturnStatement.check(s));
-    if (returns.length === 0) {
-      body.body.push(
-        j.returnStatement(
-          j.jsxExpressionContainer(j.memberExpression(j.identifier(portalIdent), j.identifier("portal"))),
-        ),
-      );
-      dirty = true;
-      return;
-    }
+    if (returns.length === 0) return false;
 
-    // Insert portal into the last return if it's JSX; otherwise append a fragment wrapper.
     const lastReturn = returns[returns.length - 1];
-    const arg = lastReturn.argument;
-    if (!arg) return;
+    if (!lastReturn.argument) return false;
 
-    const portalExpr = j.jsxExpressionContainer(j.memberExpression(j.identifier(portalIdent), j.identifier("portal")));
-
-    if (j.JSXElement.check(arg) || j.JSXFragment.check(arg)) {
-      if (j.JSXFragment.check(arg)) {
-        arg.children.push(portalExpr);
-      } else {
-        lastReturn.argument = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment(), [
-          j.jsxElement(arg.openingElement, arg.closingElement, arg.children),
-          portalExpr,
-        ]);
-      }
-      dirty = true;
-      return;
-    }
-
-    // Return of non-JSX — wrap in fragment
-    lastReturn.argument = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment(), [
-      j.jsxExpressionContainer(arg),
-      portalExpr,
-    ]);
-    dirty = true;
+    if (insertPortalIntoJsxReturn(lastReturn, portalIdent, asMember)) return true;
+    if (addPortalToObjectReturn(lastReturn, portalIdent)) return true;
+    return false;
   }
 
   function processFunction(fnPath: any) {
-    // Find useModal() declarators in this function scope only (not nested functions).
     const declarators = j(fnPath)
       .find(j.VariableDeclarator)
       .filter((p: any) => {
-        // Skip nested function scopes
         let parent = p.parent;
         while (parent) {
-          if (
-            parent.node === fnPath.node ||
-            parent.value === fnPath.value
-          ) {
-            break;
-          }
+          if (parent.node === fnPath.node || parent.value === fnPath.value) break;
           if (
             j.FunctionDeclaration.check(parent.value) ||
             j.FunctionExpression.check(parent.value) ||
@@ -134,20 +169,17 @@ export default function transformer(file: any, api: any) {
       // const modal = useModal()
       if (j.Identifier.check(id)) {
         const name = id.name;
-        if (!hasPortalJsx(fnPath, name)) {
-          insertPortalBeforeReturn(fnPath, name);
-        }
+        if (hasPortalJsx(fnPath, name) || hasPortalInReturnedObject(fnPath)) return;
+        if (placePortalOutlet(fnPath, name, true)) dirty = true;
         return;
       }
 
       // const { openModal, closeModal } = useModal()
       if (j.ObjectPattern.check(id)) {
-        const props = id.properties;
         let portalLocal: string | null = null;
         let hasPortalProp = false;
-        let hostName = "modal";
 
-        for (const prop of props) {
+        for (const prop of id.properties) {
           if (!j.Property.check(prop) && !j.ObjectProperty.check(prop)) continue;
           const key = prop.key;
           const value = prop.value;
@@ -157,42 +189,18 @@ export default function transformer(file: any, api: any) {
           }
         }
 
-        if (!hasPortalProp) {
-          // Prefer renaming to `const modal = useModal()` when destructure is simple enough,
-          // otherwise add `portal` to the pattern.
-          props.push(j.property("init", j.identifier("portal"), j.identifier("portal")));
-          portalLocal = "portal";
-          dirty = true;
-        }
+        if (hasPortalJsx(fnPath, portalLocal ?? "portal") || hasPortalInReturnedObject(fnPath)) return;
 
-        if (portalLocal && !hasPortalJsx(fnPath, portalLocal === "portal" ? "portal" : portalLocal)) {
-          // For destructured `portal`, JSX is `{portal}` not `{modal.portal}`
-          if (portalLocal === "portal" || hasPortalProp) {
-            // Insert `{portal}` — reuse insert logic with a fake member by wrapping
-            const body = fnPath.value.body;
-            if (j.BlockStatement.check(body)) {
-              const returns = body.body.filter((s: any) => j.ReturnStatement.check(s));
-              const lastReturn = returns[returns.length - 1];
-              if (lastReturn?.argument && (j.JSXElement.check(lastReturn.argument) || j.JSXFragment.check(lastReturn.argument))) {
-                const portalExpr = j.jsxExpressionContainer(j.identifier(portalLocal));
-                if (j.JSXFragment.check(lastReturn.argument)) {
-                  lastReturn.argument.children.push(portalExpr);
-                } else {
-                  const el = lastReturn.argument;
-                  lastReturn.argument = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment(), [
-                    j.jsxElement(el.openingElement, el.closingElement, el.children),
-                    portalExpr,
-                  ]);
-                }
-                dirty = true;
-              } else {
-                insertPortalBeforeReturn(fnPath, hostName);
-              }
-            }
-          } else {
-            insertPortalBeforeReturn(fnPath, portalLocal);
-          }
+        // Try placing outlet first; only mutate the destructure if we can place it.
+        const localName = portalLocal ?? "portal";
+        const asMember = false; // destructured portal renders as {portal}
+        const placed = placePortalOutlet(fnPath, localName, asMember);
+        if (!placed) return;
+
+        if (!hasPortalProp) {
+          id.properties.push(j.property("init", j.identifier("portal"), j.identifier("portal")));
         }
+        dirty = true;
       }
     });
   }
@@ -201,5 +209,6 @@ export default function transformer(file: any, api: any) {
   root.find(j.FunctionExpression).forEach(processFunction);
   root.find(j.ArrowFunctionExpression).forEach(processFunction);
 
-  return dirty ? root.toSource({ quote: "double" }) : file.source;
+  // Preserve existing quote style / formatting as much as recast allows
+  return dirty ? root.toSource() : file.source;
 }
