@@ -83,7 +83,6 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
           <SnackbarProvider>
             {/* OverlayProvider is required for Modals generated via React-Aria */}
             <ToastProvider>
-              {/* OverlayProvider is required for Modals generated via React-Aria */}
               <OverlayProvider>
                 {children}
                 {/* Beam-internal modal host for SuperDrawer ConfirmCloseModal only — not app useModal. */}
