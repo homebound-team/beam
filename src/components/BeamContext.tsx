@@ -2,26 +2,30 @@ import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo
 import { OverlayProvider } from "react-aria";
 import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
 import { DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
-import { Modal, ModalProps } from "src/components/Modal/Modal";
+import { InternalModalHost } from "src/components/Modal/InternalModalHost";
+import { createModalCoordinator, ModalCoordinator } from "src/components/Modal/ModalCoordinator";
+import { ModalProps } from "src/components/Modal/Modal";
 import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
-import { CanCloseCheck, CheckFn } from "src/types";
+import { CanCloseCheck } from "src/types";
 import { EmptyRef } from "src/utils/index";
 import { RightPaneProvider } from "./Layout";
 import { ToastProvider } from "./Toast/ToastContext";
 
+/** Beam-internal API for SuperDrawer confirm modals (not for app useModal call sites). */
+export type InternalModalApi = {
+  openModal: (props: ModalProps) => void;
+  forceClose: () => void;
+};
+
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
 export type BeamContextState = {
-  modalState: MutableRefObject<ModalProps | undefined>;
-  modalCanCloseChecks: MutableRefObject<CheckFn[]>;
-  /** The div for ModalHeader to portal into. */
-  modalHeaderDiv: HTMLDivElement;
-  /** The div for ModalBody to portal into; note this can't be a ref b/c Modal hasn't set the ref at the time ModalBody renders. */
-  modalBodyDiv: HTMLDivElement;
-  /** The div for ModalFooter to portal into. */
-  modalFooterDiv: HTMLDivElement;
+  /** Coordinates one-modal-at-a-time and force-close for SuperDrawer. */
+  modalCoordinator: ModalCoordinator;
+  /** Set by InternalModalHost; used by useSuperDrawer for ConfirmCloseModal. */
+  internalModalApi: MutableRefObject<InternalModalApi | undefined>;
   /** SuperDrawer contentStack, i.e. the main/non-detail content + 0-N detail contents. */
   drawerContentStack: MutableRefObject<readonly ContentStack[]>;
   /** Checks when closing SuperDrawer, for the main/non-detail drawer content. */
@@ -34,11 +38,8 @@ export type BeamContextState = {
 
 /** This is only exported internally, for useModal and useSuperDrawer, it's not a public API. */
 export const BeamContext = createContext<BeamContextState>({
-  modalState: new EmptyRef(),
-  modalCanCloseChecks: new EmptyRef(),
-  modalHeaderDiv: undefined!,
-  modalBodyDiv: undefined!,
-  modalFooterDiv: undefined!,
+  modalCoordinator: createModalCoordinator(),
+  internalModalApi: new EmptyRef(),
   drawerContentStack: new EmptyRef(),
   drawerCanCloseChecks: new EmptyRef(),
   drawerCanCloseDetailsChecks: new EmptyRef(),
@@ -55,16 +56,8 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
   // dependencies as well, i.e. things like GridTable rowStyles will memoize on openInDrawer.
   // So we use refs + a tick.
   const [, tick] = useReducer((prev) => prev + 1, 0);
-  const modalRef = useRef<ModalProps | undefined>();
-  const modalHeaderDiv = useMemo(() => document.createElement("div"), []);
-  const modalBodyDiv = useMemo(() => {
-    const el = document.createElement("div");
-    // Ensure this wrapping div takes up the full height of its container in the case of a virtualized table within.
-    el.style.height = "100%";
-    return el;
-  }, []);
-  const modalCanCloseChecksRef = useRef<CheckFn[]>([]);
-  const modalFooterDiv = useMemo(() => document.createElement("div"), []);
+  const modalCoordinator = useMemo(() => createModalCoordinator(), []);
+  const internalModalApi = useRef<InternalModalApi | undefined>();
   const drawerContentStackRef = useRef<ContentStack[]>([]);
   const drawerCanCloseChecks = useRef<CanCloseCheck[]>([]);
   const drawerCanCloseDetailsChecks = useRef<CanCloseCheck[][]>([]);
@@ -74,19 +67,14 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
   // have the setters call `tick` to re-render this Provider
   const context = useMemo<BeamContextState>(() => {
     return {
-      // These two keys need to trigger re-renders on change
-      modalState: new PretendRefThatTicks(modalRef, tick),
+      modalCoordinator,
+      internalModalApi,
       drawerContentStack: new PretendRefThatTicks(drawerContentStackRef, tick),
-      // The rest we don't need to re-render when these are mutated, so just expose as-is
-      modalCanCloseChecks: modalCanCloseChecksRef,
-      modalHeaderDiv,
-      modalBodyDiv,
-      modalFooterDiv,
       drawerCanCloseChecks,
       drawerCanCloseDetailsChecks,
       sdHeaderDiv,
     };
-  }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
+  }, [modalCoordinator, sdHeaderDiv]);
 
   const beamTree = (
     <PresentationProvider {...presentationProps}>
@@ -97,9 +85,11 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
             <ToastProvider>
               <OverlayProvider>
                 {children}
-                {modalRef.current && <Modal {...modalRef.current} />}
+                {/* Beam-internal modal host for SuperDrawer ConfirmCloseModal only — not app useModal. */}
+                <InternalModalHost />
+                {/* Still BeamProvider-owned (not call-site); under OverlayProvider so createPortal keeps overlay context. */}
+                <SuperDrawer />
               </OverlayProvider>
-              <SuperDrawer />
             </ToastProvider>
           </SnackbarProvider>
         </AutoSaveStatusProvider>

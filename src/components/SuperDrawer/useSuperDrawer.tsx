@@ -1,7 +1,6 @@
 import { ReactNode, useMemo } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { CanCloseCheck } from "src/types";
-import { useModal } from "../Modal";
 import { ConfirmCloseModal } from "./ConfirmCloseModal";
 import { SuperDrawerWidth } from "./utils";
 
@@ -54,16 +53,27 @@ export interface UseSuperDrawerHook {
 export function useSuperDrawer(): UseSuperDrawerHook {
   const {
     drawerContentStack: contentStack,
-    modalState,
+    internalModalApi,
+    modalCoordinator,
     drawerCanCloseChecks: canCloseChecks,
     drawerCanCloseDetailsChecks: canCloseDetailsChecks,
   } = useBeamContext();
-  const { openModal } = useModal();
+
+  function openConfirmModal(content: ReactNode) {
+    const api = internalModalApi.current;
+    if (!api) {
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[Beam] InternalModalHost is not mounted; cannot open SuperDrawer confirm modal.");
+      }
+      return;
+    }
+    api.openModal({ content });
+  }
 
   function canCloseDrawerDetails(i: number, doChange: VoidFunction) {
     for (const canCloseDrawerDetail of canCloseDetailsChecks.current[i] ?? []) {
       if (!canClose(canCloseDrawerDetail)) {
-        openModal({ content: <ConfirmCloseModal onClose={doChange} {...canCloseDrawerDetail} /> });
+        openConfirmModal(<ConfirmCloseModal onClose={doChange} {...canCloseDrawerDetail} />);
         return false;
       }
     }
@@ -94,9 +104,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
     // Attempt to close the drawer
     for (const canCloseDrawer of canCloseChecks.current) {
       if (!canClose(canCloseDrawer)) {
-        openModal({
-          content: <ConfirmCloseModal onClose={doChange} {...canCloseDrawer} />,
-        });
+        openConfirmModal(<ConfirmCloseModal onClose={doChange} {...canCloseDrawer} />);
         return;
       }
     }
@@ -136,8 +144,8 @@ export function useSuperDrawer(): UseSuperDrawerHook {
             // Pop contentStack and the current canCloseDrawerDetailsCheck
             contentStack.current = contentStack.current.slice(0, -1);
             canCloseDetailsChecks.current = canCloseDetailsChecks.current.slice(0, -1);
-            // Reset Modal state
-            modalState.current = undefined;
+            // Close any confirm modal opened over the drawer detail
+            modalCoordinator.forceCloseActive();
           }
 
           onClose();
@@ -146,7 +154,7 @@ export function useSuperDrawer(): UseSuperDrawerHook {
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [canCloseChecks, canCloseDetailsChecks, contentStack, modalState, openModal],
+    [canCloseChecks, canCloseDetailsChecks, contentStack, modalCoordinator],
   );
 
   // useMemo the actions separately from the dynamic isDrawerOpen value

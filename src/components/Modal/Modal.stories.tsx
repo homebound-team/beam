@@ -43,7 +43,7 @@ export const WithFieldInHeader = () => <ModalExample withTextArea />;
 export const WithTextFieldInHeader = () => <ModalExample withTextField />;
 export const WithDrawHeaderBorder = () => <ModalExample drawHeaderBorder={true} />;
 export const VirtualizedTableInBody = () => {
-  const { openModal } = useModal();
+  const { openModal, portal } = useModal();
   const open = () =>
     openModal({
       content: <VirtualizedTable />,
@@ -51,11 +51,16 @@ export const VirtualizedTableInBody = () => {
     });
   // Immediately open the modal for Chromatic snapshots
   useEffect(open, [openModal]);
-  return <Button label="Open" onClick={open} />;
+  return (
+    <>
+      <Button label="Open" onClick={open} />
+      {portal}
+    </>
+  );
 };
 
 export const ButtonsInFooter = () => {
-  const { openModal, setSize } = useModal();
+  const { openModal, setSize, portal } = useModal();
   const open = () =>
     openModal({
       content: (
@@ -73,7 +78,12 @@ export const ButtonsInFooter = () => {
   // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);
-  return <Button label="Open" onClick={open} />;
+  return (
+    <>
+      <Button label="Open" onClick={open} />
+      {portal}
+    </>
+  );
 };
 
 export const OpenModalTest = () => {
@@ -130,7 +140,7 @@ function ModalExample(props: ModalExampleProps) {
     drawHeaderBorder = false,
     allowClosing = true,
   } = props;
-  const { openModal } = useModal();
+  const { openModal, portal } = useModal();
   const open = () =>
     openModal({
       size,
@@ -143,11 +153,16 @@ function ModalExample(props: ModalExampleProps) {
   // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);
-  return <Button label="Open" onClick={open} />;
+  return (
+    <>
+      <Button label="Open" onClick={open} />
+      {portal}
+    </>
+  );
 }
 
 function ModalFilterTableExample({ size, forceScrolling }: Pick<ModalProps, "size" | "forceScrolling">) {
-  const { openModal } = useModal();
+  const { openModal, portal } = useModal();
   const modalProps = {
     size,
     forceScrolling,
@@ -160,7 +175,12 @@ function ModalFilterTableExample({ size, forceScrolling }: Pick<ModalProps, "siz
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);
 
-  return <Button label="Open" onClick={open} />;
+  return (
+    <>
+      <Button label="Open" onClick={open} />
+      {portal}
+    </>
+  );
 }
 
 /** Demonstrates that clicking a tooltip rendered inside a modal does not close the modal. */

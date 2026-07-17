@@ -82,14 +82,19 @@ describe("Modal", () => {
 });
 
 function TestModalApp(props: ModalProps & { canClose?: () => boolean }) {
-  const { openModal, addCanClose } = useModal();
+  const { openModal, addCanClose, portal } = useModal();
   // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => openModal(props), [openModal]);
   if (props.canClose) {
     addCanClose(props.canClose);
   }
-  return <h1>Page title</h1>;
+  return (
+    <>
+      <h1>Page title</h1>
+      {portal}
+    </>
+  );
 }
 
 function TestModalComponent({ withTooltip = false }: { withTooltip?: boolean }) {

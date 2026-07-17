@@ -33,7 +33,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
   const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
 
-  const { openModal } = useModal();
+  const modal = useModal();
   const [pageFilters, modalFilters] = useMemo(() => {
     // Take the FilterDefs that have a `key => ...` factory and eval it
     const impls = safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)]);
@@ -88,7 +88,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
           endAdornment={<CountBadge count={numModalFilters} hideIfZero />}
           variant="secondary"
           onClick={() =>
-            openModal({
+            modal.openModal({
               // Spreading `props` to pass along `data-testid`
               content: <FilterModal {...props} filter={filter} onApply={onChange} filters={modalFilters} />,
             })
@@ -101,6 +101,7 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
           <Button label="Clear" variant="tertiary" onClick={() => onChange({} as F)} {...testId.clearBtn} />
         </div>
       )}
+      {modal.portal}
     </div>
   );
 }

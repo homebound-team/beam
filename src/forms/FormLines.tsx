@@ -1,5 +1,5 @@
 import { Children, cloneElement, ReactNode } from "react";
-import { useModal } from "src/components";
+import { useModalContext } from "src/components/Modal/ModalContext";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 
@@ -28,7 +28,7 @@ export type FormLinesProps = {
  * (see the `FieldGroup` component), where they will be laid out side-by-side.
  */
 export function FormLines(props: FormLinesProps) {
-  const { inModal } = useModal();
+  const { inModal } = useModalContext();
   const {
     children,
     width = inModal ? "full" : "lg",

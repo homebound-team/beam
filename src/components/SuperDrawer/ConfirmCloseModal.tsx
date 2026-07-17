@@ -10,13 +10,11 @@ interface ConfirmCloseModalProps {
 /** Modal content to appear when a close checks fails */
 export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
   const { onClose, discardText = "Discard Changes", continueText = "Continue Editing" } = props;
-  const { modalState } = useBeamContext();
+  const { internalModalApi } = useBeamContext();
 
-  // TODO: Change to closeModal from useModal when canCloseChecks are reset
+  // Force-close without canClose checks — same as the old modalState.current = undefined path.
   function closeModal() {
-    // Not using closeModal from useModal since the canClose checks are not reset
-    // after a close and could/will cause other close attempts to fail.
-    modalState.current = undefined;
+    internalModalApi.current?.forceClose();
   }
 
   return (

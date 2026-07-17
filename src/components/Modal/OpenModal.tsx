@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
+import { noop } from "src/utils";
 
 export interface OpenModalProps {
   /** The custom modal content to show. */
@@ -31,7 +32,7 @@ export interface OpenModalProps {
  * shows up in the DOM as expected.
  */
 export function OpenModal(props: OpenModalProps): JSX.Element {
-  const { openModal } = useModal();
+  const { openModal, portal } = useModal();
   const { size, children, keepOpen } = props;
   useEffect(() => {
     if (!keepOpen) {
@@ -39,8 +40,20 @@ export function OpenModal(props: OpenModalProps): JSX.Element {
     }
   }, [keepOpen, openModal, size, children]);
   if (keepOpen) {
-    return <Modal size={size} content={children} />;
-  } else {
-    return <div>dummy content</div>;
+    return (
+      <Modal
+        size={size}
+        content={children}
+        hostCloseModal={noop}
+        hostAddCanClose={noop}
+        hostSetSize={noop}
+      />
+    );
   }
+  return (
+    <>
+      <div>dummy content</div>
+      {portal}
+    </>
+  );
 }

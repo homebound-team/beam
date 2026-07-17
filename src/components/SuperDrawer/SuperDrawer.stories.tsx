@@ -158,7 +158,7 @@ export function CanCloseDrawerDetailsChecks() {
 
 export function OpenWithModal() {
   const { openInDrawer } = useSuperDrawer();
-  const { openModal } = useModal();
+  const { openModal, portal } = useModal();
   function open() {
     openInDrawer({ content: <TestDrawerContent book={Books[0]} title="Drawer Title" /> });
     openModal({ content: <TestModalContent /> });
@@ -168,6 +168,7 @@ export function OpenWithModal() {
     <>
       <h1 css={Css.xl2.mb1.$}>SuperDrawer Open at Modal</h1>
       <Button label="Show SuperDrawer" onClick={open} />
+      {portal}
     </>
   );
 }
@@ -365,7 +366,7 @@ interface TestDrawerContentProps {
 function TestDrawerContent(props: TestDrawerContentProps) {
   const { book, hasActions = true, title, leftContent, rightContent, hideControls } = props;
   const { openDrawerDetail, closeDrawer } = useSuperDrawer();
-  const { openModal } = useModal();
+  const { openModal, portal } = useModal();
 
   function handlePurchase() {
     openModal({ content: <TestSimpleModalContent book={book} onPrimaryClick={closeDrawer} /> });
@@ -404,6 +405,7 @@ function TestDrawerContent(props: TestDrawerContentProps) {
           />
         </div>
       </SuperDrawerContent>
+      {portal}
     </>
   );
 }

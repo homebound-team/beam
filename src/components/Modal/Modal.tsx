@@ -1,16 +1,16 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { MutableRefObject, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { MutableRefObject, PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { AutoSaveStatusProvider } from "src/components";
-import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
-import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks";
+import { CheckFn } from "src/types";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { ModalProvider } from "./ModalContext";
+import { ModalInstanceProvider, useModalInstance } from "./ModalInstanceContext";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
 
@@ -42,6 +42,13 @@ export type ModalProps = {
   allowClosing?: boolean;
 };
 
+/** Props injected by useModal's portal host — not part of the public openModal API. */
+export type ModalHostProps = {
+  hostCloseModal: VoidFunction;
+  hostAddCanClose: (canClose: CheckFn) => void;
+  hostSetSize: (size: ModalProps["size"]) => void;
+};
+
 export type ModalApi = {
   setSize: (size: ModalProps["size"]) => void;
 };
@@ -50,18 +57,28 @@ export type ModalApi = {
  * Internal component for displaying a Modal; see `useModal` for the public API.
  *
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
+ * Must be rendered via `useModal().portal` so it mounts under the caller's React tree; paint uses
+ * OverlayContainer under Beam's OverlayProvider.
  */
-export function Modal(props: ModalProps) {
-  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false, allowClosing = true } = props;
+export function Modal(props: ModalProps & ModalHostProps) {
+  const {
+    size = "md",
+    content,
+    forceScrolling,
+    api,
+    drawHeaderBorder = false,
+    allowClosing = true,
+    hostCloseModal,
+    hostAddCanClose,
+    hostSetSize,
+  } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
-  const { modalBodyDiv, modalFooterDiv, modalHeaderDiv } = useBeamContext();
-  const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
     {
       ...props,
       isOpen: true,
-      onClose: closeModal,
+      onClose: hostCloseModal,
       isDismissable: true,
       shouldCloseOnInteractOutside: (el) => {
         // Do not close the Modal if the user is interacting with the Tribute mentions dropdown (via RichTextField),
@@ -89,6 +106,28 @@ export function Modal(props: ModalProps) {
   usePreventScroll();
   const { sm } = useBreakpoint();
 
+  // Per-modal-instance portal targets (not BeamProvider globals).
+  const modalHeaderDiv = useMemo(() => document.createElement("div"), []);
+  const modalBodyDiv = useMemo(() => {
+    const el = document.createElement("div");
+    // Ensure this wrapping div takes up the full height of its container in the case of a virtualized table within.
+    el.style.height = "100%";
+    return el;
+  }, []);
+  const modalFooterDiv = useMemo(() => document.createElement("div"), []);
+
+  const instanceValue = useMemo(
+    () => ({
+      closeModal: hostCloseModal,
+      addCanClose: hostAddCanClose,
+      setSize: hostSetSize,
+      modalHeaderDiv,
+      modalBodyDiv,
+      modalFooterDiv,
+    }),
+    [hostCloseModal, hostAddCanClose, hostSetSize, modalHeaderDiv, modalBodyDiv, modalFooterDiv],
+  );
+
   if (api) {
     api.current = { setSize: (size = "md") => setSize(getSize(size)) };
   }
@@ -110,75 +149,74 @@ export function Modal(props: ModalProps) {
     ),
   });
 
-  // Even though we use raw-divs for the createPortal calls, we do actually need to
-  // use refs + useEffect to stitch those raw divs back into the React component tree.
-  useEffect(
-    () => {
-      modalHeaderRef.current!.appendChild(modalHeaderDiv);
-      modalBodyRef.current!.appendChild(modalBodyDiv);
-      modalFooterRef.current!.appendChild(modalFooterDiv);
-    },
-    // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [modalBodyRef, modalFooterRef, modalHeaderRef],
-  );
+  // Stitch the portal target divs into the React-owned modal chrome.
+  useEffect(() => {
+    modalHeaderRef.current!.appendChild(modalHeaderDiv);
+    modalBodyRef.current!.appendChild(modalBodyDiv);
+    modalFooterRef.current!.appendChild(modalFooterDiv);
+  }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv]);
 
   return (
-    <ModalProvider>
-      <OverlayContainer>
-        <AutoSaveStatusProvider>
-          <div css={Css.underlay.z(zIndices.modalUnderlay).$} {...underlayProps} {...testId.underlay}>
-            <FocusScope contain restoreFocus autoFocus>
-              <div
-                css={
-                  Css.br24.bgWhite.bshModal.oh
-                    .maxh("90vh")
-                    .df.fdc.wPx(width)
-                    .mhPx(defaultMinHeight)
-                    .if(isFixedHeight)
-                    .hPx(height)
-                    .if(sm)
-                    .add("height", "100dvh")
-                    .add("width", "100dvw")
-                    .maxh("none").br0.$
-                }
-                ref={ref}
-                {...overlayProps}
-                {...dialogProps}
-                {...modalProps}
-                {...testId}
-              >
-                {/*
-                  Setup three children (header, content, footer), and flex grow the content.
+    <ModalInstanceProvider value={instanceValue}>
+      <ModalProvider>
+        <OverlayContainer>
+          <AutoSaveStatusProvider>
+            <div css={Css.underlay.z(zIndices.modalUnderlay).$} {...underlayProps} {...testId.underlay}>
+              <FocusScope contain restoreFocus autoFocus>
+                <div
+                  css={
+                    Css.br24.bgWhite.bshModal.oh
+                      .maxh("90vh")
+                      .df.fdc.wPx(width)
+                      .mhPx(defaultMinHeight)
+                      .if(isFixedHeight)
+                      .hPx(height)
+                      .if(sm)
+                      .add("height", "100dvh")
+                      .add("width", "100dvw")
+                      .maxh("none").br0.$
+                  }
+                  ref={ref}
+                  {...overlayProps}
+                  {...dialogProps}
+                  {...modalProps}
+                  {...testId}
+                >
+                  {/*
+                    Setup three children (header, content, footer), and flex grow the content.
 
-                  Use `fdrr` so that the close icon won't sit between "modal header search field"
-                  and the modal body results in the DOM focus order, i.e. in our global search modal.
-                */}
-                <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
-                  <span css={Css.fs0.pl1.$}>
-                    {allowClosing && <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />}
-                  </span>
-                  <h1 css={Css.fg1.xl2.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
-                </header>
-                <main ref={modalBodyRef} css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}>
-                  {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                  {content}
-                </main>
-                <footer css={Css.fs0.$}>
-                  <div ref={modalFooterRef} />
-                </footer>
-              </div>
-            </FocusScope>
-          </div>
-        </AutoSaveStatusProvider>
-      </OverlayContainer>
-    </ModalProvider>
+                    Use `fdrr` so that the close icon won't sit between "modal header search field"
+                    and the modal body results in the DOM focus order, i.e. in our global search modal.
+                  */}
+                  <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
+                    <span css={Css.fs0.pl1.$}>
+                      {allowClosing && <IconButton icon="x" onClick={hostCloseModal} {...testId.titleClose} />}
+                    </span>
+                    <h1 css={Css.fg1.xl2.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                  </header>
+                  <main ref={modalBodyRef} css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}>
+                    {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
+                    {content}
+                  </main>
+                  <footer css={Css.fs0.$}>
+                    <div ref={modalFooterRef} />
+                  </footer>
+                </div>
+              </FocusScope>
+            </div>
+          </AutoSaveStatusProvider>
+        </OverlayContainer>
+      </ModalProvider>
+    </ModalInstanceProvider>
   );
 }
 
 export function ModalHeader({ children }: { children: ReactNode }): JSX.Element {
-  const { modalHeaderDiv } = useBeamContext();
-  return createPortal(<>{children}</>, modalHeaderDiv);
+  const instance = useModalInstance();
+  if (!instance) {
+    throw new Error("ModalHeader must be rendered inside a Modal (via useModal().portal)");
+  }
+  return createPortal(<>{children}</>, instance.modalHeaderDiv);
 }
 
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */
@@ -186,14 +224,17 @@ export function ModalBody({
   children,
   virtualized = false,
 }: PropsWithChildren<{ virtualized?: boolean }>): JSX.Element {
-  const { modalBodyDiv } = useBeamContext();
+  const instance = useModalInstance();
+  if (!instance) {
+    throw new Error("ModalBody must be rendered inside a Modal (via useModal().portal)");
+  }
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
     // If `virtualized`, then we are expecting the `children` will handle their own scrollbar, so have the overflow hidden and adjust padding
     <div css={Css.h100.if(virtualized).oh.pl3.else.px3.$} {...testId.content}>
       {children}
     </div>,
-    modalBodyDiv,
+    instance.modalBodyDiv,
   );
 }
 
@@ -207,13 +248,16 @@ export function ModalFooter<X extends Only<ModalFooterXss, X>>({
   children: ReactNode;
   xss?: X;
 }): JSX.Element {
-  const { modalFooterDiv } = useBeamContext();
+  const instance = useModalInstance();
+  if (!instance) {
+    throw new Error("ModalFooter must be rendered inside a Modal (via useModal().portal)");
+  }
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
     <div css={{ ...Css.p3.df.aic.jcfe.gap1.$, ...xss }} {...testId.footer}>
       {children}
     </div>,
-    modalFooterDiv,
+    instance.modalFooterDiv,
   );
 }
 
