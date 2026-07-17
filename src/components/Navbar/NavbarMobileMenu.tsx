@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
-import { ContrastScope } from "src/components/ContrastScope";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import { useEnvironmentBannerLayoutHeight } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
@@ -44,10 +43,8 @@ export function NavbarMobileMenu(props: NavbarMobileMenuProps) {
         {...tid.mobileMenu}
       />
       {createPortal(
-        <ContrastScope>
-          {/* AnimatePresence keeps the drawer mounted through its slide/fade-out before unmounting. */}
-          <AnimatePresence>{isOpen && <NavbarMobileDrawer items={items} onClose={close} tid={tid} />}</AnimatePresence>
-        </ContrastScope>,
+        /* AnimatePresence keeps the drawer mounted through its slide/fade-out before unmounting.*/
+        <AnimatePresence>{isOpen && <NavbarMobileDrawer items={items} onClose={close} tid={tid} />}</AnimatePresence>,
         document.body,
       )}
     </>
@@ -89,7 +86,7 @@ function NavbarMobileDrawer({
           role="dialog"
           aria-modal="true"
           aria-label="Navigation"
-          css={Css.fixed.bottom0.left0.df.fdc.fs0.w100.oh.z(zIndices.navbarMobileMenu).bgColor(Tokens.Surface).$}
+          css={Css.fixed.bottom0.left0.df.fdc.fs0.wPx(260).oh.z(zIndices.navbarMobileMenu).bgColor(Tokens.Surface).$}
           style={overlayTopStyle}
           initial={{ x: "-100%" }}
           animate={{ x: 0 }}
@@ -98,9 +95,9 @@ function NavbarMobileDrawer({
           onClick={(e) => e.stopPropagation()}
           {...tid.mobileMenuDrawer}
         >
-          <div css={Css.df.aic.jcfe.p2.fs0.$}>
+          <div css={Css.df.aic.jcfe.px3.pyPx(12).fs0.bb.bc(Tokens.SurfaceSeparator).$}>
             <IconButton
-              icon="menuClose"
+              icon="x"
               color={Tokens.OnSurfaceMuted}
               label="Close navigation"
               onClick={onClose}
@@ -108,7 +105,7 @@ function NavbarMobileDrawer({
             />
           </div>
           <nav
-            css={Css.fg1.oya.px2.pb3.df.fdc.gap1.$}
+            css={Css.fg1.oya.px3.pb3.pt2.df.fdc.gapPx(4).$}
             // String-route items render as `<a>` (react-router Link) and external URLs as `<a href>`;
             // closing on any anchor click covers same-route taps that don't change the location.
             onClickCapture={(e) => {

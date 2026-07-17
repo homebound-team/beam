@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
+import { Breadcrumb } from "src/components/Breadcrumbs";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/PageHeader";
 import { TabContent } from "src/components/Tabs";
@@ -48,6 +49,23 @@ export function WithTabs() {
   );
 }
 
+export function WithBreadcrumbs() {
+  const breadcrumbs: Breadcrumb[] = [
+    { label: "Test 1", href: "" },
+    { label: "Test 2", href: "" },
+    { label: "Test 3", href: "" },
+  ];
+
+  return (
+    <PageHeader
+      title="Test Title"
+      breadcrumbs={{
+        breadcrumbs: breadcrumbs,
+      }}
+    />
+  );
+}
+
 export function WithRightSlotAndTabs() {
   const [selected, setSelected] = useState(testTabs[0].value);
 
@@ -55,6 +73,31 @@ export function WithRightSlotAndTabs() {
     <>
       <PageHeader
         title="Test Title"
+        rightSlot={<Button label="Test Action" variant="primary" onClick={action("clicked")} />}
+        tabs={{
+          tabs: testTabs,
+          selected,
+          onChange: setSelected,
+        }}
+      />
+      <TabContent tabs={testTabs} selected={selected} />
+    </>
+  );
+}
+
+export function WithRightSlotAndTabsAndBreadcrumbs() {
+  const [selected, setSelected] = useState(testTabs[0].value);
+  const breadcrumbs: Breadcrumb[] = [
+    { label: "Test 1", href: "" },
+    { label: "Test 2", href: "" },
+    { label: "Test 3", href: "" },
+  ];
+
+  return (
+    <>
+      <PageHeader
+        title="Test Title"
+        breadcrumbs={{ breadcrumbs }}
         rightSlot={<Button label="Test Action" variant="primary" onClick={action("clicked")} />}
         tabs={{
           tabs: testTabs,
