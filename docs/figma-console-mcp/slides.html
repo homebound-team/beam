@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Figma Console MCP · Beam designer brown bag</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #101418;
+        --bg-elevated: #1a222c;
+        --ink: #f2f4f6;
+        --muted: #93a0ad;
+        --line: rgba(242, 244, 246, 0.12);
+        --accent: #3d9b8f;
+        --accent-soft: rgba(61, 155, 143, 0.16);
+        --warm: #e8a54b;
+        --danger: #e07a6a;
+        --code-bg: #0b0f13;
+        --slide-pad: clamp(2rem, 5vw, 4.5rem);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        overflow: hidden;
+      }
+
+      body {
+        background:
+          radial-gradient(ellipse 80% 55% at 100% -10%, rgba(61, 155, 143, 0.22), transparent 55%),
+          radial-gradient(ellipse 60% 40% at -10% 110%, rgba(232, 165, 75, 0.12), transparent 50%),
+          var(--bg);
+      }
+
+      .deck {
+        height: 100%;
+        width: 100%;
+        position: relative;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: none;
+        padding: var(--slide-pad);
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.25rem;
+        animation: fadeIn 280ms ease;
+      }
+
+      .slide.active {
+        display: flex;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .eyebrow {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0;
+      }
+
+      h1,
+      h2 {
+        font-family: "Syne", sans-serif;
+        font-weight: 750;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2.6rem, 6vw, 4.4rem);
+        max-width: 14ch;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
+        max-width: 22ch;
+      }
+
+      .lede {
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
+        color: var(--muted);
+        max-width: 46ch;
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.75rem;
+        max-width: 52rem;
+      }
+
+      li {
+        position: relative;
+        padding-left: 1.35rem;
+        font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+        line-height: 1.4;
+        color: var(--ink);
+      }
+
+      li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.55em;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 2px;
+        background: var(--accent);
+      }
+
+      li strong {
+        font-weight: 600;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        width: min(100%, 56rem);
+      }
+
+      .card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.25rem 1.35rem;
+      }
+
+      .card h3 {
+        font-family: "Syne", sans-serif;
+        font-size: 1.15rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .card p,
+      .card li {
+        font-size: 0.98rem;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .card ul {
+        gap: 0.45rem;
+        margin-top: 0.65rem;
+      }
+
+      .card li::before {
+        width: 0.4rem;
+        height: 0.4rem;
+        top: 0.5em;
+      }
+
+      .prompt {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: clamp(0.85rem, 1.4vw, 1rem);
+        background: var(--code-bg);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        border-radius: 10px;
+        padding: 1rem 1.15rem;
+        color: #d7e0e8;
+        max-width: 52rem;
+        white-space: pre-wrap;
+        line-height: 1.45;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 0.25rem;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid rgba(61, 155, 143, 0.35);
+      }
+
+      .pill.warm {
+        background: rgba(232, 165, 75, 0.14);
+        color: var(--warm);
+        border-color: rgba(232, 165, 75, 0.35);
+      }
+
+      .steps {
+        counter-reset: step;
+        display: grid;
+        gap: 0.85rem;
+        max-width: 48rem;
+      }
+
+      .steps li {
+        padding-left: 3rem;
+      }
+
+      .steps li::before {
+        counter-increment: step;
+        content: counter(step);
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        top: 0.1em;
+        display: grid;
+        place-items: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--bg);
+        background: var(--accent);
+      }
+
+      .compare {
+        width: min(100%, 56rem);
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+
+      .compare th,
+      .compare td {
+        text-align: left;
+        padding: 0.7rem 0.85rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .compare th {
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .compare td:first-child {
+        font-weight: 600;
+      }
+
+      .chrome {
+        position: fixed;
+        left: var(--slide-pad);
+        right: var(--slide-pad);
+        bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .progress {
+        flex: 1;
+        max-width: 12rem;
+        height: 3px;
+        background: var(--line);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+
+      .progress > span {
+        display: block;
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 200ms ease;
+      }
+
+      .hint {
+        opacity: 0.7;
+      }
+
+      .title-slide h1 {
+        max-width: 16ch;
+      }
+
+      .big-number {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(3.5rem, 8vw, 5.5rem);
+        color: var(--accent);
+        line-height: 1;
+        margin: 0;
+      }
+
+      .split-title {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+        width: min(100%, 60rem);
+      }
+
+      @media (max-width: 800px) {
+        .grid-2,
+        .split-title {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="deck" id="deck">
+      <!-- 1 -->
+      <section class="slide title-slide active" data-notes="Welcome. Housekeeping: this is hands-on friendly — Node + Figma Desktop + Cursor.">
+        <p class="eyebrow">Beam · Designer brown bag</p>
+        <h1>Figma Console MCP</h1>
+        <p class="lede">
+          Install it, talk to your design system in plain language, and keep Figma ↔ Beam code honest.
+        </p>
+        <div class="meta-row">
+          <span class="pill">~50 minutes</span>
+          <span class="pill warm">Slides + how-to in docs/</span>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section class="slide">
+        <p class="eyebrow">Agenda</p>
+        <h2>What we’ll cover</h2>
+        <ul>
+          <li><strong>Why</strong> designers should care (beyond “AI demos”)</li>
+          <li><strong>Install</strong> Cursor + Desktop Bridge (live)</li>
+          <li><strong>Beam use cases</strong> — tokens, components, parity, a11y</li>
+          <li><strong>Hands-on</strong> + tips / Q&amp;A</li>
+        </ul>
+      </section>
+
+      <!-- 3 -->
+      <section class="slide">
+        <p class="eyebrow">The problem</p>
+        <h2>Design systems leak at the seams</h2>
+        <ul>
+          <li>Figma variables drift from <code>tokens/tokens.json</code></li>
+          <li>Variants exist in one place but not the other</li>
+          <li>Mocks reinvent Navbar / SideNav / PageHeader shells</li>
+          <li>Handoff becomes archaeology instead of a checklist</li>
+        </ul>
+      </section>
+
+      <!-- 4 -->
+      <section class="slide">
+        <p class="eyebrow">What MCP is</p>
+        <h2>A USB-C port for AI tools</h2>
+        <p class="lede">
+          Model Context Protocol lets Cursor (or Claude, etc.) call structured tools — not just guess from screenshots.
+        </p>
+        <ul>
+          <li><strong>You</strong> stay in natural language</li>
+          <li><strong>The server</strong> reads/writes Figma with real APIs</li>
+          <li><strong>Beam repo</strong> in Cursor = code context for free</li>
+        </ul>
+      </section>
+
+      <!-- 5 -->
+      <section class="slide">
+        <p class="eyebrow">Important distinction</p>
+        <h2>Two different “Figma MCPs”</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Official Figma MCP</h3>
+            <p>Figma’s own server / Cursor plugin</p>
+            <ul>
+              <li>Design → code, Code Connect</li>
+              <li>Selection-aware Dev Mode flows</li>
+              <li>Great for implementation</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Figma Console MCP</h3>
+            <p>Open source (Southleft) — today’s focus</p>
+            <ul>
+              <li>Tokens, variables, DS kit dump</li>
+              <li>Create / arrange components</li>
+              <li>A11y + design–code parity</li>
+            </ul>
+          </div>
+        </div>
+        <p class="lede" style="margin-top: 0.5rem">You can run both. Today we deepen Console MCP.</p>
+      </section>
+
+      <!-- 6 -->
+      <section class="slide">
+        <p class="eyebrow">Capabilities</p>
+        <div class="split-title">
+          <div>
+            <p class="big-number">100+</p>
+            <h2>tools for a living design system</h2>
+          </div>
+          <ul>
+            <li>Extract variables, styles, components</li>
+            <li>Export / import tokens (DTCG, CSS, …)</li>
+            <li>Create frames, variants, component sets</li>
+            <li>Screenshots + accessibility checks</li>
+            <li>Parity reports against your codebase</li>
+            <li>FigJam boards &amp; Slides helpers</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 7 -->
+      <section class="slide">
+        <p class="eyebrow">Setup paths</p>
+        <h2>Pick based on ambition</h2>
+        <table class="compare">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th>Time</th>
+              <th>Write?</th>
+              <th>Best for</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>NPX + Cursor</td>
+              <td>~10 min</td>
+              <td>Yes (full)</td>
+              <td>Beam day-to-day — recommended</td>
+            </tr>
+            <tr>
+              <td>Remote SSE</td>
+              <td>~2 min</td>
+              <td>No</td>
+              <td>Taste test only</td>
+            </tr>
+            <tr>
+              <td>Cloud Mode</td>
+              <td>~5 min</td>
+              <td>Yes</td>
+              <td>Web AI clients (Claude.ai)</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 8 -->
+      <section class="slide">
+        <p class="eyebrow">Install · Part 1</p>
+        <h2>Prerequisites</h2>
+        <ol class="steps">
+          <li>Node.js 18+ (<code>node --version</code>)</li>
+          <li>Figma <strong>Desktop</strong> (not only the browser)</li>
+          <li>Cursor installed</li>
+          <li>Figma personal access token (<code>figd_…</code>)</li>
+        </ol>
+      </section>
+
+      <!-- 9 -->
+      <section class="slide">
+        <p class="eyebrow">Install · Part 2</p>
+        <h2>Wire Cursor → MCP</h2>
+        <p class="lede">Settings → Tools &amp; MCP → Add Custom MCP, or edit <code>~/.cursor/mcp.json</code></p>
+        <pre class="prompt">{
+  "mcpServers": {
+    "figma-console": {
+      "command": "npx",
+      "args": ["-y", "figma-console-mcp@latest"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "figd_…",
+        "ENABLE_MCP_APPS": "true"
+      }
+    }
+  }</pre>
+      </section>
+
+      <!-- 10 -->
+      <section class="slide">
+        <p class="eyebrow">Install · Part 3</p>
+        <h2>Desktop Bridge plugin</h2>
+        <ol class="steps">
+          <li>Open Beam DS file in Figma Desktop</li>
+          <li>Plugins → Development → Import plugin from manifest…</li>
+          <li>Select <code>~/.figma-console-mcp/plugin/manifest.json</code></li>
+          <li>Run <strong>Figma Desktop Bridge</strong> and leave it open</li>
+        </ol>
+        <p class="lede">This WebSocket bridge is what unlocks create / edit / variables.</p>
+      </section>
+
+      <!-- 11 -->
+      <section class="slide">
+        <p class="eyebrow">Smoke tests</p>
+        <h2>Three prompts that prove it works</h2>
+        <pre class="prompt">Check Figma status</pre>
+        <pre class="prompt">Create a simple frame named "MCP smoke test" with a teal background</pre>
+        <pre class="prompt">Get design variables from the current Figma file</pre>
+      </section>
+
+      <!-- 12 -->
+      <section class="slide">
+        <p class="eyebrow">Mental model</p>
+        <h2>Read · Write · Sync · Compare</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Read</h3>
+            <p>Kit dump, component specs, screenshots, version history</p>
+          </div>
+          <div class="card">
+            <h3>Write</h3>
+            <p>Draft frames, variants, variable modes — on a scratch page first</p>
+          </div>
+          <div class="card">
+            <h3>Sync</h3>
+            <p>Export Figma → DTCG / import code → Figma (dry-run!)</p>
+          </div>
+          <div class="card">
+            <h3>Compare</h3>
+            <p>Parity + a11y against Beam <code>src/</code> and tokens</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13 -->
+      <section class="slide">
+        <p class="eyebrow">Use case · Tokens</p>
+        <h2>Figma variables vs tokens.json</h2>
+        <pre class="prompt">Export variables from the Beam Figma file as DTCG JSON.
+Compare to tokens/tokens.json under beam.color.semantic.
+Report missing / extra / renamed — do not write files yet.</pre>
+        <p class="lede">Beam still validates with <code>yarn validate:tokens</code>. MCP is the bridge; JSON remains the codegen source of truth.</p>
+      </section>
+
+      <!-- 14 -->
+      <section class="slide">
+        <p class="eyebrow">Use case · Components</p>
+        <h2>Spec a component for handoff</h2>
+        <pre class="prompt">Get the Button component from Beam Figma with a visual reference.
+Compare to src/components/Button.tsx — what exists, what’s Figma-only,
+and what would need a new prop (flag new props as discouraged).</pre>
+      </section>
+
+      <!-- 15 -->
+      <section class="slide">
+        <p class="eyebrow">Use case · Parity</p>
+        <h2>Design–code scorecard</h2>
+        <pre class="prompt">Run design-code parity for SideNav: Figma vs src/components/SideNav/.
+Scored report + concrete fix items for design and code.
+Prefer semantic tokens over hard-coded hex.</pre>
+        <p class="lede">Best when this repo is open in Cursor alongside the Figma bridge.</p>
+      </section>
+
+      <!-- 16 -->
+      <section class="slide">
+        <p class="eyebrow">Use case · Creation</p>
+        <h2>Scaffold variants — draft only</h2>
+        <pre class="prompt">On a scratch page, draft component set "FilterChip"
+(selected × size). Use existing Beam variables — no new hex.
+Name it "[MCP] FilterChip — review". Do not publish to the library.</pre>
+      </section>
+
+      <!-- 17 -->
+      <section class="slide">
+        <p class="eyebrow">Use case · Quality</p>
+        <h2>A11y + layout shells</h2>
+        <ul>
+          <li><strong>A11y:</strong> contrast, targets, truncation on a selected frame</li>
+          <li><strong>Layouts:</strong> map mocks to EnvironmentBanner → Navbar → SideNav → PageHeader</li>
+          <li>Stops one-off chrome that fights Beam’s layout contracts</li>
+        </ul>
+      </section>
+
+      <!-- 18 -->
+      <section class="slide">
+        <p class="eyebrow">Use case · Collaboration</p>
+        <h2>FigJam workshops &amp; changelogs</h2>
+        <ul>
+          <li>Token-naming boards with columns for Figma name / <code>--b-*</code> / ships?</li>
+          <li>Version-history summaries after a DS refresh</li>
+          <li>Generated markdown docs merging Figma + Storybook sources</li>
+        </ul>
+      </section>
+
+      <!-- 19 -->
+      <section class="slide">
+        <p class="eyebrow">Prompt craft</p>
+        <h2>Constraints beat vibes</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Do</h3>
+            <ul>
+              <li>File URL + component name</li>
+              <li>“Existing tokens only”</li>
+              <li>“Draft / don’t publish”</li>
+              <li>“Report first, then apply”</li>
+              <li>Beam few-props philosophy</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Don’t</h3>
+            <ul>
+              <li>“Make it modern”</li>
+              <li>Silent library publishes</li>
+              <li>Blind token imports</li>
+              <li>Five new style props</li>
+              <li>Paste PATs into chat logs</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 20 -->
+      <section class="slide">
+        <p class="eyebrow">Hands-on · 10 min</p>
+        <h2>Your turn</h2>
+        <ol class="steps">
+          <li>Get a green <code>Check Figma status</code></li>
+          <li>Pick a component you own (or Button)</li>
+          <li>Run a spec or parity prompt</li>
+          <li>Share one surprise: design-only, code-only, or token drift</li>
+        </ol>
+      </section>
+
+      <!-- 21 -->
+      <section class="slide">
+        <p class="eyebrow">Gotchas</p>
+        <h2>When it misbehaves</h2>
+        <ul>
+          <li>Bridge not running → writes silently fail or status looks empty</li>
+          <li>Read-only SSE path → can’t create (upgrade to NPX)</li>
+          <li>After MCP upgrades → re-import plugin manifest if tools break</li>
+          <li>First call slow → <code>npx</code> downloading <code>@latest</code></li>
+          <li>AI drafts still need a human Beam review</li>
+        </ul>
+      </section>
+
+      <!-- 22 -->
+      <section class="slide">
+        <p class="eyebrow">Resources</p>
+        <h2>Take it with you</h2>
+        <ul>
+          <li><code>docs/figma-console-mcp/how-to.md</code> — install handout</li>
+          <li><code>docs/figma-console-mcp/use-cases.md</code> — Beam prompt cookbook</li>
+          <li><code>docs/figma-console-mcp/slides.html</code> — this deck</li>
+          <li>Upstream: docs.figma-console-mcp.southleft.com</li>
+          <li>Beam tokens: <code>tokens/README.md</code> · layouts: <code>docs/layouts.md</code></li>
+        </ul>
+        <p class="lede">Questions? What should we automate first for Beam?</p>
+      </section>
+    </div>
+
+    <div class="chrome">
+      <span id="counter">1 / 22</span>
+      <div class="progress"><span id="bar"></span></div>
+      <span class="hint">← → or space · F fullscreen</span>
+    </div>
+
+    <script>
+      const slides = [...document.querySelectorAll(".slide")];
+      const counter = document.getElementById("counter");
+      const bar = document.getElementById("bar");
+      let i = 0;
+
+      function show(next) {
+        i = Math.max(0, Math.min(slides.length - 1, next));
+        slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+        counter.textContent = `${i + 1} / ${slides.length}`;
+        bar.style.width = `${((i + 1) / slides.length) * 100}%`;
+        history.replaceState(null, "", `#${i + 1}`);
+      }
+
+      function fromHash() {
+        const n = parseInt(location.hash.slice(1), 10);
+        if (!Number.isNaN(n)) show(n - 1);
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) {
+          e.preventDefault();
+          show(i + 1);
+        } else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) {
+          e.preventDefault();
+          show(i - 1);
+        } else if (e.key === "Home") {
+          show(0);
+        } else if (e.key === "End") {
+          show(slides.length - 1);
+        } else if (e.key === "f" || e.key === "F") {
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+          else document.exitFullscreen?.();
+        }
+      });
+
+      let touchX = null;
+      document.addEventListener(
+        "touchstart",
+        (e) => {
+          touchX = e.changedTouches[0].screenX;
+        },
+        { passive: true },
+      );
+      document.addEventListener(
+        "touchend",
+        (e) => {
+          if (touchX == null) return;
+          const dx = e.changedTouches[0].screenX - touchX;
+          if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1));
+          touchX = null;
+        },
+        { passive: true },
+      );
+
+      window.addEventListener("hashchange", fromHash);
+      fromHash();
+      show(i);
+    </script>
+  </body>
+</html>
