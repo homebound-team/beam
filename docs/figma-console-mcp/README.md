@@ -1,29 +1,29 @@
-# Figma Console MCP — designer brown bag (Claude Desktop)
+# Figma Console MCP — designer brown bag
 
-Lightweight lunch-and-learn for Beam designers using **Claude Desktop** + [Figma Console MCP](https://github.com/southleft/figma-console-mcp).
+Thin agenda for a Claude Desktop session. **Live docs are the source of truth** — these files only orient the room.
 
-| File | What it is |
+| Start here | Why |
 | --- | --- |
-| [`how-to.md`](./how-to.md) | One-page setup + 5 starter prompts |
-| [`slides.html`](./slides.html) | ~10-slide deck (browser, ←/→) |
+| [Live docs home](https://docs.figma-console-mcp.southleft.com/) | Product overview |
+| [Introduction](https://docs.figma-console-mcp.southleft.com/introduction) | What MCP is + how to get started |
+| [Setup](https://docs.figma-console-mcp.southleft.com/setup) | Claude Desktop install steps |
+| [Use cases](https://docs.figma-console-mcp.southleft.com/use-cases) | Real workflows (follow these in demos) |
+| [Troubleshooting](https://docs.figma-console-mcp.southleft.com/troubleshooting) | When something’s red |
+
+Local helpers for the meeting:
+
+| File | Role |
+| --- | --- |
+| [`slides.html`](./slides.html) | Short presenter guide — mostly “open this link” |
+| [`how-to.md`](./how-to.md) | Claude Desktop path + Beam file link + starter prompts |
 
 ## Agenda (~25 min)
 
-| Time | What |
-| --- | --- |
-| 0–5 | What MCP is + why designers care |
-| 5–10 | Add connector in Claude Desktop (live) |
-| 10–20 | Two demos from [`how-to.md`](./how-to.md) |
-| 20–25 | Q&A |
+1. What this is → [Introduction](https://docs.figma-console-mcp.southleft.com/introduction)
+2. Install in Claude Desktop → [Setup](https://docs.figma-console-mcp.southleft.com/setup) (pick Remote to start, or NPX/Cloud when you want to *create* in Figma)
+3. Demo from [Use cases](https://docs.figma-console-mcp.southleft.com/use-cases) — focus on **design creation**, FigJam, audits — not code
+4. Q&A → [Troubleshooting](https://docs.figma-console-mcp.southleft.com/troubleshooting)
 
-## Before the meeting
+## Facilitator note
 
-1. [Claude Desktop](https://claude.com/download) installed
-2. Beam DS file open in Figma (optional for read-only demos)
-3. Facilitator: add the connector once beforehand so OAuth isn’t mid-demo
-
-## What designers leave knowing
-
-- How to add the Figma Console connector in Claude Desktop
-- Three prompts that work on day one (variables, component spec, a11y)
-- When to ask eng for the “full” setup (write access + Desktop Bridge)
+Goal of the session: help designers **get more done inside Figma** with Claude (draft variants, arrange sets, FigJam boards, a11y checks, library exploration). Skip design↔code / repo workflows unless someone asks.

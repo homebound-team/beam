@@ -1,128 +1,86 @@
-# Figma Console MCP in Claude Desktop
+# Claude Desktop + Figma Console MCP
 
-One page. Start here; skip the rest until you need write access.
+Use the **live docs** for install and workflows. This page only adds Beam context and a few starter prompts.
 
-Beam file (for prompts): [Beam Design System Refresh](https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/)
+## Docs to follow (in order)
 
----
+1. **[Introduction](https://docs.figma-console-mcp.southleft.com/introduction)** — what it is, which setup path to pick  
+2. **[Setup](https://docs.figma-console-mcp.southleft.com/setup)** — Claude Desktop steps  
+3. **[Mode comparison](https://docs.figma-console-mcp.southleft.com/mode-comparison)** — Remote (read) vs NPX / Cloud (write in Figma)  
+4. **[Use cases](https://docs.figma-console-mcp.southleft.com/use-cases)** — demos and day-to-day patterns  
+5. Stuck? **[Troubleshooting](https://docs.figma-console-mcp.southleft.com/troubleshooting)**
 
-## Setup (~3 minutes)
+Also useful later:
 
-**What you need:** Claude Desktop + access to the Beam Figma file.
-
-1. Open **Claude Desktop → Settings → Connectors** (or **Developer → Edit Config** on some builds).
-2. **Add Custom Connector**
-   - **Name:** `Figma Console`
-   - **URL:** `https://figma-console-mcp.southleft.com/sse`
-3. Save. Restart Claude if it doesn’t show up.
-4. First time you ask about a Figma file, Claude may open a browser tab to **authorize with Figma** — click Allow.
-
-That’s it for the brown bag. No Node, no config files, no plugin.
-
-**What you get:** read-only tools — pull variables, component specs, screenshots, file structure. Enough for audits, handoff notes, and “what’s in this file?”
-
-**What you don’t get (yet):** creating frames, editing variables, or token push/pull. Eng can help with the [full setup](https://github.com/southleft/figma-console-mcp#-npx-setup-recommended) if you need that later.
+- [FigJam guide](https://docs.figma-console-mcp.southleft.com/figjam)
+- [Slides guide](https://docs.figma-console-mcp.southleft.com/slides)
+- [Tools reference](https://docs.figma-console-mcp.southleft.com/tools)
+- [Figma MCP vs Console MCP](https://docs.figma-console-mcp.southleft.com/figma-mcp-vs-figma-console-mcp)
 
 ---
 
-## Smoke test
+## For this brown bag
 
-Paste into a new Claude chat:
+**App:** [Claude Desktop](https://claude.com/download)
 
-```
-Get design variables from https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/
-Summarize the color collections and modes in plain language.
-```
+**Beam file to paste into prompts:**  
+https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/
 
-If you see variable names back, you’re connected.
+**Recommended path today**
+
+| If you want… | Follow in the docs |
+| --- | --- |
+| Fastest first connection (read Figma) | [Setup → Remote](https://docs.figma-console-mcp.southleft.com/setup) — Claude Desktop → Settings → Connectors → `https://figma-console-mcp.southleft.com/sse` |
+| Create / edit in Figma from Claude | [Setup → NPX](https://docs.figma-console-mcp.southleft.com/setup) (or Cloud Mode if using Claude.ai) + Desktop Bridge plugin |
+
+Remote is fine for a taste. For “get more done *in* Figma,” plan on NPX or Cloud + Desktop Bridge from the setup guide.
 
 ---
 
-## Five prompts for Beam
+## Starter prompts (Figma work)
 
-**1 — Token inventory**
+Paste the Beam URL when needed. Prefer ideas from the [live use cases](https://docs.figma-console-mcp.southleft.com/use-cases) over inventing new ones.
+
+**Explore the library**
 
 ```
-List semantic color variables in the Beam Design System Refresh file.
-Group by collection/mode. Flag anything that looks like a primitive ramp vs a role token (Surface, Primary, FieldBorder*, etc.).
+Get the design system kit for https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/
+Summarize collections, main component sets, and styles.
 ```
 
-**2 — Component spec (handoff)**
+**Component deep-dive**
 
 ```
 Get the Button component from the Beam file with a visual reference.
-List variants, properties, spacing, and any bound variables. Format as a short handoff note for engineering.
+List variants, properties, and bound variables as a designer checklist.
 ```
 
-**3 — Quick audit**
+**Draft in Figma** *(needs write setup)*
 
 ```
-Get the design system kit for the Beam file — components, variables, and styles.
-What looks incomplete or inconsistent for a design system library?
+On a scratch page, create a draft component set for FilterChip
+(selected × size). Use existing Beam variables — don’t invent new colors.
+Name it "[MCP] FilterChip — review" and don’t publish to the library.
 ```
 
-**4 — Accessibility**
+**FigJam** *(needs write setup)* — see also [FigJam guide](https://docs.figma-console-mcp.southleft.com/figjam)
 
 ```
-Take a screenshot of [paste frame URL or describe the page] and run accessibility design checks.
-Summarize contrast and legibility issues using our token names where possible.
+Create a FigJam board for a Beam crit with columns:
+Shipped well | Needs polish | Open questions
 ```
 
-**5 — Compare two components**
+**Accessibility pass** — see [use cases](https://docs.figma-console-mcp.southleft.com/use-cases)
 
 ```
-Compare Chip and CountBadge in the Beam file: variants, sizes, and token usage.
-Where could we consolidate instead of maintaining two patterns?
+Run accessibility design checks on the selected frame.
+Summarize contrast and target-size issues in plain language.
 ```
 
 ---
 
-## Optional: full setup (write access)
+## Norms for Beam
 
-Only if you need to **create or edit** in Figma from Claude (draft variants, variable modes, etc.):
-
-| Extra requirement | Why |
-| --- | --- |
-| [Node.js 18+](https://nodejs.org) | Runs the local MCP server |
-| Figma Desktop | Required for the Bridge plugin |
-| Personal access token (`figd_…`) | [Create in Figma settings](https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens) |
-
-Edit Claude’s MCP config (macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "figma-console": {
-      "command": "npx",
-      "args": ["-y", "figma-console-mcp@latest"],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "figd_YOUR_TOKEN_HERE",
-        "ENABLE_MCP_APPS": "true"
-      }
-    }
-  }
-}
-```
-
-Then in Figma Desktop: **Plugins → Development → Import plugin from manifest…** → `~/.figma-console-mcp/plugin/manifest.json` → run **Desktop Bridge**.
-
-Ask eng before exporting tokens into the Beam repo — `tokens/tokens.json` has validation rules.
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-| --- | --- |
-| Connector missing after add | Restart Claude Desktop |
-| Auth popup doesn’t appear | Settings → Connectors → reconnect Figma Console |
-| “Can’t create / edit” | Expected on read-only setup — see optional full setup |
-| Wrong file | Paste the full Figma URL in the prompt |
-
----
-
-## Not the same as Figma’s official MCP
-
-**Figma Console MCP** (this guide) = design-system extraction, variables, audits.
-
-**Official Figma MCP** = design-to-code in dev tools like Cursor. Different tool; both can coexist.
+- Draft on a scratch page; don’t publish AI output to the team library until a human reviews.
+- Prefer existing Beam variables and components over new one-offs.
+- Treat Claude’s Figma edits like a junior designer’s first pass.
