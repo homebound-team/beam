@@ -1,29 +1,13 @@
 # Figma Console MCP — designer brown bag
 
-Thin agenda for a Claude Desktop session. **Live docs are the source of truth** — these files only orient the room.
+Three beats. Live docs do the detail.
 
-| Start here | Why |
+| | Open during the session |
 | --- | --- |
-| [Live docs home](https://docs.figma-console-mcp.southleft.com/) | Product overview |
-| [Introduction](https://docs.figma-console-mcp.southleft.com/introduction) | What MCP is + how to get started |
-| [Setup](https://docs.figma-console-mcp.southleft.com/setup) | Claude Desktop install steps |
-| [Use cases](https://docs.figma-console-mcp.southleft.com/use-cases) | Real workflows (follow these in demos) |
-| [Troubleshooting](https://docs.figma-console-mcp.southleft.com/troubleshooting) | When something’s red |
+| Intro | [Introduction](https://docs.figma-console-mcp.southleft.com/introduction) · [vs Figma’s MCP](https://docs.figma-console-mcp.southleft.com/figma-mcp-vs-figma-console-mcp) |
+| Setup | [Setup](https://docs.figma-console-mcp.southleft.com/setup) (Claude Desktop) |
+| Try it | [Use cases](https://docs.figma-console-mcp.southleft.com/use-cases) |
 
-Local helpers for the meeting:
+Local files: [`slides.html`](./slides.html) · [`how-to.md`](./how-to.md) (Beam URL + prompts)
 
-| File | Role |
-| --- | --- |
-| [`slides.html`](./slides.html) | Short presenter guide — mostly “open this link” |
-| [`how-to.md`](./how-to.md) | Claude Desktop path + Beam file link + starter prompts |
-
-## Agenda (~25 min)
-
-1. What this is → [Introduction](https://docs.figma-console-mcp.southleft.com/introduction)
-2. Install in Claude Desktop → [Setup](https://docs.figma-console-mcp.southleft.com/setup) (pick Remote to start, or NPX/Cloud when you want to *create* in Figma)
-3. Demo from [Use cases](https://docs.figma-console-mcp.southleft.com/use-cases) — focus on **design creation**, FigJam, audits — not code
-4. Q&A → [Troubleshooting](https://docs.figma-console-mcp.southleft.com/troubleshooting)
-
-## Facilitator note
-
-Goal of the session: help designers **get more done inside Figma** with Claude (draft variants, arrange sets, FigJam boards, a11y checks, library exploration). Skip design↔code / repo workflows unless someone asks.
+**Audience:** designers on Claude Desktop. Goal: get more done in Figma.

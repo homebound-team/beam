@@ -3,180 +3,170 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Figma Console MCP · Brown bag guide</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@600;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Figma Console MCP</title>
     <style>
       :root {
-        --bg: #12161a;
-        --ink: #f0f2f4;
-        --muted: #8f9ba8;
-        --line: rgba(240, 242, 244, 0.1);
-        --accent: #3d9b8f;
-        --pad: clamp(2rem, 5vw, 4rem);
+        --bg: #fafaf8;
+        --ink: #1c1c1a;
+        --muted: #5c5c56;
+        --rule: #e4e4de;
+        --link: #1a5f54;
       }
       * { box-sizing: border-box; }
       html, body {
-        margin: 0; height: 100%;
-        background: var(--bg); color: var(--ink);
-        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         overflow: hidden;
       }
-      body {
-        background:
-          radial-gradient(ellipse 70% 50% at 100% 0%, rgba(61, 155, 143, 0.16), transparent 50%),
-          var(--bg);
-      }
       .slide {
-        position: absolute; inset: 0; display: none;
-        padding: var(--pad);
-        flex-direction: column; justify-content: center; gap: 1rem;
+        position: absolute;
+        inset: 0;
+        display: none;
+        padding: clamp(2.5rem, 8vw, 5.5rem);
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.25rem;
       }
       .slide.active { display: flex; }
-      .eyebrow {
-        margin: 0; font-size: 0.8rem; font-weight: 600;
-        letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+      .section {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0;
       }
-      h1, h2 {
-        margin: 0; font-family: "Syne", sans-serif; font-weight: 700;
-        line-height: 1.08; letter-spacing: -0.02em;
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4.5vw, 3rem);
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        max-width: 18ch;
       }
-      h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); max-width: 16ch; }
-      h2 { font-size: clamp(1.7rem, 3.8vw, 2.6rem); max-width: 22ch; }
-      p, li {
-        margin: 0; font-size: clamp(1.05rem, 1.7vw, 1.2rem);
-        line-height: 1.45; color: var(--muted); max-width: 42ch;
+      h2 {
+        margin: 0;
+        font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        max-width: 24ch;
       }
-      a {
-        color: var(--accent);
-        text-decoration: underline;
-        text-underline-offset: 3px;
+      p {
+        margin: 0;
+        font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+        line-height: 1.5;
+        color: var(--muted);
+        max-width: 38ch;
       }
       ul {
-        margin: 0; padding: 0; list-style: none;
-        display: grid; gap: 0.7rem; max-width: 40rem;
-      }
-      li { color: var(--ink); padding-left: 1.15rem; position: relative; }
-      li::before {
-        content: ""; position: absolute; left: 0; top: 0.55em;
-        width: 0.4rem; height: 0.4rem; border-radius: 2px; background: var(--accent);
-      }
-      .link-card {
-        display: block;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.65rem;
         max-width: 36rem;
-        padding: 1rem 1.15rem;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: rgba(255,255,255,0.03);
-        color: var(--ink);
-        text-decoration: none;
       }
-      .link-card:hover { border-color: var(--accent); }
-      .link-card strong { display: block; font-family: "Syne", sans-serif; margin-bottom: 0.25rem; }
-      .link-card span { color: var(--muted); font-size: 0.95rem; }
+      li {
+        font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+        line-height: 1.45;
+        padding-left: 1rem;
+        position: relative;
+      }
+      li::before {
+        content: "–";
+        position: absolute;
+        left: 0;
+        color: var(--muted);
+      }
+      a {
+        color: var(--link);
+      }
+      .doc {
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+      .doc a { font-weight: 500; }
       .chrome {
-        position: fixed; left: var(--pad); right: var(--pad); bottom: 1rem;
-        display: flex; justify-content: space-between; align-items: center;
-        font-size: 0.78rem; color: var(--muted);
+        position: fixed;
+        left: clamp(2.5rem, 8vw, 5.5rem);
+        right: clamp(2.5rem, 8vw, 5.5rem);
+        bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--muted);
+        border-top: 1px solid var(--rule);
+        padding-top: 0.75rem;
       }
-      .bar { flex: 1; max-width: 7rem; height: 2px; background: var(--line); margin: 0 1rem; }
-      .bar span { display: block; height: 100%; background: var(--accent); width: 0%; }
     </style>
   </head>
   <body>
+    <!-- 1. Title -->
     <section class="slide active">
-      <p class="eyebrow">Beam · designer brown bag</p>
-      <h1>Get more done in Figma with Claude</h1>
-      <p>Slides are only a guide. We’ll follow the live Figma Console MCP docs.</p>
+      <p class="section">Beam · designers</p>
+      <h1>Figma Console MCP</h1>
+      <p>Three parts: what it is, set it up, try it.</p>
     </section>
 
+    <!-- 2. Intro -->
     <section class="slide">
-      <p class="eyebrow">Today’s goal</p>
-      <h2>Stay in Figma — move faster</h2>
+      <p class="section">1 · Intro</p>
+      <h2>What is Figma Console MCP — and what can it do for you?</h2>
       <ul>
-        <li>Explore the Beam library with Claude</li>
-        <li>Draft variants, boards, and checks — not code handoff</li>
-        <li>Learn where the real docs live</li>
+        <li>Talk to your Figma file in plain language from Claude</li>
+        <li>Explore components and variables without hunting through pages</li>
+        <li>Draft variants, FigJam boards, and checks — faster first passes</li>
       </ul>
+      <p class="doc">Read together: <a href="https://docs.figma-console-mcp.southleft.com/introduction" target="_blank" rel="noopener">Introduction</a></p>
     </section>
 
+    <!-- 3. vs official -->
     <section class="slide">
-      <p class="eyebrow">Open together</p>
-      <h2>What is this?</h2>
-      <a class="link-card" href="https://docs.figma-console-mcp.southleft.com/introduction" target="_blank" rel="noopener">
-        <strong>Introduction</strong>
-        <span>docs.figma-console-mcp.southleft.com/introduction</span>
-      </a>
-      <p>Skim “how do I get started” — Remote vs full write.</p>
-    </section>
-
-    <section class="slide">
-      <p class="eyebrow">Install</p>
-      <h2>Claude Desktop setup</h2>
-      <a class="link-card" href="https://docs.figma-console-mcp.southleft.com/setup" target="_blank" rel="noopener">
-        <strong>Setup guide</strong>
-        <span>Follow the Claude Desktop section live</span>
-      </a>
-      <p>Start with <strong style="color:var(--ink)">Remote</strong> for a quick read connection. Use <strong style="color:var(--ink)">NPX / Cloud</strong> when you want Claude to create in Figma.</p>
-    </section>
-
-    <section class="slide">
-      <p class="eyebrow">Modes</p>
-      <h2>Read vs write in Figma</h2>
-      <a class="link-card" href="https://docs.figma-console-mcp.southleft.com/mode-comparison" target="_blank" rel="noopener">
-        <strong>Mode comparison</strong>
-        <span>Remote · Cloud · NPX — when to use which</span>
-      </a>
-      <p>“Get more done in Figma” ≈ write path + Desktop Bridge.</p>
-    </section>
-
-    <section class="slide">
-      <p class="eyebrow">Demo</p>
-      <h2>Use their examples</h2>
-      <a class="link-card" href="https://docs.figma-console-mcp.southleft.com/use-cases" target="_blank" rel="noopener">
-        <strong>Use cases</strong>
-        <span>Pick design creation, FigJam, or accessibility — skip code-sync demos</span>
-      </a>
-      <p>Beam file URL is in the handout if you need it.</p>
-    </section>
-
-    <section class="slide">
-      <p class="eyebrow">Also browse</p>
-      <h2>FigJam &amp; Slides</h2>
+      <p class="section">1 · Intro</p>
+      <h2>How is this different from Figma’s own MCP?</h2>
       <ul>
-        <li><a href="https://docs.figma-console-mcp.southleft.com/figjam" target="_blank" rel="noopener">FigJam guide</a> — crit boards, flows</li>
-        <li><a href="https://docs.figma-console-mcp.southleft.com/slides" target="_blank" rel="noopener">Slides guide</a> — decks in Figma</li>
-        <li><a href="https://docs.figma-console-mcp.southleft.com/tools" target="_blank" rel="noopener">Tools reference</a> — full list</li>
+        <li><strong>Figma’s MCP</strong> — strong at design → code and Dev Mode workflows</li>
+        <li><strong>Console MCP</strong> — built for design-system work in Figma: tokens, variants, FigJam, audits, creating on the canvas</li>
       </ul>
+      <p>You can use both. Today we’re here for <em>getting more done in Figma</em>.</p>
+      <p class="doc">Compare: <a href="https://docs.figma-console-mcp.southleft.com/figma-mcp-vs-figma-console-mcp" target="_blank" rel="noopener">Figma MCP vs Console MCP</a></p>
     </section>
 
+    <!-- 4. Setup -->
     <section class="slide">
-      <p class="eyebrow">When stuck</p>
-      <h2>Troubleshooting</h2>
-      <a class="link-card" href="https://docs.figma-console-mcp.southleft.com/troubleshooting" target="_blank" rel="noopener">
-        <strong>Troubleshooting</strong>
-        <span>Claude Desktop tools missing, bridge, auth</span>
-      </a>
+      <p class="section">2 · Set up</p>
+      <h2>Let’s get your system ready</h2>
+      <p>We’ll walk the Claude Desktop steps in the live setup guide. Start with Remote if you just want to connect; use NPX or Cloud when you want Claude to create in Figma.</p>
+      <p class="doc">Follow: <a href="https://docs.figma-console-mcp.southleft.com/setup" target="_blank" rel="noopener">Setup guide</a></p>
     </section>
 
+    <!-- 5. Try it -->
     <section class="slide">
-      <p class="eyebrow">Wrap</p>
-      <h2>Bookmark these</h2>
+      <p class="section">3 · Try it</p>
+      <h2>Examples — then open floor</h2>
       <ul>
-        <li><a href="https://docs.figma-console-mcp.southleft.com/" target="_blank" rel="noopener">docs.figma-console-mcp.southleft.com</a></li>
-        <li>Handout: <code>docs/figma-console-mcp/how-to.md</code></li>
-        <li>Questions?</li>
+        <li>Explore the Beam library (kit / variables / a component)</li>
+        <li>Draft something on a scratch page</li>
+        <li><strong>Your turn:</strong> what’s a real task you’d try right now?</li>
       </ul>
+      <p class="doc">Ideas: <a href="https://docs.figma-console-mcp.southleft.com/use-cases" target="_blank" rel="noopener">Use cases</a> · prompts in <code>how-to.md</code></p>
+    </section>
+
+    <!-- 6. End -->
+    <section class="slide">
+      <p class="section">Done</p>
+      <h2>Bookmark the docs</h2>
+      <p class="doc"><a href="https://docs.figma-console-mcp.southleft.com/" target="_blank" rel="noopener">docs.figma-console-mcp.southleft.com</a></p>
+      <p>Questions anytime.</p>
     </section>
 
     <div class="chrome">
-      <span id="n">1 / 9</span>
-      <div class="bar"><span id="b"></span></div>
-      <span>← → · links open docs</span>
+      <span id="n">1 / 6</span>
+      <span>← →</span>
     </div>
 
     <script>
@@ -186,11 +176,16 @@
         i = Math.max(0, Math.min(slides.length - 1, n));
         slides.forEach((s, j) => s.classList.toggle("active", j === i));
         document.getElementById("n").textContent = `${i + 1} / ${slides.length}`;
-        document.getElementById("b").style.width = `${((i + 1) / slides.length) * 100}%`;
       };
       document.addEventListener("keydown", (e) => {
-        if (["ArrowRight", " ", "Enter", "PageDown"].includes(e.key)) { e.preventDefault(); show(i + 1); }
-        if (["ArrowLeft", "Backspace", "PageUp"].includes(e.key)) { e.preventDefault(); show(i - 1); }
+        if (["ArrowRight", " ", "Enter", "PageDown"].includes(e.key)) {
+          e.preventDefault();
+          show(i + 1);
+        }
+        if (["ArrowLeft", "Backspace", "PageUp"].includes(e.key)) {
+          e.preventDefault();
+          show(i - 1);
+        }
       });
       show(0);
     </script>
