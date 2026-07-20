@@ -1,13 +1,16 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { StepperTabs } from "./StepperTabs";
+import { viewportModes } from "src/utils/sb";
+import { StepperTabs, StepperTabsStep } from "./StepperTabs";
 
 export default {
   component: StepperTabs,
+  parameters: {
+    chromatic: { modes: viewportModes("desktop", "mobile1") },
+  },
 } as Meta;
 
 export function InteractiveStepperTabs() {

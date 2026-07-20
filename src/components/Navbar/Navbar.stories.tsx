@@ -35,7 +35,7 @@ export const Example = newStory(
   () => (
     <Navbar
       brand={createBrand()}
-      items={createGlobalNavItems({ activeLabel: "Finances" })}
+      items={createGlobalNavItems({ activeLabel: "Product Offerings" })}
       rightSlot={createDefaultRightSlot()}
       user={createDefaultUser()}
     />
@@ -47,7 +47,7 @@ export const WithOpenNav = newStory(
   () => (
     <Navbar
       brand={createBrand()}
-      items={createGlobalNavItems({ activeLabel: "Finances", librariesMenuOpen: true })}
+      items={createGlobalNavItems({ activeLabel: "Product Offerings", librariesMenuOpen: true })}
       rightSlot={createDefaultRightSlot()}
       user={createDefaultUser()}
     />
@@ -77,7 +77,7 @@ function createGlobalNavItems(opts?: { activeLabel?: string; librariesMenuOpen?:
     { label: "Dashboard", onClick: "/", active: activeLabel === "Dashboard" },
     { label: "Projects", onClick: "/projects", active: activeLabel === "Projects" },
     { label: "Finances", onClick: "/finances", active: activeLabel === "Finances" },
-    createLibrariesLinkGroup({ menuOpen: opts?.librariesMenuOpen }),
+    createLibrariesLinkGroup({ menuOpen: opts?.librariesMenuOpen }, activeLabel),
     { label: "Trades", onClick: "/trades", active: activeLabel === "Trades" },
     { label: "Group Commitments", onClick: "/group-commitments", active: activeLabel === "Group Commitments" },
     { label: "Change Log", onClick: "/change-log", active: activeLabel === "Change Log" },
@@ -85,7 +85,7 @@ function createGlobalNavItems(opts?: { activeLabel?: string; librariesMenuOpen?:
   ];
 }
 
-function createLibrariesLinkGroup(opts?: { menuOpen?: boolean }): AppNavGroup {
+function createLibrariesLinkGroup(opts?: { menuOpen?: boolean }, activeLabel?: string): AppNavGroup {
   return {
     label: "Libraries",
     defaultExpanded: opts?.menuOpen,
@@ -93,27 +93,43 @@ function createLibrariesLinkGroup(opts?: { menuOpen?: boolean }): AppNavGroup {
       {
         section: true,
         items: [
-          { label: "Plans", onClick: "/libraries/plans" },
-          { label: "Design Packages", onClick: "/libraries/design-packages" },
-          { label: "Product Offerings", onClick: "/libraries/product-offerings" },
+          { label: "Plans", onClick: "/libraries/plans", active: activeLabel === "Plans" },
+          {
+            label: "Design Packages",
+            onClick: "/libraries/design-packages",
+            active: activeLabel === "Design Packages",
+          },
+          {
+            label: "Product Offerings",
+            onClick: "/libraries/product-offerings",
+            active: activeLabel === "Product Offerings",
+          },
         ],
       },
       {
         section: true,
         items: [
-          { label: "Options - Legacy", onClick: "/libraries/options-legacy" },
-          { label: "Options", onClick: "/libraries/options" },
-          { label: "Materials", onClick: "/libraries/materials" },
-          { label: "Tasks", onClick: "/libraries/tasks" },
-          { label: "Milestones", onClick: "/libraries/milestones" },
+          {
+            label: "Options - Legacy",
+            onClick: "/libraries/options-legacy",
+            active: activeLabel === "Options - Legacy",
+          },
+          { label: "Options", onClick: "/libraries/options", active: activeLabel === "Options" },
+          { label: "Materials", onClick: "/libraries/materials", active: activeLabel === "Materials" },
+          { label: "Tasks", onClick: "/libraries/tasks", active: activeLabel === "Tasks" },
+          { label: "Milestones", onClick: "/libraries/milestones", active: activeLabel === "Milestones" },
         ],
       },
       {
         section: true,
         items: [
-          { label: "Bid Items", onClick: "/libraries/bid-items" },
-          { label: "Scope Template", onClick: "/libraries/scope-template" },
-          { label: "Schedule Template", onClick: "/libraries/schedule-template" },
+          { label: "Bid Items", onClick: "/libraries/bid-items", active: activeLabel === "Bid Items" },
+          { label: "Scope Template", onClick: "/libraries/scope-template", active: activeLabel === "Scope Template" },
+          {
+            label: "Schedule Template",
+            onClick: "/libraries/schedule-template",
+            active: activeLabel === "Schedule Template",
+          },
         ],
       },
     ],

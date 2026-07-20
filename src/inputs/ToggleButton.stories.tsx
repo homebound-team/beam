@@ -14,12 +14,6 @@ export default {
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31580%3A99845",
     },
   },
-
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta<ToggleButtonProps>;
 
 export const ToggleButton = () => {

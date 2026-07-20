@@ -21,12 +21,6 @@ export default {
   },
 
   decorators: [withRouter("/ce:2", "/:ceId/*"), withBeamDecorator],
-
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 export function TabBaseStates() {

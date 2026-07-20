@@ -1,8 +1,7 @@
 import { Meta } from "@storybook/react-vite";
-import { Fragment } from "react";
-import { ContrastScope, navLink } from "src/components";
-import { Icon, Icons } from "src/components/Icon";
-import { getNavLinkStyles, NavLink, NavLinkProps } from "src/components/NavLinks/NavLink";
+import { ContrastScope } from "src/components";
+import { Icons } from "src/components/Icon";
+import { NavLink, NavLinkProps } from "src/components/NavLinks/NavLink";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
@@ -17,6 +16,7 @@ export default {
 
   argTypes: {
     icon: { control: { type: "select", options: Object.keys(Icons) } },
+    __storyState: { control: false },
   },
 
   parameters: {
@@ -27,93 +27,41 @@ export default {
   },
 
   decorators: [withRouter()],
-
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 export function BaseStates() {
-  const sideNavStyles = getNavLinkStyles("side");
-  const globalNavStyles = getNavLinkStyles("global");
-  const args = { onClick: () => {}, className: navLink };
+  const sideArgs = { onClick: () => {}, variant: "side" as const, icon: "linkExternal" as const };
+  const globalArgs = { onClick: () => {}, variant: "global" as const, icon: "linkExternal" as const };
 
   return (
     <div css={Css.df.gap2.$}>
       <div css={Css.df.fdc.gap2.p1.$}>
-        <button {...args} css={{ ...sideNavStyles.baseStyles }}>
-          {getChildren("Side nav default")}
-        </button>
-        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
-          {getChildren("Side nav hovered")}
-        </button>
-        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
-          {getChildren("Side nav pressed")}
-        </button>
-        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
-          {getChildren("Side nav active")}
-        </button>
-        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
-          {getChildren("Side nav focus ring")}
-        </button>
-        <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
-          {getChildren("Side nav disabled")}
-        </button>
+        <NavLink {...sideArgs} label="Side nav default" />
+        <NavLink {...sideArgs} label="Side nav hovered" __storyState={{ hovered: true }} />
+        <NavLink {...sideArgs} label="Side nav pressed" __storyState={{ pressed: true }} />
+        <NavLink {...sideArgs} label="Side nav active" active />
+        <NavLink {...sideArgs} label="Side nav focus ring" __storyState={{ focusVisible: true }} />
+        <NavLink {...sideArgs} label="Side nav disabled" disabled />
       </div>
       <ContrastScope>
         <div css={Css.df.fdc.gap2.bgGray900.p1.br12.$}>
-          <button {...args} css={{ ...sideNavStyles.baseStyles }}>
-            {getChildren("Side contrast nav default")}
-          </button>
-          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.hoverStyles }}>
-            {getChildren("Side contrast nav hovered")}
-          </button>
-          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.pressedStyles }}>
-            {getChildren("Side contrast nav pressed")}
-          </button>
-          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.activeStyles }}>
-            {getChildren("Side contrast nav active")}
-          </button>
-          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.focusRingStyles }}>
-            {getChildren("Side contrast nav focus ring")}
-          </button>
-          <button {...args} css={{ ...sideNavStyles.baseStyles, ...sideNavStyles.disabledStyles }}>
-            {getChildren("Side contrast nav disabled")}
-          </button>
+          <NavLink {...sideArgs} label="Side contrast nav default" />
+          <NavLink {...sideArgs} label="Side contrast nav hovered" __storyState={{ hovered: true }} />
+          <NavLink {...sideArgs} label="Side contrast nav pressed" __storyState={{ pressed: true }} />
+          <NavLink {...sideArgs} label="Side contrast nav active" active />
+          <NavLink {...sideArgs} label="Side contrast nav focus ring" __storyState={{ focusVisible: true }} />
+          <NavLink {...sideArgs} label="Side contrast nav disabled" disabled />
         </div>
       </ContrastScope>
       <div css={Css.df.fdc.gap2.p1.$}>
-        <button {...args} css={{ ...globalNavStyles.baseStyles }}>
-          {getChildren("Global nav default")}
-        </button>
-        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.hoverStyles }}>
-          {getChildren("Global nav hovered")}
-        </button>
-        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.pressedStyles }}>
-          {getChildren("Global nav pressed")}
-        </button>
-        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.activeStyles }}>
-          {getChildren("Global nav active")}
-        </button>
-        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.focusRingStyles }}>
-          {getChildren("Global nav focus ring")}
-        </button>
-        <button {...args} css={{ ...globalNavStyles.baseStyles, ...globalNavStyles.disabledStyles }}>
-          {getChildren("Global nav disabled")}
-        </button>
+        <NavLink {...globalArgs} label="Global nav default" />
+        <NavLink {...globalArgs} label="Global nav hovered" __storyState={{ hovered: true }} />
+        <NavLink {...globalArgs} label="Global nav pressed" __storyState={{ pressed: true }} />
+        <NavLink {...globalArgs} label="Global nav active" active />
+        <NavLink {...globalArgs} label="Global nav focus ring" __storyState={{ focusVisible: true }} />
+        <NavLink {...globalArgs} label="Global nav disabled" disabled />
       </div>
     </div>
-  );
-}
-
-function getChildren(label: string) {
-  return (
-    <Fragment>
-      {label}
-      <Icon icon="linkExternal" />
-    </Fragment>
   );
 }
 

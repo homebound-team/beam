@@ -1,4 +1,5 @@
-import { getTableStyles } from "src/components/Table/TableStyles";
+import { Css } from "src/Css";
+import { getTableStyles, isGridStyleDef, resolveStyles, type GridStyle } from "src/components/Table/TableStyles";
 
 describe("GridStyleDef", () => {
   it("memoizes grid styles correctly", () => {
@@ -34,5 +35,41 @@ describe("GridStyleDef", () => {
     expect(rounded.firstRowLastCellCss).toBeDefined();
     expect(square.firstRowFirstCellCss).toBeUndefined();
     expect(square.firstRowLastCellCss).toBeUndefined();
+  });
+});
+
+describe("isGridStyleDef", () => {
+  it("treats empty objects and def keys as GridStyleDef", () => {
+    // Given an empty style and styles with def keys
+    // Then they are identified as GridStyleDef
+    expect(isGridStyleDef({})).toBe(true);
+    expect(isGridStyleDef({ grouped: true })).toBe(true);
+    expect(isGridStyleDef({ allWhite: true, roundedHeader: false })).toBe(true);
+  });
+
+  it("treats pure GridStyle objects as not GridStyleDef", () => {
+    // Given a style with only GridStyle CSS keys
+    const style: GridStyle = { cellCss: Css.bgWhite.$, rowHoverColor: "none" };
+    // Then it is not a GridStyleDef
+    expect(isGridStyleDef(style)).toBe(false);
+  });
+});
+
+describe("resolveStyles", () => {
+  it("resolves GridStyleDef via getTableStyles", () => {
+    // Given a GridStyleDef
+    // When resolving styles
+    const resolved = resolveStyles({ grouped: true, allWhite: true });
+    // Then it matches getTableStyles output
+    expect(resolved).toBe(getTableStyles({ grouped: true, allWhite: true }));
+  });
+
+  it("returns a full GridStyle unchanged", () => {
+    // Given a full GridStyle
+    const style: GridStyle = { cellCss: Css.p2.$, rowHoverColor: "none" };
+    // When resolving styles
+    const resolved = resolveStyles(style);
+    // Then the same object is returned
+    expect(resolved).toBe(style);
   });
 });

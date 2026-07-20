@@ -1,29 +1,20 @@
-import { StepperTab } from "src/components/StepperTabs/StepperTab";
+import { StepperTab, StepperTabProps } from "src/components/StepperTabs/StepperTab";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
 
-export type StepperTabsStep = {
-  label: string;
-  value: string;
-  /** Whether this step's required fields are filled out. Combined with `currentStep` to derive each tab's visual state. */
-  completed: boolean;
-  disabled?: boolean;
-};
+export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled">;
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];
   currentStep: StepperTabsStep["value"];
   onChange: (stepValue: string) => void;
-  /** Forces the condensed look regardless of viewport width (e.g. StepperLayout's scroll-collapse). OR'd with the mobile-breakpoint collapse. */
-  collapsed?: boolean;
 };
 
 export function StepperTabs(props: StepperTabsProps) {
-  const { steps, currentStep, onChange, collapsed: forceCollapsed } = props;
+  const { steps, currentStep, onChange } = props;
   const tid = useTestIds(props, "stepperTabs");
-  const { sm: isMobile } = useBreakpoint();
-  const collapsed = isMobile || !!forceCollapsed;
+  const { sm: collapsed } = useBreakpoint();
   const capWidth = steps.length <= 3;
 
   return (
