@@ -19,10 +19,10 @@ export function BaseHeader(props: BaseHeaderProps) {
   useDocumentTitle(title, documentTitleSuffix);
 
   return (
-    <header {...tid} css={Css.df.fdc.pt3.px3.bb.gap2.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
+    <header {...tid} css={Css.df.fdc.pt3.bb.gap2.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
       <div
         css={{
-          ...Css.df.jcsb.w100.gap1.$,
+          ...Css.df.jcsb.w100.gap1.px3.$,
           ...Css.if(!bottomSlot).mb2.$,
         }}
       >
