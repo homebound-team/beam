@@ -32,6 +32,7 @@ export type { EnvironmentFaviconUrls } from "./EnvironmentBanner/setEnvironmentF
 export * from "./Filters";
 export * from "./Grid";
 export { HB_QUIPS_FLAVOR, HB_QUIPS_MISSION, HbLoadingSpinner, HbSpinnerProvider } from "./HbLoadingSpinner";
+export * from "./Headers";
 export * from "./HelperText";
 export * from "./HomeboundLogo";
 export * from "./Icon";
@@ -46,7 +47,6 @@ export * from "./Modal/useModal";
 export * from "./Navbar";
 export { NavLink, getNavLinkStyles } from "./NavLinks";
 export type { NavLinkProps, NavLinkVariant } from "./NavLinks";
-export * from "./PageHeader";
 export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
 export type { InputStylePalette, PresentationFieldProps } from "./PresentationContext";
