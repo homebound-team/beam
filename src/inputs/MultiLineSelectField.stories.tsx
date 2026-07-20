@@ -6,11 +6,6 @@ import { FormLines } from "..";
 
 export default {
   component: MultiLineSelectField,
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 type TestOption = {
