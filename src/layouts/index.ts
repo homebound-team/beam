@@ -13,6 +13,7 @@ export {
   beamPageHeaderLayoutHeightVar,
   beamSideNavLayoutWidthVar,
   beamTableActionsHeightVar,
+  beamWorkflowLayoutFooterHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
   stickyNavAndHeaderOffset,
@@ -22,3 +23,5 @@ export { NavbarLayout } from "./NavbarLayout";
 export type { NavbarLayoutProps } from "./NavbarLayout";
 export { PageHeaderLayout } from "./PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./PageHeaderLayout";
+export { WorkflowLayout } from "./WorkflowLayout/WorkflowLayout";
+export type { WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout/WorkflowLayout";

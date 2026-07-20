@@ -79,6 +79,18 @@ export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string;
   );
 }
 
+/**
+ * `NavbarLayout` + `SideNavLayout` chrome without `PageHeaderLayout` — for `WorkflowLayout` stories,
+ * which own their own header/chrome and are a peer/replacement for `PageHeaderLayout`, not a child of it.
+ */
+export function TestWorkflowProjectLayout({ children }: { children: ReactNode }) {
+  return (
+    <NavbarLayout navbar={createNavbar()}>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>{children}</SideNavLayout>
+    </NavbarLayout>
+  );
+}
+
 export function createNavbar(): NavbarProps {
   return {
     brand: (

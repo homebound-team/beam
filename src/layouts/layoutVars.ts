@@ -19,6 +19,13 @@ export const beamSideNavLayoutWidthVar = "--beam-side-nav-layout-width";
 /** Table actions toolbar height (px) while pinned in document-scroll layouts. */
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
+/**
+ * `WorkflowLayout`'s mobile action-footer height (px); `0px` when absent. Published directly on
+ * `document.documentElement` (not via inline `style` on a React-tree wrapper) since consumers like
+ * `DocumentScrollToTopButton` are siblings of `WorkflowLayout`'s subtree, not descendants.
+ */
+export const beamWorkflowLayoutFooterHeightVar = "--beam-workflow-layout-footer-height";
+
 /** `left` for document-scroll sticky chrome (below side nav when present). */
 export function documentScrollChromeLeft(): string {
   return `var(${beamSideNavLayoutWidthVar}, 0px)`;
