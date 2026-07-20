@@ -277,24 +277,30 @@ export const cardStyle: GridStyle = {
   levels: (level) => ({ rowIndent: level > 0 ? 24 * level : undefined }),
 };
 
-export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  const defKeysRecord: Record<keyof GridStyleDef, boolean> = {
-    inlineEditing: true,
-    grouped: true,
-    rowHeight: true,
-    cellHighlight: true,
-    allWhite: true,
-    bordered: true,
-    rowHover: true,
-    vAlign: true,
-    cellTypography: true,
-    highlightOnHover: true,
-    roundedHeader: true,
-  };
+const gridStyleDefKeysRecord: Record<keyof GridStyleDef, boolean> = {
+  inlineEditing: true,
+  grouped: true,
+  rowHeight: true,
+  cellHighlight: true,
+  allWhite: true,
+  bordered: true,
+  rowHover: true,
+  vAlign: true,
+  cellTypography: true,
+  highlightOnHover: true,
+  roundedHeader: true,
+};
+
+/** True when `style` is a GridStyleDef (empty or any def key present); otherwise a full GridStyle. */
+export function isGridStyleDef(style: GridStyle | GridStyleDef): style is GridStyleDef {
   const keys = safeKeys(style);
-  const defKeys = safeKeys(defKeysRecord);
-  if (keys.length === 0 || keys.some((k) => defKeys.includes(k))) {
-    return getTableStyles(style as GridStyleDef);
+  const defKeys = safeKeys(gridStyleDefKeysRecord);
+  return keys.length === 0 || keys.some((k) => defKeys.includes(k));
+}
+
+export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
+  if (isGridStyleDef(style)) {
+    return getTableStyles(style);
   }
-  return style as GridStyle;
+  return style;
 }
