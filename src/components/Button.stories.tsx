@@ -8,11 +8,6 @@ import { action } from "storybook/actions";
 export default {
   component: Button,
   decorators: [withRouter()],
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 const sizes: ButtonSize[] = ["sm", "md", "lg"];

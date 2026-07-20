@@ -27,12 +27,6 @@ export default {
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31586%3A99884",
     },
   },
-
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta<IconButtonProps & { storyContrast?: boolean }>;
 
 type IconButtonStoryArgs = IconButtonProps & { storyContrast?: boolean };
