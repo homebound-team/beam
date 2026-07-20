@@ -1,7 +1,7 @@
 import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
 import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from "storybook/viewport";
-import { CssReset } from "../src";
+import { CssReset, Tokens } from "../src";
 import beamTheme from "./beamTheme";
 
 // formState doesn't use actions
@@ -20,8 +20,8 @@ const preview: Preview = {
       options: {
         light: { name: "light", value: "#F8F8F8" },
 
-        // Adding this to help view with off-white hover states
-        white: { name: "white", value: "#FFF" },
+        // Default Surface; also useful for off-white hover states
+        white: { name: "white", value: `var(${Tokens.Surface})` },
 
         dark: { name: "dark", value: "rgba(53,53,53,1)" },
       },
@@ -56,7 +56,7 @@ const preview: Preview = {
 
   initialGlobals: {
     backgrounds: {
-      value: "light",
+      value: "white",
     },
   },
 };

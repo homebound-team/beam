@@ -6,11 +6,6 @@ import { AccordionList } from "./AccordionList";
 
 export default {
   component: AccordionList,
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 export function AccordionListWithMultipleSelections() {

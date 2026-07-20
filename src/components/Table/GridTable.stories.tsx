@@ -57,12 +57,6 @@ export default {
   },
 
   decorators: [withRouter()],
-
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 type Data = { name: string | undefined; value: number | undefined };
