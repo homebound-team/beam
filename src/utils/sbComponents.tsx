@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
-import { StepperTabsProps } from "src/components/StepperTabs/StepperTabs";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import {
   type AppNavItem,
@@ -66,20 +65,24 @@ export function TableExample({
   );
 }
 
-export function TestProjectLayout({
-  pageTitle,
-  stepperTabs,
-  children,
-}: {
-  pageTitle?: string;
-  stepperTabs?: StepperTabsProps;
-  children: ReactNode;
-}) {
+export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string; children: ReactNode }) {
   return (
     <NavbarLayout navbar={createNavbar()}>
       <SideNavLayout sideNav={{ items: sideNavItems() }}>
-        <PageHeaderLayout pageHeader={{ title: pageTitle ?? "", stepperTabs }}>{children}</PageHeaderLayout>
+        <PageHeaderLayout pageHeader={{ title: pageTitle ?? "" }}>{children}</PageHeaderLayout>
       </SideNavLayout>
+    </NavbarLayout>
+  );
+}
+
+/**
+ * `NavbarLayout` + `SideNavLayout` chrome without `PageHeaderLayout` — for `WorkflowLayout` stories,
+ * which own their own header/chrome and are a peer/replacement for `PageHeaderLayout`, not a child of it.
+ */
+export function TestWorkflowProjectLayout({ children }: { children: ReactNode }) {
+  return (
+    <NavbarLayout navbar={createNavbar()}>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>{children}</SideNavLayout>
     </NavbarLayout>
   );
 }

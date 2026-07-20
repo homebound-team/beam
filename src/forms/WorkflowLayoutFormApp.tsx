@@ -1,8 +1,8 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  Button,
+  ButtonProps,
   GridColumn,
   GridDataRow,
   GridTable,
@@ -10,21 +10,20 @@ import {
   simpleHeader,
   SimpleHeaderAndData,
 } from "src/components";
-import { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { PageHeaderLayout, StepperLayout, StepperLayoutStep } from "src/layouts";
+import { WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
 
 /**
- * Demos `StepperLayout` + `StepperTabs` over the same form-state domain as `StepperFormApp`. The
- * tab strip and Back/Continue/Save CTAs live in the wrapping `PageHeaderLayout`'s `PageHeader`
- * (`stepperTabs`/`rightSlot`) — `StepperLayout` only owns the active step's content.
+ * Demos `WorkflowLayout` over the same form-state domain as `StepperFormApp`. The header (title, tab
+ * strip, Back/Continue/Save CTAs) and the active step's content are both owned by `WorkflowLayout`
+ * from a single unified `steps` array.
  */
-export function StepperLayoutFormApp() {
+export function WorkflowLayoutFormApp() {
   const formState = useFormState({
     config: formConfig,
     init: { input: {} as AuthorInput, map: (i) => i },
@@ -34,10 +33,10 @@ export function StepperLayoutFormApp() {
       });
     },
   });
-  return <StepperLayoutForm formState={formState} />;
+  return <WorkflowLayoutForm formState={formState} />;
 }
 
-function StepperLayoutForm({ formState }: { formState: FormValue }) {
+function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
   const [currentStep, setCurrentStep] = useState("author");
   const [showFormData, setShowFormData] = useState(false);
 
@@ -47,7 +46,7 @@ function StepperLayoutForm({ formState }: { formState: FormValue }) {
         const step1Valid = formState.firstName.valid && formState.lastName.valid;
         const step2Valid = formState.books.valid;
 
-        const steps: (StepperTabsStep & { content: ReactNode })[] = [
+        const steps: WorkflowLayoutStep[] = [
           {
             label: "Author Details",
             value: "author",
@@ -69,7 +68,6 @@ function StepperLayoutForm({ formState }: { formState: FormValue }) {
             content: <MiscAuthorDetails formState={formState} showFormData={showFormData} />,
           },
         ];
-        const contentSteps: StepperLayoutStep[] = steps.map(({ value, content }) => ({ value, content }));
 
         const currentStepIndex = steps.findIndex((s) => s.value === currentStep);
         const isLastStep = currentStepIndex === steps.length - 1;
@@ -81,35 +79,32 @@ function StepperLayoutForm({ formState }: { formState: FormValue }) {
           }
         };
 
+        const rightSlot: ButtonProps[] = [
+          ...(currentStepIndex > 0
+            ? [
+                {
+                  variant: "tertiary" as const,
+                  label: "Back",
+                  onClick: () => setCurrentStep(steps[currentStepIndex - 1].value),
+                },
+              ]
+            : []),
+          isLastStep
+            ? { label: "Save", disabled: !formState.valid, onClick: onSave }
+            : {
+                label: "Continue",
+                disabled: !steps[currentStepIndex].completed,
+                onClick: () => setCurrentStep(steps[currentStepIndex + 1].value),
+              },
+        ];
+
         return (
-          <PageHeaderLayout
-            pageHeader={{
-              title: "Stepper Layout Form",
-              stepperTabs: { steps, currentStep, onChange: setCurrentStep },
-              rightSlot: (
-                <div css={Css.df.gap1.$}>
-                  {currentStepIndex > 0 && (
-                    <Button
-                      variant="tertiary"
-                      label="Back"
-                      onClick={() => setCurrentStep(steps[currentStepIndex - 1].value)}
-                    />
-                  )}
-                  {isLastStep ? (
-                    <Button label="Save" disabled={!formState.valid} onClick={onSave} />
-                  ) : (
-                    <Button
-                      label="Continue"
-                      disabled={!steps[currentStepIndex].completed}
-                      onClick={() => setCurrentStep(steps[currentStepIndex + 1].value)}
-                    />
-                  )}
-                </div>
-              ),
-            }}
-          >
-            <StepperLayout steps={contentSteps} currentStep={currentStep} />
-          </PageHeaderLayout>
+          <WorkflowLayout
+            steps={steps}
+            currentStep={currentStep}
+            onChange={setCurrentStep}
+            workflowHeader={{ title: "Workflow Layout Form", rightSlot }}
+          />
         );
       }}
     </Observer>
