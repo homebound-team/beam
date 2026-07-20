@@ -15,7 +15,7 @@ export function GridTableEmptyState(props: GridTableEmptyStateProps) {
   const tid = useTestIds(props, "gridTableEmptyState");
 
   return (
-    <div css={Css.df.fdc.aic.py8.gap2.$} {...tid}>
+    <div css={Css.df.fdc.aic.py(12).gap2.$} {...tid}>
       <div css={Css.xl.$} {...tid.title}>
         {title}
       </div>
