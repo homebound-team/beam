@@ -27,12 +27,6 @@ export default {
   },
 
   decorators: [withRouter()],
-
-  globals: {
-    backgrounds: {
-      value: "white",
-    },
-  },
 } as Meta;
 
 export function BaseStates() {
