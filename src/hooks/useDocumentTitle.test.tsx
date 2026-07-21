@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { DocumentTitleProvider } from "src/components/DocumentTitle/DocumentTitleContext";
-import { PageHeader } from "src/components/PageHeader";
+import { PageHeader } from "src/components/Headers/PageHeader";
 import { useDocumentTitle } from "src/hooks/useDocumentTitle";
 import { render } from "src/utils/rtl";
 
@@ -118,7 +118,7 @@ describe("useDocumentTitle", () => {
 
     // Then the suffix appears in document.title but not the visible heading
     expect(document.title).toBe("[QA] Schedule | 123 Sesame St | Blueprint | Homebound");
-    expect(r.pageHeader_title.textContent).toBe("Schedule");
+    expect(r.header_title.textContent).toBe("Schedule");
   });
 
   it("leaves document.title unchanged when PageHeader renders without a provider", async () => {

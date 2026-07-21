@@ -1,5 +1,5 @@
 import { CSSProperties, ReactNode, useCallback, useMemo, useRef } from "react";
-import { PageHeader, PageHeaderProps } from "src/components/PageHeader";
+import { PageHeader, PageHeaderProps } from "src/components/Headers/PageHeader";
 import { TabsContentXss } from "src/components/Tabs";
 import { Css, Only } from "src/Css";
 import { useTestIds } from "src/utils";
