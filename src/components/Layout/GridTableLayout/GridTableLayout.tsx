@@ -8,6 +8,7 @@ import { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
+import { GridStyle, GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
 import { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, Only, Tokens } from "src/Css";
 import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
@@ -181,6 +182,8 @@ function GridTableLayoutComponent<
   );
 
   const cardAs = withCardView && view === "card" ? ("card" as const) : undefined;
+  const tableStyle = resolveGridTableLayoutStyle(tableProps.style, inDocumentScrollLayout);
+
   const tableBody = (
     <>
       {isGridTableProps(tableProps) ? (
@@ -190,7 +193,7 @@ function GridTableLayoutComponent<
           api={api}
           emptyState={emptyState}
           filter={clientSearch}
-          style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
+          style={tableStyle}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
@@ -203,7 +206,7 @@ function GridTableLayoutComponent<
           api={api}
           emptyState={emptyState}
           filter={clientSearch}
-          style={{ allWhite: true, roundedHeader: !inDocumentScrollLayout }}
+          style={tableStyle}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
@@ -414,4 +417,22 @@ function Header(props: HeaderProps) {
       </header>
     </FullBleed>
   );
+}
+
+/** Merges layout defaults with a GridStyleDef, or passes a full GridStyle through unchanged. */
+export function resolveGridTableLayoutStyle(
+  userStyle: GridStyle | GridStyleDef | undefined,
+  inDocumentScrollLayout: boolean,
+): GridStyle | GridStyleDef {
+  const layoutDefaults: GridStyleDef = {
+    allWhite: true,
+    roundedHeader: !inDocumentScrollLayout,
+  };
+  if (userStyle === undefined) {
+    return layoutDefaults;
+  }
+  if (isGridStyleDef(userStyle)) {
+    return { ...layoutDefaults, ...userStyle };
+  }
+  return userStyle;
 }

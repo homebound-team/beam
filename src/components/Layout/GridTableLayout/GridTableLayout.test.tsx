@@ -2,6 +2,7 @@ import { act } from "@testing-library/react";
 import { checkboxFilter } from "src/components/Filters";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import { cardStyle } from "src/components/Table/TableStyles";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import {
   actionColumn,
@@ -21,6 +22,7 @@ import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
   GridTableLayoutProps,
+  resolveGridTableLayoutStyle,
   useGridTableLayoutState,
 } from "./GridTableLayout";
 import { getGridTableViewStorageKey } from "./usePersistedTableView";
@@ -720,6 +722,44 @@ describe("GridTableLayout", () => {
       onEndReached(3);
     });
     expect(onEndReached).toHaveBeenCalledWith(3);
+  });
+
+  describe("resolveGridTableLayoutStyle", () => {
+    it("returns layout defaults when style is omitted", () => {
+      // Given no user style outside document scroll layout
+      // When resolving
+      const style = resolveGridTableLayoutStyle(undefined, false);
+      // Then layout defaults are applied
+      expect(style).toEqual({ allWhite: true, roundedHeader: true });
+    });
+
+    it("sets roundedHeader false inside document scroll layout", () => {
+      // Given no user style inside document scroll layout
+      // When resolving
+      const style = resolveGridTableLayoutStyle(undefined, true);
+      // Then roundedHeader is false
+      expect(style).toEqual({ allWhite: true, roundedHeader: false });
+    });
+
+    it("merges GridStyleDef overrides on top of layout defaults", () => {
+      // Given a partial GridStyleDef that overrides roundedHeader
+      // When resolving inside document scroll layout
+      const style = resolveGridTableLayoutStyle({ bordered: true, roundedHeader: true }, true);
+      // Then defaults remain and user overrides win
+      expect(style).toEqual({
+        allWhite: true,
+        roundedHeader: true,
+        bordered: true,
+      });
+    });
+
+    it("passes a full GridStyle through unchanged", () => {
+      // Given a full GridStyle
+      // When resolving
+      const style = resolveGridTableLayoutStyle(cardStyle, false);
+      // Then layout defaults are not injected
+      expect(style).toBe(cardStyle);
+    });
   });
 });
 
