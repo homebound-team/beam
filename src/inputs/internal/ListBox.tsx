@@ -74,7 +74,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     );
 
     setPopoverHeight((prev) => {
-      // ON-285: when filtering shrinks the option list, keep the established popover height
+      // When filtering shrinks the option list, keep the established popover height
       // instead of collapsing the scroll box. Avoids a chip maxh(50%) ↔ height feedback loop
       // that a pure "latch peak" approach can cause under load.
       if (prevListHeight > 0 && listHeight < prevListHeight && next < prev) {
