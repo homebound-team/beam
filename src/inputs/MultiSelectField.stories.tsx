@@ -223,7 +223,10 @@ export function Loading() {
 export function FilterHeightRepro() {
   const manyOptions: TestOption[] = zeroTo(100).map((i) => ({
     id: String(i + 1),
-    name: i === 99 ? "ZZZ Unique Option For Filter Repro" : `Option ${String(i + 1).padStart(3, "0")} — Plan Package Selection`,
+    name:
+      i === 99
+        ? "ZZZ Unique Option For Filter Repro"
+        : `Option ${String(i + 1).padStart(3, "0")} — Plan Package Selection`,
   }));
   return (
     <div css={Css.df.fdc.gap2.p2.maxw("480px").$}>

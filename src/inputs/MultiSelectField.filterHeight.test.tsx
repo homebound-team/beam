@@ -1,5 +1,5 @@
 import { click, render } from "@homebound/rtl-utils";
-import { act, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MultiSelectField } from "src/inputs";
 import { HasIdAndName } from "src/types";
@@ -57,9 +57,7 @@ describe("MultiSelectField listbox height", () => {
     const heightBeforeFilter = listboxHeightPx(listbox);
 
     // When filtering down to a single matching option
-    act(() => {
-      fireEvent.input(r.age, { target: { value: "UniqueZebra" } });
-    });
+    fireEvent.input(r.age, { target: { value: "UniqueZebra" } });
     expect(r.getAllByRole("option").map((o) => o.textContent)).toEqual(["UniqueZebra"]);
 
     // Then the listbox height does not collapse below the height established before filtering
