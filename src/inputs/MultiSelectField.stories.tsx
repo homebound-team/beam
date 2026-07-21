@@ -219,6 +219,27 @@ export function Loading() {
   );
 }
 
+/** many options + chips; filter should not collapse the listbox height. */
+export function FilterHeightRepro() {
+  const manyOptions: TestOption[] = zeroTo(100).map((i) => ({
+    id: String(i + 1),
+    name: i === 99 ? "ZZZ Unique Option For Filter Repro" : `Option ${String(i + 1).padStart(3, "0")} — Plan Package Selection`,
+  }));
+  return (
+    <div css={Css.df.fdc.gap2.p2.maxw("480px").$}>
+      <p css={Css.sm.gray700.$}>
+        Open Options, type <code>ZZZ Unique</code>, and confirm the listbox stays tall (ON-285).
+      </p>
+      <TestMultiSelectField
+        label="Options"
+        values={[manyOptions[0].id, manyOptions[1].id, manyOptions[2].id, manyOptions[3].id]}
+        options={manyOptions}
+        autoSort={false}
+      />
+    </div>
+  );
+}
+
 // Kind of annoying but to get type inference for HasIdAndName working, we
 // have to re-copy/paste the overload here.
 function TestMultiSelectField<T extends object, V extends Value>(

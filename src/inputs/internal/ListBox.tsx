@@ -58,6 +58,9 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
   // Keep track of the virtuoso list height to properly update the ListBox's height.
   // Using a ref, this itself should not trigger a rerender, only `popoverHeight` changes will trigger a rerender.
   const virtuosoListHeight = useRef<number>(0);
+  // Latch the tallest height seen while this ListBox is mounted so filtering fewer
+  // options does not collapse the scroll box (ON-285).
+  const peakPopoverHeight = useRef(0);
   const onListHeightChange = (listHeight: number) => {
     virtuosoListHeight.current = listHeight;
     // The "listHeight" is only the list of options.
@@ -65,11 +68,15 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     // Using `offsetHeight` to account for borders
     const height = (selectedList.current?.offsetHeight || 0) + listHeight;
 
-    // Using Math.min to choose between the smaller height, either the total height of the List (`height` arg), or the maximum height defined by the space allotted on screen or our hard coded max.
-    // If there are ListBoxSections, then we assume it is the persistent section with a single item and account for that height.
-    setPopoverHeight(
-      Math.min(popoverMaxHeight, hasSections ? height + persistentItemHeight + sectionSeparatorHeight : height),
+    // Cap at the space allotted on screen / UX max. If there are ListBoxSections, then we assume
+    // it is the persistent section with a single item and account for that height.
+    // Never shrink below the peak height observed this open session (filtering must not collapse the list).
+    const next = Math.min(
+      popoverMaxHeight,
+      hasSections ? height + persistentItemHeight + sectionSeparatorHeight : height,
     );
+    peakPopoverHeight.current = Math.max(peakPopoverHeight.current, next);
+    setPopoverHeight(peakPopoverHeight.current);
   };
 
   useEffect(
