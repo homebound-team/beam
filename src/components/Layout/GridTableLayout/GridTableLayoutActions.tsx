@@ -1,5 +1,6 @@
 import { memo, MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
+import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls } from "src/components/Filters";
 import { getActiveFilterCount } from "src/components/Filters/utils";
@@ -27,6 +28,9 @@ export type SearchBoxApi = {
   clear: VoidFunction;
 };
 
+// Omit to force all action button menus to look the same
+export type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
+
 type GridTableLayoutActionsProps<
   F extends Record<string, unknown>,
   G extends Value = string,
@@ -49,6 +53,7 @@ type GridTableLayoutActionsProps<
   setView?: (v: TableView) => void;
   clearFilters?: () => void;
   searchApi?: MutableRefObject<SearchBoxApi | undefined>;
+  actionMenu?: ActionButtonMenuProps;
 };
 
 function GridTableLayoutActionsComponent<
@@ -70,6 +75,7 @@ function GridTableLayoutActionsComponent<
     setView,
     clearFilters,
     searchApi,
+    actionMenu,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
 
@@ -170,12 +176,13 @@ function GridTableLayoutActionsComponent<
             />
           )}
         </div>
-        {(hasHideableColumns || withCardView) && (
-          <div css={Css.df.gapPx(12).$}>
+        {(hasHideableColumns || withCardView || actionMenu) && (
+          <div css={Css.df.aic.gapPx(12).$}>
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}
             {withCardView && view !== undefined && setView && <ViewToggleButton view={view} onChange={setView} />}
+            {actionMenu && <ButtonMenu {...actionMenu} trigger={{ icon: "verticalDots" }} />}
           </div>
         )}
       </div>

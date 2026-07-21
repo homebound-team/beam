@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FilterDefs } from "src/components/Filters";
 import { checkboxFilter } from "src/components/Filters";
+import { noop } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
 import { typeAndWait } from "src/utils/rtlUtils";
 import { vi } from "vitest";
@@ -94,5 +95,24 @@ describe("GridTableLayoutActions", () => {
       // Then clearFilters is called
       expect(clearFilters).toHaveBeenCalled();
     });
+  });
+});
+
+describe("actionMenu", () => {
+  it("renders the action menu when actionMenu is provided", async () => {
+    // Given actionMenu is provided
+    const r = await render(
+      <GridTableLayoutActions actionMenu={{ items: [{ label: "Action", onClick: noop }] }} />,
+      withRouter(),
+    );
+    // Then the vertical-dots menu trigger is shown
+    expect(r.verticalDots).toBeInTheDocument();
+  });
+
+  it("does not render the action menu when actionMenu is not provided", async () => {
+    // Given no actionMenu
+    const r = await render(<GridTableLayoutActions />, withRouter());
+    // Then the vertical-dots menu trigger is not shown
+    expect(r.query.verticalDots).not.toBeInTheDocument();
   });
 });

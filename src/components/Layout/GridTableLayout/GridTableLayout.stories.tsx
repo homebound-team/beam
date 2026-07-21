@@ -1,6 +1,8 @@
 import { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { PageHeader } from "src/components/PageHeader";
 import { GridDataRow, SimpleHeaderAndData } from "src/components/Table";
 import {
   cardBadgeSlot,
@@ -43,25 +45,29 @@ export function GridTableLayout() {
   });
 
   return (
-    <TestProjectLayout pageTitle="Grid Table Layout">
+    <TestProjectLayout>
+      <PageHeader
+        title="Grid Table Layout Example"
+        breadcrumbs={{
+          breadcrumbs: [
+            { href: "/", label: "Home" },
+            { href: "/", label: "Sub Page" },
+          ],
+        }}
+        rightSlot={
+          <div css={Css.df.fwr.jcfe.gap1.aic.$}>
+            <Button label="Tertiary Action" variant="tertiary" tooltip="I am tertiary" onClick={noop} />
+            <Button label="Secondary Action" variant="secondary" onClick={noop} />
+            <Button label="Primary Action" onClick={noop} />
+          </div>
+        }
+      />
       <GridTableLayoutComponent
-        pageTitle="Grid Table Layout Example"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
-        ]}
         layoutState={layoutState}
         tableProps={{
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
-        }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
-        secondaryAction={{ label: "Secondary Action", onClick: noop }}
-        tertiaryAction={{
-          label: "Tertiary Action",
-          tooltip: "I am tertiary",
-          onClick: noop,
         }}
         actionMenu={{
           tooltip: "I am the actionMenu",
@@ -90,19 +96,23 @@ export function ManyFilters() {
 
   return (
     <TestProjectLayout>
+      <PageHeader
+        title="Grid Table Layout with Many Filters"
+        breadcrumbs={{
+          breadcrumbs: [
+            { href: "/", label: "Home" },
+            { href: "/", label: "Sub Page" },
+          ],
+        }}
+        rightSlot={<Button label="Primary Action" onClick={noop} />}
+      />
       <GridTableLayoutComponent
-        pageTitle="Grid Table Layout with Many Filters"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
-        ]}
         layoutState={layoutState}
         tableProps={{
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[3].id!, "ASC"] },
         }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -122,19 +132,23 @@ export function WithCheckboxFilter() {
 
   return (
     <TestProjectLayout>
+      <PageHeader
+        title="Grid Table Layout with Checkbox Filter"
+        breadcrumbs={{
+          breadcrumbs: [
+            { href: "/", label: "Home" },
+            { href: "/", label: "Sub Page" },
+          ],
+        }}
+        rightSlot={<Button label="Primary Action" onClick={noop} />}
+      />
       <GridTableLayoutComponent
-        pageTitle="Grid Table Layout with Checkbox Filter"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
-        ]}
         layoutState={layoutState}
         tableProps={{
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[3].id!, "ASC"] },
         }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -158,13 +172,18 @@ export function QueryTableLayout() {
 
   return (
     <TestProjectLayout>
+      <PageHeader
+        title="Query Table Layout Example"
+        breadcrumbs={{
+          breadcrumbs: [
+            { href: "/", label: "Home" },
+            { href: "/", label: "Sub Page A" },
+            { href: "/", label: "Sub Page B" },
+          ],
+        }}
+        rightSlot={<Button label="Primary Action" onClick={noop} />}
+      />
       <GridTableLayoutComponent
-        pageTitle="Query Table Layout Example"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page A" },
-          { href: "/", label: "Sub Page B" },
-        ]}
         layoutState={layoutState}
         tableProps={{
           columns,
@@ -175,7 +194,6 @@ export function QueryTableLayout() {
           ],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -201,10 +219,9 @@ export function DefaultEmptyState() {
   const columns = useMemo(() => getColumns(false), []);
 
   return (
-    <TestProjectLayout pageTitle="Product Offerings">
+    <TestProjectLayout>
+      <PageHeader title="Product Offerings" rightSlot={<Button label="Create New" onClick={noop} />} />
       <GridTableLayoutComponent
-        pageTitle="Product Offerings"
-        primaryAction={{ label: "Create New", onClick: noop }}
         tableProps={{
           columns,
           rows: [simpleHeader],
@@ -234,12 +251,11 @@ export function EmptyState() {
   }, []);
 
   return (
-    <TestProjectLayout pageTitle="Product Offerings">
+    <TestProjectLayout>
+      <PageHeader title="Product Offerings" rightSlot={<Button label="Create New" onClick={noop} />} />
       <GridTableLayoutComponent
-        pageTitle="Product Offerings"
         layoutState={layoutState}
         emptyFallback="No product offerings found"
-        primaryAction={{ label: "Create New", onClick: noop }}
         tableProps={{
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
@@ -281,12 +297,23 @@ export function GridTableLayoutWithColor() {
 
   return (
     <TestProjectLayout>
+      <PageHeader
+        title="Grid Table Layout with Color for clearer column manipulation"
+        breadcrumbs={{
+          breadcrumbs: [
+            { href: "/", label: "Home" },
+            { href: "/", label: "Sub Page" },
+          ],
+        }}
+        rightSlot={
+          <div css={Css.df.fwr.jcfe.gap1.aic.$}>
+            <Button label="Tertiary Action" variant="tertiary" onClick={noop} />
+            <Button label="Secondary Action" variant="secondary" onClick={noop} />
+            <Button label="Primary Action" onClick={noop} />
+          </div>
+        }
+      />
       <GridTableLayoutComponent
-        pageTitle="Grid Table Layout with Color for clearer column manipulation"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
-        ]}
         layoutState={layoutState}
         tableProps={{
           columns,
@@ -294,9 +321,6 @@ export function GridTableLayoutWithColor() {
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
           visibleColumnsStorageKey: storageKey,
         }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
-        secondaryAction={{ label: "Secondary Action", onClick: noop }}
-        tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
       />
     </TestProjectLayout>
   );
@@ -733,8 +757,8 @@ export function WithInfiniteScroll() {
 
   return (
     <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with Infinite Scroll" />
       <GridTableLayoutComponent
-        pageTitle="Grid Table Layout with Infinite Scroll"
         tableProps={{
           as: "virtual",
           rows,
@@ -775,8 +799,8 @@ export function WithQueryTableInfiniteScroll() {
 
   return (
     <TestProjectLayout>
+      <PageHeader title="Query Table with Infinite Scroll" />
       <GridTableLayoutComponent
-        pageTitle="Query Table with Infinite Scroll"
         tableProps={{
           as: "virtual",
           query,

@@ -43,35 +43,17 @@ describe("GridTableLayout", () => {
           },
           search: "client",
         }}
-        pageTitle="Grid Table Layout Example"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
-        ]}
         tableProps={{
           columns: getColumns(),
           rows: [simpleHeader, ...getRows()],
         }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
-        secondaryAction={{ label: "Secondary Action", onClick: noop }}
-        tertiaryAction={{ label: "Tertiary Action", onClick: noop }}
       />,
       withRouter(),
     );
 
-    // We expect the Header to be rendered
-    expect(r.pageTitle).toHaveTextContent("Grid Table Layout Example");
-    expect(r.primaryAction).toBeInTheDocument();
-    expect(r.secondaryAction).toBeInTheDocument();
-    expect(r.tertiaryAction).toBeInTheDocument();
-    expect(r.pageHeaderBreadcrumbs_navLink_0).toHaveTextContent("Home");
-    expect(r.pageHeaderBreadcrumbs_navLink_1).toHaveTextContent("Sub Page");
-
-    // And the table actions to be rendered
+    // Then the table actions are rendered
     expect(r.search).toHaveValue("");
     expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
-
-    // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
       "
       | Name  | Value | Action  |
@@ -98,11 +80,6 @@ describe("GridTableLayout", () => {
           },
           // And no search config
         }}
-        pageTitle="Query Table Layout Example"
-        breadCrumb={[
-          { href: "/", label: "Home" },
-          { href: "/", label: "Sub Page" },
-        ]}
         tableProps={{
           columns: getColumns(),
           query: {
@@ -117,7 +94,6 @@ describe("GridTableLayout", () => {
             ...(data?.map((row: Data & { id: string }) => ({ kind: "data", id: row.id, data: row })) ?? []),
           ],
         }}
-        primaryAction={{ label: "Primary Action", onClick: noop }}
       />,
       withRouter(),
     );
@@ -144,7 +120,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           hideEditColumns={true}
           tableProps={{
             columns: getColumns(),
@@ -165,7 +140,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: columnsWithoutId,
             rows: [simpleHeader, ...getRows()],
@@ -186,7 +160,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: columnsWithoutName,
             rows: [simpleHeader, ...getRows()],
@@ -208,7 +181,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           hideEditColumns={true}
           tableProps={{
             columns: columnsWithoutId,
@@ -218,7 +190,7 @@ describe("GridTableLayout", () => {
         withRouter(),
       );
 
-      expect(r.pageTitle).toBeInTheDocument();
+      expect(r.gridTable).toBeInTheDocument();
     });
   });
 
@@ -227,7 +199,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -244,7 +215,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -262,7 +232,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -289,7 +258,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -311,7 +279,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -332,7 +299,6 @@ describe("GridTableLayout", () => {
       await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],
@@ -350,7 +316,6 @@ describe("GridTableLayout", () => {
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
-          pageTitle="Test"
           defaultView="list"
           tableProps={{
             columns: getColumns(),
@@ -415,6 +380,29 @@ describe("GridTableLayout", () => {
       // Then the card shows the title and status
       expect(r.tableCard_title).toHaveTextContent("The Conroy");
       expect(r.tableCard_status).toHaveTextContent("Active");
+    });
+  });
+
+  describe("actionMenu", () => {
+    it("renders the action menu in table actions", async () => {
+      // Given a GridTableLayout with only an actionMenu configured
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{}}
+          hideEditColumns
+          actionMenu={{
+            items: [{ label: "First Action", onClick: noop }],
+          }}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // Then the action menu trigger is rendered in table actions
+      expect(r.verticalDots).toBeInTheDocument();
     });
   });
 
