@@ -1,7 +1,7 @@
 import { Children, cloneElement, ReactNode } from "react";
 import { useModal } from "src/components";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 
 export type FormWidth =
   /** 320px. */
@@ -68,7 +68,7 @@ export function FormLines(props: FormLinesProps) {
 
 /** Draws a line between form lines. */
 export function FormDivider() {
-  return <div css={Css.hPx(1).bgGray200.$} />;
+  return <div css={Css.hPx(1).bgColor(Tokens.SurfaceSeparator).$} />;
 }
 
 /** Groups multiple fields side-by-side. */

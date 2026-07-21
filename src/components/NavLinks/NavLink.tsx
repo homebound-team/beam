@@ -154,14 +154,12 @@ const navLinkVariantStyles: Record<
     pressedStyles: Css.color(Tokens.NavTextPressed).bgColor(Tokens.NavItemBgPressed).$,
   },
   global: {
-    baseStyles: { ...baseStyles, ...Css.hPx(32).add("width", "max-content").gray500.$ },
-    activeStyles: Css.white.bgGray900.$,
-    disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusRingStyles: Css.gray500.bgGray900.add(
-      "boxShadow",
-      `0px 1px 2px rgba(0, 0, 0, 0.05), 0px 0px 0px 2px #242424, 0px 0px 0px 4px #0EA5E9`,
-    ).$,
-    hoverStyles: Css.gray500.bgGray900.$,
-    pressedStyles: Css.gray500.bgGray700.$,
+    // Lives inside ContrastScope (Navbar); Nav* contrast values resolve light-on-dark chrome.
+    baseStyles: { ...baseStyles, ...Css.hPx(32).add("width", "max-content").color(Tokens.NavText).$ },
+    activeStyles: Css.color(Tokens.NavTextActive).bgColor(Tokens.NavItemBgActive).$,
+    disabledStyles: Css.color(Tokens.NavTextDisabled).cursorNotAllowed.$,
+    focusRingStyles: Css.color(Tokens.NavTextFocusVisible).bgColor(Tokens.NavItemBgActive).bshFocus.$,
+    hoverStyles: Css.color(Tokens.NavText).bgColor(Tokens.NavItemBgHover).$,
+    pressedStyles: Css.color(Tokens.NavTextPressed).bgColor(Tokens.NavItemBgPressed).$,
   },
 };

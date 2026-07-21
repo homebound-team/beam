@@ -2,7 +2,7 @@ import DOMPurify from "dompurify";
 import { ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { RichTextFieldMock } from "src/inputs/RichTextField.mock";
 import { maybeCall, noop } from "src/utils";
 import { withTestMock } from "src/utils/withTestMock";
@@ -12,7 +12,7 @@ import "trix/dist/trix";
 import "trix/dist/trix.css";
 import "./trix.css";
 
-export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWidth"> {
+export type RichTextFieldProps = {
   /** The initial html value to show in the trix editor. */
   value: string | undefined;
   onChange: (html: string | undefined, text: string | undefined, mergeTags: string[]) => void;
@@ -31,7 +31,7 @@ export interface RichTextFieldProps extends Pick<PresentationFieldProps, "fullWi
   onFocus?: () => void;
   /** For rendering formatted text */
   readOnly?: boolean;
-}
+} & Pick<PresentationFieldProps, "fullWidth">;
 
 export const RichTextField = withTestMock(RichTextFieldImpl, RichTextFieldMock);
 
@@ -161,7 +161,10 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {label && <Label label={label} />}
         <div
-          css={Css.mh("120px").bgWhite.sm.gray900.bn.p1.br4.bcGray300.ba.$}
+          css={
+            Css.mh("120px").bgColor(Tokens.Surface).sm.color(Tokens.OnSurface).bn.p1.br4.bc(Tokens.FieldBorderDefault)
+              .ba.$
+          }
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) || placeholder || "" }}
           data-readonly="true"
         ></div>
@@ -183,7 +186,9 @@ function attachTributeJs(mergeTags: string[], editorElement: HTMLElement) {
     // According to the Tribute Types, `original.value` should always be present.
     // However, we have received errors in DataDog for "Cannot read properties of undefined (reading 'original')", so we're adding some checks.
     selectTemplate: (item) =>
-      item?.original?.value ? `<span style="color: ${Palette.Blue700};">@${item.original.value}</span>` : "",
+      item?.original?.value
+        ? `<span style="color: var(${Tokens.TextLinkDefault});">@${item.original.value}</span>`
+        : "",
     values,
   });
   // In dev mode, this fails because jsdom doesn't support contentEditable. Note that

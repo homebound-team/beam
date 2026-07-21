@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { BeamColor } from "src/colors";
 import { Icon } from "src/components/Icon";
-import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
+import { Css, maybeCssVar, Tokens } from "src/Css";
 import { isDefined, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { Tag } from "../Tag";
@@ -47,19 +47,19 @@ export function EnvironmentBanner(props: EnvironmentBannerProps) {
           <Tag text={badgeLabel} xss={Css.bgColor("#FFFFFF90").$} {...tid.badge} />
           <span
             css={{
-              ...Css.aic.gap1.xsSb.white.$,
+              ...Css.aic.gap1.xsSb.color(Tokens.OnPrimary).$,
               ...(impersonating ? Css.dn.ifMdAndUp.df.$ : Css.df.$),
             }}
             {...tid.message}
           >
             {message}
             <span css={Css.fs0.$} {...tid.info}>
-              <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Palette.White} />
+              <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.OnPrimary} />
             </span>
           </span>
         </span>
         {impersonating != null && (
-          <span css={Css.df.aic.gap2.xsSb.white.fs0.$} {...tid.impersonating}>
+          <span css={Css.df.aic.gap2.xsSb.color(Tokens.OnPrimary).fs0.$} {...tid.impersonating}>
             {(env !== "prod" || showProdWarning) && (
               <span>
                 <span css={Css.dn.ifMdAndUp.dib.$}>Impersonating &nbsp;</span>
@@ -67,7 +67,7 @@ export function EnvironmentBanner(props: EnvironmentBannerProps) {
               </span>
             )}
             <span css={Css.df.fs0.$} {...tid.impersonatingIcon}>
-              <Icon icon="impersonate" inc={2} color={Palette.White} />
+              <Icon icon="impersonate" inc={2} color={Tokens.OnPrimary} />
             </span>
           </span>
         )}

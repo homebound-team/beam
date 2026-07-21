@@ -6,7 +6,7 @@ import { AutoSaveStatusProvider } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
-import { Css, Only, Xss } from "src/Css";
+import { Css, Only, Tokens, Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
@@ -131,8 +131,9 @@ export function Modal(props: ModalProps) {
             <FocusScope contain restoreFocus autoFocus>
               <div
                 css={
-                  Css.br24.bgWhite.bshModal.oh
-                    .maxh("90vh")
+                  Css.br24
+                    .bgColor(Tokens.Surface)
+                    .bshModal.oh.maxh("90vh")
                     .df.fdc.wPx(width)
                     .mhPx(defaultMinHeight)
                     .if(isFixedHeight)
@@ -154,13 +155,21 @@ export function Modal(props: ModalProps) {
                   Use `fdrr` so that the close icon won't sit between "modal header search field"
                   and the modal body results in the DOM focus order, i.e. in our global search modal.
                 */}
-                <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bcGray200.$}>
+                <header css={Css.df.fdrr.p3.fs0.if(drawHeaderBorder).bb.bc(Tokens.SurfaceSeparator).$}>
                   <span css={Css.fs0.pl1.$}>
                     {allowClosing && <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />}
                   </span>
-                  <h1 css={Css.fg1.xl2.gray900.$} ref={modalHeaderRef} {...titleProps} {...testId.title} />
+                  <h1
+                    css={Css.fg1.xl2.color(Tokens.OnSurface).$}
+                    ref={modalHeaderRef}
+                    {...titleProps}
+                    {...testId.title}
+                  />
                 </header>
-                <main ref={modalBodyRef} css={Css.fg1.oya.if(hasScroll).bb.bcGray200.if(!!forceScrolling).oys.$}>
+                <main
+                  ref={modalBodyRef}
+                  css={Css.fg1.oya.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
+                >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {content}
                 </main>

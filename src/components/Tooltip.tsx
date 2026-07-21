@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
 import { BeamColor } from "src/colors";
-import { Css, Padding, Palette, Xss } from "src/Css";
+import { Css, Padding, Tokens, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 // We combine react-popper and aria-tooltip to make up the tooltip component for the following reasons:
@@ -97,7 +97,7 @@ function Popper(props: PopperProps) {
     content,
     placement = "auto",
     xss,
-    bgColor = Palette.Gray900,
+    bgColor = Tokens.OnSurface,
     onMouseEnter,
     onMouseLeave,
     ...ariaProps
@@ -136,7 +136,7 @@ function Popper(props: PopperProps) {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       css={{
-        ...Css.maxw("320px").bgColor(bgColor).bshBasic.white.px1.py("4px").br4.xs.z(999999).$,
+        ...Css.maxw("320px").bgColor(bgColor).bshBasic.color(Tokens.Surface).px1.py("4px").br4.xs.z(999999).$,
         ...xss,
       }}
     >

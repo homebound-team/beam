@@ -32,7 +32,7 @@ import {
   toContent,
   TOTALS,
 } from "src/components/Table/utils/utils";
-import { Css, Palette, Properties } from "src/Css";
+import { Css, maybeCssVar, Palette, Properties, Tokens } from "src/Css";
 import { beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
@@ -138,7 +138,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(isFirstHeadRow && style.firstRowCss),
     ...(as === "table" && tableRowPrintBreakCss),
     // Optionally include the row hover styles, by default they should be turned on.
-    ...(showRowHoverColor && Css.onHover.bgColor(style.rowHoverColor ?? Palette.Blue100).$),
+    ...(showRowHoverColor && Css.onHover.bgColor(style.rowHoverColor ?? Tokens.ListRowBgHover).$),
     ...(levelIndent && Css.mlPx(levelIndent).$),
     // For virtual tables use `display: flex` to keep all cells on the same row.
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
@@ -287,7 +287,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const maybeStickyColumnStyles =
             maybeSticky && columnSizes
               ? {
-                  ...Css.sticky.z(zIndices.tableStickyColumn).bgWhite.$,
+                  ...Css.sticky.z(zIndices.tableStickyColumn).bgColor(Tokens.Surface).$,
                   ...(maybeSticky === "left"
                     ? Css.left(
                         columnIndex === 0
@@ -345,7 +345,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isHeader && style.headerCellCss),
             // Then apply any totals-specific override
             ...(isTotals && style.totalsCellCss),
-            ...(isTotals && hasExpandableHeader && Css.boxShadow(`inset 0 -1px 0 ${Palette.Gray200}`).$),
+            ...(isTotals &&
+              hasExpandableHeader &&
+              Css.boxShadow(`inset 0 -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`).$),
             // Then apply any expandable header specific override
             ...(isExpandableHeader && style.expandableHeaderCss),
             // Add right border on expandable header cells except the last column
@@ -358,7 +360,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               columnIndex + currentColspan < columns.length &&
               (isHeader || isTotals) &&
               currentExpandedColumnCount === 0 &&
-              Css.boxShadow(`inset -1px -1px 0 ${Palette.Gray200}`).$),
+              Css.boxShadow(`inset -1px -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`).$),
             // Or level-specific styling
             ...(isBodyRow && levelStyle?.cellCss),
             // Level specific styling for the first content column
@@ -367,7 +369,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...getColumnBorderCss(column.border, style),
             // The specific cell's css (if any from GridCellContent)
             ...rowStyleCellCss,
-            // Apply active row styling for non-nested card styles.
+            // Active/pinned blue selection fills have no semantic token yet — keep Blue50 default.
             ...(isActive ? Css.bgColor(style.activeBgColor ?? Palette.Blue50).$ : {}),
             // Add any cell specific style overrides
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale
@@ -380,7 +382,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Apply the blue highlight to every runtime-pinned row's cells (wins over `isActive`)
             ...(pinned && style.pinnedRowCss),
             // Apply cell highlight styles to active cell and hover
-            ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(`inset 0 0 0 1px ${Palette.Blue700}`).$,
+            ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(
+              `inset 0 0 0 1px ${maybeCssVar(Tokens.FocusRingInset)}`,
+            ).$,
             // Define the width of the column on each cell. Supports col spans.
             // If we have a 'levelIndent' defined, then subtract that amount from the first content column's width to ensure all columns will still line up properly.
             ...Css.w(

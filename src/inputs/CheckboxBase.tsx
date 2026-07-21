@@ -1,21 +1,21 @@
 import { InputHTMLAttributes, ReactNode, useRef } from "react";
 import { mergeProps, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { HelperText, maybeTooltip } from "src/components";
-import { Css, Palette, px } from "src/Css";
+import { Css, px, Tokens } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
-interface CheckboxAriaProps {
+type CheckboxAriaProps = {
   description?: string | undefined;
   onChange?: (selected: boolean) => void;
   autoFocus?: boolean | undefined;
   isSelected: boolean | undefined;
   isDisabled: boolean;
   isIndeterminate: boolean;
-}
-export interface CheckboxBaseProps extends BeamFocusableProps {
+};
+export type CheckboxBaseProps = {
   ariaProps: CheckboxAriaProps;
   description?: string;
   isDisabled?: boolean;
@@ -39,7 +39,7 @@ export interface CheckboxBaseProps extends BeamFocusableProps {
    * @default false
    */
   fullWidth?: boolean;
-}
+} & BeamFocusableProps;
 
 export function CheckboxBase(props: CheckboxBaseProps) {
   const {
@@ -97,24 +97,26 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   });
 }
 
-const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bcGray300.br4.bgWhite.transition.$;
-const filledBoxStyles = Css.bcBlue700.bgBlue700.$;
+const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bc(Tokens.FieldBorderDefault).br4.bgColor(Tokens.Surface)
+  .transition.$;
+const filledBoxStyles = Css.bc(Tokens.Primary).bgColor(Tokens.Primary).$;
+// Blue900 hover has no semantic token — keep palette.
 const filledBoxHoverStyles = Css.bgBlue900.$;
-const disabledBoxStyles = Css.bgGray50.bcGray100.$;
-const disabledSelectedBoxStyles = Css.bgGray400.bcGray400.$;
-const disabledColor = Css.gray300.$;
+const disabledBoxStyles = Css.bgColor(Tokens.NeutralFillHoverSubtle).bc(Tokens.NeutralFillHoverSubtle).$;
+const disabledSelectedBoxStyles = Css.bgColor(Tokens.TextDisabled).bc(Tokens.TextDisabled).$;
+const disabledColor = Css.color(Tokens.FieldBorderDefault).$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bcBlue900.$;
 const markSvgStyles = Css.absolute.topPx(-1).leftPx(-1).$;
 const labelStyles = Css.sm.$;
-const descStyles = Css.sm.gray700.$;
+const descStyles = Css.sm.color(Tokens.OnSurfaceMuted).$;
 
-interface StyledCheckboxProps {
+type StyledCheckboxProps = {
   isDisabled?: boolean;
   isIndeterminate?: boolean;
   isSelected?: boolean;
   isFocusVisible?: boolean;
-}
+};
 
 export function StyledCheckbox(props: StyledCheckboxProps) {
   const { isDisabled = false, isIndeterminate = false, isSelected, isFocusVisible } = props;
@@ -146,13 +148,13 @@ const checkmarkSmall = (
   <svg width="16" height="16" css={markSvgStyles}>
     <path
       d="M6.66669 10.3907L4.47135 8.19533L3.52869 9.138L6.66669 12.276L13.138 5.80467L12.1954 4.862L6.66669 10.3907Z"
-      fill={Palette.White}
+      fill={`var(${Tokens.OnPrimary})`}
     />
   </svg>
 );
 
 const dashSmall = (
   <svg width="16" height="16" css={markSvgStyles}>
-    <rect x="4" y="7.5" width="8" height="1.35" fill={Palette.White} />
+    <rect x="4" y="7.5" width="8" height="1.35" fill={`var(${Tokens.OnPrimary})`} />
   </svg>
 );

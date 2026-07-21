@@ -4,7 +4,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
 import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
-import { Css, Palette, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import {
   dateFormats,
   formatDate,
@@ -257,7 +257,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       {inputValue !== "" && !state.isOpen && (
         <IconButton
           icon="xCircle"
-          color={Palette.Gray700}
+          color={Tokens.OnSurfaceMuted}
           onClick={() => {
             setInputValue("");
             onChange(undefined);
@@ -275,7 +275,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
       css={Css.if(isDisabled).cursorNotAllowed.$}
       {...tid.calendarButton}
     >
-      <Icon icon="calendar" color={isDisabled ? Palette.Gray400 : Palette.Gray700} />
+      <Icon icon="calendar" color={isDisabled ? Tokens.TextDisabled : Tokens.OnSurfaceMuted} />
     </button>
   );
 

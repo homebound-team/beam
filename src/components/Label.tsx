@@ -27,7 +27,7 @@ function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) 
       {...labelProps}
       {...others}
       css={{
-        ...Css.dif.aic.gap1.sm.gray700
+        ...Css.dif.aic.gap1.sm
           .mbPx(inline ? 0 : 4)
           .color(Tokens.TextLabel)
           .if(!inline).asfs.$,
@@ -55,7 +55,7 @@ export function InlineLabel({ labelProps, label, multiline = false, ...others }:
     <label
       {...labelProps}
       {...others}
-      css={Css.sm.wsnw.gray900.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
+      css={Css.sm.wsnw.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
     >
       {label}:
     </label>

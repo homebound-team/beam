@@ -10,7 +10,7 @@ import { EditColumnsButton } from "src/components/Table/components/EditColumnsBu
 import { TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { GridColumn, Kinded } from "src/components/Table/types";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { Value } from "src/inputs/Value";
@@ -110,7 +110,7 @@ function GridTableLayoutActionsComponent<
       placeholder="Search"
       clearable
       fullWidth
-      startAdornment={<Icon icon="search" color={Palette.Gray700} />}
+      startAdornment={<Icon icon="search" color={Tokens.OnSurfaceMuted} />}
     />
   );
 

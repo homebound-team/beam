@@ -68,10 +68,7 @@ function NavbarMobileDrawer({
     <>
       <motion.div
         key="navbarMobileMenuScrim"
-        css={
-          Css.fixed.right0.bottom0.left0.z(zIndices.navbarMobileMenuScrim).add("backgroundColor", "rgba(36,36,36,0.2)")
-            .$
-        }
+        css={Css.fixed.right0.bottom0.left0.z(zIndices.navbarMobileMenuScrim).bgColor(Tokens.Scrim).$}
         style={overlayTopStyle}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

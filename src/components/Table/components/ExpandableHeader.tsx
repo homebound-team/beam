@@ -2,7 +2,7 @@ import { ReactNode, useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
 import { beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import { isFunction } from "src/utils";
@@ -30,7 +30,15 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
   return (
     <button
       {...hoverProps}
-      css={Css.df.xs.aic.jcsb.gap2.px1.hPx(32).mxPx(-8).w("calc(100% + 16px)").br4.blue700.if(isHovered).bgGray100.$}
+      css={
+        Css.df.xs.aic.jcsb.gap2.px1
+          .hPx(32)
+          .mxPx(-8)
+          .w("calc(100% + 16px)")
+          .br4.color(Tokens.TextLinkDefault)
+          .if(isHovered)
+          .bgColor(Tokens.ListRowBgHover).$
+      }
       onClick={async () => {
         if (isFunction(column.expandColumns)) {
           setIsLoading(true);
@@ -47,8 +55,10 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
           Css.df.aic
             .if(applyStickyStyles)
             .sticky.left(`calc(var(${beamSideNavLayoutWidthVar}, 0px) + ${minStickyLeftOffset + 12}px)`)
-            .pr2.mr2.bgWhite.z(zIndices.tableExpandableTitle)
-            .if(isHovered).bgGray100.$
+            .pr2.mr2.bgColor(Tokens.Surface)
+            .z(zIndices.tableExpandableTitle)
+            .if(isHovered)
+            .bgColor(Tokens.ListRowBgHover).$
         }
       >
         <span css={Css.tal.lineClamp2.$}>{title}</span>

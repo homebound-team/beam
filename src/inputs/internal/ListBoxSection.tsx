@@ -1,7 +1,7 @@
 import { Node } from "@react-types/shared";
 import { useListBoxSection, useSeparator } from "react-aria";
 import { ListState } from "react-stately";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { Option } from "src/inputs/internal/Option";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
@@ -26,7 +26,7 @@ export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
 
   return (
     <>
-      {isPersistentSection && <li {...separatorProps} css={Css.bt.bcGray200.$} />}
+      {isPersistentSection && <li {...separatorProps} css={Css.bt.bc(Tokens.SurfaceSeparator).$} />}
       <li {...itemProps} css={Css.if(!isPersistentSection).oa.$}>
         {/* Styles assume only one Persistent Item is ever shown. Will need to adjust if that ever changes */}
         <ul

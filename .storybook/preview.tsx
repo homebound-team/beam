@@ -1,11 +1,25 @@
 import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
 import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from "storybook/viewport";
+import { contrastDataTheme } from "../src/components/ContrastScope";
 import { CssReset, Tokens } from "../src";
 import beamTheme from "./beamTheme";
 
 // formState doesn't use actions
 configure({ enforceActions: "never" });
+
+type ColorSchemeGlobal = "light" | "dark";
+
+/** Apply Beam contrast theme for Storybook / Chromatic verification (apps stay light-only). */
+function applyStorybookColorScheme(scheme: ColorSchemeGlobal) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  if (scheme === "dark") {
+    root.setAttribute("data-theme", contrastDataTheme);
+  } else {
+    root.removeAttribute("data-theme");
+  }
+}
 
 const preview: Preview = {
   parameters: {
@@ -18,6 +32,8 @@ const preview: Preview = {
     // https://storybook.js.org/docs/react/essentials/backgrounds
     backgrounds: {
       options: {
+        // Follows --b-surface (white in light, Gray900 under contrast).
+        surface: { name: "Surface", value: "var(--b-surface)" },
         light: { name: "light", value: "#F8F8F8" },
 
         // Default Surface; also useful for off-white hover states
@@ -43,8 +59,25 @@ const preview: Preview = {
     docs: { theme: beamTheme },
   },
 
+  globalTypes: {
+    colorScheme: {
+      description: "Force Beam contrast theme on :root (apps do not follow OS dark mode yet)",
+      toolbar: {
+        title: "Color scheme",
+        icon: "mirror",
+        items: [
+          { value: "light", title: "Light", icon: "circlehollow" },
+          { value: "dark", title: "Dark (contrast)", icon: "circle" },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+
   decorators: [
-    (Story) => {
+    (Story, context) => {
+      const scheme = (context.globals.colorScheme as ColorSchemeGlobal | undefined) ?? "light";
+      applyStorybookColorScheme(scheme);
       return (
         <>
           <CssReset />
@@ -56,8 +89,9 @@ const preview: Preview = {
 
   initialGlobals: {
     backgrounds: {
-      value: "white",
+      value: "surface",
     },
+    colorScheme: "light",
   },
 };
 

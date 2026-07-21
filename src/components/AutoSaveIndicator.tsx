@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { assertNever } from "src/types";
 import { AutoSaveStatus, IconProps, Tooltip, useAutoSaveStatus } from ".";
 import { Icon } from "./Icon";
 
-interface AutoSaveIndicatorProps {
+type AutoSaveIndicatorProps = {
   hideOnIdle?: boolean;
   doNotReset?: boolean;
-}
+};
 
 export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorProps) {
   const { status, resetStatus, errors } = useAutoSaveStatus();
@@ -42,7 +42,7 @@ export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorP
          */
         <div css={Css.dif.$}>
           <Tooltip title={String(errors)} placement="bottom">
-            <Indicator icon="error" color={Palette.Red500} text="Error saving" />
+            <Indicator icon="error" color={Tokens.Danger} text="Error saving" />
           </Tooltip>
         </div>
       );
@@ -51,14 +51,14 @@ export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorP
   }
 }
 
-interface IndicatorProps {
+type IndicatorProps = {
   icon: IconProps["icon"];
   color?: IconProps["color"];
   text?: string;
-}
+};
 function Indicator({ text, icon, color }: IndicatorProps) {
   return (
-    <div data-testid="autoSave" css={Css.df.gap1.aic.gray700.smSb.$}>
+    <div data-testid="autoSave" css={Css.df.gap1.aic.color(Tokens.OnSurfaceMuted).smSb.$}>
       <Icon icon={icon} color={color} />
       {text}
     </div>

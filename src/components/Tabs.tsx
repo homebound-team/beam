@@ -4,7 +4,7 @@ import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath } from "react-router";
 import { Link, useLocation } from "react-router-dom";
 import { FullBleed, IconKey, maybeTooltip, resolveTooltip } from "src/components";
-import { Css, Margin, Only, Padding, Xss } from "src/Css";
+import { Css, Margin, Only, Padding, Tokens, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
@@ -171,7 +171,12 @@ export function Tabs<V extends string, X extends Only<TabsContentXss, X>>(
   }
 
   return (
-    <div css={{ ...Css.df.aic.oa.wsnw.gap1.$, ...(includeBottomBorder ? { ...Css.bb.bcGray200.$ } : {}) }}>
+    <div
+      css={{
+        ...Css.df.aic.oa.wsnw.gap1.$,
+        ...(includeBottomBorder ? { ...Css.bb.bc(Tokens.SurfaceSeparator).$ } : {}),
+      }}
+    >
       {/* Do not show if we should hide the tabs */}
       {!hideTabs(props) && (
         <div ref={ref} css={Css.dif.gap1.asfe.$} aria-label={ariaLabel} role="tablist" {...tid}>
@@ -275,13 +280,17 @@ export function getTabStyles() {
     .pbPx(verticalPaddingPx - borderBottomWidthPx).$;
 
   return {
-    baseStyles: Css.df.aic.hPx(32).pyPx(verticalPaddingPx).px1.outline0.gray700.add("width", "fit-content")
-      .cursorPointer.sm.$,
-    activeStyles: { ...Css.bcBlue700.smSb.gray900.$, ...borderBottomStyles },
-    disabledStyles: Css.gray400.cursorNotAllowed.$,
+    baseStyles: Css.df.aic
+      .hPx(32)
+      .pyPx(verticalPaddingPx)
+      .px1.outline0.color(Tokens.OnSurfaceMuted)
+      .add("width", "fit-content").cursorPointer.sm.$,
+    // Blue50 active hover fill has no semantic token — keep palette.
+    activeStyles: { ...Css.bc(Tokens.FieldBorderFocus).smSb.color(Tokens.OnSurface).$, ...borderBottomStyles },
+    disabledStyles: Css.color(Tokens.TextDisabled).cursorNotAllowed.$,
     focusRingStyles: Css.bgBlue50.bshFocus.$,
-    hoverStyles: { ...Css.bcGray400.$, ...borderBottomStyles },
-    activeHoverStyles: { ...Css.bgBlue50.bcBlue700.$, ...borderBottomStyles },
+    hoverStyles: { ...Css.bc(Tokens.FieldBorderHover).$, ...borderBottomStyles },
+    activeHoverStyles: { ...Css.bgBlue50.bc(Tokens.FieldBorderFocus).$, ...borderBottomStyles },
   };
 }
 

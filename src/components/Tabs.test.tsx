@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { useParams } from "react-router";
 import { ScrollableContent, ScrollableParent } from "src";
-import { Css, Palette } from "src/Css";
+import { Css } from "src/Css";
 import { click, render, withRouter } from "src/utils/rtl";
 import { getNextTabValue, RouteTabWithContent, TabContent, TabsWithContent, TabWithContent } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
@@ -21,34 +21,34 @@ describe("TabsWithContent", () => {
   it("should update the active tab", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab1);
     // when an external state change moves us to the 2nd tab
     click(r.goToTab2);
     // Then tab2 is now actively styled
-    expect(r.tabs_tab2).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab2);
   });
 
   it("should reset the active tab on blur", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab1);
     // And we've moved to the 2nd tab
     fireEvent.keyUp(r.tabs_tab2, { key: "ArrowRight" });
-    expect(r.tabs_tab2).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab2);
     // When we blur away
     fireEvent.blur(r.tabs_tab1);
     // Then the 1st tab goes back to highlighted
-    expect(r.tabs_tab1).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab1);
   });
 
   it("cannot click on disabled tabs", async () => {
     // Given we start out on tab1
     const r = await render(<TestTabs />, withRouter());
-    expect(r.tabs_tab1).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab1);
     // And we try to click on the 3rd disabled tab
     click(r.tabs_tab3);
     // Then nothing happens
-    expect(r.tabs_tab1).toHaveStyle({ borderColor: Palette.Blue700 });
+    expectActiveTab(r.tabs_tab1);
   });
 
   describe("getNextTabValue function", () => {
@@ -240,6 +240,12 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel).toHaveStyle({ paddingLeft: "calc(var(--t-spacing) * 2)" });
   });
 });
+
+/** Active tabs use smSb (font-weight 600); tokenized border colors aren't asserted via toHaveStyle. */
+function expectActiveTab(el: HTMLElement) {
+  expect(el).toHaveAttribute("aria-selected", "true");
+  expect(el).toHaveStyle({ fontWeight: 600 });
+}
 
 function TestTabs() {
   const [selectedTab, setSelectedTab] = useState(testTabs[0].value);
