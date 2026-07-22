@@ -31,7 +31,7 @@ import { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";
 
-interface TableStoryProps extends GridTableProps<any, any> {
+type TableStoryProps = {
   nestingDepth?: number;
   // Applies Group row styles
   grouped?: boolean;
@@ -43,7 +43,7 @@ interface TableStoryProps extends GridTableProps<any, any> {
   totals?: boolean;
   expandable?: boolean;
   vAlign?: "top" | "center" | "bottom";
-}
+} & GridTableProps<any, any>;
 
 export default {
   component: GridTable,
