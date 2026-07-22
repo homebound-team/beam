@@ -24,6 +24,4 @@ export type { NavbarLayoutProps } from "./NavbarLayout";
 export { PageHeaderLayout } from "./PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./PageHeaderLayout";
 export { WorkflowHeaderLayout } from "./WorkflowHeaderLayout/WorkflowHeaderLayout";
-export type { WorkflowHeaderLayoutProps } from "./WorkflowHeaderLayout/WorkflowHeaderLayout";
-export { WorkflowLayout } from "./WorkflowLayout/WorkflowLayout";
-export type { WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout/WorkflowLayout";
+export type { WorkflowHeaderConfig, WorkflowHeaderLayoutProps } from "./WorkflowHeaderLayout/WorkflowHeaderLayout";

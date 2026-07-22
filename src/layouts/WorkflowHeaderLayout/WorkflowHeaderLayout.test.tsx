@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { setViewport } from "src/tests/viewport";
 import { click, render, scrollWindowWithAnchor, withRouter } from "src/utils/rtl";
-import { WorkflowHeaderLayout, WorkflowHeaderLayoutProps } from "./WorkflowHeaderLayout";
+import { WorkflowHeaderLayout } from "./WorkflowHeaderLayout";
 
 describe("WorkflowHeaderLayout", () => {
   it("renders the header and body children", async () => {
@@ -13,32 +13,23 @@ describe("WorkflowHeaderLayout", () => {
     expect(r.body).toBeInTheDocument();
   });
 
-  it("renders rightSlot buttons in the header on desktop", async () => {
+  it("renders the CTAs in the header on desktop", async () => {
     // Given a desktop viewport (the test default)
     const r = await render(<TestWrapper />, withRouter());
 
-    // Then the button renders inside the header, and no footer is rendered
+    // Then the CTAs render inside the header, and no footer is rendered
     expect(r.workflowHeaderLayout_header).toHaveTextContent("Continue");
     expect(r.query.workflowHeaderLayout_footer).not.toBeInTheDocument();
   });
 
-  it("moves rightSlot buttons to a mobile footer at the sm breakpoint", async () => {
+  it("moves the CTAs to a mobile footer at the sm breakpoint", async () => {
     // Given a mobile viewport
     setViewport("sm");
     const r = await render(<TestWrapper />, withRouter());
 
-    // Then the button renders in the footer instead of the header
+    // Then the CTAs render in the footer instead of the header
     expect(r.workflowHeaderLayout_footer).toHaveTextContent("Continue");
     expect(r.workflowHeaderLayout_header).not.toHaveTextContent("Continue");
-  });
-
-  it("omits the mobile footer when there are no rightSlot buttons", async () => {
-    // Given a mobile viewport with no rightSlot buttons configured
-    setViewport("sm");
-    const r = await render(<TestWrapper rightSlot={[]} />, withRouter());
-
-    // Then no footer renders
-    expect(r.query.workflowHeaderLayout_footer).not.toBeInTheDocument();
   });
 
   it("forces the stepper tabs into their non-interactive collapsed state once scrolled down, and re-expands on scroll-up even short of the top", async () => {
@@ -73,22 +64,24 @@ describe("WorkflowHeaderLayout", () => {
 function TestWrapper(
   props: Partial<{
     children: ReactNode;
-    rightSlot: WorkflowHeaderLayoutProps["workflowHeader"]["rightSlot"];
+    currentStep: string;
     onChange: (stepValue: string) => void;
   }>,
 ) {
-  const { children, rightSlot = [{ label: "Continue", onClick: () => {} }], onChange = () => {} } = props;
+  const { children, currentStep = "one", onChange = () => {} } = props;
   return (
     <WorkflowHeaderLayout
       workflowHeader={{
         title: "Test Workflow",
-        rightSlot,
+        onCancel: () => {},
+        completeLabel: "Save",
+        onComplete: () => {},
         stepperTabs: {
           steps: [
             { value: "one", label: "Step One", completed: false },
             { value: "two", label: "Step Two", completed: false },
           ],
-          currentStep: "one",
+          currentStep,
           onChange,
         },
       }}

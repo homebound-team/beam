@@ -1,6 +1,10 @@
-import { CSSProperties, ReactNode, useCallback, useLayoutEffect, useMemo, useRef } from "react";
-import { Button, ButtonProps } from "src/components/Button";
-import { WorkflowHeader, WorkflowHeaderProps } from "src/components/Headers/WorkflowHeader";
+import type { PressEvent } from "@react-types/shared";
+import { CSSProperties, ReactNode, useCallback, useLayoutEffect, useRef } from "react";
+import { Button } from "src/components/Button";
+import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
+import { IconButton } from "src/components/IconButton";
+import { StepperTabsProps } from "src/components/StepperTabs";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
@@ -17,9 +21,27 @@ import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 
+export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> & {
+  stepperTabs: StepperTabsProps;
+  /** Disables the Continue button, e.g. while the current step is invalid. ReactNode is shown as a tooltip. */
+  continueDisabled?: boolean | ReactNode;
+  /** Leaves the workflow without saving. Always shown. */
+  onCancel: (e: PressEvent) => void;
+  /** Label for the completion button shown on the last step. */
+  completeLabel: "Create" | "Save";
+  /** Called when the completion button is clicked. Only shown on the last step. */
+  onComplete: (e: PressEvent) => void | Promise<void>;
+  /** Disables the completion button. ReactNode is shown as a tooltip. */
+  completeDisabled?: boolean | ReactNode;
+  /** Whether Save & Exit is available on the current step. Default false. */
+  canExitEarly?: boolean;
+  /** Saves partial progress and exits. Used whenever canExitEarly is true. */
+  onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
+};
+
 export type WorkflowHeaderLayoutProps = {
-  /** Props for the `WorkflowHeader` rendered as the page-level header. */
-  workflowHeader: WorkflowHeaderProps;
+  /** Config for the `WorkflowHeader` rendered as the page-level header, and its CTAs (Back/Cancel/Save & Exit/Continue/Complete). */
+  workflowHeader: WorkflowHeaderConfig;
   /** Slot: main page body (e.g. `WorkflowLayout`). */
   children?: ReactNode;
 };
@@ -31,9 +53,23 @@ export type WorkflowHeaderLayoutProps = {
  * under `SideNavLayout`/`NavbarLayout`, not inside `PageHeaderLayout` (which renders a different header
  * component). Unlike `PageHeaderLayout`, the header here never auto-hides; the only scroll-driven
  * behavior is collapsing the stepper tabs.
+ *
+ * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) so it can move them
+ * into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part of the public API.
  */
 export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
-  const { workflowHeader, children } = props;
+  const { children } = props;
+  const {
+    stepperTabs,
+    continueDisabled,
+    onCancel,
+    completeLabel,
+    onComplete,
+    completeDisabled,
+    canExitEarly = false,
+    onSaveAndExit,
+    ...headerProps
+  } = props.workflowHeader;
   const tid = useTestIds(props, "workflowHeaderLayout");
   const { sm: isMobile } = useBreakpoint();
 
@@ -59,9 +95,57 @@ export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
   const cssVars: Record<string, string> | undefined =
     headerHeight > 0 ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
 
-  // On mobile, rightSlot buttons move out of the header and into a fixed footer instead.
-  const footerButtons = isMobile ? workflowHeader.rightSlot : undefined;
-  const showFooter = !!footerButtons && footerButtons.length > 0;
+  const { steps, currentStep, onChange } = stepperTabs;
+  const currentIndex = steps.findIndex((step) => step.value === currentStep);
+  const isFirstStep = currentIndex <= 0;
+  const isLastStep = currentIndex === steps.length - 1;
+
+  const buttons = (
+    <>
+      {!isFirstStep &&
+        (isMobile ? (
+          <IconButton
+            icon="arrowBack"
+            label="Back"
+            onClick={() => onChange(steps[currentIndex - 1].value)}
+            {...tid.back}
+          />
+        ) : (
+          <Button
+            label="Back"
+            icon="chevronLeft"
+            variant="tertiary"
+            onClick={() => onChange(steps[currentIndex - 1].value)}
+            {...tid.back}
+          />
+        ))}
+      <Button label="Cancel" variant="quaternary" onClick={onCancel} {...tid.cancel} />
+      {canExitEarly && onSaveAndExit && (
+        <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} {...tid.saveAndExit} />
+      )}
+      {isLastStep ? (
+        <Button
+          label={completeLabel}
+          variant="primary"
+          onClick={onComplete}
+          disabled={completeDisabled}
+          {...tid.complete}
+        />
+      ) : (
+        <Button
+          label="Continue"
+          variant="primary"
+          onClick={() => onChange(steps[currentIndex + 1].value)}
+          disabled={continueDisabled}
+          {...tid.continue}
+        />
+      )}
+    </>
+  );
+
+  // On mobile, the CTAs move out of the header and into a fixed footer instead. Cancel always renders,
+  // so unlike a free-form rightSlot there's never an "empty" case to guard against.
+  const showFooter = isMobile;
 
   useLayoutEffect(() => {
     const root = document.documentElement;
@@ -76,15 +160,12 @@ export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
     };
   }, [showFooter]);
 
-  const headerEl = useMemo(
-    () => (
-      <WorkflowHeader
-        {...workflowHeader}
-        rightSlot={isMobile ? undefined : workflowHeader.rightSlot}
-        stepperTabs={{ ...workflowHeader.stepperTabs, collapsed }}
-      />
-    ),
-    [workflowHeader, isMobile, collapsed],
+  const headerEl = (
+    <WorkflowHeader
+      {...headerProps}
+      rightSlot={isMobile ? undefined : <div css={Css.df.aic.gap1.$}>{buttons}</div>}
+      stepperTabs={{ ...stepperTabs, collapsed }}
+    />
   );
 
   return (
@@ -122,9 +203,7 @@ export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
             }
             {...tid.footer}
           >
-            {footerButtons!.map((buttonProps: ButtonProps, i: number) => (
-              <Button key={typeof buttonProps.label === "string" ? buttonProps.label : i} {...buttonProps} />
-            ))}
+            {buttons}
           </div>
         )}
       </div>

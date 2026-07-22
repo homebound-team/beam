@@ -20,9 +20,9 @@ export const beamSideNavLayoutWidthVar = "--beam-side-nav-layout-width";
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
 /**
- * `WorkflowLayout`'s mobile action-footer height (px); `0px` when absent. Published directly on
+ * `WorkflowHeaderLayout`'s mobile action-footer height (px); `0px` when absent. Published directly on
  * `document.documentElement` (not via inline `style` on a React-tree wrapper) since consumers like
- * `DocumentScrollToTopButton` are siblings of `WorkflowLayout`'s subtree, not descendants.
+ * `DocumentScrollToTopButton` are siblings of `WorkflowHeaderLayout`'s subtree, not descendants.
  */
 export const beamWorkflowLayoutFooterHeightVar = "--beam-workflow-layout-footer-height";
 

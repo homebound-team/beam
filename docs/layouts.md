@@ -5,7 +5,7 @@ This document is the **canonical contract** for structural page layouts in Beam.
 ## Rules (normative)
 
 1. **Use the layouts for app page structure** — When a screen matches the navbar + body, side nav + content, or page-header + body pattern, compose **`EnvironmentBannerLayout`**, **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** (or **`WorkflowHeaderLayout`** for step-based workflow pages) from `@homebound/beam` instead of ad-hoc flex wrappers that recreate the same regions.
-2. **Preserve nesting order** when all apply: **`EnvironmentBannerLayout` → `NavbarLayout` → `SideNavLayout` → `PageHeaderLayout`**. For step-based workflow pages, use **`WorkflowHeaderLayout`** as the innermost layout instead of `PageHeaderLayout` — the two are not nested together, since `WorkflowHeaderLayout` renders a different header component (`WorkflowHeader`) and owns its own chrome. Its body is typically **`WorkflowLayout`**, passed as `children`, the same way `GridTableLayout`/arbitrary content is `PageHeaderLayout`'s.
+2. **Preserve nesting order** when all apply: **`EnvironmentBannerLayout` → `NavbarLayout` → `SideNavLayout` → `PageHeaderLayout`**. For step-based workflow pages, use **`WorkflowHeaderLayout`** as the innermost layout instead of `PageHeaderLayout` — the two are not nested together, since `WorkflowHeaderLayout` renders a different header component (`WorkflowHeader`) and owns its own chrome. Its body is arbitrary content, passed as `children`, the same way `GridTableLayout`/arbitrary content is `PageHeaderLayout`'s.
 3. **Layouts render Beam components, not arbitrary nodes** — Each layout owns its chrome and renders the real Beam component internally. Pass the component's props as a **nested object** (`environmentBanner`, `navbar`, `sideNav`, `pageHeader`/`workflowHeader`); pass page body content via **`children`**. The layouts handle the document-scroll coordination (sticky chrome, auto-hide, CSS-var offsets) for you.
 
 ## React (`@homebound/beam`)
@@ -16,12 +16,7 @@ This document is the **canonical contract** for structural page layouts in Beam.
 | `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                               |
 | `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`  |
 | `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                       |
-| `WorkflowHeaderLayout`    | `WorkflowHeader`               | `workflowHeader: WorkflowHeaderProps`; body → **`children`** (typically `WorkflowLayout`)                  |
-
-`WorkflowLayout` itself isn't in this table — it's not a chrome-owning `*Layout`, it's the typical body
-content for `WorkflowHeaderLayout`: `steps: WorkflowLayoutStep[]`, `currentStep`, `fullWidthContent?`.
-It picks and renders the active step's content; the tab strip and header CTAs live in the wrapping
-`WorkflowHeaderLayout` instead.
+| `WorkflowHeaderLayout`    | `WorkflowHeader`               | `workflowHeader: WorkflowHeaderConfig`; body → **`children`**                                              |
 
 `EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating, showProdWarning)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating or with `showProdWarning`); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation or `showProdWarning`). The banner does **not** auto-hide.
 
