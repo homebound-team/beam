@@ -16,12 +16,12 @@ import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
+import { WorkflowHeaderLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
 
 /**
- * Demos `WorkflowLayout` over the same form-state domain as `StepperFormApp`. The header (title, tab
- * strip, Back/Continue/Save CTAs) and the active step's content are both owned by `WorkflowLayout`
- * from a single unified `steps` array.
+ * Demos `WorkflowHeaderLayout` + `WorkflowLayout` over the same form-state domain as `StepperFormApp`.
+ * The header (title, tab strip, Back/Continue/Save CTAs) lives in `WorkflowHeaderLayout`; the active
+ * step's content lives in the nested `WorkflowLayout`. Both are driven from the same `steps` array.
  */
 export function WorkflowLayoutFormApp() {
   const formState = useFormState({
@@ -99,12 +99,19 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
         ];
 
         return (
-          <WorkflowLayout
-            steps={steps}
-            currentStep={currentStep}
-            onChange={setCurrentStep}
-            workflowHeader={{ title: "Workflow Layout Form", rightSlot }}
-          />
+          <WorkflowHeaderLayout
+            workflowHeader={{
+              title: "Workflow Layout Form",
+              rightSlot,
+              stepperTabs: {
+                steps: steps.map(({ value, label, completed, disabled }) => ({ value, label, completed, disabled })),
+                currentStep,
+                onChange: setCurrentStep,
+              },
+            }}
+          >
+            <WorkflowLayout steps={steps} currentStep={currentStep} />
+          </WorkflowHeaderLayout>
         );
       }}
     </Observer>
