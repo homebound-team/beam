@@ -86,8 +86,8 @@ export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string;
 }
 
 /**
- * `NavbarLayout` + `SideNavLayout` + `WorkflowHeaderLayout` — for `WorkflowLayout` stories, which are a
- * peer/replacement for `PageHeaderLayout`'s body slot, not a child of `PageHeaderLayout` itself.
+ * `NavbarLayout` + `WorkflowHeaderLayout`. For `WorkflowLayout` stories, which are a peer/replacement for
+ * `PageHeaderLayout`'s body slot, not a child of `PageHeaderLayout` itself.
  */
 export function TestWorkflowProjectLayout({
   workflowHeader,
@@ -98,9 +98,7 @@ export function TestWorkflowProjectLayout({
 }) {
   return (
     <NavbarLayout navbar={createNavbar()}>
-      <SideNavLayout sideNav={{ items: sideNavItems() }}>
-        <WorkflowHeaderLayout workflowHeader={workflowHeader}>{children}</WorkflowHeaderLayout>
-      </SideNavLayout>
+      <WorkflowHeaderLayout workflowHeader={workflowHeader}>{children}</WorkflowHeaderLayout>
     </NavbarLayout>
   );
 }

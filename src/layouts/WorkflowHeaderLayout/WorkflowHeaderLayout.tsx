@@ -94,7 +94,7 @@ export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
         <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }} {...tid.spacer}>
           <div
             ref={headerMetricsRef}
-            css={Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$}
+            css={Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$}
             style={{ top: outerTop } as CSSProperties}
             {...tid.header}
           >
