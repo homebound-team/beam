@@ -58,6 +58,7 @@ export const Icon = (props: IconProps) => {
     "undoCircle",
     "drag",
     "move",
+    "merge",
     "add",
     "remove",
     "pin",
