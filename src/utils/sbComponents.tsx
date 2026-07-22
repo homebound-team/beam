@@ -16,7 +16,13 @@ import {
   SimpleHeaderAndData,
   Tokens,
 } from "src/index";
-import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
+import {
+  NavbarLayout,
+  PageHeaderLayout,
+  SideNavLayout,
+  WorkflowHeaderLayout,
+  WorkflowHeaderLayoutProps,
+} from "src/layouts";
 import { zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
 
@@ -76,13 +82,21 @@ export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string;
 }
 
 /**
- * `NavbarLayout` + `SideNavLayout` chrome without `PageHeaderLayout` — for `WorkflowLayout` stories,
- * which own their own header/chrome and are a peer/replacement for `PageHeaderLayout`, not a child of it.
+ * `NavbarLayout` + `SideNavLayout` + `WorkflowHeaderLayout` — for `WorkflowLayout` stories, which are a
+ * peer/replacement for `PageHeaderLayout`'s body slot, not a child of `PageHeaderLayout` itself.
  */
-export function TestWorkflowProjectLayout({ children }: { children: ReactNode }) {
+export function TestWorkflowProjectLayout({
+  workflowHeader,
+  children,
+}: {
+  workflowHeader: WorkflowHeaderLayoutProps["workflowHeader"];
+  children: ReactNode;
+}) {
   return (
     <NavbarLayout navbar={createNavbar()}>
-      <SideNavLayout sideNav={{ items: sideNavItems() }}>{children}</SideNavLayout>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>
+        <WorkflowHeaderLayout workflowHeader={workflowHeader}>{children}</WorkflowHeaderLayout>
+      </SideNavLayout>
     </NavbarLayout>
   );
 }

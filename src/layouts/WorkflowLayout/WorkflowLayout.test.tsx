@@ -1,5 +1,4 @@
-import { setViewport } from "src/tests/viewport";
-import { click, render, scrollWindowWithAnchor, withRouter } from "src/utils/rtl";
+import { render, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
@@ -58,78 +57,12 @@ describe("WorkflowLayout", () => {
     expect(r.query.workflowLayout_stepHeading).not.toBeInTheDocument();
     expect(r.query.workflowLayout_stepDescription).not.toBeInTheDocument();
   });
-
-  it("renders rightSlot buttons in the header on desktop", async () => {
-    // Given a desktop viewport (the test default)
-    const r = await render(<TestWrapper currentStep="one" />, withRouter());
-
-    // Then the button renders inside the header, and no footer is rendered
-    expect(r.workflowLayout_header).toHaveTextContent("Continue");
-    expect(r.query.workflowLayout_footer).not.toBeInTheDocument();
-  });
-
-  it("moves rightSlot buttons to a mobile footer at the sm breakpoint", async () => {
-    // Given a mobile viewport
-    setViewport("sm");
-    const r = await render(<TestWrapper currentStep="one" />, withRouter());
-
-    // Then the button renders in the footer instead of the header
-    expect(r.workflowLayout_footer).toHaveTextContent("Continue");
-    expect(r.workflowLayout_header).not.toHaveTextContent("Continue");
-  });
-
-  it("omits the mobile footer when there are no rightSlot buttons", async () => {
-    // Given a mobile viewport with no rightSlot buttons configured
-    setViewport("sm");
-    const r = await render(<TestWrapper currentStep="one" rightSlot={[]} />, withRouter());
-
-    // Then no footer renders
-    expect(r.query.workflowLayout_footer).not.toBeInTheDocument();
-  });
-
-  it("forces the stepper tabs into their non-interactive collapsed state once scrolled down, and re-expands on scroll-up even short of the top", async () => {
-    // Given a WorkflowLayout on step one, with an enabled (not disabled/active) second step
-    const onChange = vi.fn();
-    const r = await render(<TestWrapper currentStep="one" onChange={onChange} />, withRouter());
-
-    // Then, at the top of the page, clicking the second step's tab navigates to it
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).toHaveBeenCalledWith("two");
-    onChange.mockClear();
-
-    // When the page scrolls down past the threshold, the tabs collapse to a non-interactive indicator bar
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 300);
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).not.toHaveBeenCalled();
-
-    // When scrolling back up — even without reaching the top — the tabs re-expand
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 250);
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).toHaveBeenCalledWith("two");
-    onChange.mockClear();
-
-    // And scrolling all the way back to the top keeps them expanded
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).toHaveBeenCalledWith("two");
-  });
 });
 
 function TestWrapper(
-  props: Partial<WorkflowLayoutProps> & {
-    currentStep: string;
-    withHeadingAndDescription?: boolean;
-    rightSlot?: WorkflowLayoutProps["workflowHeader"]["rightSlot"];
-  },
+  props: Partial<WorkflowLayoutProps> & { currentStep: string; withHeadingAndDescription?: boolean },
 ) {
-  const {
-    currentStep,
-    fullWidthContent,
-    withHeadingAndDescription,
-    rightSlot = [{ label: "Continue", onClick: () => {} }],
-    onChange = () => {},
-  } = props;
+  const { currentStep, fullWidthContent, withHeadingAndDescription } = props;
   const steps: WorkflowLayoutStep[] = [
     {
       value: "one",
@@ -141,13 +74,5 @@ function TestWrapper(
     { value: "two", label: "Step Two", completed: false, content: <div data-testid="stepTwoContent">Step Two</div> },
   ];
 
-  return (
-    <WorkflowLayout
-      steps={steps}
-      currentStep={currentStep}
-      onChange={onChange}
-      fullWidthContent={fullWidthContent}
-      workflowHeader={{ title: "Test Workflow", rightSlot }}
-    />
-  );
+  return <WorkflowLayout steps={steps} currentStep={currentStep} fullWidthContent={fullWidthContent} />;
 }
