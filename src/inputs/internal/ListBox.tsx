@@ -59,17 +59,28 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
   // Using a ref, this itself should not trigger a rerender, only `popoverHeight` changes will trigger a rerender.
   const virtuosoListHeight = useRef<number>(0);
   const onListHeightChange = (listHeight: number) => {
+    const prevListHeight = virtuosoListHeight.current;
     virtuosoListHeight.current = listHeight;
     // The "listHeight" is only the list of options.
     // For multiple selects we need to also account for the height of the list of currently selected elements when re-evaluating.
     // Using `offsetHeight` to account for borders
     const height = (selectedList.current?.offsetHeight || 0) + listHeight;
 
-    // Using Math.min to choose between the smaller height, either the total height of the List (`height` arg), or the maximum height defined by the space allotted on screen or our hard coded max.
-    // If there are ListBoxSections, then we assume it is the persistent section with a single item and account for that height.
-    setPopoverHeight(
-      Math.min(popoverMaxHeight, hasSections ? height + persistentItemHeight + sectionSeparatorHeight : height),
+    // Cap at the space allotted on screen / UX max. If there are ListBoxSections, then we assume
+    // it is the persistent section with a single item and account for that height.
+    const next = Math.min(
+      popoverMaxHeight,
+      hasSections ? height + persistentItemHeight + sectionSeparatorHeight : height,
     );
+
+    setPopoverHeight((prev) => {
+      // If the option list got shorter (e.g. typeahead filter) and that would shrink the
+      // popover, keep the current height so the scroll area does not collapse.
+      if (prevListHeight > 0 && listHeight < prevListHeight && next < prev) {
+        return prev;
+      }
+      return next;
+    });
   };
 
   useEffect(
