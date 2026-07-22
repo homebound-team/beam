@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Breadcrumb } from "src/components/Breadcrumbs";
 import { Button } from "src/components/Button";
-import { PageHeader } from "src/components/PageHeader";
+import { PageHeader } from "src/components/Headers/PageHeader";
 import { TabContent } from "src/components/Tabs";
 import { testTabs } from "src/components/testData";
 import { withBeamDecorator, withRouter } from "src/utils/sb";

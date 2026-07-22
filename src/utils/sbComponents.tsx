@@ -72,11 +72,15 @@ export function TableExample({
 }
 
 export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string; children: ReactNode }) {
+  const content = pageTitle ? (
+    <PageHeaderLayout pageHeader={{ title: pageTitle }}>{children}</PageHeaderLayout>
+  ) : (
+    children
+  );
+
   return (
     <NavbarLayout navbar={createNavbar()}>
-      <SideNavLayout sideNav={{ items: sideNavItems() }}>
-        <PageHeaderLayout pageHeader={{ title: pageTitle ?? "" }}>{children}</PageHeaderLayout>
-      </SideNavLayout>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>{content}</SideNavLayout>
     </NavbarLayout>
   );
 }

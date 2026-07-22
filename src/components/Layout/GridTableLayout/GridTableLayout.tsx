@@ -1,8 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
-import React, { ReactNode, RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
-import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
@@ -21,15 +20,10 @@ import {
 } from "src/layouts/layoutVars";
 import { noop, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
-import { FullBleed } from "../FullBleed";
-import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
-import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
-import { GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
+import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
+import { ActionButtonMenuProps, GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
-
-// Omit to force all action button menus to look the same
-type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
 
 // GridTableLayout-specific query props extend the shared base with display extras.
 type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseQueryTableProps<
@@ -47,17 +41,12 @@ export type GridTableLayoutProps<
   X extends Only<GridTableXss, X>,
   QData,
 > = {
-  pageTitle?: ReactNode;
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
-  breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   /** Title for the empty state when the table has no data rows. */
   emptyFallback?: string;
   /** Renders a ButtonMenu with "verticalDots" icon as trigger */
   actionMenu?: ActionButtonMenuProps;
-  primaryAction?: ActionButtonProps;
-  secondaryAction?: ActionButtonProps;
-  tertiaryAction?: ActionButtonProps;
   hideEditColumns?: boolean;
   totalCount?: number;
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
@@ -98,13 +87,8 @@ function GridTableLayoutComponent<
   QData,
 >(props: GridTableLayoutProps<F, R, X, QData>) {
   const {
-    pageTitle,
-    breadCrumb,
     tableProps,
     layoutState,
-    primaryAction,
-    secondaryAction,
-    tertiaryAction,
     actionMenu,
     hideEditColumns = false,
     withCardView,
@@ -128,7 +112,13 @@ function GridTableLayoutComponent<
   );
   const [view, setView] = usePersistedTableView(defaultView, !!withCardView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
-  const showTableActions = !!(layoutState?.filterDefs || layoutState?.search || hasHideableColumns || withCardView);
+  const showTableActions = !!(
+    layoutState?.filterDefs ||
+    layoutState?.search ||
+    hasHideableColumns ||
+    withCardView ||
+    actionMenu
+  );
   const isVirtualized = tableProps.as === "virtual" || (!!withCardView && view === "card");
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const tableActionsRef = useRef<HTMLDivElement>(null);
@@ -178,6 +168,7 @@ function GridTableLayoutComponent<
       setView={setView}
       clearFilters={clearFilters}
       searchApi={searchApiRef}
+      actionMenu={actionMenu}
     />
   );
 
@@ -243,22 +234,10 @@ function GridTableLayoutComponent<
   );
 
   return (
-    <>
-      {pageTitle && (
-        <Header
-          pageTitle={pageTitle}
-          breadCrumb={breadCrumb}
-          primaryAction={primaryAction}
-          secondaryAction={secondaryAction}
-          tertiaryAction={tertiaryAction}
-          actionMenu={actionMenu}
-        />
-      )}
-      {/* Wrapper sets --beam-table-actions-height so GridTable's sticky header can read it. */}
-      <div ref={tableWrapperRef} css={Css.display("contents").$} {...tid.tableWrapper}>
-        {tableScrollContent}
-      </div>
-    </>
+    /* Wrapper sets --beam-table-actions-height so GridTable's sticky header can read it. */
+    <div ref={tableWrapperRef} css={Css.display("contents").$} {...tid.tableWrapper}>
+      {tableScrollContent}
+    </div>
   );
 }
 
@@ -351,15 +330,6 @@ function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, 
   };
 }
 
-type HeaderProps = {
-  pageTitle: ReactNode;
-  breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
-  primaryAction?: ActionButtonProps;
-  secondaryAction?: ActionButtonProps;
-  tertiaryAction?: ActionButtonProps;
-  actionMenu?: ActionButtonMenuProps;
-};
-
 /** Sets `--beam-table-actions-height` on the table wrapper so the sticky header can read it without re-rendering children. */
 function useSetTableActionsHeight(
   tableWrapperRef: RefObject<HTMLElement | null>,
@@ -392,31 +362,6 @@ function useSetTableActionsHeight(
       tableWrapper?.style.removeProperty(beamTableActionsHeightVar);
     };
   }, [tableWrapperRef, syncHeightVar]);
-}
-
-function Header(props: HeaderProps) {
-  const { pageTitle, breadCrumb, primaryAction, secondaryAction, tertiaryAction, actionMenu } = props;
-  const tids = useTestIds(props);
-
-  return (
-    <FullBleed>
-      <header css={{ ...Css.p3.mhPx(50).bgWhite.df.jcsb.aic.$ }} {...tids.header}>
-        <div>
-          {breadCrumb && <PageHeaderBreadcrumbs breadcrumb={breadCrumb} />}
-          <h1 css={Css.xl2.mt1.$} {...tids.pageTitle}>
-            {pageTitle}
-          </h1>
-        </div>
-        {/* Flex wrap reverse and justify flex end allows the buttons to wrap naturally/responsively on smaller screens */}
-        <div css={Css.df.fwr.jcfe.gap1.aic.$}>
-          {tertiaryAction && <Button {...tertiaryAction} variant="tertiary" />}
-          {secondaryAction && <Button {...secondaryAction} variant="secondary" />}
-          {primaryAction && <Button {...primaryAction} />}
-          {actionMenu && <ButtonMenu {...actionMenu} trigger={{ icon: "verticalDots" }} />}
-        </div>
-      </header>
-    </FullBleed>
-  );
 }
 
 /** Merges layout defaults with a GridStyleDef, or passes a full GridStyle through unchanged. */
