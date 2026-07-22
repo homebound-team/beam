@@ -1,27 +1,29 @@
 import { BeamProvider } from "src/components/BeamContext";
 import { Button } from "src/components/Button";
-import { PageHeader } from "src/components/PageHeader";
-import { Tab } from "src/components/Tabs";
+import { BaseHeader } from "src/components/Headers/BaseHeader";
 import { noop } from "src/utils";
-import { render, withRouter } from "src/utils/rtl";
+import { render } from "src/utils/rtl";
 
-describe("PageHeader", () => {
+describe("BaseHeader", () => {
   beforeEach(() => {
     document.title = "";
   });
 
   it("renders", async () => {
-    const r = await render(<PageHeader title="Test Title" />);
-    expect(r.pageHeader).toBeInTheDocument();
-    expect(r.pageHeader_title.textContent).toEqual("Test Title");
+    // Given a BaseHeader with a title
+    // When rendered
+    const r = await render(<BaseHeader title="Test Title" />);
+    // Then the header and its title are shown
+    expect(r.header).toBeInTheDocument();
+    expect(r.header_title.textContent).toEqual("Test Title");
   });
 
   it("sets document.title when BeamProvider documentTitleConfig is configured", async () => {
-    // Given BeamProvider with documentTitleConfig and a PageHeader
+    // Given BeamProvider with documentTitleConfig and a BaseHeader
     // When rendered
     await render(
       <BeamProvider documentTitleConfig={{ env: "local", suffix: "Blueprint | Homebound" }}>
-        <PageHeader title="Projects" />
+        <BaseHeader title="Projects" />
       </BeamProvider>,
       { omitBeamContext: true },
     );
@@ -31,27 +33,32 @@ describe("PageHeader", () => {
   });
 
   it("includes documentTitleSuffix in document.title only", async () => {
-    // Given a PageHeader with documentTitleSuffix inside BeamProvider
+    // Given a BaseHeader with documentTitleSuffix inside BeamProvider
     const r = await render(
       <BeamProvider documentTitleConfig={{ env: "qa", suffix: "Blueprint | Homebound" }}>
-        <PageHeader title="Schedule" documentTitleSuffix="123 Sesame St" />
+        <BaseHeader title="Schedule" documentTitleSuffix="123 Sesame St" />
       </BeamProvider>,
       { omitBeamContext: true },
     );
 
     // Then the suffix appears in document.title but not the visible heading
     expect(document.title).toBe("[QA] Schedule | 123 Sesame St | Blueprint | Homebound");
-    expect(r.pageHeader_title.textContent).toBe("Schedule");
+    expect(r.header_title.textContent).toBe("Schedule");
   });
 
   it("renders with right slot", async () => {
-    const r = await render(<PageHeader title="Test Title" rightSlot={<Button label="Test Button" onClick={noop} />} />);
+    // Given a BaseHeader with rightSlot content
+    // When rendered
+    const r = await render(<BaseHeader title="Test Title" rightSlot={<Button label="Test Button" onClick={noop} />} />);
+    // Then the right slot content is shown
     expect(r.testButton).toBeInTheDocument();
   });
 
   it("renders breadcrumbs when provided", async () => {
+    // Given a BaseHeader with breadcrumbs
+    // When rendered
     const r = await render(
-      <PageHeader
+      <BaseHeader
         title="Test Title"
         breadcrumbs={{
           breadcrumbs: [
@@ -62,29 +69,16 @@ describe("PageHeader", () => {
       />,
       {},
     );
+    // Then the breadcrumbs are shown
     expect(r.breadcrumb_link_0.textContent).toEqual("Home");
     expect(r.breadcrumb_link_1.textContent).toEqual("Projects");
   });
 
-  it("renders with tabs", async () => {
-    const tabs: Tab[] = [
-      { name: "Tab A", value: "tabA" },
-      { name: "Tab B", value: "tabB" },
-      { name: "Tab C", value: "tabC" },
-    ];
-    const r = await render(
-      <PageHeader
-        title="Test Title"
-        tabs={{
-          tabs,
-          selected: "tabA",
-          onChange: noop,
-        }}
-      />,
-      withRouter(),
-    );
-    expect(r.tabs_tabA).toBeInTheDocument();
-    expect(r.tabs_tabB).toBeInTheDocument();
-    expect(r.tabs_tabC).toBeInTheDocument();
+  it("renders bottom slot content", async () => {
+    // Given a BaseHeader with bottomSlot content
+    // When rendered
+    const r = await render(<BaseHeader title="Test Title" bottomSlot={<div data-testid="customBottomSlot" />} />);
+    // Then the bottom slot content is shown
+    expect(r.customBottomSlot).toBeInTheDocument();
   });
 });

@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
-import { PageHeader } from "src/components/PageHeader";
+import { PageHeader } from "src/components/Headers/PageHeader";
 import { GridDataRow, SimpleHeaderAndData } from "src/components/Table";
 import {
   cardBadgeSlot,
