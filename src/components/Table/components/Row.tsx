@@ -132,13 +132,15 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(rs.isDraggedOver === DraggedOver.Below && Css.pbPx(25).$),
   };
 
+  // Narrow away `"none"` so the CSS var value is a plain color string (no cast needed).
+  const rowHoverBg: string =
+    style.rowHoverColor !== undefined && style.rowHoverColor !== "none" ? style.rowHoverColor : Palette.Blue50;
+
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
     ...(isFirstBodyRow && style.firstBodyRowCss),
     ...(isFirstHeadRow && style.firstRowCss),
     ...(as === "table" && tableRowPrintBreakCss),
-    // Optionally include the row hover styles, by default they should be turned on.
-    ...(showRowHoverColor && Css.onHover.bgColor(style.rowHoverColor ?? Palette.Blue100).$),
     ...(levelIndent && Css.mlPx(levelIndent).$),
     // For virtual tables use `display: flex` to keep all cells on the same row.
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
@@ -146,6 +148,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...((rowStyle?.rowLink || rowStyle?.onClick) && Css.onHover.cursorPointer.$),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
+    // Row hover paints cells via Row.css.ts (`.beam-row-hover:hover > *`); set the var via Css.style
+    // (React CSSProperties rejects custom props without a cast).
+    ...(showRowHoverColor && Css.style({ [rowHoverBgVar]: rowHoverBg }).$),
     // keptLastRowCss is now applied per-cell in cellCss below
   };
 
@@ -168,7 +173,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const onDragOverDebounced = useDebouncedCallback(dragOverCallback, 100);
 
   const RowContent = () => (
-    <RowTag css={rowCss} {...others} data-gridrow {...getCount(row.id)} ref={ref} className={BorderHoverParent}>
+    <RowTag
+      css={rowCss}
+      {...others}
+      data-gridrow
+      {...getCount(row.id)}
+      ref={ref}
+      className={`${BorderHoverParent} ${RowHoverClass}`}
+    >
       {isKeptGroupRow ? (
         <KeptGroupRow
           as={as}
@@ -544,3 +556,8 @@ export type GridDataRow<R extends Kinded> = {
 // Used by TextFieldBase to set a border when the row is being hovered over
 export const BorderHoverParent = "beam-bhp";
 export const BorderHoverChild = "beam-bhc";
+
+/** Class paired with `rowHoverBgVar` in Row.css.ts for cell hover fill. */
+export const RowHoverClass = "beam-row-hover";
+/** CSS custom property for the row hover background color applied to cells. */
+export const rowHoverBgVar = "--beam-row-hover-bg";
