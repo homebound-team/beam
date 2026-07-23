@@ -4,29 +4,25 @@ This document is the **canonical contract** for structural page layouts in Beam.
 
 ## Rules (normative)
 
-1. **Use the layouts for app page structure** — When a screen matches the navbar + body, side nav + content, or page-header + body pattern, compose **`EnvironmentBannerLayout`**, **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** (or **`WorkflowHeaderLayout`** for step-based workflow pages) from `@homebound/beam` instead of ad-hoc flex wrappers that recreate the same regions.
-2. **Preserve nesting order** when all apply: **`EnvironmentBannerLayout` → `NavbarLayout` → `SideNavLayout` → `PageHeaderLayout`**. For step-based workflow pages, use **`WorkflowHeaderLayout`** as the innermost layout instead of `PageHeaderLayout` — the two are not nested together, since `WorkflowHeaderLayout` renders a different header component (`WorkflowHeader`) and owns its own chrome. Its body is typically **`WorkflowLayout`**, passed as `children`, the same way `GridTableLayout`/arbitrary content is `PageHeaderLayout`'s.
-3. **Layouts render Beam components, not arbitrary nodes** — Each layout owns its chrome and renders the real Beam component internally. Pass the component's props as a **nested object** (`environmentBanner`, `navbar`, `sideNav`, `pageHeader`/`workflowHeader`); pass page body content via **`children`**. The layouts handle the document-scroll coordination (sticky chrome, auto-hide, CSS-var offsets) for you.
+1. **Use the layouts for app page structure** — When a screen matches the navbar + body, side nav + content, or page-header + body pattern, compose **`EnvironmentBannerLayout`**, **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** from `@homebound/beam` instead of ad-hoc flex wrappers that recreate the same regions. Step-based workflow pages instead use **`WorkflowLayout`** — see its own rule below.
+2. **Preserve nesting order** when all apply: **`EnvironmentBannerLayout` → `NavbarLayout` → `SideNavLayout` → `PageHeaderLayout`**.
+3. **`WorkflowLayout` is standalone, not a `PageHeaderLayout` peer** — Step-based workflow pages are their own full-page experience: **`EnvironmentBannerLayout` → `WorkflowLayout`**, never nested under `NavbarLayout` or `SideNavLayout`. `WorkflowLayout` renders its own header (`WorkflowHeader`) and owns its own chrome; its body is arbitrary content, passed as `children`.
+4. **Layouts render Beam components, not arbitrary nodes** — Each layout owns its chrome and renders the real Beam component internally. Pass the component's props as a **nested object** (`environmentBanner`, `navbar`, `sideNav`, `pageHeader`, `workflowHeader`); pass page body content via **`children`**. The layouts handle the document-scroll coordination (sticky chrome, auto-hide, CSS-var offsets) for you.
 
 ## React (`@homebound/beam`)
 
-| Layout                    | Renders                        | Props                                                                                                      |
-| ------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `EnvironmentBannerLayout` | `EnvironmentBanner` (optional) | `environmentBanner?: EnvironmentBannerProps`; body → **`children`**                                        |
-| `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                               |
-| `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`  |
-| `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                       |
-| `WorkflowHeaderLayout`    | `WorkflowHeader`               | `workflowHeader: WorkflowHeaderProps`; body → **`children`** (typically `WorkflowLayout`)                  |
-
-`WorkflowLayout` itself isn't in this table — it's not a chrome-owning `*Layout`, it's the typical body
-content for `WorkflowHeaderLayout`: `steps: WorkflowLayoutStep[]`, `currentStep`, `fullWidthContent?`.
-It picks and renders the active step's content; the tab strip and header CTAs live in the wrapping
-`WorkflowHeaderLayout` instead.
+| Layout                    | Renders                        | Props                                                                                                                              |
+| ------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `EnvironmentBannerLayout` | `EnvironmentBanner` (optional) | `environmentBanner?: EnvironmentBannerProps`; body → **`children`**                                                                |
+| `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                       |
+| `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                          |
+| `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                                               |
+| `WorkflowLayout`          | `WorkflowHeader`               | `workflowHeader: WorkflowHeaderConfig`; body → **`children`** — standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
 
 `EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating, showProdWarning)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating or with `showProdWarning`); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation or `showProdWarning`). The banner does **not** auto-hide.
 
 The navbar and page header **always auto-hide** — they scroll away on scroll-down and slide back in on
-scroll-up. (`WorkflowHeaderLayout`'s header is the one exception — see below.)
+scroll-up. (`WorkflowLayout`'s header is the one exception — see below.)
 
 ```tsx
 // main.tsx (once at bootstrap, before render)
@@ -66,6 +62,25 @@ import {
 </EnvironmentBannerLayout>;
 ```
 
+Step-based workflow pages skip `NavbarLayout`/`SideNavLayout` entirely — `WorkflowLayout` is a standalone,
+full-page experience:
+
+```tsx
+import { EnvironmentBannerLayout, shouldShowEnvironmentBanner, WorkflowLayout } from "@homebound/beam";
+
+<EnvironmentBannerLayout
+  environmentBanner={
+    shouldShowEnvironmentBanner(env, impersonating, showProdWarning)
+      ? { env, impersonating, showProdWarning }
+      : undefined
+  }
+>
+  <WorkflowLayout workflowHeader={{ title, stepperTabs, onCancel, completeLabel, onComplete }}>
+    <YourWorkflowStepBody />
+  </WorkflowLayout>
+</EnvironmentBannerLayout>;
+```
+
 ### Environment favicons
 
 Favicon **image files** are app-owned (host PNGs under your app's `public/` directory; 32×32 PNG recommended for Safari). Beam provides **`setEnvironmentFavicon(env, favicons)`** — call it once at app bootstrap (e.g. `main.tsx`) with the same `env` used for `EnvironmentBannerLayout`. Keep a static default `<link rel="icon">` in `index.html` for first paint before React hydrates.
@@ -83,7 +98,7 @@ tables) uses the document scrollbars while chrome stays in place:
 - `SideNavLayout` publishes its rail width (`--beam-side-nav-layout-width`) for sticky column offsets.
 - `PageHeaderLayout` reads those and publishes its own height (`--beam-page-header-layout-height`).
 - `GridTableLayout` — **inside `DocumentScrollLayoutProvider`** (e.g. under `NavbarLayout` / `PageHeaderLayout`): when filters, search, or edit-columns are shown, measures and publishes the table actions toolbar height (`--beam-table-actions-height`), pins table actions with the other document-scroll chrome, and renders the table inline for document scroll. **`GridTable`** reads these vars so its sticky header sits below the environment banner + navbar + page header + table actions and its sticky columns sit right of the side nav rail. **Outside document-scroll layouts**, `GridTableLayout` does not publish that var or pin table actions; it wraps the table in **`ScrollableParent` / `ScrollableContent`** (with `virtualized` when `as="virtual"`) so scrolling stays in the legacy page scroll region.
-- `WorkflowHeaderLayout` publishes `--beam-page-header-layout-height` the same way `PageHeaderLayout` does (so `stickyNavAndHeaderOffset` / `stickyTableHeaderOffset` / `GridTable` keep working unchanged inside a workflow page), but its header itself does **not** auto-hide — it stays always visible/sticky. It reuses the same scroll-direction tracking as the navbar/page-header auto-hide, but for a different effect: its stepper tabs collapse on scroll-down and re-expand on scroll-up (even before reaching the top), rather than the header sliding away. On the `sm` breakpoint, its header's action buttons move to a sticky mobile footer instead, whose height it publishes as `--beam-workflow-layout-footer-height` (read by `DocumentScrollToTopButton` so the floating scroll-to-top control isn't covered by the footer).
+- `WorkflowLayout` publishes `--beam-page-header-layout-height` the same way `PageHeaderLayout` does (so `stickyNavAndHeaderOffset` / `stickyTableHeaderOffset` / `GridTable` keep working unchanged inside a workflow page), but its header itself does **not** auto-hide — it stays always visible/sticky. It reuses the same scroll-direction tracking as the navbar/page-header auto-hide, but for a different effect: its stepper tabs collapse on scroll-down and re-expand on scroll-up (even before reaching the top), rather than the header sliding away. On the `sm` breakpoint, its header's action buttons move to a sticky mobile footer instead, whose height it publishes as `--beam-workflow-layout-footer-height`. `getFloatingBottomOffset(basePx?)` reads that var so bottom-anchored floating chrome (e.g. `DocumentScrollToTopButton`) stacks above the footer instead of being covered by it — the same pattern future bottom-anchored elements should use.
 
 The exported var-name constants (`beamNavbarLayoutHeightVar`, etc.) are available for advanced sticky
 chrome inside a page body.

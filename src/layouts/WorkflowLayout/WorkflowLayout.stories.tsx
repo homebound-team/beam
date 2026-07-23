@@ -1,86 +1,58 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
+import { StepperTabsStep } from "src/components/StepperTabs";
 import { Css } from "src/Css";
-import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestWorkflowProjectLayout } from "src/utils/sbComponents";
-import { WorkflowLayout as WorkflowLayoutComponent, WorkflowLayoutStep } from "./WorkflowLayout";
+import { action } from "storybook/actions";
+import { WorkflowLayout as WorkflowLayoutComponent } from "./WorkflowLayout";
 
 export default {
   component: WorkflowLayoutComponent,
   decorators: [withBeamDecorator, withRouter()],
-  parameters: { layout: "fullscreen" },
+  parameters: {
+    layout: "fullscreen",
+    chromatic: { modes: viewportModes("desktop", "mobile1") },
+  },
 } satisfies Meta;
 
 export function Default() {
   const [currentStep, setCurrentStep] = useState("trade");
-  const steps = makeSteps();
   return (
     <TestWorkflowProjectLayout
       workflowHeader={{
         title: "Workflow Layout",
-        rightSlot: [
-          { variant: "tertiary", label: "Save Draft", onClick: () => {} },
-          { label: "Continue", onClick: () => {} },
-        ],
-        stepperTabs: { steps: toStepperTabsSteps(steps), currentStep, onChange: setCurrentStep },
+        onCancel: action("cancel clicked"),
+        completeLabel: "Save",
+        onComplete: action("complete clicked"),
+        canExitEarly: true,
+        onSaveAndExit: action("save and exit clicked"),
+        stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
       }}
     >
-      <WorkflowLayoutComponent steps={steps} currentStep={currentStep} />
+      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} />
     </TestWorkflowProjectLayout>
   );
 }
 
-export function FullWidthContent() {
+/**
+ * Tall step content so the page scrolls — scroll down to see the header's stepper tabs collapse to
+ * their condensed look (the header itself stays pinned; it never auto-hides), then scroll back up
+ * (even without reaching the top) to see them re-expand.
+ */
+export function ScrollCollapsesTabs() {
   const [currentStep, setCurrentStep] = useState("trade");
-  const steps: WorkflowLayoutStep[] = tabValues.map((value, i) => ({
-    value,
-    label: tabLabels[value],
-    completed: false,
-    disabled: i > 0,
-    content: (
-      <div css={Css.p3.$}>
-        <h1 css={Css.xl2.mb2.$}>{tabLabels[value]}</h1>
-        <div css={Css.df.gap1.$}>
-          {zeroTo(8).map((i) => (
-            <div key={i} css={Css.fg1.hPx(200).br4.bgGray100.$} />
-          ))}
-        </div>
-      </div>
-    ),
-  }));
-
   return (
     <TestWorkflowProjectLayout
       workflowHeader={{
         title: "Workflow Layout",
-        rightSlot: [{ label: "Continue", onClick: () => {} }],
-        stepperTabs: { steps: toStepperTabsSteps(steps), currentStep, onChange: setCurrentStep },
+        onCancel: action("cancel clicked"),
+        completeLabel: "Save",
+        onComplete: action("complete clicked"),
+        stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
       }}
     >
-      <WorkflowLayoutComponent steps={steps} currentStep={currentStep} fullWidthContent />
-    </TestWorkflowProjectLayout>
-  );
-}
-
-/** A step with both `heading` and `description` set, rendered above `content`. */
-export function WithHeadingAndDescription() {
-  const [currentStep, setCurrentStep] = useState("trade");
-  const steps = makeSteps();
-  steps[0] = {
-    ...steps[0],
-    heading: "Add trade partners",
-    description: "Search for trade partners to invite, or add a new one to your directory.",
-  };
-
-  return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        rightSlot: [{ label: "Continue", onClick: () => {} }],
-        stepperTabs: { steps: toStepperTabsSteps(steps), currentStep, onChange: setCurrentStep },
-      }}
-    >
-      <WorkflowLayoutComponent steps={steps} currentStep={currentStep} />
+      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} numRows={50} />
     </TestWorkflowProjectLayout>
   );
 }
@@ -92,21 +64,21 @@ const tabLabels: Record<(typeof tabValues)[number], string> = {
   send: "Send Email",
 };
 
-function makeSteps(): WorkflowLayoutStep[] {
-  return tabValues.map((value, i) => ({
-    value,
-    label: tabLabels[value],
-    completed: false,
-    disabled: i > 0,
-    content: (
-      <div css={Css.p3.$}>
-        <h1 css={Css.xl2.mb2.$}>{tabLabels[value]}</h1>
-      </div>
-    ),
-  }));
+function makeSteps(): StepperTabsStep[] {
+  return tabValues.map((value, i) => ({ value, label: tabLabels[value], completed: false, disabled: i > 0 }));
 }
 
-/** `WorkflowHeaderLayout`'s `stepperTabs.steps` is derived from the same `steps` array via this mapping. */
-function toStepperTabsSteps(steps: WorkflowLayoutStep[]) {
-  return steps.map(({ value, label, completed, disabled }) => ({ value, label, completed, disabled }));
+function StepContent({ title, numRows = 0 }: { title: string; numRows?: number }) {
+  return (
+    <div css={Css.p3.$}>
+      <h1 css={Css.xl2.mb2.$}>{title}</h1>
+      <div css={Css.df.fdc.gap1.$}>
+        {zeroTo(numRows).map((i) => (
+          <div key={i} css={Css.hPx(48).br4.bgGray100.df.aic.pl2.$}>
+            Row {i + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

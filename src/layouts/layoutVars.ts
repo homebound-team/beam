@@ -50,3 +50,12 @@ export function stickyNavAndHeaderOffset(basePx = 0): string {
 export function stickyTableHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
 }
+
+/**
+ * `bottom` offset for floating page chrome (e.g. `DocumentScrollToTopButton`) that must clear other
+ * fixed-position bottom chrome — currently just `WorkflowLayout`'s mobile action footer, but stacks with
+ * future bottom-anchored elements the same way. `basePx` is the element's own resting offset.
+ */
+export function getFloatingBottomOffset(basePx = 0): string {
+  return `calc(${basePx}px + var(${beamWorkflowLayoutFooterHeightVar}, 0px))`;
+}

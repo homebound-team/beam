@@ -1,16 +1,17 @@
+import { Button } from "src/components/Button";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
 import { StepperTabsStep } from "src/components/StepperTabs";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("WorkflowHeader", () => {
-  it("renders each button in rightSlot and fires its onClick", async () => {
-    // Given a WorkflowHeader with a button in rightSlot
+  it("renders rightSlot content and fires its onClick", async () => {
+    // Given a WorkflowHeader with a button passed as rightSlot
     const onClick = vi.fn();
     const r = await render(
       <WorkflowHeader
         title="Test Title"
-        rightSlot={[{ label: "Save", onClick }]}
+        rightSlot={<Button label="Save" onClick={onClick} />}
         stepperTabs={{ steps: makeSteps(), currentStep: "trade", onChange: vi.fn() }}
       />,
     );

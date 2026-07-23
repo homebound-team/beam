@@ -76,11 +76,7 @@ function getCollapsedStyles(active: boolean, completed: boolean): Properties {
 }
 
 const stepperTabStyles = {
-  baseStyles: Css.df.aic.fg1.py1
-    .prPx(12)
-    .plPx(24)
-    .sm.oh.tal.maxhPx(48)
-    .add("transition", "max-height 200ms cubic-bezier(0.4, 0, 0.2, 1), padding 200ms cubic-bezier(0.4, 0, 0.2, 1)").$,
+  baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.oh.tal.maxhPx(48).transitionMaxHeightAndPadding.$,
   hoverStyles: Css.bgGray100.$,
   focusRingStyles: Css.bshFocus.outline0.$,
   // Disabled always wins over both the state's and the collapsed border color.
