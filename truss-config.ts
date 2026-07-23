@@ -79,6 +79,9 @@ const sections: Sections = {
     newMethod("transitionTop", {
       transition: `top ${motion.duration.normal} ${motion.easing.standard}`,
     }),
+    newMethod("transitionMaxHeightAndPadding", {
+      transition: `max-height ${motion.duration.normal} ${motion.easing.standard}, padding ${motion.duration.normal} ${motion.easing.standard}`,
+    })
   ],
   boxShadow: () =>
     newMethodsForProp("boxShadow", {

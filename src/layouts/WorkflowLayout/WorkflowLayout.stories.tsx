@@ -5,10 +5,10 @@ import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestWorkflowProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { WorkflowHeaderLayout as WorkflowHeaderLayoutComponent } from "./WorkflowHeaderLayout";
+import { WorkflowLayout as WorkflowLayoutComponent } from "./WorkflowLayout";
 
 export default {
-  component: WorkflowHeaderLayoutComponent,
+  component: WorkflowLayoutComponent,
   decorators: [withBeamDecorator, withRouter()],
   parameters: {
     layout: "fullscreen",
@@ -21,7 +21,7 @@ export function Default() {
   return (
     <TestWorkflowProjectLayout
       workflowHeader={{
-        title: "Workflow Header Layout",
+        title: "Workflow Layout",
         onCancel: action("cancel clicked"),
         completeLabel: "Save",
         onComplete: action("complete clicked"),
@@ -45,7 +45,7 @@ export function ScrollCollapsesTabs() {
   return (
     <TestWorkflowProjectLayout
       workflowHeader={{
-        title: "Workflow Header Layout",
+        title: "Workflow Layout",
         onCancel: action("cancel clicked"),
         completeLabel: "Save",
         onComplete: action("complete clicked"),

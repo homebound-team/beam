@@ -39,7 +39,7 @@ export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitl
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
 };
 
-export type WorkflowHeaderLayoutProps = {
+export type WorkflowLayoutProps = {
   /** Config for the `WorkflowHeader` rendered as the page-level header, and its CTAs (Back/Cancel/Save & Exit/Continue/Complete). */
   workflowHeader: WorkflowHeaderConfig;
   /** Slot: main page body (e.g. `WorkflowLayout`). */
@@ -57,7 +57,7 @@ export type WorkflowHeaderLayoutProps = {
  * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) so it can move them
  * into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part of the public API.
  */
-export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
+export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { children } = props;
   const {
     stepperTabs,
@@ -70,7 +70,7 @@ export function WorkflowHeaderLayout(props: WorkflowHeaderLayoutProps) {
     onSaveAndExit,
     ...headerProps
   } = props.workflowHeader;
-  const tid = useTestIds(props, "workflowHeaderLayout");
+  const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 
   // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
