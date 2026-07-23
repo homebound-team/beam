@@ -209,7 +209,7 @@ function memoizedTableStyles() {
           borderOnHover: highlightOnHover,
         },
         levels: grouped ? groupedLevels : defaultLevels,
-        rowHoverColor: Palette.Blue50,
+        rowHoverColor: Palette.Gray100,
         keptGroupRowCss: Css.bgYellow100.gray900.xsSb.df.aic.$,
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
         // Pinned rows get a blue highlight; the standard `betweenRowsCss` bottom border (not a

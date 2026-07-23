@@ -134,7 +134,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   // Narrow away `"none"` so the CSS var value is a plain color string (no cast needed).
   const rowHoverBg: string =
-    style.rowHoverColor !== undefined && style.rowHoverColor !== "none" ? style.rowHoverColor : Palette.Blue50;
+    style.rowHoverColor !== undefined && style.rowHoverColor !== "none" ? style.rowHoverColor : Palette.Gray100;
 
   const rowCss = {
     ...(!reservedRowKinds.includes(row.kind) && style.nonHeaderRowCss),
