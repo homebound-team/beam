@@ -16,6 +16,7 @@ export {
   beamWorkflowLayoutFooterHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
+  getFloatingBottomOffset,
   stickyNavAndHeaderOffset,
   stickyTableHeaderOffset,
 } from "./layoutVars";

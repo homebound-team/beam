@@ -3,7 +3,7 @@ import { ContrastScope, IconButton } from "src/components";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
-import { beamWorkflowLayoutFooterHeightVar } from "./layoutVars";
+import { getFloatingBottomOffset } from "./layoutVars";
 
 export type DocumentScrollToTopButtonProps = {
   /** Measured document viewport height (px); visibility threshold is one full viewport. */
@@ -38,7 +38,7 @@ export function DocumentScrollToTopButton({ viewportHeight }: DocumentScrollToTo
       {...(!visible ? { inert: "" } : {})}
       css={{
         ...Css.fixed
-          .bottom(`calc(${scrollToTopOffsetPx}px + var(${beamWorkflowLayoutFooterHeightVar}, 0px))`)
+          .bottom(getFloatingBottomOffset(scrollToTopOffsetPx))
           .rightPx(scrollToTopOffsetPx)
           .z(zIndices.scrollToTop).df.jcfe.transitionTransform.$,
         ...(visible

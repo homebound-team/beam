@@ -52,7 +52,7 @@ export function ScrollCollapsesTabs() {
         stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
       }}
     >
-      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} heightPx={2000} />
+      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} numRows={50} />
     </TestWorkflowProjectLayout>
   );
 }
@@ -68,12 +68,12 @@ function makeSteps(): StepperTabsStep[] {
   return tabValues.map((value, i) => ({ value, label: tabLabels[value], completed: false, disabled: i > 0 }));
 }
 
-function StepContent({ title, heightPx = 0 }: { title: string; heightPx?: number }) {
+function StepContent({ title, numRows = 0 }: { title: string; numRows?: number }) {
   return (
     <div css={Css.p3.$}>
       <h1 css={Css.xl2.mb2.$}>{title}</h1>
       <div css={Css.df.fdc.gap1.$}>
-        {zeroTo(Math.ceil(heightPx / 60)).map((i) => (
+        {zeroTo(numRows).map((i) => (
           <div key={i} css={Css.hPx(48).br4.bgGray100.df.aic.pl2.$}>
             Row {i + 1}
           </div>

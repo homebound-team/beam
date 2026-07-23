@@ -1,9 +1,7 @@
 import type { PressEvent } from "@react-types/shared";
-import { CSSProperties, ReactNode, useCallback, useLayoutEffect, useRef } from "react";
-import { Button } from "src/components/Button";
+import { ReactNode, useCallback, useLayoutEffect, useRef } from "react";
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
-import { IconButton } from "src/components/IconButton";
 import { StepperTabsProps } from "src/components/StepperTabs";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
@@ -14,12 +12,12 @@ import {
   bannerAndNavbarChromeTop,
   beamPageHeaderLayoutHeightVar,
   beamWorkflowLayoutFooterHeightVar,
-  documentScrollChromeLeft,
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
+import { WorkflowActions } from "./WorkflowActions";
 
 export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> & {
   stepperTabs: StepperTabsProps;
@@ -42,20 +40,21 @@ export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitl
 export type WorkflowLayoutProps = {
   /** Config for the `WorkflowHeader` rendered as the page-level header, and its CTAs (Back/Cancel/Save & Exit/Continue/Complete). */
   workflowHeader: WorkflowHeaderConfig;
-  /** Slot: main page body (e.g. `WorkflowLayout`). */
+  /** Slot: main page body. */
   children?: ReactNode;
 };
 
 /**
  * Workflow-header + body shell with sticky (always-visible) chrome. Contract: `docs/layouts.md`.
  *
- * A peer/replacement for `PageHeaderLayout` in the layout stack for workflow pages — nest it directly
- * under `SideNavLayout`/`NavbarLayout`, not inside `PageHeaderLayout` (which renders a different header
- * component). Unlike `PageHeaderLayout`, the header here never auto-hides; the only scroll-driven
- * behavior is collapsing the stepper tabs.
+ * A standalone, full-page layout for step-based workflow pages — nest it directly under
+ * `EnvironmentBannerLayout`, never under `NavbarLayout`/`SideNavLayout`/`PageHeaderLayout`. Unlike
+ * `PageHeaderLayout`, the header here never auto-hides; the only scroll-driven behavior is collapsing
+ * the stepper tabs.
  *
- * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) so it can move them
- * into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part of the public API.
+ * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) via `WorkflowActions`
+ * so it can move them into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part
+ * of the public API.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { children } = props;
@@ -88,7 +87,6 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { state: scrollState } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
   const collapsed = scrollState === "hidden";
 
-  const headerLeft = documentScrollChromeLeft();
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
 
@@ -101,46 +99,21 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const isLastStep = currentIndex === steps.length - 1;
 
   const buttons = (
-    <>
-      {!isFirstStep &&
-        (isMobile ? (
-          <IconButton
-            icon="arrowBack"
-            label="Back"
-            onClick={() => onChange(steps[currentIndex - 1].value)}
-            {...tid.back}
-          />
-        ) : (
-          <Button
-            label="Back"
-            icon="chevronLeft"
-            variant="tertiary"
-            onClick={() => onChange(steps[currentIndex - 1].value)}
-            {...tid.back}
-          />
-        ))}
-      <Button label="Cancel" variant="quaternary" onClick={onCancel} {...tid.cancel} />
-      {canExitEarly && onSaveAndExit && (
-        <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} {...tid.saveAndExit} />
-      )}
-      {isLastStep ? (
-        <Button
-          label={completeLabel}
-          variant="primary"
-          onClick={onComplete}
-          disabled={completeDisabled}
-          {...tid.complete}
-        />
-      ) : (
-        <Button
-          label="Continue"
-          variant="primary"
-          onClick={() => onChange(steps[currentIndex + 1].value)}
-          disabled={continueDisabled}
-          {...tid.continue}
-        />
-      )}
-    </>
+    <WorkflowActions
+      isFirstStep={isFirstStep}
+      isLastStep={isLastStep}
+      isMobile={isMobile}
+      onBack={() => onChange(steps[currentIndex - 1].value)}
+      onCancel={onCancel}
+      canExitEarly={canExitEarly}
+      onSaveAndExit={onSaveAndExit}
+      completeLabel={completeLabel}
+      onComplete={onComplete}
+      completeDisabled={completeDisabled}
+      onContinue={() => onChange(steps[currentIndex + 1].value)}
+      continueDisabled={continueDisabled}
+      tid={tid}
+    />
   );
 
   // On mobile, the CTAs move out of the header and into a fixed footer instead. Cancel always renders,
@@ -163,7 +136,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const headerEl = (
     <WorkflowHeader
       {...headerProps}
-      rightSlot={isMobile ? undefined : <div css={Css.df.aic.gap1.$}>{buttons}</div>}
+      rightSlot={isMobile ? undefined : buttons}
       stepperTabs={{ ...stepperTabs, collapsed }}
     />
   );
@@ -175,8 +148,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
         <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }} {...tid.spacer}>
           <div
             ref={headerMetricsRef}
-            css={Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$}
-            style={{ top: outerTop } as CSSProperties}
+            css={Css.fixed.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
             {...tid.header}
           >
             {headerEl}
@@ -185,16 +157,15 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
 
         <div css={Css.df.fdc.fg1.mh0.w100.$} {...tid.body}>
           {children}
-
-          {/* Spacer so body content isn't hidden behind the fixed mobile footer. */}
-          {showFooter && <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$} />}
         </div>
+
+        {/* Spacer so body content isn't hidden behind the fixed mobile footer. */}
+        {showFooter && <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$} />}
 
         {showFooter && (
           <div
             css={
               Css.fixed.bottom0
-                .left(headerLeft)
                 .w(headerWidth)
                 .hPx(mobileFooterHeightPx)
                 .z(zIndices.pageStickyFooter)
