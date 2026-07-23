@@ -1,5 +1,4 @@
 import type { PressEvent } from "@react-types/shared";
-import { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css } from "src/Css";
@@ -20,11 +19,7 @@ export type WorkflowActionsProps = {
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. Only shown on the last step. */
   onComplete: (e: PressEvent) => void | Promise<void>;
-  /** Disables the completion button. ReactNode is shown as a tooltip. */
-  completeDisabled?: boolean | ReactNode;
   onContinue: () => void;
-  /** Disables the Continue button, e.g. while the current step is invalid. ReactNode is shown as a tooltip. */
-  continueDisabled?: boolean | ReactNode;
   tid: TestIds;
 };
 
@@ -40,9 +35,7 @@ export function WorkflowActions(props: WorkflowActionsProps) {
     onSaveAndExit,
     completeLabel,
     onComplete,
-    completeDisabled,
     onContinue,
-    continueDisabled,
     tid,
   } = props;
 
@@ -62,21 +55,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
           <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} {...tid.saveAndExit} />
         )}
         {isLastStep ? (
-          <Button
-            label={completeLabel}
-            variant="primary"
-            onClick={onComplete}
-            disabled={completeDisabled}
-            {...tid.complete}
-          />
+          <Button label={completeLabel} variant="primary" onClick={onComplete} {...tid.complete} />
         ) : (
-          <Button
-            label="Continue"
-            variant="primary"
-            onClick={onContinue}
-            disabled={continueDisabled}
-            {...tid.continue}
-          />
+          <Button label="Continue" variant="primary" onClick={onContinue} {...tid.continue} />
         )}
       </div>
     </div>

@@ -21,16 +21,12 @@ import { WorkflowActions } from "./WorkflowActions";
 
 export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> & {
   stepperTabs: StepperTabsProps;
-  /** Disables the Continue button, e.g. while the current step is invalid. ReactNode is shown as a tooltip. */
-  continueDisabled?: boolean | ReactNode;
   /** Leaves the workflow without saving. Always shown. */
   onCancel: (e: PressEvent) => void;
   /** Label for the completion button shown on the last step. */
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. Only shown on the last step. */
   onComplete: (e: PressEvent) => void | Promise<void>;
-  /** Disables the completion button. ReactNode is shown as a tooltip. */
-  completeDisabled?: boolean | ReactNode;
   /** Whether Save & Exit is available on the current step. Default false. */
   canExitEarly?: boolean;
   /** Saves partial progress and exits. Used whenever canExitEarly is true. */
@@ -60,11 +56,9 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { children } = props;
   const {
     stepperTabs,
-    continueDisabled,
     onCancel,
     completeLabel,
     onComplete,
-    completeDisabled,
     canExitEarly = false,
     onSaveAndExit,
     ...headerProps
@@ -109,9 +103,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
-      completeDisabled={completeDisabled}
       onContinue={() => onChange(steps[currentIndex + 1].value)}
-      continueDisabled={continueDisabled}
       tid={tid}
     />
   );
