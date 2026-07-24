@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
-import { TestWorkflowProjectLayout } from "src/utils/sbComponents";
+import { TableExample, TestWorkflowProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 import { WorkflowLayout as WorkflowLayoutComponent, WorkflowLayoutStep } from "./WorkflowLayout";
 
@@ -50,6 +50,28 @@ export function ScrollCollapsesTabs() {
         stepperTabs: { currentStep, onChange: setCurrentStep },
       }}
       steps={makeSteps(50)}
+    />
+  );
+}
+
+/**
+ * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
+ * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
+ */
+export function WideStepContentOverflows() {
+  const [currentStep, setCurrentStep] = useState("trade");
+  const steps = makeSteps();
+  steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
+  return (
+    <TestWorkflowProjectLayout
+      workflowHeader={{
+        title: "Workflow Layout",
+        onCancel: action("cancel clicked"),
+        completeLabel: "Save",
+        onComplete: action("complete clicked"),
+        stepperTabs: { currentStep, onChange: setCurrentStep },
+      }}
+      steps={steps}
     />
   );
 }
