@@ -54,29 +54,6 @@ export function ScrollCollapsesTabs() {
   );
 }
 
-/**
- * At the `sm` breakpoint, the header's CTAs move out of the header and into a sticky 80px footer
- * instead. Use the Storybook viewport toolbar (or resize the window below 600px) to see it live —
- * this story is also snapshotted at the `mobile1` Chromatic viewport by default.
- */
-export function MobileFooter() {
-  const [currentStep, setCurrentStep] = useState("trade");
-  return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        canExitEarly: true,
-        onSaveAndExit: action("save and exit clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
-      steps={makeSteps(50)}
-    />
-  );
-}
-
 const tabValues = ["trade", "draft", "send"] as const;
 const tabLabels: Record<(typeof tabValues)[number], string> = {
   trade: "Trade Partners",
