@@ -38,7 +38,7 @@ describe("WorkflowLayout", () => {
     const r = await render(<WorkflowLayout {...baseProps({ workflowHeader: { onCancel } })} />, withRouter());
 
     // When Cancel is clicked
-    click(r.workflowLayout_cancel);
+    click(r.cancel);
 
     // Then it's called
     expect(onCancel).toHaveBeenCalledTimes(1);
@@ -53,7 +53,7 @@ describe("WorkflowLayout", () => {
     );
 
     // When Save is clicked
-    click(r.workflowLayout_complete);
+    click(r.save);
 
     // Then it's called
     expect(onComplete).toHaveBeenCalledTimes(1);

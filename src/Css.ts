@@ -3963,12 +3963,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get transitionTop() {
     return this.add("transition", "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   }
-  /** Sets `transition: "max-height 200ms cubic-bezier(0.4, 0, 0.2, 1), padding 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionMaxHeightAndPadding() {
-    return this.add(
-      "transition",
-      "max-height 200ms cubic-bezier(0.4, 0, 0.2, 1), padding 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-    );
+  /** Sets `transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionAll() {
+    return this.add("transition", "all 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   }
 
   // buttonBase
