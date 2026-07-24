@@ -48,6 +48,59 @@ export function WithFilters() {
   return <GridTableLayoutActions filterDefs={filterDefs} filter={filter} setFilter={setFilter} />;
 }
 
+export function WithSingleFilter() {
+  const [filter, setFilter] = useState<{ needsRevision?: boolean }>({});
+  return (
+    <GridTableLayoutActions
+      searchProps={{ onSearch: () => {} }}
+      filterDefs={{ needsRevision: checkboxFilter({ label: "Needs Revision" }) }}
+      filter={filter}
+      setFilter={setFilter}
+      hasHideableColumns
+      columns={columns}
+      api={api}
+      view="list"
+      setView={() => {}}
+    />
+  );
+}
+
+export function WithGroupByOnly() {
+  const [groupBy, setGroupBy] = useState("none");
+  return (
+    <GridTableLayoutActions
+      searchProps={{ onSearch: () => {} }}
+      groupBy={{
+        value: groupBy,
+        setValue: setGroupBy,
+        options: createGroupByOptions(),
+      }}
+      hasHideableColumns
+      columns={columns}
+      api={api}
+      view="list"
+      setView={() => {}}
+    />
+  );
+}
+
+export function WithGroupByAndFilters() {
+  const [filter, setFilter] = useState<TestFilter>({ status: ["active"] });
+  const [groupBy, setGroupBy] = useState("none");
+  return (
+    <GridTableLayoutActions
+      filterDefs={filterDefs}
+      filter={filter}
+      setFilter={setFilter}
+      groupBy={{
+        value: groupBy,
+        setValue: setGroupBy,
+        options: createGroupByOptions(),
+      }}
+    />
+  );
+}
+
 export function WithEditColumns() {
   return (
     <GridTableLayoutActions hasHideableColumns={true} columns={columns} api={api} view="list" setView={() => {}} />
@@ -100,4 +153,12 @@ export function AllFeatures() {
       }}
     />
   );
+}
+
+function createGroupByOptions() {
+  return [
+    { id: "none", name: "None" },
+    { id: "status", name: "Status" },
+    { id: "tag", name: "Tag" },
+  ];
 }

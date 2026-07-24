@@ -11,18 +11,14 @@ import {
 } from "src/components/Filters";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
-import { SelectField } from "src/inputs/SelectField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { isDefined, maybeCall, safeEntries, useTestIds } from "src/utils";
+import { GroupByField, GroupByFieldProps } from "./GroupByField";
 
 type FilterPanelProps<F extends Record<string, unknown>, G extends Value = string> = {
   isOpen: boolean;
-  groupBy?: {
-    value: G;
-    setValue: (g: G) => void;
-    options: Array<{ id: G; name: string }>;
-  };
+  groupBy?: GroupByFieldProps<G>;
   filterImpls: FilterImpls<F>;
   filter?: F;
   setFilter?: (filter: F) => void;
@@ -56,18 +52,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
         ...Css.if(inDocumentScrollLayout).px3.$,
       }}
     >
-      {groupBy && (
-        <SelectField
-          label="Group by"
-          labelStyle="inline"
-          sizeToContent
-          options={groupBy.options}
-          getOptionValue={(o) => o.id}
-          getOptionLabel={(o) => o.name}
-          value={groupBy.value}
-          onSelect={(g) => g && groupBy.setValue(g)}
-        />
-      )}
+      {groupBy && <GroupByField {...groupBy} />}
       {filterControls}
       {activeFilterCount > 0 && (
         <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
@@ -99,7 +84,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   );
 }
 
-function buildFilterControls<F extends Record<string, unknown>>(
+export function buildFilterControls<F extends Record<string, unknown>>(
   filterImpls: FilterImpls<F>,
   filter: F,
   setFilter: (f: F) => void,
