@@ -25,7 +25,6 @@ export function Default() {
         onCancel: action("cancel clicked"),
         completeLabel: "Save",
         onComplete: action("complete clicked"),
-        canExitEarly: true,
         onSaveAndExit: action("save and exit clicked"),
         stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
       }}
