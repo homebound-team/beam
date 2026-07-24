@@ -95,10 +95,9 @@ function GridTableLayoutActionsComponent<
   const hasSearch = !!searchProps;
   const filterCount = Object.keys(filterDefs ?? {}).length;
   const hasGroupBy = !!groupBy;
-  const hasFilterControls = filterCount > 0 || hasGroupBy;
   const controlCount = filterCount + (hasGroupBy ? 1 : 0);
+  const hasFilterControls = controlCount > 0;
   // One control only — nothing to nest behind a toggle; show it inline in the toolbar on desktop.
-  // Fall back to the Filter button if a lone filter is missing filter/setFilter.
   const showInlineControl = !sm && controlCount === 1 && (hasGroupBy || !!(filter && setFilter));
   const activeFilterCount = useMemo(() => (filter ? getActiveFilterCount(filter) : 0), [filter]);
   const filterImpls = useMemo(() => (filterDefs ? buildFilterImpls(filterDefs) : ({} as FilterImpls<F>)), [filterDefs]);
