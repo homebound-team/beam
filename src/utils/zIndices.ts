@@ -20,6 +20,8 @@ export const zIndices = {
   superDrawerScrim: 55,
   modalUnderlay: 60,
   pageStickyHeader: 70,
+  // Sticky mobile action footer (WorkflowLayout) — same tier as pageStickyHeader; header and footer never overlap on screen.
+  pageStickyFooter: 70,
 
   dragHandle: 80,
 

@@ -79,6 +79,9 @@ const sections: Sections = {
     newMethod("transitionTop", {
       transition: `top ${motion.duration.normal} ${motion.easing.standard}`,
     }),
+    newMethod("transitionAll", {
+      transition: `all ${motion.duration.normal} ${motion.easing.standard}`,
+    })
   ],
   boxShadow: () =>
     newMethodsForProp("boxShadow", {
