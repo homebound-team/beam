@@ -16,7 +16,7 @@ import {
   SimpleHeaderAndData,
   Tokens,
 } from "src/index";
-import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
+import { NavbarLayout, PageHeaderLayout, SideNavLayout, WorkflowLayout, WorkflowLayoutProps } from "src/layouts";
 import { zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
 
@@ -77,6 +77,20 @@ export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string;
       <SideNavLayout sideNav={{ items: sideNavItems() }}>{content}</SideNavLayout>
     </NavbarLayout>
   );
+}
+
+/**
+ * `NavbarLayout` + `WorkflowLayout`, a peer/replacement for `PageHeaderLayout` in the layout stack for
+ * workflow pages.
+ */
+export function TestWorkflowProjectLayout({
+  workflowHeader,
+  steps,
+}: {
+  workflowHeader: WorkflowLayoutProps["workflowHeader"];
+  steps: WorkflowLayoutProps["steps"];
+}) {
+  return <WorkflowLayout workflowHeader={workflowHeader} steps={steps} />;
 }
 
 export function createNavbar(): NavbarProps {
