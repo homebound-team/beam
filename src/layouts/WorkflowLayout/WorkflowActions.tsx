@@ -19,7 +19,11 @@ export type WorkflowActionsProps = {
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. Only shown on the last step. */
   onComplete: (e: PressEvent) => void | Promise<void>;
+  /** Disables the completion button, e.g. while the active step is invalid. */
+  completeDisabled?: boolean;
   onContinue: () => void;
+  /** Disables the Continue button, e.g. while the active step is invalid. */
+  continueDisabled?: boolean;
   tid: TestIds;
 };
 
@@ -35,7 +39,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
     onSaveAndExit,
     completeLabel,
     onComplete,
+    completeDisabled,
     onContinue,
+    continueDisabled,
     tid,
   } = props;
 
@@ -55,9 +61,21 @@ export function WorkflowActions(props: WorkflowActionsProps) {
           <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} {...tid.saveAndExit} />
         )}
         {isLastStep ? (
-          <Button label={completeLabel} variant="primary" onClick={onComplete} {...tid.complete} />
+          <Button
+            label={completeLabel}
+            variant="primary"
+            onClick={onComplete}
+            disabled={completeDisabled}
+            {...tid.complete}
+          />
         ) : (
-          <Button label="Continue" variant="primary" onClick={onContinue} {...tid.continue} />
+          <Button
+            label="Continue"
+            variant="primary"
+            onClick={onContinue}
+            disabled={continueDisabled}
+            {...tid.continue}
+          />
         )}
       </div>
     </div>

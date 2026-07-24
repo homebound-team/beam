@@ -6,8 +6,8 @@ This document is the **canonical contract** for structural page layouts in Beam.
 
 1. **Use the layouts for app page structure** — When a screen matches the navbar + body, side nav + content, or page-header + body pattern, compose **`EnvironmentBannerLayout`**, **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** from `@homebound/beam` instead of ad-hoc flex wrappers that recreate the same regions. Step-based workflow pages instead use **`WorkflowLayout`** — see its own rule below.
 2. **Preserve nesting order** when all apply: **`EnvironmentBannerLayout` → `NavbarLayout` → `SideNavLayout` → `PageHeaderLayout`**.
-3. **`WorkflowLayout` is standalone, not a `PageHeaderLayout` peer** — Step-based workflow pages are their own full-page experience: **`EnvironmentBannerLayout` → `WorkflowLayout`**, never nested under `NavbarLayout` or `SideNavLayout`. `WorkflowLayout` renders its own header (`WorkflowHeader`) and owns its own chrome; its body is arbitrary content, passed as `children`.
-4. **Layouts render Beam components, not arbitrary nodes** — Each layout owns its chrome and renders the real Beam component internally. Pass the component's props as a **nested object** (`environmentBanner`, `navbar`, `sideNav`, `pageHeader`, `workflowHeader`); pass page body content via **`children`**. The layouts handle the document-scroll coordination (sticky chrome, auto-hide, CSS-var offsets) for you.
+3. **`WorkflowLayout` is standalone, not a `PageHeaderLayout` peer** — Step-based workflow pages are their own full-page experience: **`EnvironmentBannerLayout` → `WorkflowLayout`**, never nested under `NavbarLayout` or `SideNavLayout`. `WorkflowLayout` renders its own header (`WorkflowHeader`) and owns its own chrome; its body renders the active step's `content`, driven by its `steps` prop.
+4. **Layouts render Beam components, not arbitrary nodes** — Each layout owns its chrome and renders the real Beam component internally. Pass the component's props as a **nested object** (`environmentBanner`, `navbar`, `sideNav`, `pageHeader`, `workflowHeader`); pass page body content via **`children`** (`WorkflowLayout` is the exception — its body comes from its `steps` prop, see below). The layouts handle the document-scroll coordination (sticky chrome, auto-hide, CSS-var offsets) for you.
 
 ## React (`@homebound/beam`)
 
@@ -17,7 +17,7 @@ This document is the **canonical contract** for structural page layouts in Beam.
 | `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                       |
 | `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                          |
 | `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                                               |
-| `WorkflowLayout`          | `WorkflowHeader`               | `workflowHeader: WorkflowHeaderConfig`; body → **`children`** — standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
+| `WorkflowLayout`          | `WorkflowHeader`               | `workflowHeader: WorkflowHeaderConfig`; `steps: WorkflowLayoutStep[]` — active step's `content` is the body; standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
 
 `EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating, showProdWarning)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating or with `showProdWarning`); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation or `showProdWarning`). The banner does **not** auto-hide.
 
@@ -63,7 +63,9 @@ import {
 ```
 
 Step-based workflow pages skip `NavbarLayout`/`SideNavLayout` entirely — `WorkflowLayout` is a standalone,
-full-page experience:
+full-page experience. Its `steps` prop is the single source of truth: it drives the header's tab strip,
+picks which step's `content` renders as the body, and gates the Continue/Complete CTA on the active
+step's `isValid`:
 
 ```tsx
 import { EnvironmentBannerLayout, shouldShowEnvironmentBanner, WorkflowLayout } from "@homebound/beam";
@@ -75,9 +77,10 @@ import { EnvironmentBannerLayout, shouldShowEnvironmentBanner, WorkflowLayout } 
       : undefined
   }
 >
-  <WorkflowLayout workflowHeader={{ title, stepperTabs, onCancel, completeLabel, onComplete }}>
-    <YourWorkflowStepBody />
-  </WorkflowLayout>
+  <WorkflowLayout
+    workflowHeader={{ title, onCancel, completeLabel, onComplete, stepperTabs: { currentStep, onChange } }}
+    steps={steps}
+  />
 </EnvironmentBannerLayout>;
 ```
 

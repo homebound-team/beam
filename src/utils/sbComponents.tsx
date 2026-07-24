@@ -85,12 +85,12 @@ export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string;
  */
 export function TestWorkflowProjectLayout({
   workflowHeader,
-  children,
+  steps,
 }: {
   workflowHeader: WorkflowLayoutProps["workflowHeader"];
-  children: ReactNode;
+  steps: WorkflowLayoutProps["steps"];
 }) {
-  return <WorkflowLayout workflowHeader={workflowHeader}>{children}</WorkflowLayout>;
+  return <WorkflowLayout workflowHeader={workflowHeader} steps={steps} />;
 }
 
 export function createNavbar(): NavbarProps {

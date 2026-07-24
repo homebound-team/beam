@@ -1,11 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { StepperTabsStep } from "src/components/StepperTabs";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestWorkflowProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { WorkflowLayout as WorkflowLayoutComponent } from "./WorkflowLayout";
+import { WorkflowLayout as WorkflowLayoutComponent, WorkflowLayoutStep } from "./WorkflowLayout";
 
 export default {
   component: WorkflowLayoutComponent,
@@ -27,11 +26,10 @@ export function Default() {
         onComplete: action("complete clicked"),
         canExitEarly: true,
         onSaveAndExit: action("save and exit clicked"),
-        stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
+        stepperTabs: { currentStep, onChange: setCurrentStep },
       }}
-    >
-      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} />
-    </TestWorkflowProjectLayout>
+      steps={makeSteps()}
+    />
   );
 }
 
@@ -49,11 +47,33 @@ export function ScrollCollapsesTabs() {
         onCancel: action("cancel clicked"),
         completeLabel: "Save",
         onComplete: action("complete clicked"),
-        stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
+        stepperTabs: { currentStep, onChange: setCurrentStep },
       }}
-    >
-      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} numRows={50} />
-    </TestWorkflowProjectLayout>
+      steps={makeSteps(50)}
+    />
+  );
+}
+
+/**
+ * At the `sm` breakpoint, the header's CTAs move out of the header and into a sticky 80px footer
+ * instead. Use the Storybook viewport toolbar (or resize the window below 600px) to see it live —
+ * this story is also snapshotted at the `mobile1` Chromatic viewport by default.
+ */
+export function MobileFooter() {
+  const [currentStep, setCurrentStep] = useState("trade");
+  return (
+    <TestWorkflowProjectLayout
+      workflowHeader={{
+        title: "Workflow Layout",
+        onCancel: action("cancel clicked"),
+        completeLabel: "Save",
+        onComplete: action("complete clicked"),
+        canExitEarly: true,
+        onSaveAndExit: action("save and exit clicked"),
+        stepperTabs: { currentStep, onChange: setCurrentStep },
+      }}
+      steps={makeSteps(50)}
+    />
   );
 }
 
@@ -64,8 +84,14 @@ const tabLabels: Record<(typeof tabValues)[number], string> = {
   send: "Send Email",
 };
 
-function makeSteps(): StepperTabsStep[] {
-  return tabValues.map((value, i) => ({ value, label: tabLabels[value], completed: false, disabled: i > 0 }));
+function makeSteps(contentRows = 0): WorkflowLayoutStep[] {
+  return tabValues.map((value, i) => ({
+    value,
+    label: tabLabels[value],
+    isValid: true,
+    disabled: i > 0,
+    content: <StepContent title={tabLabels[value]} numRows={contentRows} />,
+  }));
 }
 
 function StepContent({ title, numRows = 0 }: { title: string; numRows?: number }) {

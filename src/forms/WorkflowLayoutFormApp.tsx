@@ -1,27 +1,18 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useMemo, useState } from "react";
-import {
-  ButtonProps,
-  GridColumn,
-  GridDataRow,
-  GridTable,
-  IconButton,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components";
+import { GridColumn, GridDataRow, GridTable, IconButton, simpleHeader, SimpleHeaderAndData } from "src/components";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { WorkflowHeaderLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
+import { WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
 
 /**
- * Demos `WorkflowHeaderLayout` + `WorkflowLayout` over the same form-state domain as `StepperFormApp`.
- * The header (title, tab strip, Back/Continue/Save CTAs) lives in `WorkflowHeaderLayout`; the active
- * step's content lives in the nested `WorkflowLayout`. Both are driven from the same `steps` array.
+ * Demos `WorkflowLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab
+ * strip, Back/Cancel/Save CTAs) and the active step's content are both driven from the same `steps` array.
  */
 export function WorkflowLayoutFormApp() {
   const formState = useFormState({
@@ -50,27 +41,24 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
           {
             label: "Author Details",
             value: "author",
-            completed: step1Valid,
+            isValid: step1Valid,
             content: <AuthorDetails formState={formState} />,
           },
           {
             label: "Books",
             value: "books",
-            completed: step2Valid,
+            isValid: step2Valid,
             disabled: !step1Valid,
             content: <BookList formState={formState} />,
           },
           {
             label: "Miscellaneous Author Information",
             value: "misc",
-            completed: formState.birthday.valid,
+            isValid: formState.birthday.valid,
             disabled: !step2Valid,
             content: <MiscAuthorDetails formState={formState} showFormData={showFormData} />,
           },
         ];
-
-        const currentStepIndex = steps.findIndex((s) => s.value === currentStep);
-        const isLastStep = currentStepIndex === steps.length - 1;
 
         const onSave = () => {
           if (formState.canSave()) {
@@ -79,39 +67,17 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
           }
         };
 
-        const rightSlot: ButtonProps[] = [
-          ...(currentStepIndex > 0
-            ? [
-                {
-                  variant: "tertiary" as const,
-                  label: "Back",
-                  onClick: () => setCurrentStep(steps[currentStepIndex - 1].value),
-                },
-              ]
-            : []),
-          isLastStep
-            ? { label: "Save", disabled: !formState.valid, onClick: onSave }
-            : {
-                label: "Continue",
-                disabled: !steps[currentStepIndex].completed,
-                onClick: () => setCurrentStep(steps[currentStepIndex + 1].value),
-              },
-        ];
-
         return (
-          <WorkflowHeaderLayout
+          <WorkflowLayout
             workflowHeader={{
               title: "Workflow Layout Form",
-              rightSlot,
-              stepperTabs: {
-                steps: steps.map(({ value, label, completed, disabled }) => ({ value, label, completed, disabled })),
-                currentStep,
-                onChange: setCurrentStep,
-              },
+              onCancel: () => {},
+              completeLabel: "Save",
+              onComplete: onSave,
+              stepperTabs: { currentStep, onChange: setCurrentStep },
             }}
-          >
-            <WorkflowLayout steps={steps} currentStep={currentStep} />
-          </WorkflowHeaderLayout>
+            steps={steps}
+          />
         );
       }}
     </Observer>
@@ -122,7 +88,7 @@ function AuthorDetails({ formState }: { formState: FormValue }) {
   return (
     <Observer>
       {() => (
-        <div css={Css.p3.$}>
+        <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
           <h1 css={Css.mb1.$}>Author Details</h1>
           <div css={Css.mb2.$}>
             <BoundTextField field={formState.firstName} helperText="Required to enable next step" />
@@ -177,7 +143,7 @@ function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; 
   return (
     <Observer>
       {() => (
-        <div css={Css.p3.$}>
+        <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
           <h1 css={Css.mb1.$}>Author Details</h1>
           <div css={Css.mb2.$}>
             <BoundDateField field={formState.birthday} helperText="Required" />
@@ -212,6 +178,9 @@ function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; 
     </Observer>
   );
 }
+
+// Mimics the centered content column a future layout will own generally — see WorkflowLayout.tsx's docs.
+const contentMaxWidthPx = 720;
 
 type FormValue = ObjectState<AuthorInput>;
 
