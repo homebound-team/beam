@@ -115,7 +115,7 @@ function BookList({ formState }: { formState: FormValue }) {
         Books
         <IconButton
           icon="plus"
-          onClick={() => formState.books.add({ id: String(formState.books.value?.length || 1) })}
+          onClick={() => formState.books.add({ id: String(formState.books.value?.length + 1 || 1) })}
         />
       </h1>
       <GridTable<Row> columns={columns} rows={rows} />
