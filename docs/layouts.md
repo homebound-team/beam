@@ -65,7 +65,7 @@ import {
 Step-based workflow pages skip `NavbarLayout`/`SideNavLayout` entirely — `WorkflowLayout` is a standalone,
 full-page experience. Its `steps` prop is the single source of truth: it drives the header's tab strip,
 picks which step's `content` renders as the body, and gates the Continue/Complete CTA on the active
-step's `isValid`:
+step's `completed`:
 
 ```tsx
 import { EnvironmentBannerLayout, shouldShowEnvironmentBanner, WorkflowLayout } from "@homebound/beam";

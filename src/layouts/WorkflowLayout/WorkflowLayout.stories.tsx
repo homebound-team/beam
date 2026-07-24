@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { StepperTabsStep } from "src/components/StepperTabs";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample, TestWorkflowProjectLayout } from "src/utils/sbComponents";
@@ -17,7 +16,7 @@ export default {
 } satisfies Meta;
 
 export function Default() {
-  const [currentStep, setCurrentStep] = useState("trade");
+  const [currentStep, setCurrentStep] = useState("tradePartners");
   return (
     <TestWorkflowProjectLayout
       workflowHeader={{
@@ -39,7 +38,7 @@ export function Default() {
  * (even without reaching the top) to see them re-expand.
  */
 export function ScrollCollapsesTabs() {
-  const [currentStep, setCurrentStep] = useState("trade");
+  const [currentStep, setCurrentStep] = useState("tradePartners");
   return (
     <TestWorkflowProjectLayout
       workflowHeader={{
@@ -59,7 +58,7 @@ export function ScrollCollapsesTabs() {
  * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
  */
 export function WideStepContentOverflows() {
-  const [currentStep, setCurrentStep] = useState("trade");
+  const [currentStep, setCurrentStep] = useState("tradePartners");
   const steps = makeSteps();
   steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
   return (
@@ -84,11 +83,9 @@ const tabLabels: Record<(typeof tabValues)[number], string> = {
 };
 
 function makeSteps(contentRows = 0): WorkflowLayoutStep[] {
-  return tabValues.map((value, i) => ({
-    value,
+  return tabValues.map((value) => ({
     label: tabLabels[value],
-    isValid: true,
-    disabled: i > 0,
+    completed: false,
     content: <StepContent title={tabLabels[value]} numRows={contentRows} />,
   }));
 }

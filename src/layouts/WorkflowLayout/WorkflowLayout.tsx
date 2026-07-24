@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import { ReactNode, useCallback, useLayoutEffect, useRef } from "react";
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
 import { StepperTabsProps } from "src/components/StepperTabs";
@@ -21,15 +21,13 @@ import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
 export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
   Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
-    stepperTabs: StepperTabsProps;
+    stepperTabs: Omit<StepperTabsProps, "steps">;
   };
 
 export type WorkflowLayoutStep = {
   label: string;
-  /** Defaults to `defaultTestId(label)` when omitted. Pass an explicit value if labels aren't stable/unique. */
-  value?: string;
   /** Drives the tab's completed checkmark, and gates the Continue/Complete CTA when this is the active step. */
-  isValid: boolean;
+  completed: boolean;
   /** Whether this step's tab can be clicked/jumped to. Independent of `isValid`. */
   disabled?: boolean;
   /** Rendered as the page body while this is the active step. */
@@ -56,6 +54,7 @@ export type WorkflowLayoutProps = {
  * of the public API.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
+  const { steps } = props;
   const { stepperTabs, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props.workflowHeader;
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
@@ -83,36 +82,29 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
 
   const { currentStep, onChange } = stepperTabs;
 
-  // Resolve each step's `value` once (defaulting from `label`) and reuse it for the tab strip, the
-  // active-step lookup, and Back/Continue navigation, so all three always agree on the same ids.
-  const resolvedSteps = useMemo(
-    () => props.steps.map((step) => ({ ...step, value: step.value ?? defaultTestId(step.label) })),
-    [props.steps],
-  );
-  const currentIndex = resolvedSteps.findIndex((step) => step.value === currentStep);
-  const isFirstStep = currentIndex <= 0;
-  const isLastStep = currentIndex === resolvedSteps.length - 1;
-  const activeStep = resolvedSteps[currentIndex];
-
-  const tabSteps = resolvedSteps.map(({ label, value, isValid, disabled }) => ({
-    label,
-    value,
-    completed: isValid,
-    disabled,
+  const tabSteps = steps.map((step) => ({
+    ...step,
+    value: defaultTestId(step.label),
   }));
+
+  const currentIndex = tabSteps.findIndex((step) => step.value === currentStep);
+  const isFirstStep = currentIndex <= 0;
+  const isLastStep = currentIndex === tabSteps.length - 1;
+  const activeStep = tabSteps[currentIndex];
 
   const buttons = (
     <WorkflowActions
       isFirstStep={isFirstStep}
       isLastStep={isLastStep}
       isMobile={isMobile}
-      onBack={() => onChange(resolvedSteps[currentIndex - 1].value)}
+      onBack={() => onChange(tabSteps[currentIndex - 1].value)}
       onCancel={onCancel}
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
-      completeDisabled={!activeStep?.isValid}
-      onContinue={() => onChange(resolvedSteps[currentIndex + 1].value)}
+      completeDisabled={!activeStep?.completed}
+      continueDisabled={!activeStep?.completed}
+      onContinue={() => onChange(tabSteps[currentIndex + 1].value)}
     />
   );
 

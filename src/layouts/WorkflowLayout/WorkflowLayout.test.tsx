@@ -10,13 +10,13 @@ describe("WorkflowLayout", () => {
 
     // Then the header and the first step's content both render
     expect(r.workflowLayout_header).toHaveTextContent("Test Workflow");
-    expect(r.body).toBeInTheDocument();
+    expect(r.workflowLayout_body).toBeInTheDocument();
   });
 
   it("swaps the visible content when currentStep changes", async () => {
     // Given a WorkflowLayout on its second step
     const r = await render(
-      <WorkflowLayout {...baseProps({ workflowHeader: { stepperTabs: { currentStep: "two" } } })} />,
+      <WorkflowLayout {...baseProps({ workflowHeader: { stepperTabs: { currentStep: "stepTwo" } } })} />,
       withRouter(),
     );
 
@@ -60,7 +60,7 @@ describe("WorkflowLayout", () => {
     // Given a WorkflowLayout on its last step with a spy onComplete
     const onComplete = vi.fn();
     const r = await render(
-      <WorkflowLayout {...baseProps({ workflowHeader: { onComplete, stepperTabs: { currentStep: "two" } } })} />,
+      <WorkflowLayout {...baseProps({ workflowHeader: { onComplete, stepperTabs: { currentStep: "stepTwo" } } })} />,
       withRouter(),
     );
 
@@ -94,27 +94,27 @@ describe("WorkflowLayout", () => {
       <WorkflowLayout
         {...baseProps({
           steps: makeSteps({ twoIsValid: false }),
-          workflowHeader: { stepperTabs: { currentStep: "two" } },
+          workflowHeader: { stepperTabs: { currentStep: "stepTwo" } },
         })}
       />,
       withRouter(),
     );
 
     // Then Save is disabled
-    expect(r.workflowLayout_complete).toBeDisabled();
+    expect(r.save).toBeDisabled();
 
     // When the same step becomes valid
     await r.rerender(
       <WorkflowLayout
         {...baseProps({
           steps: makeSteps({ twoIsValid: true }),
-          workflowHeader: { stepperTabs: { currentStep: "two" } },
+          workflowHeader: { stepperTabs: { currentStep: "stepTwo" } },
         })}
       />,
     );
 
     // Then Save is enabled
-    expect(r.complete).not.toBeDisabled();
+    expect(r.save).not.toBeDisabled();
   });
 
   it("forces the stepper tabs into their non-interactive collapsed state once scrolled down, and re-expands on scroll-up even short of the top", async () => {
@@ -126,37 +126,36 @@ describe("WorkflowLayout", () => {
     );
 
     // Then, at the top of the page, clicking the second step's tab navigates to it
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).toHaveBeenCalledWith("two");
+    click(r.header_stepperTabs_tab_stepTwo);
+    expect(onChange).toHaveBeenCalledWith("stepTwo");
     onChange.mockClear();
 
     // When the page scrolls down past the threshold, the tabs collapse to a non-interactive indicator bar
     scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
     scrollWindowWithAnchor(r.workflowLayout_spacer, 300);
-    click(r.header_stepperTabs_tab_two);
+    click(r.header_stepperTabs_tab_stepTwo);
     expect(onChange).not.toHaveBeenCalled();
 
     // When scrolling back up — even without reaching the top — the tabs re-expand
     scrollWindowWithAnchor(r.workflowLayout_spacer, 250);
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).toHaveBeenCalledWith("two");
+    click(r.header_stepperTabs_tab_stepTwo);
+    expect(onChange).toHaveBeenCalledWith("stepTwo");
     onChange.mockClear();
 
     // And scrolling all the way back to the top keeps them expanded
     scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
-    click(r.header_stepperTabs_tab_two);
-    expect(onChange).toHaveBeenCalledWith("two");
+    click(r.header_stepperTabs_tab_stepTwo);
+    expect(onChange).toHaveBeenCalledWith("stepTwo");
   });
 });
 
 function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): WorkflowLayoutStep[] {
   const { oneIsValid = true, twoIsValid = true } = overrides;
   return [
-    { value: "one", label: "Step One", isValid: oneIsValid, content: <div data-testid="body">Body content</div> },
+    { label: "Step One", completed: oneIsValid, content: <div data-testid="body">Body content</div> },
     {
-      value: "two",
       label: "Step Two",
-      isValid: twoIsValid,
+      completed: twoIsValid,
       content: <div data-testid="stepTwoBody">Step two content</div>,
     },
   ];
@@ -179,7 +178,7 @@ function baseProps(overrides: BaseWorkflowLayoutOverrides = {}): WorkflowLayoutP
       onCancel: () => {},
       completeLabel: "Save",
       onComplete: () => {},
-      stepperTabs: { currentStep: "one", onChange: () => {}, ...stepperTabs },
+      stepperTabs: { currentStep: "stepOne", onChange: () => {}, ...stepperTabs },
       ...restHeader,
     },
   };

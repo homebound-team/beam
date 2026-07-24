@@ -25,8 +25,19 @@ export type WorkflowActionsProps = {
 
 /** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete); shared by `WorkflowLayout`'s header and mobile footer. */
 export function WorkflowActions(props: WorkflowActionsProps) {
-  const { isFirstStep, isLastStep, isMobile, onBack, onCancel, onSaveAndExit, completeLabel, onComplete, onContinue } =
-    props;
+  const {
+    isFirstStep,
+    isLastStep,
+    isMobile,
+    onBack,
+    onCancel,
+    onSaveAndExit,
+    completeLabel,
+    completeDisabled,
+    onComplete,
+    continueDisabled,
+    onContinue,
+  } = props;
 
   return (
     <div css={Css.df.aic.jcsb.ifSm.w100.$}>
@@ -42,9 +53,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />
         {onSaveAndExit && <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} />}
         {isLastStep ? (
-          <Button label={completeLabel} variant="primary" onClick={onComplete} />
+          <Button label={completeLabel} variant="primary" onClick={onComplete} disabled={completeDisabled} />
         ) : (
-          <Button label="Continue" variant="primary" onClick={onContinue} />
+          <Button label="Continue" variant="primary" onClick={onContinue} disabled={continueDisabled} />
         )}
       </div>
     </div>
