@@ -2,7 +2,7 @@ import { memo, MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { CountBadge } from "src/components/CountBadge";
-import { FilterDefs, FilterImpls } from "src/components/Filters";
+import { FilterDefs, FilterImpls, filterTestIdPrefix } from "src/components/Filters";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
@@ -18,7 +18,8 @@ import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext
 import { useTestIds } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
-import { buildFilterImpls, FilterPanel } from "./FilterPanel";
+import { buildFilterControls, buildFilterImpls, FilterPanel } from "./FilterPanel";
+import { GroupByField, GroupByFieldProps } from "./GroupByField";
 
 export type SearchBoxProps = {
   onSearch: (filter: string) => void;
@@ -39,11 +40,7 @@ type GridTableLayoutActionsProps<
   filterDefs?: FilterDefs<F>;
   filter?: F;
   setFilter?: (filter: F) => void;
-  groupBy?: {
-    value: G;
-    setValue: (groupBy: G) => void;
-    options: Array<{ id: G; name: string }>;
-  };
+  groupBy?: GroupByFieldProps<G>;
   searchProps?: SearchBoxProps;
   hasHideableColumns?: boolean;
   columns?: GridColumn<R>[];
@@ -78,6 +75,8 @@ function GridTableLayoutActionsComponent<
     actionMenu,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
+  // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
+  const filterTid = useTestIds({}, filterTestIdPrefix);
 
   const { sm } = useBreakpoint();
   const inDocumentScrollLayout = useDocumentScrollLayout();
@@ -94,7 +93,13 @@ function GridTableLayoutActionsComponent<
   }, 300);
 
   const hasSearch = !!searchProps;
-  const hasFilters = !!filterDefs && Object.keys(filterDefs ?? {}).length > 0;
+  const filterCount = Object.keys(filterDefs ?? {}).length;
+  const hasGroupBy = !!groupBy;
+  const hasFilterControls = filterCount > 0 || hasGroupBy;
+  const controlCount = filterCount + (hasGroupBy ? 1 : 0);
+  // One control only — nothing to nest behind a toggle; show it inline in the toolbar on desktop.
+  // Fall back to the Filter button if a lone filter is missing filter/setFilter.
+  const showInlineControl = !sm && controlCount === 1 && (hasGroupBy || !!(filter && setFilter));
   const activeFilterCount = useMemo(() => (filter ? getActiveFilterCount(filter) : 0), [filter]);
   const filterImpls = useMemo(() => (filterDefs ? buildFilterImpls(filterDefs) : ({} as FilterImpls<F>)), [filterDefs]);
 
@@ -146,7 +151,7 @@ function GridTableLayoutActionsComponent<
           )}
 
           {/* Small screen: filter icon toggle */}
-          {sm && hasFilters && (
+          {sm && hasFilterControls && (
             <IconButton
               variant="outline"
               icon={activeFilterCount > 0 ? "filterBadged" : "filter"}
@@ -157,8 +162,16 @@ function GridTableLayoutActionsComponent<
             />
           )}
 
-          {/* Large screen: full Filter button with badge + chevron */}
-          {!sm && hasFilters && (
+          {/* Desktop: single control inline in place of the Filter toggle */}
+          {showInlineControl &&
+            (groupBy ? (
+              <GroupByField {...groupBy} />
+            ) : (
+              filter && setFilter && buildFilterControls(filterImpls, filter, setFilter, filterTid)
+            ))}
+
+          {/* Large screen: Filter button when controls are nested (or inline isn't possible) */}
+          {!sm && hasFilterControls && !showInlineControl && (
             <Button
               label="Filter"
               icon="filter"
@@ -190,8 +203,8 @@ function GridTableLayoutActionsComponent<
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
       {sm && showSearch && <div css={Css.px3.$}>{searchTextField}</div>}
 
-      {/* Combined filter panel — controls when open, chips when closed */}
-      {hasFilters && (
+      {/* Combined filter panel — omitted when the single control is already inline in the toolbar */}
+      {hasFilterControls && !showInlineControl && (
         <FilterPanel
           isOpen={showFilters}
           groupBy={groupBy}

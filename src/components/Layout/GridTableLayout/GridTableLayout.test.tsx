@@ -1,5 +1,5 @@
 import { act } from "@testing-library/react";
-import { checkboxFilter } from "src/components/Filters";
+import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { cardStyle } from "src/components/Table/TableStyles";
@@ -51,9 +51,10 @@ describe("GridTableLayout", () => {
       withRouter(),
     );
 
-    // Then the table actions are rendered
+    // Then the table actions are rendered (single filter is inline on desktop)
     expect(r.search).toHaveValue("");
-    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
+    expect(r.filter_needsRevision).toBeInTheDocument();
+    expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
       "
       | Name  | Value | Action  |
@@ -100,8 +101,9 @@ describe("GridTableLayout", () => {
 
     // And the search to not be rended
     expect(r.query.search).not.toBeInTheDocument();
-    // But the filter button still is
-    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
+    // But the single filter is inline on desktop
+    expect(r.filter_needsRevision).toBeInTheDocument();
+    expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
 
     // And the table content to be rendered
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
@@ -522,11 +524,11 @@ describe("GridTableLayout", () => {
 
   describe("filters", () => {
     it("removes the filter value when a chip is clicked", async () => {
-      // Given the panel is closed with an active filter
+      // Given multiple filters so controls nest behind the Filter toggle (chips show when closed)
       const storageKey = "chip-click-test";
       sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
 
-      type ChipFilter = { needsRevision?: boolean };
+      type ChipFilter = { needsRevision?: boolean; status?: string[] };
       let capturedFilter: ChipFilter = {};
 
       function FilterChipWrapper() {
@@ -534,6 +536,15 @@ describe("GridTableLayout", () => {
           persistedFilter: {
             filterDefs: {
               needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              status: multiFilter({
+                options: [
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                ],
+                getOptionLabel: (o) => o.label,
+                getOptionValue: (o) => o.value,
+                label: "Status",
+              }),
             },
             storageKey: storageKey,
           },
@@ -555,7 +566,7 @@ describe("GridTableLayout", () => {
       click(r.filter_chip_needsRevision);
 
       // Then the chip is removed and the filter state is cleared
-      expect(r.query.filter_chip_needsRevision).not.toBeInTheDocument();
+      expect(r.query.filter_chip_needsRevision).toBeNull();
       expect(capturedFilter).toEqual({});
     });
   });
