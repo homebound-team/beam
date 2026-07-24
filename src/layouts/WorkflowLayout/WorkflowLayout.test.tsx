@@ -50,7 +50,7 @@ describe("WorkflowLayout", () => {
     const r = await render(<WorkflowLayout {...baseProps({ workflowHeader: { onCancel } })} />, withRouter());
 
     // When Cancel is clicked
-    click(r.workflowLayout_cancel);
+    click(r.cancel);
 
     // Then it's called
     expect(onCancel).toHaveBeenCalledTimes(1);
@@ -65,7 +65,7 @@ describe("WorkflowLayout", () => {
     );
 
     // When Save is clicked
-    click(r.workflowLayout_complete);
+    click(r.save);
 
     // Then it's called
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -79,13 +79,13 @@ describe("WorkflowLayout", () => {
     );
 
     // Then Continue is disabled
-    expect(r.workflowLayout_continue).toBeDisabled();
+    expect(r.continue).toBeDisabled();
 
     // When the same step becomes valid
     await r.rerender(<WorkflowLayout {...baseProps({ steps: makeSteps({ oneIsValid: true }) })} />);
 
     // Then Continue is enabled
-    expect(r.workflowLayout_continue).not.toBeDisabled();
+    expect(r.continue).not.toBeDisabled();
   });
 
   it("disables Save when the active (last) step is invalid, and enables it once valid", async () => {
@@ -114,7 +114,7 @@ describe("WorkflowLayout", () => {
     );
 
     // Then Save is enabled
-    expect(r.workflowLayout_complete).not.toBeDisabled();
+    expect(r.complete).not.toBeDisabled();
   });
 
   it("forces the stepper tabs into their non-interactive collapsed state once scrolled down, and re-expands on scroll-up even short of the top", async () => {

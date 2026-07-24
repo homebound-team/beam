@@ -1,4 +1,3 @@
-import type { PressEvent } from "@react-types/shared";
 import { ReactNode, useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
@@ -18,22 +17,12 @@ import {
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
-import { WorkflowActions } from "./WorkflowActions";
+import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
-export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> & {
-  /** Tab-strip navigation; `steps` itself is derived from `WorkflowLayoutProps.steps`. */
-  stepperTabs: Omit<StepperTabsProps, "steps">;
-  /** Leaves the workflow without saving. Always shown. */
-  onCancel: (e: PressEvent) => void;
-  /** Label for the completion button shown on the last step. */
-  completeLabel: "Create" | "Save";
-  /** Called when the completion button is clicked. Only shown on the last step. */
-  onComplete: (e: PressEvent) => void | Promise<void>;
-  /** Whether Save & Exit is available on the current step. Default false. */
-  canExitEarly?: boolean;
-  /** Saves partial progress and exits. Used whenever canExitEarly is true. */
-  onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
-};
+export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
+  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
+    stepperTabs: StepperTabsProps;
+  };
 
 export type WorkflowLayoutStep = {
   label: string;
@@ -67,15 +56,7 @@ export type WorkflowLayoutProps = {
  * of the public API.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
-  const {
-    stepperTabs,
-    onCancel,
-    completeLabel,
-    onComplete,
-    canExitEarly = false,
-    onSaveAndExit,
-    ...headerProps
-  } = props.workflowHeader;
+  const { stepperTabs, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props.workflowHeader;
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 
@@ -127,14 +108,11 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       isMobile={isMobile}
       onBack={() => onChange(resolvedSteps[currentIndex - 1].value)}
       onCancel={onCancel}
-      canExitEarly={canExitEarly}
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
       completeDisabled={!activeStep?.isValid}
       onContinue={() => onChange(resolvedSteps[currentIndex + 1].value)}
-      continueDisabled={!activeStep?.isValid}
-      tid={tid}
     />
   );
 

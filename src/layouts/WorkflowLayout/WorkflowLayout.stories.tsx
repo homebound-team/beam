@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { useState } from "react";
+import { StepperTabsStep } from "src/components/StepperTabs";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample, TestWorkflowProjectLayout } from "src/utils/sbComponents";
@@ -24,7 +25,6 @@ export function Default() {
         onCancel: action("cancel clicked"),
         completeLabel: "Save",
         onComplete: action("complete clicked"),
-        canExitEarly: true,
         onSaveAndExit: action("save and exit clicked"),
         stepperTabs: { currentStep, onChange: setCurrentStep },
       }}
