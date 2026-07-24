@@ -912,6 +912,7 @@
     "transitionTransform": {"kind":"static","defs":{"transition":"transform 200ms cubic-bezier(0.4, 0, 0.2, 1)"}},
     "transitionHeight": {"kind":"static","defs":{"transition":"height 200ms cubic-bezier(0.4, 0, 0.2, 1)"}},
     "transitionTop": {"kind":"static","defs":{"transition":"top 200ms cubic-bezier(0.4, 0, 0.2, 1)"}},
+    "transitionMaxHeightAndPadding": {"kind":"static","defs":{"transition":"max-height 200ms cubic-bezier(0.4, 0, 0.2, 1), padding 200ms cubic-bezier(0.4, 0, 0.2, 1)"}},
     "bsh0": {"kind":"static","defs":{"boxShadow":"none"}},
     "bshBasic": {"kind":"static","defs":{"boxShadow":"0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);"}},
     "bshHover": {"kind":"static","defs":{"boxShadow":"0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);"}},
