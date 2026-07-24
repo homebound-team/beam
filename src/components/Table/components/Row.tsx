@@ -179,7 +179,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
       data-gridrow
       {...getCount(row.id)}
       ref={ref}
-      className={`${BorderHoverParent} ${RowHoverClass}`}
+      className={`${BorderHoverParent}${showRowHoverColor ? ` ${RowHoverClass}` : ""}`}
     >
       {isKeptGroupRow ? (
         <KeptGroupRow
