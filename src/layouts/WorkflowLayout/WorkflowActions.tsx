@@ -14,6 +14,8 @@ export type WorkflowActionsProps = {
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
   /** Label for the completion button shown on the last step. */
   completeLabel: "Create" | "Save";
+  /** Disables the completion button, e.g. while the active step is invalid. */
+  completeDisabled?: boolean;
   /** Called when the completion button is clicked. Only shown on the last step. */
   onComplete: (e: PressEvent) => void | Promise<void>;
   /** Disables the Continue button, e.g. while the active step is invalid. */
