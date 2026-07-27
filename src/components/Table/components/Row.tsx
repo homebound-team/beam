@@ -400,7 +400,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 applyFirstContentColumnStyles && levelIndent ? ` - ${levelIndent}px` : ""
               })`,
             ).$,
-            // Gutter columns are budgeted at 12px; strip cell padding so flex min-content does not exceed that width.
+            // Gutter columns are budgeted at pageContentGutterPx; strip cell padding so flex min-content does not exceed that width.
             ...(column.isLayoutGutter && Css.px0.mw0.$),
           };
 

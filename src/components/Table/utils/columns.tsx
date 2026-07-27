@@ -7,6 +7,7 @@ import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
 import { DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
+import { pageContentGutterPx } from "src/layouts/layoutSpacing";
 import { isFunction, newMethodMissingProxy } from "src/utils";
 
 /** Provides default styling for a GridColumn representing a Date. */
@@ -124,9 +125,6 @@ export function pinColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>):
   }) as any;
 }
 
-/** Hardcoded to match page content inset (pl3/pr3). Unifying layout spacing is a separate effort. */
-const columnGutterPx = 12;
-
 export const layoutGutterLeftColumnId = "beamLayoutGutterLeft";
 export const layoutGutterRightColumnId = "beamLayoutGutterRight";
 
@@ -142,7 +140,7 @@ function layoutGutterColumn<T extends Kinded>(side: "left" | "right"): GridColum
     ...nonKindDefaults(),
     id,
     clientSideSort: false,
-    w: `${columnGutterPx}px`,
+    w: `${pageContentGutterPx}px`,
     wrapAction: false,
     isLayoutGutter: true,
     canHide: false,

@@ -13,6 +13,7 @@ import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { isDefined, maybeCall, safeEntries, useTestIds } from "src/utils";
 import { GroupByField, GroupByFieldProps } from "./GroupByField";
 
@@ -49,7 +50,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
         ...Css.df.aic.gap1.sbwn.$,
         ...Css.ifSm.oxa.mw0.$,
         ...Css.ifMdAndUp.fww.$,
-        ...Css.if(inDocumentScrollLayout).px3.$,
+        ...(inDocumentScrollLayout ? pageContentPaddingX : undefined),
       }}
     >
       {groupBy && <GroupByField {...groupBy} />}
