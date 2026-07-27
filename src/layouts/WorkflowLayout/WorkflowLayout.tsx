@@ -29,7 +29,7 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
   Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
     /** The workflow's steps; the active step's `content` is the body, and it drives the header's tab strip. */
     steps: WorkflowLayoutStep[];
-    /** The step shown initially (matched against `defaultTestId(step.label)`); defaults to the first step. Uncontrolled — the layout owns step navigation from here. */
+    /** The step shown initially (matched against `defaultTestId(step.label)`); falls back to the first step if omitted or if it doesn't match any step. Uncontrolled — the layout owns step navigation from here. */
     defaultStep?: string;
   };
 
@@ -48,7 +48,7 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
 export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props;
   const tabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
-  const [currentStep, setCurrentStep] = useState(defaultStep ?? tabSteps[0]?.value);
+  const [currentStep, setCurrentStep] = useState(() => getInitialStep(tabSteps, defaultStep));
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 
@@ -73,7 +73,10 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const cssVars: Record<string, string> | undefined =
     headerHeight > 0 ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
 
-  const currentIndex = tabSteps.findIndex((step) => step.value === currentStep);
+  // Guards against a stale `currentStep` (e.g. `steps` changed out from under it) resolving to no tab at all.
+  const currentIndex = isValidStep(tabSteps, currentStep)
+    ? tabSteps.findIndex((step) => step.value === currentStep)
+    : 0;
   const isFirstStep = currentIndex <= 0;
   const isLastStep = currentIndex === tabSteps.length - 1;
   const activeStep = tabSteps[currentIndex];
@@ -160,3 +163,11 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
 }
 
 const mobileFooterHeightPx = 80;
+
+function isValidStep(steps: { value: string }[], value: string | undefined): boolean {
+  return steps.some((step) => step.value === value);
+}
+
+function getInitialStep(steps: { value: string }[], defaultStep: string | undefined): string {
+  return defaultStep !== undefined && isValidStep(steps, defaultStep) ? defaultStep : steps[0]?.value;
+}
