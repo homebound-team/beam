@@ -1,7 +1,6 @@
-import { StepperTabsProps } from "src/components/StepperTabs";
 import { setViewport } from "src/tests/viewport";
 import { click, render, scrollWindowWithAnchor, withRouter } from "src/utils/rtl";
-import { WorkflowHeaderConfig, WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
+import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
   it("renders the header and the active step's content", async () => {
@@ -16,7 +15,7 @@ describe("WorkflowLayout", () => {
   it("swaps the visible content when currentStep changes", async () => {
     // Given a WorkflowLayout on its second step
     const r = await render(
-      <WorkflowLayout {...baseProps({ workflowHeader: { stepperTabs: { currentStep: "stepTwo" } } })} />,
+      <WorkflowLayout {...baseProps({ stepperTabs: { currentStep: "stepTwo" } })} />,
       withRouter(),
     );
 
@@ -47,7 +46,7 @@ describe("WorkflowLayout", () => {
   it("calls onCancel when Cancel is clicked", async () => {
     // Given a WorkflowLayout with a spy onCancel
     const onCancel = vi.fn();
-    const r = await render(<WorkflowLayout {...baseProps({ workflowHeader: { onCancel } })} />, withRouter());
+    const r = await render(<WorkflowLayout {...baseProps({ onCancel })} />, withRouter());
 
     // When Cancel is clicked
     click(r.cancel);
@@ -60,7 +59,7 @@ describe("WorkflowLayout", () => {
     // Given a WorkflowLayout on its last step with a spy onComplete
     const onComplete = vi.fn();
     const r = await render(
-      <WorkflowLayout {...baseProps({ workflowHeader: { onComplete, stepperTabs: { currentStep: "stepTwo" } } })} />,
+      <WorkflowLayout {...baseProps({ onComplete, stepperTabs: { currentStep: "stepTwo" } })} />,
       withRouter(),
     );
 
@@ -82,7 +81,7 @@ describe("WorkflowLayout", () => {
     expect(r.continue).toBeDisabled();
 
     // When the same step becomes valid
-    await r.rerender(<WorkflowLayout {...baseProps({ steps: makeSteps({ oneIsValid: true }) })} />);
+    r.rerender(<WorkflowLayout {...baseProps({ steps: makeSteps({ oneIsValid: true }) })} />);
 
     // Then Continue is enabled
     expect(r.continue).not.toBeDisabled();
@@ -94,7 +93,7 @@ describe("WorkflowLayout", () => {
       <WorkflowLayout
         {...baseProps({
           steps: makeSteps({ twoIsValid: false }),
-          workflowHeader: { stepperTabs: { currentStep: "stepTwo" } },
+          stepperTabs: { currentStep: "stepTwo" },
         })}
       />,
       withRouter(),
@@ -104,11 +103,11 @@ describe("WorkflowLayout", () => {
     expect(r.save).toBeDisabled();
 
     // When the same step becomes valid
-    await r.rerender(
+    r.rerender(
       <WorkflowLayout
         {...baseProps({
           steps: makeSteps({ twoIsValid: true }),
-          workflowHeader: { stepperTabs: { currentStep: "stepTwo" } },
+          stepperTabs: { currentStep: "stepTwo" },
         })}
       />,
     );
@@ -120,10 +119,7 @@ describe("WorkflowLayout", () => {
   it("forces the stepper tabs into their non-interactive collapsed state once scrolled down, and re-expands on scroll-up even short of the top", async () => {
     // Given a WorkflowLayout with an enabled (not disabled/active) second step
     const onChange = vi.fn();
-    const r = await render(
-      <WorkflowLayout {...baseProps({ workflowHeader: { stepperTabs: { onChange } } })} />,
-      withRouter(),
-    );
+    const r = await render(<WorkflowLayout {...baseProps({ stepperTabs: { onChange } })} />, withRouter());
 
     // Then, at the top of the page, clicking the second step's tab navigates to it
     click(r.header_stepperTabs_tab_stepTwo);
@@ -161,25 +157,19 @@ function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {
   ];
 }
 
-type BaseWorkflowLayoutOverrides = Omit<Partial<WorkflowLayoutProps>, "workflowHeader"> & {
-  workflowHeader?: Omit<Partial<WorkflowHeaderConfig>, "stepperTabs"> & {
-    stepperTabs?: Partial<Omit<StepperTabsProps, "steps">>;
-  };
+type BaseWorkflowLayoutOverrides = Omit<Partial<WorkflowLayoutProps>, "stepperTabs"> & {
+  stepperTabs?: Partial<WorkflowLayoutProps["stepperTabs"]>;
 };
 
 function baseProps(overrides: BaseWorkflowLayoutOverrides = {}): WorkflowLayoutProps {
-  const { workflowHeader, steps = makeSteps(), ...rest } = overrides;
-  const { stepperTabs, ...restHeader } = workflowHeader ?? {};
+  const { steps = makeSteps(), stepperTabs, ...rest } = overrides;
   return {
+    title: "Test Workflow",
+    onCancel: () => {},
+    completeLabel: "Save",
+    onComplete: () => {},
     steps,
+    stepperTabs: { currentStep: "stepOne", onChange: () => {}, ...stepperTabs },
     ...rest,
-    workflowHeader: {
-      title: "Test Workflow",
-      onCancel: () => {},
-      completeLabel: "Save",
-      onComplete: () => {},
-      stepperTabs: { currentStep: "stepOne", onChange: () => {}, ...stepperTabs },
-      ...restHeader,
-    },
   };
 }

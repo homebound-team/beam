@@ -14,13 +14,11 @@ export type WorkflowActionsProps = {
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
   /** Label for the completion button shown on the last step. */
   completeLabel: "Create" | "Save";
-  /** Disables the completion button, e.g. while the active step is invalid. */
-  completeDisabled?: boolean;
   /** Called when the completion button is clicked. Only shown on the last step. */
   onComplete: (e: PressEvent) => void | Promise<void>;
-  /** Disables the Continue button, e.g. while the active step is invalid. */
-  continueDisabled?: boolean;
   onContinue: () => void;
+  /** Disables whichever of Continue/Complete is currently shown, e.g. while the active step is invalid. */
+  primaryDisabled?: boolean;
 };
 
 /** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete); shared by `WorkflowLayout`'s header and mobile footer. */
@@ -33,10 +31,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
     onCancel,
     onSaveAndExit,
     completeLabel,
-    completeDisabled,
     onComplete,
-    continueDisabled,
     onContinue,
+    primaryDisabled,
   } = props;
 
   return (
@@ -53,9 +50,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />
         {onSaveAndExit && <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} />}
         {isLastStep ? (
-          <Button label={completeLabel} variant="primary" onClick={onComplete} disabled={completeDisabled} />
+          <Button label={completeLabel} variant="primary" onClick={onComplete} disabled={primaryDisabled} />
         ) : (
-          <Button label="Continue" variant="primary" onClick={onContinue} disabled={continueDisabled} />
+          <Button label="Continue" variant="primary" onClick={onContinue} disabled={primaryDisabled} />
         )}
       </div>
     </div>

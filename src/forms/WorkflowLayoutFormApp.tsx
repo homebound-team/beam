@@ -66,13 +66,11 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
 
         return (
           <WorkflowLayout
-            workflowHeader={{
-              title: "Workflow Layout Form",
-              onCancel: () => {},
-              completeLabel: "Save",
-              onComplete: onSave,
-              stepperTabs: { currentStep, onChange: setCurrentStep },
-            }}
+            title="Workflow Layout Form"
+            onCancel={() => {}}
+            completeLabel="Save"
+            onComplete={onSave}
+            stepperTabs={{ currentStep, onChange: setCurrentStep }}
             steps={steps}
           />
         );

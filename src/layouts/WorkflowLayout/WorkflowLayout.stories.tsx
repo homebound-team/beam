@@ -19,14 +19,12 @@ export function Default() {
   const [currentStep, setCurrentStep] = useState("tradePartners");
   return (
     <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        onSaveAndExit: action("save and exit clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      onSaveAndExit={action("save and exit clicked")}
+      stepperTabs={{ currentStep, onChange: setCurrentStep }}
       steps={makeSteps()}
     />
   );
@@ -41,13 +39,11 @@ export function ScrollCollapsesTabs() {
   const [currentStep, setCurrentStep] = useState("tradePartners");
   return (
     <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      stepperTabs={{ currentStep, onChange: setCurrentStep }}
       steps={makeSteps(50)}
     />
   );
@@ -63,13 +59,11 @@ export function WideStepContentOverflows() {
   steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
   return (
     <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      stepperTabs={{ currentStep, onChange: setCurrentStep }}
       steps={steps}
     />
   );
