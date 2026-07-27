@@ -19,6 +19,11 @@ import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
+export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
+  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
+    stepperTabs: Omit<StepperTabsProps, "steps">;
+  };
+
 export type WorkflowLayoutStep = {
   label: string;
   /** Drives the tab's completed checkmark, and gates the Continue/Complete CTA when this is the active step. */
@@ -29,12 +34,12 @@ export type WorkflowLayoutStep = {
   content: ReactNode;
 };
 
-export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
-  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
-    stepperTabs: Omit<StepperTabsProps, "steps">;
-    /** The workflow's steps; the active step (per `stepperTabs.currentStep`) drives both the tab strip and the rendered body. */
-    steps: WorkflowLayoutStep[];
-  };
+export type WorkflowLayoutProps = {
+  /** Config for the `WorkflowHeader` rendered as the page-level header, and its CTAs (Back/Cancel/Save & Exit/Continue/Complete). */
+  workflowHeader: WorkflowHeaderConfig;
+  /** The workflow's steps; the active step (per `workflowHeader.stepperTabs.currentStep`) drives both the tab strip and the rendered body. */
+  steps: WorkflowLayoutStep[];
+};
 
 /**
  * Workflow-header + body shell with sticky (always-visible) chrome. Contract: `docs/layouts.md`.
@@ -49,7 +54,8 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  * of the public API.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
-  const { steps, stepperTabs, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props;
+  const { steps } = props;
+  const { stepperTabs, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props.workflowHeader;
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 

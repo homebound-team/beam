@@ -83,8 +83,14 @@ export function TestProjectLayout({ pageTitle, children }: { pageTitle?: string;
  * `NavbarLayout` + `WorkflowLayout`, a peer/replacement for `PageHeaderLayout` in the layout stack for
  * workflow pages.
  */
-export function TestWorkflowProjectLayout(props: WorkflowLayoutProps) {
-  return <WorkflowLayout {...props} />;
+export function TestWorkflowProjectLayout({
+  workflowHeader,
+  steps,
+}: {
+  workflowHeader: WorkflowLayoutProps["workflowHeader"];
+  steps: WorkflowLayoutProps["steps"];
+}) {
+  return <WorkflowLayout workflowHeader={workflowHeader} steps={steps} />;
 }
 
 export function createNavbar(): NavbarProps {
