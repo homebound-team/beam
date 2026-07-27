@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 
@@ -21,7 +22,7 @@ export function Default() {
 
 function Body() {
   return (
-    <div css={Css.px3.py2.$}>
+    <div css={{ ...pageContentPaddingX, ...Css.py2.$ }}>
       {zeroTo(30).map((i) => (
         <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Section {i + 1}.

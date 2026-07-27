@@ -7,6 +7,7 @@ import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
+import { pageContentPaddingX } from "../layoutSpacing";
 import {
   bannerAndNavbarChromeTop,
   beamPageHeaderLayoutHeightVar,
@@ -136,14 +137,15 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
 
         {showFooter && (
           <div
-            css={
-              Css.fixed.bottom0
+            css={{
+              ...Css.fixed.bottom0
                 .w(headerWidth)
                 .hPx(mobileFooterHeightPx)
                 .z(zIndices.pageStickyFooter)
-                .df.aic.jcfe.gap1.px3.bt.bc(Tokens.SurfaceSeparator)
-                .bgColor(Tokens.Surface).$
-            }
+                .df.aic.jcfe.gap1.bt.bc(Tokens.SurfaceSeparator)
+                .bgColor(Tokens.Surface).$,
+              ...pageContentPaddingX,
+            }}
             {...tid.footer}
           >
             {buttons}

@@ -8,6 +8,7 @@ import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import { useEnvironmentBannerLayoutHeight } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 
@@ -95,7 +96,12 @@ function NavbarMobileDrawer({
           onClick={(e) => e.stopPropagation()}
           {...tid.mobileMenuDrawer}
         >
-          <div css={Css.df.aic.jcfe.px3.pyPx(12).fs0.bb.bc(Tokens.SurfaceSeparator).$}>
+          <div
+            css={{
+              ...Css.df.aic.jcfe.pyPx(12).fs0.bb.bc(Tokens.SurfaceSeparator).$,
+              ...pageContentPaddingX,
+            }}
+          >
             <IconButton
               icon="x"
               color={Tokens.OnSurfaceMuted}
@@ -105,7 +111,10 @@ function NavbarMobileDrawer({
             />
           </div>
           <nav
-            css={Css.fg1.oya.px3.pb3.pt2.df.fdc.gapPx(4).$}
+            css={{
+              ...Css.fg1.oya.pb3.pt2.df.fdc.gapPx(4).$,
+              ...pageContentPaddingX,
+            }}
             // String-route items render as `<a>` (react-router Link) and external URLs as `<a href>`;
             // closing on any anchor click covers same-route taps that don't change the location.
             onClickCapture={(e) => {

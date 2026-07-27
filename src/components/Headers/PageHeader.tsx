@@ -1,6 +1,7 @@
 import { BaseHeader, BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { RouteTabsProps, Tabs, TabsContentXss, TabsProps } from "src/components/Tabs";
-import { Css, Only } from "src/Css";
+import { Only } from "src/Css";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils";
 
 export type PageHeaderProps<V extends string, X> = Omit<BaseHeaderProps, "bottomSlot"> & {
@@ -17,7 +18,7 @@ export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(
       {...otherProps}
       bottomSlot={
         tabs && (
-          <div css={Css.px3.$}>
+          <div css={pageContentPaddingX}>
             <Tabs {...tabs} {...tid.tabs} />
           </div>
         )
