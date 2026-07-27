@@ -1,10 +1,11 @@
-import { ReactNode, useCallback, useLayoutEffect, useRef } from "react";
+import { ReactNode, useCallback, useLayoutEffect, useRef, useState } from "react";
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
-import { StepperTabsProps } from "src/components/StepperTabs";
+import { StepperTabsStep } from "src/components/StepperTabs";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "../layoutSpacing";
@@ -19,17 +20,19 @@ import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
-export type WorkflowHeaderConfig = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
-  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
-    stepperTabs: StepperTabsProps;
-  };
-
-export type WorkflowLayoutProps = {
-  /** Config for the `WorkflowHeader` rendered as the page-level header, and its CTAs (Back/Cancel/Save & Exit/Continue/Complete). */
-  workflowHeader: WorkflowHeaderConfig;
-  /** Slot: main page body. */
-  children?: ReactNode;
+/** A `WorkflowLayout` step: a `StepperTabsStep` (minus `value`, which is derived from `label`) plus the page content rendered while it's active — `completed` also gates the Continue/Complete CTA when this is the active step. */
+export type WorkflowLayoutStep = Omit<StepperTabsStep, "value"> & {
+  /** Rendered as the page body while this is the active step. */
+  content: ReactNode;
 };
+
+export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
+  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
+    /** The workflow's steps; the active step's `content` is the body, and it drives the header's tab strip. */
+    steps: WorkflowLayoutStep[];
+    /** The step shown initially (matched against `defaultTestId(step.label)`); falls back to the first step if omitted or if it doesn't match any step. Uncontrolled — the layout owns step navigation from here. */
+    defaultStep?: string;
+  };
 
 /**
  * Workflow-header + body shell with sticky (always-visible) chrome. Contract: `docs/layouts.md`.
@@ -44,8 +47,9 @@ export type WorkflowLayoutProps = {
  * of the public API.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
-  const { children } = props;
-  const { stepperTabs, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props.workflowHeader;
+  const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props;
+  const tabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
+  const [currentStep, setCurrentStep] = useState(() => getInitialStep(tabSteps, defaultStep));
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 
@@ -70,22 +74,26 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const cssVars: Record<string, string> | undefined =
     headerHeight > 0 ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
 
-  const { steps, currentStep, onChange } = stepperTabs;
-  const currentIndex = steps.findIndex((step) => step.value === currentStep);
+  // Guards against a stale `currentStep` (e.g. `steps` changed out from under it) resolving to no tab at all.
+  const currentIndex = isValidStep(tabSteps, currentStep)
+    ? tabSteps.findIndex((step) => step.value === currentStep)
+    : 0;
   const isFirstStep = currentIndex <= 0;
-  const isLastStep = currentIndex === steps.length - 1;
+  const isLastStep = currentIndex === tabSteps.length - 1;
+  const activeStep = tabSteps[currentIndex];
 
   const buttons = (
     <WorkflowActions
       isFirstStep={isFirstStep}
       isLastStep={isLastStep}
       isMobile={isMobile}
-      onBack={() => onChange(steps[currentIndex - 1].value)}
+      onBack={() => setCurrentStep(tabSteps[currentIndex - 1].value)}
       onCancel={onCancel}
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
-      onContinue={() => onChange(steps[currentIndex + 1].value)}
+      primaryDisabled={!activeStep?.completed}
+      onContinue={() => setCurrentStep(tabSteps[currentIndex + 1].value)}
     />
   );
 
@@ -110,7 +118,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
     <WorkflowHeader
       {...headerProps}
       rightSlot={isMobile ? undefined : buttons}
-      stepperTabs={{ ...stepperTabs, collapsed }}
+      stepperTabs={{ steps: tabSteps, currentStep, onChange: setCurrentStep, collapsed }}
     />
   );
 
@@ -129,7 +137,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
         </div>
 
         <div css={Css.df.fdc.fg1.mh0.w100.$} {...tid.body}>
-          {children}
+          {activeStep?.content}
         </div>
 
         {/* Spacer so body content isn't hidden behind the fixed mobile footer. */}
@@ -157,3 +165,11 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
 }
 
 const mobileFooterHeightPx = 80;
+
+function isValidStep(steps: { value: string }[], value: string | undefined): boolean {
+  return steps.some((step) => step.value === value);
+}
+
+function getInitialStep(steps: { value: string }[], defaultStep: string | undefined): string {
+  return defaultStep !== undefined && isValidStep(steps, defaultStep) ? defaultStep : steps[0]?.value;
+}

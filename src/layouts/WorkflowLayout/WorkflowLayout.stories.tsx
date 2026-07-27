@@ -1,14 +1,12 @@
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
-import { StepperTabsStep } from "src/components/StepperTabs";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
-import { TestWorkflowProjectLayout } from "src/utils/sbComponents";
+import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { WorkflowLayout as WorkflowLayoutComponent } from "./WorkflowLayout";
+import { WorkflowLayout, WorkflowLayoutStep } from "./WorkflowLayout";
 
 export default {
-  component: WorkflowLayoutComponent,
+  component: WorkflowLayout,
   decorators: [withBeamDecorator, withRouter()],
   parameters: {
     layout: "fullscreen",
@@ -17,20 +15,15 @@ export default {
 } satisfies Meta;
 
 export function Default() {
-  const [currentStep, setCurrentStep] = useState("trade");
   return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        onSaveAndExit: action("save and exit clicked"),
-        stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
-      }}
-    >
-      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} />
-    </TestWorkflowProjectLayout>
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      onSaveAndExit={action("save and exit clicked")}
+      steps={makeSteps()}
+    />
   );
 }
 
@@ -40,19 +33,32 @@ export function Default() {
  * (even without reaching the top) to see them re-expand.
  */
 export function ScrollCollapsesTabs() {
-  const [currentStep, setCurrentStep] = useState("trade");
   return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        stepperTabs: { steps: makeSteps(), currentStep, onChange: setCurrentStep },
-      }}
-    >
-      <StepContent title={tabLabels[currentStep as keyof typeof tabLabels]} numRows={50} />
-    </TestWorkflowProjectLayout>
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      steps={makeSteps(50)}
+    />
+  );
+}
+
+/**
+ * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
+ * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
+ */
+export function WideStepContentOverflows() {
+  const steps = makeSteps();
+  steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
+  return (
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      steps={steps}
+    />
   );
 }
 
@@ -63,8 +69,12 @@ const tabLabels: Record<(typeof tabValues)[number], string> = {
   send: "Send Email",
 };
 
-function makeSteps(): StepperTabsStep[] {
-  return tabValues.map((value, i) => ({ value, label: tabLabels[value], completed: false, disabled: i > 0 }));
+function makeSteps(contentRows = 0): WorkflowLayoutStep[] {
+  return tabValues.map((value) => ({
+    label: tabLabels[value],
+    completed: false,
+    content: <StepContent title={tabLabels[value]} numRows={contentRows} />,
+  }));
 }
 
 function StepContent({ title, numRows = 0 }: { title: string; numRows?: number }) {
