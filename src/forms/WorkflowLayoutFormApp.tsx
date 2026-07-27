@@ -28,7 +28,6 @@ export function WorkflowLayoutFormApp() {
 }
 
 function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
-  const [currentStep, setCurrentStep] = useState("authorDetails");
   const [showFormData, setShowFormData] = useState(false);
 
   return (
@@ -66,13 +65,10 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
 
         return (
           <WorkflowLayout
-            workflowHeader={{
-              title: "Workflow Layout Form",
-              onCancel: () => {},
-              completeLabel: "Save",
-              onComplete: onSave,
-              stepperTabs: { currentStep, onChange: setCurrentStep },
-            }}
+            title="Workflow Layout Form"
+            onCancel={() => {}}
+            completeLabel="Save"
+            onComplete={onSave}
             steps={steps}
           />
         );
@@ -83,19 +79,15 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
 
 function AuthorDetails({ formState }: { formState: FormValue }) {
   return (
-    <Observer>
-      {() => (
-        <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
-          <h1 css={Css.mb1.$}>Author Details</h1>
-          <div css={Css.mb2.$}>
-            <BoundTextField field={formState.firstName} helperText="Required to enable next step" />
-          </div>
-          <div css={Css.mb2.$}>
-            <BoundTextField field={formState.lastName} helperText="Required to enable next step" />
-          </div>
-        </div>
-      )}
-    </Observer>
+    <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
+      <h1 css={Css.mb1.$}>Author Details</h1>
+      <div css={Css.mb2.$}>
+        <BoundTextField field={formState.firstName} helperText="Required to enable next step" />
+      </div>
+      <div css={Css.mb2.$}>
+        <BoundTextField field={formState.lastName} helperText="Required to enable next step" />
+      </div>
+    </div>
   );
 }
 
@@ -127,7 +119,7 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
     { header: "#", data: ({ id }) => <span>{id.value}</span> },
     {
       header: "Title",
-      data: ({ title }) => <BoundTextField label="" compact field={title} />,
+      data: ({ title }) => <BoundTextField label="Title" compact field={title} labelStyle="hidden" />,
     },
     {
       header: "Actions",
@@ -138,17 +130,17 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
 
 function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; showFormData: boolean }) {
   return (
-    <Observer>
-      {() => (
-        <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
-          <h1 css={Css.mb1.$}>Author Details</h1>
-          <div css={Css.mb2.$}>
-            <BoundDateField field={formState.birthday} helperText="Required" />
-          </div>
-          <div css={Css.mb2.$}>
-            <BoundNumberField field={formState.heightInInches} />
-          </div>
-          {showFormData && (
+    <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
+      <h1 css={Css.mb1.$}>Author Details</h1>
+      <div css={Css.mb2.$}>
+        <BoundDateField field={formState.birthday} helperText="Required" />
+      </div>
+      <div css={Css.mb2.$}>
+        <BoundNumberField field={formState.heightInInches} />
+      </div>
+      {showFormData && (
+        <Observer>
+          {() => (
             <div css={Css.mt5.$}>
               <h2>Form saved!</h2>
               <ul>
@@ -170,9 +162,9 @@ function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; 
               </ul>
             </div>
           )}
-        </div>
+        </Observer>
       )}
-    </Observer>
+    </div>
   );
 }
 

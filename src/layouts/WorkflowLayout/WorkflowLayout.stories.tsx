@@ -1,13 +1,12 @@
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
-import { TableExample, TestWorkflowProjectLayout } from "src/utils/sbComponents";
+import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { WorkflowLayout as WorkflowLayoutComponent, WorkflowLayoutStep } from "./WorkflowLayout";
+import { WorkflowLayout, WorkflowLayoutStep } from "./WorkflowLayout";
 
 export default {
-  component: WorkflowLayoutComponent,
+  component: WorkflowLayout,
   decorators: [withBeamDecorator, withRouter()],
   parameters: {
     layout: "fullscreen",
@@ -16,17 +15,13 @@ export default {
 } satisfies Meta;
 
 export function Default() {
-  const [currentStep, setCurrentStep] = useState("tradePartners");
   return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        onSaveAndExit: action("save and exit clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      onSaveAndExit={action("save and exit clicked")}
       steps={makeSteps()}
     />
   );
@@ -38,16 +33,12 @@ export function Default() {
  * (even without reaching the top) to see them re-expand.
  */
 export function ScrollCollapsesTabs() {
-  const [currentStep, setCurrentStep] = useState("tradePartners");
   return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
       steps={makeSteps(50)}
     />
   );
@@ -58,18 +49,14 @@ export function ScrollCollapsesTabs() {
  * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
  */
 export function WideStepContentOverflows() {
-  const [currentStep, setCurrentStep] = useState("tradePartners");
   const steps = makeSteps();
   steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
   return (
-    <TestWorkflowProjectLayout
-      workflowHeader={{
-        title: "Workflow Layout",
-        onCancel: action("cancel clicked"),
-        completeLabel: "Save",
-        onComplete: action("complete clicked"),
-        stepperTabs: { currentStep, onChange: setCurrentStep },
-      }}
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
       steps={steps}
     />
   );
