@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { BeamColor } from "src/colors";
 import { Icon } from "src/components/Icon";
 import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
+import { headerContentPaddingX } from "src/layouts/layoutSpacing";
 import { isDefined, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { Tag } from "../Tag";
@@ -42,7 +43,7 @@ export function EnvironmentBanner(props: EnvironmentBannerProps) {
       {getInvertedCorner("left", bgColorVar)}
       {getInvertedCorner("right", bgColorVar)}
 
-      <div css={Css.relative.z2.df.aic.jcsb.h100.px1.ifMdAndUp.px5.$} {...tid.content}>
+      <div css={{ ...Css.relative.z2.df.aic.jcsb.h100.$, ...headerContentPaddingX() }} {...tid.content}>
         <span css={Css.df.aic.gap2.fg1.mh0.oh.$} {...tid.left}>
           <Tag text={badgeLabel} xss={Css.bgColor("#FFFFFF90").$} {...tid.badge} />
           <span

@@ -8,6 +8,7 @@ import { NavbarMobileMenu } from "src/components/Navbar/NavbarMobileMenu";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useContentOverflow } from "src/hooks/useContentOverflow";
+import { headerContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils";
 
 export type NavbarUser = {
@@ -46,7 +47,13 @@ export function Navbar(props: NavbarProps) {
 
   return (
     <ContrastScope>
-      <nav css={Css.bgColor(Tokens.SurfaceRaised).fs0.df.aic.jcsb.wsnw.px1.py1.gap2.if(!showMobile).px5.$} {...tid}>
+      <nav
+        css={{
+          ...Css.bgColor(Tokens.SurfaceRaised).fs0.df.aic.jcsb.wsnw.py1.gap2.$,
+          ...headerContentPaddingX(showMobile),
+        }}
+        {...tid}
+      >
         <div css={Css.df.aic.gap3.fg1.mw0.$}>
           <div css={Css.df.aic.fs0.gap2.$}>
             {showMobile && <NavbarMobileMenu items={items} {...tid} />}

@@ -15,6 +15,7 @@ import { useBreakpoint } from "src/hooks";
 import { TextField } from "src/inputs/TextField";
 import { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
@@ -132,7 +133,12 @@ function GridTableLayoutActionsComponent<
 
   return (
     <div css={Css.df.fdc.gap1.pb2.if(view === "card").pb3.$}>
-      <div css={Css.df.gap1.jcsb.pt3.if(inDocumentScrollLayout).px3.$}>
+      <div
+        css={{
+          ...Css.df.gap1.jcsb.pt3.$,
+          ...(inDocumentScrollLayout ? pageContentPaddingX : undefined),
+        }}
+      >
         <div css={Css.df.gapPx(12).aic.$}>
           {/* Large screen: 244px inline search field */}
           {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
@@ -200,7 +206,7 @@ function GridTableLayoutActionsComponent<
       </div>
 
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
-      {sm && showSearch && <div css={Css.px3.$}>{searchTextField}</div>}
+      {sm && showSearch && <div css={pageContentPaddingX}>{searchTextField}</div>}
 
       {/* Combined filter panel — omitted when the single control is already inline in the toolbar */}
       {hasFilterControls && !showInlineControl && (

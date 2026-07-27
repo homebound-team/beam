@@ -3,6 +3,7 @@ import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { Css, Tokens } from "src/Css";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
@@ -116,7 +117,7 @@ function UserFooter() {
 
 function PageContent() {
   return (
-    <div css={Css.px3.py2.$}>
+    <div css={{ ...pageContentPaddingX, ...Css.py2.$ }}>
       <h1 css={Css.xl.mb3.$}>Page Content</h1>
       {zeroTo(15).map((i) => (
         <p key={i} css={Css.mb3.$}>
