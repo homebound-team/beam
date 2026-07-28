@@ -1,14 +1,21 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useMemo, useState } from "react";
-import { GridColumn, GridDataRow, GridTable, IconButton, simpleHeader, SimpleHeaderAndData } from "src/components";
+import {
+  GridColumn,
+  GridDataRow,
+  GridTableLayout,
+  IconButton,
+  simpleHeader,
+  SimpleHeaderAndData,
+} from "src/components";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
+import { FormSectionLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
 
 /**
  * Demos `WorkflowLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab
@@ -79,15 +86,25 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
 
 function AuthorDetails({ formState }: { formState: FormValue }) {
   return (
-    <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
-      <h1 css={Css.mb1.$}>Author Details</h1>
-      <div css={Css.mb2.$}>
-        <BoundTextField field={formState.firstName} helperText="Required to enable next step" />
-      </div>
-      <div css={Css.mb2.$}>
-        <BoundTextField field={formState.lastName} helperText="Required to enable next step" />
-      </div>
-    </div>
+    <FormSectionLayout
+      layout="centered"
+      title="Author Details"
+      sections={[
+        {
+          title: "Name",
+          fields: (
+            <>
+              <div css={Css.mb2.$}>
+                <BoundTextField field={formState.firstName} helperText="Required to enable next step" />
+              </div>
+              <div css={Css.mb2.$}>
+                <BoundTextField field={formState.lastName} helperText="Required to enable next step" />
+              </div>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -99,15 +116,15 @@ function BookList({ formState }: { formState: FormValue }) {
   );
 
   return (
-    <div css={Css.p3.$}>
-      <h1 css={Css.df.aic.$}>
+    <div>
+      <h1 css={Css.df.aic.p2.$}>
         Books
         <IconButton
           icon="plus"
           onClick={() => formState.books.add({ id: String(formState.books.value?.length + 1 || 1) })}
         />
       </h1>
-      <GridTable<Row> columns={columns} rows={rows} />
+      <GridTableLayout tableProps={{ columns, rows }} hideEditColumns />
     </div>
   );
 }
@@ -130,46 +147,57 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
 
 function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; showFormData: boolean }) {
   return (
-    <div css={Css.p3.mx("auto").maxwPx(contentMaxWidthPx).w100.$}>
-      <h1 css={Css.mb1.$}>Author Details</h1>
-      <div css={Css.mb2.$}>
-        <BoundDateField field={formState.birthday} helperText="Required" />
-      </div>
-      <div css={Css.mb2.$}>
-        <BoundNumberField field={formState.heightInInches} />
-      </div>
-      {showFormData && (
-        <Observer>
-          {() => (
-            <div css={Css.mt5.$}>
-              <h2>Form saved!</h2>
-              <ul>
-                <li>
-                  <strong>First Name</strong> {formState.value.firstName}
-                </li>
-                <li>
-                  <strong>Last Name</strong> {formState.value.lastName}
-                </li>
-                <li>
-                  <strong>Books</strong> {formState.value.books?.map((b) => b.title).join(", ")}
-                </li>
-                <li>
-                  <strong>Birthday</strong> {formState.value.birthday?.toString()}
-                </li>
-                <li>
-                  <strong>Height</strong> {formState.value.heightInInches}
-                </li>
-              </ul>
-            </div>
-          )}
-        </Observer>
-      )}
-    </div>
+    <FormSectionLayout
+      layout="centered"
+      title="Miscellaneous Details"
+      sections={[
+        {
+          title: "Details",
+          fields: (
+            <>
+              <div css={Css.mb2.$}>
+                <BoundDateField field={formState.birthday} helperText="Required" />
+              </div>
+              <div css={Css.mb2.$}>
+                <BoundNumberField field={formState.heightInInches} />
+              </div>
+            </>
+          ),
+        },
+        ...(showFormData
+          ? [
+              {
+                title: "Form saved!",
+                fields: (
+                  <Observer>
+                    {() => (
+                      <ul>
+                        <li>
+                          <strong>First Name</strong> {formState.value.firstName}
+                        </li>
+                        <li>
+                          <strong>Last Name</strong> {formState.value.lastName}
+                        </li>
+                        <li>
+                          <strong>Books</strong> {formState.value.books?.map((b) => b.title).join(", ")}
+                        </li>
+                        <li>
+                          <strong>Birthday</strong> {formState.value.birthday?.toString()}
+                        </li>
+                        <li>
+                          <strong>Height</strong> {formState.value.heightInInches}
+                        </li>
+                      </ul>
+                    )}
+                  </Observer>
+                ),
+              },
+            ]
+          : []),
+      ]}
+    />
   );
 }
-
-// Mimics the centered content column a future layout will own generally — see WorkflowLayout.tsx's docs.
-const contentMaxWidthPx = 720;
 
 type FormValue = ObjectState<AuthorInput>;
 
