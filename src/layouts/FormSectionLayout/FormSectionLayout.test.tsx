@@ -7,7 +7,6 @@ describe("FormSectionLayout", () => {
     // When rendered
     const r = await render(
       <FormSectionLayout
-        layout="full"
         title="Trade Partners"
         description="Set up trade partner assignments for this project"
         sections={[
@@ -29,7 +28,7 @@ describe("FormSectionLayout", () => {
   it("omits the description and actions slots when not provided", async () => {
     // Given a FormSectionLayout with no description or actions
     // When rendered
-    const r = await render(<FormSectionLayout layout="full" title="Trade Partners" sections={[]} />);
+    const r = await render(<FormSectionLayout title="Trade Partners" sections={[]} />);
     // Then neither slot renders
     expect(r.query.formSectionLayout_description).not.toBeInTheDocument();
     expect(r.query.formSectionLayout_actions).not.toBeInTheDocument();
@@ -39,30 +38,9 @@ describe("FormSectionLayout", () => {
     // Given a FormSectionLayout with actions
     // When rendered
     const r = await render(
-      <FormSectionLayout
-        layout="full"
-        title="Trade Partners"
-        actions={[{ label: "Save draft", onClick: () => {} }]}
-        sections={[]}
-      />,
+      <FormSectionLayout title="Trade Partners" actions={[{ label: "Save draft", onClick: () => {} }]} sections={[]} />,
     );
     // Then the action renders as a real Button
     expect(r.getByRole("button", { name: "Save draft" })).toBeInTheDocument();
-  });
-
-  it("does not cap width for layout=full", async () => {
-    // Given layout="full"
-    // When rendered
-    const r = await render(<FormSectionLayout layout="full" title="Trade Partners" sections={[]} />);
-    // Then no max-width is applied
-    expect(r.formSectionLayout).not.toHaveStyle({ maxWidth: "720px" });
-  });
-
-  it("caps width at 720px and centers for layout=centered", async () => {
-    // Given layout="centered"
-    // When rendered
-    const r = await render(<FormSectionLayout layout="centered" title="Trade Partners" sections={[]} />);
-    // Then the content is capped at 720px and horizontally centered
-    expect(r.formSectionLayout).toHaveStyle({ maxWidth: "720px", marginLeft: "auto", marginRight: "auto" });
   });
 });

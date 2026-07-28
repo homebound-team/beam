@@ -8,10 +8,9 @@ export default {
   decorators: [withBeamDecorator],
 } as Meta;
 
-export function Full() {
+export function Default() {
   return (
     <FormSectionLayout
-      layout="full"
       title="Trade Partners"
       description="Assign and manage trade partners for this project."
       actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
@@ -31,10 +30,9 @@ export function Full() {
   );
 }
 
-export function Centered() {
+export function Basic() {
   return (
     <FormSectionLayout
-      layout="centered"
       title="Author Details"
       sections={[{ title: "Basic Information", fields: <PlaceholderFields count={2} /> }]}
     />
@@ -44,7 +42,6 @@ export function Centered() {
 export function NestedChildSections() {
   return (
     <FormSectionLayout
-      layout="full"
       title="Trade Partners"
       sections={[
         {

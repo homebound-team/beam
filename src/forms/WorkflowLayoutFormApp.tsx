@@ -87,7 +87,6 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
 function AuthorDetails({ formState }: { formState: FormValue }) {
   return (
     <FormSectionLayout
-      layout="centered"
       title="Author Details"
       sections={[
         {
@@ -148,7 +147,6 @@ function createColumns(formState: FormValue): GridColumn<Row>[] {
 function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; showFormData: boolean }) {
   return (
     <FormSectionLayout
-      layout="centered"
       title="Miscellaneous Details"
       sections={[
         {
