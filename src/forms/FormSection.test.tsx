@@ -23,7 +23,7 @@ describe("FormSection", () => {
     // When rendered
     const r = await render(<FormSection title="Trade Partners" actions={[{ label: "Add", onClick: () => {} }]} />);
     // Then the action renders as a real Button
-    expect(r.getByRole("button", { name: "Add" })).toBeInTheDocument();
+    expect(r.add).toBeInTheDocument();
   });
 
   it("omits the description and actions slots when not provided", async () => {

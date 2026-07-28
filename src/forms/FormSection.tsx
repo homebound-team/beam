@@ -46,7 +46,7 @@ export function FormSection(props: FormSectionProps) {
         <div css={Css.df.fdc.gap3.$}>
           {childSections.map((child, i) => (
             <div key={defaultTestId(child.title) || i} css={Css.bb.bc(Tokens.SurfaceSeparator).pb3.ifLastOfType.bn.$}>
-              <FormSection {...child} isChild {...tid[`childSection${i}`]} />
+              <FormSection {...child} isChild {...tid.childSection} />
             </div>
           ))}
         </div>

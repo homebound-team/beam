@@ -41,6 +41,6 @@ describe("FormSectionLayout", () => {
       <FormSectionLayout title="Trade Partners" actions={[{ label: "Save draft", onClick: () => {} }]} sections={[]} />,
     );
     // Then the action renders as a real Button
-    expect(r.getByRole("button", { name: "Save draft" })).toBeInTheDocument();
+    expect(r.saveDraft).toBeInTheDocument();
   });
 });

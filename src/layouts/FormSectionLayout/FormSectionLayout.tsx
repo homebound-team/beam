@@ -42,7 +42,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
       </div>
       <div css={Css.df.fdc.gap6.$}>
         {sections.map((section, i) => (
-          <FormSection key={defaultTestId(section.title) || i} {...section} {...tid[`section${i}`]} />
+          <FormSection key={defaultTestId(section.title) || i} {...section} />
         ))}
       </div>
     </div>
