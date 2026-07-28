@@ -1,4 +1,3 @@
-import LinkTo from "@storybook/addon-links/react";
 import { Meta } from "@storybook/react-vite";
 import { useMemo } from "react";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
@@ -10,7 +9,6 @@ import { Css, Tokens } from "src/Css";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import tokensJson from "../../tokens/tokens.json";
-import tokenUsagesJson from "./generated/tokenUsages.json";
 
 export default {
   title: "Foundations/Colors",
@@ -57,19 +55,12 @@ type ColorSource = {
   detail?: string;
 };
 
-type TokenStoryRef = {
-  label: string;
-  title: string;
-  name: string;
-};
-
 type TokenRowData = {
   name: string;
   cssVar: string;
   description: string;
   light: ColorSource;
   contrast: ColorSource | undefined;
-  usedIn: TokenStoryRef[];
 };
 
 type GroupLabel = {
@@ -163,21 +154,7 @@ function createTokenColumns() {
     clientSideSort: false,
   });
 
-  const usedInColumn = column<Row>({
-    id: "usedIn",
-    name: "Used in",
-    header: "Used in",
-    group: emptyCell,
-    data: (row) => ({
-      content: <UsedInCell stories={row.usedIn} />,
-      value: "",
-    }),
-    mw: "180px",
-    w: "2fr",
-    clientSideSort: false,
-  });
-
-  return [colorColumn, tokenColumn, descriptionColumn, usedInColumn];
+  return [colorColumn, tokenColumn, descriptionColumn];
 }
 
 function ColorSwatch({ cssVar, name }: { cssVar: string; name: string }) {
@@ -206,24 +183,6 @@ function TokenCell({ row }: { row: TokenRowData }) {
         {" | "}
         <ColorSourceLabel prefix="Dark" source={row.contrast} />)
       </div>
-    </div>
-  );
-}
-
-function UsedInCell({ stories }: { stories: TokenStoryRef[] }) {
-  if (stories.length === 0) {
-    return <span css={Css.xs.color(Tokens.OnSurfaceMuted).$}>—</span>;
-  }
-  return (
-    <div css={Css.xs.$}>
-      {stories.map((story, index) => (
-        <span key={story.title}>
-          {index > 0 ? <span css={Css.color(Tokens.OnSurfaceMuted).$}>, </span> : null}
-          <LinkTo title={story.title} name={story.name}>
-            <span css={Css.color(Tokens.TextLinkDefault).$}>{story.label}</span>
-          </LinkTo>
-        </span>
-      ))}
     </div>
   );
 }
@@ -309,7 +268,6 @@ function buildTokenRows(): TokenRowData[] {
         description: leaf.$description ?? "",
         light,
         contrast,
-        usedIn: (tokenUsagesJson.usages as Record<string, TokenStoryRef[]>)[name] ?? [],
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

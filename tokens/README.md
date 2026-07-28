@@ -2,8 +2,6 @@
 
 Source of truth: [`tokens.json`](./tokens.json) (DTCG 2025.10–shaped). [`yarn generate:design-tokens`](../scripts/generate-design-tokens.ts) reads it and emits **`truss-token-vars.ts`**, **`truss-palette.ts`**, **`truss-motion.ts`**, and **`src/css/generated/theme-scopes.css`**. Truss uses [`truss-config.ts`](../truss-config.ts); run **`yarn build:truss`** after token edits when you also need regenerated **`src/Css.ts`** / **`src/Css.json`**.
 
-The Foundations/Colors Storybook catalog’s **Used in** column comes from [`yarn generate:token-usages`](../scripts/generate-token-usages.ts) → [`src/foundations/generated/tokenUsages.json`](../src/foundations/generated/tokenUsages.json) (also run automatically by `yarn storybook` / `yarn build-storybook`).
-
 **Palette in `truss-palette.ts`:** primitives only — `White` / `Transparent`, then other `beam.color.primitive.*` keys in JSON order. Semantic roles are **not** in the Truss palette.
 
 **Normative color format:** [Design Tokens Color Module 2025.10](https://www.designtokens.org/tr/2025.10/color/#color-tokens) — for `$type: "color"`, `$value` is `colorSpace: "srgb"`, `components: [r, g, b]` (each **0–1**), optional `alpha`, optional `hex`. Semantic baselines usually reference `{beam.color.primitive.*}`.
