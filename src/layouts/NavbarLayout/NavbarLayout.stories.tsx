@@ -89,6 +89,27 @@ export function ComposedGridTableWithoutSideNav() {
   );
 }
 
+/**
+ * Same as {@link ComposedWithEnvironmentBanner}, but the table sits in a 720px-wide content column.
+ * Confirms document-scroll table width (`min(100%, chrome)`) stays within that container instead of
+ * expanding past it to the full viewport beside the side nav.
+ */
+export const ComposedConstrainedWidthTable = () => (
+  <EnvironmentBannerLayout environmentBanner={{ env: "dev" }}>
+    <NavbarLayout navbar={createNavbar()}>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>
+        <PageHeaderLayout
+          pageHeader={{ title: "Page header", rightSlot: <Button label="Action" onClick={() => {}} /> }}
+        >
+          <div css={Css.mx("auto").maxwPx(720).w100.$}>
+            <GridTableLayoutExample storageKey="navbar-layout-composed-constrained" />
+          </div>
+        </PageHeaderLayout>
+      </SideNavLayout>
+    </NavbarLayout>
+  </EnvironmentBannerLayout>
+);
+
 function sideNavItems(): AppNavItem[] {
   return [
     {

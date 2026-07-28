@@ -216,7 +216,7 @@ function GridTableLayoutComponent<
             Css.if(inDocumentScrollLayout)
               .transitionTop.sticky.top(stickyNavAndHeaderOffset())
               .left(documentScrollChromeLeft())
-              .w(documentScrollChromeWidth())
+              .w(`min(100%, ${documentScrollChromeWidth()})`)
               .z(zIndices.tableActions)
               .bgColor(Tokens.Surface).$
           }
