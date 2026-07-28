@@ -23,9 +23,8 @@ export function Avatar({ src, name, size = "md", showName = false, preventToolti
     <div
       css={{
         ...styles,
-        ...Css.typography(sizeToFallbackTypeScale[size])
-          .bgColor(Tokens.TextDisabled)
-          .color(Tokens.NeutralFillHoverSubtle).df.aic.jcc.$,
+        ...Css.typography(sizeToFallbackTypeScale[size]).bgColor(Tokens.SurfaceSubtle).color(Tokens.OnSurfaceMuted).df
+          .aic.jcc.$,
       }}
       {...tid}
     >
