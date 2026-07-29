@@ -80,7 +80,10 @@ export function Switch(props: SwitchProps) {
           <Label
             label={label}
             tooltip={tooltip}
-            xss={Css.if(labelStyle === "filter").color(Tokens.OnSurface).$}
+            xss={{
+              ...Css.if(labelStyle === "filter").color(Tokens.OnSurface).$,
+              ...(isDisabled && Css.color(Tokens.TextDisabled).$),
+            }}
             inline={labelStyle === "left" || labelStyle === "filter"}
           />
         </div>
@@ -103,7 +106,7 @@ export function Switch(props: SwitchProps) {
           <div
             css={{
               ...switchCircleDefaultStyles(compact),
-              ...(isDisabled && Css.bgColor(Tokens.NeutralFillHoverSubtle).$),
+              ...(isDisabled && Css.bgColor(Tokens.FieldBgDisabled).$),
               ...(isSelected && switchCircleSelectedStyles(compact)),
             }}
           >
@@ -125,7 +128,12 @@ export function Switch(props: SwitchProps) {
           label={label}
           tooltip={tooltip}
           inline
-          xss={Css.sm.color(Tokens.OnSurface).if(compact).add("lineHeight", "1").$}
+          xss={
+            Css.sm
+              .color(isDisabled ? Tokens.TextDisabled : Tokens.OnSurface)
+              .if(compact)
+              .add("lineHeight", "1").$
+          }
         />
       )}
       <VisuallyHidden>
@@ -142,7 +150,7 @@ const toggleWidth = (isCompact: boolean) => (isCompact ? 32 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 12 : 20);
 
 // Switcher/Toggle element styles
-export const switchHoverStyles = Css.bgColor(Tokens.TextDisabled).$;
+export const switchHoverStyles = Css.bgColor(Tokens.NeutralFillHover).$;
 export const switchFocusStyles = Css.bshFocus.$;
 // Blue900 selected hover has no semantic token — keep palette.
 export const switchSelectedHoverStyles = Css.bgBlue900.$;

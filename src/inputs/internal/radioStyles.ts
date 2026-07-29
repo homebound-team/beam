@@ -34,7 +34,7 @@ export const radioFocus = {
 export const radioHover = Css.blue900.bcBlue900.$;
 
 export const radioDisabled = {
-  ...Css.cursorNotAllowed.color(Tokens.NeutralFillHoverSubtle).$,
+  ...Css.cursorNotAllowed.color(Tokens.FieldBgDisabled).$,
   ...Css.add("backgroundColor", "currentColor")
     .add("backgroundSize", "100% 100%")
     .add("backgroundPosition", "center")
@@ -43,7 +43,7 @@ export const radioDisabled = {
 
 export const radioDisabledSelected = {
   ...radioChecked,
-  ...Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
+  ...Css.cursorNotAllowed.color(Tokens.ChoiceDisabled).$,
 };
 
 export type RadioStateStyleProps = {

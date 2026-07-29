@@ -300,7 +300,7 @@ function groupDescription(group: TokenGroupName): string {
     case "Text":
       return "Copy roles: labels, helpers, links, placeholders, disabled text.";
     case "Fields":
-      return "Input backgrounds, borders, disabled field text, and ChoiceSelected fills (checkbox, radio, switch).";
+      return "Input backgrounds, borders, disabled field text, and ChoiceSelected / ChoiceDisabled fills (checkbox, radio, switch).";
     case "Navigation":
       return "Side nav (Nav*) is contrast-themed; global nav (NavGlobal*) is fixed dark chrome for the Navbar.";
     case "Neutrals":

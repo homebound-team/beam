@@ -102,8 +102,8 @@ const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bc(Tokens.FieldBorderDefau
 const filledBoxStyles = Css.bc(Tokens.ChoiceSelected).bgColor(Tokens.ChoiceSelected).$;
 // Blue900 hover has no semantic token — keep palette.
 const filledBoxHoverStyles = Css.bgBlue900.$;
-const disabledBoxStyles = Css.bgColor(Tokens.NeutralFillHoverSubtle).bc(Tokens.NeutralFillHoverSubtle).$;
-const disabledSelectedBoxStyles = Css.bgColor(Tokens.TextDisabled).bc(Tokens.TextDisabled).$;
+const disabledBoxStyles = Css.bgColor(Tokens.FieldBgDisabled).bc(Tokens.FieldBgDisabled).$;
+const disabledSelectedBoxStyles = Css.bgColor(Tokens.ChoiceDisabled).bc(Tokens.ChoiceDisabled).$;
 const disabledColor = Css.color(Tokens.FieldBorderDefault).$;
 const focusRingStyles = Css.bshFocus.$;
 const hoverBorderStyles = Css.bcBlue900.$;
