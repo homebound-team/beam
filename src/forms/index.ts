@@ -20,5 +20,6 @@ export * from "./BoundToggleChipGroupField";
 export * from "./BoundTreeSelectField";
 export * from "./FormHeading";
 export * from "./FormLines";
+export * from "./FormSection";
 export * from "./StaticField";
 export * from "./SubmitButton";
