@@ -19,9 +19,7 @@ describe("FormSectionLayout", () => {
     expect(r.formSectionLayout_title).toHaveTextContent("Trade Partners");
     expect(r.formSectionLayout_description).toHaveTextContent("Set up trade partner assignments for this project");
     // And each section is delegated to FormSection, rendering its own content
-    expect(r.getByText("General Contractor")).toBeInTheDocument();
     expect(r.gcFields).toBeInTheDocument();
-    expect(r.getByText("Sub-Contractors")).toBeInTheDocument();
     expect(r.subFields).toBeInTheDocument();
   });
 

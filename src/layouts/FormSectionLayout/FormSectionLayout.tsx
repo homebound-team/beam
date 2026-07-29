@@ -21,7 +21,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
 
   return (
     <div css={Css.df.fdc.gap3.w100.pt4.maxwPx(720).mxa.$} {...tid}>
-      <div css={Css.df.jcsb.aifs.$}>
+      <div css={Css.df.jcsb.$}>
         <div css={Css.df.fdc.gapPx(12).$}>
           <h1 css={Css.xl.$} {...tid.title}>
             {title}

@@ -8,25 +8,11 @@ export default {
   decorators: [withBeamDecorator],
 } as Meta;
 
-export function Regular() {
+export function WithoutChildren() {
   return (
     <FormSection
       title="General Contractor"
       description="The primary contractor responsible for this project."
-      fields={<PlaceholderFields count={2} />}
-    />
-  );
-}
-
-export function Child() {
-  return <FormSection title="Electrical" isChild fields={<PlaceholderFields count={2} />} />;
-}
-
-export function WithActions() {
-  return (
-    <FormSection
-      title="Sub-Contractors"
-      actions={[{ label: "Add", onClick: () => {}, variant: "tertiary" }]}
       fields={<PlaceholderFields count={2} />}
     />
   );
@@ -38,9 +24,17 @@ export function WithChildSections() {
       title="Sub-Contractors"
       actions={[{ label: "Add", onClick: () => {}, variant: "tertiary" }]}
       childSections={[
-        { title: "Electrical", fields: <PlaceholderFields count={2} /> },
+        {
+          title: "Electrical",
+          fields: <PlaceholderFields count={2} />,
+          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+        },
         { title: "Plumbing", fields: <PlaceholderFields count={2} /> },
-        { title: "HVAC", fields: <PlaceholderFields count={2} /> },
+        {
+          title: "HVAC",
+          fields: <PlaceholderFields count={2} />,
+          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+        },
       ]}
     />
   );

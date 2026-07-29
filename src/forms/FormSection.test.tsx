@@ -51,7 +51,7 @@ describe("FormSection", () => {
     expect(r.formSection_title).toHaveStyle({ fontSize: "16px" });
   });
 
-  it("recursively renders childSections at the smaller child title size", async () => {
+  it("renders childSections at the smaller child title size", async () => {
     // Given a FormSection with a nested childSections array
     // When rendered
     const r = await render(
@@ -68,7 +68,7 @@ describe("FormSection", () => {
     expect(r.electricalFields).toBeInTheDocument();
     expect(r.plumbingFields).toBeInTheDocument();
     // And each child section's title renders at the child heading size
-    [r.getByText("Electrical"), r.getByText("Plumbing")].forEach((title) =>
+    [r.formSection_childSection_title_0, r.formSection_childSection_title_1].forEach((title) =>
       expect(title).toHaveStyle({ fontSize: "16px" }),
     );
   });

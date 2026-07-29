@@ -22,11 +22,9 @@ export function FormSection(props: FormSectionProps) {
 
   return (
     <div css={Css.df.fdc.gap2.$} {...tid}>
-      <div css={Css.df.jcsb.aifs.$}>
+      <div css={Css.df.jcsb.aic.$}>
         <div css={Css.df.fdc.gapPx(12).$}>
-          <h2 css={isChild ? Css.mdSb.$ : Css.lg.$} {...tid.title}>
-            {title}
-          </h2>
+          {getTitle(title, isChild, tid)}
           {description && (
             <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
               {description}
@@ -45,12 +43,27 @@ export function FormSection(props: FormSectionProps) {
       {childSections && (
         <div css={Css.df.fdc.gap3.$}>
           {childSections.map((child, i) => (
-            <div key={defaultTestId(child.title) || i} css={Css.bb.bc(Tokens.SurfaceSeparator).pb3.ifLastOfType.bn.$}>
+            <div key={child.title || i} css={Css.bb.bc(Tokens.SurfaceSeparator).pb3.ifLastOfType.bn.$}>
               <FormSection {...child} isChild {...tid.childSection} />
             </div>
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+function getTitle(title: string, isChild: boolean, tid: Record<string, object>) {
+  if (isChild) {
+    return (
+      <h3 css={Css.mdSb.$} {...tid.title}>
+        {title}
+      </h3>
+    );
+  }
+  return (
+    <h2 css={Css.lg.$} {...tid.title}>
+      {title}
+    </h2>
   );
 }
