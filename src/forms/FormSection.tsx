@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
-import { defaultTestId } from "src/utils/defaultTestId";
 
 export type FormSectionProps = {
   title: string;
@@ -10,7 +9,7 @@ export type FormSectionProps = {
   /** Rendered top-right of the title row, e.g. an "Add" button. */
   actions?: ButtonProps[];
   fields?: ReactNode;
-  childSections?: FormSectionProps[];
+  childSections?: Omit<FormSectionProps, "isChild">[];
   /** Nested-section styling (smaller title). Set automatically by `FormSection`'s own recursion over `childSections` — don't set this yourself. */
   isChild?: boolean;
 };
@@ -22,7 +21,7 @@ export function FormSection(props: FormSectionProps) {
 
   return (
     <div css={Css.df.fdc.gap2.$} {...tid}>
-      <div css={Css.df.jcsb.aic.$}>
+      <div css={Css.df.jcsb.$}>
         <div css={Css.df.fdc.gapPx(12).$}>
           {getTitle(title, isChild, tid)}
           {description && (

@@ -72,14 +72,4 @@ describe("FormSection", () => {
       expect(title).toHaveStyle({ fontSize: "16px" }),
     );
   });
-
-  it("overrides a caller-provided isChild on recursive childSections", async () => {
-    // Given a childSections entry that (incorrectly) sets isChild itself
-    // When rendered as a child of a parent section
-    const r = await render(
-      <FormSection title="Trade Partners" childSections={[{ title: "Electrical", isChild: false }]} />,
-    );
-    // Then it still renders at the child heading size, since FormSection's own recursion always applies it
-    expect(r.getByText("Electrical")).toHaveStyle({ fontSize: "16px" });
-  });
 });

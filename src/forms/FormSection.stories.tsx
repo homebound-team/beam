@@ -27,6 +27,7 @@ export function WithChildSections() {
         {
           title: "Electrical",
           fields: <PlaceholderFields count={2} />,
+          description: "Electrical contracts are needed for the construction to continue",
           actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
         },
         { title: "Plumbing", fields: <PlaceholderFields count={2} /> },
