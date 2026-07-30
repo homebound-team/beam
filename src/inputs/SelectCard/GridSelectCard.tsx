@@ -57,7 +57,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
         <input {...inputProps} {...tid.value} />
       </VisuallyHidden>
       {image ? (
-        <img src={image} alt="" css={Css.sqPx(120).objectContain.fs0.if(isDisabled).o50.$} {...tid.img} />
+        <img src={image} alt="" css={Css.sqPx(100).objectContain.fs0.if(isDisabled).o50.$} {...tid.img} />
       ) : (
         icon && <Icon icon={icon} inc={4} color={isDisabled ? Tokens.OnSurfaceDisabled : Tokens.OnSurface} />
       )}
