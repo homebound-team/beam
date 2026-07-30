@@ -14,6 +14,7 @@ export function Default() {
       title="Trade Partners"
       description="Assign and manage trade partners for this project."
       actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
+      fields={<PlaceholderFields count={2} />}
       sections={[
         {
           title: "General Contractor",
