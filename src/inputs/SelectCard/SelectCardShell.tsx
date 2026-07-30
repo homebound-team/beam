@@ -13,7 +13,7 @@ export type SelectCardShellProps = {
   tooltip?: ReactNode;
   __storyState?: SelectCardStoryState;
   children: ReactNode;
-  /** Optional full-width row pinned to the bottom of the card, below the padded content. */
+  /** Optional full-width row pinned to the bottom of the card, outside the label. */
   footer?: ReactNode;
   view: SelectCardView;
   layout?: SelectCardLayout;
@@ -40,8 +40,9 @@ export function SelectCardShell(props: SelectCardShellProps) {
   const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
   const isPressed = __storyState?.pressed ?? isPressedFromEvents;
 
-  // Flex/padding for the card content lives on an inner div so the footer can span the full card width.
-  const contentStyles =
+  // Flex/padding for the card content lives on the label, so the footer can sit outside it and
+  // span the full card width. `fg1` keeps the footer pinned to the bottom of equal-height cards.
+  const labelStyles =
     view === "grid"
       ? layout === "horizontal"
         ? Css.df.fdr.fg1.aic.gap2.p2.$
@@ -67,19 +68,24 @@ export function SelectCardShell(props: SelectCardShellProps) {
     title: resolveTooltip(isDisabled, tooltip),
     placement: "top",
     children: (
-      <label
-        css={{ ...styles, ...Css.cursorPointer.if(isDisabled).cursorNotAllowed.$ }}
-        // Keep focus where it is while clicking the card. Without this, mousedown moves focus to
-        // the nearest focusable ancestor (e.g. a modal, which has tabindex=-1) before the label
-        // click focuses our hidden input. react-aria sees that second focus event with no user
-        // event tied to it, assumes "virtual" (screen reader) focus, and shows the keyboard focus
-        // ring on a plain mouse click.
-        {...mergeProps(hoverProps, focusProps, pressProps, { onMouseDown: (e: MouseEvent) => e.preventDefault() })}
-        {...tid}
-      >
-        <div css={contentStyles}>{children}</div>
+      // The card chrome (border, background, selection state) wraps the label so the footer can
+      // live outside it. A footer inside the label would join the input's accessible name and
+      // trigger the card's focus ring when its own controls are focused.
+      <div css={styles}>
+        <label
+          css={{ ...labelStyles, ...Css.cursorPointer.if(isDisabled).cursorNotAllowed.$ }}
+          // Keep focus where it is while clicking the card. Without this, mousedown moves focus to
+          // the nearest focusable ancestor (e.g. a modal, which has tabindex=-1) before the label
+          // click focuses our hidden input. react-aria sees that second focus event with no user
+          // event tied to it, assumes "virtual" (screen reader) focus, and shows the keyboard focus
+          // ring on a plain mouse click.
+          {...mergeProps(hoverProps, focusProps, pressProps, { onMouseDown: (e: MouseEvent) => e.preventDefault() })}
+          {...tid}
+        >
+          {children}
+        </label>
         {footer}
-      </label>
+      </div>
     ),
   });
 }

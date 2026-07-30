@@ -20,17 +20,21 @@ type SelectCardGroupItemOptionBase<V extends Value> = {
   value: V;
   /** For checkbox groups, selecting this option clears other options and cannot be combined. */
   selectionBehavior?: "exclusive";
-  /** Optional link pinned to the bottom of the card, i.e. "More info". A url `onClick` renders an anchor. */
-  link?: { label: string; onClick: BeamButtonProps["onClick"] };
 };
 
-/** Grid-view option; requires either `icon` or `image` (image url shown in place of the icon). */
-export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> &
-  ({ icon: IconProps["icon"]; image?: never } | { image: string; icon?: never });
+/** Link pinned to the bottom of a grid card, i.e. "More info". A url `onClick` renders an anchor. */
+export type SelectCardLink = { label: string; onClick: BeamButtonProps["onClick"] };
 
-/** List-view option; `icon` is ignored when present. */
+/** Grid-view option; requires either `icon` or `image` (image url shown in place of the icon). */
+export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {
+  /** Optional link pinned to the bottom of the card, i.e. "More info". */
+  link?: SelectCardLink;
+} & ({ icon: IconProps["icon"]; image?: never } | { image: string; icon?: never });
+
+/** List-view option; `icon` is ignored when present, and links are grid-only. */
 export type SelectCardListGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {
   icon?: IconProps["icon"];
+  link?: never;
 };
 
 export type SelectCardGroupItemOption<V extends Value> =

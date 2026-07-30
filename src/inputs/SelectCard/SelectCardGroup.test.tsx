@@ -2,6 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
 import { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
+import { noop } from "src/utils";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -95,7 +96,7 @@ describe("SelectCardGroup", () => {
       />,
     );
     // Then the card content lays out its icon and text in a row
-    expect(r.categories_math.firstElementChild).toHaveStyle({ flexDirection: "row" });
+    expect(r.categories_math).toHaveStyle({ flexDirection: "row" });
     // And selection still works
     click(r.categories_history);
     expect(onChange).toHaveBeenCalledWith(Category.History);
@@ -142,6 +143,23 @@ describe("SelectCardGroup", () => {
     // Then it fires the link handler without selecting the card
     expect(onLinkClick).toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("keeps the link out of the option's accessible name", async () => {
+    // Given a grid group where an option has a link
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        options={[
+          { icon: "abacus", label: "Math", value: Category.Math, link: { label: "More info", onClick: noop } },
+          { icon: "archive", label: "History", value: Category.History },
+        ]}
+        value={Category.History}
+        onChange={noop}
+      />,
+    );
+    // Then the radio is only named by the card's own label, i.e. not "MathMore info"
+    expect((r.categories_math_value as HTMLInputElement).labels?.[0]).toHaveTextContent(/^Math$/);
   });
 
   it("supports single-select in list view", async () => {

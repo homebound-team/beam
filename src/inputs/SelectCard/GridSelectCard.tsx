@@ -2,7 +2,7 @@ import { VisuallyHidden } from "react-aria";
 import { Button, Icon, IconProps } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
-import { SelectCardGridGroupItemOption, SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
+import { SelectCardItemProps, SelectCardLayout, SelectCardLink } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -13,7 +13,7 @@ export type GridSelectCardProps = SelectCardItemProps & {
   /** Icon above the text (default) or to its left. */
   layout?: SelectCardLayout;
   /** Optional link pinned to the bottom of the card, i.e. "More info". */
-  link?: SelectCardGridGroupItemOption<never>["link"];
+  link?: SelectCardLink;
 };
 
 /** Internal grid-view card with icon or image and optional description. Used by select card groups. */
