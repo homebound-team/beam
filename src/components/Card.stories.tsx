@@ -75,6 +75,33 @@ export const BorderedListCard = createCardStory(
   true,
 );
 
+/**
+ * Two list cards in columns that aren't 520px wide, i.e. an "Original"/"Replacement" pair.
+ *
+ * The default cards overflow their columns, the fullWidth ones follow them.
+ */
+export const FullWidthListCards = newStory(
+  () => (
+    <div css={Css.df.fdc.gap5.$}>
+      <div>
+        <h2>Default (overflows narrow columns)</h2>
+        <div css={Css.wPx(800).dg.gtc("1fr 1fr").gap2.$}>
+          <CardComponent {...baseArgs} type="list" bordered />
+          <CardComponent {...baseArgs} type="list" bordered />
+        </div>
+      </div>
+      <div>
+        <h2>fullWidth (follows its column, narrow or wide)</h2>
+        <div css={Css.wPx(800).dg.gtc("1fr 1fr").gap2.$}>
+          <CardComponent {...baseArgs} type="list" bordered fullWidth />
+          <CardComponent {...baseArgs} type="list" bordered fullWidth />
+        </div>
+      </div>
+    </div>
+  ),
+  {},
+);
+
 function hoverPlayFn({ click: shouldClick }: { click: boolean }): PlayFunction {
   return async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);

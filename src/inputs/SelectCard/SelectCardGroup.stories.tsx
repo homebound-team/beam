@@ -50,6 +50,39 @@ export function OptionType() {
   );
 }
 
+/** Icon on the left, label and description on the right. */
+export function HorizontalLayout() {
+  const [value, setValue] = useState<string>("package");
+
+  return (
+    <div css={Css.wPx(640).$}>
+      <SelectCardGroup
+        label="Option Type"
+        layout="horizontal"
+        options={createOptionTypes()}
+        onChange={setValue}
+        value={value}
+      />
+    </div>
+  );
+}
+
+/** Image on the left, label and description on the right. */
+export function HorizontalLayoutWithImages() {
+  const [value, setValue] = useState<string>("fridge");
+  const options: SelectCardGridGroupItemOption<string>[] = [
+    { image: "fridge.jpeg", label: "Fridge", description: "Stainless steel, counter-depth", value: "fridge" },
+    { image: "disposal.png", label: "Disposal", description: "1/2 HP continuous feed", value: "disposal" },
+    { image: "counter-top.jpeg", label: "Counter Top", description: "Quartz, 3cm thickness", value: "counter-top" },
+  ];
+
+  return (
+    <div css={Css.wPx(640).$}>
+      <SelectCardGroup label="Appliances" layout="horizontal" options={options} onChange={setValue} value={value} />
+    </div>
+  );
+}
+
 export const InModal = newStory(
   () => {
     const { openModal } = useModal();
