@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react-vite";
+import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
 import { FormSection } from "src/forms/FormSection";
 import { withBeamDecorator } from "src/utils/sb";
@@ -22,19 +23,19 @@ export function WithChildSections() {
   return (
     <FormSection
       title="Sub-Contractors"
-      actions={[{ label: "Add", onClick: () => {}, variant: "tertiary" }]}
+      actions={<Button label="Add" onClick={() => {}} variant="tertiary" />}
       childSections={[
         {
           title: "Electrical",
           fields: <PlaceholderFields count={2} />,
           description: "Electrical contracts are needed for the construction to continue",
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: <Button label="Add" onClick={() => {}} variant="tertiary" />,
         },
         { title: "Plumbing", fields: <PlaceholderFields count={2} /> },
         {
           title: "HVAC",
           fields: <PlaceholderFields count={2} />,
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: <Button label="Add" onClick={() => {}} variant="tertiary" />,
         },
       ]}
     />

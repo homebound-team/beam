@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react-vite";
+import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { withBeamDecorator } from "src/utils/sb";
@@ -13,12 +14,12 @@ export function Default() {
     <FormSectionLayout
       title="Trade Partners"
       description="Assign and manage trade partners for this project."
-      actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
+      actions={<Button label="Save draft" onClick={() => {}} variant="tertiary" />}
       sections={[
         {
           title: "General Contractor",
           description: "The primary contractor responsible for this project.",
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: <Button label="Add" onClick={() => {}} variant="tertiary" />,
           fields: <PlaceholderFields count={2} />,
         },
         {
@@ -46,7 +47,7 @@ export function NestedChildSections() {
       sections={[
         {
           title: "Sub-Contractors",
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: <Button label="Add" onClick={() => {}} variant="tertiary" />,
           childSections: [
             { title: "Electrical", fields: <PlaceholderFields count={2} /> },
             { title: "Plumbing", fields: <PlaceholderFields count={2} /> },

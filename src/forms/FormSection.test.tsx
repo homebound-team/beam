@@ -1,3 +1,4 @@
+import { Button } from "src/components/Button";
 import { FormSection } from "src/forms/FormSection";
 import { render } from "src/utils/rtl";
 
@@ -21,7 +22,7 @@ describe("FormSection", () => {
   it("renders actions as Buttons", async () => {
     // Given a FormSection with actions
     // When rendered
-    const r = await render(<FormSection title="Trade Partners" actions={[{ label: "Add", onClick: () => {} }]} />);
+    const r = await render(<FormSection title="Trade Partners" actions={<Button label="Add" onClick={() => {}} />} />);
     // Then the action renders as a real Button
     expect(r.add).toBeInTheDocument();
   });

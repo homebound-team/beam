@@ -1,3 +1,4 @@
+import { Button } from "src/components/Button";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { render } from "src/utils/rtl";
 
@@ -36,7 +37,11 @@ describe("FormSectionLayout", () => {
     // Given a FormSectionLayout with actions
     // When rendered
     const r = await render(
-      <FormSectionLayout title="Trade Partners" actions={[{ label: "Save draft", onClick: () => {} }]} sections={[]} />,
+      <FormSectionLayout
+        title="Trade Partners"
+        actions={<Button label="Save draft" onClick={() => {}} />}
+        sections={[]}
+      />,
     );
     // Then the action renders as a real Button
     expect(r.saveDraft).toBeInTheDocument();

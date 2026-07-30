@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { Button, ButtonProps } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
@@ -7,7 +6,7 @@ export type FormSectionProps = {
   title: string;
   description?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add" button. */
-  actions?: ButtonProps[];
+  actions?: ReactNode;
   fields?: ReactNode;
   childSections?: Omit<FormSectionProps, "isChild">[];
   /** Nested-section styling (smaller title). Set automatically by `FormSection`'s own recursion over `childSections` — don't set this yourself. */
@@ -32,9 +31,7 @@ export function FormSection(props: FormSectionProps) {
         </div>
         {actions && (
           <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-            {actions.map((action) => (
-              <Button key={`${action.label}`} {...action} />
-            ))}
+            {actions}
           </div>
         )}
       </div>
