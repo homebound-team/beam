@@ -2,6 +2,7 @@ import { InputHTMLAttributes, ReactNode } from "react";
 import { IconProps } from "src/components/Icon";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Value } from "src/inputs";
+import { BeamButtonProps } from "src/interfaces";
 
 export type SelectCardView = "grid" | "list";
 
@@ -19,6 +20,8 @@ type SelectCardGroupItemOptionBase<V extends Value> = {
   value: V;
   /** For checkbox groups, selecting this option clears other options and cannot be combined. */
   selectionBehavior?: "exclusive";
+  /** Optional link pinned to the bottom of the card, i.e. "More info". A url `onClick` renders an anchor. */
+  link?: { label: string; onClick: BeamButtonProps["onClick"] };
 };
 
 /** Grid-view option; requires either `icon` or `image` (image url shown in place of the icon). */

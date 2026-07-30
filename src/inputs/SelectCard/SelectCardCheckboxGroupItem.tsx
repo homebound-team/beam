@@ -35,5 +35,13 @@ export function SelectCardCheckboxGroupItem<V extends Value>(props: SelectCardCh
   }
 
   const gridOption = option as SelectCardGridGroupItemOption<V>;
-  return <GridSelectCard {...layoutProps} layout={layout} icon={gridOption.icon} image={gridOption.image} />;
+  return (
+    <GridSelectCard
+      {...layoutProps}
+      layout={layout}
+      icon={gridOption.icon}
+      image={gridOption.image}
+      link={gridOption.link}
+    />
+  );
 }

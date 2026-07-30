@@ -1,8 +1,8 @@
 import { VisuallyHidden } from "react-aria";
-import { Icon, IconProps } from "src/components";
+import { Button, Icon, IconProps } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
-import { SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
+import { SelectCardGridGroupItemOption, SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -12,6 +12,8 @@ export type GridSelectCardProps = SelectCardItemProps & {
   image?: string;
   /** Icon above the text (default) or to its left. */
   layout?: SelectCardLayout;
+  /** Optional link pinned to the bottom of the card, i.e. "More info". */
+  link?: SelectCardGridGroupItemOption<never>["link"];
 };
 
 /** Internal grid-view card with icon or image and optional description. Used by select card groups. */
@@ -20,6 +22,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
     icon,
     image,
     layout,
+    link,
     label,
     description,
     selected: isSelected = false,
@@ -41,6 +44,13 @@ export function GridSelectCard(props: GridSelectCardProps) {
       view="grid"
       layout={layout}
       __storyState={__storyState}
+      footer={
+        link && (
+          <span css={Css.df.jcc.aic.xsSb.bt.bc(Tokens.SurfaceSeparator).pyPx(8).$}>
+            <Button variant="text" label={link.label} onClick={link.onClick} disabled={isDisabled} {...tid.link} />
+          </span>
+        )
+      }
       {...others}
     >
       <VisuallyHidden>

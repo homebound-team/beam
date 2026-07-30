@@ -13,6 +13,8 @@ export type SelectCardShellProps = {
   tooltip?: ReactNode;
   __storyState?: SelectCardStoryState;
   children: ReactNode;
+  /** Optional full-width row pinned to the bottom of the card, below the padded content. */
+  footer?: ReactNode;
   view: SelectCardView;
   layout?: SelectCardLayout;
 };
@@ -28,6 +30,7 @@ export function SelectCardShell(props: SelectCardShellProps) {
     tooltip,
     __storyState,
     children,
+    footer,
   } = props;
 
   const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
@@ -37,14 +40,17 @@ export function SelectCardShell(props: SelectCardShellProps) {
   const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
   const isPressed = __storyState?.pressed ?? isPressedFromEvents;
 
+  // Flex/padding for the card content lives on an inner div so the footer can span the full card width.
+  const contentStyles =
+    view === "grid"
+      ? layout === "horizontal"
+        ? Css.df.fdr.fg1.aic.gap2.p2.$
+        : Css.df.fdc.fg1.aic.gap1.px2.py3.tac.$
+      : Css.df.fdc.fg1.aifs.gapPx(4).p2.$;
+
   const styles = useMemo(
     () => ({
       ...Css.df.fdc.ba.br12.bgWhite.bcGray300.w100.$,
-      ...(view === "grid"
-        ? layout === "horizontal"
-          ? Css.fdr.aic.gap2.p2.$
-          : Css.aic.gap1.px2.py3.tac.$
-        : Css.aifs.gapPx(4).p2.$),
       ...(isHovered && !isDisabled && Css.bgGray100.$),
       ...((isSelected || isPressed) &&
         !isDisabled &&
@@ -52,7 +58,7 @@ export function SelectCardShell(props: SelectCardShellProps) {
       ...(isDisabled && (isSelected ? Css.bgGray100.bcGray300.$ : Css.bgGray50.bcGray300.$)),
       ...(isFocusVisible ? Css.bshFocus.$ : {}),
     }),
-    [view, layout, isDisabled, isHovered, isSelected, isFocusVisible, isPressed],
+    [isDisabled, isHovered, isSelected, isFocusVisible, isPressed],
   );
 
   const tid = useTestIds(props, defaultTestId(label));
@@ -66,7 +72,8 @@ export function SelectCardShell(props: SelectCardShellProps) {
         {...mergeProps(hoverProps, focusProps, pressProps)}
         {...tid}
       >
-        {children}
+        <div css={contentStyles}>{children}</div>
+        {footer}
       </label>
     ),
   });

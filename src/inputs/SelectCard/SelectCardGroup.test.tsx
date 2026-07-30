@@ -93,8 +93,8 @@ describe("SelectCardGroup", () => {
         onChange={onChange}
       />,
     );
-    // Then the card lays out its icon and text in a row
-    expect(r.categories_math).toHaveStyle({ flexDirection: "row" });
+    // Then the card content lays out its icon and text in a row
+    expect(r.categories_math.firstElementChild).toHaveStyle({ flexDirection: "row" });
     // And selection still works
     click(r.categories_history);
     expect(onChange).toHaveBeenCalledWith(Category.History);
@@ -119,6 +119,28 @@ describe("SelectCardGroup", () => {
     // And selection still works
     click(r.categories_history);
     expect(onChange).toHaveBeenCalledWith(Category.History);
+  });
+
+  it("renders a link at the bottom of the card when the option has one", async () => {
+    const onChange = vi.fn();
+    const onLinkClick = vi.fn();
+    // Given a grid group where an option has a link
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        options={[
+          { icon: "abacus", label: "Math", value: Category.Math, link: { label: "More info", onClick: onLinkClick } },
+          { icon: "archive", label: "History", value: Category.History },
+        ]}
+        value={Category.History}
+        onChange={onChange}
+      />,
+    );
+    // When clicking the link
+    click(r.categories_math_link);
+    // Then it fires the link handler without selecting the card
+    expect(onLinkClick).toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it("supports single-select in list view", async () => {
