@@ -8,7 +8,7 @@ import {
   SelectCardGroupProps,
   SelectCardListGroupItemOption,
 } from "src/inputs/SelectCard/types";
-import { withBeamDecorator } from "src/utils/sb";
+import { newStory, withBeamDecorator } from "src/utils/sb";
 
 export default {
   component: SelectCardGroup,
@@ -50,14 +50,16 @@ export function OptionType() {
   );
 }
 
-export function InModal() {
-  const { openModal } = useModal();
-  const open = () => openModal({ content: <InModalContent /> });
-  // Immediately open the modal for Chromatic snapshots
-  useEffect(open, [openModal]);
-  return <Button label="Open" onClick={open} />;
-}
-InModal.decorators = [withBeamDecorator];
+export const InModal = newStory(
+  () => {
+    const { openModal } = useModal();
+    const open = () => openModal({ content: <InModalContent /> });
+    // Immediately open the modal for Chromatic snapshots
+    useEffect(open, [openModal]);
+    return <Button label="Open" onClick={open} />;
+  },
+  { decorators: [withBeamDecorator] },
+);
 
 function InModalContent() {
   const [value, setValue] = useState<string>("package");
