@@ -47,7 +47,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
       footer={
         link && (
           <span css={Css.df.jcc.aic.xsSb.bt.bc(Tokens.SurfaceSeparator).pyPx(8).$}>
-            <Button variant="text" label={link.label} onClick={link.onClick} disabled={isDisabled} {...tid.link} />
+            <Button variant="text" label={link.label} onClick={link.onClick} disabled={isDisabled} />
           </span>
         )
       }

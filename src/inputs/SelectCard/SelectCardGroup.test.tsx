@@ -139,7 +139,7 @@ describe("SelectCardGroup", () => {
       />,
     );
     // When clicking the link
-    click(r.categories_math_link);
+    click(r.moreInfo);
     // Then it fires the link handler without selecting the card
     expect(onLinkClick).toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();
