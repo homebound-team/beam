@@ -2,7 +2,7 @@ import { ReactNode, useMemo } from "react";
 import { mergeProps, useFocusRing, useHover, usePress } from "react-aria";
 import { maybeTooltip, resolveTooltip } from "src/components";
 import { Css, maybeCssVar, Tokens } from "src/Css";
-import { SelectCardStoryState, SelectCardView } from "src/inputs/SelectCard/types";
+import { SelectCardLayout, SelectCardStoryState, SelectCardView } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -14,12 +14,14 @@ export type SelectCardShellProps = {
   __storyState?: SelectCardStoryState;
   children: ReactNode;
   view: SelectCardView;
+  layout?: SelectCardLayout;
 };
 
 /** Tooltip, hover/focus shell, and shared selection-state borders shared by both card variants. */
 export function SelectCardShell(props: SelectCardShellProps) {
   const {
     view,
+    layout = "vertical",
     label,
     selected: isSelected = false,
     disabled: isDisabled = false,
@@ -38,7 +40,11 @@ export function SelectCardShell(props: SelectCardShellProps) {
   const styles = useMemo(
     () => ({
       ...Css.df.fdc.ba.br12.bgWhite.bcGray300.w100.$,
-      ...(view === "grid" ? Css.aic.gap1.px2.py3.tac.$ : Css.aifs.gapPx(4).p2.$),
+      ...(view === "grid"
+        ? layout === "horizontal"
+          ? Css.fdr.aic.gap2.p2.$
+          : Css.aic.gap1.px2.py3.tac.$
+        : Css.aifs.gapPx(4).p2.$),
       ...(isHovered && !isDisabled && Css.bgGray100.$),
       ...((isSelected || isPressed) &&
         !isDisabled &&
@@ -46,7 +52,7 @@ export function SelectCardShell(props: SelectCardShellProps) {
       ...(isDisabled && (isSelected ? Css.bgGray100.bcGray300.$ : Css.bgGray50.bcGray300.$)),
       ...(isFocusVisible ? Css.bshFocus.$ : {}),
     }),
-    [view, isDisabled, isHovered, isSelected, isFocusVisible, isPressed],
+    [view, layout, isDisabled, isHovered, isSelected, isFocusVisible, isPressed],
   );
 
   const tid = useTestIds(props, defaultTestId(label));

@@ -5,6 +5,9 @@ import { Value } from "src/inputs";
 
 export type SelectCardView = "grid" | "list";
 
+/** Grid-view card layout: icon above the text (vertical) or to its left (horizontal). */
+export type SelectCardLayout = "vertical" | "horizontal";
+
 type SelectCardGroupItemOptionBase<V extends Value> = {
   label: string;
   /** Optional secondary copy shown beneath the label. */
@@ -43,11 +46,14 @@ type SelectCardGroupViewProps<V extends Value> =
   | {
       /** Grid of icon cards (default). */
       view?: "grid";
+      /** Icon above the text (default) or to its left. */
+      layout?: SelectCardLayout;
       options: SelectCardGridGroupItemOption<V>[];
     }
   | {
       /** Stacked checkbox/radio rows; option icons are ignored. */
       view: "list";
+      layout?: never;
       options: SelectCardListGroupItemOption<V>[];
     };
 
@@ -69,6 +75,7 @@ export type SelectCardGroupItemProps<V extends Value> = {
   option: SelectCardGroupItemOption<V>;
   isSelected: boolean;
   view: SelectCardView;
+  layout?: SelectCardLayout;
 };
 
 export type SelectCardShared = {

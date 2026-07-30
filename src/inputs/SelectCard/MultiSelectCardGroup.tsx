@@ -26,6 +26,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
     disabled: isDisabled = false,
     onChange,
     view = "grid",
+    layout,
   } = props;
 
   const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
@@ -66,7 +67,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
       helperText={helperText}
       tid={tid}
     >
-      <div css={getSelectCardOptionsCss(view, hasDescription)}>
+      <div css={getSelectCardOptionsCss(view, hasDescription, layout)}>
         {options.map((option) => (
           <SelectCardCheckboxGroupItem
             key={String(option.value)}
@@ -74,6 +75,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
             groupState={state}
             isSelected={values.includes(option.value)}
             view={view}
+            layout={layout}
             {...tid[defaultTestId(option.label)]}
           />
         ))}

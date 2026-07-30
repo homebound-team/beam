@@ -2,18 +2,21 @@ import { VisuallyHidden } from "react-aria";
 import { Icon, IconProps } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
-import { SelectCardItemProps } from "src/inputs/SelectCard/types";
+import { SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export type GridSelectCardProps = SelectCardItemProps & {
   icon: IconProps["icon"];
+  /** Icon above the text (default) or to its left. */
+  layout?: SelectCardLayout;
 };
 
 /** Internal grid-view card with icon and optional description. Used by select card groups. */
 export function GridSelectCard(props: GridSelectCardProps) {
   const {
     icon,
+    layout,
     label,
     description,
     selected: isSelected = false,
@@ -33,6 +36,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
       disabled={isDisabled}
       tooltip={tooltip}
       view="grid"
+      layout={layout}
       __storyState={__storyState}
       {...others}
     >

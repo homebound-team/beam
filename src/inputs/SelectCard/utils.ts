@@ -1,6 +1,6 @@
 import { Css } from "src/Css";
 import { Value } from "src/inputs";
-import { SelectCardView } from "src/inputs/SelectCard/types";
+import { SelectCardLayout, SelectCardView } from "src/inputs/SelectCard/types";
 
 type SelectCardGroupOptionLike<V extends Value> = {
   value: V;
@@ -42,7 +42,9 @@ export function findToggledSelectCardGroupValue<V extends Value>(prev: V[], next
   return prev.find((v) => !next.includes(v));
 }
 
-export function getSelectCardOptionsCss(view: SelectCardView, hasDescription: boolean) {
-  const cardWidth = hasDescription ? 192 : 142;
-  return view === "list" ? Css.df.fdc.gap2.w100.$ : Css.dg.gtc(`repeat(auto-fill, minmax(${cardWidth}px, 1fr))`).gap2.$;
+export function getSelectCardOptionsCss(view: SelectCardView, hasDescription: boolean, layout?: SelectCardLayout) {
+  if (view === "list") return Css.df.fdc.gap2.w100.$;
+  // Horizontal cards fit the icon and text side-by-side, so they need a wider column.
+  const cardWidth = layout === "horizontal" ? 240 : hasDescription ? 192 : 142;
+  return Css.dg.gtc(`repeat(auto-fill, minmax(${cardWidth}px, 1fr))`).gap2.$;
 }

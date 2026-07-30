@@ -48,6 +48,23 @@ export function OptionType() {
   );
 }
 
+/** Icon on the left, label and description on the right. */
+export function HorizontalLayout() {
+  const [value, setValue] = useState<string>("package");
+
+  return (
+    <div css={Css.wPx(640).$}>
+      <SelectCardGroup
+        label="Option Type"
+        layout="horizontal"
+        options={createOptionTypes()}
+        onChange={setValue}
+        value={value}
+      />
+    </div>
+  );
+}
+
 function createRadioListOptions(): SelectCardListGroupItemOption<string>[] {
   return [
     {

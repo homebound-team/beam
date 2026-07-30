@@ -81,6 +81,25 @@ describe("SelectCardGroup", () => {
     expect(r.categories_math_value).not.toBeChecked();
   });
 
+  it("renders cards horizontally when layout is horizontal", async () => {
+    const onChange = vi.fn();
+    // Given a grid group with the horizontal layout
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        layout="horizontal"
+        options={createGridCategoryOptions()}
+        value={Category.Math}
+        onChange={onChange}
+      />,
+    );
+    // Then the card lays out its icon and text in a row
+    expect(r.categories_math).toHaveStyle({ flexDirection: "row" });
+    // And selection still works
+    click(r.categories_history);
+    expect(onChange).toHaveBeenCalledWith(Category.History);
+  });
+
   it("supports single-select in list view", async () => {
     const onChange = vi.fn();
     const r = await render(

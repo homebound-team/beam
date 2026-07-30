@@ -26,6 +26,20 @@ export function States() {
         <GridSelectCardWrapper label="Pressed selected" icon="columns" selected __storyState={{ pressed: true }} />
       </div>
 
+      <h2 css={Css.lg.$}>Horizontal layout</h2>
+      <div css={getSelectCardOptionsCss("grid", true, "horizontal")}>
+        <GridSelectCardWrapper label="Default" icon="single" description={description} layout="horizontal" />
+        <GridSelectCardWrapper label="Selected" icon="single" description={description} layout="horizontal" selected />
+        <GridSelectCardWrapper label="Disabled" icon="single" description={description} layout="horizontal" disabled />
+        <GridSelectCardWrapper
+          label="Hover"
+          icon="single"
+          description={description}
+          layout="horizontal"
+          __storyState={{ hovered: true }}
+        />
+      </div>
+
       <h2 css={Css.lg.$}>With description</h2>
       <div css={getSelectCardOptionsCss("grid", true)}>
         <GridSelectCardWrapper label="Default" icon="single" description={description} />

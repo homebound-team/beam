@@ -11,7 +11,7 @@ type SelectCardRadioGroupItemProps<V extends Value> = SelectCardGroupItemProps<V
 };
 
 export function SelectCardRadioGroupItem<V extends Value>(props: SelectCardRadioGroupItemProps<V>) {
-  const { option, groupState, isSelected, view, ...others } = props;
+  const { option, groupState, isSelected, view, layout, ...others } = props;
   const { label, description, disabled, tooltip, value } = option;
   const ref = useRef<HTMLInputElement>(null);
   const { inputProps, isDisabled: isOptionDisabled } = useRadio(
@@ -34,5 +34,5 @@ export function SelectCardRadioGroupItem<V extends Value>(props: SelectCardRadio
     return <ListSelectCard {...layoutProps} />;
   }
 
-  return <GridSelectCard {...layoutProps} icon={(option as SelectCardGridGroupItemOption<V>).icon} />;
+  return <GridSelectCard {...layoutProps} layout={layout} icon={(option as SelectCardGridGroupItemOption<V>).icon} />;
 }
