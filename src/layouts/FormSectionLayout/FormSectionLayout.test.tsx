@@ -47,7 +47,7 @@ describe("FormSectionLayout", () => {
     const r = await render(
       <FormSectionLayout
         title="Trade Partners"
-        fields={<div data-testid="topLevelFields" />}
+        initialFields={<div data-testid="topLevelFields" />}
         sections={[{ title: "General Contractor", fields: <div data-testid="gcFields" /> }]}
       />,
     );
