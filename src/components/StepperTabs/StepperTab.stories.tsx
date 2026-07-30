@@ -8,15 +8,20 @@ export default {
   argTypes: { __storyState: { control: false } },
 } as Meta;
 
-const states: { visited: boolean; active: boolean; completed: boolean; label: string }[] = [
-  { visited: true, active: false, completed: true, label: "Visited, Inactive, and Completed" },
-  { visited: true, active: true, completed: false, label: "Visited, Active, and Not Completed" },
-  { visited: true, active: true, completed: true, label: "Visited, Active, and Completed" },
-  { visited: false, active: false, completed: false, label: "Not Visited" },
-];
+export function States() {
+  const states: { visited: boolean; active: boolean; completed: boolean; label: string }[] = [
+    { visited: true, active: false, completed: true, label: "Visited, Inactive, and Completed" },
+    { visited: true, active: true, completed: false, label: "Visited, Active, and Not Completed" },
+    { visited: true, active: true, completed: true, label: "Visited, Active, and Completed" },
+    { visited: false, active: false, completed: false, label: "Not Visited" },
+  ];
 
-const rows: { name: string; storyState?: StepperTabProps["__storyState"]; disabled?: boolean; collapsed?: boolean }[] =
-  [
+  const rows: {
+    name: string;
+    storyState?: StepperTabProps["__storyState"];
+    disabled?: boolean;
+    collapsed?: boolean;
+  }[] = [
     { name: "Default" },
     { name: "Hover", storyState: { hovered: true } },
     { name: "Focus", storyState: { focusVisible: true } },
@@ -24,9 +29,8 @@ const rows: { name: string; storyState?: StepperTabProps["__storyState"]; disabl
     { name: "Collapsed", collapsed: true },
   ];
 
-const labelColumnWidthPx = 160;
+  const labelColumnWidthPx = 160;
 
-export function States() {
   return (
     <div css={Css.df.fdc.gap2.bgWhite.$}>
       <div css={Css.df.gap2.$}>
