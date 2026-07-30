@@ -1,3 +1,4 @@
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
 import { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
@@ -157,6 +158,29 @@ describe("SelectCardGroup", () => {
     // When selecting History
     click(r.categories_history);
     // Then onChange receives only History
+    expect(onChange).toHaveBeenCalledWith(Category.History);
+  });
+
+  it("prevents the browser default on mousedown so focus stays put", async () => {
+    // react-aria flags a focus event with no preceding user event as "virtual" focus and shows
+    // the keyboard focus ring. Inside a modal (tabindex=-1), mousedown on a card would move focus
+    // to the modal and "use up" the pointer event, so the label click's focus on our hidden input
+    // looked virtual and cards got the focus ring on plain mouse clicks. Preventing the mousedown
+    // default keeps focus in place, so the only focus event happens right after the click.
+    const onChange = vi.fn();
+    // Given a grid group
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        options={createGridCategoryOptions()}
+        value={Category.Math}
+        onChange={onChange}
+      />,
+    );
+    // When mousing down on a card, then the default focus-move is prevented
+    expect(fireEvent.mouseDown(r.categories_history)).toBe(false);
+    // And clicking still selects the card
+    click(r.categories_history);
     expect(onChange).toHaveBeenCalledWith(Category.History);
   });
 

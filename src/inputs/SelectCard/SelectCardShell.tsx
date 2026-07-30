@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from "react";
+import { MouseEvent, ReactNode, useMemo } from "react";
 import { mergeProps, useFocusRing, useHover, usePress } from "react-aria";
 import { maybeTooltip, resolveTooltip } from "src/components";
 import { Css, maybeCssVar, Tokens } from "src/Css";
@@ -69,7 +69,12 @@ export function SelectCardShell(props: SelectCardShellProps) {
     children: (
       <label
         css={{ ...styles, ...Css.cursorPointer.if(isDisabled).cursorNotAllowed.$ }}
-        {...mergeProps(hoverProps, focusProps, pressProps)}
+        // Keep focus where it is while clicking the card. Without this, mousedown moves focus to
+        // the nearest focusable ancestor (e.g. a modal, which has tabindex=-1) before the label
+        // click focuses our hidden input. react-aria sees that second focus event with no user
+        // event tied to it, assumes "virtual" (screen reader) focus, and shows the keyboard focus
+        // ring on a plain mouse click.
+        {...mergeProps(hoverProps, focusProps, pressProps, { onMouseDown: (e: MouseEvent) => e.preventDefault() })}
         {...tid}
       >
         <div css={contentStyles}>{children}</div>
