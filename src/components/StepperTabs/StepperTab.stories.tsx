@@ -9,11 +9,11 @@ export default {
 } as Meta;
 
 export function States() {
-  const states: { visited: boolean; active: boolean; completed: boolean; label: string }[] = [
-    { visited: true, active: false, completed: true, label: "Visited, Inactive, and Completed" },
-    { visited: true, active: true, completed: false, label: "Visited, Active, and Not Completed" },
-    { visited: true, active: true, completed: true, label: "Visited, Active, and Completed" },
-    { visited: false, active: false, completed: false, label: "Not Visited" },
+  const states: { active: boolean; completed: boolean; label: string }[] = [
+    { active: false, completed: false, label: "Default" },
+    { active: true, completed: false, label: "Active" },
+    { active: false, completed: true, label: "Completed" },
+    { active: true, completed: true, label: "Active & Completed" },
   ];
 
   const rows: {
@@ -45,7 +45,7 @@ export function States() {
       {rows.map(({ name, storyState, disabled, collapsed }) => (
         <div key={name} css={Css.df.aife.gap2.$}>
           <div css={Css.wPx(labelColumnWidthPx).fs0.smSb.$}>{name}</div>
-          {states.map(({ visited, active, completed, label }) => {
+          {states.map(({ active, completed, label }) => {
             const key = `${name}-${label}`;
             return (
               <div key={key} css={Css.df.fg1.fb(0).$}>
@@ -54,7 +54,6 @@ export function States() {
                   value={key}
                   active={active}
                   completed={completed}
-                  visited={visited}
                   onClick={noop}
                   disabled={disabled}
                   collapsed={collapsed}

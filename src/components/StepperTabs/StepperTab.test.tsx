@@ -44,47 +44,21 @@ describe("StepperTab", () => {
     expect(onClick).toHaveBeenCalledWith("step2");
   });
 
-  it("does not show the check icon for a completed step that hasn't been visited", async () => {
-    // Given a completed tab that has not been visited
+  it("uses a blue collapsed border for an active-but-not-completed step, same as expanded", async () => {
+    // Given an active, not-yet-completed, collapsed tab
     const r = await render(
-      <StepperTab label="Step Label" value="step" active={false} completed={true} visited={false} onClick={vi.fn()} />,
+      <StepperTab label="Step Label" value="step" active completed={false} collapsed onClick={vi.fn()} />,
     );
-    // Then the check icon is not shown, since it can't visually read as done until visited
-    expect(r.query.stepperTab_check).not.toBeInTheDocument();
-  });
-
-  it("shows blue styling once visited, even before completed", async () => {
-    // Given a visited but not-yet-completed tab
-    const r = await render(
-      <StepperTab label="Step Label" value="step" active={false} completed={false} visited={true} onClick={vi.fn()} />,
-    );
-    // Then no check icon renders, but the border reads as visited (blue)
-    expect(r.query.stepperTab_check).not.toBeInTheDocument();
+    // Then it reads as blue, matching the expanded state's active-or-completed rule
     expect(r.stepperTab_step).toHaveStyle({ borderBottomColor: Palette.Blue600 });
   });
 
-  it("uses grey styling for a step that has not been visited", async () => {
-    // Given an unvisited tab
+  it("uses a grey collapsed border for an inactive, not-completed step", async () => {
+    // Given an inactive, not-completed, collapsed tab
     const r = await render(
-      <StepperTab label="Step Label" value="step" active={false} completed={false} visited={false} onClick={vi.fn()} />,
+      <StepperTab label="Step Label" value="step" active={false} completed={false} collapsed onClick={vi.fn()} />,
     );
-    // Then the border reads as not-yet-reached (grey)
+    // Then it reads as grey
     expect(r.stepperTab_step).toHaveStyle({ borderBottomColor: Palette.Gray300 });
-  });
-
-  it("collapsed border color depends only on visited, not completed/active", async () => {
-    // Given a completed, active, but unvisited collapsed tab
-    const notVisited = await render(
-      <StepperTab label="Step Label" value="s1" active completed visited={false} collapsed onClick={vi.fn()} />,
-    );
-    // Then it still reads as grey (unvisited)
-    expect(notVisited.stepperTab_s1).toHaveStyle({ borderBottomColor: Palette.Gray300 });
-
-    // Given an inactive, not-completed, but visited collapsed tab
-    const visited = await render(
-      <StepperTab label="Step Label" value="s2" active={false} completed={false} visited collapsed onClick={vi.fn()} />,
-    );
-    // Then it reads as blue (visited)
-    expect(visited.stepperTab_s2).toHaveStyle({ borderBottomColor: Palette.Blue600 });
   });
 });

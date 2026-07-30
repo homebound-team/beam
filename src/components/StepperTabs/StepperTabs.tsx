@@ -3,7 +3,7 @@ import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
 
-export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled" | "visited">;
+export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled">;
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];
@@ -38,7 +38,6 @@ export function StepperTabs(props: StepperTabsProps) {
                 active={isCurrent}
                 completed={step.completed}
                 disabled={step.disabled}
-                visited={step.visited}
                 collapsed={collapsed}
                 onClick={onChange}
                 {...tid.tab}

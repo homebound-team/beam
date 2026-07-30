@@ -1,4 +1,3 @@
-import { Palette } from "src/Css";
 import { setViewport } from "src/tests/viewport";
 import { click, render, scrollWindowWithAnchor, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
@@ -126,39 +125,6 @@ describe("WorkflowLayout", () => {
     scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
     click(r.header_stepperTabs_tab_stepTwo);
     expect(r.stepTwoBody).toBeInTheDocument();
-  });
-
-  it("marks the initial step visited on mount, and later steps not-yet-visited", async () => {
-    // Given a WorkflowLayout on its first step
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
-
-    // Then the first (current) step reads as visited, and the second hasn't been reached yet
-    expect(r.header_stepperTabs_tab_stepOne).toHaveStyle({ borderBottomColor: Palette.Blue600 });
-    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ borderBottomColor: Palette.Gray300 });
-  });
-
-  it("marks a step visited once navigated to, and keeps it visited after navigating away", async () => {
-    // Given a WorkflowLayout on its first step
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
-
-    // When navigating to the second step
-    click(r.header_stepperTabs_tab_stepTwo);
-    // Then it reads as visited
-    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ borderBottomColor: Palette.Blue600 });
-
-    // When navigating back to the first step
-    click(r.header_stepperTabs_tab_stepOne);
-    // Then the second step stays visited, even though it's no longer current
-    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ borderBottomColor: Palette.Blue600 });
-  });
-
-  it("respects defaultStep by marking that step, not the first, visited on mount", async () => {
-    // Given a WorkflowLayout whose defaultStep is its second step
-    const r = await render(<WorkflowLayout {...baseProps({ defaultStep: "stepTwo" })} />, withRouter());
-
-    // Then the second step reads as visited, and the first hasn't been reached
-    expect(r.header_stepperTabs_tab_stepOne).toHaveStyle({ borderBottomColor: Palette.Gray300 });
-    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ borderBottomColor: Palette.Blue600 });
   });
 });
 
