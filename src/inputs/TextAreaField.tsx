@@ -8,14 +8,14 @@ import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 import { maybeCall } from "src/utils";
 
 // Exported for test purposes
-export interface TextAreaFieldProps<X> extends BeamTextFieldProps<X> {
+export type TextAreaFieldProps<X> = {
   // Does not allow the user to enter new line characters and removes minimum height for textarea.
   preventNewLines?: boolean;
   // `onEnter` is only triggered when `preventNewLines` is set to `true`
   onEnter?: VoidFunction;
   // Maximum number of lines before scrolling is enabled, must be >= 5 to take effect; If not provided, the textarea will grow indefinitely.
   maxLines?: number;
-}
+} & BeamTextFieldProps<X>;
 
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
 export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFieldProps<X>) {
@@ -38,7 +38,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
 
   useGrowingTextField({ inputRef, inputWrapRef, value, maxLines });
 
-  const { labelProps, inputProps } = useTextField(
+  const { labelProps, inputProps } = useTextField<"textarea">(
     {
       ...textFieldProps,
       inputElementType: "textarea",
