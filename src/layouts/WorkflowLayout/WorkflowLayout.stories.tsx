@@ -1,4 +1,6 @@
 import { Meta } from "@storybook/react-vite";
+import { Button } from "src/components/Button";
+import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
@@ -51,6 +53,42 @@ export function ScrollCollapsesTabs() {
 export function WideStepContentOverflows() {
   const steps = makeSteps();
   steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
+  return (
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      steps={steps}
+    />
+  );
+}
+
+/**
+ * A step whose content leads with a `ContentHeader` above a wide table. Scroll the page horizontally
+ * (most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px) — the table
+ * scrolls away, but `ContentHeader` stays pinned to the visible left/right edges since it only sticks
+ * horizontally (it has no `top` set, so it still scrolls away normally on the vertical axis).
+ *
+ * The wrapping div needs `mw("fit-content")` for this to work — `ContentHeader`'s sticky positioning
+ * has no "room" to operate unless its containing block is at least as wide as the table's full content
+ * width (see the doc comment on `ContentHeader` itself), the same technique `GridTable` uses internally.
+ */
+export function WideContentWithContentHeader() {
+  const steps = makeSteps();
+  steps[0] = {
+    ...steps[0],
+    content: (
+      <div css={Css.df.fdc.gap2.pt3.mw("fit-content").$}>
+        <ContentHeader
+          title="Trade Partners"
+          description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."
+          actions={<Button label="Add" onClick={action("add clicked")} />}
+        />
+        <TableExample numCols={10} numRows={20} />
+      </div>
+    ),
+  };
   return (
     <WorkflowLayout
       title="Workflow Layout"
