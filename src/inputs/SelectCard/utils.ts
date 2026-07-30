@@ -42,9 +42,16 @@ export function findToggledSelectCardGroupValue<V extends Value>(prev: V[], next
   return prev.find((v) => !next.includes(v));
 }
 
-export function getSelectCardOptionsCss(view: SelectCardView, hasDescription: boolean, layout?: SelectCardLayout) {
+type GetSelectCardOptionsCssArgs = {
+  view: SelectCardView;
+  hasDescription?: boolean;
+  layout?: SelectCardLayout;
+  hasImage?: boolean;
+};
+
+export function getSelectCardOptionsCss({ view, hasDescription, layout, hasImage }: GetSelectCardOptionsCssArgs) {
   if (view === "list") return Css.df.fdc.gap2.w100.$;
   // Horizontal cards fit the icon and text side-by-side, so they need a wider column.
-  const cardWidth = layout === "horizontal" ? 240 : hasDescription ? 192 : 142;
+  const cardWidth = layout === "horizontal" ? 240 : hasImage || hasDescription ? 192 : 142;
   return Css.dg.gtc(`repeat(auto-fill, minmax(${cardWidth}px, 1fr))`).gap2.$;
 }

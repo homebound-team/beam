@@ -21,10 +21,9 @@ type SelectCardGroupItemOptionBase<V extends Value> = {
   selectionBehavior?: "exclusive";
 };
 
-/** Grid-view option; `icon` is required. */
-export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {
-  icon: IconProps["icon"];
-};
+/** Grid-view option; requires either `icon` or `image` (image url shown in place of the icon). */
+export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> &
+  ({ icon: IconProps["icon"]; image?: never } | { image: string; icon?: never });
 
 /** List-view option; `icon` is ignored when present. */
 export type SelectCardListGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {

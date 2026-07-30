@@ -13,7 +13,7 @@ export function States() {
   return (
     <div css={Css.df.fdc.gap4.wPx(640).$}>
       <h2 css={Css.lg.$}>Without description</h2>
-      <div css={getSelectCardOptionsCss("grid", false)}>
+      <div css={getSelectCardOptionsCss({ view: "grid" })}>
         <GridSelectCardWrapper label="Default" icon="columns" />
         <GridSelectCardWrapper label="Selected" icon="columns" selected />
         <GridSelectCardWrapper label="Disabled" icon="columns" disabled />
@@ -27,7 +27,7 @@ export function States() {
       </div>
 
       <h2 css={Css.lg.$}>Horizontal layout</h2>
-      <div css={getSelectCardOptionsCss("grid", true, "horizontal")}>
+      <div css={getSelectCardOptionsCss({ view: "grid", hasDescription: true, layout: "horizontal" })}>
         <GridSelectCardWrapper label="Default" icon="single" description={description} layout="horizontal" />
         <GridSelectCardWrapper label="Selected" icon="single" description={description} layout="horizontal" selected />
         <GridSelectCardWrapper label="Disabled" icon="single" description={description} layout="horizontal" disabled />
@@ -41,7 +41,7 @@ export function States() {
       </div>
 
       <h2 css={Css.lg.$}>With description</h2>
-      <div css={getSelectCardOptionsCss("grid", true)}>
+      <div css={getSelectCardOptionsCss({ view: "grid", hasDescription: true })}>
         <GridSelectCardWrapper label="Default" icon="single" description={description} />
         <GridSelectCardWrapper label="Selected" icon="single" description={description} selected />
         <GridSelectCardWrapper

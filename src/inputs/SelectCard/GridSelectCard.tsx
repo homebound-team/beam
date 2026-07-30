@@ -7,15 +7,18 @@ import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
 export type GridSelectCardProps = SelectCardItemProps & {
-  icon: IconProps["icon"];
+  icon?: IconProps["icon"];
+  /** Image url shown in place of the icon. */
+  image?: string;
   /** Icon above the text (default) or to its left. */
   layout?: SelectCardLayout;
 };
 
-/** Internal grid-view card with icon and optional description. Used by select card groups. */
+/** Internal grid-view card with icon or image and optional description. Used by select card groups. */
 export function GridSelectCard(props: GridSelectCardProps) {
   const {
     icon,
+    image,
     layout,
     label,
     description,
@@ -43,7 +46,11 @@ export function GridSelectCard(props: GridSelectCardProps) {
       <VisuallyHidden>
         <input {...inputProps} {...tid.value} />
       </VisuallyHidden>
-      <Icon icon={icon} inc={4} color={isDisabled ? Tokens.OnSurfaceDisabled : Tokens.OnSurface} />
+      {image ? (
+        <img src={image} alt="" css={Css.sqPx(120).objectContain.fs0.if(isDisabled).o50.$} {...tid.img} />
+      ) : (
+        icon && <Icon icon={icon} inc={4} color={isDisabled ? Tokens.OnSurfaceDisabled : Tokens.OnSurface} />
+      )}
       <span css={Css.df.fdc.gap("4px").w100.$}>
         <span css={Css.smSb.if(isDisabled).gray600.$}>{label}</span>
         {description && <span css={Css.sm.color(Tokens.OnSurface).if(isDisabled).gray600.$}>{description}</span>}

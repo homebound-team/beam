@@ -34,5 +34,6 @@ export function SelectCardRadioGroupItem<V extends Value>(props: SelectCardRadio
     return <ListSelectCard {...layoutProps} />;
   }
 
-  return <GridSelectCard {...layoutProps} layout={layout} icon={(option as SelectCardGridGroupItemOption<V>).icon} />;
+  const gridOption = option as SelectCardGridGroupItemOption<V>;
+  return <GridSelectCard {...layoutProps} layout={layout} icon={gridOption.icon} image={gridOption.image} />;
 }
