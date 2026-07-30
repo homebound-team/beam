@@ -1,3 +1,4 @@
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
 import { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
@@ -135,6 +136,37 @@ describe("SelectCardGroup", () => {
     // When selecting History
     click(r.categories_history);
     // Then onChange receives only History
+    expect(onChange).toHaveBeenCalledWith(Category.History);
+  });
+
+  it("keeps focus in place when mouse-pressing a card inside a modal", async () => {
+    // react-aria flags a focus event with no preceding user event as "virtual" focus and shows
+    // the keyboard focus ring. Inside a modal (tabindex=-1), mousedown on a card moves focus to
+    // the modal and "uses up" the pointer event, so the label click's focus on our hidden input
+    // looked virtual and cards got the focus ring on plain mouse clicks. usePress's
+    // preventFocusOnPress suppresses that focus-move, so the only focus event happens right
+    // after the click.
+    const onChange = vi.fn();
+    // Given a grid group inside a modal-like focusable container, with focus on another element
+    const r = await render(
+      <div tabIndex={-1} data-testid="modal">
+        <button data-testid="other">other</button>
+        <SelectCardGroup
+          label="Categories"
+          options={createGridCategoryOptions()}
+          value={Category.Math}
+          onChange={onChange}
+        />
+      </div>,
+    );
+    r.other.focus();
+    // When mousing down on a card and the browser applies its default focus-move to the modal
+    fireEvent.mouseDown(r.categories_history);
+    r.modal.focus();
+    // Then react-aria kept focus where it was
+    expect(r.other).toHaveFocus();
+    // And clicking still selects the card
+    click(r.categories_history);
     expect(onChange).toHaveBeenCalledWith(Category.History);
   });
 

@@ -32,7 +32,12 @@ export function SelectCardShell(props: SelectCardShellProps) {
 
   const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
   const { isFocusVisible: isFocusVisibleFromEvents, focusProps } = useFocusRing({ within: true });
-  const { pressProps, isPressed: isPressedFromEvents } = usePress({ isDisabled });
+  // preventFocusOnPress keeps focus where it is while clicking the card. Without it, mousedown
+  // moves focus to the nearest focusable ancestor (e.g. a modal, which has tabindex=-1) before the
+  // label click focuses our hidden input. react-aria sees that second focus event with no user
+  // event tied to it, assumes "virtual" (screen reader) focus, and shows the keyboard focus ring
+  // on a plain mouse click. Keyboard focus is unaffected: it goes straight to the hidden input.
+  const { pressProps, isPressed: isPressedFromEvents } = usePress({ isDisabled, preventFocusOnPress: true });
   const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
   const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
   const isPressed = __storyState?.pressed ?? isPressedFromEvents;
