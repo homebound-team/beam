@@ -6,7 +6,6 @@ export type {
   SelectCardGroupItemOption,
   SelectCardGroupProps,
   SelectCardLayout,
-  SelectCardLink,
   SelectCardListGroupItemOption,
   SelectCardView,
 } from "src/inputs/SelectCard/types";

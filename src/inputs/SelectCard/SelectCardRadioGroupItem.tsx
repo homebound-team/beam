@@ -35,13 +35,5 @@ export function SelectCardRadioGroupItem<V extends Value>(props: SelectCardRadio
   }
 
   const gridOption = option as SelectCardGridGroupItemOption<V>;
-  return (
-    <GridSelectCard
-      {...layoutProps}
-      layout={layout}
-      icon={gridOption.icon}
-      image={gridOption.image}
-      link={gridOption.link}
-    />
-  );
+  return <GridSelectCard {...layoutProps} layout={layout} icon={gridOption.icon} image={gridOption.image} />;
 }

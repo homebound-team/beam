@@ -7,7 +7,6 @@ import {
   SelectCardGroupProps,
   SelectCardListGroupItemOption,
 } from "src/inputs/SelectCard/types";
-import { action } from "storybook/actions";
 
 export default {
   component: SelectCardGroup,
@@ -69,10 +68,9 @@ export function HorizontalLayout() {
 /** Image on the left, label and description on the right. */
 export function HorizontalLayoutWithImages() {
   const [value, setValue] = useState<string>("fridge");
-  const link = { label: "More info", onClick: action("more info clicked") };
   const options: SelectCardGridGroupItemOption<string>[] = [
-    { image: "fridge.jpeg", label: "Fridge", description: "Stainless steel, counter-depth", value: "fridge", link },
-    { image: "disposal.png", label: "Disposal", description: "1/2 HP continuous feed", value: "disposal", link },
+    { image: "fridge.jpeg", label: "Fridge", description: "Stainless steel, counter-depth", value: "fridge" },
+    { image: "disposal.png", label: "Disposal", description: "1/2 HP continuous feed", value: "disposal" },
     { image: "counter-top.jpeg", label: "Counter Top", description: "Quartz, 3cm thickness", value: "counter-top" },
   ];
 

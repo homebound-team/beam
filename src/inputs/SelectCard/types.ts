@@ -2,7 +2,6 @@ import { InputHTMLAttributes, ReactNode } from "react";
 import { IconProps } from "src/components/Icon";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Value } from "src/inputs";
-import { BeamButtonProps } from "src/interfaces";
 
 export type SelectCardView = "grid" | "list";
 
@@ -22,19 +21,13 @@ type SelectCardGroupItemOptionBase<V extends Value> = {
   selectionBehavior?: "exclusive";
 };
 
-/** Link pinned to the bottom of a grid card, i.e. "More info". A url `onClick` renders an anchor. */
-export type SelectCardLink = { label: string; onClick: BeamButtonProps["onClick"] };
-
 /** Grid-view option; requires either `icon` or `image` (image url shown in place of the icon). */
-export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {
-  /** Optional link pinned to the bottom of the card, i.e. "More info". */
-  link?: SelectCardLink;
-} & ({ icon: IconProps["icon"]; image?: never } | { image: string; icon?: never });
+export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> &
+  ({ icon: IconProps["icon"]; image?: never } | { image: string; icon?: never });
 
-/** List-view option; `icon` is ignored when present, and links are grid-only. */
+/** List-view option; `icon` is ignored when present. */
 export type SelectCardListGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {
   icon?: IconProps["icon"];
-  link?: never;
 };
 
 export type SelectCardGroupItemOption<V extends Value> =
