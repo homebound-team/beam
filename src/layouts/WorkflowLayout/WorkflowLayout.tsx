@@ -48,11 +48,10 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props;
-  const tid = useTestIds(props, "workflowLayout");
-  const { sm: isMobile } = useBreakpoint();
-
   const tabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(tabSteps, defaultStep));
+  const tid = useTestIds(props, "workflowLayout");
+  const { sm: isMobile } = useBreakpoint();
 
   // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
   const bannerAndNavbarHeight = useBannerAndNavbarHeight();
