@@ -1,5 +1,6 @@
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Button, ModalBody, ModalHeader, useModal } from "src/components";
 import { Css } from "src/Css";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
 import {
@@ -7,6 +8,7 @@ import {
   SelectCardGroupProps,
   SelectCardListGroupItemOption,
 } from "src/inputs/SelectCard/types";
+import { newStory, withBeamDecorator } from "src/utils/sb";
 
 export default {
   component: SelectCardGroup,
@@ -45,6 +47,29 @@ export function OptionType() {
     <div css={Css.wPx(640).$}>
       <SelectCardGroup label="Option Type" options={createOptionTypes()} onChange={setValue} value={value} />
     </div>
+  );
+}
+
+export const InModal = newStory(
+  () => {
+    const { openModal } = useModal();
+    const open = () => openModal({ content: <InModalContent /> });
+    // Immediately open the modal for Chromatic snapshots
+    useEffect(open, [openModal]);
+    return <Button label="Open" onClick={open} />;
+  },
+  { decorators: [withBeamDecorator] },
+);
+
+function InModalContent() {
+  const [value, setValue] = useState<string>("package");
+  return (
+    <>
+      <ModalHeader>Option Type</ModalHeader>
+      <ModalBody>
+        <SelectCardGroup label="Option Type" options={createOptionTypes()} onChange={setValue} value={value} />
+      </ModalBody>
+    </>
   );
 }
 
