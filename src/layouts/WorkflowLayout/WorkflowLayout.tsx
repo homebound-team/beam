@@ -20,8 +20,8 @@ import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
-/** A `WorkflowLayout` step: a `StepperTabsStep` (minus `value`, which is derived from `label`) plus the page content rendered while it's active — `completed` also gates the Continue/Complete CTA when this is the active step. */
-export type WorkflowLayoutStep = Omit<StepperTabsStep, "value"> & {
+/** A `WorkflowLayout` step: a `StepperTabsStep` (minus `value`, derived from `label`, and `visited`, tracked internally as the user navigates) plus the page content rendered while it's active — `completed` also gates the Continue/Complete CTA when this is the active step. */
+export type WorkflowLayoutStep = Omit<StepperTabsStep, "value" | "visited"> & {
   /** Rendered as the page body while this is the active step. */
   content: ReactNode;
 };
@@ -48,10 +48,20 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props;
-  const tabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
-  const [currentStep, setCurrentStep] = useState(() => getInitialStep(tabSteps, defaultStep));
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
+
+  // Step state
+  const baseTabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
+  const [currentStep, setCurrentStepValue] = useState(() => getInitialStep(baseTabSteps, defaultStep));
+  // Tracks every step value `currentStep` has ever equaled, seeded with the initial step.
+  const [visitedSteps, setVisitedSteps] = useState<Set<string>>(() => new Set([currentStep]));
+  const tabSteps = baseTabSteps.map((step) => ({ ...step, visited: visitedSteps.has(step.value) }));
+
+  function setCurrentStep(step: string) {
+    setCurrentStepValue(step);
+    setVisitedSteps((prev) => (prev.has(step) ? prev : new Set(prev).add(step)));
+  }
 
   // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
   const bannerAndNavbarHeight = useBannerAndNavbarHeight();

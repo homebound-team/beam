@@ -15,9 +15,9 @@ export default {
 
 export function InteractiveStepperTabs() {
   const [steps, setSteps] = useState<StepperTabsStep[]>([
-    { label: "Trade Partners", value: "trade", completed: false },
-    { label: "Draft Email", value: "draft", completed: false, disabled: true },
-    { label: "Send Email", value: "send", completed: false, disabled: true },
+    { label: "Trade Partners", value: "trade", completed: false, visited: true },
+    { label: "Draft Email", value: "draft", completed: false, disabled: true, visited: false },
+    { label: "Send Email", value: "send", completed: false, disabled: true, visited: false },
   ]);
   const [currentStep, setCurrentStep] = useState(steps[0].value);
 
@@ -25,23 +25,29 @@ export function InteractiveStepperTabs() {
     setSteps(steps.map((s, idx) => (idx === stepIdx ? { ...steps[stepIdx], ...stepData } : s)));
   }
 
+  // Mimics what WorkflowLayout does internally: mark a step visited once the user navigates to it.
+  function goToStep(stepValue: string) {
+    setSteps(steps.map((s) => (s.value === stepValue ? { ...s, visited: true } : s)));
+    setCurrentStep(stepValue);
+  }
+
   return (
     <div>
-      <StepperTabs steps={steps} currentStep={currentStep} onChange={setCurrentStep} />
+      <StepperTabs steps={steps} currentStep={currentStep} onChange={goToStep} />
 
       <div css={Css.mt2.df.gap1.$}>
         {currentStep === "trade" && (
           <>
             <Button label="Toggle complete" onClick={() => setStep(0, { completed: !steps[0].completed })} />
             <Button label="Enable Draft Email step" onClick={() => setStep(1, { disabled: false })} />
-            <Button label="To Draft Email" onClick={() => setCurrentStep("draft")} disabled={steps[1].disabled} />
+            <Button label="To Draft Email" onClick={() => goToStep("draft")} disabled={steps[1].disabled} />
           </>
         )}
         {currentStep === "draft" && (
           <>
             <Button label="Toggle complete" onClick={() => setStep(1, { completed: !steps[1].completed })} />
             <Button label="Enable Send Email step" onClick={() => setStep(2, { disabled: false })} />
-            <Button label="To Send Email" onClick={() => setCurrentStep("send")} disabled={steps[2].disabled} />
+            <Button label="To Send Email" onClick={() => goToStep("send")} disabled={steps[2].disabled} />
           </>
         )}
         {currentStep === "send" && (
@@ -64,11 +70,11 @@ const threeSteps: StepperTabsStep[] = [
 ];
 
 const fiveSteps: StepperTabsStep[] = [
-  { label: "Trade Partners", value: "trade", completed: true },
-  { label: "Plan Package", value: "plan", completed: true },
-  { label: "Design Packages", value: "design", completed: false },
-  { label: "Options", value: "options", completed: false, disabled: true },
-  { label: "Review", value: "review", completed: false, disabled: true },
+  { label: "Trade Partners", value: "trade", completed: true, visited: true },
+  { label: "Plan Package", value: "plan", completed: true, visited: true },
+  { label: "Design Packages", value: "design", completed: false, visited: true },
+  { label: "Options", value: "options", completed: false, disabled: true, visited: false },
+  { label: "Review", value: "review", completed: false, disabled: true, visited: false },
 ];
 
 export function StepWidths() {

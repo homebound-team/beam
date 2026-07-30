@@ -1,4 +1,5 @@
 import { StepperTabs, StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
+import { Palette } from "src/Css";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -40,6 +41,20 @@ describe("StepperTabs", () => {
     click(r.stepperTabs_tab_send);
     // Then onChange is invoked with that step's value
     expect(onChange).toHaveBeenCalledWith("send");
+  });
+
+  it("hides the check icon and shows grey styling for a completed-but-unvisited step", async () => {
+    // Given a completed step that hasn't been visited, and a visited step that isn't completed
+    const steps: StepperTabsStep[] = [
+      { label: "Trade Partners", value: "trade", completed: true, visited: false },
+      { label: "Draft Email", value: "draft", completed: false, visited: true },
+    ];
+    // When rendered
+    const r = await render(<StepperTabs steps={steps} currentStep="draft" onChange={vi.fn()} />);
+    // Then the unvisited-but-completed step shows no checkmark
+    expect(r.stepperTabs_tab_trade.querySelector("[data-icon='check']")).not.toBeInTheDocument();
+    // And the visited-but-not-completed step still reads as blue
+    expect(r.stepperTabs_tab_draft).toHaveStyle({ borderBottomColor: Palette.Blue600 });
   });
 });
 

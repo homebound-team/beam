@@ -1,80 +1,66 @@
 import { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { StepperTab } from "./StepperTab";
+import { StepperTab, StepperTabProps } from "./StepperTab";
 
 export default {
   component: StepperTab,
+  argTypes: { __storyState: { control: false } },
 } as Meta;
 
-export function States() {
-  const combos: { active: boolean; completed: boolean; label: string }[] = [
-    { active: false, completed: true, label: "Step Label" },
-    { active: true, completed: false, label: "Step Label" },
-    { active: true, completed: true, label: "Step Label" },
-    { active: false, completed: false, label: "Details & Slots" },
+const states: { visited: boolean; active: boolean; completed: boolean; label: string }[] = [
+  { visited: true, active: false, completed: true, label: "Visited, Inactive, and Completed" },
+  { visited: true, active: true, completed: false, label: "Visited, Active, and Not Completed" },
+  { visited: true, active: true, completed: true, label: "Visited, Active, and Completed" },
+  { visited: false, active: false, completed: false, label: "Not Visited" },
+];
+
+const rows: { name: string; storyState?: StepperTabProps["__storyState"]; disabled?: boolean; collapsed?: boolean }[] =
+  [
+    { name: "Default" },
+    { name: "Hover", storyState: { hovered: true } },
+    { name: "Focus", storyState: { focusVisible: true } },
+    { name: "Disabled", disabled: true },
+    { name: "Collapsed", collapsed: true },
   ];
 
+const labelColumnWidthPx = 160;
+
+export function States() {
   return (
-    <div css={Css.df.fdc.gap4.bgWhite.$}>
-      {combos.map(({ active, completed, label }) => {
-        const key = `active-${active}-completed-${completed}`;
-        return (
-          <div key={key}>
-            <h2>
-              active={String(active)}, completed={String(completed)}
-            </h2>
-            <div css={Css.df.gap1.maxwPx(600).$}>
-              <div css={Css.df.fdc.gap1.fg1.$}>
-                <div>Default</div>
-                <StepperTab label={label} value={key} active={active} completed={completed} onClick={noop} />
-              </div>
-              <div css={Css.df.fdc.gap1.fg1.$}>
-                <div>Disabled</div>
+    <div css={Css.df.fdc.gap2.bgWhite.$}>
+      <div css={Css.df.gap2.$}>
+        <div css={Css.wPx(labelColumnWidthPx).fs0.$} />
+        {states.map(({ label }) => (
+          <div key={label} css={Css.fg1.fb(0).smSb.$}>
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {rows.map(({ name, storyState, disabled, collapsed }) => (
+        <div key={name} css={Css.df.aife.gap2.$}>
+          <div css={Css.wPx(labelColumnWidthPx).fs0.smSb.$}>{name}</div>
+          {states.map(({ visited, active, completed, label }) => {
+            const key = `${name}-${label}`;
+            return (
+              <div key={key} css={Css.df.fg1.fb(0).$}>
                 <StepperTab
-                  label={label}
-                  value={`${key}-disabled`}
+                  label="Step Label"
+                  value={key}
                   active={active}
                   completed={completed}
+                  visited={visited}
                   onClick={noop}
-                  disabled
+                  disabled={disabled}
+                  collapsed={collapsed}
+                  __storyState={storyState}
                 />
               </div>
-            </div>
-          </div>
-        );
-      })}
-      <div>
-        <h2>Collapsed (No Active State Difference)</h2>
-        <div css={Css.df.gap1.maxwPx(600).$}>
-          <div css={Css.df.fdc.gap1.fg1.$}>
-            <div>Completed</div>
-            <div css={Css.h0.df.aife.$}>
-              <StepperTab
-                label="Step Label"
-                value="collapsed-completed"
-                active={false}
-                completed={true}
-                onClick={noop}
-                collapsed
-              />
-            </div>
-          </div>
-          <div css={Css.df.fdc.gap1.fg1.$}>
-            <div>Not Completed</div>
-            <div css={Css.h0.df.aife.$}>
-              <StepperTab
-                label="Step Label"
-                value="collapsed-not-completed"
-                active={false}
-                completed={false}
-                onClick={noop}
-                collapsed
-              />
-            </div>
-          </div>
+            );
+          })}
         </div>
-      </div>
+      ))}
     </div>
   );
 }
