@@ -40,8 +40,6 @@ export function SelectCardShell(props: SelectCardShellProps) {
   const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
   const isPressed = __storyState?.pressed ?? isPressedFromEvents;
 
-  // Flex/padding for the card content lives on the label, so the footer can sit outside it and
-  // span the full card width. `fg1` keeps the footer pinned to the bottom of equal-height cards.
   const labelStyles =
     view === "grid"
       ? layout === "horizontal"
@@ -68,9 +66,6 @@ export function SelectCardShell(props: SelectCardShellProps) {
     title: resolveTooltip(isDisabled, tooltip),
     placement: "top",
     children: (
-      // The card chrome (border, background, selection state) wraps the label so the footer can
-      // live outside it. A footer inside the label would join the input's accessible name and
-      // trigger the card's focus ring when its own controls are focused.
       <div css={styles}>
         <label
           css={{ ...labelStyles, ...Css.cursorPointer.if(isDisabled).cursorNotAllowed.$ }}
