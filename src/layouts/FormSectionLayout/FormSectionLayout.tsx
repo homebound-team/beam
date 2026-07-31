@@ -22,23 +22,23 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
   const tid = useTestIds(props, "formSectionLayout");
 
   return (
-    <div css={Css.df.fdc.gap3.w100.pt4.maxwPx(720).mxa.$} {...tid}>
-      <div css={Css.df.jcsb.$}>
-        <div css={Css.df.fdc.gapPx(12).$}>
+    <div css={Css.df.fdc.gap3.w100.pt4.maxwPx(720).mxa.ifSm.px2.$} {...tid}>
+      <div css={Css.df.fdc.jcsb.gapPx(12).$}>
+        <div css={Css.df.jcsb.aic.$}>
           <h1 css={Css.xl.$} {...tid.title}>
             {title}
           </h1>
-          {description && (
-            <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-              {description}
+          {actions && (
+            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+              {actions.map((action) => (
+                <Button key={`${action.label}`} {...action} />
+              ))}
             </div>
           )}
         </div>
-        {actions && (
-          <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-            {actions.map((action) => (
-              <Button key={`${action.label}`} {...action} />
-            ))}
+        {description && (
+          <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
+            {description}
           </div>
         )}
       </div>
