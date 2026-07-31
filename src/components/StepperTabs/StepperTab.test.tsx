@@ -1,4 +1,5 @@
 import { StepperTab } from "src/components/StepperTabs/StepperTab";
+import { Palette } from "src/Css";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -41,5 +42,23 @@ describe("StepperTab", () => {
     click(r.stepperTab_step2);
     // Then onClick is invoked with that value
     expect(onClick).toHaveBeenCalledWith("step2");
+  });
+
+  it("uses a blue collapsed border for an active-but-not-completed step, same as expanded", async () => {
+    // Given an active, not-yet-completed, collapsed tab
+    const r = await render(
+      <StepperTab label="Step Label" value="step" active completed={false} collapsed onClick={vi.fn()} />,
+    );
+    // Then it reads as blue, matching the expanded state's active-or-completed rule
+    expect(r.stepperTab_step).toHaveStyle({ borderBottomColor: Palette.Blue600 });
+  });
+
+  it("uses a grey collapsed border for an inactive, not-completed step", async () => {
+    // Given an inactive, not-completed, collapsed tab
+    const r = await render(
+      <StepperTab label="Step Label" value="step" active={false} completed={false} collapsed onClick={vi.fn()} />,
+    );
+    // Then it reads as grey
+    expect(r.stepperTab_step).toHaveStyle({ borderBottomColor: Palette.Gray300 });
   });
 });
