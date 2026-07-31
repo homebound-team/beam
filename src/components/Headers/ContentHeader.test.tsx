@@ -25,4 +25,18 @@ describe("ContentHeader", () => {
     expect(r.query.contentHeader_description).not.toBeInTheDocument();
     expect(r.query.contentHeader_actions).not.toBeInTheDocument();
   });
+
+  it("puts description in the title's slot when there is no title", async () => {
+    // Given a ContentHeader with description and actions but no title
+    const r = await render(
+      <ContentHeader
+        description="Assign and manage trade partners for this project."
+        actions={[{ label: "Add", onClick: () => {} }]}
+      />,
+    );
+    // Then there's no title, and description + actions both render
+    expect(r.query.contentHeader_title).not.toBeInTheDocument();
+    expect(r.contentHeader_description).toHaveTextContent("Assign and manage trade partners for this project.");
+    expect(r.add).toBeInTheDocument();
+  });
 });

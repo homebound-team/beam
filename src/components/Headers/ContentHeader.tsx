@@ -27,37 +27,40 @@ export type ContentHeaderProps = {
 export function ContentHeader(props: ContentHeaderProps) {
   const { title, description, actions } = props;
   const tid = useTestIds(props, "contentHeader");
+  const descriptionEl = description && (
+    <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
+      {description}
+    </div>
+  );
 
   return (
     <div
-      css={Css.sticky.left(documentScrollChromeLeft()).w(documentScrollChromeWidth()).px3.df.jcsb.if(!title).aic.$}
+      css={Css.sticky.left(documentScrollChromeLeft()).w(documentScrollChromeWidth()).px3.df.fdc.gapPx(12).$}
       {...tid}
     >
       {(title || description) && (
-        <div css={Css.df.fdc.gapPx(12).mw0.$}>
-          {title && (
+        <div css={Css.df.aic.jcsb.mw0.$}>
+          {title ? (
             <h2 css={Css.xl.$} {...tid.title}>
               {title}
             </h2>
+          ) : (
+            descriptionEl
           )}
-          {description && (
-            <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-              {description}
+          {actions && (
+            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+              {actions.map((action) =>
+                action.kind === "icon" ? (
+                  <IconButton key={action.icon} {...action} />
+                ) : (
+                  <Button key={`${action.label}`} {...action} />
+                ),
+              )}
             </div>
           )}
         </div>
       )}
-      {actions && (
-        <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-          {actions.map((action) =>
-            action.kind === "icon" ? (
-              <IconButton key={action.icon} {...action} />
-            ) : (
-              <Button key={`${action.label}`} {...action} />
-            ),
-          )}
-        </div>
-      )}
+      {title && descriptionEl}
     </div>
   );
 }
