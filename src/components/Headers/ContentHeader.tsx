@@ -1,12 +1,15 @@
 import { ReactNode } from "react";
+import { Button, ButtonProps, IconButton, IconButtonProps } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { documentScrollChromeLeft, documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils";
 
+export type ContentHeaderAction = ({ kind?: "default" } & ButtonProps) | ({ kind: "icon" } & IconButtonProps);
+
 export type ContentHeaderProps = {
   title?: string;
   description?: ReactNode;
-  actions?: ReactNode;
+  actions?: ContentHeaderAction[];
 };
 
 /**
@@ -46,7 +49,13 @@ export function ContentHeader(props: ContentHeaderProps) {
       )}
       {actions && (
         <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-          {actions}
+          {actions.map((action) =>
+            action.kind === "icon" ? (
+              <IconButton key={action.icon} {...action} />
+            ) : (
+              <Button key={`${action.label}`} {...action} />
+            ),
+          )}
         </div>
       )}
     </div>
