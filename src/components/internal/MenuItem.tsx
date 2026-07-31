@@ -1,5 +1,5 @@
 import { Node } from "@react-types/shared";
-import { useRef } from "react";
+import { type KeyboardEvent, type MouseEvent, useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { Link, useNavigate } from "react-router-dom";
 import { TreeState } from "react-stately";
@@ -24,6 +24,14 @@ export function MenuItemImpl(props: MenuItemProps) {
   const navigate = useNavigate();
   const { hoverProps, isHovered } = useHover({});
   const tid = useTestIds(props);
+  // react-aria's `onAction` callback isn't given the triggering event, so we can't inspect
+  // modifier keys there. Capture whether the user cmd/ctrl/shift-clicked (which should open a
+  // new tab instead of navigating the current page) in the capture phase, before react-aria's
+  // press handling fires `onAction`, and read it back below. I.e. cmd-click -> `true`.
+  const openInNewTabRef = useRef(false);
+  function captureModifiers(e: KeyboardEvent | MouseEvent) {
+    openInNewTabRef.current = wantsNewTab(e);
+  }
   const { menuItemProps } = useMenuItem(
     {
       key: item.key,
@@ -34,8 +42,8 @@ export function MenuItemImpl(props: MenuItemProps) {
         }
         const { onClick } = menuItem;
         if (typeof onClick === "string") {
-          // if it is an absolute URL, then open in new window. Assuming this should leave the App
-          if (isAbsoluteUrl(onClick)) {
+          // Open in a new tab for absolute (external) URLs, or when the user cmd/ctrl/shift-clicked.
+          if (isAbsoluteUrl(onClick) || openInNewTabRef.current) {
             // We want to do `window.open(url, "_blank", "noopener,noreferrer")` but that Safari treats
             // that as "open in new window", this happens when safari has the "Open pages in tabs instead of windows" set to "Automatically" (which is the default)
             // see https://support.apple.com/guide/safari/tabs-ibrw1045/mac (Open pages in tabs instead of windows) for other behaviors
@@ -71,6 +79,10 @@ export function MenuItemImpl(props: MenuItemProps) {
     <li
       {...menuItemProps}
       {...hoverProps}
+      // Capture-phase handlers run before react-aria's press handling, so `onAction` sees a fresh value.
+      onPointerDownCapture={captureModifiers}
+      onKeyDownCapture={captureModifiers}
+      onClickCapture={captureModifiers}
       ref={ref}
       css={{
         ...Css.df.aic.py1.px2.cursorPointer.outline0.mh("42px").sm.$,
@@ -162,6 +174,11 @@ function maybeWrapInLink(
       {content}
     </Link>
   );
+}
+
+/** True when a click's modifier keys indicate the user wants a new tab/window. I.e. cmd/ctrl/shift-click. */
+function wantsNewTab(e: KeyboardEvent | MouseEvent): boolean {
+  return e.metaKey || e.ctrlKey || e.shiftKey;
 }
 
 function isIconMenuItem(item: MenuItem): item is IconMenuItemType {
