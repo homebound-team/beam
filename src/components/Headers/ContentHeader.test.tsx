@@ -1,4 +1,3 @@
-import { Button } from "src/components/Button";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { render } from "src/utils/rtl";
 
@@ -9,7 +8,7 @@ describe("ContentHeader", () => {
       <ContentHeader
         title="Trade Partners"
         description="Assign and manage trade partners for this project."
-        actions={<Button label="Add" onClick={() => {}} />}
+        actions={[{ label: "Add", onClick: () => {} }]}
       />,
     );
     // Then all three render

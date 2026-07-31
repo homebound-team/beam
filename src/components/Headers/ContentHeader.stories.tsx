@@ -1,5 +1,4 @@
 import { Meta } from "@storybook/react-vite";
-import { Button } from "src/components/Button";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { withBeamDecorator } from "src/utils/sb";
 
@@ -13,7 +12,7 @@ export function Default() {
     <ContentHeader
       title="Trade Partners"
       description="Assign and manage trade partners for this project."
-      actions={<Button label="Add" onClick={() => {}} />}
+      actions={[{ label: "Add", onClick: () => {} }]}
     />
   );
 }
@@ -26,7 +25,7 @@ export function DescriptionAndActions() {
   return (
     <ContentHeader
       description="Assign and manage trade partners for this project."
-      actions={<Button label="Add" onClick={() => {}} />}
+      actions={[{ label: "Add", onClick: () => {} }]}
     />
   );
 }

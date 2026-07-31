@@ -1,5 +1,4 @@
 import { Meta } from "@storybook/react-vite";
-import { Button } from "src/components/Button";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
@@ -83,7 +82,7 @@ export function WideContentWithContentHeader() {
         <ContentHeader
           title="Trade Partners"
           description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."
-          actions={<Button label="Add" onClick={action("add clicked")} />}
+          actions={[{ label: "Add", onClick: action("add clicked") }]}
         />
         <TableExample numCols={10} numRows={20} />
       </div>
