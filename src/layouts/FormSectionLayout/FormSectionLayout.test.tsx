@@ -38,7 +38,7 @@ describe("FormSectionLayout", () => {
     const r = await render(
       <FormSectionLayout
         title="Trade Partners"
-        actions={[{ kind: "button", label: "Save draft", onClick: () => {} }]}
+        actions={[{ label: "Save draft", onClick: () => {} }]}
         sections={[]}
       />,
     );

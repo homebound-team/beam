@@ -11,7 +11,7 @@ import { useTestIds } from "src/utils";
  * Tagged with `kind` (not `type`) because `ButtonProps` already has its own
  * unrelated `type?: "button" | "submit" | "reset"` HTML-attribute field.
  */
-export type FormSectionAction = ({ kind: "button" } & ButtonProps) | ({ kind: "icon" } & IconButtonProps);
+export type FormSectionAction = ({ kind?: "default" } & ButtonProps) | ({ kind: "icon" } & IconButtonProps);
 
 export type FormSectionProps = {
   title: string;
@@ -43,10 +43,10 @@ export function FormSection(props: FormSectionProps) {
         {actions && (
           <div css={Css.df.gap1.fs0.$} {...tid.actions}>
             {actions.map((action) =>
-              action.kind === "button" ? (
-                <Button key={`button-${action.label}`} {...action} />
+              action.kind === "icon" ? (
+                <IconButton key={action.icon} {...action} />
               ) : (
-                <IconButton key={`icon-${action.icon}`} {...action} />
+                <Button key={`${action.label}`} {...action} />
               ),
             )}
           </div>

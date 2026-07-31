@@ -10,7 +10,7 @@ export type FormSectionLayoutProps = {
   /** The form's own title — one level up from any `FormSection`'s title. */
   title: string;
   description?: ReactNode;
-  /** Rendered top-right of the title row, e.g. a "Save draft" Button. */
+  /** Rendered top-right of the title row, e.g. an "Add items" Button. */
   actions?: FormSectionAction[];
   sections: FormSectionProps[];
 };
@@ -36,10 +36,10 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
         {actions && (
           <div css={Css.df.gap1.fs0.$} {...tid.actions}>
             {actions.map((action) =>
-              action.kind === "button" ? (
-                <Button key={`button-${action.label}`} {...action} />
+              action.kind === "icon" ? (
+                <IconButton key={action.icon} {...action} />
               ) : (
-                <IconButton key={`icon-${action.icon}`} {...action} />
+                <Button key={`${action.label}`} {...action} />
               ),
             )}
           </div>

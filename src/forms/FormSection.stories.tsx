@@ -23,7 +23,7 @@ export function WithChildSections() {
     <FormSection
       title="Sub-Contractors"
       actions={[
-        { kind: "button", label: "Add", onClick: () => {}, variant: "tertiary" },
+        { label: "Add", onClick: () => {}, variant: "tertiary" },
         { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
       ]}
       childSections={[
@@ -31,13 +31,13 @@ export function WithChildSections() {
           title: "Electrical",
           fields: <PlaceholderFields count={2} />,
           description: "Electrical contracts are needed for the construction to continue",
-          actions: [{ kind: "button", label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
         },
         { title: "Plumbing", fields: <PlaceholderFields count={2} /> },
         {
           title: "HVAC",
           fields: <PlaceholderFields count={2} />,
-          actions: [{ kind: "button", label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
         },
       ]}
     />

@@ -13,13 +13,13 @@ export function Default() {
     <FormSectionLayout
       title="Trade Partners"
       description="Assign and manage trade partners for this project."
-      actions={[{ kind: "button", label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
+      actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
       sections={[
         {
           title: "General Contractor",
           description: "The primary contractor responsible for this project.",
           actions: [
-            { kind: "button", label: "Add", onClick: () => {}, variant: "tertiary" },
+            { label: "Add", onClick: () => {}, variant: "tertiary" },
             { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
           ],
           fields: <PlaceholderFields count={2} />,
@@ -49,7 +49,7 @@ export function NestedChildSections() {
       sections={[
         {
           title: "Sub-Contractors",
-          actions: [{ kind: "button", label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
           childSections: [
             { title: "Electrical", fields: <PlaceholderFields count={2} /> },
             { title: "Plumbing", fields: <PlaceholderFields count={2} /> },

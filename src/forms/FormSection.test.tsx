@@ -25,7 +25,7 @@ describe("FormSection", () => {
       <FormSection
         title="Trade Partners"
         actions={[
-          { kind: "button", label: "Add", onClick: () => {} },
+          { label: "Add", onClick: () => {} },
           { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
         ]}
       />,
