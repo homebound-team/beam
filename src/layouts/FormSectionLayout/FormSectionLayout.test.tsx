@@ -36,11 +36,7 @@ describe("FormSectionLayout", () => {
     // Given a FormSectionLayout with actions
     // When rendered
     const r = await render(
-      <FormSectionLayout
-        title="Trade Partners"
-        actions={[{ label: "Save draft", onClick: () => {} }]}
-        sections={[]}
-      />,
+      <FormSectionLayout title="Trade Partners" actions={[{ label: "Save draft", onClick: () => {} }]} sections={[]} />,
     );
     // Then the action renders as a real Button
     expect(r.saveDraft).toBeInTheDocument();
