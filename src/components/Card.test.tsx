@@ -24,6 +24,20 @@ describe("Card Component", () => {
     expect(r.card_details).toHaveTextContent("Detail Content");
   });
 
+  it("uses a fixed width by default", async () => {
+    // Given a list card
+    const r = await render(<Card {...defaultProps} type="list" />);
+    // Expect the default list width
+    expect(r.card).toHaveStyle({ width: "520px" });
+  });
+
+  it("can follow its container when fullWidth", async () => {
+    // Given a fullWidth list card
+    const r = await render(<Card {...defaultProps} type="list" fullWidth />);
+    // Expect the fixed width to be dropped
+    expect(r.card).toHaveStyle({ width: "100%" });
+  });
+
   it("can display and handle click events on the vertical dots menu button", async () => {
     // Given a card component with buttonMenuItems
     const buttonMenuItems = [{ label: "View", onClick: noop }];
