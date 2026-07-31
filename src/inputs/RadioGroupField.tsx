@@ -1,5 +1,5 @@
 import { Fragment, ReactNode, useMemo, useRef } from "react";
-import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
+import { useFocusRing, useHover, useRadio, useRadioGroup, VisuallyHidden } from "react-aria";
 import { RadioGroupState, useRadioGroupState } from "react-stately";
 import { maybeTooltip, resolveTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
@@ -24,6 +24,11 @@ export type RadioFieldOption<K extends string> = {
   value: K;
   /** Disable only specific option, with an optional reason */
   disabled?: boolean | ReactNode;
+  /**
+   * Optional image shown beside the radio instead of the label/description text, i.e. for a
+   * photo picker. `label` is still required and used for assistive tech, but is visually hidden.
+   */
+  image?: string;
 };
 
 export type RadioGroupFieldLayout = "vertical" | "horizontal";
@@ -134,7 +139,7 @@ function Radio<K extends string>(props: {
 }) {
   const {
     parentId,
-    option: { description, label, value },
+    option: { description, label, value, image },
     state,
     isOptionDisabled,
     ...others
@@ -156,7 +161,13 @@ function Radio<K extends string>(props: {
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 
   return (
-    <label css={Css.df.cursorPointer.if(disabled).add("cursor", "initial").$} {...hoverProps}>
+    <label
+      css={{
+        ...Css.df.cursorPointer.if(disabled).add("cursor", "initial").$,
+        ...(image && Css.aic.gap1.$),
+      }}
+      {...hoverProps}
+    >
       <input
         type="radio"
         ref={ref}
@@ -166,8 +177,9 @@ function Radio<K extends string>(props: {
           ...getRadioStateStyles({ isDisabled: disabled, isSelected }),
           ...(isHovered && !disabled ? radioHover : {}),
           ...(isFocusVisible ? radioFocus : {}),
-          // Nudge down so the center of the circle lines up with the label text
-          ...Css.mtPx(2).mr1.$,
+          // Without an image, nudge down so the center of the circle lines up with the label text.
+          // With an image, the label is hidden and `gap1` on the label above handles spacing instead.
+          ...(image ? Css.fs0.$ : Css.mtPx(2).mr1.$),
         }}
         disabled={disabled}
         aria-labelledby={labelId}
@@ -176,20 +188,32 @@ function Radio<K extends string>(props: {
         // Put others here b/c it could have data-testid in it or onX events.
         {...others}
       />
-      <div>
-        <div
-          id={labelId}
-          css={Css.sm.gray800.if(disabled).gray400.$}
-          {...(description ? { "aria-describedby": descriptionId } : {})}
-        >
-          {label}
-        </div>
-        {description && (
-          <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
-            {typeof description === "function" ? description() : description}
+      {image ? (
+        <>
+          {/* Kept for accessibility; the image stands in for the visible label. */}
+          <VisuallyHidden>
+            <span id={labelId}>{label}</span>
+          </VisuallyHidden>
+          <div css={Css.sqPx(120).ba.bw1.bcGray200.br8.bgWhite.df.aic.jcc.oh.p1.fs0.$}>
+            <img src={image} alt="" css={Css.w100.h100.objectContain.$} />
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div>
+          <div
+            id={labelId}
+            css={Css.sm.gray800.if(disabled).gray400.$}
+            {...(description ? { "aria-describedby": descriptionId } : {})}
+          >
+            {label}
+          </div>
+          {description && (
+            <div id={descriptionId} css={Css.sm.gray700.if(disabled).gray400.$}>
+              {typeof description === "function" ? description() : description}
+            </div>
+          )}
+        </div>
+      )}
     </label>
   );
 }
