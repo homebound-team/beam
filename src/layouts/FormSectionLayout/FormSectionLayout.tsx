@@ -10,6 +10,8 @@ export type FormSectionLayoutProps = {
   /** The form's own title — one level up from any `FormSection`'s title. */
   title: string;
   description?: ReactNode;
+  /** Rendered before form sections. Useful in forms that only need the main form title, or for form fields that shape the context of a form beforehand.  */
+  initialFields?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add items" Button. */
   actions?: FormSectionAction[];
   sections: FormSectionProps[];
@@ -17,7 +19,7 @@ export type FormSectionLayoutProps = {
 
 /** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
 export function FormSectionLayout(props: FormSectionLayoutProps) {
-  const { title, description, actions, sections } = props;
+  const { title, description, actions, initialFields, sections } = props;
   const tid = useTestIds(props, "formSectionLayout");
 
   return (
@@ -45,6 +47,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
           </div>
         )}
       </div>
+      {initialFields}
       <div css={Css.df.fdc.gap6.$}>
         {sections.map((section, i) => (
           <FormSection key={defaultTestId(section.title) || i} {...section} />
