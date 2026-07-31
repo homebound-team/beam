@@ -11,7 +11,7 @@ type SelectCardCheckboxGroupItemProps<V extends Value> = SelectCardGroupItemProp
 };
 
 export function SelectCardCheckboxGroupItem<V extends Value>(props: SelectCardCheckboxGroupItemProps<V>) {
-  const { option, groupState, isSelected, view, ...others } = props;
+  const { option, groupState, isSelected, view, layout, ...others } = props;
   const { label, description, disabled, tooltip, value } = option;
   const ref = useRef<HTMLInputElement>(null);
   const { inputProps, isDisabled: isOptionDisabled } = useCheckboxGroupItem(
@@ -34,5 +34,6 @@ export function SelectCardCheckboxGroupItem<V extends Value>(props: SelectCardCh
     return <ListSelectCard {...layoutProps} />;
   }
 
-  return <GridSelectCard {...layoutProps} icon={(option as SelectCardGridGroupItemOption<V>).icon} />;
+  const gridOption = option as SelectCardGridGroupItemOption<V>;
+  return <GridSelectCard {...layoutProps} layout={layout} icon={gridOption.icon} image={gridOption.image} />;
 }

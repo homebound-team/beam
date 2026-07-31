@@ -20,6 +20,11 @@ export interface CardProps {
   // contain displays entire image, cover fills the space
   imageFit?: ImageFitType;
   type?: CardType;
+  /**
+   * Makes the card fill its container instead of using the default fixed width (256px card / 520px list),
+   * i.e. for two list cards side-by-side in a grid whose columns aren't 520px wide.
+   */
+  fullWidth?: boolean;
   bordered?: boolean;
   disabled?: boolean;
   buttonMenuItems?: MenuItem[];
@@ -34,6 +39,7 @@ export function Card(props: CardProps) {
     imgSrc,
     imageFit = "contain",
     type = "card",
+    fullWidth = false,
     bordered = false,
     disabled: isDisabled = false,
     buttonMenuItems,
@@ -47,12 +53,13 @@ export function Card(props: CardProps) {
   const styles = useMemo(
     () => ({
       ...baseStyles(type),
+      ...(fullWidth && fullWidthStyles),
       ...(isList && listStyles),
       ...(bordered && borderedStyles),
       ...(isHovered && cardHoverStyles),
       ...(isDisabled && disabledStyles),
     }),
-    [isDisabled, isHovered, bordered, type, isList],
+    [isDisabled, isHovered, bordered, type, isList, fullWidth],
   );
 
   return (
@@ -61,6 +68,8 @@ export function Card(props: CardProps) {
       <div
         css={{
           ...Css.hPx(imgHeight).ba.br8.bcGray300.oh.df.asc.jsc.relative.add("filter", "brightness(1)").$,
+          // Once the card follows its container, keep the image at its own size so the title wraps instead.
+          ...(fullWidth && Css.fs0.$),
           ...(isHovered && !isList && imageHoverStyles),
         }}
       >
@@ -99,6 +108,8 @@ export function Card(props: CardProps) {
 
 const width = { card: 256, list: 520 };
 const baseStyles = (type: CardType) => Css.wPx(width[type]).bgWhite.df.fdc.gap1.relative.$;
+// Replaces the fixed width above, so the card follows its container instead of overflowing it.
+const fullWidthStyles = Css.w100.$;
 const listStyles = Css.df.fdr.gap2.$;
 const borderedStyles = Css.ba.br8.bcGray300.p2.$;
 const disabledStyles = Css.add("opacity", 0.5).add("transition", "opacity 0.3s ease").$;
