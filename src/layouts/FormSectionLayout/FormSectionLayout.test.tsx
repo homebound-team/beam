@@ -1,4 +1,3 @@
-import { Button } from "src/components/Button";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { render } from "src/utils/rtl";
 
@@ -39,7 +38,7 @@ describe("FormSectionLayout", () => {
     const r = await render(
       <FormSectionLayout
         title="Trade Partners"
-        actions={<Button label="Save draft" onClick={() => {}} />}
+        actions={[{ kind: "button", label: "Save draft", onClick: () => {} }]}
         sections={[]}
       />,
     );
