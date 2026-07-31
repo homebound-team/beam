@@ -677,22 +677,18 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   );
 }
 
+/** Flattens `o` + its not-collapsed descendants into leveled options, i.e. `[[o, 0], [child, 1]]`. */
 function levelOptions<O, V extends Value>(
   o: NestedOption<O>,
   level: number,
-  filtering: boolean,
   collapsedKeys: AriaKey[],
   getOptionValue: (o: O) => V,
 ): LeveledOption<O>[] {
-  // If a user is filtering, then do not provide level to the options as the various paddings may look quite odd.
-  const actualLevel = filtering ? 0 : level;
   return [
-    [o, actualLevel],
-    // Flat map the children if the parent is not collapsed or if we are filtering (for the search results)
-    ...(o.children?.length && (!collapsedKeys.includes(valueToKey(getOptionValue(o))) || filtering)
-      ? o.children.flatMap((oc: NestedOption<O>) =>
-          levelOptions(oc, actualLevel + 1, filtering, collapsedKeys, getOptionValue),
-        )
+    [o, level],
+    // Flat map the children if the parent is not collapsed
+    ...(o.children?.length && !collapsedKeys.includes(valueToKey(getOptionValue(o)))
+      ? o.children.flatMap((oc: NestedOption<O>) => levelOptions(oc, level + 1, collapsedKeys, getOptionValue))
       : []),
   ];
 }
@@ -711,6 +707,7 @@ function getTopLevelSelections<O, V extends Value>(
   return [];
 }
 
+/** The options to show in the menu, i.e. either the not-collapsed tree, or the search results. */
 function getFilteredOptions<O, V extends Value>(
   allOptions: NestedOption<O>[],
   searchValue: string | undefined,
@@ -719,11 +716,39 @@ function getFilteredOptions<O, V extends Value>(
   getOptionLabel: (o: O) => string,
   getOptionValue: (o: O) => V,
 ): LeveledOption<O>[] {
-  return allOptions.flatMap((option) =>
-    levelOptions(option, 0, !!searchValue, collapsedKeys, getOptionValue).filter(([nestedOption]) =>
-      searchValue ? contains(getOptionLabel(nestedOption), searchValue) : true,
-    ),
-  );
+  return searchValue
+    ? allOptions.flatMap((option) => matchedOptions(option, 0, false, searchValue, contains, getOptionLabel))
+    : allOptions.flatMap((option) => levelOptions(option, 0, collapsedKeys, getOptionValue));
+}
+
+/**
+ * Filters `o`'s subtree against `searchValue`, but keeps the tree structure/levels intact.
+ *
+ * This mirrors GridTable's `RowState.isMatched` heuristic, i.e. an option is shown if it directly
+ * matches, if an ancestor directly matched (a matched parent shows all of its children), or if a
+ * descendant directly matched (a matched child shows its parents).
+ *
+ * I.e. searching "nba" shows `Basketball > [NBA, WNBA]` instead of a flat `[NBA, WNBA]`.
+ *
+ * Note that, unlike GridTable, collapsed-ness is ignored while searching, so that matches hidden
+ * within a collapsed parent are still shown.
+ */
+function matchedOptions<O>(
+  o: NestedOption<O>,
+  level: number,
+  hasMatchedParent: boolean,
+  searchValue: string,
+  contains: (string: string, substring: string) => boolean,
+  getOptionLabel: (o: O) => string,
+): LeveledOption<O>[] {
+  const isDirectlyMatched = contains(getOptionLabel(o), searchValue);
+  const children =
+    o.children?.flatMap((oc) =>
+      matchedOptions(oc, level + 1, hasMatchedParent || isDirectlyMatched, searchValue, contains, getOptionLabel),
+    ) ?? [];
+  // I.e. a non-empty `children` here means a descendant directly matched, b/c if `isDirectlyMatched`
+  // or `hasMatchedParent` was true, every child would have been kept regardless of its own match.
+  return isDirectlyMatched || hasMatchedParent || children.length > 0 ? [[o, level], ...children] : [];
 }
 
 function isOptionFullySelected<O, V extends Value>(

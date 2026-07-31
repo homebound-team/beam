@@ -1,3 +1,4 @@
+import { RenderResult } from "@homebound/rtl-utils";
 import { fireEvent, within } from "@testing-library/react";
 import { useState } from "react";
 import { TreeSelectField } from "src/inputs";
@@ -467,10 +468,49 @@ describe("TreeSelectField", () => {
     // And typing in the filter input
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
     expect(r.favoriteLeague).toHaveValue("nba");
-    // Then only the NBA option is visible
-    expect(r.queryAllByRole("option")).toHaveLength(2);
-    expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
-    expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
+    // Then only the matched options, and their parent, are visible
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
+  it("keeps the tree structure when filtering", async () => {
+    // Given a TreeSelectField with three levels of options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={[
+          {
+            id: "sports",
+            name: "Sports",
+            children: [
+              {
+                id: "basketball",
+                name: "Basketball",
+                children: [
+                  { id: "nba", name: "NBA" },
+                  { id: "wnba", name: "WNBA" },
+                ],
+              },
+              { id: "football", name: "Football", children: [{ id: "nfl", name: "NFL" }] },
+            ],
+          },
+        ]}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    // When filtering on a grandchild option
+    fireEvent.input(r.favoriteLeague, { target: { value: "wnba" } });
+    // Then all of its parents are shown, still nested
+    expect(getOptionLabels(r)).toEqual(["Sports", "Basketball", "WNBA"]);
+    expect(getOptionLevels(r)).toEqual([0, 1, 2]);
+    // And when filtering on a mid-level parent option
+    fireEvent.input(r.favoriteLeague, { target: { value: "basketball" } });
+    // Then its parent and all of its children are shown
+    expect(getOptionLabels(r)).toEqual(["Sports", "Basketball", "NBA", "WNBA"]);
+    expect(getOptionLevels(r)).toEqual([0, 1, 2, 2]);
   });
 
   it("can filter options even if parent if collapsed", async () => {
@@ -493,10 +533,8 @@ describe("TreeSelectField", () => {
     click(r.treeOption_collapseToggle_basketball);
     // And typing in the filter input
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
-    // Then only the options that match the filter are visible
-    expect(r.queryAllByRole("option")).toHaveLength(2);
-    expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
-    expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
+    // Then the options that match the filter are visible, even though their parent was collapsed
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
   });
 
   it("shows the correct input text when selecting options", async () => {
@@ -904,6 +942,20 @@ describe("TreeSelectField", () => {
     expect(getSelected(r.favoriteLeague)).toEqual(undefined);
   });
 });
+
+/** Returns the labels of the currently-shown options, in menu order, i.e. `["Basketball", "NBA"]`. */
+function getOptionLabels(r: RenderResult): string[] {
+  return r.queryAllByRole("option").map((o) => o.textContent ?? "");
+}
+
+/** Returns the nesting level of each currently-shown option, based on its indentation, i.e. `[0, 1]`. */
+function getOptionLevels(r: RenderResult): number[] {
+  return r.queryAllByRole("option").map((o) => {
+    // The level is applied as `plPx(16 + level * 8)` on the option's `li`, i.e. `--paddingLeft: 24px`
+    const paddingLeft = Number.parseInt(o.closest("li")!.style.getPropertyValue("--paddingLeft"), 10);
+    return (paddingLeft - 16) / 8;
+  });
+}
 
 function getNestedOptions(): NestedOption<HasIdAndName>[] {
   return [
