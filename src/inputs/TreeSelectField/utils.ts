@@ -19,7 +19,6 @@ export type TreeFieldState<O> = {
   selectedOptionsLabels: string[];
   allOptions: NestedOption<O>[];
   optionsLoading: boolean;
-  allowCollapsing: boolean;
 };
 
 export type TreeSelectResponse<O, V extends Value> = {

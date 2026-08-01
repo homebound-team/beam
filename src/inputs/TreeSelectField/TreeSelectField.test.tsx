@@ -528,13 +528,71 @@ describe("TreeSelectField", () => {
     // When opening the options
     click(r.favoriteLeague);
     // Then the child options are visible
-    expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
+    expect(getOptionLabels(r)).toEqual([
+      "Baseball",
+      "MLB",
+      "Minor League Baseball",
+      "Basketball",
+      "NBA",
+      "WNBA",
+      "Football",
+      "NFL",
+      "XFL",
+    ]);
     // When we collapse the parent option
     click(r.treeOption_collapseToggle_basketball);
     // And typing in the filter input
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
     // Then the options that match the filter are visible, even though their parent was collapsed
     expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
+  it("can collapse parents within the filtered options", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    // When filtering down to a matched child
+    fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+    // Then its parent can still be collapsed
+    click(r.treeOption_collapseToggle_basketball);
+    expect(getOptionLabels(r)).toEqual(["Basketball"]);
+    // And expanded again
+    click(r.treeOption_collapseToggle_basketball);
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
+  it("restores the collapsed options when the filter is cleared", async () => {
+    // Given a TreeSelectField with a collapsed parent
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    click(r.treeOption_collapseToggle_baseball);
+    const collapsed = ["Baseball", "Basketball", "NBA", "WNBA", "Football", "NFL", "XFL"];
+    expect(getOptionLabels(r)).toEqual(collapsed);
+    // When filtering and then clearing the filter
+    fireEvent.input(r.favoriteLeague, { target: { value: "mlb" } });
+    expect(getOptionLabels(r)).toEqual(["Baseball", "MLB"]);
+    fireEvent.input(r.favoriteLeague, { target: { value: "" } });
+    // Then the parent we'd collapsed is collapsed again
+    expect(getOptionLabels(r)).toEqual(collapsed);
   });
 
   it("shows the correct input text when selecting options", async () => {

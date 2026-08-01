@@ -18,21 +18,11 @@ type VirtualizedOptionsProps<O> = {
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons: Record<string, string | undefined>;
   isTree?: boolean;
-  allowCollapsing?: boolean;
 };
 
 // Displays ListBox options in a virtualized container for performance reasons
 export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
-  const {
-    state,
-    items,
-    onListHeightChange,
-    scrollOnFocus,
-    loading,
-    disabledOptionsWithReasons,
-    isTree,
-    allowCollapsing,
-  } = props;
+  const { state, items, onListHeightChange, scrollOnFocus, loading, disabledOptionsWithReasons, isTree } = props;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const focusedKey = state.selectionManager.focusedKey;
   const focusedItem = focusedKey != null ? state.collection.getItem(focusedKey) : null;
@@ -91,7 +81,6 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
                 item={item}
                 state={state}
                 // scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
-                allowCollapsing={allowCollapsing}
                 disabledReason={disabledOptionsWithReasons[item.key]}
               />
             );

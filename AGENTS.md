@@ -56,6 +56,27 @@ After editing a test file, run `yarn lint:fix:files` on that path (see **Linting
 - In tests, use each component’s default prefix (e.g. `r.sideNav_trigger`) — do not pass `data-testid` on the component under test.
 - For **absence** checks, use `r.query.someTestId` (e.g. `expect(r.query.sideNav_section_label).toBeNull()`), not `r.queryByTestId("sideNav_section_label")`.
 
+### Never query by accessible name
+
+**Do not use `getByRole(role, { name })`** (or `getAllByRole` / `findByRole` / `queryByRole` with a `name`). It is the single most expensive thing a Beam test can do, and it has repeatedly caused CI timeouts.
+
+Passing `name` makes Testing Library compute each candidate’s **accessible name** via `dom-accessibility-api`, which calls `getComputedStyle` on every candidate *and its subtree*. jsdom has no cascade cache, so each of those calls re-matches **every CSS rule in the document** — and Truss injects ~2.5k atomic utility rules (`.br4 { … }`), for ~2.7k rules total. Measured on a 14-option `TreeSelectField` listbox:
+
+| Query | Cost |
+| --- | --- |
+| `getByRole("option", { name: "Grandparent 0" })` | **270ms** |
+| `getAllByRole("option")` (no `name`) | 10ms |
+| `getByText("Grandparent 0")` | ~0ms |
+| the `click` itself | 10ms |
+
+That is ~96% of the interaction spent in jsdom’s CSS matcher, and it scales with both option count and stylesheet size. Three such lookups per test made `TreeFilter.test.tsx` take 1.1s locally and **16.4s in CI** (CI runs ~13x slower), blowing the 15s `testTimeout` on `main` and on unrelated branches until the queries were replaced.
+
+Use instead:
+
+- **Beam listbox options** — [`select(r.field, "Label")`](src/utils/rtlUtils.tsx) or `select(r.field, ["A", "B"])`, which opens the listbox and matches each option’s `data-label` / `data-key`. Related helpers: `getOptions(r.field)`, `getSelected(r.field)`.
+- **Everything else** — `data-testid` via `useTestIds` (see above), or `getByText` when the text is unique.
+- If you genuinely need role semantics, query the role **without** `name` (`getAllByRole("option")` is cheap) and narrow by `textContent` / `dataset` yourself.
+
 ### `useTestIds` for components
 
 Use [`useTestIds`](src/utils/useTestIds.tsx) for any element tests need to target — do **not** set `data-testid={...}` by hand in components or tests.
