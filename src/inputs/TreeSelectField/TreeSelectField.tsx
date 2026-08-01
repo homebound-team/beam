@@ -438,8 +438,8 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         if (newKeys.size === 0) {
           setFieldState((prevState) => ({
             ...prevState,
-            inputValue: nothingSelectedText,
-            searchValue: undefined,
+            // Unselecting the last option shouldn't drop the search either
+            inputValue: prevState.searchValue ?? nothingSelectedText,
             selectedKeys: [],
             selectedOptions: [],
             selectedChipOptions: [],
@@ -551,9 +551,9 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
 
         setFieldState((prevState) => ({
           ...prevState,
-          // Since we reset the list of options upon selection changes, then set the `inputValue` to empty string to reflect that.
-          inputValue: "",
-          searchValue: undefined,
+          // Keep any search in place, so picking several options out of the same filtered list doesn't
+          // make the user retype it; when they're not searching the input stays empty as before.
+          inputValue: prevState.searchValue ?? "",
           selectedKeys: [...selectedKeys],
           selectedOptions,
           selectedChipOptions: selectedChipState.options,

@@ -595,6 +595,33 @@ describe("TreeSelectField", () => {
     expect(getOptionLabels(r)).toEqual(collapsed);
   });
 
+  it("keeps the filter when selecting options", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
+    // When selecting one of the matched options
+    click(r.treeOption_nba_checkbox);
+    // Then it is selected, and the filter + filtered options are left as-is
+    expect(r.treeOption_nba_checkbox).toHaveAttribute("data-checked", "true");
+    expect(r.favoriteLeague).toHaveValue("nba");
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+    // And when unselecting it, i.e. clearing the last selection, the filter is still kept
+    click(r.treeOption_nba_checkbox);
+    expect(r.treeOption_nba_checkbox).toHaveAttribute("data-checked", "false");
+    expect(r.favoriteLeague).toHaveValue("nba");
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
   it("shows the correct input text when selecting options", async () => {
     // Given a TreeSelectField with nested options
     const r = await render(
