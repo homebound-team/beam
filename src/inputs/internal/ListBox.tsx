@@ -21,7 +21,6 @@ type ListBoxProps<O, V extends AriaKey> = {
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons?: Record<string, string | undefined>;
   isTree?: boolean;
-  allowCollapsing?: boolean;
 };
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -37,7 +36,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     loading,
     disabledOptionsWithReasons = {},
     isTree,
-    allowCollapsing,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -104,7 +102,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
   return (
     <div
       css={
-        Css.bgColor(Tokens.PopoverSurface).br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(horizontalLayout).w50.onHover
+        Css.bgColor(Tokens.SurfaceRaised).br4.w100.bshBasic.hPx(popoverHeight).df.fdc.if(horizontalLayout).w50.onHover
           .bshHover.$
       }
       ref={listBoxRef}
@@ -112,7 +110,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     >
       {isMultiSelect && selectedOptions.length > 0 && (
         <ul
-          css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bcGray200.add("flexWrap", "wrap").maxh("50%").oa.$}
+          css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bc(Tokens.SurfaceSeparator).add("flexWrap", "wrap").maxh("50%").oa.$}
           ref={selectedList}
         >
           {selectedOptions.map((o) => (
@@ -152,7 +150,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
             loading={loading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
             isTree={isTree}
-            allowCollapsing={allowCollapsing}
           />
         )}
       </ul>

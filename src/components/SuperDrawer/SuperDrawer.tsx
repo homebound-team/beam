@@ -3,7 +3,7 @@ import { ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AutoSaveStatusProvider, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
-import { Css, px } from "src/Css";
+import { Css, px, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { SuperDrawerWidth } from "./utils";
@@ -76,11 +76,7 @@ export function SuperDrawer(): ReactPortal | null {
             key="superDrawer"
             // TODO: Should this color be part of the Palette?
             // Not using `inset` due to Safari 14.0.x not supporting this CSS property.
-            css={
-              Css.fixed.df.jcfe
-                .add("backgroundColor", "rgba(36,36,36,0.2)")
-                .top0.right0.bottom0.left0.z(zIndices.superDrawerScrim).$
-            }
+            css={Css.fixed.df.jcfe.bgColor(Tokens.Scrim).top0.right0.bottom0.left0.z(zIndices.superDrawerScrim).$}
             // Initial styles (acts similar to `from` in keyframe animations)
             initial={{ opacity: 0 }}
             // Rendered styles (acts similar to `to` in keyframe animations)
@@ -92,7 +88,7 @@ export function SuperDrawer(): ReactPortal | null {
             {/* Content container */}
             <motion.aside
               key="superDrawerContainer"
-              css={Css.bgWhite.h100.maxw(px(width)).w100.df.fdc.relative.$}
+              css={Css.bgColor(Tokens.Surface).h100.maxw(px(width)).w100.df.fdc.relative.$}
               // Keeping initial x to 1040 as this will still work if the container is smaller
               initial={{ x: width }}
               animate={{ x: 0 }}
@@ -103,8 +99,8 @@ export function SuperDrawer(): ReactPortal | null {
               onClick={(e) => e.stopPropagation()}
             >
               <AutoSaveStatusProvider>
-                <header css={Css.p3.bb.bcGray200.df.aic.jcsb.gap3.$}>
-                  <div ref={headerRef} css={Css.gray900.fg1.$}></div>
+                <header css={Css.p3.bb.bc(Tokens.SurfaceSeparator).df.aic.jcsb.gap3.$}>
+                  <div ref={headerRef} css={Css.color(Tokens.OnSurface).fg1.$}></div>
                   <IconButton icon="x" onClick={closeDrawer} {...testId.close} />
                 </header>
                 {content}

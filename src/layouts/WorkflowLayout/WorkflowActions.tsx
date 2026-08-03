@@ -39,12 +39,7 @@ export function WorkflowActions(props: WorkflowActionsProps) {
   return (
     <div css={Css.df.aic.jcsb.ifSm.w100.$}>
       <div css={Css.df.aic.$}>
-        {!isFirstStep &&
-          (isMobile ? (
-            <IconButton icon="arrowBack" label="Back" onClick={onBack} />
-          ) : (
-            <Button label="Back" icon="chevronLeft" variant="tertiary" onClick={onBack} />
-          ))}
+        {!isFirstStep && isMobile && <IconButton icon="arrowBack" label="Back" onClick={onBack} />}
       </div>
       <div css={Css.df.aic.gap1.$}>
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />

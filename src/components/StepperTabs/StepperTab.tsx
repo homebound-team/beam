@@ -16,16 +16,23 @@ export type StepperTabProps = {
   disabled?: boolean;
   /** Collapses the tab down to its colored bottom border only, hiding the label — for the mobile view */
   collapsed?: boolean;
+  /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
+  __storyState?: {
+    hovered?: boolean;
+    focusVisible?: boolean;
+  };
 };
 
 export function StepperTab(props: StepperTabProps) {
-  const { label, value, active, completed, onClick, disabled = false, collapsed = false } = props;
+  const { label, value, active, completed, onClick, disabled = false, collapsed = false, __storyState } = props;
   // Collapsed tabs are a passive indicator bar, not an actionable control — same as `disabled`, they shouldn't be clickable or focusable.
   const ariaProps = { onPress: () => onClick(value), isDisabled: disabled || collapsed };
   const ref = useRef(null);
   const { buttonProps } = useButton(ariaProps, ref);
-  const { isFocusVisible, focusProps } = useFocusRing();
-  const { hoverProps, isHovered } = useHover(ariaProps);
+  const { isFocusVisible: isFocusVisibleFromEvents, focusProps } = useFocusRing();
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover(ariaProps);
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
+  const isFocusVisible = __storyState?.focusVisible ?? isFocusVisibleFromEvents;
   const tid = useTestIds(props, "stepperTab");
 
   return (
@@ -68,10 +75,12 @@ function getStateStyles(active: boolean, completed: boolean): Properties {
   };
 }
 
+// Mirrors getStateStyles' border condition — a step reads as blue while collapsed under the same
+// active-or-completed rule as expanded, not just when completed.
 function getCollapsedStyles(active: boolean, completed: boolean): Properties {
   return {
     ...Css.cursor("default").hPx(0).py0.$,
-    ...(completed && !active ? Css.bcBlue600.$ : Css.bcGray300.$),
+    ...(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
   };
 }
 

@@ -23,7 +23,11 @@ export type DocumentScrollLayoutProviderProps = {
   bodyBackgroundColor?: BeamColor;
 };
 
-/** Outermost document-scroll layout root; nested providers bypass. Publishes viewport CSS vars. */
+/**
+ * Outermost document-scroll layout root; nested providers bypass.
+ * Publishes viewport CSS vars and a `width: fit-content; min-width: 100%` shell so sticky
+ * chrome can stay pinned when wide content (e.g. tables) expands the document horizontally.
+ */
 export function DocumentScrollLayoutProvider({
   children,
   bodyBackgroundColor = Tokens.Surface,
@@ -81,8 +85,9 @@ function DocumentScrollLayoutViewportRoot({
   }
 
   return (
-    // `display: contents` keeps vars inheritable without adding a layout box.
-    <div css={Css.display("contents").$} style={Object.keys(style).length > 0 ? (style as CSSProperties) : undefined}>
+    // Grow with wide document-scroll content (`wfc`) while staying at least viewport-wide (`mw100`),
+    // so sticky chrome ancestors are wide enough for `left` pinning on horizontal scroll.
+    <div css={Css.df.fdc.wfc.mw100.$} style={Object.keys(style).length > 0 ? (style as CSSProperties) : undefined}>
       {children}
       <DocumentScrollToTopButton viewportHeight={viewportSize.height} />
     </div>
