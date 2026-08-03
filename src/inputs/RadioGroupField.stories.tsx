@@ -315,6 +315,27 @@ export function HelperText() {
   );
 }
 
+/** Photo picker use case: radio beside a plain image, no card border, no visible label. */
+export function ImageOptions() {
+  const [state, setState] = useState<string | undefined>("c");
+  return (
+    <div css={Css.wPx(500).$}>
+      <RadioGroupField
+        label="Featured image"
+        labelStyle="hidden"
+        layout="horizontal"
+        value={state}
+        onChange={setState}
+        options={[
+          { value: "a", label: "Sherwin Williams Paint - Pure White", image: "fridge.jpeg" },
+          { value: "b", label: "Sherwin Williams Paint - Off White", image: "fridge2.jpeg" },
+          { value: "c", label: "Benjamin Moore - Rockport Gray", image: "disposal.png" },
+        ]}
+      />
+    </div>
+  );
+}
+
 export function HorizontalLayout() {
   const [state, setState] = useState<string | undefined>("option-1");
   return (

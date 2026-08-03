@@ -1,5 +1,6 @@
 import { RadioGroupField } from "src/inputs";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("RadioGroupField", () => {
   it("has data-testids for its options", async () => {
@@ -99,5 +100,31 @@ describe("RadioGroupField", () => {
     // The flex container that wraps the option labels uses row direction.
     const optionsContainer = r.container.querySelector(`[data-testid="favoriteCheese_a"]`)!.closest("div")!;
     expect(optionsContainer).toHaveStyle({ "flex-direction": "row" });
+  });
+
+  it("renders an image instead of the label/description text when image is provided", async () => {
+    const onChange = vi.fn();
+    const r = await render(
+      <RadioGroupField
+        label="Featured image"
+        labelStyle="hidden"
+        layout="horizontal"
+        value="a"
+        onChange={onChange}
+        options={[
+          { value: "a", label: "Pure White", image: "pure-white.png" },
+          { value: "b", label: "Off White", image: "off-white.png" },
+        ]}
+      />,
+    );
+    // Then each option renders its image
+    const inputA = r.container.querySelector(`[data-testid="featuredImage_a"]`)!;
+    const image = inputA.closest("label")!.querySelector("img")!;
+    expect(image).toHaveAttribute("src", "pure-white.png");
+    // And the label is still available to assistive tech
+    expect(r.getByText("Pure White")).toBeInTheDocument();
+    // And selection still works
+    click(r.featuredImage_b);
+    expect(onChange).toHaveBeenCalledWith("b");
   });
 });
