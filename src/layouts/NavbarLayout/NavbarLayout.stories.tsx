@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
@@ -21,7 +21,7 @@ export default {
 export function Default() {
   return (
     <NavbarLayout navbar={createNavbar()}>
-      <div css={Css.bgGray50.p3.$}>Body slot — pass a SideNavLayout or PageHeaderLayout here.</div>
+      <div css={Css.bgColor(Tokens.Surface).p3.$}>Body slot — pass a SideNavLayout or PageHeaderLayout here.</div>
     </NavbarLayout>
   );
 }

@@ -41,4 +41,18 @@ describe("FormSectionLayout", () => {
     // Then the action renders as a real Button
     expect(r.saveDraft).toBeInTheDocument();
   });
+
+  it("renders fields ahead of sections", async () => {
+    // Given a FormSectionLayout with both top-level fields and sections
+    const r = await render(
+      <FormSectionLayout
+        title="Trade Partners"
+        initialFields={<div data-testid="topLevelFields" />}
+        sections={[{ title: "General Contractor", fields: <div data-testid="gcFields" /> }]}
+      />,
+    );
+    // Then the top-level fields render before the sections
+    expect(r.topLevelFields).toBeInTheDocument();
+    expect(r.topLevelFields.compareDocumentPosition(r.gcFields)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
 });

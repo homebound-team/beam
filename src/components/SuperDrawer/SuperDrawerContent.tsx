@@ -3,10 +3,10 @@ import { ReactNode } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { Button, ButtonProps } from "src/components/Button";
 import { OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { SuperDrawerWidth } from "./utils";
 
-interface SuperDrawerContentProps {
+type SuperDrawerContentProps = {
   children: ReactNode;
   /**
    * Actions represents an array of button props with represents that different
@@ -15,7 +15,7 @@ interface SuperDrawerContentProps {
    * Ex: A `cancel` and `submit` button
    * */
   actions?: ButtonProps[];
-}
+};
 
 /**
  * Helper component to place the given children and actions into the appropriate
@@ -74,7 +74,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
       {wrapWithMotionAndMaybeBack(children)}
       {/* Optionally render footer section with row of given footer buttons */}
       {actions && (
-        <footer css={Css.bt.bcGray200.p3.df.aic.jcfe.$}>
+        <footer css={Css.bt.bc(Tokens.SurfaceSeparator).p3.df.aic.jcfe.$}>
           <div css={Css.df.gap1.$}>
             {actions.map((buttonProps, i) => (
               <Button key={i} {...buttonProps} />

@@ -4,6 +4,7 @@ import { Css } from "src/Css";
 import { jan19, jan2 } from "src/forms/formStateDomain";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { DateRange } from "src/types";
+import { withDimensions } from "src/utils/sb";
 import { action } from "storybook/actions";
 
 export default {
@@ -44,3 +45,19 @@ export function Example() {
     </div>
   );
 }
+
+export function DatePickerOpen() {
+  const [range, setRange] = useState<DateRange | undefined>({ from: jan2, to: jan19 });
+  return (
+    <DateRangeField
+      label="Select a range"
+      value={range}
+      onChange={setRange}
+      placeholder="Date Range"
+      onBlur={action("Blur")}
+      onFocus={action("Focus")}
+      defaultOpen
+    />
+  );
+}
+DatePickerOpen.decorators = [withDimensions()];

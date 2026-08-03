@@ -1,6 +1,6 @@
 import { Dispatch } from "react";
 import { IconButton } from "src/components";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { SelectField } from "src/inputs";
 import { useTestIds } from "src/utils";
 
@@ -17,11 +17,11 @@ export type OffsetAndLimit = { offset: number; limit: number };
 // Use OffsetAndLimit as our default b/c that's what backend filters expect
 export const defaultPage: OffsetAndLimit = { offset: 0, limit: 100 };
 
-interface PaginationProps {
+type PaginationProps = {
   page: readonly [PageNumberAndSize, Dispatch<PageNumberAndSize>] | readonly [OffsetAndLimit, Dispatch<OffsetAndLimit>];
   totalCount: number;
   pageSizes?: number[];
-}
+};
 
 export function Pagination(props: PaginationProps) {
   const { totalCount, pageSizes = [100, 500, 1000] } = props;
@@ -48,7 +48,7 @@ export function Pagination(props: PaginationProps) {
 
   const tid = useTestIds(props, "pagination");
   return (
-    <div css={Css.df.bcGray200.bt.xs.gray500.px2.pt2.$} {...tid}>
+    <div css={Css.df.bc(Tokens.SurfaceSeparator).bt.xs.color(Tokens.OnSurfaceMuted).px2.pt2.$} {...tid}>
       <div css={Css.df.mya.mr2.$} {...tid.pageSizeLabel}>
         Page size:
       </div>
@@ -70,14 +70,14 @@ export function Pagination(props: PaginationProps) {
         </div>
         <IconButton
           icon="chevronLeft"
-          color={hasPrevPage ? Palette.Blue700 : Palette.Gray200}
+          color={hasPrevPage ? Tokens.TextLinkDefault : Tokens.SurfaceSeparator}
           onClick={() => set({ pageNumber: pageNumber - 1, pageSize })}
           disabled={!hasPrevPage}
           {...tid.previousIcon}
         />
         <IconButton
           icon="chevronRight"
-          color={hasNextPage ? Palette.Blue700 : Palette.Gray200}
+          color={hasNextPage ? Tokens.TextLinkDefault : Tokens.SurfaceSeparator}
           onClick={() => set({ pageNumber: pageNumber + 1, pageSize })}
           disabled={!hasNextPage}
           {...tid.nextIcon}

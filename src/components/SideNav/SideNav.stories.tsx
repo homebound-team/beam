@@ -155,7 +155,7 @@ function Brand() {
   if (navState === "collapse") return <></>;
   return (
     <div css={Css.df.fdc.gap1.$}>
-      <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceSubtle).mr8.$}>
+      <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
         <span css={Css.fs0.$}>
           <Icon icon="houseFilled" inc={3} />
         </span>

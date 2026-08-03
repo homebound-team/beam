@@ -4,9 +4,11 @@ import { treeFilter, TreeFilterProps } from "src/components/Filters/TreeFilter";
 import { FilterDefs } from "src/components/Filters/types";
 import { NestedOption } from "src/inputs";
 import { HasIdAndName } from "src/types";
-import { click, render } from "src/utils/rtl";
+import { render, select } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 
+// Pick options with `select` (which matches on `data-label`), never `getByRole("option", { name })`:
+// the by-name lookup cost ~270ms a call here and timed this file out in CI. See AGENTS.md.
 describe("TreeFilter", () => {
   it("can select root values (default)", async () => {
     // Given the tree filter filtering by root option values (default)
@@ -15,10 +17,7 @@ describe("TreeFilter", () => {
     expect(r.filter_tree).toHaveValue("All");
     expect(r.value).toHaveTextContent("{}");
     // When selecting some options
-    click(r.filter_tree);
-    click(r.getByRole("option", { name: "Grandparent 0" }));
-    click(r.getByRole("option", { name: "Child 1-0-0" }));
-    click(r.getByRole("option", { name: "Parent 1-1" }));
+    select(r.filter_tree, ["Grandparent 0", "Child 1-0-0", "Parent 1-1"]);
     // Then the filter's value is empty now that we're making selections
     expect(r.filter_tree).toHaveValue("");
     // Then the filter is set to only return the "root" values that are selected.
@@ -29,10 +28,7 @@ describe("TreeFilter", () => {
     // Given the tree filter filtering by leaf option values
     const r = await render(<TestFilter filterBy="leaf" />);
     // When selecting some options
-    click(r.filter_tree);
-    click(r.getByRole("option", { name: "Grandparent 0" }));
-    click(r.getByRole("option", { name: "Child 1-0-0" }));
-    click(r.getByRole("option", { name: "Parent 1-1" }));
+    select(r.filter_tree, ["Grandparent 0", "Child 1-0-0", "Parent 1-1"]);
     // Then the filter is set to only return the "root" values that are selected.
     expect(r.value).toHaveTextContent(
       '{"tree":["child:0-0-0","child:0-0-1","child:0-1-0","child:0-1-1","child:1-0-0","child:1-1-0","child:1-1-1"]}',
@@ -43,10 +39,7 @@ describe("TreeFilter", () => {
     // Given the tree filter filtering by all option values
     const r = await render(<TestFilter filterBy="all" />);
     // When selecting some options
-    click(r.filter_tree);
-    click(r.getByRole("option", { name: "Grandparent 0" }));
-    click(r.getByRole("option", { name: "Child 1-0-0" }));
-    click(r.getByRole("option", { name: "Parent 1-1" }));
+    select(r.filter_tree, ["Grandparent 0", "Child 1-0-0", "Parent 1-1"]);
     // Then the filter is set to only return the "root" values that are selected.
     expect(r.value).toHaveTextContent(
       '{"tree":["gp:0","parent:0-0","child:0-0-0","child:0-0-1","parent:0-1","child:0-1-0","child:0-1-1","child:1-0-0","parent:1-1","child:1-1-0","child:1-1-1"]}',
@@ -74,8 +67,7 @@ describe("TreeFilter", () => {
     const r = await render(<TestFilter defaultValue={["child:0-0-1"]} />);
     expect(r.value).toHaveTextContent('{"tree":["child:0-0-1"]}');
     // When clearing the selection
-    click(r.filter_tree);
-    click(r.getByRole("option", { name: "Child 0-0-1" }));
+    select(r.filter_tree, "Child 0-0-1");
     // Then the value is undefined
     expect(r.value).toHaveTextContent("{}");
   });

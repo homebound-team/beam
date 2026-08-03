@@ -1,13 +1,27 @@
 import { ReactNode } from "react";
 import { Button, ButtonProps } from "src/components/Button";
+import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
+
+/**
+ * A single action rendered in a `FormSection`/`FormSectionLayout` title row —
+ * either a full `Button` or an icon-only `IconButton`.
+ *
+ * Tagged with `kind` (not `type`) because `ButtonProps` already has its own
+ * unrelated `type?: "button" | "submit" | "reset"` HTML-attribute field.
+ *
+ * Icon actions always render with the `outline` `IconButton` variant, so `variant` is omitted here.
+ */
+export type FormSectionAction =
+  | ({ kind?: "default" } & ButtonProps)
+  | ({ kind: "icon" } & Omit<IconButtonProps, "variant">);
 
 export type FormSectionProps = {
   title: string;
   description?: ReactNode;
-  /** Rendered top-right of the title row, e.g. an "Add" button. */
-  actions?: ButtonProps[];
+  /** Rendered top-right of the title row, e.g. an "Add" Button or an icon-only IconButton. */
+  actions?: FormSectionAction[];
   fields?: ReactNode;
   childSections?: Omit<FormSectionProps, "isChild">[];
   /** Nested-section styling (smaller title). Set automatically by `FormSection`'s own recursion over `childSections` — don't set this yourself. */
@@ -32,9 +46,13 @@ export function FormSection(props: FormSectionProps) {
         </div>
         {actions && (
           <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-            {actions.map((action) => (
-              <Button key={`${action.label}`} {...action} />
-            ))}
+            {actions.map((action) =>
+              action.kind === "icon" ? (
+                <IconButton key={action.icon} {...action} variant="outline" />
+              ) : (
+                <Button key={`${action.label}`} {...action} />
+              ),
+            )}
           </div>
         )}
       </div>

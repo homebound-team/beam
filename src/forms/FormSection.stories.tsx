@@ -22,7 +22,10 @@ export function WithChildSections() {
   return (
     <FormSection
       title="Sub-Contractors"
-      actions={[{ label: "Add", onClick: () => {}, variant: "tertiary" }]}
+      actions={[
+        { label: "Add", onClick: () => {}, variant: "tertiary" },
+        { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
+      ]}
       childSections={[
         {
           title: "Electrical",

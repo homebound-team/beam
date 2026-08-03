@@ -26,7 +26,7 @@ type ComboBoxInputProps<O, V extends Value> = {
   inputRef: MutableRefObject<HTMLInputElement | null>;
   inputWrapRef: MutableRefObject<HTMLDivElement | null>;
   listBoxRef?: MutableRefObject<HTMLDivElement | null>;
-  state: ComboBoxState<O>;
+  state: ComboBoxState<O, "single" | "multiple">;
   fieldDecoration?: (opt: O) => ReactNode;
   errorMsg?: string;
   required?: boolean;
