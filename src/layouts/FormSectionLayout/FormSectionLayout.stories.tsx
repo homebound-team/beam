@@ -21,7 +21,7 @@ export function Default() {
           description: "The primary contractor responsible for this project.",
           actions: [
             { label: "Add", onClick: () => {}, variant: "tertiary" },
-            { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
+            { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {}, variant: "outline" },
           ],
           fields: <PlaceholderFields count={2} />,
         },
