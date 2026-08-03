@@ -1,14 +1,12 @@
 import { ReactNode } from "react";
-import { Button, ButtonProps, IconButton, IconButtonProps } from "src/components";
+import { HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
-
-export type ContentHeaderAction = ({ kind?: "default" } & ButtonProps) | ({ kind: "icon" } & IconButtonProps);
 
 export type ContentHeaderProps = {
   title?: string;
   description?: ReactNode;
-  actions?: ContentHeaderAction[];
+  actions?: HeaderAction[];
 };
 
 /**
@@ -43,17 +41,7 @@ export function ContentHeader(props: ContentHeaderProps) {
           ) : (
             descriptionEl
           )}
-          {actions && (
-            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-              {actions.map((action) =>
-                action.kind === "icon" ? (
-                  <IconButton key={action.icon} {...action} />
-                ) : (
-                  <Button key={`${action.label}`} {...action} />
-                ),
-              )}
-            </div>
-          )}
+          {actions && <HeaderActions actions={actions} {...tid.actions} />}
         </div>
       )}
       {title && descriptionEl}
