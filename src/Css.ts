@@ -3942,6 +3942,16 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("fontFamily", value);
   }
 
+  // layoutContainer
+  /** Sets `width: "calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))"; left: "var(--beam-side-nav-layout-width, 0px)"; position: "sticky"; paddingLeft: "24px"; paddingRight: "24px"`. */
+  get layoutContainer() {
+    return this.add("width", "calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))")
+      .add("left", "var(--beam-side-nav-layout-width, 0px)").add("position", "sticky").add("paddingLeft", "24px").add(
+        "paddingRight",
+        "24px",
+      );
+  }
+
   // animation
   /** Sets `transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
   get transition() {

@@ -1,4 +1,5 @@
 import { Css } from "src/Css";
+import { pageContentPaddingXValue } from "./layoutVars";
 
 /**
  * Empty table gutter column width. Default cell pad is 12px and gutters use `px0`, so
@@ -7,7 +8,7 @@ import { Css } from "src/Css";
 export const pageContentGutterPx = 12;
 
 /** Horizontal inset for page body / page header content. */
-export const pageContentPaddingX = Css.px3.$;
+export const pageContentPaddingX = Css.px(pageContentPaddingXValue).$;
 
 /**
  * Horizontal inset for global header chrome (navbar, env banner): `px1` below `md`, `px5` at
