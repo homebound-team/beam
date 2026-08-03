@@ -39,7 +39,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
           <div css={Css.df.gap1.fs0.$} {...tid.actions}>
             {actions.map((action) =>
               action.kind === "icon" ? (
-                <IconButton key={action.icon} {...action} />
+                <IconButton key={action.icon} {...action} variant="outline" />
               ) : (
                 <Button key={`${action.label}`} {...action} />
               ),

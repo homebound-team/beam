@@ -24,7 +24,7 @@ export function WithChildSections() {
       title="Sub-Contractors"
       actions={[
         { label: "Add", onClick: () => {}, variant: "tertiary" },
-        { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {}, variant: "outline" },
+        { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
       ]}
       childSections={[
         {
