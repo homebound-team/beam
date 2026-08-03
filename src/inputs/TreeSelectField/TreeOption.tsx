@@ -13,13 +13,12 @@ import { useTestIds } from "src/utils";
 type TreeOptionProps<O> = {
   item: Node<LeveledOption<O>>;
   state: ListState<O>;
-  allowCollapsing?: boolean;
   /** When the option is disabled, the reason shown as a tooltip on hover. */
   disabledReason?: string;
 };
 /** Represents a single option within a ListBox - used by SelectField, MultiSelectField, and TreeSelectField */
 export function TreeOption<O>(props: TreeOptionProps<O>) {
-  const { item, state, allowCollapsing = true, disabledReason } = props;
+  const { item, state, disabledReason } = props;
   const leveledOption = item.value;
   if (!leveledOption) return null;
 
@@ -46,7 +45,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
     ref,
   );
   const isGroup = groupKeys.includes(item.key);
-  const canCollapse = allowCollapsing && !!option.children?.length;
+  const canCollapse = !!option.children?.length;
 
   function toggleCollapsed() {
     if (!canCollapse) return;
@@ -86,24 +85,22 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
           ...(isDisabled && !isGroup ? listItemStyles.disabled : {}),
         }}
       >
-        {allowCollapsing && (
-          <span css={Css.wPx(18).fs0.df.aic.$}>
-            {canCollapse && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleCollapsed();
-                  return false;
-                }}
-                css={Css.br4.hPx(16).wPx(16).bgTransparent.onHover.bgGray300.$}
-                {...tid[`collapseToggle_${item.key}`]}
-              >
-                <Icon icon={collapsedKeys.includes(item.key) ? "triangleRight" : "triangleDown"} inc={2} />
-              </button>
-            )}
-          </span>
-        )}
+        <span css={Css.wPx(18).fs0.df.aic.$}>
+          {canCollapse && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleCollapsed();
+                return false;
+              }}
+              css={Css.br4.hPx(16).wPx(16).bgTransparent.onHover.bgGray300.$}
+              {...tid[`collapseToggle_${item.key}`]}
+            >
+              <Icon icon={collapsedKeys.includes(item.key) ? "triangleRight" : "triangleDown"} inc={2} />
+            </button>
+          )}
+        </span>
         <span css={Css.df.aic.gap1.h100.fg1.py1.pr2.$} ref={ref} {...optionProps} data-label={item.textValue}>
           {!isGroup && (
             <StyledCheckbox

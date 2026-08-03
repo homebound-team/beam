@@ -21,7 +21,6 @@ type ListBoxProps<O, V extends AriaKey> = {
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons?: Record<string, string | undefined>;
   isTree?: boolean;
-  allowCollapsing?: boolean;
 };
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -37,7 +36,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     loading,
     disabledOptionsWithReasons = {},
     isTree,
-    allowCollapsing,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -152,7 +150,6 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
             loading={loading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
             isTree={isTree}
-            allowCollapsing={allowCollapsing}
           />
         )}
       </ul>

@@ -1,3 +1,4 @@
+import { RenderResult } from "@homebound/rtl-utils";
 import { fireEvent, within } from "@testing-library/react";
 import { useState } from "react";
 import { TreeSelectField } from "src/inputs";
@@ -467,10 +468,49 @@ describe("TreeSelectField", () => {
     // And typing in the filter input
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
     expect(r.favoriteLeague).toHaveValue("nba");
-    // Then only the NBA option is visible
-    expect(r.queryAllByRole("option")).toHaveLength(2);
-    expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
-    expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
+    // Then only the matched options, and their parent, are visible
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
+  it("keeps the tree structure when filtering", async () => {
+    // Given a TreeSelectField with three levels of options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={[
+          {
+            id: "sports",
+            name: "Sports",
+            children: [
+              {
+                id: "basketball",
+                name: "Basketball",
+                children: [
+                  { id: "nba", name: "NBA" },
+                  { id: "wnba", name: "WNBA" },
+                ],
+              },
+              { id: "football", name: "Football", children: [{ id: "nfl", name: "NFL" }] },
+            ],
+          },
+        ]}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    // When filtering on a grandchild option
+    fireEvent.input(r.favoriteLeague, { target: { value: "wnba" } });
+    // Then all of its parents are shown, still nested
+    expect(getOptionLabels(r)).toEqual(["Sports", "Basketball", "WNBA"]);
+    expect(getOptionLevels(r)).toEqual([0, 1, 2]);
+    // And when filtering on a mid-level parent option
+    fireEvent.input(r.favoriteLeague, { target: { value: "basketball" } });
+    // Then its parent and all of its children are shown
+    expect(getOptionLabels(r)).toEqual(["Sports", "Basketball", "NBA", "WNBA"]);
+    expect(getOptionLevels(r)).toEqual([0, 1, 2, 2]);
   });
 
   it("can filter options even if parent if collapsed", async () => {
@@ -488,15 +528,98 @@ describe("TreeSelectField", () => {
     // When opening the options
     click(r.favoriteLeague);
     // Then the child options are visible
-    expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
+    expect(getOptionLabels(r)).toEqual([
+      "Baseball",
+      "MLB",
+      "Minor League Baseball",
+      "Basketball",
+      "NBA",
+      "WNBA",
+      "Football",
+      "NFL",
+      "XFL",
+    ]);
     // When we collapse the parent option
     click(r.treeOption_collapseToggle_basketball);
     // And typing in the filter input
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
-    // Then only the options that match the filter are visible
-    expect(r.queryAllByRole("option")).toHaveLength(2);
-    expect(r.getByRole("option", { name: "NBA" })).toBeVisible();
-    expect(r.getByRole("option", { name: "WNBA" })).toBeVisible();
+    // Then the options that match the filter are visible, even though their parent was collapsed
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
+  it("can collapse parents within the filtered options", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    // When filtering down to a matched child
+    fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+    // Then its parent can still be collapsed
+    click(r.treeOption_collapseToggle_basketball);
+    expect(getOptionLabels(r)).toEqual(["Basketball"]);
+    // And expanded again
+    click(r.treeOption_collapseToggle_basketball);
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+  });
+
+  it("restores the collapsed options when the filter is cleared", async () => {
+    // Given a TreeSelectField with a collapsed parent
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    click(r.treeOption_collapseToggle_baseball);
+    const collapsed = ["Baseball", "Basketball", "NBA", "WNBA", "Football", "NFL", "XFL"];
+    expect(getOptionLabels(r)).toEqual(collapsed);
+    // When filtering and then clearing the filter
+    fireEvent.input(r.favoriteLeague, { target: { value: "mlb" } });
+    expect(getOptionLabels(r)).toEqual(["Baseball", "MLB"]);
+    fireEvent.input(r.favoriteLeague, { target: { value: "" } });
+    // Then the parent we'd collapsed is collapsed again
+    expect(getOptionLabels(r)).toEqual(collapsed);
+  });
+
+  it("keeps the filter when selecting options", async () => {
+    // Given a TreeSelectField with nested options
+    const r = await render(
+      <TreeSelectField
+        onSelect={noop}
+        options={getNestedOptions()}
+        label="Favorite League"
+        values={[]}
+        getOptionValue={(o) => o.id}
+        getOptionLabel={(o) => o.name}
+      />,
+    );
+    click(r.favoriteLeague);
+    fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
+    // When selecting one of the matched options
+    click(r.treeOption_nba_checkbox);
+    // Then it is selected, and the filter + filtered options are left as-is
+    expect(r.treeOption_nba_checkbox).toHaveAttribute("data-checked", "true");
+    expect(r.favoriteLeague).toHaveValue("nba");
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
+    // And when unselecting it, i.e. clearing the last selection, the filter is still kept
+    click(r.treeOption_nba_checkbox);
+    expect(r.treeOption_nba_checkbox).toHaveAttribute("data-checked", "false");
+    expect(r.favoriteLeague).toHaveValue("nba");
+    expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
   });
 
   it("shows the correct input text when selecting options", async () => {
@@ -904,6 +1027,20 @@ describe("TreeSelectField", () => {
     expect(getSelected(r.favoriteLeague)).toEqual(undefined);
   });
 });
+
+/** Returns the labels of the currently-shown options, in menu order, i.e. `["Basketball", "NBA"]`. */
+function getOptionLabels(r: RenderResult): string[] {
+  return r.queryAllByRole("option").map((o) => o.textContent ?? "");
+}
+
+/** Returns the nesting level of each currently-shown option, based on its indentation, i.e. `[0, 1]`. */
+function getOptionLevels(r: RenderResult): number[] {
+  return r.queryAllByRole("option").map((o) => {
+    // The level is applied as `plPx(16 + level * 8)` on the option's `li`, i.e. `--paddingLeft: 24px`
+    const paddingLeft = Number.parseInt(o.closest("li")!.style.getPropertyValue("--paddingLeft"), 10);
+    return (paddingLeft - 16) / 8;
+  });
+}
 
 function getNestedOptions(): NestedOption<HasIdAndName>[] {
   return [
