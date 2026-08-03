@@ -4,7 +4,7 @@ import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only, Palette } from "src/Css";
+import { Css, Only, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { Toast } from "../../Toast/Toast";
@@ -98,7 +98,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
   }
 
   return (
-    <div css={Css.fixed.top0.bottom0.left0.right0.z(zIndices.pageOverlay).bgWhite.df.fdc.$} {...tid}>
+    <div css={Css.fixed.top0.bottom0.left0.right0.z(zIndices.pageOverlay).bgColor(Tokens.Surface).df.fdc.$} {...tid}>
       <header css={Css.px3.pt3.pb2.fs0.$} {...tid.header}>
         <Toast />
         <div css={Css.df.jcsb.aic.$}>
@@ -110,7 +110,7 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
           </div>
           <Button label="Close" onClick={closeAction} {...tid.closeButton} />
         </div>
-        <div css={Css.sm.gray700.mt2.$} {...tid.description}>
+        <div css={Css.sm.color(Tokens.OnSurfaceMuted).mt2.$} {...tid.description}>
           {description}
         </div>
       </header>
@@ -131,14 +131,14 @@ export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss,
               {/* Close button + vertical line — negative top pulls it up into the header description row */}
               <div css={Css.absolute.topPx(-32).df.fdc.aic.leftPx(-24).z1.$}>
                 <IconButton
-                  bgColor={Palette.White}
+                  bgColor={Tokens.Surface}
                   variant="circle"
                   icon="x"
                   inc={3.5}
                   onClick={handleClosePanel}
                   {...tid.closePanelButton}
                 />
-                <div css={Css.wPx(1).bgGray300.vh100.$} />
+                <div css={Css.wPx(1).bgColor(Tokens.FieldBorderDefault).vh100.$} />
               </div>
               {/* Panel content */}
               <div css={Css.fg1.oh.mh0.$}>

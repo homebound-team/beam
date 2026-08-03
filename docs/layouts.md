@@ -93,7 +93,9 @@ The layouts share a **document-scroll** model: the environment banner, navbar, s
 tables) uses the document scrollbars while chrome stays in place:
 
 - `DocumentScrollLayoutProvider` (via `EnvironmentBannerLayout` or each layout's outermost wrapper) measures and publishes the
-  visible viewport size (`--beam-layout-viewport-width` / `--beam-layout-viewport-height`).
+  visible viewport size (`--beam-layout-viewport-width` / `--beam-layout-viewport-height`). Its root also uses
+  `width: fit-content; min-width: 100%` so sticky chrome stays pinned when wide content expands the document horizontally,
+  regardless of which layout is outermost.
 - `EnvironmentBannerLayout` publishes the displayed banner height (`--beam-environment-banner-height`; `0px` when hidden, `32px` when shown).
 - `NavbarLayout` measures and publishes the navbar height (`--beam-navbar-layout-height`).
 - `SideNavLayout` publishes its rail width (`--beam-side-nav-layout-width`) for sticky column offsets.

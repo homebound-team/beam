@@ -3,11 +3,11 @@ import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { Icon } from "../components/Icon";
 import { toToggleState, useTestIds } from "../utils";
 
-export interface SwitchProps {
+export type SwitchProps = {
   /** Whether the element should receive focus on render. */
   autoFocus?: boolean;
   /** Whether to render a compact version of Switch */
@@ -33,7 +33,7 @@ export interface SwitchProps {
     hovered?: boolean;
     focusVisible?: boolean;
   };
-}
+};
 
 export function Switch(props: SwitchProps) {
   const { fieldProps } = usePresentationContext();
@@ -72,7 +72,7 @@ export function Switch(props: SwitchProps) {
         ...(labelStyle === "inline" && Css.gap2.aic.$),
         ...(labelStyle === "filter" && Css.jcsb.gap1.aic.wa.sm.$),
         ...(labelStyle === "centered" && Css.fdc.aic.$),
-        ...(isDisabled && Css.cursorNotAllowed.gray400.$),
+        ...(isDisabled && Css.cursorNotAllowed.color(Tokens.TextDisabled).$),
       }}
     >
       {labelStyle !== "inline" && labelStyle !== "hidden" && (
@@ -80,7 +80,10 @@ export function Switch(props: SwitchProps) {
           <Label
             label={label}
             tooltip={tooltip}
-            xss={Css.if(labelStyle === "filter").gray900.$}
+            xss={{
+              ...Css.if(labelStyle === "filter").color(Tokens.OnSurface).$,
+              ...(isDisabled && Css.color(Tokens.TextDisabled).$),
+            }}
             inline={labelStyle === "left" || labelStyle === "filter"}
           />
         </div>
@@ -90,11 +93,12 @@ export function Switch(props: SwitchProps) {
         <div
           aria-hidden="true"
           css={{
-            ...Css.wPx(toggleWidth(compact)).hPx(toggleHeight(compact)).bgGray200.br12.relative.transition.$,
+            ...Css.wPx(toggleWidth(compact)).hPx(toggleHeight(compact)).bgColor(Tokens.NeutralFillPressed).br12.relative
+              .transition.$,
             ...(isHovered && switchHoverStyles),
             ...(isFocusVisible && switchFocusStyles),
-            ...(isDisabled && Css.bgGray300.$),
-            ...(isSelected && Css.bgBlue700.$),
+            ...(isDisabled && Css.bgColor(Tokens.FieldBorderDefault).$),
+            ...(isSelected && Css.bgColor(Tokens.ChoiceSelected).$),
             ...(isSelected && isHovered && switchSelectedHoverStyles),
           }}
         >
@@ -102,7 +106,7 @@ export function Switch(props: SwitchProps) {
           <div
             css={{
               ...switchCircleDefaultStyles(compact),
-              ...(isDisabled && Css.bgGray100.$),
+              ...(isDisabled && Css.bgColor(Tokens.FieldBgDisabled).$),
               ...(isSelected && switchCircleSelectedStyles(compact)),
             }}
           >
@@ -110,7 +114,7 @@ export function Switch(props: SwitchProps) {
             {withIcon && (
               <Icon
                 icon={isSelected ? "check" : "x"}
-                color={isSelected ? Palette.Blue700 : Palette.Gray400}
+                color={isSelected ? Tokens.ChoiceSelected : Tokens.TextDisabled}
                 inc={toggleHeight(compact) / 16}
               />
             )}
@@ -120,7 +124,17 @@ export function Switch(props: SwitchProps) {
       {/* Since we are using childGap, we must wrap the label in an element and
         match the height of the icon for horizontal alignment */}
       {labelStyle === "inline" && (
-        <Label label={label} tooltip={tooltip} inline xss={Css.sm.gray900.if(compact).add("lineHeight", "1").$} />
+        <Label
+          label={label}
+          tooltip={tooltip}
+          inline
+          xss={
+            Css.sm
+              .color(isDisabled ? Tokens.TextDisabled : Tokens.OnSurface)
+              .if(compact)
+              .add("lineHeight", "1").$
+          }
+        />
       )}
       <VisuallyHidden>
         <input ref={ref} {...inputProps} {...focusProps} {...tid} />
@@ -136,8 +150,9 @@ const toggleWidth = (isCompact: boolean) => (isCompact ? 32 : 40);
 const circleDiameter = (isCompact: boolean) => (isCompact ? 12 : 20);
 
 // Switcher/Toggle element styles
-export const switchHoverStyles = Css.bgGray400.$;
+export const switchHoverStyles = Css.bgColor(Tokens.NeutralFillHover).$;
 export const switchFocusStyles = Css.bshFocus.$;
+// Blue900 selected hover has no semantic token — keep palette.
 export const switchSelectedHoverStyles = Css.bgBlue900.$;
 
 // Circle inside Switcher/Toggle element styles
@@ -145,7 +160,8 @@ function switchCircleDefaultStyles(isCompact: boolean) {
   return {
     ...Css.wPx(circleDiameter(isCompact))
       .hPx(circleDiameter(isCompact))
-      .br100.bgWhite.bshBasic.absolute.leftPx(2)
+      .br100.bgColor(Tokens.Surface)
+      .bshBasic.absolute.leftPx(2)
       .topPx(2).transition.df.aic.jcc.$,
   };
 }

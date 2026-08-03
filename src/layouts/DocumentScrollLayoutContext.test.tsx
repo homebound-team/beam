@@ -41,7 +41,7 @@ describe("DocumentScrollLayoutProvider", () => {
       </DocumentScrollLayoutProvider>,
     );
 
-    // Then the display:contents measurement root sets measured viewport size (not 100vw/100vh fallbacks)
+    // Then the measurement root sets measured viewport size (not 100vw/100vh fallbacks)
     const root = findViewportRoot(r.container);
     expect(root?.style.getPropertyValue(beamLayoutViewportWidthVar)).toBe("1024px");
     expect(root?.style.getPropertyValue(beamLayoutViewportHeightVar)).toBe("768px");

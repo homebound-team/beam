@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Palette } from "src/Css";
+import { Tokens } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useTestIds } from "src/utils";
 
@@ -22,7 +22,7 @@ export function PinToggle({ rowId }: PinToggleProps) {
     <IconButton
       {...tid[rowId]}
       icon="pin"
-      color={isPinned ? Palette.Blue600 : undefined}
+      color={isPinned ? Tokens.Primary : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
       onClick={() => tableState.togglePinned(rowId)}
     />
