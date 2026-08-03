@@ -78,7 +78,7 @@ export function WideContentWithContentHeader() {
   steps[0] = {
     ...steps[0],
     content: (
-      <div css={Css.df.fdc.gap2.pt3.mw("fit-content").$}>
+      <div css={Css.df.fdc.gap2.pt3.$}>
         <ContentHeader
           title="Trade Partners"
           description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."

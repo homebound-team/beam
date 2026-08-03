@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { Button, ButtonProps, IconButton, IconButtonProps } from "src/components";
 import { Css, Tokens } from "src/Css";
-import { documentScrollChromeLeft, documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils";
 
 export type ContentHeaderAction = ({ kind?: "default" } & ButtonProps) | ({ kind: "icon" } & IconButtonProps);
@@ -34,10 +33,7 @@ export function ContentHeader(props: ContentHeaderProps) {
   );
 
   return (
-    <div
-      css={Css.sticky.left(documentScrollChromeLeft()).w(documentScrollChromeWidth()).px3.df.fdc.gapPx(12).$}
-      {...tid}
-    >
+    <div css={Css.df.fdc.gapPx(12).layoutContainer.bgColor(Tokens.Surface).$} {...tid}>
       {(title || description) && (
         <div css={Css.df.aic.jcsb.mw0.$}>
           {title ? (

@@ -13,6 +13,7 @@ import {
   bannerAndNavbarChromeTop,
   beamPageHeaderLayoutHeightVar,
   beamWorkflowLayoutFooterHeightVar,
+  documentScrollChromeLeft,
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
@@ -68,6 +69,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { state: scrollState } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
   const collapsed = scrollState === "hidden";
 
+  const headerLeft = documentScrollChromeLeft();
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
 
@@ -129,7 +131,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
         <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }} {...tid.spacer}>
           <div
             ref={headerMetricsRef}
-            css={Css.fixed.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
+            css={Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
             {...tid.header}
           >
             {headerEl}
@@ -141,22 +143,22 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
         </div>
 
         {/* Spacer so body content isn't hidden behind the fixed mobile footer. */}
-        {showFooter && <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$} />}
-
         {showFooter && (
-          <div
-            css={{
-              ...Css.fixed.bottom0
-                .w(headerWidth)
-                .hPx(mobileFooterHeightPx)
-                .z(zIndices.pageStickyFooter)
-                .df.aic.jcfe.gap1.bt.bc(Tokens.SurfaceSeparator)
-                .bgColor(Tokens.Surface).$,
-              ...pageContentPaddingX,
-            }}
-            {...tid.footer}
-          >
-            {buttons}
+          <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$}>
+            <div
+              css={{
+                ...Css.fixed.bottom0
+                  .w(headerWidth)
+                  .hPx(mobileFooterHeightPx)
+                  .z(zIndices.pageStickyFooter)
+                  .df.aic.jcfe.gap1.bt.bc(Tokens.SurfaceSeparator)
+                  .bgColor(Tokens.Surface).$,
+                ...pageContentPaddingX,
+              }}
+              {...tid.footer}
+            >
+              {buttons}
+            </div>
           </div>
         )}
       </div>
