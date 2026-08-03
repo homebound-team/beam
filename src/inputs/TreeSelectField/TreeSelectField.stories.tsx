@@ -8,7 +8,7 @@ import { NestedOption } from "src/inputs/TreeSelectField/utils";
 import { HasIdAndName } from "src/types";
 import { newStory, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
-import { within } from "storybook/test";
+import { userEvent, within } from "storybook/test";
 
 export default {
   component: TreeSelectField,
@@ -206,6 +206,25 @@ export const OpenMenuWithSelections = newStory(
     play: async ({ canvasElement }) => {
       const canvas = within(canvasElement);
       canvas.getByTestId("toggleListBox").click();
+    },
+  },
+);
+
+/** Filtering keeps the tree intact, i.e. "nba" leaves NBA/WNBA nested under (and collapsible from) Basketball. */
+export const FilteredMenu = newStory(
+  () => (
+    <TestTreeSelectField
+      values={[]}
+      options={getLeagueOptions()}
+      label="Favorite League"
+      placeholder="Select a league"
+    />
+  ),
+  {
+    play: async ({ canvasElement }) => {
+      const canvas = within(canvasElement);
+      canvas.getByTestId("toggleListBox").click();
+      await userEvent.type(canvas.getByTestId("favoriteLeague"), "nba");
     },
   },
 );
