@@ -157,7 +157,7 @@ function DraggableChildSection({ child, index, isLast, tid }: DraggableChildSect
   const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: getChildId(child, index), itemRef });
 
   return (
-    <div ref={itemRef} {...dragItemProps} css={Css.bb.bc(Tokens.SurfaceSeparator).pb3.if(isLast).bn.$}>
+    <div ref={itemRef} {...dragItemProps} css={isLast ? Css.pb3.$ : Css.bb.bc(Tokens.SurfaceSeparator).pb3.$}>
       {child.orderField && (
         <Observer>
           {() => <input type="hidden" data-testid="orderInput" readOnly value={child.orderField!.value ?? index} />}
