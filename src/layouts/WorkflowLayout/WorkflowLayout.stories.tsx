@@ -30,6 +30,23 @@ export function Default() {
 }
 
 /**
+ * Tall step content so the page scrolls. On mobile the tabs are always collapsed; on desktop, scroll
+ * down to see them collapse to their condensed look (the header itself stays pinned; it never
+ * auto-hides), then scroll back up (even without reaching the top) to see them re-expand.
+ */
+export function ScrollCollapsesTabs() {
+  return (
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      steps={makeSteps(50)}
+    />
+  );
+}
+
+/**
  * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
  * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
  */
@@ -86,7 +103,9 @@ export function WideContentWithContentHeader() {
 /**
  * `WorkflowLayout` nested under `EnvironmentBannerLayout` with a banner actually displayed, pushing the
  * whole layout down by `environmentBannerSizePx`. Tall step content so the page scrolls — sanity check
- * that the header renders correctly in that composed position and stays pinned while scrolling.
+ * that the header renders correctly in that composed position and stays pinned while scrolling. The
+ * stepper-tabs scroll-collapse threshold correctly accounts for the banner's height here, since it's
+ * plain arithmetic rather than a measured DOM anchor.
  */
 export function Composed() {
   return (

@@ -15,6 +15,7 @@ import {
   beamWorkflowLayoutFooterHeightVar,
   documentScrollChromeWidth,
 } from "../layoutVars";
+import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
@@ -37,8 +38,9 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  *
  * A standalone, full-page layout for step-based workflow pages — nest it directly under
  * `EnvironmentBannerLayout`, never under `NavbarLayout`/`SideNavLayout`/`PageHeaderLayout`. Unlike
- * `PageHeaderLayout`, the header here never auto-hides; the stepper tabs collapse to a condensed
- * indicator bar on mobile instead.
+ * `PageHeaderLayout`, the header here never auto-hides. The stepper tabs always collapse to a condensed
+ * indicator bar on mobile, and on larger viewports also collapse once scrolled past a threshold,
+ * re-expanding on scroll-up (even before reaching the top).
  *
  * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) via `WorkflowActions`
  * so it can move them into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part
@@ -51,11 +53,96 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 
+  const bannerAndNavbarHeight = useBannerAndNavbarHeight();
+  // Ref mirrors so the scroll handler always reads the latest value without resubscribing — critical
+  // here since `headerHeight` itself changes as a *result* of collapsing/expanding (see below).
+  const bannerAndNavbarHeightRef = useRef(bannerAndNavbarHeight);
+  bannerAndNavbarHeightRef.current = bannerAndNavbarHeight;
+
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
+  const headerHeightRef = useRef(headerHeight);
+  headerHeightRef.current = headerHeight;
 
-  // TODO: revisit scroll-driven collapsing (see plan); collapsed on mobile only for now.
-  const collapsed = isMobile;
+  // Header stays always-sticky (unlike PageHeaderLayout, it never hides) — the only scroll-driven
+  // behavior is collapsing the stepper tabs. No DOM anchor/rect is needed: WorkflowLayout is only ever
+  // nested directly under `EnvironmentBannerLayout` (never NavbarLayout/SideNavLayout), so the header's
+  // resting position is always exactly `bannerAndNavbarHeight + headerHeight` px below the true document
+  // top — pure `window.scrollY` arithmetic determines the collapse point.
+  const [scrolledPastThreshold, setScrolledPastThreshold] = useState(
+    () => typeof window !== "undefined" && window.scrollY > 0,
+  );
+  const scrolledPastThresholdRef = useRef(scrolledPastThreshold);
+  scrolledPastThresholdRef.current = scrolledPastThreshold;
+  // +Infinity so the first scroll check reads as "up" — a deep link / browser scroll-restore landing
+  // mid-page expands the tabs rather than assuming collapsed.
+  const lastScrollYRef = useRef(Number.POSITIVE_INFINITY);
+  const lastScrollHeightRef = useRef(0);
+
+  // The header is sticky (in-flow), so expanding/collapsing the tabs changes its own height, which
+  // changes `document.documentElement.scrollHeight`. Resync the layout-shift baseline whenever that
+  // happens — otherwise the very next scroll tick would mistake the header's own height change for an
+  // unrelated layout shift (e.g. a table row expanding) and immediately re-collapse right after
+  // expanding, fighting the scroll-up gesture that just expanded it.
+  useLayoutEffect(() => {
+    lastScrollHeightRef.current = document.documentElement.scrollHeight;
+  }, [headerHeight]);
+
+  useLayoutEffect(() => {
+    // Mobile always collapses regardless of scroll (see `collapsed` below) — no need to track scroll.
+    if (isMobile) return;
+
+    const setScrolledPastThresholdIfChanged = (next: boolean) => {
+      if (next !== scrolledPastThresholdRef.current) {
+        scrolledPastThresholdRef.current = next;
+        setScrolledPastThreshold(next);
+      }
+    };
+
+    const updateScrolledPastThreshold = () => {
+      const doc = document.documentElement;
+      const currentY = window.scrollY;
+      const threshold = bannerAndNavbarHeightRef.current + headerHeightRef.current + SCROLL_COLLAPSE_THRESHOLD_PX;
+
+      // Top of page (or iOS rubber-band overscroll) — always expanded.
+      if (currentY <= 0) {
+        lastScrollYRef.current = 0;
+        lastScrollHeightRef.current = doc.scrollHeight;
+        setScrolledPastThresholdIfChanged(false);
+        return;
+      }
+
+      const currentScrollHeight = doc.scrollHeight;
+      const scrollHeightChanged =
+        lastScrollHeightRef.current !== 0 && currentScrollHeight !== lastScrollHeightRef.current;
+      const dy = currentY - lastScrollYRef.current;
+      lastScrollYRef.current = currentY;
+      lastScrollHeightRef.current = currentScrollHeight;
+
+      if (currentY <= threshold) return; // Not past the engagement zone yet — leave state as-is.
+
+      if (scrollHeightChanged) {
+        // Content resized underneath the scroll position (e.g. a table row expanded, or rows filtered)
+        // rather than a real scroll gesture — only ever collapse from this, never spuriously re-expand.
+        setScrolledPastThresholdIfChanged(true);
+        return;
+      }
+
+      const atBottom = currentY >= doc.scrollHeight - doc.clientHeight;
+      // Only flip on vertical movement — horizontal-only scroll fires with dy === 0, leaving it unchanged.
+      if (dy > 0) setScrolledPastThresholdIfChanged(true);
+      else if (dy < 0 && !atBottom) setScrolledPastThresholdIfChanged(false);
+    };
+
+    updateScrolledPastThreshold();
+    window.addEventListener("scroll", updateScrolledPastThreshold, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrolledPastThreshold);
+  }, [isMobile]);
+
+  // Mobile always shows the condensed indicator bar (screen space is tight regardless of scroll);
+  // otherwise collapse once scrolled past the engagement threshold, matching the hysteresis a scroll
+  // listener needs: stays collapsed until scrolled back up (even before reaching the top) or to the top.
+  const collapsed = isMobile || scrolledPastThreshold;
 
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
@@ -151,6 +238,9 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
 }
 
 const mobileFooterHeightPx = 80;
+
+// Distance past the header's resting position before the stepper tabs collapse.
+const SCROLL_COLLAPSE_THRESHOLD_PX = 80;
 
 function isValidStep(steps: { value: string }[], value: string | undefined): boolean {
   return steps.some((step) => step.value === value);

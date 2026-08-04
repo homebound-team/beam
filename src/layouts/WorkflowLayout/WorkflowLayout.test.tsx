@@ -1,5 +1,5 @@
 import { setViewport } from "src/tests/viewport";
-import { click, render, withRouter } from "src/utils/rtl";
+import { click, render, scrollWindow, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
@@ -117,6 +117,30 @@ describe("WorkflowLayout", () => {
     // Then clicking the second step's tab does not navigate to it
     click(r.header_stepperTabs_tab_stepTwo);
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
+  });
+
+  it("collapses the tabs on scroll past the threshold on desktop, and re-expands on scroll-up", async () => {
+    // Given a WorkflowLayout on its first step, on a desktop viewport
+    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    const scrollOpts = { clientHeight: 800, scrollHeight: 1_000_800 };
+
+    // When the page scrolls down past the threshold, the tabs collapse to a non-interactive indicator bar
+    scrollWindow(0, scrollOpts);
+    scrollWindow(300, scrollOpts);
+    click(r.header_stepperTabs_tab_stepTwo);
+    expect(r.query.stepTwoBody).not.toBeInTheDocument();
+
+    // When scrolling back up — even without reaching the top — the tabs re-expand
+    scrollWindow(250, scrollOpts);
+    click(r.header_stepperTabs_tab_stepTwo);
+    expect(r.stepTwoBody).toBeInTheDocument();
+    click(r.header_stepperTabs_tab_stepOne);
+    expect(r.body).toBeInTheDocument();
+
+    // And scrolling all the way back to the top keeps them expanded
+    scrollWindow(0, scrollOpts);
+    click(r.header_stepperTabs_tab_stepTwo);
+    expect(r.stepTwoBody).toBeInTheDocument();
   });
 });
 
