@@ -1,5 +1,5 @@
 import { setViewport } from "src/tests/viewport";
-import { click, render, scrollWindowWithAnchor, withRouter } from "src/utils/rtl";
+import { click, render, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
@@ -98,33 +98,25 @@ describe("WorkflowLayout", () => {
     expect(r.save).not.toBeDisabled();
   });
 
-  it("navigates between steps by clicking their tab, but not while scroll-collapsed", async () => {
-    // Given a WorkflowLayout on its first step
+  it("navigates between steps by clicking their tab on desktop", async () => {
+    // Given a WorkflowLayout on its first step, on a desktop viewport (the test default)
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
 
-    // Then, at the top of the page, clicking the second step's tab navigates to it
+    // Then clicking the second step's tab navigates to it
     click(r.header_stepperTabs_tab_stepTwo);
     expect(r.stepTwoBody).toBeInTheDocument();
     click(r.header_stepperTabs_tab_stepOne);
     expect(r.body).toBeInTheDocument();
+  });
 
-    // When the page scrolls down past the threshold, the tabs collapse to a non-interactive indicator bar
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 300);
+  it("collapses the tabs to a non-interactive indicator bar on mobile", async () => {
+    // Given a WorkflowLayout on a mobile viewport
+    setViewport("sm");
+    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+
+    // Then clicking the second step's tab does not navigate to it
     click(r.header_stepperTabs_tab_stepTwo);
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
-
-    // When scrolling back up — even without reaching the top — the tabs re-expand
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 250);
-    click(r.header_stepperTabs_tab_stepTwo);
-    expect(r.stepTwoBody).toBeInTheDocument();
-    click(r.header_stepperTabs_tab_stepOne);
-    expect(r.body).toBeInTheDocument();
-
-    // And scrolling all the way back to the top keeps them expanded
-    scrollWindowWithAnchor(r.workflowLayout_spacer, 0);
-    click(r.header_stepperTabs_tab_stepTwo);
-    expect(r.stepTwoBody).toBeInTheDocument();
   });
 });
 
