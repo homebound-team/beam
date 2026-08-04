@@ -1,10 +1,12 @@
+import type { FieldState } from "@homebound/form-state";
+import { Observer } from "mobx-react";
 import { ReactNode, useRef } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { isDefined, useTestIds } from "src/utils";
 
 export type FormSectionProps = {
   title: string;
@@ -34,6 +36,19 @@ export type FormSectionProps = {
    * reordering; omitting either leaves rendering/behavior unchanged.
    */
   onReorderChildSections?: (newOrder: string[]) => void;
+  /**
+   * Tracks this section's display order when it's rendered as a draggable `childSection`. When provided,
+   * `FormSection` renders a `<input type="hidden">` mirroring `orderField.value` (falling back to the
+   * section's position among its siblings when `value` is `null`/`undefined`), permutes it into sync via
+   * `orderField.set(...)` whenever a drag/keyboard reorder commits — reassigning the *existing* set of
+   * order values held by these `childSections` rather than writing fresh 0-based indices, so it stays
+   * correct even when those values aren't zero-based (e.g. they share a numbering space with sections
+   * outside this `childSections` list) — and sorts `childSections` by `orderField.value` on every render
+   * (only takes effect when *every* childSection has one; otherwise array order is preserved). Also
+   * unlocks dragging on its own, without requiring `onReorderChildSections`. Has no effect outside a
+   * draggable `childSections` list.
+   */
+  orderField?: FieldState<number | null | undefined>;
   /** @internal Set automatically by `FormSection`'s own recursion when rendering a draggable `childSections` entry — don't set this yourself. */
   dragHandle?: ReactNode;
 };
@@ -52,7 +67,18 @@ export function FormSection(props: FormSectionProps) {
     dragHandle,
   } = props;
   const tid = useTestIds(props, "formSection");
-  const isDraggable = draggableChildSections && !!onReorderChildSections;
+  const hasOrderFields = !!childSections?.some((c) => !!c.orderField);
+  const isDraggable = draggableChildSections && (!!onReorderChildSections || hasOrderFields);
+
+  const handleReorder = (newOrder: string[]) => {
+    if (childSections && hasCompleteOrderFields(childSections)) {
+      const sorted = sortByOrderField(childSections);
+      const childById = new Map(sorted.map((child, i) => [getChildId(child, i), child]));
+      const existingValues = sorted.map((c) => c.orderField!.value!);
+      newOrder.forEach((id, i) => childById.get(id)?.orderField?.set(existingValues[i]!));
+    }
+    onReorderChildSections?.(newOrder);
+  };
 
   return (
     <div css={Css.df.fdc.gap2.$} {...tid}>
@@ -79,16 +105,25 @@ export function FormSection(props: FormSectionProps) {
       {fields}
       {childSections &&
         (isDraggable ? (
-          <DnDGrid onReorder={onReorderChildSections!} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
-            {childSections.map((child, i) => (
-              <DraggableChildSection
-                key={child.id ?? (child.title || i)}
-                child={child}
-                index={i}
-                isLast={i === childSections.length - 1}
-                tid={tid}
-              />
-            ))}
+          <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
+            {/* Observer: `sortByOrderField` reads each child's `orderField.value` — without this, the
+                order here would only refresh on some unrelated re-render, not on the `.set()` calls
+                `handleReorder`/consumers make directly to those FieldStates. */}
+            <Observer>
+              {() => (
+                <>
+                  {sortByOrderField(childSections).map((child, i) => (
+                    <DraggableChildSection
+                      key={getChildId(child, i)}
+                      child={child}
+                      index={i}
+                      isLast={i === childSections.length - 1}
+                      tid={tid}
+                    />
+                  ))}
+                </>
+              )}
+            </Observer>
           </DnDGrid>
         ) : (
           <div css={Css.df.fdc.gap3.$}>
@@ -119,10 +154,15 @@ type DraggableChildSectionProps = {
  */
 function DraggableChildSection({ child, index, isLast, tid }: DraggableChildSectionProps) {
   const itemRef = useRef(null);
-  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: child.id ?? (child.title || index), itemRef });
+  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: getChildId(child, index), itemRef });
 
   return (
     <div ref={itemRef} {...dragItemProps} css={Css.bb.bc(Tokens.SurfaceSeparator).pb3.if(isLast).bn.$}>
+      {child.orderField && (
+        <Observer>
+          {() => <input type="hidden" data-testid="orderInput" readOnly value={child.orderField!.value ?? index} />}
+        </Observer>
+      )}
       <FormSection
         {...child}
         isChild
@@ -131,6 +171,22 @@ function DraggableChildSection({ child, index, isLast, tid }: DraggableChildSect
       />
     </div>
   );
+}
+
+function getChildId(child: Omit<FormSectionProps, "isChild" | "dragHandle">, index: number): string {
+  return String(child.id ?? (child.title || index));
+}
+
+/** Sorts by `orderField.value` only when *every* entry has one; otherwise preserves array order. */
+function sortByOrderField(
+  childSections: NonNullable<FormSectionProps["childSections"]>,
+): NonNullable<FormSectionProps["childSections"]> {
+  if (!hasCompleteOrderFields(childSections)) return childSections;
+  return [...childSections].sort((a, b) => a.orderField!.value! - b.orderField!.value!);
+}
+
+function hasCompleteOrderFields(childSections: NonNullable<FormSectionProps["childSections"]>): boolean {
+  return childSections.every((c) => c.orderField && isDefined(c.orderField.value));
 }
 
 function getTitle(title: string, isChild: boolean, tid: Record<string, object>) {

@@ -1,7 +1,15 @@
+import { createObjectState, ObjectConfig } from "@homebound/form-state";
 import { fireEvent } from "@testing-library/react";
 import { FormSection } from "src/forms/FormSection";
 import { render } from "src/utils/rtl";
 import { vi } from "vitest";
+
+type OrderInput = { order?: number | null };
+const orderConfig: ObjectConfig<OrderInput> = { order: { type: "value" } };
+/** A real form-state `FieldState<number>`, so orderField tests exercise the actual integration. */
+function orderField(value: number | null) {
+  return createObjectState(orderConfig, { order: value }).order;
+}
 
 describe("FormSection", () => {
   it("renders title, description, and fields", async () => {
@@ -146,6 +154,115 @@ describe("FormSection", () => {
     fireEvent.keyDown(handle, { key: "Enter" });
 
     // Then onReorderChildSections fires with "electrical" and "plumbing" swapped
+    expect(onReorderChildSections).toHaveBeenCalledWith(["plumbing", "electrical"]);
+  });
+
+  it("renders a hidden input mirroring orderField.value, and omits it when orderField isn't provided", async () => {
+    // Given a FormSection with one childSection that has an orderField and one that doesn't
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        draggableChildSections
+        childSections={[
+          { id: "electrical", title: "Electrical", orderField: orderField(2) },
+          { id: "plumbing", title: "Plumbing" },
+        ]}
+      />,
+    );
+    // Then a hidden input mirrors the first section's order value
+    expect(r.orderInput_0).toHaveValue("2");
+    // And no hidden input renders for the section without an orderField
+    expect(r.query.orderInput_1).not.toBeInTheDocument();
+  });
+
+  it("auto-updates each child's orderField after a keyboard-driven reorder, with no onReorderChildSections passed", async () => {
+    // Given a FormSection with two draggable childSections, each with an orderField, and no onReorderChildSections
+    const electricalOrder = orderField(0);
+    const plumbingOrder = orderField(1);
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        draggableChildSections
+        childSections={[
+          { id: "electrical", title: "Electrical", orderField: electricalOrder },
+          { id: "plumbing", title: "Plumbing", orderField: plumbingOrder },
+        ]}
+      />,
+    );
+
+    // When the user grabs the first section's drag handle via keyboard, moves it down one, and commits
+    const handle = r.dragHandle_0;
+    fireEvent.keyDown(handle, { key: " " });
+    fireEvent.keyDown(handle, { key: "ArrowDown" });
+    fireEvent.keyDown(handle, { key: "Enter" });
+
+    // Then each orderField reflects its new position — proving dragging works via orderField alone
+    expect(plumbingOrder.value).toBe(0);
+    expect(electricalOrder.value).toBe(1);
+  });
+
+  it("renders childSections pre-sorted by orderField.value, independent of array order", async () => {
+    // Given a FormSection whose childSections array order disagrees with each orderField.value
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        draggableChildSections
+        childSections={[
+          { id: "plumbing", title: "Plumbing", orderField: orderField(1) },
+          { id: "electrical", title: "Electrical", orderField: orderField(0) },
+        ]}
+      />,
+    );
+    // Then they render in orderField order (Electrical first), not array order
+    expect(r.formSection_childSection_title_0).toHaveTextContent("Electrical");
+    expect(r.formSection_childSection_title_1).toHaveTextContent("Plumbing");
+  });
+
+  it("preserves array order when only some childSections have an orderField", async () => {
+    // Given only one of two childSections has an orderField
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        draggableChildSections
+        childSections={[
+          { id: "plumbing", title: "Plumbing", orderField: orderField(5) },
+          { id: "electrical", title: "Electrical" },
+        ]}
+      />,
+    );
+    // Then array order is preserved rather than partially sorting
+    expect(r.formSection_childSection_title_0).toHaveTextContent("Plumbing");
+    expect(r.formSection_childSection_title_1).toHaveTextContent("Electrical");
+  });
+
+  it("permutes existing (non-zero-based) order values rather than resetting them to 0-based indices", async () => {
+    // Given two childSections whose orderFields start at 2 and 3 (e.g. sharing a numbering space with
+    // sections outside this childSections list), plus a reorder side-effect callback
+    const onReorderChildSections = vi.fn();
+    const electricalOrder = orderField(2);
+    const plumbingOrder = orderField(3);
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        draggableChildSections
+        onReorderChildSections={onReorderChildSections}
+        childSections={[
+          { id: "electrical", title: "Electrical", orderField: electricalOrder },
+          { id: "plumbing", title: "Plumbing", orderField: plumbingOrder },
+        ]}
+      />,
+    );
+
+    // When the user grabs the first section's drag handle via keyboard, moves it down one, and commits
+    const handle = r.dragHandle_0;
+    fireEvent.keyDown(handle, { key: " " });
+    fireEvent.keyDown(handle, { key: "ArrowDown" });
+    fireEvent.keyDown(handle, { key: "Enter" });
+
+    // Then the existing {2, 3} values are swapped, never reset to {0, 1}
+    expect(plumbingOrder.value).toBe(2);
+    expect(electricalOrder.value).toBe(3);
+    // And the consumer's callback still fires, as a side effect rather than the source of truth
     expect(onReorderChildSections).toHaveBeenCalledWith(["plumbing", "electrical"]);
   });
 });

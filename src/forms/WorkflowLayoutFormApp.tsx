@@ -99,14 +99,6 @@ function AuthorDetails({ formState }: { formState: FormValue }) {
 }
 
 function BookList({ formState }: { formState: FormValue }) {
-  // form-state's list field only exposes `add`/`remove`, no `move` — reorder by re-`set`ing the list in
-  // the new order. `set` looks up each value's existing `ObjectState` by reference, so re-ordering the
-  // same row values preserves their state (touched/dirty/etc) rather than recreating them.
-  const onReorderBooks = (newOrder: string[]) => {
-    const rowByBookId = new Map(formState.books.rows.map((row) => [row.id.value!, row.value]));
-    formState.books.set(newOrder.map((id) => rowByBookId.get(id)!));
-  };
-
   return (
     <Observer>
       {() => (
@@ -119,14 +111,18 @@ function BookList({ formState }: { formState: FormValue }) {
                 {
                   label: "Add Book",
                   icon: "plus",
-                  onClick: () => formState.books.add({ id: String(formState.books.value?.length + 1 || 1) }),
+                  onClick: () =>
+                    formState.books.add({
+                      id: String(formState.books.value?.length + 1 || 1),
+                      order: formState.books.value?.length ?? 0,
+                    }),
                 },
               ],
               draggableChildSections: true,
-              onReorderChildSections: onReorderBooks,
               childSections: formState.books.rows.map((row, i) => ({
                 id: row.id.value!,
                 title: `Book ${i + 1}`,
+                orderField: row.order,
                 fields: <BoundTextField label="Title" field={row.title} />,
                 actions: [
                   { label: "Remove", icon: "x", variant: "tertiary", onClick: () => formState.books.remove(row.value) },
@@ -173,7 +169,11 @@ function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; 
                           <strong>Last Name</strong> {formState.value.lastName}
                         </li>
                         <li>
-                          <strong>Books</strong> {formState.value.books?.map((b) => b.title).join(", ")}
+                          <strong>Books</strong>{" "}
+                          {[...(formState.value.books ?? [])]
+                            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                            .map((b) => b.title)
+                            .join(", ")}
                         </li>
                         <li>
                           <strong>Birthday</strong> {formState.value.birthday?.toString()}
@@ -206,6 +206,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
     rules: [({ value }) => ((value || []).length === 0 ? "Empty" : undefined)],
     config: {
       id: { type: "value" },
+      order: { type: "value" },
       title: { type: "value", rules: [required] },
     },
   },

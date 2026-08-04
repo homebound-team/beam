@@ -18,7 +18,7 @@ export enum AuthorHeight {
   TALL,
 }
 
-export interface AuthorInput {
+export type AuthorInput = {
   id?: string | null;
   height?: AuthorHeight | null;
   firstName?: string | null;
@@ -38,23 +38,24 @@ export interface AuthorInput {
   bio?: string | null;
   saleDates?: DateRange | null;
   favoriteGenres?: string[] | null;
-}
+};
 
-export interface AuthorAddress {
+export type AuthorAddress = {
   street?: string | null;
   city?: string | null;
-}
+};
 
-export interface BookInput {
+export type BookInput = {
   id?: string | null | undefined;
+  order?: number | null | undefined;
   title?: string | null | undefined;
   summary?: string | null | undefined;
   classification?: DeweyDecimalClassification;
   delete?: boolean | null | undefined;
   isPublished?: boolean;
-}
+};
 
-export interface DeweyDecimalClassification {
+export type DeweyDecimalClassification = {
   number: string;
   category: string;
-}
+};
