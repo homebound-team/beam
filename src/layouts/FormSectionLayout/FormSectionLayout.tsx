@@ -23,32 +23,34 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
   const tid = useTestIds(props, "formSectionLayout");
 
   return (
-    <div css={Css.df.fdc.gap3.w100.pt4.maxwPx(720).mxa.ifSm.px2.$} {...tid}>
-      <div css={Css.df.fdc.jcsb.gapPx(12).$}>
-        <div css={Css.df.jcsb.aic.$}>
-          <h1 css={Css.xl.$} {...tid.title}>
-            {title}
-          </h1>
-          {actions && (
-            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-              {actions.map((action) =>
-                action.kind === "icon" ? (
-                  <IconButton key={action.icon} {...action} variant="outline" />
-                ) : (
-                  <Button key={`${action.label}`} {...action} />
-                ),
-              )}
+    <div css={Css.df.fdc.gap8.w100.pt4.maxwPx(720).mxa.ifSm.px2.$} {...tid}>
+      <div css={Css.df.fdc.gap3.$}>
+        <div css={Css.df.fdc.jcsb.gapPx(12).$}>
+          <div css={Css.df.jcsb.aic.$}>
+            <h1 css={Css.xl.$} {...tid.title}>
+              {title}
+            </h1>
+            {actions && (
+              <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+                {actions.map((action) =>
+                  action.kind === "icon" ? (
+                    <IconButton key={action.icon} {...action} variant="outline" />
+                  ) : (
+                    <Button key={`${action.label}`} {...action} />
+                  ),
+                )}
+              </div>
+            )}
+          </div>
+          {description && (
+            <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
+              {description}
             </div>
           )}
         </div>
-        {description && (
-          <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-            {description}
-          </div>
-        )}
+        {initialFields}
       </div>
-      {initialFields}
-      <div css={Css.df.fdc.gap6.$}>
+      <div css={Css.df.fdc.gap8.$}>
         {sections.map((section, i) => (
           <FormSection key={defaultTestId(section.title) || i} {...section} />
         ))}
