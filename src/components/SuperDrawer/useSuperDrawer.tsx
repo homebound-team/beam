@@ -1,11 +1,11 @@
 import { ReactNode, useMemo } from "react";
 import { useBeamContext } from "src/components/BeamContext";
+import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
 import { CanCloseCheck } from "src/types";
 import { useModal } from "../Modal";
-import { ConfirmCloseModal } from "./ConfirmCloseModal";
 import { SuperDrawerWidth } from "./utils";
 
-export interface OpenInDrawerOpts {
+export type OpenInDrawerOpts = {
   /** Invokes left, disabled if undefined. */
   onPrevClick?: () => void;
   /** Invokes right, disabled if undefined. */
@@ -15,16 +15,16 @@ export interface OpenInDrawerOpts {
   content: ReactNode;
   /** Adds the ability to change the SuperDrawer width based on some pre-defined values */
   width?: SuperDrawerWidth;
-}
+};
 
-export interface OpenDetailOpts {
+export type OpenDetailOpts = {
   content: ReactNode;
-}
+};
 
 export type ContentStack = { kind: "open"; opts: OpenInDrawerOpts } | { kind: "detail"; opts: OpenDetailOpts };
 
 /** The public API for interacting with `useSuperDrawer`. */
-export interface UseSuperDrawerHook {
+export type UseSuperDrawerHook = {
   /** Opens a new drawer, throwing away the current drawer is one exists. */
   openInDrawer: (opts: OpenInDrawerOpts) => void;
   /** Closes the entire drawer, returns false is the previous drawer can't be closed. */
@@ -49,7 +49,7 @@ export interface UseSuperDrawerHook {
    * the action.
    */
   addCanCloseDrawerDetailCheck: (canCloseCheck: CanCloseCheck) => void;
-}
+};
 
 export function useSuperDrawer(): UseSuperDrawerHook {
   const {
