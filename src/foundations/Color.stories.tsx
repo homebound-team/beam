@@ -2,14 +2,14 @@ import { Meta } from "@storybook/react-vite";
 import { Css, Palette, px } from "src/Css";
 
 export default {
-  title: "Foundations/Color",
+  title: "Foundations/Colors",
 } as Meta;
 
-export const Color = () => {
+export const PrimitivePalette = () => {
   const paletteEntries = Object.entries(Palette);
   return (
     <div>
-      <h1 css={Css.xl2.mb4.$}>Extended Palette</h1>
+      <h1 css={Css.xl2.mb4.$}>Primitive Palette</h1>
       <h2 css={Css.xl.mb4.$}>Gray</h2>
       <ListColors palette={paletteEntries.filter(([name]) => name.startsWith("Gray"))} />
       <h2 css={Css.xl.mb4.$}>Blue</h2>

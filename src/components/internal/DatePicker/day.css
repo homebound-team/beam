@@ -8,23 +8,23 @@
 
 /* Hover: only when not selected and not disabled */
 .beam-day-button:hover:not(:active):not([data-selected]):not([data-disabled]) > div {
-  background-color: rgba(247, 245, 245, 1); /* Gray100 */
+  background-color: var(--b-neutral-fill-hover-subtle);
 }
 
 /* Active: only when not disabled */
 .beam-day-button:not([data-disabled]):active > div {
-  background-color: rgba(201, 201, 201, 1); /* Gray400 */
-  color: rgba(36, 36, 36, 1); /* Gray900 */
+  background-color: var(--b-neutral-fill-pressed);
+  color: var(--b-on-surface);
 }
 
-/* Focus: always applied (default blue700 border) */
+/* Focus: always applied (default focus border) */
 .beam-day-button:focus:not(:active) > div {
   border-style: solid;
   border-width: 1px;
-  border-color: rgba(29, 78, 216, 1); /* Blue700 */
+  border-color: var(--b-field-border-focus);
 }
 
-/* Focus when selected: override border to blue900 */
+/* Focus when selected: keep primary focus ring weight via primary-pressed */
 .beam-day-button[data-selected]:focus:not(:active) > div {
-  border-color: rgba(30, 58, 138, 1); /* Blue900 */
+  border-color: var(--b-primary-pressed);
 }

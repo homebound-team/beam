@@ -1,6 +1,6 @@
 {
   "name": "@homebound/beam",
-  "version": "3.62.0",
+  "version": "3.66.0",
   "type": "module",
   "author": "Homebound",
   "license": "MIT",
@@ -104,7 +104,6 @@
     "@homebound/tsconfig": "^1.1.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
-    "@storybook/addon-links": "^10.4.0",
     "@storybook/react-vite": "^10.4.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

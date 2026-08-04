@@ -19,7 +19,10 @@ export function Default() {
         {
           title: "General Contractor",
           description: "The primary contractor responsible for this project.",
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: [
+            { label: "Add", onClick: () => {}, variant: "tertiary" },
+            { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
+          ],
           fields: <PlaceholderFields count={2} />,
         },
         {

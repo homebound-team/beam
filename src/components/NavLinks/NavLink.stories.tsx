@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { ContrastScope } from "src/components";
 import { Icons } from "src/components/Icon";
 import { NavLink, NavLinkProps } from "src/components/NavLinks/NavLink";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { withRouter } from "src/utils/sb";
 
 export default {
@@ -61,6 +61,17 @@ export function BaseStates() {
         <NavLink {...globalArgs} label="Global nav focus ring" __storyState={{ focusVisible: true }} />
         <NavLink {...globalArgs} label="Global nav disabled" disabled />
       </div>
+      <ContrastScope>
+        {/* SurfaceRaised (Gray800) so Gray900 active/hover chrome reads like Navbar. */}
+        <div css={Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).p1.br12.$}>
+          <NavLink {...globalArgs} label="Global contrast nav default" />
+          <NavLink {...globalArgs} label="Global contrast nav hovered" __storyState={{ hovered: true }} />
+          <NavLink {...globalArgs} label="Global contrast nav pressed" __storyState={{ pressed: true }} />
+          <NavLink {...globalArgs} label="Global contrast nav active" active />
+          <NavLink {...globalArgs} label="Global contrast nav focus ring" __storyState={{ focusVisible: true }} />
+          <NavLink {...globalArgs} label="Global contrast nav disabled" disabled />
+        </div>
+      </ContrastScope>
     </div>
   );
 }
@@ -92,6 +103,22 @@ export const NavLinks = (args: NavLinkProps) => {
         <NavLink icon="linkExternal" {...args} variant="global" active />
         <NavLink icon="linkExternal" {...args} variant="global" disabled />
       </div>
+      <ContrastScope>
+        <div css={Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).p2.br12.$}>
+          <h2 css={Css.color(Tokens.OnSurface).$}>Global contrast nav link</h2>
+          <NavLink {...args} icon={undefined} variant="global" />
+          <NavLink {...args} icon={undefined} variant="global" active />
+          <NavLink {...args} icon={undefined} variant="global" disabled />
+        </div>
+      </ContrastScope>
+      <ContrastScope>
+        <div css={Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).p2.br12.$}>
+          <h2 css={Css.color(Tokens.OnSurface).$}>Global contrast nav link with icon</h2>
+          <NavLink icon="linkExternal" {...args} variant="global" />
+          <NavLink icon="linkExternal" {...args} variant="global" active />
+          <NavLink icon="linkExternal" {...args} variant="global" disabled />
+        </div>
+      </ContrastScope>
     </div>
   );
 };

@@ -31,7 +31,7 @@ import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
-import { Css, Palette } from "src/Css";
+import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
 import { useComputed } from "src/hooks";
 import { SelectField, TextField } from "src/inputs";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
@@ -281,26 +281,11 @@ describe("GridTable", () => {
 
     const r = await render(<GridTable columns={[nameColumn, leftBorderColumn, rightBorderColumn]} rows={rows} />);
 
-    expect(cell(r, 0, 1)).toHaveStyle({
-      borderLeftStyle: "solid",
-      borderLeftWidth: "1px",
-      borderColor: Palette.Gray200,
-    });
-    expect(cell(r, 1, 1)).toHaveStyle({
-      borderLeftStyle: "solid",
-      borderLeftWidth: "1px",
-      borderColor: Palette.Gray200,
-    });
-    expect(cell(r, 0, 2)).toHaveStyle({
-      borderRightStyle: "solid",
-      borderRightWidth: "1px",
-      borderColor: Palette.Gray200,
-    });
-    expect(cell(r, 1, 2)).toHaveStyle({
-      borderRightStyle: "solid",
-      borderRightWidth: "1px",
-      borderColor: Palette.Gray200,
-    });
+    // Border color uses CSS vars (SurfaceSeparator); assert geometry that jsdom resolves reliably.
+    expect(cell(r, 0, 1)).toHaveStyle({ borderLeftStyle: "solid", borderLeftWidth: "1px" });
+    expect(cell(r, 1, 1)).toHaveStyle({ borderLeftStyle: "solid", borderLeftWidth: "1px" });
+    expect(cell(r, 0, 2)).toHaveStyle({ borderRightStyle: "solid", borderRightWidth: "1px" });
+    expect(cell(r, 1, 2)).toHaveStyle({ borderRightStyle: "solid", borderRightWidth: "1px" });
     expect(cell(r, 0, 0)).not.toHaveStyle({ borderLeftWidth: "1px" });
   });
 
@@ -315,20 +300,18 @@ describe("GridTable", () => {
       <GridTable
         columns={[nameColumn, borderedColumn]}
         rows={rows}
-        style={{ ...defaultStyle, borderStyle: Css.bcGray400.pl2.$ }}
+        style={{ ...defaultStyle, borderStyle: Css.bc(Tokens.TextDisabled).pl2.$ }}
       />,
     );
 
     expect(cell(r, 0, 1)).toHaveStyle({
       borderLeftStyle: "solid",
       borderLeftWidth: "1px",
-      borderColor: Palette.Gray400,
       paddingLeft: "calc(var(--t-spacing) * 2)",
     });
     expect(cell(r, 1, 1)).toHaveStyle({
       borderLeftStyle: "solid",
       borderLeftWidth: "1px",
-      borderColor: Palette.Gray400,
       paddingLeft: "calc(var(--t-spacing) * 2)",
     });
   });
@@ -3184,7 +3167,9 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell does not have the highlight color.
-    expect(cell(r, 1, 1)).not.toHaveStyle({ boxShadow: `inset 0 0 0 1px ${Palette.Blue700}` });
+    expect(cell(r, 1, 1)).not.toHaveStyle({
+      boxShadow: `inset 0 0 0 1px ${maybeCssVar(Tokens.FocusRingInset)}`,
+    });
   });
 
   it("shows cell border when 'cellHighlight' is defined", async () => {
@@ -3195,7 +3180,9 @@ describe("GridTable", () => {
     click(cell(r, 1, 1));
 
     // Then the cell has the highlight color.
-    expect(cell(r, 1, 1)).toHaveStyle({ boxShadow: `inset 0 0 0 1px ${Palette.Blue700}` });
+    expect(cell(r, 1, 1)).toHaveStyle({
+      boxShadow: `inset 0 0 0 1px ${maybeCssVar(Tokens.FocusRingInset)}`,
+    });
   });
 
   it("can render with rows with initCollapsed defined", async () => {

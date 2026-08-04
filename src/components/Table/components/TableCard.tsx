@@ -122,7 +122,7 @@ export function TableCardView(props: TableCardViewProps) {
   const col2 = data.slice(Math.ceil(data.length / 2));
 
   return (
-    <div css={Css.p3.w100.hPx(430).bshBasic.bgColor(Tokens.Surface).df.fdc.gap2.br8.$} {...tid}>
+    <div css={Css.p3.w100.hPx(430).bshBasic.bgColor(Tokens.SurfaceRaised).df.fdc.gap2.br8.$} {...tid}>
       <div css={Css.relative.$}>
         <img css={Css.hPx(184).w100.objectFit("cover").$} src={imgSrc} alt={title} {...tid.image} />
         {status && (
@@ -178,7 +178,7 @@ export function TableCardView(props: TableCardViewProps) {
           {progress !== undefined && (
             <div css={Css.df.fdc.gap1.$}>
               <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-                <div css={Css.w25.hPx(8).br4.bgGray200.$}>
+                <div css={Css.w25.hPx(8).br4.bgColor(Tokens.SurfaceSubtle).$}>
                   <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
                 </div>
                 <span {...tid.progressValue}>{progressValue}%</span>

@@ -3,14 +3,14 @@ import { RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Avatar, AvatarProps } from "src/components/Avatar/Avatar";
-import { Css, Palette } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
 
-export interface AvatarButtonProps extends AvatarProps, BeamButtonProps, BeamFocusableProps {
+export type AvatarButtonProps = {
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement>;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
@@ -19,7 +19,9 @@ export interface AvatarButtonProps extends AvatarProps, BeamButtonProps, BeamFoc
     focusVisible?: boolean;
     pressed?: boolean;
   };
-}
+} & AvatarProps &
+  BeamButtonProps &
+  BeamFocusableProps;
 
 export function AvatarButton(props: AvatarButtonProps) {
   const {
@@ -92,9 +94,10 @@ export function AvatarButton(props: AvatarButtonProps) {
 }
 
 const resetStyles = Css.br100.cursorPointer.outline0.relative.$;
-export const hoverStyles = Css.boxShadow(`0 0 4px ${Palette.Gray900}`).$;
+export const hoverStyles = Css.boxShadow(`0 0 4px var(${Tokens.OnSurface})`).$;
 const focusStyles = Css.bshFocus.$;
 const disabledStyles = Css.cursorNotAllowed.$;
-export const pressedOverlayCss = Css.br100.bgGray900.w100.h100.absolute.top0.left0
-  .add("opacity", "0.2")
+export const pressedOverlayCss = Css.br100
+  .bgColor(Tokens.OnSurface)
+  .w100.h100.absolute.top0.left0.add("opacity", "0.2")
   .add("pointerEvents", "none").$;

@@ -154,14 +154,12 @@ const navLinkVariantStyles: Record<
     pressedStyles: Css.color(Tokens.NavTextPressed).bgColor(Tokens.NavItemBgPressed).$,
   },
   global: {
-    baseStyles: { ...baseStyles, ...Css.hPx(32).add("width", "max-content").gray500.$ },
-    activeStyles: Css.white.bgGray900.$,
-    disabledStyles: Css.gray400.cursorNotAllowed.$,
-    focusRingStyles: Css.gray500.bgGray900.add(
-      "boxShadow",
-      `0px 1px 2px rgba(0, 0, 0, 0.05), 0px 0px 0px 2px #242424, 0px 0px 0px 4px #0EA5E9`,
-    ).$,
-    hoverStyles: Css.gray500.bgGray900.$,
-    pressedStyles: Css.gray500.bgGray700.$,
+    // Fixed dark-chrome NavGlobal* tokens (Navbar); independent of side Nav* / contrast axis.
+    baseStyles: { ...baseStyles, ...Css.hPx(32).add("width", "max-content").color(Tokens.NavGlobalText).$ },
+    activeStyles: Css.color(Tokens.NavGlobalTextActive).bgColor(Tokens.NavGlobalItemBgActive).$,
+    disabledStyles: Css.color(Tokens.NavGlobalTextDisabled).cursorNotAllowed.$,
+    focusRingStyles: Css.color(Tokens.NavGlobalText).bgColor(Tokens.NavGlobalItemBgActive).bshFocus.$,
+    hoverStyles: Css.color(Tokens.NavGlobalText).bgColor(Tokens.NavGlobalItemBgHover).$,
+    pressedStyles: Css.color(Tokens.NavGlobalText).bgColor(Tokens.NavGlobalItemBgPressed).$,
   },
 };
