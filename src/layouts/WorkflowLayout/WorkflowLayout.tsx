@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useLayoutEffect, useRef, useState } from "react";
+import { ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
 import { StepperTabsStep } from "src/components/StepperTabs";
@@ -15,8 +15,6 @@ import {
   beamWorkflowLayoutFooterHeightVar,
   documentScrollChromeWidth,
 } from "../layoutVars";
-import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
-import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
@@ -39,8 +37,8 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  *
  * A standalone, full-page layout for step-based workflow pages — nest it directly under
  * `EnvironmentBannerLayout`, never under `NavbarLayout`/`SideNavLayout`/`PageHeaderLayout`. Unlike
- * `PageHeaderLayout`, the header here never auto-hides; the only scroll-driven behavior is collapsing
- * the stepper tabs.
+ * `PageHeaderLayout`, the header here never auto-hides; the stepper tabs collapse to a condensed
+ * indicator bar on mobile instead.
  *
  * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) via `WorkflowActions`
  * so it can move them into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part
@@ -53,20 +51,11 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
 
-  // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
-  const bannerAndNavbarHeight = useBannerAndNavbarHeight();
-  const bannerAndNavbarHeightRef = useRef(bannerAndNavbarHeight);
-  bannerAndNavbarHeightRef.current = bannerAndNavbarHeight;
-  const getBannerAndNavbarHeight = useCallback(() => bannerAndNavbarHeightRef.current, []);
-
   const headerMetricsRef = useRef<HTMLDivElement>(null);
-  const spacerRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
 
-  // Header stays always-sticky (unlike PageHeaderLayout, it never hides) — `state` is only consumed to
-  // collapse the stepper tabs, not to reposition the header itself.
-  const { state: scrollState } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
-  const collapsed = scrollState === "hidden";
+  // TODO: revisit scroll-driven collapsing (see plan); collapsed on mobile only for now.
+  const collapsed = isMobile;
 
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
@@ -125,15 +114,12 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   return (
     <DocumentScrollLayoutProvider>
       <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
-        {/* Spacer reserves height for the always-sticky header; also the geometry anchor for scroll-collapse. */}
-        <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }} {...tid.spacer}>
-          <div
-            ref={headerMetricsRef}
-            css={Css.fixed.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
-            {...tid.header}
-          >
-            {headerEl}
-          </div>
+        <div
+          ref={headerMetricsRef}
+          css={Css.sticky.left0.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
+          {...tid.header}
+        >
+          {headerEl}
         </div>
 
         <div css={Css.df.fdc.fg1.mh0.w100.$} {...tid.body}>
@@ -141,22 +127,22 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
         </div>
 
         {/* Spacer so body content isn't hidden behind the fixed mobile footer. */}
-        {showFooter && <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$} />}
-
         {showFooter && (
-          <div
-            css={{
-              ...Css.fixed.bottom0
-                .w(headerWidth)
-                .hPx(mobileFooterHeightPx)
-                .z(zIndices.pageStickyFooter)
-                .df.aic.jcfe.gap1.bt.bc(Tokens.SurfaceSeparator)
-                .bgColor(Tokens.Surface).$,
-              ...pageContentPaddingX,
-            }}
-            {...tid.footer}
-          >
-            {buttons}
+          <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$}>
+            <div
+              css={{
+                ...Css.fixed.bottom0
+                  .w(headerWidth)
+                  .hPx(mobileFooterHeightPx)
+                  .z(zIndices.pageStickyFooter)
+                  .df.aic.jcfe.gap1.bt.bc(Tokens.SurfaceSeparator)
+                  .bgColor(Tokens.Surface).$,
+                ...pageContentPaddingX,
+              }}
+              {...tid.footer}
+            >
+              {buttons}
+            </div>
           </div>
         )}
       </div>

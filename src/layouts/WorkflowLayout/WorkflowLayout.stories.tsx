@@ -1,5 +1,7 @@
 import { Meta } from "@storybook/react-vite";
+import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
+import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -28,23 +30,6 @@ export function Default() {
 }
 
 /**
- * Tall step content so the page scrolls — scroll down to see the header's stepper tabs collapse to
- * their condensed look (the header itself stays pinned; it never auto-hides), then scroll back up
- * (even without reaching the top) to see them re-expand.
- */
-export function ScrollCollapsesTabs() {
-  return (
-    <WorkflowLayout
-      title="Workflow Layout"
-      onCancel={action("cancel clicked")}
-      completeLabel="Save"
-      onComplete={action("complete clicked")}
-      steps={makeSteps(50)}
-    />
-  );
-}
-
-/**
  * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
  * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
  */
@@ -59,6 +44,61 @@ export function WideStepContentOverflows() {
       onComplete={action("complete clicked")}
       steps={steps}
     />
+  );
+}
+
+/**
+ * A step whose content leads with a `ContentHeader` above a wide table. Scroll the page horizontally
+ * (most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px) — the table
+ * scrolls away, but `ContentHeader` stays pinned to the visible left/right edges since it only sticks
+ * horizontally (it has no `top` set, so it still scrolls away normally on the vertical axis).
+ *
+ * The wrapping div needs `mw("fit-content")` for this to work — `ContentHeader`'s sticky positioning
+ * has no "room" to operate unless its containing block is at least as wide as the table's full content
+ * width (see the doc comment on `ContentHeader` itself), the same technique `GridTable` uses internally.
+ */
+export function WideContentWithContentHeader() {
+  const steps = makeSteps();
+  steps[0] = {
+    ...steps[0],
+    content: (
+      <div css={Css.df.fdc.gap2.pt3.$}>
+        <ContentHeader
+          title="Trade Partners"
+          description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."
+          actions={[{ label: "Add", onClick: action("add clicked") }]}
+        />
+        <TableExample numCols={10} numRows={20} />
+      </div>
+    ),
+  };
+  return (
+    <WorkflowLayout
+      title="Workflow Layout"
+      onCancel={action("cancel clicked")}
+      completeLabel="Save"
+      onComplete={action("complete clicked")}
+      steps={steps}
+    />
+  );
+}
+
+/**
+ * `WorkflowLayout` nested under `EnvironmentBannerLayout` with a banner actually displayed, pushing the
+ * whole layout down by `environmentBannerSizePx`. Tall step content so the page scrolls — sanity check
+ * that the header renders correctly in that composed position and stays pinned while scrolling.
+ */
+export function Composed() {
+  return (
+    <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>
+      <WorkflowLayout
+        title="Workflow Layout"
+        onCancel={action("cancel clicked")}
+        completeLabel="Save"
+        onComplete={action("complete clicked")}
+        steps={makeSteps(50)}
+      />
+    </EnvironmentBannerLayout>
   );
 }
 

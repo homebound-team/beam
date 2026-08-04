@@ -32,6 +32,8 @@ export type { EnvironmentFaviconUrls } from "./EnvironmentBanner/setEnvironmentF
 export * from "./Filters";
 export * from "./Grid";
 export { HB_QUIPS_FLAVOR, HB_QUIPS_MISSION, HbLoadingSpinner, HbSpinnerProvider } from "./HbLoadingSpinner";
+export * from "./Headers/ContentHeader";
+export type { HeaderAction } from "./Headers/HeaderActions";
 export * from "./HelperText";
 export * from "./HomeboundLogo";
 export * from "./Icon";
