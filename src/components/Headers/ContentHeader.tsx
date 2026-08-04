@@ -24,6 +24,11 @@ export type ContentHeaderProps = {
 export function ContentHeader(props: ContentHeaderProps) {
   const { title, description, actions } = props;
   const tid = useTestIds(props, "contentHeader");
+
+  if (!title && !description && !actions) {
+    return null;
+  }
+
   const descriptionEl = description && (
     <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
       {description}
@@ -32,18 +37,16 @@ export function ContentHeader(props: ContentHeaderProps) {
 
   return (
     <div css={Css.df.fdc.gapPx(12).layoutContainer.bgColor(Tokens.Surface).$} {...tid}>
-      {(title || description) && (
-        <div css={Css.df.aic.jcsb.mw0.$}>
-          {title ? (
-            <h2 css={Css.xl.$} {...tid.title}>
-              {title}
-            </h2>
-          ) : (
-            descriptionEl
-          )}
-          {actions && <HeaderActions actions={actions} {...tid.actions} />}
-        </div>
-      )}
+      <div css={Css.df.aic.jcsb.mw0.$}>
+        {title ? (
+          <h2 css={Css.xl.$} {...tid.title}>
+            {title}
+          </h2>
+        ) : (
+          descriptionEl
+        )}
+        {actions && <HeaderActions actions={actions} {...tid.actions} />}
+      </div>
       {title && descriptionEl}
     </div>
   );
