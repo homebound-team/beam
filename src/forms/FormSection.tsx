@@ -35,24 +35,24 @@ export function FormSection(props: FormSectionProps) {
 
   return (
     <div css={Css.df.fdc.gap2.$} {...tid}>
-      <div css={Css.df.jcsb.$}>
-        <div css={Css.df.fdc.gapPx(12).$}>
+      <div css={Css.df.fdc.jcsb.gapPx(12).$}>
+        <div css={Css.df.jcsb.aic.$}>
           {getTitle(title, isChild, tid)}
-          {description && (
-            <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-              {description}
+          {actions && (
+            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+              {actions.map((action) =>
+                action.kind === "icon" ? (
+                  <IconButton key={action.icon} {...action} variant="outline" />
+                ) : (
+                  <Button key={`${action.label}`} {...action} />
+                ),
+              )}
             </div>
           )}
         </div>
-        {actions && (
-          <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-            {actions.map((action) =>
-              action.kind === "icon" ? (
-                <IconButton key={action.icon} {...action} variant="outline" />
-              ) : (
-                <Button key={`${action.label}`} {...action} />
-              ),
-            )}
+        {description && (
+          <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
+            {description}
           </div>
         )}
       </div>
