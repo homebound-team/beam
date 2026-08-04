@@ -1,20 +1,11 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { useMemo, useState } from "react";
-import {
-  GridColumn,
-  GridDataRow,
-  GridTableLayout,
-  IconButton,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components";
+import { useState } from "react";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
 import { FormSectionLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
 
 /**
@@ -108,40 +99,45 @@ function AuthorDetails({ formState }: { formState: FormValue }) {
 }
 
 function BookList({ formState }: { formState: FormValue }) {
-  const columns = useMemo(() => createColumns(formState), [formState]);
-  const rows: GridDataRow<Row>[] = useComputed(
-    () => [simpleHeader, ...formState.books.rows.map((data) => ({ kind: "data" as const, id: data.id.value!, data }))],
-    [],
-  );
+  // form-state's list field only exposes `add`/`remove`, no `move` — reorder by re-`set`ing the list in
+  // the new order. `set` looks up each value's existing `ObjectState` by reference, so re-ordering the
+  // same row values preserves their state (touched/dirty/etc) rather than recreating them.
+  const onReorderBooks = (newOrder: string[]) => {
+    const rowByBookId = new Map(formState.books.rows.map((row) => [row.id.value!, row.value]));
+    formState.books.set(newOrder.map((id) => rowByBookId.get(id)!));
+  };
 
   return (
-    <div>
-      <h1 css={Css.df.aic.p2.$}>
-        Books
-        <IconButton
-          icon="plus"
-          onClick={() => formState.books.add({ id: String(formState.books.value?.length + 1 || 1) })}
+    <Observer>
+      {() => (
+        <FormSectionLayout
+          title="Books"
+          sections={[
+            {
+              title: "Books",
+              actions: [
+                {
+                  label: "Add Book",
+                  icon: "plus",
+                  onClick: () => formState.books.add({ id: String(formState.books.value?.length + 1 || 1) }),
+                },
+              ],
+              draggableChildSections: true,
+              onReorderChildSections: onReorderBooks,
+              childSections: formState.books.rows.map((row, i) => ({
+                id: row.id.value!,
+                title: `Book ${i + 1}`,
+                fields: <BoundTextField label="Title" field={row.title} />,
+                actions: [
+                  { label: "Remove", icon: "x", variant: "tertiary", onClick: () => formState.books.remove(row.value) },
+                ],
+              })),
+            },
+          ]}
         />
-      </h1>
-      <GridTableLayout tableProps={{ columns, rows }} hideEditColumns />
-    </div>
+      )}
+    </Observer>
   );
-}
-
-type Row = SimpleHeaderAndData<FormValue["books"]["rows"][number]>;
-
-function createColumns(formState: FormValue): GridColumn<Row>[] {
-  return [
-    { header: "#", data: ({ id }) => <span>{id.value}</span> },
-    {
-      header: "Title",
-      data: ({ title }) => <BoundTextField label="Title" compact field={title} labelStyle="hidden" />,
-    },
-    {
-      header: "Actions",
-      data: (row) => <IconButton icon="x" onClick={() => formState.books.remove(row.value)} />,
-    },
-  ];
 }
 
 function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; showFormData: boolean }) {
