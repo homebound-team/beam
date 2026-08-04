@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
+import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -96,6 +97,28 @@ export function WideContentWithContentHeader() {
       onComplete={action("complete clicked")}
       steps={steps}
     />
+  );
+}
+
+/**
+ * `WorkflowLayout` nested under `EnvironmentBannerLayout` with a banner actually displayed, pushing the
+ * whole layout down by `environmentBannerSizePx`. The header's geometry anchor is `position: absolute`,
+ * which (absent a positioned ancestor) resolves against the page origin rather than `WorkflowLayout`'s
+ * own root — off by the banner's height from where the header actually rests. In practice this only
+ * shifts the stepper tabs' scroll-collapse threshold by that same handful of px, well within
+ * `useAutoHideOnScroll`'s `THRESHOLD` slop, so it isn't visible here.
+ */
+export function Composed() {
+  return (
+    <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>
+      <WorkflowLayout
+        title="Workflow Layout"
+        onCancel={action("cancel clicked")}
+        completeLabel="Save"
+        onComplete={action("complete clicked")}
+        steps={makeSteps(50)}
+      />
+    </EnvironmentBannerLayout>
   );
 }
 

@@ -13,7 +13,6 @@ import {
   bannerAndNavbarChromeTop,
   beamPageHeaderLayoutHeightVar,
   beamWorkflowLayoutFooterHeightVar,
-  documentScrollChromeLeft,
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
@@ -69,7 +68,6 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { state: scrollState } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
   const collapsed = scrollState === "hidden";
 
-  const headerLeft = documentScrollChromeLeft();
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
 
@@ -127,15 +125,20 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   return (
     <DocumentScrollLayoutProvider>
       <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
-        {/* Spacer reserves height for the always-sticky header; also the geometry anchor for scroll-collapse. */}
-        <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }} {...tid.spacer}>
-          <div
-            ref={headerMetricsRef}
-            css={Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
-            {...tid.header}
-          >
-            {headerEl}
-          </div>
+        {/*
+          Geometry anchor for `useAutoHideOnScroll`'s scroll-collapse threshold: it needs a rect that
+          keeps tracking scroll position, which a stuck sticky/fixed element's own rect can't do once
+          pinned. Absolutely positioned (against the nearest positioned ancestor, or the page origin
+          absent one) so it mirrors the header's resting spot without reserving its own layout space —
+          the sticky header below already reserves that space itself, being in-flow.
+        */}
+        <div ref={spacerRef} css={Css.absolute.top0.left0.w100.$} style={{ height: headerHeight }} {...tid.spacer} />
+        <div
+          ref={headerMetricsRef}
+          css={Css.sticky.left0.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
+          {...tid.header}
+        >
+          {headerEl}
         </div>
 
         <div css={Css.df.fdc.fg1.mh0.w100.$} {...tid.body}>
