@@ -63,9 +63,7 @@ export function FormSection(props: FormSectionBase | ReorderableFormSection) {
 
   const handleReorder = (newOrder: string[]) => {
     if (reorderableChildSections) {
-      const sorted = [...reorderableChildSections].sort(
-        (a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0),
-      );
+      const sorted = sortByOrderField(reorderableChildSections);
       const existingValues = sorted.map((c) => c.orderField.value ?? 0);
       const childById = new Map(sorted.map((c) => [c.id, c]));
       newOrder.forEach((id, i) => childById.get(id)?.orderField.set(existingValues[i]!));
@@ -117,9 +115,7 @@ export function FormSection(props: FormSectionBase | ReorderableFormSection) {
           <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
             <Observer>
               {() => {
-                const sorted = [...reorderableChildSections!].sort(
-                  (a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0),
-                );
+                const sorted = sortByOrderField(reorderableChildSections!);
                 return (
                   <>
                     {sorted.map((child, i) => (
@@ -147,6 +143,10 @@ export function FormSection(props: FormSectionBase | ReorderableFormSection) {
         ))}
     </div>
   );
+}
+
+function sortByOrderField(childSections: ReorderableFormSection[]): ReorderableFormSection[] {
+  return [...childSections].sort((a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0));
 }
 
 function getTitle(title: string, isChild: boolean, tid: Record<string, object>) {

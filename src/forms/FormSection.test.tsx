@@ -148,12 +148,11 @@ describe("FormSection", () => {
         ]}
       />,
     );
-    const items = () => Array.from(r.dndGrid.querySelectorAll<HTMLElement>("[dndgrid-itemid]"));
 
     // Then only the last section has no bottom border
-    expect(items()[0]).toHaveStyle({ borderBottomStyle: "solid" });
-    expect(items()[1]).toHaveStyle({ borderBottomStyle: "solid" });
-    expect(items()[2]).not.toHaveStyle({ borderBottomStyle: "solid" });
+    expect(r.formSection_childSection_0).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(r.formSection_childSection_1).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(r.formSection_childSection_2).not.toHaveStyle({ borderBottomStyle: "solid" });
 
     // When the user grabs the first section's drag handle via keyboard, moves it to the end, and commits
     const handle = r.dragHandle_0;
@@ -163,9 +162,9 @@ describe("FormSection", () => {
     fireEvent.keyDown(handle, { key: "Enter" });
 
     // Then the border still only omits from whichever section is now last
-    expect(items()[0]).toHaveStyle({ borderBottomStyle: "solid" });
-    expect(items()[1]).toHaveStyle({ borderBottomStyle: "solid" });
-    expect(items()[2]).not.toHaveStyle({ borderBottomStyle: "solid" });
+    expect(r.formSection_childSection_0).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(r.formSection_childSection_1).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(r.formSection_childSection_2).not.toHaveStyle({ borderBottomStyle: "solid" });
   });
 
   it("renders a hidden input mirroring each childSection's orderField.value", async () => {
