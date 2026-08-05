@@ -119,28 +119,18 @@ describe("WorkflowLayout", () => {
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
   });
 
-  it("collapses the tabs on scroll past the threshold on desktop, and re-expands on scroll-up", async () => {
+  it("collapses the tabs on scroll past the resting position on desktop", async () => {
     // Given a WorkflowLayout on its first step, on a desktop viewport
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
-    const scrollOpts = { clientHeight: 800, scrollHeight: 1_000_800 };
 
-    // When the page scrolls down past the threshold, the tabs collapse to a non-interactive indicator bar
-    scrollWindow(0, scrollOpts);
-    scrollWindow(300, scrollOpts);
+    // When the page scrolls down past the header's resting position
+    scrollWindow(0, { clientHeight: 800, scrollHeight: 1_000_800 });
+    scrollWindow(300, { clientHeight: 800, scrollHeight: 1_000_800 });
+
+    // Then the tabs collapse to a non-interactive indicator bar
+    // (the scroll-position state machine itself is covered by useScrollCollapse's own tests)
     click(r.header_stepperTabs_tab_stepTwo);
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
-
-    // When scrolling back up — even without reaching the top — the tabs re-expand
-    scrollWindow(250, scrollOpts);
-    click(r.header_stepperTabs_tab_stepTwo);
-    expect(r.stepTwoBody).toBeInTheDocument();
-    click(r.header_stepperTabs_tab_stepOne);
-    expect(r.body).toBeInTheDocument();
-
-    // And scrolling all the way back to the top keeps them expanded
-    scrollWindow(0, scrollOpts);
-    click(r.header_stepperTabs_tab_stepTwo);
-    expect(r.stepTwoBody).toBeInTheDocument();
   });
 });
 

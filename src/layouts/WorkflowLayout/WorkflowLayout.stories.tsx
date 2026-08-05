@@ -2,9 +2,10 @@ import { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
-import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { newStory, viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
+import { waitFor, within } from "storybook/test";
 import { WorkflowLayout, WorkflowLayoutStep } from "./WorkflowLayout";
 
 export default {
@@ -30,12 +31,13 @@ export function Default() {
 }
 
 /**
- * Tall step content so the page scrolls. On mobile the tabs are always collapsed; on desktop, scroll
- * down to see them collapse to their condensed look (the header itself stays pinned; it never
- * auto-hides), then scroll back up (even without reaching the top) to see them re-expand.
+ * Tall step content so the page scrolls. On mobile the tabs are always collapsed; on desktop, the
+ * `play` function scrolls down to show them collapse to their condensed look (the header itself stays
+ * pinned; it never auto-hides). Scroll back up from there (even without reaching the top) to see them
+ * re-expand.
  */
-export function ScrollCollapsesTabs() {
-  return (
+export const ScrollCollapsesTabs = newStory(
+  () => (
     <WorkflowLayout
       title="Workflow Layout"
       onCancel={action("cancel clicked")}
@@ -43,8 +45,20 @@ export function ScrollCollapsesTabs() {
       onComplete={action("complete clicked")}
       steps={makeSteps(50)}
     />
-  );
-}
+  ),
+  {
+    play: async ({ canvasElement }) => {
+      const header = within(canvasElement).getByTestId("workflowLayout_header");
+      const expandedHeight = header.getBoundingClientRect().height;
+      window.scrollTo({ top: 400 });
+      await waitFor(() => {
+        if (header.getBoundingClientRect().height >= expandedHeight) {
+          throw new Error("Waiting for the stepper tabs to collapse on scroll");
+        }
+      });
+    },
+  },
+);
 
 /**
  * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
