@@ -1,7 +1,6 @@
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
 import { Css, Tokens } from "src/Css";
-import { FormSection, FormSectionProps } from "src/forms/FormSection";
+import { FormSection } from "src/forms/FormSection";
 import { withBeamDecorator } from "src/utils/sb";
 
 export default {
@@ -38,41 +37,6 @@ export function WithChildSections() {
           actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
         },
       ]}
-    />
-  );
-}
-
-/**
- * Drag a childSection by its handle (mouse/touch), or focus the handle and use the keyboard:
- * Space to grab, Arrow Up/Down to move, Enter/Space to commit, Escape to cancel.
- */
-export function DraggableChildSections() {
-  const [childSections, setChildSections] = useState<NonNullable<FormSectionProps["childSections"]>>([
-    {
-      id: "electrical",
-      title: "Electrical",
-      fields: <PlaceholderFields count={2} />,
-      description: "Electrical contracts are needed for the construction to continue",
-      actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
-    },
-    { id: "plumbing", title: "Plumbing", fields: <PlaceholderFields count={2} /> },
-    {
-      id: "hvac",
-      title: "HVAC",
-      fields: <PlaceholderFields count={2} />,
-      actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
-    },
-  ]);
-
-  return (
-    <FormSection
-      title="Sub-Contractors"
-      actions={[{ label: "Add", onClick: () => {}, variant: "tertiary" }]}
-      childSections={childSections}
-      draggableChildSections
-      onReorderChildSections={(newOrder) =>
-        setChildSections((prev) => newOrder.map((id) => prev.find((c) => c.id === id)!))
-      }
     />
   );
 }

@@ -6,55 +6,38 @@ import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { Css, Tokens } from "src/Css";
-import { isDefined, useTestIds } from "src/utils";
+import { useTestIds } from "src/utils";
 
-export type FormSectionProps = {
+type FormSectionCommon = {
   title: string;
   description?: ReactNode;
-  /** Rendered top-right of the title row, e.g. an "Add" button. */
+  /** Rendered top-right of the title row. */
   actions?: ButtonProps[];
   fields?: ReactNode;
-  childSections?: Omit<FormSectionProps, "isChild" | "dragHandle">[];
-  /** Nested-section styling (smaller title). Set automatically by `FormSection`'s own recursion over `childSections` — don't set this yourself. */
+  /** @internal smaller title styling for nested sections. */
   isChild?: boolean;
-  /**
-   * Stable identifier for this section. Used as the React key for `childSections`, and — when the
-   * parent section has `draggableChildSections` set — as the id returned in `onReorderChildSections`'s
-   * new-order array. Falls back to `title`, then array index, when omitted; supply a stable `id`
-   * whenever a section may appear in a draggable `childSections` list, since titles aren't guaranteed unique.
-   */
-  id?: string;
-  /**
-   * Opts into mouse/touch/keyboard drag-and-drop reordering of `childSections` (via `DnDGrid`), with a
-   * drag handle rendered next to each child section's title. Has no effect without `childSections`,
-   * and is a no-op unless `onReorderChildSections` is also provided.
-   */
-  draggableChildSections?: boolean;
-  /**
-   * Called with the new order of `childSections`' `id`s (falling back to `title`, then index) once a
-   * drag-and-drop or keyboard reorder completes. Provide together with `draggableChildSections` to enable
-   * reordering; omitting either leaves rendering/behavior unchanged.
-   */
-  onReorderChildSections?: (newOrder: string[]) => void;
-  /**
-   * Tracks this section's display order when it's rendered as a draggable `childSection`. When provided,
-   * `FormSection` renders a `<input type="hidden">` mirroring `orderField.value` (falling back to the
-   * section's position among its siblings when `value` is `null`/`undefined`), permutes it into sync via
-   * `orderField.set(...)` whenever a drag/keyboard reorder commits — reassigning the *existing* set of
-   * order values held by these `childSections` rather than writing fresh 0-based indices, so it stays
-   * correct even when those values aren't zero-based (e.g. they share a numbering space with sections
-   * outside this `childSections` list) — and sorts `childSections` by `orderField.value` on every render
-   * (only takes effect when *every* childSection has one; otherwise array order is preserved). Also
-   * unlocks dragging on its own, without requiring `onReorderChildSections`. Has no effect outside a
-   * draggable `childSections` list.
-   */
-  orderField?: FieldState<number | null | undefined>;
-  /** @internal Set automatically by `FormSection`'s own recursion when rendering a draggable `childSections` entry — don't set this yourself. */
-  dragHandle?: ReactNode;
+  /** @internal omits the bottom separator for the last of a set of reorderable siblings. */
+  isLast?: boolean;
 };
 
-/** A titled section of form content — title/description/actions row, then `fields`, then any recursively-rendered `childSections`. */
-export function FormSection(props: FormSectionProps) {
+/** Either `childSections` is absent/plain, or `onReorderChildSections` is set and every entry is reorderable. */
+type ChildSectionsUnion =
+  | { onReorderChildSections?: undefined; childSections?: FormSectionBase[] }
+  | { onReorderChildSections: (newOrder: string[]) => void; childSections?: ReorderableFormSection[] };
+
+/** Any form section — title/description/actions row, then `fields`, then any recursive `childSections`. */
+export type FormSectionBase = FormSectionCommon & { id?: string } & ChildSectionsUnion;
+
+/** A `childSections` entry usable in a reorderable list — requires `id` and `orderField`. */
+export type ReorderableFormSection = FormSectionCommon & {
+  id: string;
+  orderField: FieldState<number | null | undefined>;
+} & ChildSectionsUnion;
+
+/** @deprecated use `FormSectionBase` */
+export type FormSectionProps = FormSectionBase;
+
+export function FormSection(props: FormSectionBase | ReorderableFormSection) {
   const {
     title,
     description,
@@ -62,30 +45,56 @@ export function FormSection(props: FormSectionProps) {
     fields,
     childSections,
     isChild = false,
-    draggableChildSections = false,
+    isLast = false,
     onReorderChildSections,
-    dragHandle,
   } = props;
   const tid = useTestIds(props, "formSection");
-  const hasOrderFields = !!childSections?.some((c) => !!c.orderField);
-  const isDraggable = draggableChildSections && (!!onReorderChildSections || hasOrderFields);
+  const itemRef = useRef(null);
+  const orderField = "orderField" in props ? props.orderField : undefined;
+  const dragId = ("id" in props ? props.id : undefined) ?? title;
+  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: dragId, itemRef });
+  const isReorderableEntry = !!orderField;
+  const isDraggableParent = !!onReorderChildSections;
+
+  // Safe: `onReorderChildSections` being set means `childSections` (if any) is `ReorderableFormSection[]`,
+  // per the discriminated union above — TS can't track that correlation through the destructure above,
+  // so assert it once here instead of fighting the type checker at every use site below.
+  const reorderableChildSections = childSections as ReorderableFormSection[] | undefined;
 
   const handleReorder = (newOrder: string[]) => {
-    if (childSections && hasCompleteOrderFields(childSections)) {
-      const sorted = sortByOrderField(childSections);
-      const childById = new Map(sorted.map((child, i) => [getChildId(child, i), child]));
-      const existingValues = sorted.map((c) => c.orderField!.value!);
-      newOrder.forEach((id, i) => childById.get(id)?.orderField?.set(existingValues[i]!));
+    if (reorderableChildSections) {
+      const sorted = [...reorderableChildSections].sort(
+        (a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0),
+      );
+      const existingValues = sorted.map((c) => c.orderField.value ?? 0);
+      const childById = new Map(sorted.map((c) => [c.id, c]));
+      newOrder.forEach((id, i) => childById.get(id)?.orderField.set(existingValues[i]!));
     }
     onReorderChildSections?.(newOrder);
   };
 
   return (
-    <div css={Css.df.fdc.gap2.$} {...tid}>
+    <div
+      ref={isReorderableEntry ? itemRef : undefined}
+      {...(isReorderableEntry ? dragItemProps : {})}
+      css={
+        !isReorderableEntry
+          ? Css.df.fdc.gap2.$
+          : isLast
+            ? Css.df.fdc.gap2.bgColor(Tokens.Surface).pb3.$
+            : Css.df.fdc.gap2.bgColor(Tokens.Surface).bb.bc(Tokens.SurfaceSeparator).pb3.$
+      }
+      {...tid}
+    >
+      {isReorderableEntry && (
+        <Observer>
+          {() => <input type="hidden" data-testid="orderInput" readOnly value={orderField!.value ?? 0} />}
+        </Observer>
+      )}
       <div css={Css.df.jcsb.$}>
         <div css={Css.df.fdc.gapPx(12).$}>
           <div css={Css.df.aic.gap1.$}>
-            {dragHandle}
+            {isReorderableEntry && <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact />}
             {getTitle(title, isChild, tid)}
           </div>
           {description && (
@@ -104,25 +113,27 @@ export function FormSection(props: FormSectionProps) {
       </div>
       {fields}
       {childSections &&
-        (isDraggable ? (
+        (isDraggableParent ? (
           <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
-            {/* Observer: `sortByOrderField` reads each child's `orderField.value` — without this, the
-                order here would only refresh on some unrelated re-render, not on the `.set()` calls
-                `handleReorder`/consumers make directly to those FieldStates. */}
             <Observer>
-              {() => (
-                <>
-                  {sortByOrderField(childSections).map((child, i) => (
-                    <DraggableChildSection
-                      key={getChildId(child, i)}
-                      child={child}
-                      index={i}
-                      isLast={i === childSections.length - 1}
-                      tid={tid}
-                    />
-                  ))}
-                </>
-              )}
+              {() => {
+                const sorted = [...reorderableChildSections!].sort(
+                  (a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0),
+                );
+                return (
+                  <>
+                    {sorted.map((child, i) => (
+                      <FormSection
+                        key={child.id}
+                        {...child}
+                        isChild
+                        isLast={i === sorted.length - 1}
+                        {...tid.childSection}
+                      />
+                    ))}
+                  </>
+                );
+              }}
             </Observer>
           </DnDGrid>
         ) : (
@@ -136,57 +147,6 @@ export function FormSection(props: FormSectionProps) {
         ))}
     </div>
   );
-}
-
-type DraggableChildSectionProps = {
-  child: Omit<FormSectionProps, "isChild" | "dragHandle">;
-  index: number;
-  isLast: boolean;
-  tid: Record<string, object>;
-};
-
-/**
- * The ref/`dragItemProps` must go on this wrapper (not on `FormSection`'s own root) because it must
- * remain a *direct child* of `DnDGrid`'s container — `DnDGrid` reparents this exact node via
- * `insertBefore` while dragging. The border-bottom separator is computed from `index`/`isLast` rather
- * than `:last-of-type`, since `DnDGrid` briefly inserts a cloned placeholder `div` as a sibling during a
- * drag, which can otherwise transiently steal `:last-of-type` from the real last section.
- */
-function DraggableChildSection({ child, index, isLast, tid }: DraggableChildSectionProps) {
-  const itemRef = useRef(null);
-  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: getChildId(child, index), itemRef });
-
-  return (
-    <div ref={itemRef} {...dragItemProps} css={isLast ? Css.pb3.$ : Css.bb.bc(Tokens.SurfaceSeparator).pb3.$}>
-      {child.orderField && (
-        <Observer>
-          {() => <input type="hidden" data-testid="orderInput" readOnly value={child.orderField!.value ?? index} />}
-        </Observer>
-      )}
-      <FormSection
-        {...child}
-        isChild
-        dragHandle={<DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact />}
-        {...tid.childSection}
-      />
-    </div>
-  );
-}
-
-function getChildId(child: Omit<FormSectionProps, "isChild" | "dragHandle">, index: number): string {
-  return String(child.id ?? (child.title || index));
-}
-
-/** Sorts by `orderField.value` only when *every* entry has one; otherwise preserves array order. */
-function sortByOrderField(
-  childSections: NonNullable<FormSectionProps["childSections"]>,
-): NonNullable<FormSectionProps["childSections"]> {
-  if (!hasCompleteOrderFields(childSections)) return childSections;
-  return [...childSections].sort((a, b) => a.orderField!.value! - b.orderField!.value!);
-}
-
-function hasCompleteOrderFields(childSections: NonNullable<FormSectionProps["childSections"]>): boolean {
-  return childSections.every((c) => c.orderField && isDefined(c.orderField.value));
 }
 
 function getTitle(title: string, isChild: boolean, tid: Record<string, object>) {

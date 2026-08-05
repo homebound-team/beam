@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
-import { FormSection, FormSectionProps } from "src/forms/FormSection";
+import { FormSection, FormSectionBase } from "src/forms/FormSection";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -11,7 +11,7 @@ export type FormSectionLayoutProps = {
   description?: ReactNode;
   /** Rendered top-right of the title row, e.g. a "Save draft" button. */
   actions?: ButtonProps[];
-  sections: FormSectionProps[];
+  sections: FormSectionBase[];
 };
 
 /** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */

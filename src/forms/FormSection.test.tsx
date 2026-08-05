@@ -83,8 +83,8 @@ describe("FormSection", () => {
     );
   });
 
-  it("does not render a DnDGrid or drag handles by default", async () => {
-    // Given a FormSection with childSections and neither draggable prop set
+  it("does not render a DnDGrid or drag handles when onReorderChildSections is omitted", async () => {
+    // Given a FormSection with childSections and no onReorderChildSections
     const r = await render(
       <FormSection title="Trade Partners" childSections={[{ title: "Electrical" }, { title: "Plumbing" }]} />,
     );
@@ -93,36 +93,15 @@ describe("FormSection", () => {
     expect(r.query.dragHandle).not.toBeInTheDocument();
   });
 
-  it("does not enable dragging when only one of draggableChildSections/onReorderChildSections is set", async () => {
-    // Given a FormSection with only draggableChildSections set
-    const r1 = await render(
-      <FormSection title="Trade Partners" draggableChildSections childSections={[{ title: "Electrical" }]} />,
-    );
-    // Then no DnDGrid renders
-    expect(r1.query.dndGrid).not.toBeInTheDocument();
-
-    // And given a FormSection with only onReorderChildSections set
-    const r2 = await render(
-      <FormSection
-        title="Trade Partners"
-        onReorderChildSections={() => {}}
-        childSections={[{ title: "Electrical" }]}
-      />,
-    );
-    // Then no DnDGrid renders
-    expect(r2.query.dndGrid).not.toBeInTheDocument();
-  });
-
-  it("renders a DnDGrid with a drag handle per childSection when both draggable props are set", async () => {
-    // Given a FormSection with both draggable props set
+  it("renders a DnDGrid with a drag handle per childSection when onReorderChildSections is set", async () => {
+    // Given a FormSection with onReorderChildSections and reorderable childSections
     const r = await render(
       <FormSection
         title="Trade Partners"
-        draggableChildSections
         onReorderChildSections={() => {}}
         childSections={[
-          { id: "electrical", title: "Electrical" },
-          { id: "plumbing", title: "Plumbing" },
+          { id: "electrical", title: "Electrical", orderField: orderField(0) },
+          { id: "plumbing", title: "Plumbing", orderField: orderField(1) },
         ]}
       />,
     );
@@ -133,16 +112,15 @@ describe("FormSection", () => {
   });
 
   it("calls onReorderChildSections with the new id order after a keyboard-driven reorder", async () => {
-    // Given a FormSection with two draggable childSections and a reorder spy
+    // Given a FormSection with two reorderable childSections and a reorder spy
     const onReorderChildSections = vi.fn();
     const r = await render(
       <FormSection
         title="Trade Partners"
-        draggableChildSections
         onReorderChildSections={onReorderChildSections}
         childSections={[
-          { id: "electrical", title: "Electrical" },
-          { id: "plumbing", title: "Plumbing" },
+          { id: "electrical", title: "Electrical", orderField: orderField(0) },
+          { id: "plumbing", title: "Plumbing", orderField: orderField(1) },
         ]}
       />,
     );
@@ -157,32 +135,64 @@ describe("FormSection", () => {
     expect(onReorderChildSections).toHaveBeenCalledWith(["plumbing", "electrical"]);
   });
 
-  it("renders a hidden input mirroring orderField.value, and omits it when orderField isn't provided", async () => {
-    // Given a FormSection with one childSection that has an orderField and one that doesn't
+  it("never shows a bottom border on the last reorderable childSection, including after a reorder", async () => {
+    // Given a FormSection with three reorderable childSections
     const r = await render(
       <FormSection
         title="Trade Partners"
-        draggableChildSections
+        onReorderChildSections={() => {}}
         childSections={[
-          { id: "electrical", title: "Electrical", orderField: orderField(2) },
-          { id: "plumbing", title: "Plumbing" },
+          { id: "electrical", title: "Electrical", orderField: orderField(0) },
+          { id: "plumbing", title: "Plumbing", orderField: orderField(1) },
+          { id: "hvac", title: "HVAC", orderField: orderField(2) },
         ]}
       />,
     );
-    // Then a hidden input mirrors the first section's order value
-    expect(r.orderInput_0).toHaveValue("2");
-    // And no hidden input renders for the section without an orderField
-    expect(r.query.orderInput_1).not.toBeInTheDocument();
+    const items = () => Array.from(r.dndGrid.querySelectorAll<HTMLElement>("[dndgrid-itemid]"));
+
+    // Then only the last section has no bottom border
+    expect(items()[0]).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(items()[1]).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(items()[2]).not.toHaveStyle({ borderBottomStyle: "solid" });
+
+    // When the user grabs the first section's drag handle via keyboard, moves it to the end, and commits
+    const handle = r.dragHandle_0;
+    fireEvent.keyDown(handle, { key: " " });
+    fireEvent.keyDown(handle, { key: "ArrowDown" });
+    fireEvent.keyDown(handle, { key: "ArrowDown" });
+    fireEvent.keyDown(handle, { key: "Enter" });
+
+    // Then the border still only omits from whichever section is now last
+    expect(items()[0]).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(items()[1]).toHaveStyle({ borderBottomStyle: "solid" });
+    expect(items()[2]).not.toHaveStyle({ borderBottomStyle: "solid" });
   });
 
-  it("auto-updates each child's orderField after a keyboard-driven reorder, with no onReorderChildSections passed", async () => {
-    // Given a FormSection with two draggable childSections, each with an orderField, and no onReorderChildSections
+  it("renders a hidden input mirroring each childSection's orderField.value", async () => {
+    // Given a FormSection with two reorderable childSections
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        onReorderChildSections={() => {}}
+        childSections={[
+          { id: "electrical", title: "Electrical", orderField: orderField(2) },
+          { id: "plumbing", title: "Plumbing", orderField: orderField(5) },
+        ]}
+      />,
+    );
+    // Then a hidden input mirrors each section's order value
+    expect(r.orderInput_0).toHaveValue("2");
+    expect(r.orderInput_1).toHaveValue("5");
+  });
+
+  it("auto-updates each child's orderField after a keyboard-driven reorder", async () => {
+    // Given a FormSection with two reorderable childSections
     const electricalOrder = orderField(0);
     const plumbingOrder = orderField(1);
     const r = await render(
       <FormSection
         title="Trade Partners"
-        draggableChildSections
+        onReorderChildSections={() => {}}
         childSections={[
           { id: "electrical", title: "Electrical", orderField: electricalOrder },
           { id: "plumbing", title: "Plumbing", orderField: plumbingOrder },
@@ -196,7 +206,7 @@ describe("FormSection", () => {
     fireEvent.keyDown(handle, { key: "ArrowDown" });
     fireEvent.keyDown(handle, { key: "Enter" });
 
-    // Then each orderField reflects its new position — proving dragging works via orderField alone
+    // Then each orderField reflects its new position
     expect(plumbingOrder.value).toBe(0);
     expect(electricalOrder.value).toBe(1);
   });
@@ -206,7 +216,7 @@ describe("FormSection", () => {
     const r = await render(
       <FormSection
         title="Trade Partners"
-        draggableChildSections
+        onReorderChildSections={() => {}}
         childSections={[
           { id: "plumbing", title: "Plumbing", orderField: orderField(1) },
           { id: "electrical", title: "Electrical", orderField: orderField(0) },
@@ -218,23 +228,6 @@ describe("FormSection", () => {
     expect(r.formSection_childSection_title_1).toHaveTextContent("Plumbing");
   });
 
-  it("preserves array order when only some childSections have an orderField", async () => {
-    // Given only one of two childSections has an orderField
-    const r = await render(
-      <FormSection
-        title="Trade Partners"
-        draggableChildSections
-        childSections={[
-          { id: "plumbing", title: "Plumbing", orderField: orderField(5) },
-          { id: "electrical", title: "Electrical" },
-        ]}
-      />,
-    );
-    // Then array order is preserved rather than partially sorting
-    expect(r.formSection_childSection_title_0).toHaveTextContent("Plumbing");
-    expect(r.formSection_childSection_title_1).toHaveTextContent("Electrical");
-  });
-
   it("permutes existing (non-zero-based) order values rather than resetting them to 0-based indices", async () => {
     // Given two childSections whose orderFields start at 2 and 3 (e.g. sharing a numbering space with
     // sections outside this childSections list), plus a reorder side-effect callback
@@ -244,7 +237,6 @@ describe("FormSection", () => {
     const r = await render(
       <FormSection
         title="Trade Partners"
-        draggableChildSections
         onReorderChildSections={onReorderChildSections}
         childSections={[
           { id: "electrical", title: "Electrical", orderField: electricalOrder },
