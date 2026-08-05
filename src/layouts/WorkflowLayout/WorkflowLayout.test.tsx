@@ -261,10 +261,10 @@ describe("WorkflowLayout", () => {
 function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): WorkflowLayoutStep[] {
   const { oneIsValid = true, twoIsValid = true } = overrides;
   return [
-    { label: "Step One", completed: oneIsValid, content: <div data-testid="body">Body content</div> },
+    { label: "Step One", isValid: oneIsValid, content: <div data-testid="body">Body content</div> },
     {
       label: "Step Two",
-      completed: twoIsValid,
+      isValid: twoIsValid,
       content: <div data-testid="stepTwoBody">Step two content</div>,
     },
   ];

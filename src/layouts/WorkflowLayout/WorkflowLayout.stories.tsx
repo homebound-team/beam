@@ -114,7 +114,7 @@ const tabLabels: Record<(typeof tabValues)[number], string> = {
 function makeSteps(contentRows = 0): WorkflowLayoutStep[] {
   return tabValues.map((value) => ({
     label: tabLabels[value],
-    completed: false,
+    isValid: false,
     content: <StepContent title={tabLabels[value]} numRows={contentRows} />,
   }));
 }

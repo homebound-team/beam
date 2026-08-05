@@ -4,7 +4,7 @@ import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { WorkflowActionsProps } from "src/layouts/WorkflowLayout/WorkflowActions";
 import { useTestIds } from "src/utils";
 
-export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled"> &
+export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "disabled"> &
   Partial<Pick<WorkflowActionsProps, "onContinue">>;
 
 export type StepperTabsProps = {
@@ -21,12 +21,17 @@ export function StepperTabs(props: StepperTabsProps) {
   const { sm: isMobile } = useBreakpoint();
   const collapsed = isMobile || !!forceCollapsed;
   const capWidth = steps.length <= 3;
+  const currentStepIndex = Math.max(
+    0,
+    steps.findIndex((step) => step.value === currentStep),
+  );
 
   return (
     <nav aria-label="steps" css={Css.w100.$} {...tid}>
       <ol css={Css.listReset.df.gapPx(gapPx).w100.bb.bcGray400.$}>
-        {steps.map((step) => {
-          const isCurrent = step.value === currentStep;
+        {steps.map((step, idx) => {
+          const isCurrent = idx === currentStepIndex;
+          const isCompleted = idx < currentStepIndex;
           return (
             <li
               css={Css.df.fg1.fb(0).if(collapsed).mw0.if(capWidth).maxwPx(maxStepWidthPx).$}
@@ -38,7 +43,7 @@ export function StepperTabs(props: StepperTabsProps) {
                 label={step.label}
                 value={step.value}
                 active={isCurrent}
-                completed={step.completed}
+                completed={isCompleted}
                 disabled={step.disabled}
                 collapsed={collapsed}
                 onClick={onChange}
