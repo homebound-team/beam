@@ -48,9 +48,6 @@ export type ReorderableFormSection = FormSectionCommon & {
   orderField: FieldState<number | null | undefined>;
 } & ChildSectionsUnion;
 
-/** @deprecated use `FormSectionBase` */
-export type FormSectionProps = FormSectionBase;
-
 export function FormSection(props: FormSectionBase | ReorderableFormSection) {
   const {
     title,
