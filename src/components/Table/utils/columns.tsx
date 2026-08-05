@@ -134,7 +134,7 @@ export function isContentColumn(column: Pick<GridColumn<Kinded>, "isAction" | "i
 }
 
 /** Empty fixed-width column inset for document-scroll table layouts. */
-function layoutGutterColumn<T extends Kinded>(side: "left" | "right"): GridColumn<T> {
+function layoutGutterColumn<T extends Kinded>(side: "left" | "right", sticky?: "left" | "right"): GridColumn<T> {
   const id = side === "left" ? layoutGutterLeftColumnId : layoutGutterRightColumnId;
   const base = {
     ...nonKindDefaults(),
@@ -146,13 +146,20 @@ function layoutGutterColumn<T extends Kinded>(side: "left" | "right"): GridColum
     canHide: false,
     expandableHeader: emptyCell,
     totals: emptyCell,
+    ...(sticky ? { sticky } : {}),
   };
   return newMethodMissingProxy(base, () => () => emptyCell) as GridColumn<T>;
 }
 
 /** Prepends and appends layout gutter columns for document-scroll table alignment. */
 export function withColumnGutters<T extends Kinded>(columns: GridColumn<T>[]): GridColumn<T>[] {
-  return [layoutGutterColumn("left"), ...columns, layoutGutterColumn("right")];
+  const stickyLeft = columns.some((c) => c.sticky === "left");
+  const stickyRight = columns.some((c) => c.sticky === "right");
+  return [
+    layoutGutterColumn("left", stickyLeft ? "left" : undefined),
+    ...columns,
+    layoutGutterColumn("right", stickyRight ? "right" : undefined),
+  ];
 }
 
 // Keep keys like `w` and `mw` from hitting the method missing proxy

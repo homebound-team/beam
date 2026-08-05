@@ -9,6 +9,7 @@ import {
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
+import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
@@ -52,6 +53,8 @@ type RowProps<R extends Kinded> = {
   isFirstHeadRow: boolean;
   isFirstBodyRow: boolean;
   isLastBodyRow: boolean;
+  /** When true, a trailing companion sits under this row — suppress the bottom separator. */
+  hasTrailingCompanion?: boolean;
   /* column resizers */
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
@@ -89,6 +92,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     isFirstHeadRow,
     isFirstBodyRow,
     isLastBodyRow,
+    hasTrailingCompanion = false,
     resizedWidths,
     setResizedWidth,
     disableColumnResizing = true,
@@ -348,6 +352,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isBodyRow && style.betweenRowsCss),
             ...(isFirstHeadCellRow && style.firstRowCellCss),
             ...(isLastBodyRow && style.lastRowCellCss),
+            // Trailing companion sits directly under this row — clear the bottom inset separator so
+            // the companion owns the group divider instead.
+            ...(hasTrailingCompanion && Css.bsh0.$),
             // Then override with first/last cell styling
             ...getFirstOrLastCellCss(style, columnIndex, columns, currentColspan),
             ...(columnIndex === 0 && isFirstHeadCellRow && style.firstRowFirstCellCss),
@@ -558,6 +565,11 @@ export type GridDataRow<R extends Kinded> = {
   draggable?: boolean;
   /** Image src for the row, to be used for card view */
   imgSrc?: string;
+  /**
+   * Full-width content rendered with this row (no separator between them).
+   * Plain content / render fn defaults to `"trailing"`; use `{ position, content }` for `"leading"`.
+   */
+  companion?: GridRowCompanion;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Used by TextFieldBase to set a border when the row is being hovered over
