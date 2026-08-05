@@ -1,4 +1,9 @@
 import { defineConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
+import {
+  documentScrollChromeLeft,
+  documentScrollChromeWidth,
+  pageContentPaddingXValue,
+} from "./src/layouts/layoutVars";
 import { motion } from "./truss-motion";
 import { palette } from "./truss-palette";
 import { Tokens } from "./truss-token-vars";
@@ -62,6 +67,15 @@ const sections: Sections = {
     newMethod("brt4", { borderTopRightRadius: "4px", borderTopLeftRadius: "4px" }),
     newMethod("brb4", { borderBottomRightRadius: "4px", borderBottomLeftRadius: "4px" }),
   ],
+  layoutContainer: () => [
+    newMethod("layoutContainer", {
+      width: documentScrollChromeWidth(),
+      left: documentScrollChromeLeft(),
+      position: "sticky",
+      paddingLeft: pageContentPaddingXValue,
+      paddingRight: pageContentPaddingXValue,
+    }),
+  ],
   animation: () => [
     newMethod("transition", { transition }),
     newMethod("transitionWidth", {
@@ -81,7 +95,7 @@ const sections: Sections = {
     }),
     newMethod("transitionAll", {
       transition: `all ${motion.duration.normal} ${motion.easing.standard}`,
-    })
+    }),
   ],
   boxShadow: () =>
     newMethodsForProp("boxShadow", {

@@ -5,14 +5,28 @@ import { Button, ButtonProps } from "src/components/Button";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
+import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
+
+/**
+ * A single action rendered in a `FormSection`/`FormSectionLayout` title row —
+ * either a full `Button` or an icon-only `IconButton`.
+ *
+ * Tagged with `kind` (not `type`) because `ButtonProps` already has its own
+ * unrelated `type?: "button" | "submit" | "reset"` HTML-attribute field.
+ *
+ * Icon actions always render with the `outline` `IconButton` variant, so `variant` is omitted here.
+ */
+export type FormSectionAction =
+  | ({ kind?: "default" } & ButtonProps)
+  | ({ kind: "icon" } & Omit<IconButtonProps, "variant">);
 
 type FormSectionCommon = {
   title: string;
   description?: ReactNode;
-  /** Rendered top-right of the title row. */
-  actions?: ButtonProps[];
+  /** Rendered top-right of the title row, e.g. an "Add" Button or an icon-only IconButton. */
+  actions?: FormSectionAction[];
   fields?: ReactNode;
   /** @internal smaller title styling for nested sections. */
   isChild?: boolean;
@@ -95,17 +109,21 @@ export function FormSection(props: FormSectionBase | ReorderableFormSection) {
             {isReorderableEntry && <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact />}
             {getTitle(title, isChild, tid)}
           </div>
-          {description && (
-            <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-              {description}
+          {actions && (
+            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+              {actions.map((action) =>
+                action.kind === "icon" ? (
+                  <IconButton key={action.icon} {...action} variant="outline" />
+                ) : (
+                  <Button key={`${action.label}`} {...action} />
+                ),
+              )}
             </div>
           )}
         </div>
-        {actions && (
-          <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-            {actions.map((action) => (
-              <Button key={`${action.label}`} {...action} />
-            ))}
+        {description && (
+          <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
+            {description}
           </div>
         )}
       </div>

@@ -67,6 +67,7 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
             onCancel={() => {}}
             completeLabel="Save"
             onComplete={onSave}
+            isDirty={() => formState.dirty}
             steps={steps}
           />
         );

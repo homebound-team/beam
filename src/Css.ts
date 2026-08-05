@@ -50,8 +50,11 @@ export enum Tokens {
   ButtonGhostFg = "--b-button-ghost-fg",
   ButtonPrimaryDisabledBg = "--b-button-primary-disabled-bg",
   ButtonPrimaryDisabledFg = "--b-button-primary-disabled-fg",
+  ButtonSecondaryFg = "--b-button-secondary-fg",
   ButtonTertiaryFg = "--b-button-tertiary-fg",
   ButtonTertiaryFgPressed = "--b-button-tertiary-fg-pressed",
+  ChoiceDisabled = "--b-choice-disabled",
+  ChoiceSelected = "--b-choice-selected",
   Danger = "--b-danger",
   DangerPressed = "--b-danger-pressed",
   EnvBrandDev = "--b-env-brand-dev",
@@ -68,11 +71,15 @@ export enum Tokens {
   FieldTextDisabled = "--b-field-text-disabled",
   FocusRingInset = "--b-focus-ring-inset",
   FocusRingMuted = "--b-focus-ring-muted",
-  ListRowBgHover = "--b-list-row-bg-hover",
   LoaderFill = "--b-loader-fill",
   LoaderSpinner = "--b-loader-spinner",
   LoaderTrack = "--b-loader-track",
-  MenuItemBgHover = "--b-menu-item-bg-hover",
+  NavGlobalItemBgActive = "--b-nav-global-item-bg-active",
+  NavGlobalItemBgHover = "--b-nav-global-item-bg-hover",
+  NavGlobalItemBgPressed = "--b-nav-global-item-bg-pressed",
+  NavGlobalText = "--b-nav-global-text",
+  NavGlobalTextActive = "--b-nav-global-text-active",
+  NavGlobalTextDisabled = "--b-nav-global-text-disabled",
   NavItemBgActive = "--b-nav-item-bg-active",
   NavItemBgHover = "--b-nav-item-bg-hover",
   NavItemBgPressed = "--b-nav-item-bg-pressed",
@@ -81,6 +88,7 @@ export enum Tokens {
   NavTextDisabled = "--b-nav-text-disabled",
   NavTextFocusVisible = "--b-nav-text-focus-visible",
   NavTextPressed = "--b-nav-text-pressed",
+  NeutralFillHover = "--b-neutral-fill-hover",
   NeutralFillHoverStrong = "--b-neutral-fill-hover-strong",
   NeutralFillHoverSubtle = "--b-neutral-fill-hover-subtle",
   NeutralFillPressed = "--b-neutral-fill-pressed",
@@ -88,18 +96,17 @@ export enum Tokens {
   OnPrimary = "--b-on-primary",
   OnSurface = "--b-on-surface",
   OnSurfaceMuted = "--b-on-surface-muted",
-  OnSurfaceSubtle = "--b-on-surface-subtle",
   OnSurfaceDisabled = "--b-on-surface-disabled",
   OnSurfaceRaisedHover = "--b-on-surface-raised-hover",
   OnSurfaceRaisedPressed = "--b-on-surface-raised-pressed",
-  PopoverSurface = "--b-popover-surface",
   Primary = "--b-primary",
   PrimaryHover = "--b-primary-hover",
   PrimaryPressed = "--b-primary-pressed",
   Scrim = "--b-scrim",
+  SelectionFill = "--b-selection-fill",
   SelectionIndicator = "--b-selection-indicator",
-  StatusSuccessFg = "--b-status-success-fg",
   Surface = "--b-surface",
+  SurfaceHover = "--b-surface-hover",
   SurfaceRaised = "--b-surface-raised",
   SurfaceRaisedHover = "--b-surface-raised-hover",
   SurfaceRaisedPressed = "--b-surface-raised-pressed",
@@ -3933,6 +3940,16 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `fontFamily: value`. */
   fontFamily(value: Properties["fontFamily"]) {
     return this.add("fontFamily", value);
+  }
+
+  // layoutContainer
+  /** Sets `width: "calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))"; left: "var(--beam-side-nav-layout-width, 0px)"; position: "sticky"; paddingLeft: "24px"; paddingRight: "24px"`. */
+  get layoutContainer() {
+    return this.add("width", "calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))")
+      .add("left", "var(--beam-side-nav-layout-width, 0px)").add("position", "sticky").add("paddingLeft", "24px").add(
+        "paddingRight",
+        "24px",
+      );
   }
 
   // animation

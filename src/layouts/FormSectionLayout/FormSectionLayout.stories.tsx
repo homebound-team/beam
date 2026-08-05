@@ -14,11 +14,15 @@ export function Default() {
       title="Trade Partners"
       description="Assign and manage trade partners for this project."
       actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
+      initialFields={<PlaceholderFields count={2} />}
       sections={[
         {
           title: "General Contractor",
           description: "The primary contractor responsible for this project.",
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          actions: [
+            { label: "Add", onClick: () => {}, variant: "tertiary" },
+            { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
+          ],
           fields: <PlaceholderFields count={2} />,
         },
         {
@@ -43,14 +47,28 @@ export function NestedChildSections() {
   return (
     <FormSectionLayout
       title="Trade Partners"
+      description="Assign and manage trade partners for this project."
       sections={[
         {
           title: "Sub-Contractors",
-          actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
+          description: "Assign and manage trade partners for this project.",
+          actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
           childSections: [
-            { title: "Electrical", fields: <PlaceholderFields count={2} /> },
-            { title: "Plumbing", fields: <PlaceholderFields count={2} /> },
-            { title: "HVAC", fields: <PlaceholderFields count={2} /> },
+            {
+              title: "Electrical",
+              actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
+              fields: <PlaceholderFields count={2} />,
+            },
+            {
+              title: "Plumbing",
+              actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
+              fields: <PlaceholderFields count={2} />,
+            },
+            {
+              title: "HVAC",
+              actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
+              fields: <PlaceholderFields count={2} />,
+            },
           ],
         },
       ]}

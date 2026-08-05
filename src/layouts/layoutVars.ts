@@ -59,3 +59,8 @@ export function stickyTableHeaderOffset(basePx = 0): string {
 export function getFloatingBottomOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamWorkflowLayoutFooterHeightVar}, 0px))`;
 }
+
+/** Page content horizontal inset (px).
+ * Setting in layoutVars instead of layoutSpacing to avoid circular dependency with truss-config.ts
+ */
+export const pageContentPaddingXValue = "24px";

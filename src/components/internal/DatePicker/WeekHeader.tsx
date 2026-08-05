@@ -1,4 +1,4 @@
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { formatPlainDate, todayPlainDate } from "src/utils/plainDate";
 
 export function WeekHeader() {
@@ -14,7 +14,7 @@ export function WeekHeader() {
     <thead className="rdp-head">
       <tr className="rdp-head_row">
         {days.map((day) => (
-          <th scope="col" css={Css.p1.pbPx(12).xs.gray400.$} key={formatPlainDate(day, "weekday")}>
+          <th scope="col" css={Css.p1.pbPx(12).xs.color(Tokens.OnSurfaceMuted).$} key={formatPlainDate(day, "weekday")}>
             <span aria-hidden="true">{formatPlainDate(day, "weekdayInitial")}</span>
             <span className="rdp-vhidden">{formatPlainDate(day, "weekday")}</span>
           </th>

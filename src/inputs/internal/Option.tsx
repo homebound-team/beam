@@ -21,7 +21,7 @@ export function Option<O>(props: OptionProps<O>) {
 
   const themeStyles = {
     item: Css.color(Tokens.OnSurface).$,
-    hover: Css.bgColor(Tokens.ListRowBgHover).$,
+    hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
     disabled: Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
     focus: Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$,
   };
@@ -45,7 +45,7 @@ export function Option<O>(props: OptionProps<O>) {
         css={{
           ...Css.df.aic.jcsb.py1.px2.mh("42px").outline0.cursorPointer.sm.$,
           // Assumes only one Persistent Item per list - will need to change to utilize Sections if that assumption is incorrect.
-          ...(isPersistentKey(item.key) ? Css.bt.bcGray200.$ : {}),
+          ...(isPersistentKey(item.key) ? Css.bt.bc(Tokens.SurfaceSeparator).$ : {}),
           ...themeStyles.item,
           ...(isHovered && !isDisabled ? themeStyles.hover : {}),
           ...(isFocused ? themeStyles.focus : {}),

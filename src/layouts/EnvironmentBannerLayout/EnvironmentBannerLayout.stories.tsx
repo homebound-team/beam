@@ -27,7 +27,7 @@ export function Hidden() {
           items: [{ label: "Dashboard", onClick: () => {}, active: true }],
         }}
       >
-        <div css={Css.bgGray50.p3.$}>Body without a displayed banner.</div>
+        <div css={Css.bgColor(Tokens.Surface).p3.$}>Body without a displayed banner.</div>
       </NavbarLayout>
     </EnvironmentBannerLayout>
   );
@@ -58,6 +58,14 @@ export function Composed() {
           }}
         >
           <PageHeaderLayout pageHeader={{ title: "Page header" }}>
+            <p css={Css.p3.$}>
+              This text will take up the entire width of its container and get scrolled away both horizontally and
+              vertically.
+            </p>
+            <p css={Css.layoutContainer.py3.$}>
+              This text uses <pre>Css.layoutContainer.$</pre> to fix itself in place horizontally, but will still scroll
+              away vertically.
+            </p>
             <GridTableLayoutExample storageKey="environment-banner-layout-composed" />
           </PageHeaderLayout>
         </SideNavLayout>

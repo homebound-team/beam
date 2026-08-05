@@ -1,4 +1,6 @@
+import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
@@ -166,6 +168,45 @@ describe("ButtonMenu", () => {
     expect(r.trigger_optionB.querySelector("[data-icon='check']")).toBeTruthy();
   });
 
+  it("navigates in-app when clicking a link menu item", async () => {
+    // Given a menu item that links to a relative, in-app URL
+    const r = await render(
+      <>
+        <LocationDisplay />
+        <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Projects", onClick: "/projects" }]} />
+      </>,
+      withRouter(),
+    );
+    click(r.trigger);
+
+    // When plainly clicking the item
+    click(r.trigger_projects);
+
+    // Then we navigate the current page (SPA) to that URL
+    expect(r.location.textContent).toBe("/projects");
+  });
+
+  it("opens a link menu item in a new tab when cmd/ctrl-clicking", async () => {
+    // Given a menu item that links to a relative, in-app URL
+    const openSpy = vi.spyOn(window, "open").mockReturnValue({ opener: null } as Window);
+    const r = await render(
+      <>
+        <LocationDisplay />
+        <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Projects", onClick: "/projects" }]} />
+      </>,
+      withRouter(),
+    );
+    click(r.trigger);
+
+    // When cmd/ctrl-clicking the item
+    fireEvent.click(r.trigger_projects, { metaKey: true });
+
+    // Then it opens in a new tab and does not navigate the current page
+    expect(openSpy).toHaveBeenCalledWith("/projects", "_blank");
+    expect(r.location.textContent).toBe("/");
+    openSpy.mockRestore();
+  });
+
   it("closes the menu when clicking the trigger again", async () => {
     // Given a ButtonMenu
     const r = await render(
@@ -182,6 +223,12 @@ describe("ButtonMenu", () => {
     expect(r.query.trigger_optionA).toBe(null);
   });
 });
+
+/** Renders the current router pathname so tests can assert on in-app navigation. */
+function LocationDisplay() {
+  const location = useLocation();
+  return <div data-testid="location">{location.pathname}</div>;
+}
 
 function TestButtonMenu({ empty = false, searchable = false, ...others }: { empty?: boolean; searchable?: boolean }) {
   const [loaded, setLoaded] = useState(!empty);
