@@ -93,8 +93,8 @@ export function FormSection(props: FormSectionBase | ReorderableFormSection) {
         !isReorderableEntry
           ? Css.df.fdc.gap2.$
           : isLast
-            ? Css.df.fdc.gap2.bgColor(Tokens.Surface).pb3.$
-            : Css.df.fdc.gap2.bgColor(Tokens.Surface).bb.bc(Tokens.SurfaceSeparator).pb3.$
+            ? Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).pb3.$
+            : Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).bb.bc(Tokens.SurfaceSeparator).pb3.$
       }
       {...tid}
     >
@@ -103,8 +103,8 @@ export function FormSection(props: FormSectionBase | ReorderableFormSection) {
           {() => <input type="hidden" data-testid="orderInput" readOnly value={orderField!.value ?? 0} />}
         </Observer>
       )}
-      <div css={Css.df.jcsb.$}>
-        <div css={Css.df.fdc.gapPx(12).$}>
+      <div css={Css.df.fdc.jcsb.$}>
+        <div css={Css.df.jcsb.gapPx(12).$}>
           <div css={Css.df.aic.gap1.$}>
             {isReorderableEntry && <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact />}
             {getTitle(title, isChild, tid)}

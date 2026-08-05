@@ -193,8 +193,13 @@ export function DnDGrid(props: DnDGridProps) {
 
         // Remove any placeholder elements.
         gridEl.current.querySelectorAll(`[${gridCloneKey}]`).forEach((el) => el.remove());
-        // Clear custom styling
-        dragEl.current.removeAttribute("style");
+        // Clear only the drag-overlay styles we applied ourselves -- not the whole `style` attribute,
+        // which would also wipe out any of dragEl's own pre-existing inline styles (e.g. this repo's
+        // CSS-custom-property-driven tokens like `bgColor`/`bc`, which rely on inline `--foo` vars) that
+        // have nothing to do with dragging.
+        dragOverlayStyleKeys.forEach((prop) => {
+          dragEl.current!.style[prop] = "";
+        });
         gridEl.current.style.cursor = "auto";
         // And unset the `cloneEl`
         cloneEl.current = undefined;
@@ -316,6 +321,18 @@ type GridStyles = Pick<
 
 export const gridItemIdKey = "dndgrid-itemid";
 const gridCloneKey = "dndgrid-clone";
+
+/** The inline style properties `onDragStart`/`onMove` apply directly to `dragEl` to visually detach it during a mouse/touch drag -- cleared by `onDragEnd`. Kept separate from `activeStyles`, which `commitReorder` already clears via `clearInlineStyles`. */
+const dragOverlayStyleKeys = [
+  "pointerEvents",
+  "position",
+  "zIndex",
+  "top",
+  "left",
+  "width",
+  "height",
+  "transform",
+] as const;
 
 // Create a union of the mouse and touch events, both native and react synthetics.
 // This simplifies the type signature of the event handlers.
