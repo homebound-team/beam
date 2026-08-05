@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { Css } from "src/Css";
+import { Breakpoints, Css } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { newStory, viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
@@ -48,6 +48,10 @@ export const ScrollCollapsesTabs = newStory(
   ),
   {
     play: async ({ canvasElement }) => {
+      // On mobile (e.g. the `mobile1` Chromatic mode) the tabs are already collapsed on mount — scrolling
+      // wouldn't shrink them any further, so the height-shrinks wait below would never resolve.
+      if (window.matchMedia(Breakpoints.sm.replace("@media ", "")).matches) return;
+
       const header = within(canvasElement).getByTestId("workflowLayout_header");
       const expandedHeight = header.getBoundingClientRect().height;
       window.scrollTo({ top: 400 });
