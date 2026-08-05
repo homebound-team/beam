@@ -17,7 +17,7 @@ This document is the **canonical contract** for structural page layouts in Beam.
 | `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                       |
 | `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                                                                                                                                                                                                                                                          |
 | `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                                                                                                                                                                                                                                                                               |
-| `WorkflowLayout`          | `WorkflowHeader`               | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?` flattened onto `WorkflowLayoutProps`, `steps: WorkflowLayoutStep[]` (label/completed/disabled/content — no `value`, it's derived from `label`) — active step's `content` is the body; `defaultStep?` picks the initial step (matched against the derived value), the layout owns navigation from there; standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
+| `WorkflowLayout`          | `WorkflowHeader`               | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?` flattened onto `WorkflowLayoutProps`, `steps: WorkflowLayoutStep[]` (label/completed/disabled/content — no `value`, it's derived from `label`) — active step's `content` is the body; `defaultStep?` picks the initial step (matched against the derived value), the layout owns navigation from there; standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
 
 `EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating, showProdWarning)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating or with `showProdWarning`); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation or `showProdWarning`). The banner does **not** auto-hide.
 
@@ -78,9 +78,66 @@ import { EnvironmentBannerLayout, shouldShowEnvironmentBanner, WorkflowLayout } 
       : undefined
   }
 >
-  <WorkflowLayout title={title} onCancel={onCancel} completeLabel={completeLabel} onComplete={onComplete} steps={steps} />
+  <WorkflowLayout
+    title={title}
+    onCancel={onCancel}
+    completeLabel={completeLabel}
+    onComplete={onComplete}
+    isDirty={() => formState.dirty}
+    steps={steps}
+  />
 </EnvironmentBannerLayout>;
 ```
+
+When `isDirty` returns true, Cancel, in-app React Router navigation, and tab close/refresh ask the user to confirm before leaving. Requires a data router (`RouterProvider` / `createBrowserRouter`) for in-app blocking. Do **not** also register the same form with an app-level navigation check (e.g. `useRegisterNavigationCheck`) — only one `useBlocker` should guard the page.
+
+#### Multiple form states (one per step)
+
+When each step has its own `@homebound/form-state` instance, keep those forms **alive on the workflow page** (not created/destroyed with step mount). Load each step’s server data on demand into `useFormState`’s `init` so hydration does not mark the form dirty. Aggregate dirty flags in `isDirty`:
+
+```tsx
+function CreateThingWorkflow() {
+  // Config-only at first — light. Fetch each step’s input when that step is visited, then pass it to `init`.
+  const [basicsInput, setBasicsInput] = useState<BasicsInput | undefined>();
+  const [detailsInput, setDetailsInput] = useState<DetailsInput | undefined>();
+
+  const basicsForm = useFormState({
+    config: basicsConfig,
+    ...(basicsInput ? { init: { input: basicsInput, map: (i) => i } } : {}),
+  });
+  const detailsForm = useFormState({
+    config: detailsConfig,
+    ...(detailsInput ? { init: { input: detailsInput, map: (i) => i } } : {}),
+  });
+
+  return (
+    <WorkflowLayout
+      title={title}
+      onCancel={onCancel}
+      completeLabel="Create"
+      onComplete={onComplete}
+      isDirty={() => basicsForm.dirty || detailsForm.dirty}
+      steps={[
+        {
+          label: "Basics",
+          completed: basicsForm.valid,
+          content: <BasicsStep form={basicsForm} onLoad={setBasicsInput} />,
+        },
+        {
+          label: "Details",
+          completed: detailsForm.valid,
+          disabled: !basicsForm.valid,
+          content: <DetailsStep form={detailsForm} onLoad={setDetailsInput} />,
+        },
+      ]}
+    />
+  );
+}
+```
+
+Avoid creating form state only inside step content that unmounts when the user changes steps — leave protection would lose dirty state for unvisited/unmounted steps. Prefer feeding loaded data through `init` (or `set` + `commitChanges`) rather than field-by-field edits that look like user changes.
+
+See Storybook: **WorkflowLayoutMultiFormApp** for a runnable example.
 
 ### Environment favicons
 

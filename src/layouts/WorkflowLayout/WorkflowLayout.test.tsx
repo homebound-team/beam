@@ -1,5 +1,6 @@
+import { act } from "@testing-library/react";
 import { setViewport } from "src/tests/viewport";
-import { click, render, withRouter } from "src/utils/rtl";
+import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
@@ -50,6 +51,87 @@ describe("WorkflowLayout", () => {
 
     // Then it's called
     expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onCancel immediately when Cancel is clicked and the form is clean", async () => {
+    // Given a WorkflowLayout that reports not dirty
+    const onCancel = vi.fn();
+    const r = await render(<WorkflowLayout {...baseProps({ onCancel, isDirty: () => false })} />, withRouter());
+
+    // When Cancel is clicked
+    click(r.cancel);
+
+    // Then onCancel is called without a confirm modal
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(r.query.discardChanges).toBeNull();
+  });
+
+  it("confirms before calling onCancel when Cancel is clicked and the form is dirty", async () => {
+    // Given a WorkflowLayout that reports dirty
+    const onCancel = vi.fn();
+    const r = await render(<WorkflowLayout {...baseProps({ onCancel, isDirty: () => true })} />, withRouter());
+
+    // When Cancel is clicked
+    click(r.cancel);
+
+    // Then a confirm modal appears and onCancel is not called yet
+    expect(r.discardChanges).toBeInTheDocument();
+    expect(onCancel).not.toHaveBeenCalled();
+
+    // When Discard Changes is clicked
+    click(r.discardChanges);
+
+    // Then onCancel is called
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call onCancel when Continue Editing is chosen on Cancel confirm", async () => {
+    // Given a dirty WorkflowLayout whose Cancel confirm is open
+    const onCancel = vi.fn();
+    const r = await render(<WorkflowLayout {...baseProps({ onCancel, isDirty: () => true })} />, withRouter());
+    click(r.cancel);
+
+    // When Continue Editing is clicked
+    click(r.continueEditing);
+
+    // Then onCancel is not called
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  it("blocks in-app navigation when dirty and proceeds after Discard Changes", async () => {
+    // Given a dirty WorkflowLayout
+    const router = withRouter("/");
+    const r = await render(<WorkflowLayout {...baseProps({ isDirty: () => true })} />, router);
+
+    // When navigating away
+    await act(async () => {
+      await router.navigate("/other");
+    });
+
+    // Then navigation is blocked and a confirm modal appears
+    expect(router.location.pathname).toBe("/");
+    expect(r.discardChanges).toBeInTheDocument();
+
+    // When Discard Changes is clicked
+    await clickAndWait(r.discardChanges);
+
+    // Then navigation proceeds
+    expect(router.location.pathname).toBe("/other");
+  });
+
+  it("stays on the page when Continue Editing is chosen after a blocked navigation", async () => {
+    // Given a dirty WorkflowLayout with a blocked navigation
+    const router = withRouter("/");
+    const r = await render(<WorkflowLayout {...baseProps({ isDirty: () => true })} />, router);
+    await act(async () => {
+      await router.navigate("/other");
+    });
+
+    // When Continue Editing is clicked
+    await clickAndWait(r.continueEditing);
+
+    // Then we remain on the current route
+    expect(router.location.pathname).toBe("/");
   });
 
   it("calls onComplete when Save is clicked on the last step", async () => {

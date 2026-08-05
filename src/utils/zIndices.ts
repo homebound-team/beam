@@ -17,8 +17,6 @@ export const zIndices = {
 
   // Page chrome - ensure these items sit above the table
   scrollShadow: 50,
-  superDrawerScrim: 55,
-  modalUnderlay: 60,
   pageStickyHeader: 70,
   // Sticky mobile action footer (WorkflowLayout) — same tier as pageStickyHeader; header and footer never overlap on screen.
   pageStickyFooter: 70,
@@ -37,8 +35,13 @@ export const zIndices = {
   navbarMobileMenuScrim: 124,
   navbarMobileMenu: 125,
 
-  // Environment banner (EnvironmentBannerLayout) — above navbar mobile menu; below snackbar.
+  // Environment banner (EnvironmentBannerLayout) — above navbar mobile menu; below overlay scrims.
   environmentBanner: 130,
+
+  // Overlay scrims — above app chrome (including the environment banner); modal above SuperDrawer
+  // so ConfirmCloseModal can sit on top of an open drawer. Below pageOverlay / snackbar.
+  superDrawerScrim: 140,
+  modalUnderlay: 150,
 
   // Full-page overlays — high enough to clear consuming-app nav bars (~999).
   // Both layouts own their Toast internally so it renders inside the overlay header.

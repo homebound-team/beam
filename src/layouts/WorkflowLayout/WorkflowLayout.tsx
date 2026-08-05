@@ -16,6 +16,7 @@ import {
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useMeasuredHeight } from "../useMeasuredHeight";
+import { UnsavedChangesNavigationModal, useUnsavedChangesGuard } from "./useUnsavedChangesGuard";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
 /** A `WorkflowLayout` step: a `StepperTabsStep` (minus `value`, which is derived from `label`) plus the page content rendered while it's active — `completed` also gates the Continue/Complete CTA when this is the active step. */
@@ -30,6 +31,8 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
     steps: WorkflowLayoutStep[];
     /** The step shown initially (matched against `defaultTestId(step.label)`); falls back to the first step if omitted or if it doesn't match any step. Uncontrolled — the layout owns step navigation from here. */
     defaultStep?: string;
+    /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
+    isDirty?: () => boolean;
   };
 
 /**
@@ -42,14 +45,15 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  *
  * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) via `WorkflowActions`
  * so it can move them into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part
- * of the public API.
+ * of the public API. Pass `isDirty` to confirm before Cancel, in-app navigation, or tab close.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
-  const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, ...headerProps } = props;
+  const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, isDirty, ...headerProps } = props;
   const tabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(tabSteps, defaultStep));
   const tid = useTestIds(props, "workflowLayout");
   const { sm: isMobile } = useBreakpoint();
+  const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard({ isDirty, onCancel });
 
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
@@ -77,7 +81,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       isLastStep={isLastStep}
       isMobile={isMobile}
       onBack={() => setCurrentStep(tabSteps[currentIndex - 1].value)}
-      onCancel={onCancel}
+      onCancel={onCancelClick}
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
@@ -146,6 +150,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
           </div>
         )}
       </div>
+      {navigationBlocker && <UnsavedChangesNavigationModal {...navigationBlocker} />}
     </DocumentScrollLayoutProvider>
   );
 }
