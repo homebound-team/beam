@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css, Properties } from "src/Css";
+import { Css, Properties, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -44,50 +44,69 @@ export function StepperTab(props: StepperTabProps) {
         ...stepperTabStyles.baseStyles,
         ...getStateStyles(active, completed),
         ...(isHovered && !disabled ? stepperTabStyles.hoverStyles : {}),
-        ...(collapsed ? getCollapsedStyles(active, completed) : {}),
+        ...(collapsed ? stepperTabStyles.collapsedStyles : {}),
         ...(disabled ? stepperTabStyles.disabledStyles : {}),
         ...(isFocusVisible ? stepperTabStyles.focusRingStyles : {}),
       }}
       {...tid[defaultTestId(value)]}
     >
-      <span css={Css.lineClamp1.$}>{label}</span>
-      {completed && (
-        <span css={Css.fs0.ml1.$}>
-          <Icon icon="check" inc={2.5} {...tid.check} />
-        </span>
+      {!collapsed && (
+        <>
+          <span css={Css.dg.jic.mw0.$}>
+            {/* Hidden semibold size reserves bold width so switching between font-weights won't shift layout. */}
+            <span
+              css={Css.smSb.visibility("hidden").add("gridArea", "1/1").lineClamp1.wordBreak("break-all").$}
+              aria-hidden
+            >
+              {label}
+            </span>
+            <span css={Css.add("gridArea", "1/1").lineClamp1.wordBreak("break-all").if(active).smSb.$}>{label}</span>
+          </span>
+          <span
+            css={
+              Css.fs0.ml1.transitionAll.o0
+                .add("transform", "scale(0.75) translateY(100%)")
+                .if(completed)
+                .o100.add("transform", "scale(1) translateY(0%)").$
+            }
+          >
+            <Icon icon="check" inc={2.5} {...tid.check} />
+          </span>
+        </>
       )}
+      {/* The indicator is a border element that is used to indicate the current step. */}
+      <span aria-hidden css={getIndicatorStyles(active, completed, disabled)} {...tid.indicator} />
       <VisuallyHidden>{completed ? "Complete" : "Not Complete"}</VisuallyHidden>
     </button>
   );
 }
 
-function withBorderBottom(color: Properties) {
-  return {
-    ...Css.bb.add("borderBottomWidth", `3px`).$,
-    ...color,
-  };
-}
-
 function getStateStyles(active: boolean, completed: boolean): Properties {
+  return Css.color(Tokens.OnSurfaceMuted)
+    .if(active || completed)
+    .color(Tokens.ChoiceSelected).$;
+}
+
+function getIndicatorStyles(active: boolean, completed: boolean, disabled: boolean): Properties {
+  // Absolute so active vs inactive thickness never changes the tab's layout height.
+  // Note: We are using border token colors for background. This is because the element we are rendering visually appears as a border.
   return {
-    ...Css.gray400.if(active || completed).blue700.if(active).smSb.$,
-    ...withBorderBottom(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
+    ...Css.absolute.left0.right0.bottom0
+      .hPx(active ? activeIndicatorHeightPx : inactiveIndicatorHeightPx)
+      .bgColor(Tokens.FieldBorderDefault)
+      .if((active || completed) && !disabled)
+      .bgColor(Tokens.Primary).$,
   };
 }
 
-// Mirrors getStateStyles' border condition — a step reads as blue while collapsed under the same
-// active-or-completed rule as expanded, not just when completed.
-function getCollapsedStyles(active: boolean, completed: boolean): Properties {
-  return {
-    ...Css.cursor("default").hPx(0).py0.$,
-    ...(active || completed ? Css.bcBlue600.$ : Css.bcGray300.$),
-  };
-}
+const activeIndicatorHeightPx = 3;
+const inactiveIndicatorHeightPx = 2;
 
 const stepperTabStyles = {
-  baseStyles: Css.df.aic.fg1.py1.prPx(12).plPx(24).sm.oh.tal.hPx(48).transitionAll.$,
+  // No overflow:hidden — collapsed indicators are absolute and must paint outside the 0-height box.
+  baseStyles: Css.relative.df.aic.jcfs.fg1.py1.prPx(12).plPx(24).sm.color(Tokens.OnSurfaceMuted).tal.hPx(40).$,
   hoverStyles: Css.bgGray100.$,
   focusRingStyles: Css.bshFocus.outline0.$,
-  // Disabled always wins over both the state's and the collapsed border color.
-  disabledStyles: Css.gray400.cursorNotAllowed.bcGray300.$,
+  collapsedStyles: Css.cursor("default").hPx(0).py0.$,
+  disabledStyles: Css.color(Tokens.TextDisabled).cursorNotAllowed.$,
 };

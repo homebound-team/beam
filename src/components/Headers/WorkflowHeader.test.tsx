@@ -44,7 +44,7 @@ describe("WorkflowHeader", () => {
 
 function makeSteps(): StepperTabsStep[] {
   return [
-    { label: "Trade Partners", value: "trade", completed: false },
-    { label: "Send Email", value: "send", completed: false },
+    { label: "Trade Partners", value: "trade" },
+    { label: "Send Email", value: "send" },
   ];
 }

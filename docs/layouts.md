@@ -11,13 +11,13 @@ This document is the **canonical contract** for structural page layouts in Beam.
 
 ## React (`@homebound/beam`)
 
-| Layout                    | Renders                        | Props                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------- | ------------------------------ |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `EnvironmentBannerLayout` | `EnvironmentBanner` (optional) | `environmentBanner?: EnvironmentBannerProps`; body → **`children`**                                                                                                                                                                                                                                                                                                |
-| `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                       |
-| `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                                                                                                                                                                                                                                                          |
-| `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                                                                                                                                                                                                                                                                               |
-| `WorkflowLayout`          | `WorkflowHeader`               | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?` flattened onto `WorkflowLayoutProps`, `steps: WorkflowLayoutStep[]` (label/completed/disabled/content — no `value`, it's derived from `label`) — active step's `content` is the body; `defaultStep?` picks the initial step (matched against the derived value), the layout owns navigation from there; standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
+| Layout                    | Renders                        | Props                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EnvironmentBannerLayout` | `EnvironmentBanner` (optional) | `environmentBanner?: EnvironmentBannerProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                                                                                      |
+| `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                                                                                                                                                                                                                                                                                                                                                |
+| `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `WorkflowLayout`          | `WorkflowHeader`               | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?` flattened onto `WorkflowLayoutProps`, `steps: WorkflowLayoutStep[]` (label/isValid/disabled/content — no `value`, it's derived from `label`) — active step's `content` is the body; `defaultStep?` picks the initial step (matched against the derived value), the layout owns navigation from there; standalone, only ever under `EnvironmentBannerLayout` (see rule 3) |
 
 `EnvironmentBannerLayout` is the **outermost** wrapper. Pass `environmentBanner` when `shouldShowEnvironmentBanner(env, impersonating, showProdWarning)` is true (`dev`, `qa`, `local-prod`, or `prod` while impersonating or with `showProdWarning`); omit it (or pass `undefined`) when hidden (`local`, or `prod` without impersonation or `showProdWarning`). The banner does **not** auto-hide.
 
@@ -65,7 +65,7 @@ import {
 Step-based workflow pages skip `NavbarLayout`/`SideNavLayout` entirely — `WorkflowLayout` is a standalone,
 full-page experience. Its `steps` prop is the single source of truth: it drives the header's tab strip,
 picks which step's `content` renders as the body, and gates the Continue/Complete CTA on the active
-step's `completed`. `WorkflowLayout` owns step navigation itself (clicking a tab, Back, Continue all move
+step's `isValid`. `WorkflowLayout` owns step navigation itself (clicking a tab, Back, Continue all move
 between `steps` internally) — `defaultStep` only picks which step it starts on (defaults to the first):
 
 ```tsx
@@ -120,12 +120,12 @@ function CreateThingWorkflow() {
       steps={[
         {
           label: "Basics",
-          completed: basicsForm.valid,
+          isValid: basicsForm.valid,
           content: <BasicsStep form={basicsForm} onLoad={setBasicsInput} />,
         },
         {
           label: "Details",
-          completed: detailsForm.valid,
+          isValid: detailsForm.valid,
           disabled: !basicsForm.valid,
           content: <DetailsStep form={detailsForm} onLoad={setDetailsInput} />,
         },

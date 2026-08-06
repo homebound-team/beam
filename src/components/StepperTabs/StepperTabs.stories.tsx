@@ -15,9 +15,9 @@ export default {
 
 export function InteractiveStepperTabs() {
   const [steps, setSteps] = useState<StepperTabsStep[]>([
-    { label: "Trade Partners", value: "trade", completed: false },
-    { label: "Draft Email", value: "draft", completed: false, disabled: true },
-    { label: "Send Email", value: "send", completed: false, disabled: true },
+    { label: "Trade Partners", value: "trade" },
+    { label: "Draft Email", value: "draft", disabled: true },
+    { label: "Send Email", value: "send", disabled: true },
   ]);
   const [currentStep, setCurrentStep] = useState(steps[0].value);
 
@@ -32,43 +32,39 @@ export function InteractiveStepperTabs() {
       <div css={Css.mt2.df.gap1.$}>
         {currentStep === "trade" && (
           <>
-            <Button label="Toggle complete" onClick={() => setStep(0, { completed: !steps[0].completed })} />
             <Button label="Enable Draft Email step" onClick={() => setStep(1, { disabled: false })} />
             <Button label="To Draft Email" onClick={() => setCurrentStep("draft")} disabled={steps[1].disabled} />
           </>
         )}
         {currentStep === "draft" && (
           <>
-            <Button label="Toggle complete" onClick={() => setStep(1, { completed: !steps[1].completed })} />
             <Button label="Enable Send Email step" onClick={() => setStep(2, { disabled: false })} />
             <Button label="To Send Email" onClick={() => setCurrentStep("send")} disabled={steps[2].disabled} />
           </>
         )}
-        {currentStep === "send" && (
-          <Button label="Toggle complete" onClick={() => setStep(2, { completed: !steps[2].completed })} />
-        )}
+        {currentStep === "send" && <Button label="Back to Trade Partners" onClick={() => setCurrentStep("trade")} />}
       </div>
     </div>
   );
 }
 
 const twoSteps: StepperTabsStep[] = [
-  { label: "Trade Partners", value: "trade", completed: true },
-  { label: "Send Email", value: "send", completed: false },
+  { label: "Trade Partners", value: "trade" },
+  { label: "Send Email", value: "send" },
 ];
 
 const threeSteps: StepperTabsStep[] = [
-  { label: "Trade Partners", value: "trade", completed: true },
-  { label: "Draft Email", value: "draft", completed: false },
-  { label: "Send Email", value: "send", completed: false },
+  { label: "Trade Partners", value: "trade" },
+  { label: "Draft Email", value: "draft" },
+  { label: "Send Email", value: "send" },
 ];
 
 const fiveSteps: StepperTabsStep[] = [
-  { label: "Trade Partners", value: "trade", completed: true },
-  { label: "Plan Package", value: "plan", completed: true },
-  { label: "Design Packages", value: "design", completed: false },
-  { label: "Options", value: "options", completed: false, disabled: true },
-  { label: "Review", value: "review", completed: false, disabled: true },
+  { label: "Trade Partners", value: "trade" },
+  { label: "Plan Package", value: "plan" },
+  { label: "Design Packages", value: "design" },
+  { label: "Options", value: "options", disabled: true },
+  { label: "Review", value: "review", disabled: true },
 ];
 
 export function StepWidths() {

@@ -44,18 +44,18 @@ export function WorkflowLayoutMultiFormApp() {
         const steps: WorkflowLayoutStep[] = [
           {
             label: "Basics",
-            completed: basicsForm.valid,
+            isValid: basicsForm.valid,
             content: <BasicsStep form={basicsForm} onLoad={loadBasics} loaded={!!basicsInput} />,
           },
           {
             label: "Contact",
-            completed: contactForm.valid,
+            isValid: contactForm.valid,
             disabled: !basicsForm.valid,
             content: <ContactStep form={contactForm} onLoad={loadContact} loaded={!!contactInput} />,
           },
           {
             label: "Notes",
-            completed: notesForm.valid,
+            isValid: notesForm.valid,
             disabled: !contactForm.valid,
             content: <NotesStep form={notesForm} onLoad={loadNotes} loaded={!!notesInput} />,
           },
