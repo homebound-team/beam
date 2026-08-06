@@ -87,8 +87,12 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       onComplete={onComplete}
       primaryDisabled={!activeStep?.completed}
       onContinue={async () => {
-        // A `false` result means the step vetoed the advance (e.g. its save failed), so stay put.
-        if ((await activeStep?.onContinue?.()) !== false) setCurrentStep(tabSteps[currentIndex + 1].value);
+        const onContinue = activeStep?.onContinue;
+        if (onContinue) {
+          const allowed = await onContinue();
+          if (allowed === false) return;
+        }
+        setCurrentStep(tabSteps[currentIndex + 1].value);
       }}
     />
   );
