@@ -201,8 +201,8 @@ describe("WorkflowLayout", () => {
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
   });
 
-  it("advances on Continue when no onContinue is passed", async () => {
-    // Given a WorkflowLayout with no onContinue interception
+  it("advances on Continue when the step has no onContinue", async () => {
+    // Given a WorkflowLayout whose steps don't intercept Continue
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
     // When Continue is clicked
     await clickAndWait(r.continue);
@@ -210,15 +210,19 @@ describe("WorkflowLayout", () => {
     expect(r.stepTwoBody).toBeInTheDocument();
   });
 
-  it("awaits onContinue before advancing to the next step", async () => {
-    // Given a WorkflowLayout whose onContinue resolves after a tick
+  it("awaits the active step's onContinue before advancing", async () => {
+    // Given a first step whose onContinue resolves after a tick
     let resolveContinue: () => void = () => {};
     const onContinue = vi.fn(() => new Promise<void>((resolve) => (resolveContinue = () => resolve())));
-    const r = await render(<WorkflowLayout {...baseProps({ onContinue })} />, withRouter());
+    const steps = makeSteps();
+    const r = await render(
+      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue }, steps[1]] })} />,
+      withRouter(),
+    );
     // When Continue is clicked
     click(r.continue);
-    // Then onContinue is called with the active step's derived value, and we've not advanced yet
-    expect(onContinue).toHaveBeenCalledWith("stepOne");
+    // Then that step's onContinue is called, and we've not advanced yet
+    expect(onContinue).toHaveBeenCalled();
     expect(r.body).toBeInTheDocument();
     // And once it resolves, we advance
     await act(async () => {
@@ -227,9 +231,13 @@ describe("WorkflowLayout", () => {
     expect(r.stepTwoBody).toBeInTheDocument();
   });
 
-  it("stays on the active step when onContinue returns false", async () => {
-    // Given a WorkflowLayout whose onContinue vetoes synchronously
-    const r = await render(<WorkflowLayout {...baseProps({ onContinue: () => false })} />, withRouter());
+  it("stays on the active step when its onContinue returns false", async () => {
+    // Given a first step whose onContinue vetoes synchronously
+    const steps = makeSteps();
+    const r = await render(
+      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue: () => false }, steps[1]] })} />,
+      withRouter(),
+    );
     // When Continue is clicked
     await clickAndWait(r.continue);
     // Then we stay on the first step
