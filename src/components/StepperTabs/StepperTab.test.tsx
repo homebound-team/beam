@@ -61,6 +61,8 @@ describe("StepperTab", () => {
     );
     // Then the indicator reads as primary, matching the expanded state's active-or-completed rule
     expect(r.stepperTab_indicator).toHaveStyle({ backgroundColor: Tokens.Primary });
+    // And its indicator is 3px tall
+    expect(r.stepperTab_indicator).toHaveStyle({ height: "3px" });
   });
 
   it("uses a default indicator for an inactive, not-completed step", async () => {
@@ -70,21 +72,7 @@ describe("StepperTab", () => {
     );
     // Then the indicator reads as the default field border
     expect(r.stepperTab_indicator).toHaveStyle({ backgroundColor: Tokens.FieldBorderDefault });
-  });
-
-  it("uses a 3px indicator when active", async () => {
-    // Given an active tab
-    const r = await render(<StepperTab label="Step Label" value="step" active completed={false} onClick={vi.fn()} />);
-    // Then its indicator is 3px tall
-    expect(r.stepperTab_indicator).toHaveStyle({ height: "3px" });
-  });
-
-  it("uses a 2px indicator when inactive", async () => {
-    // Given an inactive tab
-    const r = await render(
-      <StepperTab label="Step Label" value="step" active={false} completed={false} onClick={vi.fn()} />,
-    );
-    // Then its indicator is 2px tall
+    // And its indicator is 2px tall
     expect(r.stepperTab_indicator).toHaveStyle({ height: "2px" });
   });
 });

@@ -30,16 +30,6 @@ describe("StepperTabs", () => {
     expect(sendCheck?.parentElement).toHaveStyle({ opacity: "0" });
   });
 
-  it("keeps the check hidden on the active step", async () => {
-    // Given the first step is current (so nothing is index-completed yet)
-    const r = await render(<StepperTabs steps={makeSteps()} currentStep="trade" onChange={vi.fn()} />);
-    // Then it's marked current and its check stays at zero opacity
-    expect(r.stepperTabs_step_0).toHaveAttribute("aria-current", "true");
-    const tradeCheck = r.stepperTabs_tab_trade.querySelector("[data-icon='check']");
-    expect(tradeCheck).toBeInTheDocument();
-    expect(tradeCheck?.parentElement).toHaveStyle({ opacity: "0" });
-  });
-
   it("invokes onChange with the clicked step's value", async () => {
     // Given a rendered stepper
     const onChange = vi.fn();

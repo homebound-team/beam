@@ -74,7 +74,7 @@ export function StepperTab(props: StepperTabProps) {
           </span>
         </>
       )}
-      {/* Absolute so active vs inactive thickness never changes the tab's layout height. */}
+      {/* The indicator is a border element that is used to indicate the current step. */}
       <span aria-hidden css={getIndicatorStyles(active, completed, disabled)} {...tid.indicator} />
       <VisuallyHidden>{completed ? "Complete" : "Not Complete"}</VisuallyHidden>
     </button>
@@ -88,15 +88,14 @@ function getStateStyles(active: boolean, completed: boolean): Properties {
 }
 
 function getIndicatorStyles(active: boolean, completed: boolean, disabled: boolean): Properties {
+  // Absolute so active vs inactive thickness never changes the tab's layout height.
   // Note: We are using border token colors for background. This is because the element we are rendering visually appears as a border.
   return {
     ...Css.absolute.left0.right0.bottom0
       .hPx(active ? activeIndicatorHeightPx : inactiveIndicatorHeightPx)
       .bgColor(Tokens.FieldBorderDefault)
-      .if(active || completed)
-      .bgColor(Tokens.Primary)
-      .if(disabled)
-      .bgColor(Tokens.FieldBorderDefault).$,
+      .if((active || completed) && !disabled)
+      .bgColor(Tokens.Primary).$,
   };
 }
 
