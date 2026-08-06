@@ -50,7 +50,7 @@ export const ScrollCollapsesTabs = newStory(
     // The tabs' collapse is a 200ms CSS transition (see StepperTab's `transitionAll`) — the play function
     // below only waits for the shrink to begin, so give Chromatic a little extra time past that before it
     // snapshots, to capture the fully-settled collapsed state rather than a mid-transition frame.
-    parameters: { chromatic: { delay: 300 } },
+    parameters: { chromatic: { delay: 1000 } },
     play: async ({ canvasElement }) => {
       // On mobile (e.g. the `mobile1` Chromatic mode) the tabs are already collapsed on mount — scrolling
       // wouldn't shrink them any further, so the height-shrinks wait below would never resolve.
@@ -58,7 +58,7 @@ export const ScrollCollapsesTabs = newStory(
 
       const header = within(canvasElement).getByTestId("workflowLayout_header");
       const expandedHeight = header.getBoundingClientRect().height;
-      window.scrollTo({ top: 400 });
+      window.scrollTo({ top: 800 });
       await waitFor(() => {
         if (header.getBoundingClientRect().height >= expandedHeight) {
           throw new Error("Waiting for the stepper tabs to collapse on scroll");
