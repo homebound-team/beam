@@ -1,7 +1,7 @@
-import { clearInlineStyles, setInlineStyles } from "src/utils/inlineStyles";
+import { restoreElementStyle, setInlineStyles, snapshotElementStyle } from "src/utils/inlineStyles";
 
 describe("inlineStyles", () => {
-  it("sets and clears inline styles", () => {
+  it("sets inline styles", () => {
     const el = document.createElement("div");
     const styles = { color: "red", zIndex: 2, "--x-test": "1" };
 
@@ -10,12 +10,6 @@ describe("inlineStyles", () => {
     expect(el.style.color).toBe("red");
     expect(el.style.zIndex).toBe("2");
     expect(el.style.getPropertyValue("--x-test")).toBe("1");
-
-    clearInlineStyles(el, styles);
-
-    expect(el.style.color).toBe("");
-    expect(el.style.zIndex).toBe("");
-    expect(el.style.getPropertyValue("--x-test")).toBe("");
   });
 
   it("ignores non-inline values", () => {
@@ -26,5 +20,32 @@ describe("inlineStyles", () => {
     expect(el.style.color).toBe("red");
     expect(el.style.transform).toBe("");
     expect(el.getAttribute("style")).not.toContain("nested");
+  });
+
+  it("snapshots and restores an element's style and className", () => {
+    const el = document.createElement("div");
+    el.setAttribute("style", "color: red;");
+    el.className = "original";
+
+    const snapshot = snapshotElementStyle(el);
+
+    // Mutate both further, as DnDGrid does during a drag
+    el.style.position = "fixed";
+    el.classList.add("active");
+
+    restoreElementStyle(el, snapshot);
+
+    expect(el.getAttribute("style")).toBe("color: red;");
+    expect(el.className).toBe("original");
+  });
+
+  it("removes the style attribute entirely when restoring to an originally-unstyled element", () => {
+    const el = document.createElement("div");
+    const snapshot = snapshotElementStyle(el);
+
+    el.style.position = "fixed";
+    restoreElementStyle(el, snapshot);
+
+    expect(el.hasAttribute("style")).toBe(false);
   });
 });
