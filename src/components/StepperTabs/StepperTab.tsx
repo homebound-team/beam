@@ -14,8 +14,6 @@ export type StepperTabProps = {
   completed: boolean;
   onClick: (value: string) => void;
   disabled?: boolean;
-  /** Runs before leaving this step via Continue, e.g. to save it. Return `false` to stay put, like when the save failed. */
-  onContinue?: () => boolean | void | Promise<boolean | void>;
   /** Collapses the tab down to its colored bottom border only, hiding the label — for the mobile view */
   collapsed?: boolean;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
