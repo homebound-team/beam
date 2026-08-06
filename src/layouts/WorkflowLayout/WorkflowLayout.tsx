@@ -33,6 +33,8 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
     defaultStep?: string;
     /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
     isDirty?: () => boolean;
+    /** Runs before advancing to the next step. */
+    onContinue?: (activeStepValue: string) => boolean | void | Promise<boolean | void>;
   };
 
 /**
@@ -48,7 +50,17 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  * of the public API. Pass `isDirty` to confirm before Cancel, in-app navigation, or tab close.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
-  const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, isDirty, ...headerProps } = props;
+  const {
+    steps,
+    defaultStep,
+    onCancel,
+    completeLabel,
+    onComplete,
+    onSaveAndExit,
+    isDirty,
+    onContinue,
+    ...headerProps
+  } = props;
   const tabSteps = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(tabSteps, defaultStep));
   const tid = useTestIds(props, "workflowLayout");
@@ -86,7 +98,10 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={!activeStep?.completed}
-      onContinue={() => setCurrentStep(tabSteps[currentIndex + 1].value)}
+      onContinue={async () => {
+        // A `false` result means the caller vetoed the advance (e.g. a save failed), so stay put.
+        if ((await onContinue?.(activeStep.value)) !== false) setCurrentStep(tabSteps[currentIndex + 1].value);
+      }}
     />
   );
 

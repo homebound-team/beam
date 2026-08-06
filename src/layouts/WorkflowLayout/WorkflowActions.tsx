@@ -16,7 +16,8 @@ export type WorkflowActionsProps = {
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. Only shown on the last step. */
   onComplete: (e: PressEvent) => void | Promise<void>;
-  onContinue: () => void;
+  /** Advances to the next step. May return a promise, which `Button` uses to show in-flight state. */
+  onContinue: () => void | Promise<void>;
   /** Disables whichever of Continue/Complete is currently shown, e.g. while the active step is invalid. */
   primaryDisabled?: boolean;
 };
