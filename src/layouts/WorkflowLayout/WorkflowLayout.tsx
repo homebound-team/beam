@@ -63,9 +63,6 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
 
-  // No DOM anchor needed: WorkflowLayout only nests under `EnvironmentBannerLayout`, so the header
-  // always rests exactly `bannerAndNavbarHeight + headerHeight` px below the document top — plain
-  // scrollY arithmetic finds the collapse point.
   const scrollCollapsed = useScrollCollapse(!isMobile, bannerAndNavbarHeight + headerHeight);
 
   // Mobile always collapses (tight screen space); desktop collapses past the scroll threshold instead.

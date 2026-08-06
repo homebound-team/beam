@@ -196,9 +196,8 @@ describe("WorkflowLayout", () => {
     setViewport("sm");
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
 
-    // Then clicking the second step's tab does not navigate to it
-    click(r.header_stepperTabs_tab_stepTwo);
-    expect(r.query.stepTwoBody).not.toBeInTheDocument();
+    // Then the tab collapses to its 0px indicator bar
+    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
   });
 
   it("collapses the tabs on scroll past the resting position on desktop", async () => {
@@ -209,10 +208,9 @@ describe("WorkflowLayout", () => {
     scrollWindow(0, { clientHeight: 800, scrollHeight: 1_000_800 });
     scrollWindow(300, { clientHeight: 800, scrollHeight: 1_000_800 });
 
-    // Then the tabs collapse to a non-interactive indicator bar
+    // Then the tab collapses to its 0px indicator bar
     // (the scroll-position state machine itself is covered by useScrollCollapse's own tests)
-    click(r.header_stepperTabs_tab_stepTwo);
-    expect(r.query.stepTwoBody).not.toBeInTheDocument();
+    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
   });
 });
 
