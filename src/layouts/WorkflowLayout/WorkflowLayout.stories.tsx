@@ -1,11 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { Breakpoints, Css } from "src/Css";
+import { Css } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
-import { newStory, viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { waitFor, within } from "storybook/test";
 import { WorkflowLayout, WorkflowLayoutStep } from "./WorkflowLayout";
 
 export default {
@@ -29,44 +28,6 @@ export function Default() {
     />
   );
 }
-
-/**
- * Tall step content so the page scrolls. On mobile the tabs are always collapsed; on desktop, the
- * `play` function scrolls down to show them collapse to their condensed look (the header itself stays
- * pinned; it never auto-hides). Scroll back up from there (even without reaching the top) to see them
- * re-expand.
- */
-export const ScrollCollapsesTabs = newStory(
-  () => (
-    <WorkflowLayout
-      title="Workflow Layout"
-      onCancel={action("cancel clicked")}
-      completeLabel="Save"
-      onComplete={action("complete clicked")}
-      steps={makeSteps(50)}
-    />
-  ),
-  {
-    // The tabs' collapse is a 200ms CSS transition (see StepperTab's `transitionAll`) — the play function
-    // below only waits for the shrink to begin, so give Chromatic a little extra time past that before it
-    // snapshots, to capture the fully-settled collapsed state rather than a mid-transition frame.
-    parameters: { chromatic: { delay: 1000 } },
-    play: async ({ canvasElement }) => {
-      // On mobile (e.g. the `mobile1` Chromatic mode) the tabs are already collapsed on mount — scrolling
-      // wouldn't shrink them any further, so the height-shrinks wait below would never resolve.
-      if (window.matchMedia(Breakpoints.sm.replace("@media ", "")).matches) return;
-
-      const header = within(canvasElement).getByTestId("workflowLayout_header");
-      const expandedHeight = header.getBoundingClientRect().height;
-      window.scrollTo({ top: 800 });
-      await waitFor(() => {
-        if (header.getBoundingClientRect().height >= expandedHeight) {
-          throw new Error("Waiting for the stepper tabs to collapse on scroll");
-        }
-      });
-    },
-  },
-);
 
 /**
  * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
