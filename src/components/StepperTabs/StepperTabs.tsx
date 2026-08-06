@@ -3,10 +3,7 @@ import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils";
 
-export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled"> & {
-  /** Runs before leaving this step via Continue, e.g. to save it. Return `false` to stay put, like when the save failed. */
-  onContinue?: () => boolean | void | Promise<boolean | void>;
-};
+export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled" | "onContinue">;
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];
