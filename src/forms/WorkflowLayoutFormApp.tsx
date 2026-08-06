@@ -119,7 +119,6 @@ function BookList({ formState }: { formState: FormValue }) {
                     }),
                 },
               ],
-              onReorderChildSections: () => {},
               childSections: formState.books.rows.map((row, i) => ({
                 id: row.id.value!,
                 title: `Book ${i + 1}`,

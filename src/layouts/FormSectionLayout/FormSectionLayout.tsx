@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
-import { FormSection, FormSectionBase, FormSectionAction } from "src/forms/FormSection";
+import { FormSection, FormSectionAction, FormSectionProps } from "src/forms/FormSection";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -14,7 +14,7 @@ export type FormSectionLayoutProps = {
   initialFields?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add items" Button. */
   actions?: FormSectionAction[];
-  sections: FormSectionBase[];
+  sections: FormSectionProps[];
 };
 
 /** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
