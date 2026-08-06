@@ -5,7 +5,7 @@ import { WorkflowActionsProps } from "src/layouts/WorkflowLayout/WorkflowActions
 import { useTestIds } from "src/utils";
 
 export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled"> &
-  Pick<WorkflowActionsProps, "onContinue">;
+  Partial<Pick<WorkflowActionsProps, "onContinue">>;
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];
