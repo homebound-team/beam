@@ -212,6 +212,50 @@ describe("WorkflowLayout", () => {
     // (the scroll-position state machine itself is covered by useScrollCollapse's own tests)
     expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
   });
+
+  it("advances on Continue when the step has no onContinue", async () => {
+    // Given a WorkflowLayout whose steps don't intercept Continue
+    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    // When Continue is clicked
+    await clickAndWait(r.continue);
+    // Then we advance to the next step
+    expect(r.stepTwoBody).toBeInTheDocument();
+  });
+
+  it("awaits the active step's onContinue before advancing", async () => {
+    // Given a first step whose onContinue resolves after a tick
+    let resolveContinue: () => void = () => {};
+    const onContinue = vi.fn(() => new Promise<void>((resolve) => (resolveContinue = () => resolve())));
+    const steps = makeSteps();
+    const r = await render(
+      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue }, steps[1]] })} />,
+      withRouter(),
+    );
+    // When Continue is clicked
+    click(r.continue);
+    // Then that step's onContinue is called, and we've not advanced yet
+    expect(onContinue).toHaveBeenCalled();
+    expect(r.body).toBeInTheDocument();
+    // And once it resolves, we advance
+    await act(async () => {
+      resolveContinue();
+    });
+    expect(r.stepTwoBody).toBeInTheDocument();
+  });
+
+  it("stays on the active step when its onContinue returns false", async () => {
+    // Given a first step whose onContinue vetoes synchronously
+    const steps = makeSteps();
+    const r = await render(
+      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue: () => false }, steps[1]] })} />,
+      withRouter(),
+    );
+    // When Continue is clicked
+    await clickAndWait(r.continue);
+    // Then we stay on the first step
+    expect(r.body).toBeInTheDocument();
+    expect(r.query.stepTwoBody).not.toBeInTheDocument();
+  });
 });
 
 function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): WorkflowLayoutStep[] {

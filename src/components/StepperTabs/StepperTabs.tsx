@@ -1,9 +1,11 @@
 import { StepperTab, StepperTabProps } from "src/components/StepperTabs/StepperTab";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { WorkflowActionsProps } from "src/layouts/WorkflowLayout/WorkflowActions";
 import { useTestIds } from "src/utils";
 
-export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled">;
+export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "completed" | "disabled"> &
+  Partial<Pick<WorkflowActionsProps, "onContinue">>;
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];

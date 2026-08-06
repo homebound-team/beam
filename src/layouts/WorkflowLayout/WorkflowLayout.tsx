@@ -93,7 +93,14 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={!activeStep?.completed}
-      onContinue={() => setCurrentStep(tabSteps[currentIndex + 1].value)}
+      onContinue={async () => {
+        const onContinue = activeStep?.onContinue;
+        if (onContinue) {
+          const allowed = await onContinue();
+          if (allowed === false) return;
+        }
+        setCurrentStep(tabSteps[currentIndex + 1].value);
+      }}
     />
   );
 
