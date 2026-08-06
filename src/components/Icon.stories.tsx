@@ -114,6 +114,8 @@ export const Icon = (props: IconProps) => {
     "file",
     "images",
     "openBook",
+    "television",
+    "monitor",
   ];
   const miscIcons: IconProps["icon"][] = [
     "inbox",
@@ -176,6 +178,8 @@ export const Icon = (props: IconProps) => {
     "single",
     "linked",
     "package",
+    "dinner",
+    "connect",
   ];
   const navigationIcons: IconProps["icon"][] = [
     "projects",
