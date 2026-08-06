@@ -27,9 +27,9 @@ describe("DnDGrid", () => {
     expect(r.item_a).not.toHaveStyle({ backgroundColor: Palette.Blue700 });
 
     // When the user starts dragging the first item -- mid-drag, a placeholder clone shares the same
-    // data-testid, so query the real (non-clone) dragged element directly
+    // data-testid, so query both matches and pick out the real (non-clone) dragged element
     fireEvent.mouseDown(r.dragHandle_0);
-    const draggedItem = document.querySelector('[data-testid="item_a"]:not([dndgrid-clone])')!;
+    const draggedItem = r.getAllByTestId("item_a").find((el) => !el.hasAttribute("dndgrid-clone"))!;
 
     // Then the active styles are applied
     expect(draggedItem).toHaveStyle({ backgroundColor: Palette.Blue700 });
