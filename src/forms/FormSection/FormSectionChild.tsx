@@ -30,8 +30,7 @@ export function FormSectionChild(props: FormSectionChildComponentProps) {
 
   return (
     <div
-      ref={isDraggable ? itemRef : undefined}
-      {...(isDraggable ? dragItemProps : {})}
+      {...(isDraggable ? {...dragItemProps, ref: itemRef} : {})}
       css={
         isLast
           ? Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).pb3.$
