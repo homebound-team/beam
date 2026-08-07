@@ -20,6 +20,22 @@ export const beamSideNavLayoutWidthVar = "--beam-side-nav-layout-width";
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
 /**
+ * Open document-scroll right pane width; `0px` when closed. Published on
+ * `DocumentScrollRightPaneLayout` so sticky right columns (descendants) inherit it.
+ * Not subtracted from `documentScrollChromeWidth` — the pane pins below page header /
+ * table actions.
+ */
+export const beamRightPaneWidthVar = "--beam-right-pane-width";
+
+/**
+ * Extra `right` inset for floating page chrome when the document-scroll right pane is open.
+ * Published on `document.documentElement` so siblings outside the pane layout (e.g.
+ * `DocumentScrollToTopButton`) can clear the pane. Prefer this over reading
+ * `beamRightPaneWidthVar` at the root.
+ */
+export const beamFloatingRightOffsetVar = "--beam-floating-right-offset";
+
+/**
  * `WorkflowLayout`'s mobile action-footer height (px); `0px` when absent. Published directly on
  * `document.documentElement` (not via inline `style` on a React-tree wrapper) since consumers like
  * `DocumentScrollToTopButton` are siblings of `WorkflowLayout`'s subtree, not descendants.
@@ -34,6 +50,19 @@ export function documentScrollChromeLeft(): string {
 /** `width` for document-scroll sticky chrome spanning the visible viewport beside the side nav. */
 export function documentScrollChromeWidth(): string {
   return `calc(var(${beamLayoutViewportWidthVar}, 100vw) - var(${beamSideNavLayoutWidthVar}, 0px))`;
+}
+
+/** `height` for a fixed document-scroll right pane from the sticky table-header offset to the viewport bottom. */
+export function documentScrollRightPaneHeight(): string {
+  return `calc(var(${beamLayoutViewportHeightVar}, 100vh) - ${stickyTableHeaderOffset()})`;
+}
+
+/**
+ * `width` for the document-scroll right pane: the configured max px, capped by available chrome
+ * width so the pane fits the viewport on mobile (side nav collapses to `0px` there).
+ */
+export function documentScrollRightPaneWidth(maxPx: number): string {
+  return `min(${maxPx}px, ${documentScrollChromeWidth()})`;
 }
 
 /** CSS `top` offset below the environment banner + auto-hiding navbar. */
@@ -58,6 +87,14 @@ export function stickyTableHeaderOffset(basePx = 0): string {
  */
 export function getFloatingBottomOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamWorkflowLayoutFooterHeightVar}, 0px))`;
+}
+
+/**
+ * `right` offset for floating page chrome that must clear the open document-scroll right pane.
+ * `basePx` is the element's own resting inset from the viewport edge.
+ */
+export function getFloatingRightOffset(basePx = 0): string {
+  return `calc(${basePx}px + var(${beamFloatingRightOffsetVar}, 0px))`;
 }
 
 /** Page content horizontal inset (px).

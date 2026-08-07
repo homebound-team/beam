@@ -17,6 +17,8 @@ export const zIndices = {
 
   // Page chrome - ensure these items sit above the table
   scrollShadow: 50,
+  // Document-scroll detail pane (DocumentScrollRightPaneLayout) — above table sticky chrome, below page sticky headers.
+  rightPane: 60,
   pageStickyHeader: 70,
   // Sticky mobile action footer (WorkflowLayout) — same tier as pageStickyHeader; header and footer never overlap on screen.
   pageStickyFooter: 70,
@@ -34,6 +36,10 @@ export const zIndices = {
   // Navbar mobile drawer + scrim — above navbar; below environment banner.
   navbarMobileMenuScrim: 124,
   navbarMobileMenu: 125,
+
+  // Document-scroll right pane on `sm` — full-bleed overlay below the env banner; covers navbar /
+  // page chrome / table actions but must not paint over the banner.
+  rightPaneMobile: 126,
 
   // Environment banner (EnvironmentBannerLayout) — above navbar mobile menu; below overlay scrims.
   environmentBanner: 130,
