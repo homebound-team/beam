@@ -99,21 +99,6 @@ describe("FormSection", () => {
     expect(r.query.dragHandle).not.toBeInTheDocument();
   });
 
-  it("does not wrap childSections in a DnDGrid when only some of them set orderField", async () => {
-    // Given a FormSection with a mixed (unsupported) childSections array -- only one sets orderField
-    const r = await render(
-      <FormSection
-        title="Trade Partners"
-        childSections={[
-          { id: "electrical", title: "Electrical", orderField: orderField(0) },
-          { id: "plumbing", title: "Plumbing" },
-        ]}
-      />,
-    );
-    // Then it's not treated as draggable -- no DnDGrid wraps it
-    expect(r.query.dndGrid).not.toBeInTheDocument();
-  });
-
   it("renders a DnDGrid with a drag handle per childSection when every childSection has orderField", async () => {
     // Given a FormSection with reorderable childSections
     const r = await render(

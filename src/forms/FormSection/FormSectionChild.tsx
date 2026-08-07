@@ -8,34 +8,32 @@ import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import type { FormSectionProps } from "./FormSection";
 
-/** A single entry in a `FormSection`'s `childSections` — never itself nests further children. */
-export type FormSectionChildProps = Omit<FormSectionProps, "childSections"> & {
-  id: string;
-  /** Drives draggability: set on every child for a draggable, order-sorted list; omit on all for a plain list. Mixing is unsupported and not type-checked. */
-  orderField?: FieldState<number | null | undefined>;
-};
+type FormSectionChildBase = Omit<FormSectionProps, "childSections">;
 
-type FormSectionChildComponentProps = FormSectionChildProps & {
-  /** @internal computed by the parent `FormSection`; not caller-supplied. */
-  isLast: boolean;
+/** A single, non-draggable entry in a `FormSection`'s `childSections` — never itself nests further children. */
+export type PlainFormSectionChild = FormSectionChildBase & { id?: string; orderField?: never };
+
+/**
+ * A single, draggable entry in a `FormSection`'s `childSections`. `orderField` drives both draggability
+ * and sort order; `id` is required so drag/keyboard reordering can track this entry.
+ */
+export type ReorderableFormSectionChild = FormSectionChildBase & {
+  id: string;
+  orderField: FieldState<number | null | undefined>;
 };
 
 /** A single, non-nestable child row within a `FormSection`'s `childSections`. Internal to `FormSection`. */
-export function FormSectionChild(props: FormSectionChildComponentProps) {
-  const { title, description, actions, fields, orderField, isLast } = props;
+export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormSectionChild) {
+  const { title, description, actions, fields, orderField } = props;
   const tid = useTestIds(props, "formSectionChild");
   const itemRef = useRef(null);
   const isDraggable = !!orderField;
-  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: props.id, itemRef });
+  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: props.id ?? title, itemRef });
 
   return (
     <div
-      {...(isDraggable ? {...dragItemProps, ref: itemRef} : {})}
-      css={
-        isLast
-          ? Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).pb3.$
-          : Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).bb.bc(Tokens.SurfaceSeparator).pb3.$
-      }
+      {...(isDraggable ? { ...dragItemProps, ref: itemRef } : {})}
+      css={Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).pb3.bb.bc(Tokens.SurfaceSeparator).ifLastOfType.bn.$}
       {...tid}
     >
       <div css={Css.df.fdc.jcsb.$}>

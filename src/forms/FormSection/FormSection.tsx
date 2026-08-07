@@ -1,11 +1,10 @@
-import { Observer } from "mobx-react";
 import { ReactNode } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
-import { FormSectionChild, FormSectionChildProps } from "./FormSectionChild";
+import { FormSectionChild, type PlainFormSectionChild, type ReorderableFormSectionChild } from "./FormSectionChild";
 
 /**
  * An action in a `FormSection`/`FormSectionLayout` title row — a `Button`, or an icon-only `IconButton` via `kind: "icon"`.
@@ -20,20 +19,12 @@ export type FormSectionProps = {
   description?: ReactNode;
   actions?: FormSectionAction[];
   fields?: ReactNode;
-  childSections?: FormSectionChildProps[];
+  childSections?: PlainFormSectionChild[] | ReorderableFormSectionChild[];
 };
 
 export function FormSection(props: FormSectionProps) {
   const { title, description, actions, fields, childSections } = props;
   const tid = useTestIds(props, "formSection");
-  const isDraggableParent = !!childSections?.length && childSections.every((c) => !!c.orderField);
-
-  const handleReorder = (newOrder: string[]) => {
-    const sorted = sortByOrderField(childSections!);
-    const existingValues = sorted.map((c) => c.orderField!.value ?? 0);
-    const childById = new Map(sorted.map((c) => [c.id, c]));
-    newOrder.forEach((id, i) => childById.get(id)?.orderField!.set(existingValues[i]!));
-  };
 
   return (
     <div css={Css.df.fdc.gap2.$} {...tid}>
@@ -64,35 +55,12 @@ export function FormSection(props: FormSectionProps) {
       </div>
       {fields}
       {childSections &&
-        (isDraggableParent ? (
-          <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
-            <Observer>
-              {() => {
-                const sorted = sortByOrderField(childSections);
-                return (
-                  <>
-                    {sorted.map((child, i) => (
-                      <FormSectionChild
-                        key={child.id}
-                        {...child}
-                        isLast={i === sorted.length - 1}
-                        {...tid.childSection}
-                      />
-                    ))}
-                  </>
-                );
-              }}
-            </Observer>
-          </DnDGrid>
+        (isReorderable(childSections) ? (
+          <DraggableChildren childSections={childSections} {...tid.childSection} />
         ) : (
           <div css={Css.df.fdc.gap3.$}>
-            {childSections.map((child, i) => (
-              <FormSectionChild
-                key={child.id}
-                {...child}
-                isLast={i === childSections.length - 1}
-                {...tid.childSection}
-              />
+            {childSections.map((child) => (
+              <FormSectionChild key={child.id ?? child.title} {...child} {...tid.childSection} />
             ))}
           </div>
         ))}
@@ -100,6 +68,35 @@ export function FormSection(props: FormSectionProps) {
   );
 }
 
-function sortByOrderField(childSections: FormSectionChildProps[]): FormSectionChildProps[] {
-  return [...childSections].sort((a, b) => (a.orderField?.value ?? 0) - (b.orderField?.value ?? 0));
+/** True only when every childSection sets `orderField` -- narrows `childSections` to the reorderable variant. */
+function isReorderable(
+  childSections: PlainFormSectionChild[] | ReorderableFormSectionChild[],
+): childSections is ReorderableFormSectionChild[] {
+  return childSections.length > 0 && childSections.every((c) => !!c.orderField);
+}
+
+type DraggableChildrenProps = { childSections: ReorderableFormSectionChild[] };
+
+/** Renders reorderable childSections, sorted by `orderField.value`, in a `DnDGrid`. */
+const DraggableChildren = function DraggableChildren(props: DraggableChildrenProps) {
+  const { childSections, ...tid } = props;
+  const sorted = sortByOrderField(childSections);
+
+  const handleReorder = (newOrder: string[]) => {
+    const existingValues = sorted.map((c) => c.orderField.value ?? 0);
+    const childById = new Map(sorted.map((c) => [c.id, c]));
+    newOrder.forEach((id, i) => childById.get(id)?.orderField.set(existingValues[i]!));
+  };
+
+  return (
+    <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
+      {sorted.map((child) => (
+        <FormSectionChild key={child.id} {...child} {...tid} />
+      ))}
+    </DnDGrid>
+  );
+};
+
+function sortByOrderField(childSections: ReorderableFormSectionChild[]): ReorderableFormSectionChild[] {
+  return [...childSections].sort((a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0));
 }

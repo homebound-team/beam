@@ -140,8 +140,6 @@ export function DnDGrid(props: DnDGridProps) {
   const onDragStart = useCallback(
     (e: MouseOrTouchEvent) => {
       if (!reorderViaKeyboard.current && dragEl.current && gridEl.current) {
-        initReorder();
-
         // Determine the position of the pointer relative to the element being dragged.
         const rect = dragEl.current.getBoundingClientRect();
         const clientX = "clientX" in e ? e.clientX : e.touches[0].clientX;
@@ -153,7 +151,8 @@ export function DnDGrid(props: DnDGridProps) {
         // Store the pointer's offset from the tile being moved to help correctly position the element as we drag it around.
         transformFrom.current = { x: clientX - left, y: clientY - top };
 
-        // Duplicate the draggable element as a placeholder to show as a drop target
+        // Duplicate the draggable element -- before `initReorder` applies any active styles below -- as a
+        // placeholder to show as a drop target, so the placeholder never inherits the dragged item's active styling.
         cloneEl.current = dragEl.current.cloneNode() as HTMLElement;
         cloneEl.current?.setAttribute(
           "style",
@@ -165,6 +164,9 @@ export function DnDGrid(props: DnDGridProps) {
         cloneEl.current.removeAttribute("id");
         // And finally place it in the DOM after the element being dragged. If there is no `nextSibling`, then it is appended to the grid element.
         gridEl.current.insertBefore(cloneEl.current, dragEl.current.nextSibling);
+
+        // Now that the clone has captured the item's normal appearance, apply the active/reorder styling to the real element.
+        initReorder();
 
         // Apply styles to the actual element to make it look like it's being dragged.
         // This will remove it from the normal flow of the page, allowing the clone above to take its place.
