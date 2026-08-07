@@ -86,7 +86,9 @@ export function WideContentWithContentHeader() {
 /**
  * `WorkflowLayout` nested under `EnvironmentBannerLayout` with a banner actually displayed, pushing the
  * whole layout down by `environmentBannerSizePx`. Tall step content so the page scrolls — sanity check
- * that the header renders correctly in that composed position and stays pinned while scrolling.
+ * that the header renders correctly in that composed position and stays pinned while scrolling. The
+ * stepper-tabs scroll-collapse threshold correctly accounts for the banner's height here, since it's
+ * plain arithmetic rather than a measured DOM anchor.
  */
 export function Composed() {
   return (
@@ -112,7 +114,7 @@ const tabLabels: Record<(typeof tabValues)[number], string> = {
 function makeSteps(contentRows = 0): WorkflowLayoutStep[] {
   return tabValues.map((value) => ({
     label: tabLabels[value],
-    completed: false,
+    isValid: false,
     content: <StepContent title={tabLabels[value]} numRows={contentRows} />,
   }));
 }

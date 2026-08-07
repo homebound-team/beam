@@ -14,7 +14,7 @@ export type FormSectionLayoutProps = {
   initialFields?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add items" Button. */
   actions?: FormSectionAction[];
-  sections: FormSectionProps[];
+  sections?: FormSectionProps[];
 };
 
 /** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
@@ -50,11 +50,13 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
         </div>
         {initialFields}
       </div>
-      <div css={Css.df.fdc.gap8.$}>
-        {sections.map((section, i) => (
-          <FormSection key={defaultTestId(section.title) || i} {...section} />
-        ))}
-      </div>
+      {sections && (
+        <div css={Css.df.fdc.gap8.$}>
+          {sections.map((section, i) => (
+            <FormSection key={defaultTestId(section.title) || i} {...section} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

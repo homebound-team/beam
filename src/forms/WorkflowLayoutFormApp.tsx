@@ -37,18 +37,18 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
         const steps: WorkflowLayoutStep[] = [
           {
             label: "Author Details",
-            completed: step1Valid,
+            isValid: step1Valid,
             content: <AuthorDetails formState={formState} />,
           },
           {
             label: "Books",
-            completed: step2Valid,
+            isValid: step2Valid,
             disabled: !step1Valid,
             content: <BookList formState={formState} />,
           },
           {
             label: "Miscellaneous Author Information",
-            completed: formState.birthday.valid,
+            isValid: formState.birthday.valid,
             disabled: !step2Valid,
             content: <MiscAuthorDetails formState={formState} showFormData={showFormData} />,
           },

@@ -26,7 +26,7 @@ describe("FormSectionLayout", () => {
   it("omits the description and actions slots when not provided", async () => {
     // Given a FormSectionLayout with no description or actions
     // When rendered
-    const r = await render(<FormSectionLayout title="Trade Partners" sections={[]} />);
+    const r = await render(<FormSectionLayout title="Trade Partners" />);
     // Then neither slot renders
     expect(r.query.formSectionLayout_description).not.toBeInTheDocument();
     expect(r.query.formSectionLayout_actions).not.toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("FormSectionLayout", () => {
     // Given a FormSectionLayout with actions
     // When rendered
     const r = await render(
-      <FormSectionLayout title="Trade Partners" actions={[{ label: "Save draft", onClick: () => {} }]} sections={[]} />,
+      <FormSectionLayout title="Trade Partners" actions={[{ label: "Save draft", onClick: () => {} }]} />,
     );
     // Then the action renders as a real Button
     expect(r.saveDraft).toBeInTheDocument();

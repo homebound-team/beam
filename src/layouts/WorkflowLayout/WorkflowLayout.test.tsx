@@ -1,6 +1,6 @@
 import { act } from "@testing-library/react";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
+import { click, clickAndWait, render, scrollWindow, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
@@ -196,8 +196,64 @@ describe("WorkflowLayout", () => {
     setViewport("sm");
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
 
-    // Then clicking the second step's tab does not navigate to it
-    click(r.header_stepperTabs_tab_stepTwo);
+    // Then the tab collapses to its 0px indicator bar
+    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
+  });
+
+  it("collapses the tabs on scroll past the resting position on desktop", async () => {
+    // Given a WorkflowLayout on its first step, on a desktop viewport
+    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+
+    // When the page scrolls down past the header's resting position
+    scrollWindow(0, { clientHeight: 800, scrollHeight: 1_000_800 });
+    scrollWindow(300, { clientHeight: 800, scrollHeight: 1_000_800 });
+
+    // Then the tab collapses to its 0px indicator bar
+    // (the scroll-position state machine itself is covered by useScrollCollapse's own tests)
+    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
+  });
+
+  it("advances on Continue when the step has no onContinue", async () => {
+    // Given a WorkflowLayout whose steps don't intercept Continue
+    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    // When Continue is clicked
+    await clickAndWait(r.continue);
+    // Then we advance to the next step
+    expect(r.stepTwoBody).toBeInTheDocument();
+  });
+
+  it("awaits the active step's onContinue before advancing", async () => {
+    // Given a first step whose onContinue resolves after a tick
+    let resolveContinue: () => void = () => {};
+    const onContinue = vi.fn(() => new Promise<void>((resolve) => (resolveContinue = () => resolve())));
+    const steps = makeSteps();
+    const r = await render(
+      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue }, steps[1]] })} />,
+      withRouter(),
+    );
+    // When Continue is clicked
+    click(r.continue);
+    // Then that step's onContinue is called, and we've not advanced yet
+    expect(onContinue).toHaveBeenCalled();
+    expect(r.body).toBeInTheDocument();
+    // And once it resolves, we advance
+    await act(async () => {
+      resolveContinue();
+    });
+    expect(r.stepTwoBody).toBeInTheDocument();
+  });
+
+  it("stays on the active step when its onContinue returns false", async () => {
+    // Given a first step whose onContinue vetoes synchronously
+    const steps = makeSteps();
+    const r = await render(
+      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue: () => false }, steps[1]] })} />,
+      withRouter(),
+    );
+    // When Continue is clicked
+    await clickAndWait(r.continue);
+    // Then we stay on the first step
+    expect(r.body).toBeInTheDocument();
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
   });
 });
@@ -205,10 +261,10 @@ describe("WorkflowLayout", () => {
 function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): WorkflowLayoutStep[] {
   const { oneIsValid = true, twoIsValid = true } = overrides;
   return [
-    { label: "Step One", completed: oneIsValid, content: <div data-testid="body">Body content</div> },
+    { label: "Step One", isValid: oneIsValid, content: <div data-testid="body">Body content</div> },
     {
       label: "Step Two",
-      completed: twoIsValid,
+      isValid: twoIsValid,
       content: <div data-testid="stepTwoBody">Step two content</div>,
     },
   ];
