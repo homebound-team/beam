@@ -17,7 +17,7 @@ export type FormSectionLayoutProps = {
   sections?: FormSectionProps[];
 };
 
-/** Centered (720px) width/column shell for a form builtz out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
+/** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
 export function FormSectionLayout(props: FormSectionLayoutProps) {
   const { title, description, actions, initialFields, sections } = props;
   const tid = useTestIds(props, "formSectionLayout");
