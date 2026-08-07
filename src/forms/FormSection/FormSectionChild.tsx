@@ -36,8 +36,8 @@ export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormS
       css={Css.df.fdc.gap2.bgColor(Tokens.SurfaceRaised).pb3.bb.bc(Tokens.SurfaceSeparator).ifLastOfType.bn.$}
       {...tid}
     >
-      <div css={Css.df.fdc.jcsb.$}>
-        <div css={Css.df.jcsb.gapPx(12).$}>
+      <div css={Css.df.fdc.gapPx(12).$}>
+        <div css={Css.df.jcsb.gap2.$}>
           <div css={Css.df.aic.gap1.$}>
             {isDraggable && <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact />}
             <h3 css={Css.mdSb.$} {...tid.title}>

@@ -28,8 +28,8 @@ export function FormSection(props: FormSectionProps) {
 
   return (
     <div css={Css.df.fdc.gap2.$} {...tid}>
-      <div css={Css.df.fdc.jcsb.$}>
-        <div css={Css.df.jcsb.gapPx(12).$}>
+      <div css={Css.df.fdc.gapPx(12).$}>
+        <div css={Css.df.jcsb.$}>
           <div css={Css.df.aic.gap1.$}>
             <h2 css={Css.lg.$} {...tid.title}>
               {title}
