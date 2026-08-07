@@ -55,16 +55,19 @@ export function NestedChildSections() {
           actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
           childSections: [
             {
+              id: "electrical",
               title: "Electrical",
               actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
               fields: <PlaceholderFields count={2} />,
             },
             {
+              id: "plumbing",
               title: "Plumbing",
               actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
               fields: <PlaceholderFields count={2} />,
             },
             {
+              id: "hvac",
               title: "HVAC",
               actions: [{ label: "Add", onClick: () => {}, variant: "secondary", size: "sm" }],
               fields: <PlaceholderFields count={2} />,

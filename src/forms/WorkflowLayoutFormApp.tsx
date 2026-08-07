@@ -1,20 +1,11 @@
 import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { useMemo, useState } from "react";
-import {
-  GridColumn,
-  GridDataRow,
-  GridTableLayout,
-  IconButton,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components";
+import { useState } from "react";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
 import { FormSectionLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
 
 /**
@@ -109,40 +100,40 @@ function AuthorDetails({ formState }: { formState: FormValue }) {
 }
 
 function BookList({ formState }: { formState: FormValue }) {
-  const columns = useMemo(() => createColumns(formState), [formState]);
-  const rows: GridDataRow<Row>[] = useComputed(
-    () => [simpleHeader, ...formState.books.rows.map((data) => ({ kind: "data" as const, id: data.id.value!, data }))],
-    [],
-  );
-
   return (
-    <div>
-      <h1 css={Css.df.aic.p2.$}>
-        Books
-        <IconButton
-          icon="plus"
-          onClick={() => formState.books.add({ id: String(formState.books.value?.length + 1 || 1) })}
+    <Observer>
+      {() => (
+        <FormSectionLayout
+          title="Books"
+          sections={[
+            {
+              title: "Books",
+              actions: [
+                {
+                  label: "Add Book",
+                  icon: "plus",
+                  onClick: () =>
+                    formState.books.add({
+                      id: String(formState.books.value?.length + 1 || 1),
+                      order: formState.books.value?.length ?? 0,
+                    }),
+                },
+              ],
+              childSections: formState.books.rows.map((row, i) => ({
+                id: row.id.value!,
+                title: `Book ${i + 1}`,
+                orderField: row.order,
+                fields: <BoundTextField label="Title" field={row.title} />,
+                actions: [
+                  { label: "Remove", icon: "x", variant: "tertiary", onClick: () => formState.books.remove(row.value) },
+                ],
+              })),
+            },
+          ]}
         />
-      </h1>
-      <GridTableLayout tableProps={{ columns, rows }} hideEditColumns />
-    </div>
+      )}
+    </Observer>
   );
-}
-
-type Row = SimpleHeaderAndData<FormValue["books"]["rows"][number]>;
-
-function createColumns(formState: FormValue): GridColumn<Row>[] {
-  return [
-    { header: "#", data: ({ id }) => <span>{id.value}</span> },
-    {
-      header: "Title",
-      data: ({ title }) => <BoundTextField label="Title" compact field={title} labelStyle="hidden" />,
-    },
-    {
-      header: "Actions",
-      data: (row) => <IconButton icon="x" onClick={() => formState.books.remove(row.value)} />,
-    },
-  ];
 }
 
 function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; showFormData: boolean }) {
@@ -178,7 +169,11 @@ function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; 
                           <strong>Last Name</strong> {formState.value.lastName}
                         </li>
                         <li>
-                          <strong>Books</strong> {formState.value.books?.map((b) => b.title).join(", ")}
+                          <strong>Books</strong>{" "}
+                          {[...(formState.value.books ?? [])]
+                            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                            .map((b) => b.title)
+                            .join(", ")}
                         </li>
                         <li>
                           <strong>Birthday</strong> {formState.value.birthday?.toString()}
@@ -211,6 +206,7 @@ const formConfig: ObjectConfig<AuthorInput> = {
     rules: [({ value }) => ((value || []).length === 0 ? "Empty" : undefined)],
     config: {
       id: { type: "value" },
+      order: { type: "value" },
       title: { type: "value", rules: [required] },
     },
   },

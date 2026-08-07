@@ -1,6 +1,7 @@
+import { createObjectState, ObjectConfig } from "@homebound/form-state";
 import { Meta } from "@storybook/react-vite";
 import { Css, Tokens } from "src/Css";
-import { FormSection } from "src/forms/FormSection";
+import { FormSection } from "src/forms/FormSection/FormSection";
 import { withBeamDecorator } from "src/utils/sb";
 
 export default {
@@ -28,13 +29,15 @@ export function WithChildSections() {
       ]}
       childSections={[
         {
+          id: "electrical",
           title: "Electrical",
           fields: <PlaceholderFields count={2} />,
           description: "Electrical contracts are needed for the construction to continue",
           actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
         },
-        { title: "Plumbing", fields: <PlaceholderFields count={2} /> },
+        { id: "plumbing", title: "Plumbing", fields: <PlaceholderFields count={2} /> },
         {
+          id: "hvac",
           title: "HVAC",
           fields: <PlaceholderFields count={2} />,
           actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
@@ -42,6 +45,26 @@ export function WithChildSections() {
       ]}
     />
   );
+}
+
+export function WithDraggableChildSections() {
+  return (
+    <FormSection
+      title="Sub-Contractors"
+      childSections={[
+        { id: "electrical", title: "Electrical", orderField: orderField(0), fields: <PlaceholderFields count={2} /> },
+        { id: "plumbing", title: "Plumbing", orderField: orderField(1), fields: <PlaceholderFields count={2} /> },
+        { id: "hvac", title: "HVAC", orderField: orderField(2), fields: <PlaceholderFields count={2} /> },
+      ]}
+    />
+  );
+}
+
+type OrderInput = { order?: number | null };
+const orderConfig: ObjectConfig<OrderInput> = { order: { type: "value" } };
+/** A real form-state `FieldState<number>`, so this story exercises the actual drag-to-reorder integration. */
+function orderField(value: number | null) {
+  return createObjectState(orderConfig, { order: value }).order;
 }
 
 function PlaceholderFields({ count }: { count: number }) {
