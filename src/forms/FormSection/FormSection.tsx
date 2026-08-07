@@ -78,7 +78,7 @@ function isReorderable(
 type DraggableChildrenProps = { childSections: ReorderableFormSectionChild[] };
 
 /** Renders reorderable childSections, sorted by `orderField.value`, in a `DnDGrid`. */
-const DraggableChildren = function DraggableChildren(props: DraggableChildrenProps) {
+function DraggableChildren(props: DraggableChildrenProps) {
   const { childSections, ...tid } = props;
   const sorted = sortByOrderField(childSections);
 
@@ -95,7 +95,7 @@ const DraggableChildren = function DraggableChildren(props: DraggableChildrenPro
       ))}
     </DnDGrid>
   );
-};
+}
 
 function sortByOrderField(childSections: ReorderableFormSectionChild[]): ReorderableFormSectionChild[] {
   return [...childSections].sort((a, b) => (a.orderField.value ?? 0) - (b.orderField.value ?? 0));
