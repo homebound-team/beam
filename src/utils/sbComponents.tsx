@@ -2,8 +2,11 @@ import { ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
+import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import { Css } from "src/Css";
 import {
   type AppNavItem,
   GridColumn,
@@ -142,9 +145,18 @@ type GridTableLayoutDataRow = { kind: "data"; id: string; data: GridTableLayoutD
 type GridTableLayoutRow = GridTableLayoutHeaderRow | GridTableLayoutParentRow | GridTableLayoutDataRow;
 
 /** Document-scroll `GridTableLayout` fixture for composed layout stories. */
-export function GridTableLayoutExample({ storageKey }: { storageKey: string }) {
+export function GridTableLayoutExample({
+  storageKey,
+  withRightPane = false,
+}: {
+  storageKey: string;
+  /** When true, row clicks open a document-scroll right pane (desktop split / mobile full-bleed). */
+  withRightPane?: boolean;
+}) {
   const filterDefs = useMemo(() => createGridTableLayoutFilterDefs(), []);
   const columns = useMemo(() => createGridTableLayoutColumns(), []);
+  const rows = useMemo(() => [simpleHeader, ...createGridTableLayoutNestedRows(20)], []);
+  const { openRightPane } = useRightPane();
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -154,15 +166,35 @@ export function GridTableLayoutExample({ storageKey }: { storageKey: string }) {
     search: "client",
   });
 
+  const tableProps = useMemo(
+    () => ({
+      as: "virtual" as const,
+      columns,
+      rows,
+      sorting: { on: "client" as const, initial: [columns[1].id!, "ASC"] as [string, "ASC"] },
+      ...(withRightPane
+        ? {
+            rowStyles: {
+              data: {
+                onClick: (row: GridDataRow<GridTableLayoutRow>) =>
+                  openRightPane({ content: <GridTableLayoutRightPaneDetail name={row.data.name ?? row.id} /> }),
+              },
+              parent: {
+                onClick: (row: GridDataRow<GridTableLayoutRow>) =>
+                  openRightPane({ content: <GridTableLayoutRightPaneDetail name={row.data.name ?? row.id} /> }),
+              },
+            },
+          }
+        : {}),
+    }),
+    [columns, openRightPane, rows, withRightPane],
+  );
+
   return (
     <GridTableLayout
       layoutState={layoutState}
-      tableProps={{
-        as: "virtual",
-        columns,
-        rows: [simpleHeader, ...createGridTableLayoutNestedRows(20)],
-        sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
-      }}
+      rightPaneWidth={withRightPane ? 400 : undefined}
+      tableProps={tableProps}
     />
   );
 }
@@ -294,4 +326,27 @@ function createGridTableLayoutNestedRows(repeat: number = 1): GridDataRow<GridTa
       },
     ];
   });
+}
+
+function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
+  const { closeRightPane } = useRightPane();
+  return (
+    <div css={Css.df.fdc.h100.$}>
+      <div css={Css.df.aic.jcsb.gap1.p2.bb.bc(Tokens.SurfaceSeparator).$}>
+        <div css={Css.mdSb.$}>{name}</div>
+        <IconButton icon="x" onClick={closeRightPane} />
+      </div>
+      <div css={Css.fg1.oya.p2.$}>
+        <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
+          Independent pane scroll. On desktop, table columns stay reachable via horizontal document scroll; on mobile
+          the pane is a full-bleed overlay below the environment banner.
+        </p>
+        {zeroTo(40).map((i) => (
+          <div key={i} css={Css.py1.$}>
+            Detail line {i + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
