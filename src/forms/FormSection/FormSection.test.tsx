@@ -212,4 +212,47 @@ describe("FormSection", () => {
     expect(plumbingOrder.value).toBe(2);
     expect(electricalOrder.value).toBe(3);
   });
+
+  it("permutes off the latest sort order across back-to-back reorders, not the order as of the last render", async () => {
+    // Given a FormSection with three reorderable childSections
+    const electricalOrder = orderField(0);
+    const plumbingOrder = orderField(1);
+    const hvacOrder = orderField(2);
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        childSections={[
+          { id: "electrical", title: "Electrical", orderField: electricalOrder },
+          { id: "plumbing", title: "Plumbing", orderField: plumbingOrder },
+          { id: "hvac", title: "HVAC", orderField: hvacOrder },
+        ]}
+      />,
+    );
+
+    // When the user moves the first section (Electrical) to the end, committing that reorder...
+    const firstHandle = r.dragHandle_0;
+    fireEvent.keyDown(firstHandle, { key: " " });
+    fireEvent.keyDown(firstHandle, { key: "ArrowDown" });
+    fireEvent.keyDown(firstHandle, { key: "ArrowDown" });
+    fireEvent.keyDown(firstHandle, { key: "Enter" });
+
+    // Then the DOM (and orderField values) now read Plumbing, HVAC, Electrical
+    expect(plumbingOrder.value).toBe(0);
+    expect(hvacOrder.value).toBe(1);
+    expect(electricalOrder.value).toBe(2);
+
+    // When the user immediately makes a second, independent move -- Plumbing (now first) down one spot,
+    // landing on HVAC, Plumbing, Electrical -- without any intervening render of FormSection itself.
+    // (`dragHandle_0` is re-queried live by current DOM position, so it now resolves to Plumbing.)
+    const secondHandle = r.dragHandle_0;
+    fireEvent.keyDown(secondHandle, { key: " " });
+    fireEvent.keyDown(secondHandle, { key: "ArrowDown" });
+    fireEvent.keyDown(secondHandle, { key: "Enter" });
+
+    // Then the second reorder permutes off the *current* order (Plumbing, HVAC, Electrical), not the
+    // original mount-time order (Electrical, Plumbing, HVAC) -- landing on HVAC, Plumbing, Electrical
+    expect(hvacOrder.value).toBe(0);
+    expect(plumbingOrder.value).toBe(1);
+    expect(electricalOrder.value).toBe(2);
+  });
 });

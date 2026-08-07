@@ -83,12 +83,14 @@ function DraggableChildren(props: DraggableChildrenProps) {
   const sorted = sortByOrderField(childSections);
 
   /**
-   * Permutes `sorted`'s existing orderField values across the new positions -- e.g. moving item 0 to
-   * position 1 swaps its value with whichever item lands in position 0.
+   * Permutes the childSections' existing orderField values across the new positions -- e.g. moving item 0
+   * to position 1 swaps its value with whichever item lands in position 0.
    */
   const handleReorder = (newOrder: string[]) => {
-    const existingValues = sorted.map((c) => c.orderField.value ?? 0);
-    const childById = new Map(sorted.map((c) => [c.id, c]));
+    // Re-sort here, rather than reusing the outer `sorted`, so back-to-back reorders (no re-render in between) each permute off the current order, not the order as of the last render.
+    const currentSorted = sortByOrderField(childSections);
+    const existingValues = currentSorted.map((c) => c.orderField.value ?? 0);
+    const childById = new Map(currentSorted.map((c) => [c.id, c]));
     newOrder.forEach((id, i) => {
       const value = existingValues[i];
       if (value !== undefined) {
