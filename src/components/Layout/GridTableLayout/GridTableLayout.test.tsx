@@ -1,5 +1,7 @@
 import { act } from "@testing-library/react";
+import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { cardStyle } from "src/components/Table/TableStyles";
@@ -15,9 +17,14 @@ import {
 } from "src/components/Table/utils/columns";
 import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
-import { beamTableActionsHeightVar } from "src/layouts/layoutVars";
+import {
+  beamFloatingRightOffsetVar,
+  beamRightPaneWidthVar,
+  beamTableActionsHeightVar,
+  documentScrollRightPaneWidth,
+} from "src/layouts/layoutVars";
 import { noop } from "src/utils";
-import { click, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
+import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
@@ -409,6 +416,10 @@ describe("GridTableLayout", () => {
   });
 
   describe("document scroll layout", () => {
+    afterEach(() => {
+      document.documentElement.style.removeProperty(beamFloatingRightOffsetVar);
+    });
+
     it("sets table actions height CSS var inside DocumentScrollLayoutProvider", async () => {
       const rectSpy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
         height: 40,
@@ -505,6 +516,68 @@ describe("GridTableLayout", () => {
       );
 
       expect(api.getVisibleColumnIds()[0]).toBe("name");
+    });
+
+    it("renders a right pane spacer when useRightPane opens the pane", async () => {
+      // Given a GridTableLayout inside a document-scroll layout
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <OpenPaneButton />
+          <TestWrapper
+            hideEditColumns
+            rightPaneWidth={280}
+            layoutStateProps={{}}
+            tableProps={{
+              columns: getColumns(),
+              rows: [simpleHeader, ...getRows()],
+            }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // Then there is no spacer while the pane is closed
+      expect(r.query.rightPaneSpacer).toBeNull();
+      expect(r.query.rightPaneContent).toBeNull();
+
+      // When the pane is opened
+      await clickAndWait(r.openPaneBtn);
+
+      // Then the pane renders and a spacer matching the pane width is rendered after the table
+      expect(r.rightPaneContent).toBeInTheDocument();
+      expect(r.rightPaneSpacer).toBeInTheDocument();
+      expect(r.rightPaneSpacer).toHaveStyle({ width: documentScrollRightPaneWidth(280) });
+      expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
+        documentScrollRightPaneWidth(280),
+      );
+      expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+        documentScrollRightPaneWidth(280),
+      );
+    });
+
+    it("does not render the document-scroll right pane outside DocumentScrollLayoutProvider", async () => {
+      // Given a GridTableLayout outside document-scroll
+      const r = await render(
+        <>
+          <OpenPaneButton />
+          <TestWrapper
+            hideEditColumns
+            layoutStateProps={{}}
+            tableProps={{
+              columns: getColumns(),
+              rows: [simpleHeader, ...getRows()],
+            }}
+          />
+        </>,
+        withRouter(),
+      );
+
+      // When opening the right pane context
+      await clickAndWait(r.openPaneBtn);
+
+      // Then GridTableLayout does not host the document-scroll pane or spacer
+      expect(r.query.rightPaneContent).toBeNull();
+      expect(r.query.rightPaneSpacer).toBeNull();
     });
 
     function getFilterLayoutStateProps(storageKey: string) {
@@ -774,6 +847,13 @@ type TestWrapperProps = Omit<GridTableLayoutProps<any, Row, any, any>, "layoutSt
 function TestWrapper(props: TestWrapperProps) {
   const layoutState = useGridTableLayoutState(props.layoutStateProps);
   return <GridTableLayoutComponent {...props} layoutState={layoutState} />;
+}
+
+function OpenPaneButton() {
+  const { openRightPane } = useRightPane();
+  return (
+    <Button data-testid="openPaneBtn" label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />
+  );
 }
 
 function getColumns() {

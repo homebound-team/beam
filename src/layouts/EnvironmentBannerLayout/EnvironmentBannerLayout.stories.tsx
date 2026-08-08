@@ -33,7 +33,11 @@ export function Hidden() {
   );
 }
 
-/** Full composition with a displayed QA environment banner above auto-hiding navbar + page header. */
+/**
+ * Full composition with a displayed QA environment banner above auto-hiding navbar + page header.
+ * Click a table row to open the document-scroll right pane (desktop split under sticky chrome; on `sm` a
+ * full-bleed overlay pinned below the env banner).
+ */
 export function Composed() {
   return (
     <EnvironmentBannerLayout environmentBanner={{ env: "qa", impersonating: createImpersonatedUser() }}>
@@ -66,7 +70,7 @@ export function Composed() {
               This text uses <pre>Css.layoutContainer.$</pre> to fix itself in place horizontally, but will still scroll
               away vertically.
             </p>
-            <GridTableLayoutExample storageKey="environment-banner-layout-composed" />
+            <GridTableLayoutExample storageKey="environment-banner-layout-composed" withRightPane />
           </PageHeaderLayout>
         </SideNavLayout>
       </NavbarLayout>

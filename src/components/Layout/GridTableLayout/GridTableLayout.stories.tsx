@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { PageHeader } from "src/components/Headers/PageHeader";
-import { GridDataRow, SimpleHeaderAndData } from "src/components/Table";
+import { IconButton } from "src/components/IconButton";
+import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { GridColumn, GridDataRow, SimpleHeaderAndData } from "src/components/Table";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -14,10 +16,11 @@ import {
 } from "src/components/Table/cardSlots";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
+import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
 import { noop } from "src/utils";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
-import { TestProjectLayout } from "src/utils/sbComponents";
+import { createNavbar, sideNavItems, TestProjectLayout } from "src/utils/sbComponents";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
@@ -817,6 +820,33 @@ export function WithQueryTableInfiniteScroll() {
   );
 }
 
+/**
+ * Document-scroll detail pane: click a data row to open a fixed right pane (sticky below table actions).
+ * A spacer equal to the pane width grows horizontal document scroll so columns are not trapped under the pane.
+ */
+export function WithDocumentScrollRightPane() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => [simpleHeader, ...makeNestedRows(8)], []);
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-right-pane",
+    },
+    search: "client",
+  });
+
+  return (
+    <NavbarLayout navbar={createNavbar()}>
+      <SideNavLayout sideNav={{ items: sideNavItems() }}>
+        <PageHeaderLayout pageHeader={{ title: "Grid Table with Right Pane" }}>
+          <DocumentScrollRightPaneTable layoutState={layoutState} columns={columns} rows={rows} />
+        </PageHeaderLayout>
+      </SideNavLayout>
+    </NavbarLayout>
+  );
+}
+
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 
@@ -1132,6 +1162,74 @@ function getColumns(showColor: boolean = false) {
     priorityColumn,
     actionColumn,
   ];
+}
+
+function DocumentScrollRightPaneTable<F extends Record<string, unknown>>({
+  layoutState,
+  columns,
+  rows,
+}: {
+  layoutState: ReturnType<typeof useGridTableLayoutState<F>>;
+  columns: GridColumn<Row>[];
+  rows: GridDataRow<Row>[];
+}) {
+  const { openRightPane } = useRightPane();
+
+  const tableProps = useMemo(
+    () => ({
+      as: "virtual" as const,
+      columns,
+      rows,
+      sorting: { on: "client" as const, initial: [columns[1].id!, "ASC"] as [string, "ASC"] },
+      rowStyles: {
+        data: {
+          onClick: (row: GridDataRow<Row>) =>
+            openRightPane({
+              content: <RightPaneDetail name={rowDetailName(row)} />,
+            }),
+        },
+        parent: {
+          onClick: (row: GridDataRow<Row>) =>
+            openRightPane({
+              content: <RightPaneDetail name={rowDetailName(row)} />,
+            }),
+        },
+      },
+    }),
+    [columns, openRightPane, rows],
+  );
+
+  return <GridTableLayoutComponent layoutState={layoutState} rightPaneWidth={400} tableProps={tableProps} />;
+}
+
+function rowDetailName(row: GridDataRow<Row>): string {
+  if (row.data && "name" in row.data) {
+    return row.data.name ?? row.id;
+  }
+  return row.id;
+}
+
+function RightPaneDetail({ name }: { name: string }) {
+  const { closeRightPane } = useRightPane();
+  return (
+    <div css={Css.df.fdc.h100.$}>
+      <div css={Css.df.aic.jcsb.gap1.p2.bb.bc(Tokens.SurfaceSeparator).$}>
+        <div css={Css.mdSb.$}>{name}</div>
+        <IconButton icon="x" onClick={closeRightPane} />
+      </div>
+      <div css={Css.fg1.oya.p2.$}>
+        <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
+          Independent pane scroll. Table columns remain reachable via horizontal document scroll (spacer matches pane
+          width).
+        </p>
+        {zeroTo(40).map((i) => (
+          <div key={i} css={Css.py1.$}>
+            Detail line {i + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {

@@ -1,5 +1,6 @@
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";
+import { getFloatingRightOffset } from "src/layouts/layoutVars";
 import { click, mockDocumentViewport, render, scrollWindow } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -48,6 +49,14 @@ describe("DocumentScrollToTopButton", () => {
 
     // Then the window scrolls smoothly to the top
     expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
+  });
+
+  it("offsets from the right using the floating right offset helper", async () => {
+    // Given the scroll-to-top control
+    const r = await render(<DocumentScrollToTopButton viewportHeight={768} />);
+
+    // Then its right inset stacks the resting offset with the floating right offset var
+    expect(r.documentScrollToTop_wrapper).toHaveStyle({ right: getFloatingRightOffset(20) });
   });
 
   it("renders only on the outermost document-scroll provider", async () => {

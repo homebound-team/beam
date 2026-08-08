@@ -21,6 +21,10 @@ import {
 import { noop, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
+import {
+  defaultDocumentScrollRightPaneWidth,
+  DocumentScrollRightPaneLayout,
+} from "../RightPaneLayout/DocumentScrollRightPaneLayout";
 import { ActionButtonMenuProps, GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
@@ -52,6 +56,11 @@ export type GridTableLayoutProps<
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
   withCardView?: boolean;
   defaultView?: TableView;
+  /**
+   * Width (px) of the document-scroll detail pane opened via `useRightPane`.
+   * Only applies inside a document-scroll layout; ignored on the legacy ScrollableParent path.
+   */
+  rightPaneWidth?: number;
 };
 
 /**
@@ -94,6 +103,7 @@ function GridTableLayoutComponent<
     withCardView,
     defaultView = "list",
     emptyFallback: layoutEmptyFallback,
+    rightPaneWidth = defaultDocumentScrollRightPaneWidth,
   } = props;
 
   const tid = useTestIds(props);
@@ -226,7 +236,8 @@ function GridTableLayoutComponent<
         </div>
       )}
       {inDocumentScrollLayout ? (
-        tableBody
+        // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
+        <DocumentScrollRightPaneLayout paneWidth={rightPaneWidth}>{tableBody}</DocumentScrollRightPaneLayout>
       ) : (
         <ScrollableContent virtualized={isVirtualized}>{tableBody}</ScrollableContent>
       )}
@@ -234,7 +245,7 @@ function GridTableLayoutComponent<
   );
 
   return (
-    /* Wrapper sets --beam-table-actions-height so GridTable's sticky header can read it. */
+    /* Wrapper sets --beam-table-actions-height so sticky headers / the pane can read it. */
     <div ref={tableWrapperRef} css={Css.display("contents").$} {...tid.tableWrapper}>
       {tableScrollContent}
     </div>
