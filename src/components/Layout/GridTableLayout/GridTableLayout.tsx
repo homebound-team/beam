@@ -21,6 +21,10 @@ import {
 import { noop, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
+import {
+  defaultDocumentScrollRightPaneWidth,
+  DocumentScrollRightPaneLayout,
+} from "../RightPaneLayout/DocumentScrollRightPaneLayout";
 import { ActionButtonMenuProps, GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
@@ -52,6 +56,11 @@ export type GridTableLayoutProps<
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
   withCardView?: boolean;
   defaultView?: TableView;
+  /**
+   * Opt into the document-scroll detail pane (`useRightPane`). `true` uses the default width;
+   * a number sets the pane width in px. Only applies inside a document-scroll layout.
+   */
+  withRightPane?: boolean | number;
 };
 
 /**
@@ -94,7 +103,14 @@ function GridTableLayoutComponent<
     withCardView,
     defaultView = "list",
     emptyFallback: layoutEmptyFallback,
+    withRightPane,
   } = props;
+  const rightPaneWidth =
+    withRightPane === true
+      ? defaultDocumentScrollRightPaneWidth
+      : typeof withRightPane === "number"
+        ? withRightPane
+        : undefined;
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
@@ -226,7 +242,12 @@ function GridTableLayoutComponent<
         </div>
       )}
       {inDocumentScrollLayout ? (
-        tableBody
+        // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
+        rightPaneWidth !== undefined ? (
+          <DocumentScrollRightPaneLayout paneWidth={rightPaneWidth}>{tableBody}</DocumentScrollRightPaneLayout>
+        ) : (
+          tableBody
+        )
       ) : (
         <ScrollableContent virtualized={isVirtualized}>{tableBody}</ScrollableContent>
       )}
@@ -234,7 +255,7 @@ function GridTableLayoutComponent<
   );
 
   return (
-    /* Wrapper sets --beam-table-actions-height so GridTable's sticky header can read it. */
+    /* Wrapper sets --beam-table-actions-height so sticky headers / the pane can read it. */
     <div ref={tableWrapperRef} css={Css.display("contents").$} {...tid.tableWrapper}>
       {tableScrollContent}
     </div>

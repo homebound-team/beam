@@ -1,6 +1,10 @@
 import {
   bannerAndNavbarChromeTop,
   documentScrollChromeWidth,
+  documentScrollRightPaneHeight,
+  documentScrollRightPaneWidth,
+  getFloatingBottomOffset,
+  getFloatingRightOffset,
   stickyNavAndHeaderOffset,
   stickyTableHeaderOffset,
 } from "src/layouts/layoutVars";
@@ -12,8 +16,57 @@ describe("layoutVars", () => {
       // When computing the width expression
       const result = documentScrollChromeWidth();
 
-      // Then it subtracts the side nav rail from the layout viewport width
+      // Then it subtracts the side nav rail from the layout viewport width (not the right pane —
+      // the pane pins below page header / table actions, so chrome stays full-bleed).
       expect(result).toBe("calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))");
+    });
+  });
+
+  describe("documentScrollRightPaneHeight", () => {
+    it("fills the viewport below the sticky table header offset", () => {
+      // Given the document-scroll right pane height helper
+      // When computing the height expression
+      const result = documentScrollRightPaneHeight();
+
+      // Then it subtracts the sticky table header offset from the layout viewport height
+      expect(result).toBe(
+        "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-table-actions-height, 0px)))",
+      );
+    });
+  });
+
+  describe("documentScrollRightPaneWidth", () => {
+    it("caps the configured max width by available document-scroll chrome width", () => {
+      // Given a 400px preferred pane width
+      // When computing the width expression
+      const result = documentScrollRightPaneWidth(400);
+
+      // Then it uses min(maxPx, chrome width) so the pane fits the viewport on mobile
+      expect(result).toBe(
+        "min(400px, calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px)))",
+      );
+    });
+  });
+
+  describe("getFloatingRightOffset", () => {
+    it("adds the floating right offset var to the base inset", () => {
+      // Given a 20px resting inset
+      // When computing the floating right offset
+      const result = getFloatingRightOffset(20);
+
+      // Then it stacks the base with the open right-pane floating offset var
+      expect(result).toBe("calc(20px + var(--beam-floating-right-offset, 0px))");
+    });
+  });
+
+  describe("getFloatingBottomOffset", () => {
+    it("adds the workflow footer height var to the base inset", () => {
+      // Given a 20px resting inset
+      // When computing the floating bottom offset
+      const result = getFloatingBottomOffset(20);
+
+      // Then it stacks the base with the workflow footer height var
+      expect(result).toBe("calc(20px + var(--beam-workflow-layout-footer-height, 0px))");
     });
   });
 

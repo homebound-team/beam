@@ -33,7 +33,7 @@ import {
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, maybeCssVar, Palette, Properties, Tokens } from "src/Css";
-import { beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
+import { beamRightPaneWidthVar, beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
@@ -309,11 +309,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                           : `calc(var(${beamSideNavLayoutWidthVar}, 0px) + (${columnSizes.slice(0, columnIndex).join(" + ")}))`,
                       ).$
                     : {}),
+                  // Offset by the open right pane so sticky-right cells pin to the clear edge, not under it (0 when closed).
                   ...(maybeSticky === "right"
                     ? Css.right(
                         columnIndex + 1 === columnSizes.length
-                          ? 0
-                          : `calc(${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")})`,
+                          ? `var(${beamRightPaneWidthVar}, 0px)`
+                          : `calc(var(${beamRightPaneWidthVar}, 0px) + (${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")}))`,
                       ).$
                     : {}),
                 }
