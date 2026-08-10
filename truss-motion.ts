@@ -1,5 +1,5 @@
 /**
- * AUTO-GENERATED — do not edit by hand. Source: tokens/tokens.json (DTCG 2025.10 — duration + cubicBezier types).
+ * AUTO-GENERATED — do not edit by hand. Source: tokens/motion.json (DTCG 2025.10 — duration + cubicBezier types).
  * Run yarn generate:design-tokens, yarn build, or yarn build:truss.
  *
  * Motion tokens are JS-only literals (not CSS variables) because Beam's animation behavior

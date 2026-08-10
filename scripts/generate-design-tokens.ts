@@ -1,15 +1,13 @@
 /**
- * Reads `tokens/tokens.json` (DTCG 2025.10–shaped) and emits:
- * - `truss-token-vars.ts` — `Tokens` map for Truss (`--b-*` names only)
- * - `truss-palette.ts` — primitive color literals only (Truss `palette`; no semantic roles)
- * - `src/css/generated/theme-scopes.css` — `:root` semantic defaults and `[data-theme="…"]` overrides
+ * Syncs Figma colors then emits Truss/CSS outputs:
+ * 1. `figma-colors.raw.json` → `color.json`
+ * 2. `color.json` + `motion.json` → `truss-token-vars.ts`, `truss-palette.ts`, `truss-motion.ts`, `theme-scopes.css`
  *
  * Palette order: `White` / `Transparent`, then remaining `beam.color.primitive.*` keys in JSON order.
- * Semantic roles use `Tokens` (`--b-*`) and baseline values on `:root` in `theme-scopes.css`.
  *
  *   yarn generate:design-tokens
  */
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import {
@@ -23,8 +21,11 @@ import {
   isPathReference,
   loadTokensJson,
   resolveValue,
+  type DtcgSrgbColorValue,
+  type JsonObject,
   type TokenLeaf,
 } from "./dtcg-shared";
+import { semanticLeafKeyToExpectedCssVar } from "./token-naming";
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensDir = join(rootDir, "tokens");
@@ -34,6 +35,170 @@ const trussMotionPath = join(rootDir, "truss-motion.ts");
 const themeScopesCssPath = join(rootDir, "src/css/generated/theme-scopes.css");
 
 const BEAM_EXT = "com.homebound.beam";
+
+type RawColorValue = { alias: string; hex?: never; alpha?: never } | { hex: string; alpha?: number; alias?: never };
+
+type FigmaColorsRaw = {
+  source?: JsonObject;
+  primitives: Record<string, RawColorValue>;
+  semantics: Record<
+    string,
+    {
+      description?: string;
+      light: RawColorValue;
+      contrast: RawColorValue;
+    }
+  >;
+};
+
+function normalizeAlpha(alpha: number | undefined): number | undefined {
+  if (alpha === undefined) return undefined;
+  // Collapse float32 noise from Figma (e.g. 0.20000000298023224 → 0.2).
+  return Math.round(alpha * 1000) / 1000;
+}
+
+function parseHexChannels(hex: string): [number, number, number] {
+  const h = hex.replace("#", "").toLowerCase();
+  if (h.length !== 6 && h.length !== 8) {
+    throw new Error(`Expected 6- or 8-digit hex, got ${hex}`);
+  }
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  return [r, g, b];
+}
+
+function toDtcgColor(value: RawColorValue): DtcgSrgbColorValue {
+  if ("alias" in value && value.alias) {
+    throw new Error(`toDtcgColor expected a literal color, got alias ${value.alias}`);
+  }
+  if (!("hex" in value) || !value.hex) {
+    throw new Error(`Literal color missing hex: ${JSON.stringify(value)}`);
+  }
+  const hex6 = `#${value.hex.replace("#", "").slice(0, 6).toLowerCase()}`;
+  const components = parseHexChannels(hex6);
+  const alpha = normalizeAlpha(value.alpha);
+  const out: DtcgSrgbColorValue = {
+    colorSpace: "srgb",
+    components,
+    hex: hex6,
+  };
+  if (alpha !== undefined && alpha < 1) {
+    out.alpha = alpha;
+  }
+  return out;
+}
+
+function toTokenValue(value: RawColorValue): string | DtcgSrgbColorValue {
+  if ("alias" in value && value.alias) {
+    return `{beam.color.primitive.${value.alias}}`;
+  }
+  return toDtcgColor(value);
+}
+
+/** Contrast extension values must be strings (path ref or hex) for codegen. */
+function toContrastExtensionValue(value: RawColorValue): string {
+  if ("alias" in value && value.alias) {
+    return `{beam.color.primitive.${value.alias}}`;
+  }
+  if (!("hex" in value) || !value.hex) {
+    throw new Error(`Contrast literal missing hex: ${JSON.stringify(value)}`);
+  }
+  const hexBody = value.hex.replace("#", "").toLowerCase();
+  const hex6 = `#${hexBody.slice(0, 6)}`;
+  const alpha = normalizeAlpha(value.alpha);
+  if (alpha !== undefined && alpha < 1) {
+    const aByte = Math.round(alpha * 255)
+      .toString(16)
+      .padStart(2, "0");
+    return `${hex6}${aByte}`;
+  }
+  return hex6;
+}
+
+function assertRawColorValue(label: string, value: unknown): asserts value is RawColorValue {
+  if (!value || typeof value !== "object") {
+    throw new Error(`${label}: expected color value object`);
+  }
+  const v = value as Record<string, unknown>;
+  if (typeof v.alias === "string") return;
+  if (typeof v.hex === "string") return;
+  throw new Error(`${label}: expected { alias } or { hex, alpha? }`);
+}
+
+/** Writes `tokens/color.json` from `tokens/figma-colors.raw.json`. */
+function writeColorJsonFromFigmaRaw(): void {
+  const rawPath = join(tokensDir, "figma-colors.raw.json");
+  const colorPath = join(tokensDir, "color.json");
+  const raw = JSON.parse(readFileSync(rawPath, "utf8")) as FigmaColorsRaw;
+  if (!raw.primitives || !raw.semantics) {
+    throw new Error(`${rawPath} must include primitives and semantics`);
+  }
+  if (!raw.primitives.White || !raw.primitives.Transparent) {
+    throw new Error("figma-colors.raw.json primitives must include White and Transparent");
+  }
+
+  // White / Transparent first (palette contract), then remaining keys in raw order.
+  const primitiveNames = [
+    "White",
+    "Transparent",
+    ...Object.keys(raw.primitives).filter((k) => k !== "White" && k !== "Transparent"),
+  ];
+
+  const primitive: JsonObject = {};
+  for (const name of primitiveNames) {
+    const value = raw.primitives[name];
+    assertRawColorValue(`primitives.${name}`, value);
+    if ("alias" in value && value.alias) {
+      throw new Error(`primitives.${name}: primitives must be literal colors, not aliases`);
+    }
+    primitive[name] = {
+      $type: "color",
+      $value: toDtcgColor(value),
+    };
+  }
+
+  const semanticNames = Object.keys(raw.semantics).sort((a, b) => a.localeCompare(b));
+  const semantic: JsonObject = {};
+  for (const name of semanticNames) {
+    const row = raw.semantics[name];
+    assertRawColorValue(`semantics.${name}.light`, row.light);
+    assertRawColorValue(`semantics.${name}.contrast`, row.contrast);
+
+    const leaf: JsonObject = {
+      $type: "color",
+      $value: toTokenValue(row.light),
+      $extensions: {
+        [BEAM_EXT]: {
+          cssVar: semanticLeafKeyToExpectedCssVar(name),
+          contrast: toContrastExtensionValue(row.contrast),
+        },
+      },
+    };
+    if (row.description) {
+      leaf.$description = row.description;
+    }
+    semantic[name] = leaf;
+  }
+
+  writeFileSync(
+    colorPath,
+    `${JSON.stringify(
+      {
+        $description:
+          "AUTO-GENERATED from tokens/figma-colors.raw.json — do not edit by hand. Run yarn generate:design-tokens.",
+        primitive,
+        semantic,
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  console.log(
+    `Wrote ${colorPath} (${primitiveNames.length} primitives, ${semanticNames.length} semantics) from ${rawPath}`,
+  );
+}
 
 type SemanticCodegenRow = {
   tokenName: string;
@@ -142,7 +307,7 @@ function emitThemeScopesCss(rows: SemanticCodegenRow[]): string {
  * AUTO-GENERATED — do not edit. Run \`yarn generate:design-tokens\`, \`yarn build\`, or \`yarn build:truss\`.
  *
  * :root — baseline semantic custom properties from beam.color.semantic.* $value.
- * [data-theme] — overrides per theme axis; values must match ContrastScope / tokens.json.
+ * [data-theme] — overrides per theme axis; values must match ContrastScope / color.json.
  */
 
 `;
@@ -205,7 +370,7 @@ function emitTrussMotion(pathMap: Map<string, TokenLeaf>): string {
     entries.map(([k, v]) => `    ${JSON.stringify(k)}: ${JSON.stringify(v)},`).join("\n");
 
   const header = `/**
- * AUTO-GENERATED — do not edit by hand. Source: tokens/tokens.json (DTCG 2025.10 — duration + cubicBezier types).
+ * AUTO-GENERATED — do not edit by hand. Source: tokens/motion.json (DTCG 2025.10 — duration + cubicBezier types).
  * Run yarn generate:design-tokens, yarn build, or yarn build:truss.
  *
  * Motion tokens are JS-only literals (not CSS variables) because Beam's animation behavior
@@ -224,6 +389,7 @@ function emitTrussMotion(pathMap: Map<string, TokenLeaf>): string {
 }
 
 function main(): void {
+  writeColorJsonFromFigmaRaw();
   const merged = loadTokensJson(tokensDir) as Record<string, unknown>;
   const leaves: TokenLeaf[] = [];
   collectTokenLeaves(merged, [], leaves);
@@ -272,7 +438,7 @@ function main(): void {
   }
 
   const sharedHeader = `/**
- * AUTO-GENERATED — do not edit by hand. Source: \`tokens/tokens.json\` (DTCG 2025.10–shaped).
+ * AUTO-GENERATED — do not edit by hand. Source: \`tokens/color.json\` (from Figma via generate:design-tokens).
  * Run \`yarn generate:design-tokens\`, \`yarn build\`, or \`yarn build:truss\`.
  */
 
@@ -283,7 +449,7 @@ function main(): void {
 
   const trussPaletteContent =
     `/**\n` +
-    ` * AUTO-GENERATED — do not edit by hand. Source: tokens/tokens.json.\n` +
+    ` * AUTO-GENERATED — do not edit by hand. Source: tokens/color.json (from Figma via generate:design-tokens).\n` +
     ` * Run yarn generate:design-tokens, yarn build, or yarn build:truss.\n` +
     ` */\n\n` +
     `// Use rgba() for colors as Beam may attempt to modify opacity values in some components (e.g. ScrollShadows)\n` +

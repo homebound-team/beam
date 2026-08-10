@@ -8,7 +8,7 @@ import { Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
-import tokensJson from "../../tokens/tokens.json";
+import colorTokens from "../../tokens/color.json";
 
 export default {
   title: "Foundations/Colors",
@@ -250,7 +250,7 @@ function buildGroupedTokenRows(): GroupRow[] {
 }
 
 function buildTokenRows(): TokenRowData[] {
-  const colorRoot = tokensJson.beam.color as unknown as {
+  const colorRoot = colorTokens as unknown as {
     primitive: Record<string, PrimitiveLeaf>;
     semantic: Record<string, SemanticLeaf>;
   };

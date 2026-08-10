@@ -1,5 +1,5 @@
 /**
- * Structural validation for `tokens/tokens.json` before codegen.
+ * Structural validation for merged Beam tokens (`color.json` + `motion.json`) before codegen.
  *
  *   yarn validate:tokens
  */
@@ -83,11 +83,12 @@ function validateColorLeaf(leaf: TokenLeaf): void {
   if (b.cssVar !== expectedCssVar) {
     throw new Error(`Token ${leaf.path}: cssVar must be ${JSON.stringify(expectedCssVar)}, got ${JSON.stringify(b.cssVar)}`);
   }
-  if (b.contrast !== undefined) {
-    const c = b.contrast;
-    if (typeof c !== "string" || (!isPathReference(c) && !isHexColor(c))) {
-      throw new Error(`Token ${leaf.path}: contrast must be hex or {path} reference`);
-    }
+  if (b.contrast === undefined) {
+    throw new Error(`Token ${leaf.path}: contrast is required (duplicate Light when unchanged in Figma)`);
+  }
+  const c = b.contrast;
+  if (typeof c !== "string" || (!isPathReference(c) && !isHexColor(c))) {
+    throw new Error(`Token ${leaf.path}: contrast must be hex or {path} reference`);
   }
 }
 
@@ -167,7 +168,7 @@ function main(): void {
     validateLeaf(leaf, pathMap);
   }
   validateReferences(pathMap);
-  console.log(`Validated ${leaves.length} token leaves from ${join(tokensDir, "tokens.json")}`);
+  console.log(`Validated ${leaves.length} token leaves from ${join(tokensDir, "color.json")} + motion.json`);
 }
 
 main();

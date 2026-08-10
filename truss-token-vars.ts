@@ -1,5 +1,5 @@
 /**
- * AUTO-GENERATED — do not edit by hand. Source: `tokens/tokens.json` (DTCG 2025.10–shaped).
+ * AUTO-GENERATED — do not edit by hand. Source: `tokens/color.json` (from Figma via generate:design-tokens).
  * Run `yarn generate:design-tokens`, `yarn build`, or `yarn build:truss`.
  */
 
@@ -57,8 +57,8 @@ export const Tokens = {
   NeutralSurfacePressed: "--b-neutral-surface-pressed",
   OnPrimary: "--b-on-primary",
   OnSurface: "--b-on-surface",
-  OnSurfaceMuted: "--b-on-surface-muted",
   OnSurfaceDisabled: "--b-on-surface-disabled",
+  OnSurfaceMuted: "--b-on-surface-muted",
   OnSurfaceRaisedHover: "--b-on-surface-raised-hover",
   OnSurfaceRaisedPressed: "--b-on-surface-raised-pressed",
   Primary: "--b-primary",
@@ -68,11 +68,11 @@ export const Tokens = {
   SelectionFill: "--b-selection-fill",
   SelectionIndicator: "--b-selection-indicator",
   Surface: "--b-surface",
+  SurfaceDisabled: "--b-surface-disabled",
   SurfaceHover: "--b-surface-hover",
   SurfaceRaised: "--b-surface-raised",
   SurfaceRaisedHover: "--b-surface-raised-hover",
   SurfaceRaisedPressed: "--b-surface-raised-pressed",
-  SurfaceDisabled: "--b-surface-disabled",
   SurfaceSeparator: "--b-surface-separator",
   SurfaceSubtle: "--b-surface-subtle",
   TextDisabled: "--b-text-disabled",
