@@ -1,4 +1,5 @@
 import { InputHTMLAttributes, ReactNode } from "react";
+import type { CardTag } from "src/components/Card";
 import { IconProps } from "src/components/Icon";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Value } from "src/inputs";
@@ -12,6 +13,8 @@ type SelectCardGroupItemOptionBase<V extends Value> = {
   label: string;
   /** Optional secondary copy shown beneath the label. */
   description?: ReactNode;
+  /** Optional tag shown above the label. */
+  tag?: CardTag;
   disabled?: boolean;
   /** Tooltip shown on hover, i.e. to explain why the option is disabled. */
   tooltip?: ReactNode;
@@ -81,6 +84,8 @@ export type SelectCardShared = {
   label: string;
   /** Optional secondary copy shown beneath the label. When present the card grows to fit it. */
   description?: ReactNode;
+  /** Optional tag shown above the label. */
+  tag?: CardTag;
   selected?: boolean;
   disabled?: boolean;
   tooltip?: ReactNode;

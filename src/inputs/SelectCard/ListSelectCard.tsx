@@ -1,4 +1,5 @@
 import { VisuallyHidden } from "react-aria";
+import { Tag } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
@@ -12,6 +13,7 @@ export function ListSelectCard(props: SelectCardItemProps) {
   const {
     label,
     description,
+    tag,
     selected: isSelected = false,
     disabled: isDisabled = false,
     tooltip,
@@ -32,6 +34,11 @@ export function ListSelectCard(props: SelectCardItemProps) {
       __storyState={__storyState}
       {...others}
     >
+      {tag && (
+        <div css={Css.ml3.if(isDisabled).o50.$}>
+          <Tag type={tag.type} text={tag.text} {...tid.tag} />
+        </div>
+      )}
       <div css={Css.df.aic.gap1.$}>
         {inputProps.type === "checkbox" ? (
           <>

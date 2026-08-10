@@ -12,7 +12,7 @@ type SelectCardCheckboxGroupItemProps<V extends Value> = SelectCardGroupItemProp
 
 export function SelectCardCheckboxGroupItem<V extends Value>(props: SelectCardCheckboxGroupItemProps<V>) {
   const { option, groupState, isSelected, view, layout, ...others } = props;
-  const { label, description, disabled, tooltip, value } = option;
+  const { label, description, tag, disabled, tooltip, value } = option;
   const ref = useRef<HTMLInputElement>(null);
   const { inputProps, isDisabled: isOptionDisabled } = useCheckboxGroupItem(
     { value: valueToKey(value), "aria-label": label, isDisabled: disabled ?? false },
@@ -23,6 +23,7 @@ export function SelectCardCheckboxGroupItem<V extends Value>(props: SelectCardCh
   const layoutProps = {
     label,
     description,
+    tag,
     selected: isSelected,
     disabled: isOptionDisabled,
     tooltip,

@@ -37,6 +37,19 @@ export function CheckboxStates() {
         selected
         __storyState={{ pressed: true }}
       />
+      <ListSelectCardWrapper label="Tag" description={description} tag={{ text: "PO Issued", type: "info" }} />
+      <ListSelectCardWrapper
+        label="Tag selected"
+        description={description}
+        tag={{ text: "PO Issued", type: "info" }}
+        selected
+      />
+      <ListSelectCardWrapper
+        label="Tag disabled"
+        description={description}
+        tag={{ text: "Configuration Required", type: "warning" }}
+        disabled
+      />
     </div>
   );
 }
@@ -79,6 +92,13 @@ export function RadioStates() {
         selected
         __storyState={{ pressed: true }}
       />
+      <ListSelectCardWrapper
+        type="radio"
+        label="Tag"
+        description={description}
+        tag={{ text: "PO Issued", type: "info" }}
+      />
+      <ListSelectCardWrapper type="radio" label="Tag without description" tag={{ text: "PO Issued", type: "info" }} />
     </div>
   );
 }

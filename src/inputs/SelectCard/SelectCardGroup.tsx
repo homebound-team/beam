@@ -27,6 +27,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
 
   const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
   const hasImage = useMemo(() => options.some((o) => "image" in o && o.image), [options]);
+  const hasTag = useMemo(() => options.some((o) => o.tag), [options]);
   const tid = useTestIds(props, defaultTestId(label));
 
   const handleChange = useCallback(
@@ -53,7 +54,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
       helperText={helperText}
       tid={tid}
     >
-      <div css={getSelectCardOptionsCss({ view, hasDescription, layout, hasImage })}>
+      <div css={getSelectCardOptionsCss({ view, hasDescription, layout, hasImage, hasTag })}>
         {options.map((option) => (
           <SelectCardRadioGroupItem
             key={String(option.value)}
