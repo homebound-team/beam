@@ -50,29 +50,27 @@ export function StepperTab(props: StepperTabProps) {
       }}
       {...tid[defaultTestId(value)]}
     >
+      <span css={Css.dg.jic.mw0.transitionAll.o100.if(collapsed).o0.$}>
+        {/* Hidden semibold size reserves bold width so switching between font-weights won't shift layout. */}
+        <span
+          css={Css.smSb.visibility("hidden").add("gridArea", "1/1").lineClamp1.wordBreak("break-all").$}
+          aria-hidden
+        >
+          {label}
+        </span>
+        <span css={Css.add("gridArea", "1/1").lineClamp1.wordBreak("break-all").if(active).smSb.$}>{label}</span>
+      </span>
       {!collapsed && (
-        <>
-          <span css={Css.dg.jic.mw0.$}>
-            {/* Hidden semibold size reserves bold width so switching between font-weights won't shift layout. */}
-            <span
-              css={Css.smSb.visibility("hidden").add("gridArea", "1/1").lineClamp1.wordBreak("break-all").$}
-              aria-hidden
-            >
-              {label}
-            </span>
-            <span css={Css.add("gridArea", "1/1").lineClamp1.wordBreak("break-all").if(active).smSb.$}>{label}</span>
-          </span>
-          <span
-            css={
-              Css.fs0.ml1.transitionAll.o0
-                .add("transform", "scale(0.75) translateY(100%)")
-                .if(completed)
-                .o100.add("transform", "scale(1) translateY(0%)").$
-            }
-          >
-            <Icon icon="check" inc={2.5} {...tid.check} />
-          </span>
-        </>
+        <span
+          css={
+            Css.fs0.ml1.transitionAll.o0
+              .add("transform", "scale(0.75) translateY(100%)")
+              .if(completed)
+              .o100.add("transform", "scale(1) translateY(0%)").$
+          }
+        >
+          <Icon icon="check" inc={2.5} {...tid.check} />
+        </span>
       )}
       {/* The indicator is a border element that is used to indicate the current step. */}
       <span aria-hidden css={getIndicatorStyles(active, completed, disabled)} {...tid.indicator} />
@@ -104,7 +102,8 @@ const inactiveIndicatorHeightPx = 2;
 
 const stepperTabStyles = {
   // No overflow:hidden — collapsed indicators are absolute and must paint outside the 0-height box.
-  baseStyles: Css.relative.df.aic.jcfs.fg1.py1.prPx(12).plPx(24).sm.color(Tokens.OnSurfaceMuted).tal.hPx(40).$,
+  baseStyles: Css.relative.df.aic.jcfs.fg1.py1.prPx(12).plPx(24).sm.color(Tokens.OnSurfaceMuted).tal.hPx(40)
+    .transitionAll.$,
   hoverStyles: Css.bgGray100.$,
   focusRingStyles: Css.bshFocus.outline0.$,
   collapsedStyles: Css.cursor("default").hPx(0).py0.$,
