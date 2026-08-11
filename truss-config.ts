@@ -1,9 +1,5 @@
 import { defineConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
-import {
-  documentScrollChromeLeft,
-  documentScrollChromeWidth,
-  pageContentPaddingXValue,
-} from "./src/layouts/layoutVars";
+import { documentScrollChromeLeft, documentScrollChromeWidth } from "./src/layouts/layoutVars";
 import { motion } from "./truss-motion";
 import { palette } from "./truss-palette";
 import { Tokens } from "./truss-token-vars";
@@ -69,11 +65,9 @@ const sections: Sections = {
   ],
   layoutContainer: () => [
     newMethod("layoutContainer", {
-      width: documentScrollChromeWidth(),
+      width: `min(100%, ${documentScrollChromeWidth()})`,
       left: documentScrollChromeLeft(),
       position: "sticky",
-      paddingLeft: pageContentPaddingXValue,
-      paddingRight: pageContentPaddingXValue,
     }),
   ],
   animation: () => [
