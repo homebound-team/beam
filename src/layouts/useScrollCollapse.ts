@@ -11,9 +11,11 @@ export function useScrollCollapse(enabled: boolean, restingOffset: number): bool
   const [collapsed, setCollapsed] = useState(() => typeof window !== "undefined" && window.scrollY > 0);
   const collapsedRef = useRef(collapsed);
   collapsedRef.current = collapsed;
-  // Ref-mirrored so the scroll listener doesn't resubscribe every time this changes.
+  // Latches to the largest value seen: `restingOffset` shrinks while our own chrome is collapsing, and
+  // mirroring it live would flip the "past resting" check on that shrink alone, not an actual scroll.
+  // Also ref-mirrored so the scroll listener doesn't resubscribe every time this changes.
   const restingOffsetRef = useRef(restingOffset);
-  restingOffsetRef.current = restingOffset;
+  restingOffsetRef.current = Math.max(restingOffsetRef.current, restingOffset);
   // +Infinity so a deep-link/scroll-restore landing mid-page reads as "scrolled up" (expands) rather
   // than assumes collapsed.
   const lastScrollYRef = useRef(Number.POSITIVE_INFINITY);
@@ -58,8 +60,8 @@ export function useScrollCollapse(enabled: boolean, restingOffset: number): bool
       if (currentY <= restingOffsetRef.current) return; // Not past the resting position yet.
 
       if (scrollHeightChanged) {
-        // Content resize (e.g. filtered/expanded rows), not a real scroll — collapse only, never reveal.
-        commit(true);
+        // A resize (content, or our own collapse animation), not a real scroll — leave `collapsed` as-is.
+        // Forcing a collapse here could fight a real scroll-up that just expanded it.
         return;
       }
 
