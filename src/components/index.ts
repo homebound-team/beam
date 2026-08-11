@@ -35,13 +35,13 @@ export { HB_QUIPS_FLAVOR, HB_QUIPS_MISSION, HbLoadingSpinner, HbSpinnerProvider 
 export * from "./Headers/ContentHeader";
 export type { HeaderAction } from "./Headers/HeaderActions";
 export * from "./HelperText";
-export * from "./HomeboundLogo";
 export * from "./Icon";
 export * from "./IconButton";
 export * from "./JumpLink";
 export * from "./Layout";
 export * from "./Loader";
 export * from "./LoadingSkeleton";
+export * from "./Logos";
 export * from "./MaxLines";
 export * from "./Modal";
 export * from "./Modal/useModal";
