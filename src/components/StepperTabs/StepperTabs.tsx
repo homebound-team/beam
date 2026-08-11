@@ -11,7 +11,7 @@ export type StepperTabsProps = {
   steps: StepperTabsStep[];
   currentStep: StepperTabsStep["value"];
   onChange: (stepValue: string) => void;
-  /** Forces the condensed look regardless of viewport width (e.g. WorkflowLayout's scroll-collapse). OR'd with the mobile-breakpoint collapse. */
+  /** Forces the condensed look regardless of viewport width. OR'd with the mobile-breakpoint collapse. */
   collapsed?: boolean;
 };
 

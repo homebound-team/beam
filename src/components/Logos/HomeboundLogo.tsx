@@ -1,11 +1,8 @@
 import { BeamColor } from "src/colors";
+import { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css } from "src/Css";
 
-type HomeboundLogoProps = {
-  fill?: BeamColor;
-  width?: number | "auto";
-  height?: number | "auto";
-};
+type HomeboundLogoProps = { fill?: BeamColor } & LogoSizeProps;
 
 export function HomeboundLogo(props: HomeboundLogoProps) {
   const { fill = "currentColor", width = "auto", height = "auto" } = props;

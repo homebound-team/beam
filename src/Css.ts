@@ -3943,13 +3943,12 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // layoutContainer
-  /** Sets `width: "calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))"; left: "var(--beam-side-nav-layout-width, 0px)"; position: "sticky"; paddingLeft: "24px"; paddingRight: "24px"`. */
+  /** Sets `width: "min(100%, calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px)))"; left: "var(--beam-side-nav-layout-width, 0px)"; position: "sticky"`. */
   get layoutContainer() {
-    return this.add("width", "calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px))")
-      .add("left", "var(--beam-side-nav-layout-width, 0px)").add("position", "sticky").add("paddingLeft", "24px").add(
-        "paddingRight",
-        "24px",
-      );
+    return this.add(
+      "width",
+      "min(100%, calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px)))",
+    ).add("left", "var(--beam-side-nav-layout-width, 0px)").add("position", "sticky");
   }
 
   // animation

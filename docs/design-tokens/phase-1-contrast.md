@@ -10,7 +10,7 @@ Replace color-level contrast branches with semantic token values so contrast mod
 
 ## Migration Checklist
 
-- [x] Single JSON source (`tokens/tokens.json`: `beam.color.*`) and codegen for `truss-token-vars`, `truss-palette`, and `theme-scopes.css`
+- [x] Color tokens + codegen for `truss-token-vars`, `truss-palette`, and `theme-scopes.css` (now: Figma export → `tokens/color.json`)
 - [x] Semantic baselines on `:root` and contrast overrides in `theme-scopes.css`; primitives-only `truss-palette.ts`
 - [x] Wire Truss token import from `truss-token-vars.ts`
 - [x] Add `ContrastScope` (contrast via `data-theme` + generated `theme-scopes.css`; portaled overlays set the same attribute when scope is active)
