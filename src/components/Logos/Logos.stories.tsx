@@ -13,14 +13,12 @@ export default {
   },
 } as Meta;
 
-type LogoSize = "small" | "medium" | "large";
-
 /**
- * Logo heights in `Css` increments, i.e. `medium` == 40px, which is the Blueprint AI
- * lockup's natural size. We size by height so the logos are optically consistent
- * regardless of how wide each one's aspect ratio is.
+ * Story-local sizes, not a component prop — these are just the `height` values we pass, in
+ * `Css` increments, i.e. `medium` == 40px, the Blueprint AI lockup's natural size. We size by
+ * height so the logos stay optically consistent despite their very different aspect ratios.
  */
-const sizes: Record<LogoSize, number> = { small: 3, medium: 5, large: 8 };
+const sizes = { small: 3, medium: 5, large: 8 };
 
 const logos: { name: string; render: (height: number) => ReactNode }[] = [
   { name: "BlueprintAiLogo", render: (height) => <BlueprintAiLogo height={height} /> },
@@ -38,7 +36,7 @@ export function Logos() {
             {Object.entries(sizes).map(([size, height]) => (
               <div key={size} css={Css.df.fdc.aic.gap1.$}>
                 {render(height)}
-                <span css={Css.xs.gray700.$}>{`${size} (${height * 8}px)`}</span>
+                <span css={Css.xs.gray700.$}>{`${size} — height={${height}} (${height * 8}px)`}</span>
               </div>
             ))}
           </div>

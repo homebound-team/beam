@@ -1,15 +1,11 @@
 import { BeamColor } from "src/colors";
+import { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css } from "src/Css";
 
-type BeamLogoProps = {
-  fill?: BeamColor;
-  // Defaults to 500
-  width?: number | "auto";
-  height?: number | "auto";
-};
+type BeamLogoProps = { fill?: BeamColor } & LogoSizeProps;
 
 export function BeamLogo(props: BeamLogoProps) {
-  const { fill = "currentColor", width = "500", height = "500" } = props;
+  const { fill = "currentColor", width = "auto", height = "auto" } = props;
   return (
     <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" css={Css.fill(fill).w(width).h(height).$}>
       <rect x="10" y="90" width="32" height="320" />

@@ -1,10 +1,6 @@
 import { useId } from "@react-aria/utils";
+import { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css, Palette } from "src/Css";
-
-type BlueprintAiLogoProps = {
-  width?: number | "auto";
-  height?: number | "auto";
-};
 
 /**
  * Blueprint AI logo
@@ -12,7 +8,7 @@ type BlueprintAiLogoProps = {
  * Unlike `BeamLogo`/`HomeboundLogo` this is always drawn with the brand gradient, so it
  * takes no `fill`.
  */
-export function BlueprintAiLogo(props: BlueprintAiLogoProps) {
+export function BlueprintAiLogo(props: LogoSizeProps) {
   const { width = "auto", height = "auto" } = props;
   // Gradients are referenced by id, so generate a unique one per instance.
   const gradientId = useId();
