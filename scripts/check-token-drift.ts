@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const GENERATED_PATHS = [
+  "tokens/color.json",
   "truss-token-vars.ts",
   "truss-palette.ts",
   "truss-motion.ts",
@@ -26,9 +27,10 @@ function main(): void {
   if (out.length > 0) {
     const pathsList = GENERATED_PATHS.join("\n  - ");
     console.error(`
-Design token drift: committed generated files do not match tokens/tokens.json after codegen.
+Design token drift: committed generated files do not match after yarn generate:design-tokens
+(figma-colors.raw.json + motion.json → color.json + Truss/CSS outputs).
 
-CI (or this check) ran yarn generate:design-tokens; git still shows changes in:
+CI (or this check) still shows changes in:
   - ${pathsList}
 
 Fix locally:

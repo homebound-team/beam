@@ -116,10 +116,24 @@ export function dtcgSrgbColorToRgbaString(v: DtcgSrgbColorValue): string {
 
 export type JsonObject = { [k: string]: unknown };
 
-/** Single source of truth: `tokens/tokens.json` under the tokens directory. */
+const TOKENS_SCHEMA = "https://www.designtokens.org/schemas/2025.10/format.json";
+
+/**
+ * Loads Beam tokens by merging `tokens/color.json` (from Figma sync) and
+ * hand-authored `tokens/motion.json` into the DTCG document shape codegen expects.
+ */
 export function loadTokensJson(tokensDir: string): JsonObject {
-  const path = join(tokensDir, "tokens.json");
-  return JSON.parse(readFileSync(path, "utf8")) as JsonObject;
+  const color = JSON.parse(readFileSync(join(tokensDir, "color.json"), "utf8")) as JsonObject;
+  const motion = JSON.parse(readFileSync(join(tokensDir, "motion.json"), "utf8")) as JsonObject;
+  return {
+    $schema: TOKENS_SCHEMA,
+    beam: {
+      $description:
+        "Beam design tokens — DTCG 2025.10-shaped. Colors: figma-colors.raw.json → color.json via yarn generate:design-tokens. Motion: edit motion.json. See tokens/README.md.",
+      color,
+      motion,
+    },
+  };
 }
 
 export type TokenLeaf = {
