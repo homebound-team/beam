@@ -2,7 +2,7 @@ import { DOMProps } from "@react-types/shared";
 import React, { AriaAttributes, ReactNode } from "react";
 import { BeamColor } from "src/colors";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, increment, Margin, Tokens, Xss } from "src/Css";
+import { Css, increment, Margin, Palette, Tokens, Xss } from "src/Css";
 
 export type IconProps = {
   /** The name of an icon */
@@ -46,11 +46,12 @@ export const Icon = React.memo((props: IconProps) => {
 });
 
 /**
- * Eight-pointed AI sparkle, drawn edge-to-edge in a 24x24 box.
- *
- * `Icons.aiStar` insets it to the icon set's optical size; `AiLoader` uses it full-bleed.
+ * The AI sparkle is a brand mark, so it ships its own gradient instead of taking `Icon`'s `color`.
  */
-export const aiStarPath =
+const aiStarGradientId = "beamAiStarGradient";
+
+/** Eight-pointed AI sparkle, drawn to a 24x24 viewbox. */
+const aiStarPath =
   "M12.9626 9.3548L19.4693 2.84806C19.8571 2.4603 20.4861 2.46022 20.8739 2.84806L20.9418 2.92322C21.2598 3.31316 21.2377 3.88891 20.8739 4.25269L14.0892 11.0374H23.0067C23.5552 11.0374 24 11.4822 24 12.0307C23.9999 12.5789 23.5553 13.024 23.0067 13.024H14.5159L20.6307 19.1387L20.6994 19.2147C20.9953 19.5785 20.9952 20.1029 20.6994 20.4666L20.6307 20.5426C20.2428 20.9304 19.6139 20.9304 19.226 20.5426L12.9626 14.2791V23.0067C12.9626 23.5552 12.5178 24 11.9693 24C11.4211 23.9999 10.976 23.5553 10.976 23.0067V14.1498L4.618 20.5078C4.25431 20.8715 3.67862 20.8941 3.28852 20.5757L3.21336 20.5078C2.82588 20.12 2.82584 19.4918 3.21336 19.104L9.29337 13.024H0.993265C0.47908 13.024 0.0559128 12.633 0.00484914 12.1325L0 12.0307C0 11.4822 0.444789 11.0374 0.993265 11.0374H9.7201L2.9701 4.28745C2.58225 3.89959 2.58241 3.2706 2.9701 2.88281L3.04526 2.81492C3.43535 2.49653 4.01105 2.51913 4.37473 2.88281L10.976 9.48411V0.993265C10.976 0.444731 11.4211 0.000149661 11.9693 0C12.5178 2.4664e-08 12.9626 0.444789 12.9626 0.993265V9.3548Z";
 
 /**
@@ -208,8 +209,18 @@ export const Icons = {
       <path d="M11.0513 3.69095C11.3506 2.76968 12.654 2.76968 12.9534 3.69095L14.4722 8.36485C14.6061 8.77685 14.99 9.05579 15.4232 9.0558L20.3377 9.05599C21.3064 9.05603 21.7091 10.2956 20.9255 10.865L16.9497 13.7538C16.5992 14.0084 16.4526 14.4598 16.5864 14.8718L18.1049 19.5458C18.4042 20.4671 17.3498 21.2332 16.5661 20.6638L12.5901 17.7753C12.2396 17.5207 11.765 17.5207 11.4146 17.7753L7.43853 20.6638C6.65483 21.2332 5.6004 20.4671 5.89971 19.5458L7.4182 14.8718C7.55205 14.4598 7.4054 14.0084 7.05494 13.7538L3.07914 10.865C2.29548 10.2956 2.69823 9.05603 3.66692 9.05599L8.58142 9.0558C9.01461 9.05579 9.39854 8.77685 9.53242 8.36486L11.0513 3.69095Z" />
     </>
   ),
-  // Inset to ~18.8px so it reads at the same optical size as `star` and the rest of the set.
-  aiStar: <path d={aiStarPath} transform="translate(2.6 2.6) scale(0.78333)" />,
+  aiStar: (
+    <>
+      <defs>
+        <linearGradient id={aiStarGradientId} x1="24" y1="24" x2="11.1944" y2="26.1689" gradientUnits="userSpaceOnUse">
+          <stop stopColor={Palette.Blue700} />
+          <stop offset="1" stopColor={Palette.Purple700} />
+        </linearGradient>
+      </defs>
+      {/* A `fill` attribute on the path beats the `fill` the parent `<svg>` inherits down. */}
+      <path d={aiStarPath} fill={`url(#${aiStarGradientId})`} />
+    </>
+  ),
   cloudSave: (
     <>
       <path d="M9 19H7C4.243 19 2 16.757 2 14C2 11.82 3.609 9.792 5.757 9.15C6.85 6.611 9.244 5 12 5C15.56 5 18.507 7.67 18.944 11.112C20.695 11.538 22 13.12 22 15C22 17.206 20.206 19 18 19H15H9ZM15 17H18C19.103 17 20 16.103 20 15C20 13.897 19.103 13 18 13H17V12C17 9.243 14.757 7 12 7C9.895 7 8.149 8.274 7.446 10.325L7.254 10.883L6.673 10.985C5.199 11.244 4 12.596 4 14C4 15.654 5.346 17 7 17H9H15Z" />
