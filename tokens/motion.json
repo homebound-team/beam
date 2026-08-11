@@ -1,0 +1,61 @@
+{
+  "$description": "Motion tokens — durations and easing curves consumed by Truss at build time. Unlike colors, motion is not themed at runtime, so values flow into truss-motion.ts as JS literals (no CSS variables).",
+  "duration": {
+    "fast": {
+      "$type": "duration",
+      "$value": {
+        "value": 150,
+        "unit": "ms"
+      },
+      "$description": "Quick UI feedback — small property changes, tooltip fades."
+    },
+    "normal": {
+      "$type": "duration",
+      "$value": {
+        "value": 200,
+        "unit": "ms"
+      },
+      "$description": "Default Beam transition duration. Used by Css.transition and the per-property motion helpers."
+    },
+    "slow": {
+      "$type": "duration",
+      "$value": {
+        "value": 300,
+        "unit": "ms"
+      },
+      "$description": "Larger spatial changes — drawer slides, layout reflows."
+    }
+  },
+  "easing": {
+    "standard": {
+      "$type": "cubicBezier",
+      "$value": [
+        0.4,
+        0,
+        0.2,
+        1
+      ],
+      "$description": "Symmetric ease-in-out for elements that change shape (open ↔ close)."
+    },
+    "decelerate": {
+      "$type": "cubicBezier",
+      "$value": [
+        0,
+        0,
+        0.2,
+        1
+      ],
+      "$description": "Ease-out for entering elements (decelerating into final position)."
+    },
+    "accelerate": {
+      "$type": "cubicBezier",
+      "$value": [
+        0.4,
+        0,
+        1,
+        1
+      ],
+      "$description": "Ease-in for exiting elements (accelerating off-screen)."
+    }
+  }
+}

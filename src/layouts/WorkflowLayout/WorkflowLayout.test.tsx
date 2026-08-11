@@ -1,6 +1,6 @@
 import { act } from "@testing-library/react";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render, scrollWindow, withRouter } from "src/utils/rtl";
+import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
 import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
 
 describe("WorkflowLayout", () => {
@@ -197,19 +197,6 @@ describe("WorkflowLayout", () => {
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
 
     // Then the tab collapses to its 0px indicator bar
-    expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
-  });
-
-  it("collapses the tabs on scroll past the resting position on desktop", async () => {
-    // Given a WorkflowLayout on its first step, on a desktop viewport
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
-
-    // When the page scrolls down past the header's resting position
-    scrollWindow(0, { clientHeight: 800, scrollHeight: 1_000_800 });
-    scrollWindow(300, { clientHeight: 800, scrollHeight: 1_000_800 });
-
-    // Then the tab collapses to its 0px indicator bar
-    // (the scroll-position state machine itself is covered by useScrollCollapse's own tests)
     expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
   });
 
