@@ -134,7 +134,7 @@ Example tests: [`DateField.test.tsx`](src/inputs/DateFields/DateField.test.tsx),
 
 ## Design tokens
 
-Authoring, structure, nomenclature, and commands: [`tokens/README.md`](tokens/README.md) (source: [`tokens/tokens.json`](tokens/tokens.json)). After JSON edits: `yarn generate:design-tokens` (also at the start of `yarn build` / `yarn build:truss`), then `yarn validate:tokens`. **CI** runs **`yarn validate:tokens`** then **`yarn check:token-drift`** before `yarn build`; on drift, regenerate, commit `truss-token-vars.ts`, `truss-palette.ts`, `truss-motion.ts`, and `src/css/generated/theme-scopes.css`, and push. Roadmap: [`docs/design-tokens/README.md`](docs/design-tokens/README.md).
+Authoring, structure, nomenclature, and commands: [`tokens/README.md`](tokens/README.md). Colors: Figma → [`tokens/figma-colors.raw.json`](tokens/figma-colors.raw.json) → `yarn generate:design-tokens` (writes [`tokens/color.json`](tokens/color.json) + Truss/CSS). Motion: edit [`tokens/motion.json`](tokens/motion.json), then the same generate. Also runs at the start of `yarn build` / `yarn build:truss`. Then `yarn validate:tokens`. **CI** runs **`yarn validate:tokens`** then **`yarn check:token-drift`** before `yarn build`; on drift, regenerate and commit `color.json`, `truss-token-vars.ts`, `truss-palette.ts`, `truss-motion.ts`, and `src/css/generated/theme-scopes.css`, and push. Roadmap: [`docs/design-tokens/README.md`](docs/design-tokens/README.md).
 
 ## Linting
 
