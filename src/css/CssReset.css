@@ -45,6 +45,19 @@
     }
   }
 
+  /* AiLoader's star wave. Each star swells over the first third of the cycle and settles back over
+     the second, then rests small while its two neighbors take their turn. */
+  @keyframes aiStarLoader {
+    0%,
+    66.67%,
+    100% {
+      transform: scale(0.5);
+    }
+    33.33% {
+      transform: scale(1);
+    }
+  }
+
   /* Respect WCAG SC 2.3.3 — collapse animations and transitions when the user
      has set prefers-reduced-motion: reduce in their OS. Applies globally so it
      covers every motion-token-driven helper as well as legacy inline transitions. */

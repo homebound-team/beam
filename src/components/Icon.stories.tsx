@@ -44,6 +44,7 @@ export const Icon = (props: IconProps) => {
     "verticalDots",
     "star",
     "starFilled",
+    "aiStar",
     "cloudSave",
     "attachment",
     "archive",

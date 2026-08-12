@@ -7,6 +7,7 @@ export * from "src/components/ToggleChips";
 export * from "src/css/CssReset";
 export * from "./Accordion";
 export * from "./AccordionList";
+export * from "./AiLoader";
 export * from "./AppNav";
 export * from "./AutoSaveIndicator";
 export * from "./Avatar";
