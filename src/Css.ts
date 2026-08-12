@@ -95,8 +95,8 @@ export enum Tokens {
   NeutralSurfacePressed = "--b-neutral-surface-pressed",
   OnPrimary = "--b-on-primary",
   OnSurface = "--b-on-surface",
-  OnSurfaceMuted = "--b-on-surface-muted",
   OnSurfaceDisabled = "--b-on-surface-disabled",
+  OnSurfaceMuted = "--b-on-surface-muted",
   OnSurfaceRaisedHover = "--b-on-surface-raised-hover",
   OnSurfaceRaisedPressed = "--b-on-surface-raised-pressed",
   Primary = "--b-primary",
@@ -106,11 +106,11 @@ export enum Tokens {
   SelectionFill = "--b-selection-fill",
   SelectionIndicator = "--b-selection-indicator",
   Surface = "--b-surface",
+  SurfaceDisabled = "--b-surface-disabled",
   SurfaceHover = "--b-surface-hover",
   SurfaceRaised = "--b-surface-raised",
   SurfaceRaisedHover = "--b-surface-raised-hover",
   SurfaceRaisedPressed = "--b-surface-raised-pressed",
-  SurfaceDisabled = "--b-surface-disabled",
   SurfaceSeparator = "--b-surface-separator",
   SurfaceSubtle = "--b-surface-subtle",
   TextDisabled = "--b-text-disabled",
@@ -196,6 +196,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `borderColor: "rgba(0,0,0,0)"`. */
   get bcTransparent() {
     return this.add("borderColor", "rgba(0,0,0,0)");
+  }
+  /** Sets `borderColor: "rgba(0, 0, 0, 1)"`. */
+  get bcBlack() {
+    return this.add("borderColor", "rgba(0, 0, 0, 1)");
   }
   /** Sets `borderColor: "rgba(255, 253, 253, 1)"`. */
   get bcGray50() {
@@ -1880,6 +1884,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get transparent() {
     return this.add("color", "rgba(0,0,0,0)");
   }
+  /** Sets `color: "rgba(0, 0, 0, 1)"`. */
+  get black() {
+    return this.add("color", "rgba(0, 0, 0, 1)");
+  }
   /** Sets `color: "rgba(255, 253, 253, 1)"`. */
   get gray50() {
     return this.add("color", "rgba(255, 253, 253, 1)");
@@ -2172,6 +2180,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get bgTransparent() {
     return this.add("backgroundColor", "rgba(0,0,0,0)");
   }
+  /** Sets `backgroundColor: "rgba(0, 0, 0, 1)"`. */
+  get bgBlack() {
+    return this.add("backgroundColor", "rgba(0, 0, 0, 1)");
+  }
   /** Sets `backgroundColor: "rgba(255, 253, 253, 1)"`. */
   get bgGray50() {
     return this.add("backgroundColor", "rgba(255, 253, 253, 1)");
@@ -2463,6 +2475,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `fill: "rgba(0,0,0,0)"`. */
   get fTransparent() {
     return this.add("fill", "rgba(0,0,0,0)");
+  }
+  /** Sets `fill: "rgba(0, 0, 0, 1)"`. */
+  get fBlack() {
+    return this.add("fill", "rgba(0, 0, 0, 1)");
   }
   /** Sets `fill: "rgba(255, 253, 253, 1)"`. */
   get fGray50() {
@@ -3932,6 +3948,22 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("zIndex", value);
   }
 
+  // ai
+  /** Sets `backgroundImage: "linear-gradient(90deg, rgba(124, 58, 237, 0.07) 0%, rgba(147, 197, 253, 0.07) 36%, rgba(124, 58, 237, 0.07) 73%)"`. */
+  get aiWash() {
+    return this.add(
+      "backgroundImage",
+      "linear-gradient(90deg, rgba(124, 58, 237, 0.07) 0%, rgba(147, 197, 253, 0.07) 36%, rgba(124, 58, 237, 0.07) 73%)",
+    );
+  }
+  /** Sets `color: "rgba(109, 40, 217, 1)"; backgroundImage: "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))"; backgroundClip: "text"; WebkitBackgroundClip: "text"; WebkitTextFillColor: "transparent"`. */
+  get aiGradientText() {
+    return this.add("color", "rgba(109, 40, 217, 1)").add(
+      "backgroundImage",
+      "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))",
+    ).add("backgroundClip", "text").add("WebkitBackgroundClip", "text").add("WebkitTextFillColor", "transparent");
+  }
+
   // fontFamily
   /** Sets `fontFamily: "'Inter', sans-serif"`. */
   get sansSerif() {
@@ -4298,6 +4330,7 @@ function omitUndefinedValues<T extends object>(value: T): T {
 export enum Palette {
   White = "rgba(255, 255, 255, 1)",
   Transparent = "rgba(0,0,0,0)",
+  Black = "rgba(0, 0, 0, 1)",
   Gray50 = "rgba(255, 253, 253, 1)",
   Gray100 = "rgba(247, 245, 245, 1)",
   Gray200 = "rgba(236, 235, 235, 1)",

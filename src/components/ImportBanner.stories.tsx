@@ -27,18 +27,18 @@ export const Small = () => (
  */
 export const Large = () => (
   <div css={Css.wPx(816).$}>
-    <ImportBanner size="lg" />
+    <ImportBanner variant="page" />
   </div>
 );
 
-/** Both sizes shrink with their container — the copy wraps, the loader doesn't. */
+/** Both variants shrink with their container — the copy wraps, the loader doesn't. */
 export const Narrow = () => (
   <div css={Css.df.fdc.gap4.$}>
     <div css={Css.wPx(420).$}>
       <ImportBanner />
     </div>
     <div css={Css.wPx(420).$}>
-      <ImportBanner size="lg" />
+      <ImportBanner variant="page" />
     </div>
   </div>
 );

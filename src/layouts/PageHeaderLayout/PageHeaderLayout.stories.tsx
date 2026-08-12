@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react-vite";
+import { AiPanel } from "src/components/AiPanel";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
@@ -15,6 +16,22 @@ export default {
 export function Default() {
   return (
     <PageHeaderLayout pageHeader={{ title: "Page title", rightSlot: <Button label="Action" onClick={() => {}} /> }}>
+      <Body />
+    </PageHeaderLayout>
+  );
+}
+
+/**
+ * An `AiPanel` above content the user keeps working in. Outside `pageContentPaddingX` on purpose, so
+ * its wash spans the body rather than starting in the gutters.
+ */
+export function WithAiPanel() {
+  return (
+    <PageHeaderLayout pageHeader={{ title: "Page title", rightSlot: <Button label="Action" onClick={() => {}} /> }}>
+      <AiPanel
+        title="Importing Details..."
+        message="This process can take a few minutes. Feel free to keep working in another tab."
+      />
       <Body />
     </PageHeaderLayout>
   );

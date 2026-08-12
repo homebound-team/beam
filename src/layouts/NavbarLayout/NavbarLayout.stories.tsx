@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react-vite";
+import { AiPanel } from "src/components/AiPanel";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
@@ -108,6 +109,25 @@ export const ComposedConstrainedWidthTable = () => (
       </SideNavLayout>
     </NavbarLayout>
   </EnvironmentBannerLayout>
+);
+
+/**
+ * An `AiPanel` above the wide table from {@link Composed}. The table makes the document wider than the
+ * viewport, and the document-scroll root is `width: fit-content`, so scroll right and the wash still
+ * reaches the edge. Falls out of block layout — no `AiPanel` prop controls it.
+ */
+export const WithAiPanel = () => (
+  <NavbarLayout navbar={createNavbar()}>
+    <SideNavLayout sideNav={{ items: sideNavItems() }}>
+      <PageHeaderLayout pageHeader={{ title: "Page header", rightSlot: <Button label="Action" onClick={() => {}} /> }}>
+        <AiPanel
+          title="Importing Details..."
+          message="This process can take a few minutes. Feel free to keep working in another tab."
+        />
+        <GridTableLayoutExample storageKey="navbar-layout-with-ai-panel" />
+      </PageHeaderLayout>
+    </SideNavLayout>
+  </NavbarLayout>
 );
 
 function sideNavItems(): AppNavItem[] {

@@ -44,8 +44,41 @@ const transition: string = [
   .map((property) => `${property} ${motion.duration.normal} ${motion.easing.standard}`)
   .join(", ");
 
+/** `palette` values are opaque `rgba(...)`, so re-alpha one to layer it as a tint. */
+function alpha(color: string, a: number): string {
+  return color.replace(/,\s*1\)$/, `, ${a})`);
+}
+
+/** The Blueprint AI ramp — the same purple-to-blue as the `aiStar` sparkle, so AI marks read as one family. */
+const aiGradient = `linear-gradient(90deg, ${palette.Purple700}, ${palette.Blue700})`;
+
+/**
+ * A faint wash for AI surfaces. The designs draw it as a radial gradient, but it's stretched so far
+ * that within a panel's height it only varies left-to-right — so this is that one axis, with the stops
+ * snapped to palette entries rather than carrying one-off hexes.
+ */
+const aiWash = [
+  `linear-gradient(90deg,`,
+  `${alpha(palette.Purple600, 0.07)} 0%,`,
+  `${alpha(palette.Blue300, 0.07)} 36%,`,
+  `${alpha(palette.Purple600, 0.07)} 73%)`,
+].join(" ");
+
 // Custom rules
 const sections: Sections = {
+  ai: () => [
+    // `backgroundImage` only, so the caller supplies the surface under it and it stays themeable.
+    newMethod("aiWash", { backgroundImage: aiWash }),
+    newMethod("aiGradientText", {
+      // Fallback where a background can't be clipped to text; `transparent` would hide it outright.
+      color: palette.Purple700,
+      backgroundImage: aiGradient,
+      backgroundClip: "text",
+      WebkitBackgroundClip: "text",
+      // Clears the glyph fill so the background shows through.
+      WebkitTextFillColor: "transparent",
+    }),
+  ],
   fontFamily: () =>
     newMethodsForProp("fontFamily", {
       sansSerif: "'Inter', sans-serif",

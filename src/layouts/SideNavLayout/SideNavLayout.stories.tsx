@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react-vite";
+import { AiPanel } from "src/components/AiPanel";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Icon } from "src/components/Icon";
@@ -63,6 +64,19 @@ export function WithoutCollapseToggle() {
 export function ContrastRail() {
   return (
     <SideNavLayout contrastRail sideNav={{ top: <Brand />, items, footer: <UserFooter /> }}>
+      <PageContent />
+    </SideNavLayout>
+  );
+}
+
+/** An `AiPanel` atop the content column. Collapse the rail and the wash should re-span with it. */
+export function WithAiPanel() {
+  return (
+    <SideNavLayout sideNav={{ top: <Brand />, items, footer: <UserFooter /> }}>
+      <AiPanel
+        title="Importing Details..."
+        message="This process can take a few minutes. Feel free to keep working in another tab."
+      />
       <PageContent />
     </SideNavLayout>
   );

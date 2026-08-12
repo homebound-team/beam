@@ -8,6 +8,7 @@ export * from "src/css/CssReset";
 export * from "./Accordion";
 export * from "./AccordionList";
 export * from "./AiLoader";
+export * from "./AiPanel";
 export * from "./AppNav";
 export * from "./AutoSaveIndicator";
 export * from "./Avatar";
