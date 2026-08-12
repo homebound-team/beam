@@ -15,9 +15,7 @@ import {
   beamWorkflowLayoutFooterHeightVar,
   documentScrollChromeWidth,
 } from "../layoutVars";
-import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
-import { useScrollCollapse } from "../useScrollCollapse";
 import { UnsavedChangesNavigationModal, useUnsavedChangesGuard } from "./useUnsavedChangesGuard";
 import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
 
@@ -48,9 +46,8 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  *
  * A standalone, full-page layout for step-based workflow pages — nest it directly under
  * `EnvironmentBannerLayout`, never under `NavbarLayout`/`SideNavLayout`/`PageHeaderLayout`. Unlike
- * `PageHeaderLayout`, the header here never auto-hides. The stepper tabs always collapse to a condensed
- * indicator bar on mobile, and on larger viewports also collapse once scrolled past a threshold,
- * re-expanding on scroll-up (even before reaching the top).
+ * `PageHeaderLayout`, the header here never auto-hides. The stepper tabs collapse to a condensed
+ * indicator bar on mobile only.
  *
  * Owns the workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete) via `WorkflowActions`
  * so it can move them into a mobile footer at the `sm` breakpoint — `WorkflowHeader` itself is not part
@@ -64,15 +61,8 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
   const { sm: isMobile } = useBreakpoint();
   const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard({ isDirty, onCancel });
 
-  const bannerAndNavbarHeight = useBannerAndNavbarHeight();
-
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
-
-  const scrollCollapsed = useScrollCollapse(!isMobile, bannerAndNavbarHeight + headerHeight);
-
-  // Mobile always collapses (tight screen space); desktop collapses past the scroll threshold instead.
-  const collapsed = isMobile || scrollCollapsed;
 
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
@@ -131,7 +121,8 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
     <WorkflowHeader
       {...headerProps}
       rightSlot={isMobile ? undefined : buttons}
-      stepperTabs={{ steps: stepTabs, currentStep, onChange: setCurrentStep, collapsed }}
+      // Mobile collapses the tabs for the tighter screen space; desktop always shows them in full.
+      stepperTabs={{ steps: stepTabs, currentStep, onChange: setCurrentStep, collapsed: isMobile }}
     />
   );
 

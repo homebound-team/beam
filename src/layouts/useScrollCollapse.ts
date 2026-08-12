@@ -2,10 +2,15 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 /**
  * Whether the document has scrolled past `restingOffset`, for chrome that collapses on scroll-down and
- * re-expands on scroll-up (even before reaching the top) — e.g. `WorkflowLayout`'s stepper tabs.
+ * re-expands on scroll-up (even before reaching the top).
  *
  * Unlike `useAutoHideOnScroll`, this tracks plain `window.scrollY` rather than a spacer's rect, since
  * callers here rest at a fixed, computable offset rather than needing a measured DOM anchor.
+ *
+ * Currently **unused** — kept for a future revisit. `WorkflowLayout` was its only caller (collapsing the
+ * stepper tabs on scroll-down at `md`+) and no longer wires it up; its tabs now collapse on mobile only.
+ * Before re-adopting it, note that `restingOffset` is meant to be a *stable* value: passing a live
+ * measured height of the very chrome being collapsed feeds the collapse back into its own threshold.
  */
 export function useScrollCollapse(enabled: boolean, restingOffset: number): boolean {
   const [collapsed, setCollapsed] = useState(() => typeof window !== "undefined" && window.scrollY > 0);

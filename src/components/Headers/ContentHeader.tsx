@@ -1,12 +1,16 @@
 import { ReactNode } from "react";
 import { HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
-import { Css, Tokens } from "src/Css";
+import { Css, Only, Padding, Tokens, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export type ContentHeaderProps = {
+type ContentHeaderXss = Xss<Padding>;
+
+export type ContentHeaderProps<X = ContentHeaderXss> = {
   title?: string;
   description?: ReactNode;
   actions?: HeaderAction[];
+  /** Style overrides for padding. */
+  xss?: X;
 };
 
 /**
@@ -21,8 +25,8 @@ export type ContentHeaderProps = {
  * so the containing block grows to match the full scrollable width — the same technique `GridTable`
  * uses internally for its own sticky columns (`src/components/Table/GridTable.tsx`).
  */
-export function ContentHeader(props: ContentHeaderProps) {
-  const { title, description, actions } = props;
+export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
+  const { title, description, actions, xss } = props;
   const tid = useTestIds(props, "contentHeader");
 
   if (!title && !description && !actions) {
@@ -36,7 +40,7 @@ export function ContentHeader(props: ContentHeaderProps) {
   );
 
   return (
-    <div css={Css.df.fdc.gapPx(12).layoutContainer.bgColor(Tokens.Surface).$} {...tid}>
+    <div css={{ ...Css.df.fdc.gapPx(12).layoutContainer.bgColor(Tokens.Surface).$, ...xss }} {...tid}>
       <div css={Css.df.aic.jcsb.mw0.$}>
         {title ? (
           <h2 css={Css.xl.$} {...tid.title}>

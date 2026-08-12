@@ -1,5 +1,5 @@
 /**
- * AUTO-GENERATED — do not edit by hand. Source: tokens/tokens.json.
+ * AUTO-GENERATED — do not edit by hand. Source: tokens/color.json (from Figma via generate:design-tokens).
  * Run yarn generate:design-tokens, yarn build, or yarn build:truss.
  */
 
@@ -7,6 +7,7 @@
 export const palette = {
   White:  'rgba(255, 255, 255, 1)',
   Transparent:  'rgba(0,0,0,0)',
+  Black:  'rgba(0, 0, 0, 1)',
   Gray50:  'rgba(255, 253, 253, 1)',
   Gray100:  'rgba(247, 245, 245, 1)',
   Gray200:  'rgba(236, 235, 235, 1)',
