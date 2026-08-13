@@ -9,6 +9,11 @@ import { SuperDrawerWidth } from "./utils";
 type SuperDrawerContentProps = {
   children: ReactNode;
   /**
+   * Spans the drawer's full width above the content cancelling the padding while
+   * the children keep it.
+   */
+  banner?: ReactNode;
+  /**
    * Actions represents an array of button props with represents that different
    * actions that can be conducted in the SuperDrawer page.
    *
@@ -24,7 +29,7 @@ type SuperDrawerContentProps = {
  * NOTE: This does not include the header props since the caller will be the one
  * that knows how to handle the title, prev/next link and the onClose handler.
  */
-export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProps) => {
+export const SuperDrawerContent = ({ children, banner, actions }: SuperDrawerContentProps) => {
   const { closeDrawerDetail } = useSuperDrawer();
   const { drawerContentStack: contentStack } = useBeamContext();
 
@@ -38,6 +43,7 @@ export const SuperDrawerContent = ({ children, actions }: SuperDrawerContentProp
     if (kind === "open") {
       return (
         <motion.div key="content" css={Css.p3.fg1.oa.$}>
+          {banner && <div css={Css.mx(-3).mt(-3).mb3.$}>{banner}</div>}
           {children}
         </motion.div>
       );

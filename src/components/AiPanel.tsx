@@ -1,5 +1,7 @@
 import { AriaAttributes, AriaRole, ReactNode } from "react";
 import { AiLoader } from "src/components/AiLoader";
+import { Button } from "src/components/Button";
+import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { BlueprintAiLogo } from "src/components/Logos";
 import { Css, Properties, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -22,6 +24,8 @@ export type AiPanelProps = {
   align?: "left" | "center";
   rounded?: boolean;
   variant?: AiPanelVariant;
+  primaryAction?: ActionButtonProps;
+  secondaryAction?: ActionButtonProps;
 } & AriaAttributes & { role?: AriaRole };
 
 /**
@@ -39,10 +43,29 @@ export function AiPanel(props: AiPanelProps) {
     align = "left",
     rounded = false,
     variant = "banner",
+    primaryAction,
+    secondaryAction,
     ...others
   } = props;
   const tid = useTestIds(others, "aiPanel");
   const { column, card, logoHeight } = variantStyles[variant];
+  const hasActions = !!(primaryAction || secondaryAction);
+  const panelContent = (
+    <>
+      {loading && <AiLoader />}
+      {title && (
+        <span css={{ ...Css.if(hasActions).mdSb.else.lg.$, ...Css.aiGradientText.$ }} {...tid.title}>
+          {title}
+        </span>
+      )}
+      {message && (
+        <span css={{ ...Css.sm.color(Tokens.OnSurface).$, ...alignStyles[align].text }} {...tid.message}>
+          {message}
+        </span>
+      )}
+      {children}
+    </>
+  );
   return (
     // The wash is out here rather than on the column, so it fills the container even when `page` caps
     // the content inside it.
@@ -59,23 +82,23 @@ export function AiPanel(props: AiPanelProps) {
     >
       <div css={{ ...Css.df.fdc.aifs.w100.$, ...column }} {...tid.column}>
         <BlueprintAiLogo height={logoHeight} />
-        <div
-          css={{ ...Css.df.fdc.gap1.w100.bgColor(Tokens.Surface).bshBasic.$, ...card, ...alignStyles[align].card }}
-          {...tid.card}
-        >
-          {loading && <AiLoader />}
-          {title && (
-            <span css={Css.lg.aiGradientText.$} {...tid.title}>
-              {title}
-            </span>
-          )}
-          {message && (
-            <span css={{ ...Css.sm.color(Tokens.OnSurface).$, ...alignStyles[align].text }} {...tid.message}>
-              {message}
-            </span>
-          )}
-          {children}
-        </div>
+        {/* actions need to render themselves on the right side of the the title & message */}
+        {hasActions ? (
+          <div css={{ ...Css.df.aic.gap2.w100.bgColor(Tokens.Surface).bshBasic.$, ...card }} {...tid.card}>
+            <div css={Css.df.fdc.gapPx(4).fg1.mw0.$}>{panelContent}</div>
+            <div css={Css.df.gap2.fs0.$} {...tid.actions}>
+              {secondaryAction && <Button {...secondaryAction} variant="quaternary" />}
+              {primaryAction && <Button {...primaryAction} variant="ai" />}
+            </div>
+          </div>
+        ) : (
+          <div
+            css={{ ...Css.df.fdc.gap1.w100.bgColor(Tokens.Surface).bshBasic.$, ...card, ...alignStyles[align].card }}
+            {...tid.card}
+          >
+            {panelContent}
+          </div>
+        )}
       </div>
     </div>
   );

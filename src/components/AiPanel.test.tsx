@@ -1,4 +1,5 @@
 import { AiPanel } from "src";
+import { noop } from "src/utils";
 import { render } from "src/utils/rtl";
 
 describe("AiPanel", () => {
@@ -106,5 +107,43 @@ describe("AiPanel", () => {
   it("uses the roomier card for the page variant", async () => {
     const r = await render(<AiPanel variant="page" title="t" />);
     expect(r.aiPanel_card).toHaveStyle({ borderRadius: "16px" });
+  });
+
+  it("has no actions row unless given actions", async () => {
+    const r = await render(<AiPanel title="t" message="m" />);
+    expect(r.query.aiPanel_actions).not.toBeInTheDocument();
+  });
+
+  it("puts actions beside the copy", async () => {
+    const r = await render(
+      <AiPanel
+        title="Review updates found in your import."
+        message="m"
+        secondaryAction={{ label: "Clear Import", onClick: noop }}
+      />,
+    );
+    // Then the card is a row, with the copy and the actions as its two children
+    expect(r.aiPanel_card.children).toHaveLength(2);
+    expect(r.aiPanel_card.lastElementChild).toBe(r.aiPanel_actions);
+    expect(r.aiPanel_actions).toHaveTextContent("Clear Import");
+  });
+
+  it("compacts the title when actions share its row", async () => {
+    const r = await render(<AiPanel title="t" secondaryAction={{ label: "a", onClick: noop }} />);
+    // Then the title drops to 16/24 from the 18/28 the stacked layout uses
+    expect(r.aiPanel_title).toHaveStyle({ fontSize: "16px", lineHeight: "24px" });
+  });
+
+  it("renders the secondary action left of the primary", async () => {
+    const r = await render(
+      <AiPanel
+        title="t"
+        secondaryAction={{ label: "Ignore All", onClick: noop }}
+        primaryAction={{ label: "Accept All", onClick: noop }}
+      />,
+    );
+    expect(r.aiPanel_actions.children).toHaveLength(2);
+    expect(r.aiPanel_actions.firstElementChild).toHaveTextContent("Ignore All");
+    expect(r.aiPanel_actions.lastElementChild).toHaveTextContent("Accept All");
   });
 });

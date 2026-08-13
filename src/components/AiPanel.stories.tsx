@@ -104,6 +104,18 @@ export const Upload = () => (
   </div>
 );
 
+/** The review banner — copy left, actions right. */
+export const Actions = () => (
+  <div css={Css.wPx(1440).$}>
+    <AiPanel
+      title="Review changes to your plan found in your latest document capture."
+      message="Review the changes highlighted below including 4 warnings."
+      secondaryAction={{ label: "Ignore All", onClick: () => {} }}
+      primaryAction={{ label: "Accept All", onClick: () => {} }}
+    />
+  </div>
+);
+
 /** `align` and `rounded` combined — all four are the same width, `rounded` only changes corners. */
 export const AlignAndRounded = () => (
   <div css={Css.df.fdc.gap4.wPx(720).$}>

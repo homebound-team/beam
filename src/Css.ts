@@ -3956,6 +3956,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
       "linear-gradient(90deg, rgba(124, 58, 237, 0.07) 0%, rgba(147, 197, 253, 0.07) 36%, rgba(124, 58, 237, 0.07) 73%)",
     );
   }
+  /** Sets `backgroundImage: "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))"`. */
+  get aiGradientBg() {
+    return this.add("backgroundImage", "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))");
+  }
   /** Sets `color: "rgba(109, 40, 217, 1)"; backgroundImage: "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))"; backgroundClip: "text"; WebkitBackgroundClip: "text"; WebkitTextFillColor: "transparent"`. */
   get aiGradientText() {
     return this.add("color", "rgba(109, 40, 217, 1)").add(

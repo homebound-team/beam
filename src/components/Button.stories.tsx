@@ -12,6 +12,7 @@ export default {
 
 const sizes: ButtonSize[] = ["sm", "md", "lg"];
 const variants: ButtonVariant[] = [
+  "ai",
   "primary",
   "secondary",
   "tertiary",

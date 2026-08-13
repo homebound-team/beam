@@ -69,6 +69,7 @@ const sections: Sections = {
   ai: () => [
     // `backgroundImage` only, so the caller supplies the surface under it and it stays themeable.
     newMethod("aiWash", { backgroundImage: aiWash }),
+    newMethod("aiGradientBg", { backgroundImage: aiGradient }),
     newMethod("aiGradientText", {
       // Fallback where a background can't be clipped to text; `transparent` would hide it outright.
       color: palette.Purple700,

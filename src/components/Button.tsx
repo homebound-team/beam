@@ -2,7 +2,7 @@ import { AriaButtonProps } from "@react-types/button";
 import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Properties, Tokens } from "src/Css";
+import { Css, Palette, Properties, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
 import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { isAbsoluteUrl, isPromise, noop } from "src/utils";
@@ -142,6 +142,17 @@ const variantStyles: Record<
     focusStyles: Properties;
   }
 > = {
+  ai: {
+    baseStyles: Css.aiGradientBg.color(Tokens.OnPrimary).$,
+    hoverStyles: Css.add("backgroundImage", `linear-gradient(90deg, ${Palette.Purple800}, ${Palette.Blue800})`).$,
+    pressedStyles: Css.add("backgroundImage", `linear-gradient(90deg, ${Palette.Purple900}, ${Palette.Blue900})`).$,
+    disabledStyles: Css.add(
+      "backgroundImage",
+      `linear-gradient(90deg, ${Palette.Purple200}, ${Palette.Blue200})`,
+    ).color(Tokens.ButtonPrimaryDisabledFg).$,
+    focusStyles: Css.bshFocus.$,
+  },
+
   primary: {
     baseStyles: Css.bgColor(Tokens.Primary).color(Tokens.OnPrimary).$,
     hoverStyles: Css.bgColor(Tokens.PrimaryHover).$,
@@ -243,6 +254,7 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonVariant =
+  | "ai"
   | "primary"
   | "secondary"
   | "secondaryBlack"
