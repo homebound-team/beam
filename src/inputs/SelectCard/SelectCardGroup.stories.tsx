@@ -36,12 +36,6 @@ function createOptionTypes(): SelectCardGridGroupItemOption<string>[] {
       description: "Selections come in preconfigured bundles.",
       value: "package",
     },
-    {
-      icon: "flag",
-      label: "Bundle",
-      description: "Selections are grouped and priced together.",
-      value: "bundle",
-    },
   ];
 }
 

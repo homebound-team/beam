@@ -43,12 +43,6 @@ function createMixedOptions(): SelectCardGridGroupItemOption<string>[] {
       value: "package",
     },
     { icon: "dollar", label: "Finance", value: "finance" },
-    {
-      icon: "flag",
-      label: "Design",
-      description: "Selections are pulled from the approved design set.",
-      value: "design",
-    },
   ];
 }
 
