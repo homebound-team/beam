@@ -1,4 +1,5 @@
 import { InputHTMLAttributes, ReactNode } from "react";
+import type { CardTag } from "src/components/Card";
 import { IconProps } from "src/components/Icon";
 import { PresentationFieldProps } from "src/components/PresentationContext";
 import { Value } from "src/inputs";
@@ -10,6 +11,8 @@ export type SelectCardLayout = "vertical" | "horizontal";
 
 type SelectCardGroupItemOptionBase<V extends Value> = {
   label: string;
+  /** Optional tag shown above the label (grid view) or next to it (list view). Not supported on icon cards. */
+  tag?: CardTag;
   /** Optional secondary copy shown beneath the label. */
   description?: ReactNode;
   disabled?: boolean;
@@ -21,9 +24,9 @@ type SelectCardGroupItemOptionBase<V extends Value> = {
   selectionBehavior?: "exclusive";
 };
 
-/** Grid-view option; requires either `icon` or `image` (image url shown in place of the icon). */
+/** Grid-view option; requires either `icon` or `image`, and only image cards take a `tag`. */
 export type SelectCardGridGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> &
-  ({ icon: IconProps["icon"]; image?: never } | { image: string; icon?: never });
+  ({ icon: IconProps["icon"]; image?: never; tag?: never } | { image: string; icon?: never; tag?: CardTag });
 
 /** List-view option; `icon` is ignored when present. */
 export type SelectCardListGroupItemOption<V extends Value> = SelectCardGroupItemOptionBase<V> & {
@@ -81,6 +84,8 @@ export type SelectCardShared = {
   label: string;
   /** Optional secondary copy shown beneath the label. When present the card grows to fit it. */
   description?: ReactNode;
+  /** Optional tag shown above the label (grid view) or next to it (list view). */
+  tag?: CardTag;
   selected?: boolean;
   disabled?: boolean;
   tooltip?: ReactNode;

@@ -1,5 +1,5 @@
 import { VisuallyHidden } from "react-aria";
-import { Icon, IconProps } from "src/components";
+import { Icon, IconProps, Tag } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
 import { SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
@@ -22,6 +22,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
     layout,
     label,
     description,
+    tag,
     selected: isSelected = false,
     disabled: isDisabled = false,
     tooltip,
@@ -52,6 +53,11 @@ export function GridSelectCard(props: GridSelectCardProps) {
         icon && <Icon icon={icon} inc={4} color={isDisabled ? Tokens.OnSurfaceDisabled : Tokens.OnSurface} />
       )}
       <span css={Css.df.fdc.gap("4px").w100.$}>
+        {tag && (
+          <span css={Css.df.if(layout !== "horizontal").jcc.$}>
+            <Tag type={tag.type} text={tag.text} {...tid.tag} />
+          </span>
+        )}
         <span css={Css.smSb.if(isDisabled).color(Tokens.FieldTextDisabled).$}>{label}</span>
         {description && (
           <span css={Css.sm.color(Tokens.OnSurface).if(isDisabled).color(Tokens.FieldTextDisabled).$}>
