@@ -22,6 +22,7 @@ export function SelectCardCheckboxGroupItem<V extends Value>(props: SelectCardCh
 
   const layoutProps = {
     label,
+    tag,
     description,
     selected: isSelected,
     disabled: isOptionDisabled,

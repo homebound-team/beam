@@ -22,6 +22,7 @@ export function SelectCardRadioGroupItem<V extends Value>(props: SelectCardRadio
 
   const layoutProps = {
     label,
+    tag,
     description,
     selected: isSelected,
     disabled: isOptionDisabled,
