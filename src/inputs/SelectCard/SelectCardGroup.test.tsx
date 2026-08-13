@@ -123,13 +123,13 @@ describe("SelectCardGroup", () => {
   });
 
   it("renders a tag on the options that have one", async () => {
-    // Given a grid group where only Math has a tag
+    // Given a grid group of image options where only Math has a tag
     const r = await render(
       <SelectCardGroup
         label="Categories"
         options={[
-          { icon: "abacus", label: "Math", tag: { text: "PO Issued", type: "info" }, value: Category.Math },
-          { icon: "archive", label: "History", value: Category.History },
+          { image: "math.png", label: "Math", tag: { text: "PO Issued", type: "info" }, value: Category.Math },
+          { image: "history.png", label: "History", value: Category.History },
         ]}
         value={Category.Math}
         onChange={() => {}}

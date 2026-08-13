@@ -31,7 +31,6 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
 
   const hasDescription = useMemo(() => options.some((o) => o.description), [options]);
   const hasImage = useMemo(() => options.some((o) => "image" in o && o.image), [options]);
-  const hasTag = useMemo(() => options.some((o) => o.tag), [options]);
   const tid = useTestIds(props, defaultTestId(label));
 
   // Aria reports the full next selection, not which card was clicked. Diff prev/next to
@@ -69,7 +68,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
       helperText={helperText}
       tid={tid}
     >
-      <div css={getSelectCardOptionsCss({ view, hasDescription, layout, hasImage, hasTag })}>
+      <div css={getSelectCardOptionsCss({ view, hasDescription, layout, hasImage })}>
         {options.map((option) => (
           <SelectCardCheckboxGroupItem
             key={String(option.value)}

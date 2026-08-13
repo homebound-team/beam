@@ -47,7 +47,6 @@ function createMixedOptions(): SelectCardGridGroupItemOption<string>[] {
       icon: "flag",
       label: "Design",
       description: "Selections are pulled from the approved design set.",
-      tag: { text: "PO Issued", type: "info" },
       value: "design",
     },
   ];

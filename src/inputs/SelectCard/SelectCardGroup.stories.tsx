@@ -40,7 +40,6 @@ function createOptionTypes(): SelectCardGridGroupItemOption<string>[] {
       icon: "flag",
       label: "Bundle",
       description: "Selections are grouped and priced together.",
-      tag: { text: "PO Issued", type: "info" },
       value: "bundle",
     },
   ];

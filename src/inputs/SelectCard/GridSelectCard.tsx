@@ -54,7 +54,7 @@ export function GridSelectCard(props: GridSelectCardProps) {
       )}
       <span css={Css.df.fdc.gap("4px").w100.$}>
         {tag && (
-          <span css={Css.df.if(layout !== "horizontal").jcc.if(isDisabled).o50.$}>
+          <span css={Css.df.if(layout !== "horizontal").jcc.$}>
             <Tag type={tag.type} text={tag.text} {...tid.tag} />
           </span>
         )}

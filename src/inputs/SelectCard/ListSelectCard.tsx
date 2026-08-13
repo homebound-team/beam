@@ -34,11 +34,6 @@ export function ListSelectCard(props: SelectCardItemProps) {
       __storyState={__storyState}
       {...others}
     >
-      {tag && (
-        <div css={Css.ml3.if(isDisabled).o50.$}>
-          <Tag type={tag.type} text={tag.text} {...tid.tag} />
-        </div>
-      )}
       <div css={Css.df.aic.gap1.$}>
         {inputProps.type === "checkbox" ? (
           <>
@@ -54,6 +49,7 @@ export function ListSelectCard(props: SelectCardItemProps) {
           <StyledRadio {...tid} label={label} isDisabled={isDisabled} isSelected={isSelected} inputProps={inputProps} />
         )}
         <span css={Css.smSb.color(Tokens.OnSurface).if(isDisabled).color(Tokens.FieldTextDisabled).$}>{label}</span>
+        {tag && <Tag type={tag.type} text={tag.text} {...tid.tag} />}
       </div>
       {description && (
         <span css={Css.ml3.sm.color(Tokens.OnSurface).if(isDisabled).color(Tokens.FieldTextDisabled).$}>

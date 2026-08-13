@@ -24,9 +24,6 @@ export function States() {
         <GridSelectCardWrapper label="Focus selected" icon="columns" selected __storyState={{ focusVisible: true }} />
         <GridSelectCardWrapper label="Pressed" icon="columns" __storyState={{ pressed: true }} />
         <GridSelectCardWrapper label="Pressed selected" icon="columns" selected __storyState={{ pressed: true }} />
-        <GridSelectCardWrapper label="Tag" icon="columns" tag={{ text: "PO Issued", type: "info" }} />
-        <GridSelectCardWrapper label="Tag selected" icon="columns" tag={{ text: "PO Issued", type: "info" }} selected />
-        <GridSelectCardWrapper label="Tag disabled" icon="columns" tag={{ text: "PO Issued", type: "info" }} disabled />
       </div>
 
       <h2 css={Css.lg.$}>Horizontal layout</h2>
@@ -40,13 +37,6 @@ export function States() {
           description={description}
           layout="horizontal"
           __storyState={{ hovered: true }}
-        />
-        <GridSelectCardWrapper
-          label="Tag"
-          icon="single"
-          description={description}
-          layout="horizontal"
-          tag={{ text: "Configuration Required", type: "warning" }}
         />
       </div>
 
@@ -76,17 +66,25 @@ export function States() {
           disabled
           tooltip="Type cannot be modified for existing options"
         />
+      </div>
+
+      <h2 css={Css.lg.$}>With image</h2>
+      <div css={getSelectCardOptionsCss({ view: "grid", hasDescription: true })}>
+        <GridSelectCardWrapper label="Default" image="fridge.jpeg" description={description} />
+        <GridSelectCardWrapper label="Selected" image="fridge.jpeg" description={description} selected />
+        <GridSelectCardWrapper label="Disabled" image="fridge.jpeg" description={description} disabled />
         <GridSelectCardWrapper
           label="Tag"
-          icon="single"
+          image="fridge.jpeg"
           description={description}
           tag={{ text: "PO Issued", type: "info" }}
         />
         <GridSelectCardWrapper
-          label="Tag with long text"
-          icon="single"
+          label="Tag disabled"
+          image="fridge.jpeg"
           description={description}
           tag={{ text: "Configuration Required", type: "warning" }}
+          disabled
         />
       </div>
     </div>
