@@ -122,6 +122,41 @@ describe("SelectCardGroup", () => {
     expect(onChange).toHaveBeenCalledWith(Category.History);
   });
 
+  it("renders a tag on the options that have one", async () => {
+    // Given a grid group of image options where only Math has a tag
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        options={[
+          { image: "math.png", label: "Math", tag: { text: "PO Issued", type: "info" }, value: Category.Math },
+          { image: "history.png", label: "History", value: Category.History },
+        ]}
+        value={Category.Math}
+        onChange={() => {}}
+      />,
+    );
+    // Then only Math shows the tag
+    expect(r.categories_math_tag).toHaveTextContent("PO Issued");
+    expect(r.query.categories_history_tag).not.toBeInTheDocument();
+  });
+
+  it("renders a tag in list view", async () => {
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        view="list"
+        options={[
+          { label: "Math", tag: { text: "PO Issued", type: "info" }, value: Category.Math },
+          { label: "History", value: Category.History },
+        ]}
+        value={Category.Math}
+        onChange={() => {}}
+      />,
+    );
+    expect(r.categories_math_tag).toHaveTextContent("PO Issued");
+    expect(r.query.categories_history_tag).not.toBeInTheDocument();
+  });
+
   it("supports single-select in list view", async () => {
     const onChange = vi.fn();
     const r = await render(

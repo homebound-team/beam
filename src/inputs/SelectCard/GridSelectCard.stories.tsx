@@ -67,6 +67,26 @@ export function States() {
           tooltip="Type cannot be modified for existing options"
         />
       </div>
+
+      <h2 css={Css.lg.$}>With image</h2>
+      <div css={getSelectCardOptionsCss({ view: "grid", hasDescription: true })}>
+        <GridSelectCardWrapper label="Default" image="fridge.jpeg" description={description} />
+        <GridSelectCardWrapper label="Selected" image="fridge.jpeg" description={description} selected />
+        <GridSelectCardWrapper label="Disabled" image="fridge.jpeg" description={description} disabled />
+        <GridSelectCardWrapper
+          label="Tag"
+          image="fridge.jpeg"
+          description={description}
+          tag={{ text: "PO Issued", type: "info" }}
+        />
+        <GridSelectCardWrapper
+          label="Tag disabled"
+          image="fridge.jpeg"
+          description={description}
+          tag={{ text: "Configuration Required", type: "warning" }}
+          disabled
+        />
+      </div>
     </div>
   );
 }

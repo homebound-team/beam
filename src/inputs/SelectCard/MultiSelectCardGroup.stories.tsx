@@ -79,6 +79,12 @@ function createListOptions(): SelectCardListGroupItemOption<string>[] {
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
       value: "selected",
     },
+    {
+      label: "Tagged Option",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+      tag: { text: "PO Issued", type: "info" },
+      value: "tagged",
+    },
   ];
 }
 

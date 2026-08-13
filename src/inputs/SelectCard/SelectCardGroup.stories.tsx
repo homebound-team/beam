@@ -74,6 +74,13 @@ export function HorizontalLayoutWithImages() {
     { image: "fridge.jpeg", label: "Fridge", description: "Stainless steel, counter-depth", value: "fridge" },
     { image: "disposal.png", label: "Disposal", description: "1/2 HP continuous feed", value: "disposal" },
     { image: "counter-top.jpeg", label: "Counter Top", description: "Quartz, 3cm thickness", value: "counter-top" },
+    {
+      image: "fridge.jpeg",
+      label: "Dishwasher",
+      description: "Panel-ready, third rack",
+      tag: { text: "PO Issued", type: "info" },
+      value: "dishwasher",
+    },
   ];
 
   return (
@@ -122,6 +129,12 @@ function createRadioListOptions(): SelectCardListGroupItemOption<string>[] {
       label: "Selected Option",
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
       value: "selected",
+    },
+    {
+      label: "Tagged Option",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+      tag: { text: "PO Issued", type: "info" },
+      value: "tagged",
     },
   ];
 }
