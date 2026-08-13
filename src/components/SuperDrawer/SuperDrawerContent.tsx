@@ -9,8 +9,7 @@ import { SuperDrawerWidth } from "./utils";
 type SuperDrawerContentProps = {
   children: ReactNode;
   /**
-   * Spans the drawer's full width above the content cancelling the padding while
-   * the children keep it.
+   * Rendered above the children, spanning the drawer's full width without receiving the padding set on the content
    */
   banner?: ReactNode;
   /**

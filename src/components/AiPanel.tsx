@@ -82,7 +82,7 @@ export function AiPanel(props: AiPanelProps) {
     >
       <div css={{ ...Css.df.fdc.aifs.w100.$, ...column }} {...tid.column}>
         <BlueprintAiLogo height={logoHeight} />
-        {/* actions need to render themselves on the right side of the the title & message */}
+        {/* actions need to render themselves on the right side of the title & message */}
         {hasActions ? (
           <div css={{ ...Css.df.aic.gap2.w100.bgColor(Tokens.Surface).bshBasic.$, ...card }} {...tid.card}>
             <div css={Css.df.fdc.gapPx(4).fg1.mw0.$}>{panelContent}</div>
