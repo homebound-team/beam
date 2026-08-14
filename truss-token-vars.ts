@@ -4,6 +4,8 @@
  */
 
 export const Tokens = {
+  AiFieldBg: "--b-ai-field-bg",
+  AiFieldFg: "--b-ai-field-fg",
   ButtonCautionDisabledBg: "--b-button-caution-disabled-bg",
   ButtonCautionDisabledFg: "--b-button-caution-disabled-fg",
   ButtonDangerDisabledBg: "--b-button-danger-disabled-bg",

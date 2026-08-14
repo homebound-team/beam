@@ -7,7 +7,7 @@
       "Primitive Colors",
       "Semantic Tokens"
     ],
-    "exportedAt": "2026-08-10T14:20:00.172Z"
+    "exportedAt": "2026-08-14T16:27:35.179Z"
   },
   "primitives": {
     "White": {
@@ -617,7 +617,7 @@
       "contrast": {
         "alias": "White"
       },
-      "description": "Default body text and icon ink on Surface. Pair with Surface — they invert under contrast so content stays readable."
+      "description": "Default body text and icon ink on Surface. Pair with Surface \u2014 they invert under contrast so content stays readable."
     },
     "OnSurfaceMuted": {
       "light": {
@@ -953,6 +953,22 @@
         "alias": "Gray800"
       },
       "description": "Hover fill on Surface (e.g. table row hover). Prefer SurfaceRaisedHover for items on raised panels."
+    },
+    "AiFieldBg": {
+      "light": {
+        "alias": "Purple50"
+      },
+      "contrast": {
+        "alias": "Purple50"
+      }
+    },
+    "AiFieldFg": {
+      "light": {
+        "alias": "Purple800"
+      },
+      "contrast": {
+        "alias": "Purple800"
+      }
     }
   }
 }
