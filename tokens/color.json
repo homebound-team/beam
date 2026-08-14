@@ -880,6 +880,26 @@
     }
   },
   "semantic": {
+    "AiFieldBg": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Purple50}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-ai-field-bg",
+          "contrast": "{beam.color.primitive.Purple50}"
+        }
+      }
+    },
+    "AiFieldFg": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Purple800}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-ai-field-fg",
+          "contrast": "{beam.color.primitive.Purple800}"
+        }
+      }
+    },
     "ButtonCautionDisabledBg": {
       "$type": "color",
       "$value": "{beam.color.primitive.Yellow200}",

@@ -1,5 +1,4 @@
 import { Meta } from "@storybook/react-vite";
-import { AiPanel } from "src/components/AiPanel";
 import { HomeboundLogo } from "src/components/Logos";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
@@ -72,43 +71,6 @@ export function Composed() {
               away vertically.
             </p>
             <GridTableLayoutExample storageKey="environment-banner-layout-composed" withRightPane />
-          </PageHeaderLayout>
-        </SideNavLayout>
-      </NavbarLayout>
-    </EnvironmentBannerLayout>
-  );
-}
-
-/**
- * An `AiPanel` under the full nesting — env banner → navbar → side nav → page header. All sticky
- * chrome coordinating through CSS vars, so this checks the wash doesn't fight any of it.
- */
-export function WithAiPanel() {
-  return (
-    <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>
-      <NavbarLayout
-        navbar={{
-          brand: <HomeboundLogo fill={Tokens.OnSurface} width={5} />,
-          items: [{ label: "Dashboard", onClick: () => {}, active: true }],
-        }}
-      >
-        <SideNavLayout
-          sideNav={{
-            items: [
-              {
-                section: true,
-                label: "Main",
-                items: [{ label: "Dashboard", icon: "columns", onClick: "/", active: true }],
-              },
-            ],
-          }}
-        >
-          <PageHeaderLayout pageHeader={{ title: "Page header" }}>
-            <AiPanel
-              title="Importing Details..."
-              message="This process can take a few minutes. Feel free to keep working in another tab."
-            />
-            <GridTableLayoutExample storageKey="environment-banner-layout-with-ai-panel" />
           </PageHeaderLayout>
         </SideNavLayout>
       </NavbarLayout>

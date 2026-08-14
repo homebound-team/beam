@@ -48,8 +48,8 @@ export function AiPanel(props: AiPanelProps) {
     // the content inside it.
     <div
       css={{
-        // `aiWash` is a backgroundImage, so the surface under it stays the caller's — and themeable.
-        ...Css.df.fdc.aic.px3.py2.bgColor(Tokens.Surface).aiWash.$,
+        // `aiBackground` is opaque, so `Tokens.Surface` only shows if the gradient fails to paint.
+        ...Css.df.fdc.aic.px3.py2.bgColor(Tokens.Surface).aiBackground.$,
         ...(rounded ? Css.br12.$ : {}),
       }}
       // Before `others`, so a caller can override.
@@ -65,7 +65,7 @@ export function AiPanel(props: AiPanelProps) {
         >
           {loading && <AiLoader />}
           {title && (
-            <span css={Css.lg.aiGradientText.$} {...tid.title}>
+            <span css={Css.lg.aiBold.$} {...tid.title}>
               {title}
             </span>
           )}

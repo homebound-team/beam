@@ -6,6 +6,8 @@
  */
 
 :root {
+  --b-ai-field-bg: rgba(245, 243, 255, 1);
+  --b-ai-field-fg: rgba(91, 33, 182, 1);
   --b-button-caution-disabled-bg: rgba(254, 240, 138, 1);
   --b-button-caution-disabled-fg: rgba(36, 36, 36, 1);
   --b-button-danger-disabled-bg: rgba(254, 202, 202, 1);
@@ -89,6 +91,8 @@
 }
 
 [data-theme="contrast"] {
+  --b-ai-field-bg: rgba(245, 243, 255, 1);
+  --b-ai-field-fg: rgba(91, 33, 182, 1);
   --b-button-caution-disabled-bg: rgba(113, 63, 18, 1);
   --b-button-caution-disabled-fg: rgba(255, 255, 255, 1);
   --b-button-danger-disabled-bg: rgba(127, 29, 29, 1);

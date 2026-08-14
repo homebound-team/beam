@@ -42,6 +42,8 @@ export type RuntimeStyles = RawCssProperties & { readonly __kind: "runtime" };
 export type Typography = "xs2" | "xs2Sb" | "xs" | "xsSb" | "sm" | "smSb" | "md" | "mdSb" | "lg" | "xl" | "xl2";
 
 export enum Tokens {
+  AiFieldBg = "--b-ai-field-bg",
+  AiFieldFg = "--b-ai-field-fg",
   ButtonCautionDisabledBg = "--b-button-caution-disabled-bg",
   ButtonCautionDisabledFg = "--b-button-caution-disabled-fg",
   ButtonDangerDisabledBg = "--b-button-danger-disabled-bg",
@@ -3949,18 +3951,18 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // ai
-  /** Sets `backgroundImage: "linear-gradient(90deg, rgba(124, 58, 237, 0.07) 0%, rgba(147, 197, 253, 0.07) 36%, rgba(124, 58, 237, 0.07) 73%)"`. */
-  get aiWash() {
+  /** Sets `backgroundImage: "linear-gradient(90deg, rgba(237, 233, 254, 1) 0%, rgba(239, 246, 255, 1) 36%, rgba(237, 233, 254, 1) 73%)"`. */
+  get aiBackground() {
     return this.add(
       "backgroundImage",
-      "linear-gradient(90deg, rgba(124, 58, 237, 0.07) 0%, rgba(147, 197, 253, 0.07) 36%, rgba(124, 58, 237, 0.07) 73%)",
+      "linear-gradient(90deg, rgba(237, 233, 254, 1) 0%, rgba(239, 246, 255, 1) 36%, rgba(237, 233, 254, 1) 73%)",
     );
   }
-  /** Sets `color: "rgba(109, 40, 217, 1)"; backgroundImage: "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))"; backgroundClip: "text"; WebkitBackgroundClip: "text"; WebkitTextFillColor: "transparent"`. */
-  get aiGradientText() {
+  /** Sets `color: "rgba(109, 40, 217, 1)"; backgroundImage: "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)"; backgroundClip: "text"; WebkitBackgroundClip: "text"; WebkitTextFillColor: "transparent"`. */
+  get aiBold() {
     return this.add("color", "rgba(109, 40, 217, 1)").add(
       "backgroundImage",
-      "linear-gradient(90deg, rgba(109, 40, 217, 1), rgba(29, 78, 216, 1))",
+      "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)",
     ).add("backgroundClip", "text").add("WebkitBackgroundClip", "text").add("WebkitTextFillColor", "transparent");
   }
 
