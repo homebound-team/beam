@@ -23,7 +23,7 @@ export function AiImportBanner(props: AiImportBannerProps) {
     <AiPanel role="status" aria-busy={true} {...tid}>
       <div css={Css.df.fdc.aic.gap1.w100.$}>
         <AiLoader />
-        <span css={Css.lg.aiBold.$} {...tid.title}>
+        <span css={Css.lg.aiBoldText.$} {...tid.title}>
           {title}
         </span>
         <span css={Css.sm.color(Tokens.OnSurface).tac.$} {...tid.message}>

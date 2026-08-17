@@ -62,7 +62,8 @@ const aiBackground = [
 const sections: Sections = {
   ai: () => [
     newMethod("aiBackground", { backgroundImage: aiBackground }),
-    newMethod("aiBold", {
+    newMethod("aiBoldBg", { backgroundImage: aiBold }),
+    newMethod("aiBoldText", {
       // Fallback where a background can't be clipped to text; `transparent` would hide it outright.
       color: palette.Purple700,
       backgroundImage: aiBold,

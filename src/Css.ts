@@ -3958,8 +3958,15 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
       "linear-gradient(90deg, rgba(237, 233, 254, 1) 0%, rgba(239, 246, 255, 1) 36%, rgba(237, 233, 254, 1) 73%)",
     );
   }
+  /** Sets `backgroundImage: "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)"`. */
+  get aiBoldBg() {
+    return this.add(
+      "backgroundImage",
+      "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)",
+    );
+  }
   /** Sets `color: "rgba(109, 40, 217, 1)"; backgroundImage: "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)"; backgroundClip: "text"; WebkitBackgroundClip: "text"; WebkitTextFillColor: "transparent"`. */
-  get aiBold() {
+  get aiBoldText() {
     return this.add("color", "rgba(109, 40, 217, 1)").add(
       "backgroundImage",
       "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)",
