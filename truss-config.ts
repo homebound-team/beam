@@ -44,8 +44,33 @@ const transition: string = [
   .map((property) => `${property} ${motion.duration.normal} ${motion.easing.standard}`)
   .join(", ");
 
+/** Design's "AI Bold" ramp */
+const aiBold = `linear-gradient(270deg, ${palette.Blue700} 2.97%, ${palette.Purple700} 87.08%)`;
+
+/**
+ * Design's "AI Background", keeping their radial form and centre point.
+ */
+const aiBackground = [
+  `radial-gradient(40% 1000% at 35.83% 62.18%,`,
+  `${palette.Blue50} 0%,`,
+  `${palette.Purple100} 100%)`,
+].join(" ");
+
 // Custom rules
 const sections: Sections = {
+  ai: () => [
+    newMethod("aiBackground", { backgroundImage: aiBackground }),
+    newMethod("aiBoldBg", { backgroundImage: aiBold }),
+    newMethod("aiBoldText", {
+      // Fallback where a background can't be clipped to text; `transparent` would hide it outright.
+      color: palette.Purple700,
+      backgroundImage: aiBold,
+      backgroundClip: "text",
+      WebkitBackgroundClip: "text",
+      // Clears the glyph fill so the background shows through.
+      WebkitTextFillColor: "transparent",
+    }),
+  ],
   fontFamily: () =>
     newMethodsForProp("fontFamily", {
       sansSerif: "'Inter', sans-serif",
