@@ -48,14 +48,12 @@ const transition: string = [
 const aiBold = `linear-gradient(270deg, ${palette.Blue700} 2.97%, ${palette.Purple700} 87.08%)`;
 
 /**
- * Design's "AI Background". Drawn as a radial gradient, but its ellipse is elongated far enough that
- * the render only varies left-to-right, so this is that one axis.
+ * Design's "AI Background", keeping their radial form and centre point.
  */
 const aiBackground = [
-  `linear-gradient(90deg,`,
-  `${palette.Purple100} 0%,`,
-  `${palette.Blue50} 36%,`,
-  `${palette.Purple100} 73%)`,
+  `radial-gradient(40% 1000% at 35.83% 62.18%,`,
+  `${palette.Blue50} 0%,`,
+  `${palette.Purple100} 100%)`,
 ].join(" ");
 
 // Custom rules

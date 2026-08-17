@@ -10,6 +10,7 @@ export * from "./AccordionList";
 export * from "./AiImportBanner";
 export * from "./AiLoader";
 export * from "./AiPanel";
+export * from "./AiReviewBanner";
 export * from "./AppNav";
 export * from "./AutoSaveIndicator";
 export * from "./Avatar";
