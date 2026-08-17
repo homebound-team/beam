@@ -13,13 +13,14 @@ import {
   SimpleHeaderAndData,
   Tag,
 } from "src/components";
+import { AiReview } from "src/components/AiReview";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { GridDataRow, GridRowLookup } from "src/components/Table";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { noop } from "src/utils";
-import { withBeamDecorator, withDimensions } from "src/utils/sb";
+import { withBeamDecorator, withDimensions, zeroTo } from "src/utils/sb";
 import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
 import { SuperDrawerWidth } from "./utils";
@@ -359,6 +360,46 @@ interface TestDrawerContentProps {
   leftContent?: ReactNode;
   rightContent?: ReactNode;
   hideControls?: boolean;
+}
+
+/** An `AiReview` in `SuperDrawerContent`'s `banner` slot, spanning the drawer while the content stays inset. */
+export function WithAiBanner() {
+  const { openInDrawer, isDrawerOpen } = useSuperDrawer();
+  function open() {
+    openInDrawer({ content: <AiBannerDrawerContent /> });
+  }
+  useEffect(open, [openInDrawer]);
+  return (
+    <div css={Css.hPx(1200).$}>
+      <h1 css={Css.xl2.mb1.$}>SuperDrawer with an AI banner</h1>
+      <Button label={isDrawerOpen ? "SuperDrawer is open" : "Show SuperDrawer"} onClick={open} />
+    </div>
+  );
+}
+
+function AiBannerDrawerContent() {
+  const { closeDrawer } = useSuperDrawer();
+  return (
+    <>
+      <SuperDrawerHeader title="Edit Material" />
+      <SuperDrawerContent
+        actions={[{ label: "Cancel", onClick: closeDrawer, variant: "tertiary" }]}
+        banner={
+          <AiReview
+            title="Review updates found in your import."
+            message="Blueprint AI captured a change to the name of your product, added a description, and added 1 additional variant."
+            secondaryAction={{ label: "Clear Import", onClick: noop }}
+            primaryAction={{ label: "Accept Import", onClick: noop }}
+          />
+        }
+      >
+        <h2 css={Css.lg.mb2.$}>Material Overview</h2>
+        {zeroTo(6).map((i) => (
+          <div key={i} css={Css.hPx(56).br4.bgColor(Tokens.SurfaceSeparator).mb2.$} />
+        ))}
+      </SuperDrawerContent>
+    </>
+  );
 }
 
 /** Example component to render inside the SuperDrawer */
