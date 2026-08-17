@@ -50,13 +50,17 @@ export const WithForm = () => {
   );
 };
 
-/** It fills whatever it's given, so the container decides the width. */
-export const Widths = () => (
-  <div css={Css.df.fdc.gap4.$}>
-    {[1440, 956, 640].map((w) => (
-      <div key={w} css={Css.wPx(w).$}>
-        <AiPanel>
-          <div css={Css.sm.color(Tokens.OnSurface).$}>{w}px container</div>
+/**
+ * The background always spans its container. `fullWidth={false}` shrinks the card to its content and
+ * centers it, leaving the background full width either way.
+ */
+export const CardWidth = () => (
+  <div css={Css.df.fdc.gap4.wPx(1200).$}>
+    {[true, false].map((fullWidth) => (
+      <div key={String(fullWidth)}>
+        <div css={Css.xsSb.gray700.mb1.$}>fullWidth={String(fullWidth)}</div>
+        <AiPanel fullWidth={fullWidth}>
+          <div css={Css.sm.color(Tokens.OnSurface).$}>Children go here.</div>
         </AiPanel>
       </div>
     ))}

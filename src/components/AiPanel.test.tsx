@@ -21,10 +21,17 @@ describe("AiPanel", () => {
     expect(r.aiPanel).toHaveStyle({ borderRadius: "12px" });
   });
 
-  it("fills its container, leaving the width to whatever contains it", async () => {
-    const r = await render(<AiPanel rounded />);
+  it("spans its container, and fills the card by default", async () => {
+    const r = await render(<AiPanel />);
     expect(r.aiPanel).toHaveStyle({ width: "100%" });
-    expect(r.aiPanel).not.toHaveStyle({ width: "fit-content" });
+    expect(r.aiPanel_column).toHaveStyle({ width: "100%" });
+  });
+
+  it("shrinks and centers the card when not fullWidth", async () => {
+    const r = await render(<AiPanel fullWidth={false} />);
+    // Background still spans, only the card column shrinks
+    expect(r.aiPanel).toHaveStyle({ width: "100%" });
+    expect(r.aiPanel_column).toHaveStyle({ width: "fit-content", marginLeft: "auto", marginRight: "auto" });
   });
 
   it("says nothing of its own", async () => {
