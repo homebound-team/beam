@@ -3950,6 +3950,29 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("zIndex", value);
   }
 
+  // ai
+  /** Sets `backgroundImage: "radial-gradient(40% 1000% at 35.83% 62.18%, rgba(239, 246, 255, 1) 0%, rgba(237, 233, 254, 1) 100%)"`. */
+  get aiBackground() {
+    return this.add(
+      "backgroundImage",
+      "radial-gradient(40% 1000% at 35.83% 62.18%, rgba(239, 246, 255, 1) 0%, rgba(237, 233, 254, 1) 100%)",
+    );
+  }
+  /** Sets `backgroundImage: "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)"`. */
+  get aiBoldBg() {
+    return this.add(
+      "backgroundImage",
+      "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)",
+    );
+  }
+  /** Sets `color: "rgba(109, 40, 217, 1)"; backgroundImage: "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)"; backgroundClip: "text"; WebkitBackgroundClip: "text"; WebkitTextFillColor: "transparent"`. */
+  get aiBoldText() {
+    return this.add("color", "rgba(109, 40, 217, 1)").add(
+      "backgroundImage",
+      "linear-gradient(270deg, rgba(29, 78, 216, 1) 2.97%, rgba(109, 40, 217, 1) 87.08%)",
+    ).add("backgroundClip", "text").add("WebkitBackgroundClip", "text").add("WebkitTextFillColor", "transparent");
+  }
+
   // fontFamily
   /** Sets `fontFamily: "'Inter', sans-serif"`. */
   get sansSerif() {
