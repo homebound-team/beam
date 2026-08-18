@@ -220,6 +220,36 @@ describe("GridTableLayout", () => {
       expect(r.query.viewToggleButton).not.toBeInTheDocument();
     });
 
+    it("renders cards with defaultView=card without withCardView and without a toggle", async () => {
+      setRunningInJest();
+      // Given a layout locked to card via defaultView only (no toggle)
+      type CardTestData = { name: string };
+      type CardTestRow = SimpleHeaderAndData<CardTestData>;
+      const cardCols = [
+        column<CardTestRow>({
+          id: "name",
+          name: "Name",
+          header: "Name",
+          data: ({ name }) => ({ content: name, value: name, cardSlot: cardTitleSlot(name) }),
+        }),
+      ];
+      // When rendered with defaultView="card" and no withCardView
+      const r = await render(
+        <GridTableLayoutComponent
+          defaultView="card"
+          hideEditColumns
+          tableProps={{
+            columns: cardCols,
+            rows: [simpleHeader, { kind: "data" as const, id: "1", data: { name: "Alpha" } }],
+          }}
+        />,
+        withRouter(),
+      );
+      // Then cards render and the view toggle is absent
+      expect(r.tableCard_title).toHaveTextContent("Alpha");
+      expect(r.query.viewToggleButton).not.toBeInTheDocument();
+    });
+
     it("should display view toggle if withCardView is defined", async () => {
       const r = await render(
         <TestWrapper

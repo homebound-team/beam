@@ -12,26 +12,56 @@ export type CardBadgeTag = {
 } & ({ iconOnly?: false; icon?: IconKey } | { iconOnly: true; icon: IconKey });
 
 export type CardTitleSlot = CardSlotBase<"title"> & { text: string };
-export type CardEyebrowSlot = CardSlotBase<"eyebrow"> & { text: string };
+/** Left meta text above the title */
+export type CardLeftEyebrowSlot = CardSlotBase<"leftEyebrow"> & { text: string };
+/** Right meta text above the title. Distinct from title-row `cardBadgeSlot`. */
+export type CardRightEyebrowSlot = CardSlotBase<"rightEyebrow"> & { text: string };
 export type CardBadgeSlot = CardSlotBase<"badge"> & { text: string; tags?: CardBadgeTag[] };
 export type CardStatusSlot = CardSlotBase<"status"> & { tag: CardTag };
 export type CardDataBlockSlot = CardSlotBase<"dataBlock"> & { label: string; value: ReactNode | string | number };
 export type CardProgressSlot = CardSlotBase<"progress"> & { value: number };
 
+/** One thumbnail link in a thumbnail carousel footer. */
+export type CardCarouselThumbnail = {
+  id: string;
+  swatchUrl: string;
+  label: string;
+  to: string;
+};
+
+export type CardCarouselSlot = CardSlotBase<"carousel"> & {
+  title: string;
+  thumbnails: CardCarouselThumbnail[];
+};
+
+/** @deprecated Prefer `cardLeftEyebrowSlot`. Alias kept for existing plan-code callers. */
+export type CardEyebrowSlot = CardLeftEyebrowSlot;
+
 export type CardSlot =
   | CardTitleSlot
-  | CardEyebrowSlot
+  | CardLeftEyebrowSlot
+  | CardRightEyebrowSlot
   | CardBadgeSlot
   | CardStatusSlot
   | CardDataBlockSlot
-  | CardProgressSlot;
+  | CardProgressSlot
+  | CardCarouselSlot;
 
 export function cardTitleSlot(text: string): CardTitleSlot {
   return { kind: "title", text };
 }
 
-export function cardEyebrowSlot(text: string): CardEyebrowSlot {
-  return { kind: "eyebrow", text };
+export function cardLeftEyebrowSlot(text: string): CardLeftEyebrowSlot {
+  return { kind: "leftEyebrow", text };
+}
+
+export function cardRightEyebrowSlot(text: string): CardRightEyebrowSlot {
+  return { kind: "rightEyebrow", text };
+}
+
+/** @deprecated Prefer `cardLeftEyebrowSlot`. */
+export function cardEyebrowSlot(text: string): CardLeftEyebrowSlot {
+  return cardLeftEyebrowSlot(text);
 }
 
 export function cardBadgeSlot(text: string, tags?: CardBadgeTag[]): CardBadgeSlot {
@@ -48,4 +78,9 @@ export function cardDataBlockSlot(props: { label: string; value: ReactNode | str
 
 export function cardProgressSlot(value: number): CardProgressSlot {
   return { kind: "progress", value };
+}
+
+/** Footer carousel (title + thumbnail links). */
+export function cardCarouselSlot(props: { title: string; thumbnails: CardCarouselThumbnail[] }): CardCarouselSlot {
+  return { kind: "carousel", ...props };
 }

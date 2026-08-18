@@ -1,8 +1,14 @@
+import { fireEvent } from "@testing-library/react";
 import { TableCardView } from "src/components/Table/components/TableCard";
-import { render } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("TableCardView", () => {
   const imgSrc = "home.jpg";
+  const thumbnails = [
+    { id: "mv:1", swatchUrl: "chrome.png", label: "Polished Chrome", to: "/mv/1" },
+    { id: "mv:2", swatchUrl: "black.png", label: "Matte Black", to: "/mv/2" },
+  ];
 
   it("renders title and image with title as alt text", async () => {
     // Given a card with only required props
@@ -13,12 +19,23 @@ describe("TableCardView", () => {
     expect(r.tableCardView_image).toHaveAttribute("alt", "123 Main St");
   });
 
-  it("renders eyebrow above title", async () => {
-    // Given a card with an eyebrow prop
+  it("renders left eyebrow above title", async () => {
+    // Given a card with a left eyebrow
     // When rendered
-    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" eyebrow="Lot 42" data={[]} />);
-    // Then the eyebrow text is displayed
-    expect(r.tableCardView_eyebrow).toHaveTextContent("Lot 42");
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" leftEyebrow="Lot 42" data={[]} />);
+    // Then the left eyebrow text is displayed
+    expect(r.tableCardView_leftEyebrow).toHaveTextContent("Lot 42");
+  });
+
+  it("renders left and right eyebrows on the meta row", async () => {
+    // Given a card with both eyebrows
+    // When rendered
+    const r = await render(
+      <TableCardView imgSrc={imgSrc} title="123 Main St" leftEyebrow="Kohler" rightEyebrow="Shower Faucet" data={[]} />,
+    );
+    // Then both sides of the meta row render
+    expect(r.tableCardView_leftEyebrow).toHaveTextContent("Kohler");
+    expect(r.tableCardView_rightEyebrow).toHaveTextContent("Shower Faucet");
   });
 
   it("renders badge inline with title", async () => {
@@ -45,7 +62,6 @@ describe("TableCardView", () => {
       { label: "Beds", value: "3" },
       { label: "Baths", value: "2" },
     ];
-
     // When rendered
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={data} />);
     // Then each block is displayed as a label: value pair
@@ -68,5 +84,165 @@ describe("TableCardView", () => {
     // Then optional sections are not in the document
     expect(r.query.tableCardView_progressValue).not.toBeInTheDocument();
     expect(r.query.tableCardView_eyebrow).not.toBeInTheDocument();
+    expect(r.query.tableCardView_carousel).not.toBeInTheDocument();
+  });
+
+  it("renders carousel title and thumbnails", async () => {
+    // Given a card with a carousel
+    const thumbnails = [
+      { id: "mv:1", swatchUrl: "chrome-swatch.png", label: "Polished Chrome", to: "/mv/1" },
+      { id: "mv:2", swatchUrl: "black-swatch.png", label: "Matte Black", to: "/mv/2" },
+    ];
+    // When rendered
+    const r = await render(
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        leftEyebrow="Kohler"
+        rightEyebrow="Shower Faucet"
+        data={[]}
+        carousel={{ title: "2 Variants", thumbnails }}
+      />,
+      { at: { url: "/" } },
+    );
+    // Then carousel title and thumbnails are present
+    expect(r.tableCardView_carouselTitle).toHaveTextContent("2 Variants");
+    expect(r.tableCardView_carousel_item_0).toHaveAttribute("href", "/mv/1");
+    expect(r.tableCardView_carousel_item_1).toHaveAttribute("href", "/mv/2");
+  });
+
+  it("covers the hero by default and can opt into contain", async () => {
+    // Given a carousel card with no imageFit override
+    const thumbnails = [{ id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
+    // When rendered
+    const r = await render(
+      <TableCardView imgSrc={imgSrc} title="Forté Showerhead" data={[]} carousel={{ title: "1 Color", thumbnails }} />,
+      { at: { url: "/" } },
+    );
+    // Then the hero fills the frame
+    expect(r.tableCardView_image).toHaveStyle({ objectFit: "cover" });
+    // When contain is requested
+    r.rerender(
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        data={[]}
+        imageFit="contain"
+        carousel={{ title: "1 Color", thumbnails }}
+      />,
+    );
+    // Then the full image is shown
+    expect(r.tableCardView_image).toHaveStyle({ objectFit: "contain" });
+  });
+
+  it("renders progress and carousel stacked", async () => {
+    // Given a card with both progress and a thumbnail carousel
+    const thumbnails = [{ id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
+    // When rendered
+    const r = await render(
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        data={[]}
+        progress={40}
+        height={480}
+        carousel={{ title: "1 Color", thumbnails }}
+      />,
+      { at: { url: "/" } },
+    );
+    // Then both footer sections render
+    expect(r.tableCardView_progressValue).toHaveTextContent("40%");
+    expect(r.tableCardView_carouselTitle).toHaveTextContent("1 Color");
+    expect(r.tableCardView_carousel_item_0).toHaveAttribute("href", "/mv/1");
+  });
+
+  it("shows overflow arrows when the thumbnail strip scrolls", async () => {
+    // Given many thumbnails that overflow the strip
+    const thumbnails = Array.from({ length: 8 }, (_, i) => ({
+      id: `mv:${i}`,
+      swatchUrl: `s${i}.png`,
+      label: `Color ${i}`,
+      to: `/mv/${i}`,
+    }));
+    const r = await render(
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        data={[]}
+        carousel={{ title: "8 Variants", thumbnails }}
+      />,
+      { at: { url: "/" } },
+    );
+    // And the strip reports overflow to the right
+    Object.defineProperty(r.tableCardView_carousel_items, "scrollWidth", { configurable: true, value: 400 });
+    Object.defineProperty(r.tableCardView_carousel_items, "clientWidth", { configurable: true, value: 100 });
+    Object.defineProperty(r.tableCardView_carousel_items, "scrollLeft", { configurable: true, value: 0 });
+    fireEvent.scroll(r.tableCardView_carousel_items);
+    // Then the next arrow is available
+    expect(r.tableCardView_carousel_next).toBeInTheDocument();
+    expect(r.query.tableCardView_carousel_prev).not.toBeInTheDocument();
+  });
+
+  it("washes the card gray on hover when interactive", async () => {
+    // Given an interactive table card
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} interactive />);
+    // Then there is no hover wash
+    expect(r.query.tableCardView_hoverWash).not.toBeInTheDocument();
+    // When hovered
+    fireEvent.pointerEnter(r.tableCardView);
+    // Then a translucent wash covers the card, including the image
+    expect(r.tableCardView_hoverWash).toBeInTheDocument();
+  });
+
+  it("does not wash a static card on hover", async () => {
+    // Given a card with no row action
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} />);
+    // When hovered
+    fireEvent.pointerEnter(r.tableCardView);
+    // Then there is no hover wash
+    expect(r.query.tableCardView_hoverWash).not.toBeInTheDocument();
+  });
+
+  it("stretches a link across a carousel card without nesting it around the thumbnails", async () => {
+    // Given a carousel card with a card-level link
+    // When rendered
+    const r = await render(
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        data={[]}
+        to="/item/1"
+        carousel={{ title: "2 Colors", thumbnails }}
+      />,
+      { at: { url: "/" } },
+    );
+    // Then one link covers the whole card, named by the title
+    expect(r.tableCardView_action).toHaveAttribute("href", "/item/1");
+    expect(r.tableCardView_action).toHaveAttribute("aria-label", "Forté Showerhead");
+    // And the thumbnails keep their own links, outside of it
+    expect(r.tableCardView_carousel_item_0).toHaveAttribute("href", "/mv/1");
+    expect(r.tableCardView_action).not.toContainElement(r.tableCardView_carousel_item_0);
+  });
+
+  it("gives carousel cards a keyboard-reachable button for their row click", async () => {
+    // Given a carousel card with a row click
+    const onClick = vi.fn();
+    const r = await render(
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        data={[]}
+        onClick={onClick}
+        carousel={{ title: "2 Colors", thumbnails }}
+      />,
+      { at: { url: "/" } },
+    );
+    // Then the action is a real button rather than a click handler on the card div
+    expect(r.tableCardView_action.tagName).toBe("BUTTON");
+    // And it can be focused and invoked
+    r.tableCardView_action.focus();
+    expect(r.tableCardView_action).toHaveFocus();
+    click(r.tableCardView_action);
+    expect(onClick).toHaveBeenCalled();
   });
 });
