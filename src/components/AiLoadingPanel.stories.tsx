@@ -1,9 +1,9 @@
 import { Meta } from "@storybook/react-vite";
-import { AiImporting } from "src/components/AiImporting";
+import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { Css } from "src/Css";
 
 export default {
-  component: AiImporting,
+  component: AiLoadingPanel,
   parameters: {
     design: {
       type: "figma",
@@ -14,20 +14,20 @@ export default {
 
 export const Default = () => (
   <div css={Css.wPx(956).$}>
-    <AiImporting />
+    <AiLoadingPanel />
   </div>
 );
 
 /** The copy wraps; the loader doesn't. */
 export const Narrow = () => (
   <div css={Css.wPx(420).$}>
-    <AiImporting />
+    <AiLoadingPanel />
   </div>
 );
 
 /** `title` and `message` default to the import copy, but either can be swapped per flow. */
 export const CustomCopy = () => (
   <div css={Css.wPx(956).$}>
-    <AiImporting title="Reading your spec..." message="We'll email you when this finishes." />
+    <AiLoadingPanel title="Reading your spec..." message="We'll email you when this finishes." />
   </div>
 );

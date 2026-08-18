@@ -34,7 +34,7 @@ describe("AiPanel", () => {
     expect(r.aiPanel_column).toHaveStyle({ width: "fit-content", marginLeft: "auto", marginRight: "auto" });
   });
 
-  it("says nothing of its own", async () => {
+  it("does not set assistive attributes by default", async () => {
     // Given a bare panel, i.e. no caller-supplied ARIA
     const r = await render(<AiPanel />);
     // Then it stays inert — announcements belong to whoever fills it

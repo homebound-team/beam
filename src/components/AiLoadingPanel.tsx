@@ -4,19 +4,19 @@ import { AiPanel } from "src/components/AiPanel";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
-export type AiImportingProps = {
+export type AiLoadingPanelProps = {
   title?: string;
   message?: ReactNode;
 };
 
 /**
- * Tells the user an AI import is running, and that they're free to go do something else.
+ * Tells the user AI work is running, and that they're free to go do something else.
  *
- * Indeterminate — imports don't report progress, so this never shows a percentage or ETA.
+ * Indeterminate — these steps don't report progress, so this never shows a percentage or ETA.
  */
-export function AiImporting(props: AiImportingProps) {
+export function AiLoadingPanel(props: AiLoadingPanelProps) {
   const { title = "Importing Details...", message = defaultMessage } = props;
-  const tid = useTestIds(props, "aiImporting");
+  const tid = useTestIds(props, "aiLoadingPanel");
   return (
     // `status` rather than `alert` so assistive tech waits for a pause instead of interrupting, and
     // `aria-busy` so it knows the surrounding content is still settling.

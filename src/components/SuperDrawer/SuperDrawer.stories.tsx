@@ -13,7 +13,7 @@ import {
   SimpleHeaderAndData,
   Tag,
 } from "src/components";
-import { AiReview } from "src/components/AiReview";
+import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
@@ -362,7 +362,7 @@ interface TestDrawerContentProps {
   hideControls?: boolean;
 }
 
-/** An `AiReview` in `SuperDrawerContent`'s `banner` slot, spanning the drawer while the content stays inset. */
+/** An AI panel in `SuperDrawerContent`'s `banner` slot, spanning the drawer while the content stays inset. */
 export function WithAiBanner() {
   const { openInDrawer, isDrawerOpen } = useSuperDrawer();
   function open() {
@@ -384,14 +384,7 @@ function AiBannerDrawerContent() {
       <SuperDrawerHeader title="Edit Material" />
       <SuperDrawerContent
         actions={[{ label: "Cancel", onClick: closeDrawer, variant: "tertiary" }]}
-        banner={
-          <AiReview
-            title="Review updates found in your import."
-            message="Blueprint AI captured a change to the name of your product, added a description, and added 1 additional variant."
-            secondaryAction={{ label: "Clear Import", onClick: noop }}
-            primaryAction={{ label: "Accept Import", onClick: noop }}
-          />
-        }
+        banner={<AiLoadingPanel />}
       >
         <h2 css={Css.lg.mb2.$}>Material Overview</h2>
         {zeroTo(6).map((i) => (

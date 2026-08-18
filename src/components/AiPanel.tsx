@@ -21,7 +21,7 @@ export function AiPanel(props: AiPanelProps) {
   const { rounded = false, fullWidth = true, children, ...others } = props;
   const tid = useTestIds(others, "aiPanel");
   return (
-    <div css={{ ...Css.df.fdc.w100.px3.py2.aiBackground.$, ...(rounded ? Css.br12.$ : {}) }} {...others} {...tid}>
+    <div css={Css.w100.px3.py2.aiBackground.if(rounded).br12.$} {...others} {...tid}>
       {/* Keeps the wordmark aligned to the card when the card is narrower than the panel. */}
       <div css={Css.df.fdc.aifs.gap1.w100.if(!fullWidth).wfc.mxa.$} {...tid.column}>
         <BlueprintAiLogo height={3} />
