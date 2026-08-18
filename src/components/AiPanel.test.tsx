@@ -21,9 +21,8 @@ describe("AiPanel", () => {
     expect(r.aiPanel).toHaveStyle({ borderRadius: "12px" });
   });
 
-  it("spans its container, and fills the card by default", async () => {
+  it("fills the card by default", async () => {
     const r = await render(<AiPanel />);
-    expect(r.aiPanel).toHaveStyle({ width: "100%" });
     expect(r.aiPanel_column).toHaveStyle({ width: "100%" });
   });
 

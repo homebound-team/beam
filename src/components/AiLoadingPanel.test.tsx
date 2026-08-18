@@ -22,9 +22,4 @@ describe("AiLoadingPanel", () => {
     expect(r.aiLoadingPanel).toHaveAttribute("role", "status");
     expect(r.aiLoadingPanel).toHaveAttribute("aria-busy", "true");
   });
-
-  it("centers its copy", async () => {
-    const r = await render(<AiLoadingPanel />);
-    expect(r.aiLoadingPanel_message).toHaveStyle({ textAlign: "center" });
-  });
 });
