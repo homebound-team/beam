@@ -12,6 +12,7 @@ import {
 } from "../layoutVars";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useMeasuredHeight } from "../useMeasuredHeight";
+import { MobileSubNavProvider } from "./MobileSubNavContext";
 import { NavbarLayoutHeightProvider } from "./NavbarLayoutHeightContext";
 
 export type NavbarLayoutProps = {
@@ -62,17 +63,19 @@ export function NavbarLayout(props: NavbarLayoutProps) {
   return (
     <DocumentScrollLayoutProvider>
       <NavbarLayoutHeightProvider value={navbarOffsetPx}>
-        <div css={Css.df.fdc.wfc.mw100.$} style={cssVars} {...tid}>
-          {/* Spacer reserves height when inner flips to fixed. */}
-          <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: navHeight }}>
-            <div ref={navMetricsRef} css={innerCss} style={innerStyle} {...tid.navbar}>
-              {navbarEl}
+        <MobileSubNavProvider>
+          <div css={Css.df.fdc.wfc.mw100.$} style={cssVars} {...tid}>
+            {/* Spacer reserves height when inner flips to fixed. */}
+            <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: navHeight }}>
+              <div ref={navMetricsRef} css={innerCss} style={innerStyle} {...tid.navbar}>
+                {navbarEl}
+              </div>
+            </div>
+            <div css={Css.df.fdc.mh0.mw100.w100.$} {...tid.body}>
+              {children}
             </div>
           </div>
-          <div css={Css.df.fdc.mh0.mw100.w100.$} {...tid.body}>
-            {children}
-          </div>
-        </div>
+        </MobileSubNavProvider>
       </NavbarLayoutHeightProvider>
     </DocumentScrollLayoutProvider>
   );

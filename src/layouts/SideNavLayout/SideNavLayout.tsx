@@ -11,6 +11,7 @@ import {
   beamNavbarLayoutHeightVar,
   beamSideNavLayoutWidthVar,
 } from "src/layouts/layoutVars";
+import { useRegisterMobileSubNav } from "src/layouts/NavbarLayout/MobileSubNavContext";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
@@ -46,9 +47,12 @@ function SideNavLayoutContent(props: SideNavLayoutProps) {
   const bp = useBreakpoint();
   const tid = useTestIds(props, "sideNavLayout");
   const railCollapsedWidthPx = 56;
+  // Under NavbarLayout on `sm`, the rail is hidden and items show as the mobile menu's nested pane.
+  const hasMobileSubNavProvider = useRegisterMobileSubNav(sideNav, !bp.mdAndUp);
+  const showMobileSubNav = hasMobileSubNavProvider && !bp.mdAndUp;
 
   const collapsed = navState === "collapse";
-  const showRail = navState !== "hidden";
+  const showRail = navState !== "hidden" && !showMobileSubNav;
 
   // Rail width reserved in content space (mobile overlay only reserves the collapsed strip).
   const railOffsetPx = !showRail ? 0 : !bp.mdAndUp || collapsed ? railCollapsedWidthPx : railWidthPx;

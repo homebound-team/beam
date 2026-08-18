@@ -1,16 +1,12 @@
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
+import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import {
   SIDE_NAV_LAYOUT_STATE_STORAGE_KEY,
   SideNavLayoutProvider,
 } from "src/layouts/SideNavLayout/SideNavLayoutContext";
 import { setViewport } from "src/tests/viewport";
-import { click, render } from "src/utils/rtl";
-
-const items: AppNavItem[] = [
-  { label: "Dashboard", icon: "columns", onClick: () => {}, active: true },
-  { label: "Projects", icon: "search", onClick: () => {} },
-];
+import { click, render, withRouter } from "src/utils/rtl";
 
 describe("SideNavLayout", () => {
   it("renders the rail, side nav slot, and page content at desktop", async () => {
@@ -149,4 +145,31 @@ describe("SideNavLayout", () => {
     // Then nothing is written to localStorage
     expect(window.localStorage.getItem(SIDE_NAV_LAYOUT_STATE_STORAGE_KEY)).toBeNull();
   });
+
+  it("hides the rail on mobile when composed under NavbarLayout", async () => {
+    // Given a mobile viewport and NavbarLayout → SideNavLayout
+    setViewport("sm");
+
+    // When rendered
+    const r = await render(
+      <NavbarLayout navbar={{ brand: "Brand", items: [{ label: "Home", onClick: "/" }] }}>
+        <SideNavLayout sideNav={{ items }} />
+      </NavbarLayout>,
+      withRouter(),
+    );
+
+    // Then the rail and toggle are absent
+    expect(r.query.sideNavLayout_sideNav).toBeNull();
+    expect(r.query.sideNavLayout_toggle).toBeNull();
+
+    // And the items show in the navbar mobile menu
+    click(r.navbar_mobileMenu);
+    expect(r.navbar_mobileMenuMainMenu).toBeInTheDocument();
+    expect(r.navbar_link_dashboard).toHaveTextContent("Dashboard");
+  });
 });
+
+const items: AppNavItem[] = [
+  { label: "Dashboard", icon: "columns", onClick: () => {}, active: true },
+  { label: "Projects", icon: "search", onClick: () => {} },
+];

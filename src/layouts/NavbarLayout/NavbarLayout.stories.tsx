@@ -6,8 +6,9 @@ import { EnvironmentBannerLayout } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
-import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { createNavbar, GridTableLayoutExample } from "src/utils/sbComponents";
+import { userEvent, within } from "storybook/test";
 
 export default {
   component: NavbarLayout,
@@ -41,6 +42,17 @@ export const Composed = () => (
     </SideNavLayout>
   </NavbarLayout>
 );
+
+/** Mobile: hamburger opens on the mobile sub-nav with Main Menu + close. */
+export const ComposedWithOpenSubNav = newStory(Composed, {
+  parameters: { chromatic: { modes: viewportModes("mobile1") } },
+  play: async ({ canvasElement }) => {
+    const mobileMenu = within(canvasElement).queryByTestId("navbar_mobileMenu");
+    if (mobileMenu) {
+      await userEvent.click(mobileMenu);
+    }
+  },
+});
 
 /**
  * Same as {@link Composed} wrapped in {@link EnvironmentBannerLayout} with a displayed dev environment banner.
