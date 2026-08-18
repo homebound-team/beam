@@ -62,6 +62,8 @@ import {
 </EnvironmentBannerLayout>;
 ```
 
+On the `sm` breakpoint (≤599px), `NavbarLayout` + `SideNavLayout` share **one hamburger**. `SideNavLayout` does not render its rail or collapse toggle; it registers its `items` (and optional `top` / `footer`) as the mobile menu's nested pane. The drawer renders both levels with the same `AppNavItems` chrome and page-content inset. Opening the menu shows that mobile sub-nav first (`level: "sub"`), with **Main Menu** to switch to `Navbar.items` (`level: "global"`). Close, scrim, or route change dismisses the drawer; the next open lands on the sub-nav again. Pages without a registered mobile sub-nav keep the main-only drawer. On `mdAndUp` the SideNav rail is unchanged; a hamburger that appears from navbar overflow stays main-only.
+
 Step-based workflow pages skip `NavbarLayout`/`SideNavLayout` entirely — `WorkflowLayout` is a standalone,
 full-page experience. Its `steps` prop is the single source of truth: it drives the header's tab strip,
 picks which step's `content` renders as the body, and gates the Continue/Complete CTA on the active
