@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
@@ -14,12 +15,14 @@ export type FormSectionLayoutProps = {
   initialFields?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add items" Button. */
   actions?: FormSectionAction[];
+  /** When true, prepends `AutoSaveIndicator` in the actions area. */
+  withAutoSave?: boolean;
   sections?: FormSectionProps[];
 };
 
 /** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
 export function FormSectionLayout(props: FormSectionLayoutProps) {
-  const { title, description, actions, initialFields, sections } = props;
+  const { title, description, actions, withAutoSave, initialFields, sections } = props;
   const tid = useTestIds(props, "formSectionLayout");
 
   return (
@@ -30,9 +33,10 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
             <h1 css={Css.xl.$} {...tid.title}>
               {title}
             </h1>
-            {actions && (
+            {(withAutoSave || actions) && (
               <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-                {actions.map((action) =>
+                {withAutoSave && <AutoSaveIndicator />}
+                {actions?.map((action) =>
                   action.kind === "icon" ? (
                     <IconButton key={action.icon} {...action} variant="outline" />
                   ) : (

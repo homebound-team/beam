@@ -42,6 +42,26 @@ describe("FormSectionLayout", () => {
     expect(r.saveDraft).toBeInTheDocument();
   });
 
+  it("prepends AutoSaveIndicator in the actions area when withAutoSave is true", async () => {
+    // Given a FormSectionLayout with withAutoSave and actions
+    // When rendered
+    const r = await render(
+      <FormSectionLayout title="Trade Partners" withAutoSave actions={[{ label: "Save draft", onClick: () => {} }]} />,
+    );
+    // Then AutoSaveIndicator renders before the actions
+    expect(r.autoSave).toBeInTheDocument();
+    expect(r.autoSave.compareDocumentPosition(r.saveDraft)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("renders AutoSaveIndicator in the actions area when withAutoSave is true and actions are omitted", async () => {
+    // Given a FormSectionLayout with withAutoSave and no actions
+    // When rendered
+    const r = await render(<FormSectionLayout title="Trade Partners" withAutoSave />);
+    // Then the actions slot still renders with AutoSaveIndicator
+    expect(r.formSectionLayout_actions).toBeInTheDocument();
+    expect(r.autoSave).toBeInTheDocument();
+  });
+
   it("renders fields ahead of sections", async () => {
     // Given a FormSectionLayout with both top-level fields and sections
     const r = await render(
