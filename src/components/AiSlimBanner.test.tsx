@@ -21,17 +21,4 @@ describe("AiSlimBanner", () => {
     const r = await render(<AiSlimBanner title="Review 4 Suggested Changes" />);
     expect(r.query.aiSlimBanner_action).not.toBeInTheDocument();
   });
-
-  // An action's line box is taller than the title, so these pin the height either way.
-  it("stays 32px tall with an action", async () => {
-    const r = await render(
-      <AiSlimBanner title="Review 4 Suggested Changes" action={{ label: "Ignore All", onClick: () => {} }} />,
-    );
-    expect(r.aiSlimBanner).toHaveStyle({ height: "32px" });
-  });
-
-  it("stays 32px tall without one", async () => {
-    const r = await render(<AiSlimBanner title="Review 4 Suggested Changes" />);
-    expect(r.aiSlimBanner).toHaveStyle({ height: "32px" });
-  });
 });

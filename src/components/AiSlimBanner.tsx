@@ -16,12 +16,11 @@ export function AiSlimBanner(props: AiSlimBannerProps) {
   const { title, action } = props;
   const tid = useTestIds(props, "aiSlimBanner");
   return (
-    // Fixed height: an action's 20px line box would otherwise outgrow the 16px title.
-    <div css={Css.df.aic.gapPx(4).w100.hPx(32).px2.xs.aiBackground.$} {...tid}>
+    <div css={Css.df.aic.gapPx(4).w100.px2.xs.aiBackground.$} {...tid}>
       <Icon icon="aiStar" inc={1.5} xss={Css.fs0.$} {...tid.sparkle} />
       <div css={Css.df.aic.jcsb.gap2.fg1.mw0.$}>
-        {/* The fixed height leaves no room to wrap. */}
-        <span css={Css.xsSb.aiBoldText.truncate.mw0.$} {...tid.title}>
+        {/* The vertical padding lives on the title so an action's taller line box can't grow the bar. */}
+        <span css={Css.xsSb.aiBoldText.py1.mw0.$} {...tid.title}>
           {title}
         </span>
         {action && (

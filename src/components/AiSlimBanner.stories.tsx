@@ -28,8 +28,11 @@ export function Default() {
         <AiSlimBanner title={title} />
       </Sample>
 
-      <Sample title="Long copy truncates rather than wrapping, so the bar can't grow">
-        <AiSlimBanner title={`${title} found across every plan in this project`} action={action} />
+      <Sample title="Long copy wraps">
+        <AiSlimBanner
+          title={`${title} found across every plan in this project, including the ones you archived last month`}
+          action={action}
+        />
       </Sample>
 
       <Sample title="Inline above the content it's about">
