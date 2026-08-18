@@ -4,6 +4,7 @@ import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import { FormSection, FormSectionAction, FormSectionProps } from "src/forms/FormSection";
+import { CenteredLayout } from "src/layouts/CenteredLayout";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -20,47 +21,49 @@ export type FormSectionLayoutProps = {
   sections?: FormSectionProps[];
 };
 
-/** Centered (720px) width/column shell for a form built out of `FormSection`s — e.g. as a `WorkflowLayoutStep`'s `content`. */
+/** Form of `FormSection`s in a `sm` {@link CenteredLayout} — e.g. a `WorkflowLayoutStep`'s `content`. */
 export function FormSectionLayout(props: FormSectionLayoutProps) {
   const { title, description, actions, withAutoSave, initialFields, sections } = props;
   const tid = useTestIds(props, "formSectionLayout");
 
   return (
-    <div css={Css.df.fdc.gap8.w100.pt4.maxwPx(720).mxa.ifSm.px2.$} {...tid}>
-      <div css={Css.df.fdc.gap3.$}>
-        <div css={Css.df.fdc.jcsb.gapPx(12).$}>
-          <div css={Css.df.jcsb.aic.$}>
-            <h1 css={Css.xl.$} {...tid.title}>
-              {title}
-            </h1>
-            {(withAutoSave || actions) && (
-              <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-                {withAutoSave && <AutoSaveIndicator />}
-                {actions?.map((action) =>
-                  action.kind === "icon" ? (
-                    <IconButton key={action.icon} {...action} variant="outline" />
-                  ) : (
-                    <Button key={`${action.label}`} {...action} />
-                  ),
-                )}
+    <CenteredLayout size="sm">
+      <div css={Css.df.fdc.gap8.pt4.$} {...tid}>
+        <div css={Css.df.fdc.gap3.$}>
+          <div css={Css.df.fdc.jcsb.gapPx(12).$}>
+            <div css={Css.df.jcsb.aic.$}>
+              <h1 css={Css.xl.$} {...tid.title}>
+                {title}
+              </h1>
+              {(withAutoSave || actions) && (
+                <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+                  {withAutoSave && <AutoSaveIndicator />}
+                  {actions?.map((action) =>
+                    action.kind === "icon" ? (
+                      <IconButton key={action.icon} {...action} variant="outline" />
+                    ) : (
+                      <Button key={`${action.label}`} {...action} />
+                    ),
+                  )}
+                </div>
+              )}
+            </div>
+            {description && (
+              <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
+                {description}
               </div>
             )}
           </div>
-          {description && (
-            <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-              {description}
-            </div>
-          )}
+          {initialFields}
         </div>
-        {initialFields}
+        {sections && (
+          <div css={Css.df.fdc.gap8.$}>
+            {sections.map((section, i) => (
+              <FormSection key={defaultTestId(section.title) || i} {...section} />
+            ))}
+          </div>
+        )}
       </div>
-      {sections && (
-        <div css={Css.df.fdc.gap8.$}>
-          {sections.map((section, i) => (
-            <FormSection key={defaultTestId(section.title) || i} {...section} />
-          ))}
-        </div>
-      )}
-    </div>
+    </CenteredLayout>
   );
 }
