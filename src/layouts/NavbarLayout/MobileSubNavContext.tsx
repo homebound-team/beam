@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useLayoutEffect, useMemo, useState } from "react";
 import type { SideNavProps } from "src/components/SideNav/SideNav";
+import { useBreakpoint } from "src/hooks";
 
 /** Nested pane of the mobile nav menu. Drawer-owned fields from {@link SideNavProps}. */
 export type MobileSubNavContent = Pick<SideNavProps, "top" | "items" | "footer">;
@@ -24,12 +25,13 @@ export function useMobileSubNav(): MobileSubNavContent | null {
 }
 
 /**
- * Publish `content` as the mobile menu's nested pane while `enabled`.
- * Returns whether a {@link MobileSubNavProvider} exists (i.e. under `NavbarLayout`).
+ * Publish `content` into the navbar mobile menu on `sm`. True under `NavbarLayout` on mobile (hide the rail);
+ * false for standalone `SideNavLayout` (no provider) or `mdAndUp` (rail stays).
  */
-export function useRegisterMobileSubNav(content: MobileSubNavContent, enabled: boolean): boolean {
+export function useRegisterMobileSubNav(content: MobileSubNavContent): boolean {
   const ctx = useContext(MobileSubNavContext);
   const setMobileSubNav = ctx?.setMobileSubNav;
+  const enabled = !useBreakpoint().mdAndUp;
   // Depend on fields, not the `content` object — callers pass `sideNav={{ items }}` inline.
   const { top, items, footer } = content;
 
@@ -44,5 +46,5 @@ export function useRegisterMobileSubNav(content: MobileSubNavContent, enabled: b
     return () => setMobileSubNav(null);
   }, [setMobileSubNav, enabled]);
 
-  return ctx !== undefined;
+  return ctx !== undefined && enabled;
 }

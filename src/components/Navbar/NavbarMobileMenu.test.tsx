@@ -8,6 +8,7 @@ import {
   MobileSubNavProvider,
   useRegisterMobileSubNav,
 } from "src/layouts/NavbarLayout/MobileSubNavContext";
+import { setViewport } from "src/tests/viewport";
 import { click, render, withRouter } from "src/utils/rtl";
 import { zIndices } from "src/utils/zIndices";
 
@@ -171,6 +172,7 @@ function createMobileSubNav(): MobileSubNavContent {
 }
 
 function withRegisteredMobileSubNav(mobileSubNav: MobileSubNavContent, children: ReactNode) {
+  setViewport("sm");
   return (
     <MobileSubNavProvider>
       <RegisterMobileSubNav content={mobileSubNav} />
@@ -180,6 +182,6 @@ function withRegisteredMobileSubNav(mobileSubNav: MobileSubNavContent, children:
 }
 
 function RegisterMobileSubNav({ content }: { content: MobileSubNavContent }) {
-  useRegisterMobileSubNav(content, true);
+  useRegisterMobileSubNav(content);
   return null;
 }

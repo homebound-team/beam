@@ -48,8 +48,7 @@ function SideNavLayoutContent(props: SideNavLayoutProps) {
   const tid = useTestIds(props, "sideNavLayout");
   const railCollapsedWidthPx = 56;
   // Under NavbarLayout on `sm`, the rail is hidden and items show as the mobile menu's nested pane.
-  const hasMobileSubNavProvider = useRegisterMobileSubNav(sideNav, !bp.mdAndUp);
-  const showMobileSubNav = hasMobileSubNavProvider && !bp.mdAndUp;
+  const showMobileSubNav = useRegisterMobileSubNav(sideNav);
 
   const collapsed = navState === "collapse";
   const showRail = navState !== "hidden" && !showMobileSubNav;
