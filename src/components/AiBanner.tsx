@@ -29,7 +29,7 @@ export function AiBanner(props: AiBannerProps) {
           )}
         </div>
         {(primaryAction || secondaryAction) && (
-          <div css={Css.df.aic.gap2.fs0.$} {...tid.actions}>
+          <div css={Css.df.aic.gap2.fs0.$}>
             {secondaryAction && <Button {...secondaryAction} variant="quaternary" />}
             {primaryAction && <Button {...primaryAction} variant="ai" />}
           </div>

@@ -17,14 +17,14 @@ export function AiSlimBanner(props: AiSlimBannerProps) {
   const tid = useTestIds(props, "aiSlimBanner");
   return (
     <div css={Css.df.aic.gapPx(4).w100.px2.xs.aiBackground.$} {...tid}>
-      <Icon icon="aiStar" inc={1.5} xss={Css.fs0.$} {...tid.sparkle} />
+      <Icon icon="aiStar" inc={1.5} xss={Css.fs0.$} />
       <div css={Css.df.aic.jcsb.gap2.fg1.mw0.$}>
         {/* The vertical padding lives on the title so an action's taller line box can't grow the bar. */}
         <span css={Css.xsSb.aiBoldText.py1.mw0.$} {...tid.title}>
           {title}
         </span>
         {action && (
-          <div css={Css.fs0.$} {...tid.action}>
+          <div css={Css.fs0.$}>
             <Button {...action} variant="text" />
           </div>
         )}

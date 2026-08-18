@@ -34,16 +34,17 @@ describe("AiBanner", () => {
     expect(onIgnore).toHaveBeenCalledTimes(1);
   });
 
-  it("omits the actions row when it has no actions", async () => {
+  it("omits its actions when it has none", async () => {
     const r = await render(<AiBanner title="Review changes" />);
-    expect(r.query.aiBanner_actions).not.toBeInTheDocument();
+    expect(r.query.acceptAll).not.toBeInTheDocument();
+    expect(r.query.ignoreAll).not.toBeInTheDocument();
   });
 
   it("can render just one action", async () => {
     const r = await render(
       <AiBanner title="Review changes" primaryAction={{ label: "Accept All", onClick: () => {} }} />,
     );
-    expect(r.aiBanner_actions).toBeInTheDocument();
+    expect(r.acceptAll).toBeInTheDocument();
     expect(r.query.ignoreAll).not.toBeInTheDocument();
   });
 });
