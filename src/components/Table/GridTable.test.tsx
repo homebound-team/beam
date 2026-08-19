@@ -4964,7 +4964,7 @@ describe("card view", () => {
     expect(r.query.tableCard).not.toBeInTheDocument();
   });
 
-  it("wraps card in Link when rowStyle.rowLink is set", async () => {
+  it("makes the card's content a Link when rowStyle.rowLink is set", async () => {
     // Given a title column and a rowLink style
     const columns = [
       column<CardRow>({
@@ -4991,11 +4991,12 @@ describe("card view", () => {
       <GridTable as="card" columns={columns} rows={rows} rowStyles={{ data: { rowLink: () => "/detail/1" } }} />,
       withRouter(),
     );
-    // Then the card is wrapped in an anchor tag
-    const cards = r.queryAllByTestId("tableCard");
-    for (const card of cards) {
-      expect(card.parentElement?.tagName).toBe("A");
-      expect(card.parentElement).toHaveAttribute("href", "/detail/1");
+    // Then each card's content is an anchor tag
+    const actions = r.queryAllByTestId("tableCard_action");
+    expect(actions).toHaveLength(2);
+    for (const action of actions) {
+      expect(action.tagName).toBe("A");
+      expect(action).toHaveAttribute("href", "/detail/1");
     }
   });
 
@@ -5021,7 +5022,7 @@ describe("card view", () => {
     const r = await render(
       <GridTable as="card" columns={columns} rows={rows} rowStyles={{ data: { onClick: handler } }} />,
     );
-    click(r.tableCard);
+    click(r.tableCard_action);
     // Then the handler is called
     expect(handler).toHaveBeenCalled();
   });

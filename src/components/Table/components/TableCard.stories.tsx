@@ -1,7 +1,11 @@
 import { Meta } from "@storybook/react-vite";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { TableCardView } from "src/components/Table/components/TableCard";
-import { Css } from "src/Css";
-import { withRouter } from "src/utils/sb";
+import { Css, Tokens } from "src/Css";
+import { newStory, withRouter } from "src/utils/sb";
+import type { PlayFunction } from "storybook/internal/types";
+import { userEvent } from "storybook/test";
 
 export default {
   component: TableCardView,
@@ -147,6 +151,89 @@ export function WithContainImageFit() {
       />
     </CardContainer>
   );
+}
+
+/**
+ * Demonstrates the card's interactive states.
+ *
+ * The whole card is a single link (or button), and the carousel thumbnails are their own links
+ * beside it, so clicking a thumbnail follows the thumbnail rather than the row.
+ */
+export function Interactive() {
+  const { pathname } = useLocation();
+  const [rowClicks, setRowClicks] = useState(0);
+  return (
+    <div css={Css.df.fdc.gap3.$}>
+      <div css={Css.df.gap3.$}>
+        <CardContainer>
+          <TableCardView
+            imgSrc={imgSrc}
+            leftEyebrow="Kohler"
+            rightEyebrow="Shower Faucet"
+            title="Forté Showerhead"
+            status={{ text: "Active", type: "success" }}
+            data={[]}
+            to="/plan/1"
+            carousel={{ title: "8 Variants", thumbnails }}
+            imageFit="contain"
+          />
+        </CardContainer>
+        <CardContainer>
+          <TableCardView
+            imgSrc={imgSrc}
+            leftEyebrow="226"
+            title="The Emerson Houston"
+            badge="v23"
+            data={data.slice(0, 4)}
+            progress={72}
+            onClick={() => setRowClicks((count) => count + 1)}
+          />
+        </CardContainer>
+      </div>
+      <dl css={Css.df.gap3.sm.p2.br8.bgColor(Tokens.SurfaceSubtle).$}>
+        <div css={Css.df.gapPx(4).$}>
+          <dt>Route:</dt>
+          <dd data-testid="route">{pathname}</dd>
+        </div>
+        <div css={Css.df.gapPx(4).$}>
+          <dt>Row clicks:</dt>
+          <dd data-testid="rowClicks">{rowClicks}</dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
+/** Tabbing to the card's action rings the whole card, rather than just the action itself. */
+export const CardFocused = newStory(() => <FocusStory />, { play: tabPlayFn(1) });
+
+/** ...but tabbing on into a thumbnail rings only that thumbnail, i.e. the card doesn't double-ring. */
+export const ThumbnailFocused = newStory(() => <FocusStory />, { play: tabPlayFn(2) });
+
+/** A single interactive card, with few enough thumbnails that the carousel doesn't scroll. */
+function FocusStory() {
+  return (
+    <CardContainer>
+      <TableCardView
+        imgSrc={imgSrc}
+        leftEyebrow="Kohler"
+        rightEyebrow="Shower Faucet"
+        title="Forté Showerhead"
+        data={[]}
+        to="/plan/1"
+        carousel={{ title: "3 Variants", thumbnails: thumbnails.slice(0, 3) }}
+      />
+    </CardContainer>
+  );
+}
+
+/** Tabs `times` times from the top of the canvas, i.e. 1 lands on the card, 2 on its first thumbnail. */
+function tabPlayFn(times: number): PlayFunction {
+  return async () => {
+    for (let i = 0; i < times; i++) {
+      await userEvent.tab();
+    }
+  };
 }
 
 function CardContainer({ children }: { children: JSX.Element }) {

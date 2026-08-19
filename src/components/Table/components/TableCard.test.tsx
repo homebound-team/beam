@@ -183,27 +183,30 @@ describe("TableCardView", () => {
     expect(r.query.tableCardView_carousel_prev).not.toBeInTheDocument();
   });
 
-  it("washes the card gray on hover when interactive", async () => {
-    // Given an interactive table card
-    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} interactive />);
-    // Then there is no hover wash
-    expect(r.query.tableCardView_hoverWash).not.toBeInTheDocument();
-    // When hovered
-    fireEvent.pointerEnter(r.tableCardView);
-    // Then a translucent wash covers the card, including the image
-    expect(r.tableCardView_hoverWash).toBeInTheDocument();
+  it("renders the card content as a link when the row links", async () => {
+    // Given a card with a row link
+    // When rendered
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} to="/item/1" />, {
+      at: { url: "/" },
+    });
+    // Then the card's content is a single link, named by the title
+    expect(r.tableCardView_action.tagName).toBe("A");
+    expect(r.tableCardView_action).toHaveAttribute("href", "/item/1");
+    expect(r.tableCardView_action).toHaveAttribute("aria-label", "123 Main St");
+    // And it holds the card's content
+    expect(r.tableCardView_action).toContainElement(r.tableCardView_title);
+    // And it is a direct child of the card, which is how the card rings for its focus
+    expect(r.tableCardView_action.parentElement).toBe(r.tableCardView);
   });
 
-  it("does not wash a static card on hover", async () => {
+  it("does not render an action for a static card", async () => {
     // Given a card with no row action
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} />);
-    // When hovered
-    fireEvent.pointerEnter(r.tableCardView);
-    // Then there is no hover wash
-    expect(r.query.tableCardView_hoverWash).not.toBeInTheDocument();
+    // Then there is nothing interactive to focus
+    expect(r.query.tableCardView_action).not.toBeInTheDocument();
   });
 
-  it("stretches a link across a carousel card without nesting it around the thumbnails", async () => {
+  it("keeps the carousel thumbnails outside of the card's link", async () => {
     // Given a carousel card with a card-level link
     // When rendered
     const r = await render(
@@ -216,10 +219,9 @@ describe("TableCardView", () => {
       />,
       { at: { url: "/" } },
     );
-    // Then one link covers the whole card, named by the title
+    // Then the card's link covers its content
     expect(r.tableCardView_action).toHaveAttribute("href", "/item/1");
-    expect(r.tableCardView_action).toHaveAttribute("aria-label", "Forté Showerhead");
-    // And the thumbnails keep their own links, outside of it
+    // And the thumbnails keep their own links, as siblings of it
     expect(r.tableCardView_carousel_item_0).toHaveAttribute("href", "/mv/1");
     expect(r.tableCardView_action).not.toContainElement(r.tableCardView_carousel_item_0);
   });
