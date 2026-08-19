@@ -134,7 +134,7 @@ export function isContentColumn(column: Pick<GridColumn<Kinded>, "isAction" | "i
 }
 
 /** Empty fixed-width column inset for document-scroll table layouts. */
-function layoutGutterColumn<T extends Kinded>(side: "left" | "right"): GridColumn<T> {
+function layoutGutterColumn<T extends Kinded>(side: "left" | "right", sticky?: "left" | "right"): GridColumn<T> {
   const id = side === "left" ? layoutGutterLeftColumnId : layoutGutterRightColumnId;
   const base = {
     ...nonKindDefaults(),
@@ -146,13 +146,20 @@ function layoutGutterColumn<T extends Kinded>(side: "left" | "right"): GridColum
     canHide: false,
     expandableHeader: emptyCell,
     totals: emptyCell,
+    ...(sticky ? { sticky } : {}),
   };
   return newMethodMissingProxy(base, () => () => emptyCell) as GridColumn<T>;
 }
 
 /** Prepends and appends layout gutter columns for document-scroll table alignment. */
 export function withColumnGutters<T extends Kinded>(columns: GridColumn<T>[]): GridColumn<T>[] {
-  return [layoutGutterColumn("left"), ...columns, layoutGutterColumn("right")];
+  const stickyLeft = columns.some((c) => c.sticky === "left");
+  const stickyRight = columns.some((c) => c.sticky === "right");
+  return [
+    layoutGutterColumn("left", stickyLeft ? "left" : undefined),
+    ...columns,
+    layoutGutterColumn("right", stickyRight ? "right" : undefined),
+  ];
 }
 
 // Keep keys like `w` and `mw` from hitting the method missing proxy
@@ -213,7 +220,7 @@ function sumColumnSizeParts(columnSizes: string[]): { pxSum: number; percentSum:
   return { pxSum, percentSum, hasCalc };
 }
 
-/** Table content width: at least the measured container and a self-consistent width for literal % columns. */
+/** Table content width from column defs; may exceed the probe when %/mw columns require it. */
 export function resolveTableContentWidth(
   tableWidth: number | undefined,
   columnSizes: string[],
@@ -232,7 +239,9 @@ export function resolveTableContentWidth(
   const sum = sumColumnSizesPx(columnSizes, tableWidth);
   if (sum === null) return undefined;
 
-  return Math.max(tableWidth, sum, minWidthPx);
+  // Use the column sum, not max(probe, sum) — flooring at the probe when columns are narrower
+  // forces a wider table shell than the row (e.g. ~12px spurious document scroll).
+  return Math.max(minWidthPx, sum);
 }
 
 /**

@@ -2,6 +2,8 @@ export * from "./SideNavLayout";
 
 export { setEnvironmentFavicon } from "src/components/EnvironmentBanner/setEnvironmentFavicon";
 export type { EnvironmentFaviconUrls } from "src/components/EnvironmentBanner/setEnvironmentFavicon";
+export { CenteredLayout } from "./CenteredLayout";
+export type { CenteredLayoutProps, CenteredLayoutSize } from "./CenteredLayout";
 export { EnvironmentBannerLayout } from "./EnvironmentBannerLayout/EnvironmentBannerLayout";
 export type { EnvironmentBannerLayoutProps } from "./EnvironmentBannerLayout/EnvironmentBannerLayout";
 export { FormSectionLayout } from "./FormSectionLayout";
@@ -11,6 +13,7 @@ export {
   bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
   beamFloatingRightOffsetVar,
+  beamLayoutContentPaddingXVar,
   beamLayoutViewportHeightVar,
   beamLayoutViewportWidthVar,
   beamNavbarLayoutHeightVar,
@@ -21,6 +24,8 @@ export {
   beamWorkflowLayoutFooterHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
+  documentScrollContentLeft,
+  documentScrollContentWidth,
   documentScrollRightPaneHeight,
   documentScrollRightPaneWidth,
   getFloatingBottomOffset,

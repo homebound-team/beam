@@ -1,6 +1,7 @@
 import {
   bannerAndNavbarChromeTop,
   documentScrollChromeWidth,
+  documentScrollContentWidth,
   documentScrollRightPaneHeight,
   documentScrollRightPaneWidth,
   getFloatingBottomOffset,
@@ -10,6 +11,18 @@ import {
 } from "src/layouts/layoutVars";
 
 describe("layoutVars", () => {
+  describe("documentScrollContentWidth", () => {
+    it("subtracts padded-ancestor inset from document scroll chrome width", () => {
+      // Given the layout container width helper
+      const result = documentScrollContentWidth();
+
+      // Then it subtracts both sides of the optional layout padding var
+      expect(result).toBe(
+        "calc(calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px)) - 2 * var(--beam-layout-content-padding-x, 0px))",
+      );
+    });
+  });
+
   describe("documentScrollChromeWidth", () => {
     it("spans the viewport width beside the side nav rail", () => {
       // Given the document scroll chrome width helper
