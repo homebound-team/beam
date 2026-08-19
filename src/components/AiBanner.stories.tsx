@@ -3,10 +3,12 @@ import { ReactNode } from "react";
 import { AiBanner } from "src/components/AiBanner";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
+import { viewportModes } from "src/utils/sb";
 
 export default {
   component: AiBanner,
   parameters: {
+    chromatic: { modes: viewportModes("desktop", "mobile1") },
     design: {
       type: "figma",
       url: "https://www.figma.com/design/DchiwVkssXeYi2Er8sMU2k/H2-2026-Plans---Automated-Construction-Doc-Capture?node-id=1608-25908&m=dev",
@@ -35,19 +37,15 @@ export function Default() {
       <Sample title="Without actions">
         <AiBanner title={title} message={message} />
       </Sample>
-
-      <Sample title="Narrow — the copy wraps, the actions don't shrink" width={640}>
-        <AiBanner title={title} message={message} {...actions} />
-      </Sample>
     </div>
   );
 }
 
-function Sample({ title, width = 1440, children }: { title: string; width?: number; children: ReactNode }) {
+function Sample({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
       <h2 css={Css.lg.mb1.$}>{title}</h2>
-      <div css={Css.wPx(width).$}>{children}</div>
+      {children}
     </div>
   );
 }

@@ -17,8 +17,10 @@ export function AiBanner(props: AiBannerProps) {
   const tid = useTestIds(props, "aiBanner");
   return (
     <AiPanel {...tid}>
-      <div css={Css.df.aic.jcsb.gap2.w100.$}>
-        <div css={Css.df.fdc.gapPx(4).fg1.mw0.$}>
+      {/* Wraps the actions below the copy rather than crushing it when there isn't room for both. */}
+      <div css={Css.df.aic.jcsb.gap2.w100.fww.$}>
+        {/* `fb(0)` so the copy shares the row until it hits its min width, rather than wrapping early. */}
+        <div css={Css.df.fdc.gapPx(4).fg1.fb(0).mwPx(240).$}>
           <span css={Css.smSb.aiBoldText.$} {...tid.title}>
             {title}
           </span>

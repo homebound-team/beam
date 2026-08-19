@@ -3,10 +3,12 @@ import { ReactNode } from "react";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
+import { viewportModes } from "src/utils/sb";
 
 export default {
   component: AiSlimBanner,
   parameters: {
+    chromatic: { modes: viewportModes("desktop", "mobile1") },
     design: {
       type: "figma",
       url: "https://www.figma.com/design/DchiwVkssXeYi2Er8sMU2k/H2-2026-Plans---Automated-Construction-Doc-Capture?node-id=1518-51815&m=dev",
@@ -19,7 +21,7 @@ const action = { label: "Ignore All", onClick: noop };
 
 export function Default() {
   return (
-    <div css={Css.df.fdc.gap5.wPx(640).$}>
+    <div css={Css.df.fdc.gap5.$}>
       <Sample title="With an action">
         <AiSlimBanner title={title} action={action} />
       </Sample>
@@ -28,7 +30,7 @@ export function Default() {
         <AiSlimBanner title={title} />
       </Sample>
 
-      <Sample title="Long copy wraps">
+      <Sample title="Long copy">
         <AiSlimBanner
           title={`${title} found across every plan in this project, including the ones you archived last month`}
           action={action}
