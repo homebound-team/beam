@@ -16,6 +16,12 @@ export const beamLayoutViewportHeightVar = "--beam-layout-viewport-height";
 /** Side nav rail width (px) for horizontal sticky offsets. */
 export const beamSideNavLayoutWidthVar = "--beam-side-nav-layout-width";
 
+/**
+ * Horizontal inset from a padded ancestor (e.g. {@link CenteredLayout}). `0px` when unset.
+ * `layoutContainer` subtracts this from chrome width and adds it to `left`.
+ */
+export const beamLayoutContentPaddingXVar = "--beam-layout-content-padding-x";
+
 /** Table actions toolbar height (px) while pinned in document-scroll layouts. */
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
@@ -50,6 +56,16 @@ export function documentScrollChromeLeft(): string {
 /** `width` for document-scroll sticky chrome spanning the visible viewport beside the side nav. */
 export function documentScrollChromeWidth(): string {
   return `calc(var(${beamLayoutViewportWidthVar}, 100vw) - var(${beamSideNavLayoutWidthVar}, 0px))`;
+}
+
+/** `left` for `layoutContainer` when inside a padded ancestor (e.g. {@link CenteredLayout}); chrome left when the padding var is unset. */
+export function documentScrollContentLeft(): string {
+  return `calc(${documentScrollChromeLeft()} + var(${beamLayoutContentPaddingXVar}, 0px))`;
+}
+
+/** `width` for `layoutContainer` when inside a padded ancestor (e.g. {@link CenteredLayout}); chrome width when the padding var is unset. */
+export function documentScrollContentWidth(): string {
+  return `calc(${documentScrollChromeWidth()} - 2 * var(${beamLayoutContentPaddingXVar}, 0px))`;
 }
 
 /** `height` for a fixed document-scroll right pane from the sticky table-header offset to the viewport bottom. */

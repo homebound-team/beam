@@ -10,6 +10,8 @@ _To see the latest designs, check out the [Figma](https://www.figma.com/file/aWU
 
 Standard **app shell** composition (global nav + body, sidebar + content, page header + body) is implemented as **`NavbarLayout`**, **`SideNavLayout`**, and **`PageHeaderLayout`** from this package. Source lives in **`src/layouts/`** (sibling of `src/components/`). Full setup and composition rules: [`docs/layouts.md`](docs/layouts.md) — also published in the npm package at `node_modules/@homebound/beam/docs/layouts.md`.
 
+Component file structure (imports, props types, implementation, module helpers): [`docs/components.md`](docs/components.md).
+
 ## Getting Started
 
 ```bash

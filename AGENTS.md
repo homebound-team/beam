@@ -6,7 +6,7 @@ This file is the **source of truth** for agent-oriented conventions in this repo
 
 Use the `src/` path alias (e.g. `import { Css } from "src/Css"`), not relative paths like `../../utils/...`. This applies repo-wide — components, hooks, tests, and stories.
 
-**Do not re-export types through component files.** A `*.tsx` file may export types it defines locally (e.g. `FooProps` beside `Foo`), but do not `export type { … } from "…/types"` (or similar) from a component file just to create a second import path. Put shared types in a dedicated module (e.g. `types.ts`) and expose the public API from the folder barrel (`index.ts`). Consumers import components from the component file (or barrel) and shared types from `types.ts` or the barrel.
+**Do not re-export types through component files.** Put shared types in a dedicated module (e.g. `types.ts`) and expose the public API from the folder barrel (`index.ts`); do not `export type { … } from "…/types"` from a component file just to create a second import path. Prop types for the component (e.g. `FooProps`) stay **above** the component; other file-local types may live **below** it — see [`docs/components.md`](docs/components.md).
 
 ## File naming
 
@@ -18,13 +18,17 @@ Match the existing conventions when adding files:
 - **Utility / constant modules** — camelCase: `zIndices.ts`, `layoutVars.ts`.
 - Co-locate `*.test.tsx` and `*.stories.tsx` beside the file they cover.
 
+## Component files
+
+File order and placement for `*.tsx` component modules: **[`docs/components.md`](docs/components.md)**.
+
 ## Utility modules
 
 In camelCase utility files (e.g. `formatDocumentTitle.ts`), put **types first**, then the **primary exported function** the file exists for, then other exports and private helpers. Do not bury the main export below unrelated helpers.
 
 ## Comments
 
-- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md)).
+- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md), [`docs/components.md`](docs/components.md)).
 - **Inline comments:** Use for non-obvious logic near the code. Keep them **short** — one line when possible.
 - **Avoid:** Multi-paragraph JSDoc, restating what the code already says, and duplicating docs that live elsewhere.
 

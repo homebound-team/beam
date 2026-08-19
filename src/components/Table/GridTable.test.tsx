@@ -35,6 +35,7 @@ import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
 import { useComputed } from "src/hooks";
 import { SelectField, TextField } from "src/inputs";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
+import { documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { isDefined, noop } from "src/utils";
 import {
   cell,
@@ -1457,6 +1458,23 @@ describe("GridTable", () => {
       expect(contentWidth).toBe(698);
     });
 
+    it("does not floor content width at the probe when fixed columns sum narrower", () => {
+      // Given fixed px columns totaling less than the measured probe (TableExample-like)
+      const columns = Array.from({ length: 10 }, (_, i) => ({
+        id: `col${i}`,
+        header: () => `Header ${i + 1}`,
+        data: () => `Cell ${i + 1}`,
+        w: "100px",
+      })) as GridColumnWithId<any>[];
+      const tableWidth = 1012;
+
+      // When sizing columns in a document-scroll layout
+      const { contentWidth } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
+
+      // Then content width follows the column sum, not the probe
+      expect(contentWidth).toBe(1000);
+    });
+
     it("does not expand content width on the legacy column layout path", () => {
       // Given columns that would expand in document-scroll mode
       const columns = getLegacyGateColumns();
@@ -1559,6 +1577,51 @@ describe("GridTable", () => {
     );
 
     expect(api.getVisibleColumnIds()[0]).toBe("beamCollapseColumn");
+  });
+
+  it("uses min(100%, chrome) for the document-scroll width probe", async () => {
+    // Given a document-scroll table
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <GridTable
+          columns={[
+            { id: "name", header: () => "Name", data: ({ name }: Data) => name },
+            { id: "value", header: () => "Value", data: ({ value }: Data) => value },
+          ]}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // Then the probe caps at chrome while still honoring a narrower parent via min(100%, …)
+    expect(r.gridTable_probe).toHaveStyle({
+      width: `min(100%, ${documentScrollChromeWidth()})`,
+      minWidth: "0px",
+    });
+  });
+
+  it("uses plain 100% width for the probe outside document-scroll layout", async () => {
+    // Given a nested-scroll table
+    const r = await render(
+      <GridTable
+        columns={[
+          { id: "name", header: () => "Name", data: ({ name }: Data) => name },
+          { id: "value", header: () => "Value", data: ({ value }: Data) => value },
+        ]}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+        ]}
+      />,
+    );
+
+    // Then the probe fills its container instead of capping at document-scroll chrome
+    expect(r.gridTable_probe).toHaveStyle({ width: "100%" });
   });
 
   it("throws error if column min-width definition is set with a non-px value", async () => {

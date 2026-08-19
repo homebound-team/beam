@@ -44,7 +44,7 @@ import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { stickyTableHeaderOffset } from "src/layouts/layoutVars";
-import { isPromise } from "src/utils";
+import { isPromise, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { CompanionRow, resolveCompanion } from "./components/CompanionRow";
 import type { GridDataRow, GridRowKind } from "./components/Row";
@@ -270,6 +270,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const tid = useTestIds({ "data-testid": id }, "gridTable");
 
   const columnsWithIds = useMemo(() => {
     const columns = columnGutter && inDocumentScrollLayout ? withColumnGutters(_columns) : _columns;
@@ -714,7 +715,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
+        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} {...tid.probe} />
         {as === "card" ? (
           <CardView
             cardRows={visibleDataRows}
