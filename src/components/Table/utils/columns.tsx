@@ -220,7 +220,7 @@ function sumColumnSizeParts(columnSizes: string[]): { pxSum: number; percentSum:
   return { pxSum, percentSum, hasCalc };
 }
 
-/** Table content width: at least the measured container and a self-consistent width for literal % columns. */
+/** Table content width from column defs; may exceed the probe when %/mw columns require it. */
 export function resolveTableContentWidth(
   tableWidth: number | undefined,
   columnSizes: string[],
@@ -239,7 +239,9 @@ export function resolveTableContentWidth(
   const sum = sumColumnSizesPx(columnSizes, tableWidth);
   if (sum === null) return undefined;
 
-  return Math.max(tableWidth, sum, minWidthPx);
+  // Use the column sum, not max(probe, sum) — flooring at the probe when columns are narrower
+  // forces a wider table shell than the row (e.g. ~12px spurious document scroll).
+  return Math.max(minWidthPx, sum);
 }
 
 /**
