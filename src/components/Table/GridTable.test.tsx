@@ -35,6 +35,7 @@ import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
 import { useComputed } from "src/hooks";
 import { SelectField, TextField } from "src/inputs";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
+import { documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { isDefined, noop } from "src/utils";
 import {
   cell,
@@ -1135,6 +1136,272 @@ describe("GridTable", () => {
     });
   });
 
+  describe("companion rows", () => {
+    const insetSeparator = `inset 0 -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`;
+
+    it("renders a trailing companion under its owning row at full column width", async () => {
+      // Given a data row with trailing companion content and a following data row
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: () => <div data-testid="companionMessage">Review matches</div>,
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then the companion sits directly under the owning row, before the next data row
+      expect(cell(r, 1, 0)).toHaveTextContent("foo");
+      expect(r.companion_1).toBeInTheDocument();
+      expect(r.companionMessage).toHaveTextContent("Review matches");
+      expect(cell(r, 3, 0)).toHaveTextContent("bar");
+      // And the companion cell spans all columns
+      expect(cell(r, 2, 0).style.getPropertyValue("--width")).toContain("+");
+    });
+
+    it("transfers the row separator from parent to a trailing companion", async () => {
+      // Given a trailing companion between two data rows
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: () => <span>Companion</span>,
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then the parent row has no bottom separator
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: "none" });
+      expect(cell(r, 1, 1)).toHaveStyle({ boxShadow: "none" });
+      // And the companion row carries the separator between row groups
+      expect(cell(r, 2, 0)).toHaveStyle({ boxShadow: insetSeparator });
+    });
+
+    it("applies last-row styling to the trailing companion when it is the final body row", async () => {
+      // Given a single data row whose trailing companion is the last body entry
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: () => <span>Last companion</span>,
+            },
+          ]}
+        />,
+      );
+
+      // Then the parent is not the last body row (no bottom separator)
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: "none" });
+      // And the companion receives last-row styling (no bottom separator)
+      expect(cell(r, 2, 0)).toHaveStyle({ boxShadow: "none" });
+    });
+
+    it("hoists a companion into the pinned section with its parent row", async () => {
+      // Given a body row with a companion, between two other data rows
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+            {
+              kind: "data",
+              id: "2",
+              data: { name: "bar", value: 2 },
+              companion: () => <span data-testid="pinnedCompanion">Pinned note</span>,
+            },
+            { kind: "data", id: "3", data: { name: "zaz", value: 3 } },
+          ]}
+        />,
+      );
+
+      // When the owning row is pinned
+      act(() => api.pinRow("2"));
+
+      // Then the companion moves with its parent into the pinned section
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(r.companion_2).toBeInTheDocument();
+      expect(r.pinnedCompanion).toHaveTextContent("Pinned note");
+      // And the remaining body rows stay in place
+      expect(cell(r, 3, 0)).toHaveTextContent("foo");
+      expect(cell(r, 4, 0)).toHaveTextContent("zaz");
+    });
+
+    it("renders a leading companion above its owning row", async () => {
+      // Given a data row with a leading companion and a following data row
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: {
+                position: "leading",
+                content: () => <div data-testid="leadingCompanion">Above</div>,
+              },
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then the companion renders above the owning row
+      expect(r.companion_1).toBeInTheDocument();
+      expect(r.leadingCompanion).toHaveTextContent("Above");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(cell(r, 3, 0)).toHaveTextContent("bar");
+    });
+
+    it("keeps the row separator on the parent when the companion is leading", async () => {
+      // Given a leading companion followed by another data row
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: {
+                position: "leading",
+                content: () => <span>Above</span>,
+              },
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then the leading companion has no bottom separator (flush against the parent)
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: "none" });
+      // And the parent row owns the separator before the next data row
+      expect(cell(r, 2, 0)).toHaveStyle({ boxShadow: insetSeparator });
+    });
+
+    it("defaults object-form companion config to trailing placement", async () => {
+      // Given an object-form companion without an explicit position
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: { content: () => <div data-testid="objectCompanion">Note</div> },
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then the companion renders under the owning row (trailing)
+      expect(cell(r, 1, 0)).toHaveTextContent("foo");
+      expect(r.companion_1).toBeInTheDocument();
+      expect(r.objectCompanion).toHaveTextContent("Note");
+      expect(cell(r, 3, 0)).toHaveTextContent("bar");
+    });
+
+    it("sticks companion content to document-scroll chrome inset by layout gutters", async () => {
+      // Given a companion inside a document-scroll table with column gutters
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <GridTable<Row>
+            columnGutter
+            columns={[nameColumn, valueColumn]}
+            rows={[
+              simpleHeader,
+              {
+                kind: "data",
+                id: "1",
+                data: { name: "foo", value: 1 },
+                companion: () => <span>Note</span>,
+              },
+            ]}
+          />
+        </DocumentScrollLayoutProvider>,
+      );
+
+      // Then the companion content is wrapped in a sticky chrome container aligned to the layout gutters
+      expect(r.companion_chrome).toBeInTheDocument();
+      expect(r.companion_chrome.style.getPropertyValue("--left")).toContain("12px");
+    });
+
+    it("groups parent and companion in one row group for shared hover in div mode", async () => {
+      // Given a trailing companion followed by another data row
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: () => <span>Companion</span>,
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then parent and companion share a row group wrapper, separate from the next row
+      expect(r.companion_1.parentElement).toBe(row(r, 1).parentElement);
+      expect(row(r, 3).parentElement).not.toBe(r.companion_1.parentElement);
+      expect(r.companion_1.parentElement).toHaveClass("beam-row-hover");
+    });
+
+    it("groups parent and companion in one tbody per row group in table mode", async () => {
+      // Given a table-mode row with a companion, followed by another row
+      const r = await render(
+        <GridTable<Row>
+          as="table"
+          columns={[nameColumn, valueColumn]}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: () => <span>Companion</span>,
+            },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />,
+      );
+
+      // Then parent and companion share one tbody, and the next row has its own
+      expect(r.companion_1.closest("tbody")).toBe(row(r, 1).closest("tbody"));
+      expect(row(r, 3).closest("tbody")).not.toBe(r.companion_1.closest("tbody"));
+      expect(row(r, 1).closest("table")!.querySelectorAll("tbody")).toHaveLength(2);
+    });
+  });
+
   describe("column sizes", () => {
     it("as=virtual defaults to fr widths", () => {
       expect(calcColumnSizes([{ id: "c1" }, { id: "c2" }], undefined, undefined, []).join(" ")).toEqual(
@@ -1189,6 +1456,23 @@ describe("GridTable", () => {
 
       // Then the resolved content width expands beyond the probe
       expect(contentWidth).toBe(698);
+    });
+
+    it("does not floor content width at the probe when fixed columns sum narrower", () => {
+      // Given fixed px columns totaling less than the measured probe (TableExample-like)
+      const columns = Array.from({ length: 10 }, (_, i) => ({
+        id: `col${i}`,
+        header: () => `Header ${i + 1}`,
+        data: () => `Cell ${i + 1}`,
+        w: "100px",
+      })) as GridColumnWithId<any>[];
+      const tableWidth = 1012;
+
+      // When sizing columns in a document-scroll layout
+      const { contentWidth } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
+
+      // Then content width follows the column sum, not the probe
+      expect(contentWidth).toBe(1000);
     });
 
     it("does not expand content width on the legacy column layout path", () => {
@@ -1257,6 +1541,30 @@ describe("GridTable", () => {
     expect(api.getVisibleColumnIds().at(-1)).toBe(layoutGutterRightColumnId);
   });
 
+  it("pins layout gutters to match sticky left/right columns", () => {
+    // Given columns with sticky left and sticky right
+    const columns = withColumnGutters([
+      selectColumn<Row>({ sticky: "left" }),
+      nameColumn,
+      { ...valueColumn, sticky: "right" },
+    ]);
+
+    // Then the left gutter sticks with the left columns, and the right gutter with the right
+    expect(columns[0].id).toBe(layoutGutterLeftColumnId);
+    expect(columns[0].sticky).toBe("left");
+    expect(columns[columns.length - 1].id).toBe(layoutGutterRightColumnId);
+    expect(columns[columns.length - 1].sticky).toBe("right");
+  });
+
+  it("does not pin layout gutters when no columns are sticky", () => {
+    // Given columns with no sticky sides
+    const columns = withColumnGutters([selectColumn<Row>(), nameColumn, valueColumn]);
+
+    // Then neither gutter is sticky
+    expect(columns[0].sticky).toBeUndefined();
+    expect(columns[columns.length - 1].sticky).toBeUndefined();
+  });
+
   it("does not inject layout gutter columns outside document-scroll layout", async () => {
     const api = new GridTableApiImpl();
     await render(
@@ -1269,6 +1577,51 @@ describe("GridTable", () => {
     );
 
     expect(api.getVisibleColumnIds()[0]).toBe("beamCollapseColumn");
+  });
+
+  it("uses min(100%, chrome) for the document-scroll width probe", async () => {
+    // Given a document-scroll table
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <GridTable
+          columns={[
+            { id: "name", header: () => "Name", data: ({ name }: Data) => name },
+            { id: "value", header: () => "Value", data: ({ value }: Data) => value },
+          ]}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+            { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+          ]}
+        />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // Then the probe caps at chrome while still honoring a narrower parent via min(100%, …)
+    expect(r.gridTable_probe).toHaveStyle({
+      width: `min(100%, ${documentScrollChromeWidth()})`,
+      minWidth: "0px",
+    });
+  });
+
+  it("uses plain 100% width for the probe outside document-scroll layout", async () => {
+    // Given a nested-scroll table
+    const r = await render(
+      <GridTable
+        columns={[
+          { id: "name", header: () => "Name", data: ({ name }: Data) => name },
+          { id: "value", header: () => "Value", data: ({ value }: Data) => value },
+        ]}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+          { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+        ]}
+      />,
+    );
+
+    // Then the probe fills its container instead of capping at document-scroll chrome
+    expect(r.gridTable_probe).toHaveStyle({ width: "100%" });
   });
 
   it("throws error if column min-width definition is set with a non-px value", async () => {
@@ -2654,7 +3007,8 @@ describe("GridTable", () => {
       expect(baseElement.querySelector("table")).toBeTruthy();
       expect(baseElement.querySelector("thead")).toBeTruthy();
       expect(baseElement.querySelector("th")).toBeTruthy();
-      expect(baseElement.querySelector("tbody")).toBeTruthy();
+      // One tbody per body row (header stays in thead)
+      expect(baseElement.querySelectorAll("tbody")).toHaveLength(2);
       expect(baseElement.querySelector("tr")).toBeTruthy();
       expect(baseElement.querySelector("td")).toBeTruthy();
     });
