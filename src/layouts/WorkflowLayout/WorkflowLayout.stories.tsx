@@ -5,6 +5,7 @@ import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/Env
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
+import { CenteredLayout } from "../CenteredLayout";
 import { WorkflowLayout, WorkflowLayoutStep } from "./WorkflowLayout";
 
 export default {
@@ -62,14 +63,16 @@ export function WideContentWithContentHeader() {
   steps[0] = {
     ...steps[0],
     content: (
-      <div css={Css.df.fdc.gap2.pt3.maxw("1440px").mxa.$}>
-        <ContentHeader
-          title="Trade Partners"
-          description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."
-          actions={[{ label: "Add", onClick: action("add clicked") }]}
-        />
-        <TableExample numCols={10} numRows={20} />
-      </div>
+      <CenteredLayout size="lg">
+        <div css={Css.df.fdc.gap2.pt3.$}>
+          <ContentHeader
+            title="Trade Partners"
+            description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."
+            actions={[{ label: "Add", onClick: action("add clicked") }]}
+          />
+          <TableExample numCols={10} numRows={20} />
+        </div>
+      </CenteredLayout>
     ),
   };
   return (
