@@ -117,7 +117,6 @@ type ScrollButtonProps = {
   inc: number;
   visible: boolean;
   onClick: () => void;
-  "data-testid"?: string;
 };
 
 /**
