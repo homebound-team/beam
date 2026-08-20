@@ -43,6 +43,7 @@ export function IconMenuItems() {
         { label: "Edit", icon: "pencil", onClick: noop },
         { label: "Like", icon: "thumbsUp", onClick: noop },
         { label: "Favorite", icon: "star", onClick: noop },
+        { label: "Install Tasks", icon: "linkExternal", onClick: "/install-tasks" },
         { label: "Delete", icon: "trash", onClick: noop, destructive: true },
       ]}
     />

@@ -207,6 +207,22 @@ describe("ButtonMenu", () => {
     openSpy.mockRestore();
   });
 
+  it("keeps an icon and label on one row when the item is an in-app link", async () => {
+    // Given a menu item that is both an icon item and a relative URL
+    const r = await render(
+      <ButtonMenu
+        trigger={{ label: "Trigger" }}
+        items={[{ label: "Install Tasks", onClick: "/install-tasks", icon: "linkExternal" }]}
+      />,
+      withRouter(),
+    );
+    // When opening the menu
+    click(r.trigger);
+    // Then the in-app link is a flex row so the block-level SVG does not wrap the label
+    expect(r.trigger_installTasks.querySelector("a")).toHaveStyle({ display: "flex" });
+    expect(r.trigger_installTasks).toHaveTextContent("Install Tasks");
+  });
+
   it("closes the menu when clicking the trigger again", async () => {
     // Given a ButtonMenu
     const r = await render(

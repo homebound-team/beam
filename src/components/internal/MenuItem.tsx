@@ -170,7 +170,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <Link className="navLink" to={onClick}>
+    <Link className="navLink" css={Css.df.aic.w100.$} to={onClick}>
       {content}
     </Link>
   );
