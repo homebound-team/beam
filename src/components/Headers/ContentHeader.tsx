@@ -24,6 +24,10 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
  * table), wrap both in a shared container sized with `min-width: fit-content` (truss: `mw("fit-content")`)
  * so the containing block grows to match the full scrollable width — the same technique `GridTable`
  * uses internally for its own sticky columns (`src/components/Table/GridTable.tsx`).
+ *
+ * Apply horizontal inset via `xss` when the header should align with padded body content; omit for
+ * full-bleed within the page column. `layoutContainer` honors `--beam-layout-content-padding-x`
+ * from padded ancestors (e.g. {@link CenteredLayout}).
  */
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
   const { title, description, actions, xss } = props;
@@ -40,7 +44,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
   );
 
   return (
-    <div css={{ ...Css.df.fdc.gapPx(12).layoutContainer.bgColor(Tokens.Surface).$, ...xss }} {...tid}>
+    <div css={{ ...Css.df.fdc.gapPx(12).layoutContainer.mw0.bgColor(Tokens.Surface).$, ...xss }} {...tid}>
       <div css={Css.df.aic.jcsb.mw0.$}>
         {title ? (
           <h2 css={Css.xl.$} {...tid.title}>

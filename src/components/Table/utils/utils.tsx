@@ -314,7 +314,7 @@ export function recursivelyGetContainingRow<R extends Kinded>(
 export function getTableRefWidthStyles(isVirtual: boolean, inDocumentScrollLayout: boolean = false) {
   // When using document-scroll, utilize the documentScrollChromeWidth to get the available width on the page for it.
   if (inDocumentScrollLayout) {
-    return Css.w(`min(100%, ${documentScrollChromeWidth()})`).$;
+    return Css.w(`min(100%, ${documentScrollChromeWidth()})`).mw0.$;
   }
   // Nested scrolling virtual tables reserve space for Virtuoso / ScrollableParent vertical scrollbars.
   if (isVirtual) {

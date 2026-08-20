@@ -36,6 +36,7 @@ import {
   HEADER,
   isCursorBelowMidpoint,
   KEPT_GROUP,
+  reservedRowKinds,
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, Only } from "src/Css";
@@ -43,10 +44,12 @@ import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { stickyTableHeaderOffset } from "src/layouts/layoutVars";
-import { isPromise } from "src/utils";
+import { isPromise, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
+import { CompanionRow, resolveCompanion } from "./components/CompanionRow";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
+import { RowGroup } from "./components/RowGroup";
 import { TableCard } from "./components/TableCard";
 import { GridTableEmptyState, GridTableEmptyStateProps } from "./GridTableEmptyState";
 import { DraggedOver, RowState } from "./utils/RowState";
@@ -267,6 +270,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const tid = useTestIds({ "data-testid": id }, "gridTable");
 
   const columnsWithIds = useMemo(() => {
     const columns = columnGutter && inDocumentScrollLayout ? withColumnGutters(_columns) : _columns;
@@ -508,12 +512,16 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const visibleRows = tableState.visibleRows.filter((rs) => !pinnedIds.has(rs.row.id));
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
 
+    const omitRowHover = "rowHover" in maybeStyle && maybeStyle.rowHover === false;
+    const isHeadKind = (kind: string) => [HEADER, EXPANDABLE_HEADER, TOTALS].includes(kind);
+
     // Builds a `<Row>` element; shared by the partition loop and the pinned section so they stay in sync.
     const makeRow = (
       rs: RowState<R>,
       isFirstHeadRow: boolean,
       isFirstBodyRow: boolean,
       isLastBodyRow: boolean,
+      hasTrailingCompanion: boolean,
     ): ReactElement => (
       <Row
         key={rs.key}
@@ -530,11 +538,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           columnSizes,
           getCount,
           cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
-          omitRowHover: "rowHover" in maybeStyle && maybeStyle.rowHover === false,
+          omitRowHover,
           hasExpandableHeader,
           isFirstHeadRow,
           isFirstBodyRow,
           isLastBodyRow,
+          hasTrailingCompanion,
           resizedWidths,
           setResizedWidth: handleColumnResize,
           disableColumnResizing,
@@ -543,40 +552,91 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       />
     );
 
-    const bodyRowsCount = visibleRows.filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind)).length;
-    const onlyKeptBodyRows =
-      bodyRowsCount > 0 &&
-      visibleRows.every(
-        (rs) =>
-          // For our purposes, "body rows" are any non-header / non-totals rows.
-          [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind) || rs.isKept || rs.kind === KEPT_GROUP,
+    const makeCompanionRow = (
+      rs: RowState<R>,
+      resolved: NonNullable<ReturnType<typeof resolveCompanion>>,
+      isFirstBodyRow: boolean,
+      isLastBodyRow: boolean,
+    ): ReactElement => {
+      const levelStyle =
+        style.levels && (typeof style.levels === "function" ? style.levels(rs.level) : style.levels[rs.level]);
+      return (
+        <CompanionRow
+          key={`${rs.key}-companion`}
+          as={as}
+          style={style}
+          columnSizes={columnSizes}
+          rowId={rs.row.id}
+          colSpan={columns.length}
+          isFirstBodyRow={isFirstBodyRow}
+          isLastBodyRow={isLastBodyRow}
+          position={resolved.position}
+          companion={resolved.content}
+          levelIndent={levelStyle?.rowIndent}
+        />
       );
-    let bodyRowsSeen = 0;
+    };
+
+    /** One wrapper per logical body row so parent + companion virtualize, hover, and print together. */
+    const makeRowGroup = (
+      rs: RowState<R>,
+      isFirstBodyRow: boolean,
+      isLastBodyRow: boolean,
+      inHead: boolean,
+    ): ReactElement => {
+      const resolved = resolveCompanion(rs.row.companion);
+      const position = resolved?.position;
+      const row = makeRow(
+        rs,
+        false,
+        isFirstBodyRow && position !== "leading",
+        isLastBodyRow && position !== "trailing",
+        position === "trailing",
+      );
+      const companionEl = resolved
+        ? makeCompanionRow(
+            rs,
+            resolved,
+            isFirstBodyRow && position === "leading",
+            isLastBodyRow && position === "trailing",
+          )
+        : undefined;
+      const children =
+        position === "leading" && companionEl ? [companionEl, row] : companionEl ? [row, companionEl] : row;
+      const showRowHover = !reservedRowKinds.includes(rs.kind) && !omitRowHover && style.rowHoverColor !== "none";
+      return (
+        <RowGroup key={rs.key} as={as} inHead={inHead} showRowHover={showRowHover} style={style}>
+          {children}
+        </RowGroup>
+      );
+    };
+
+    const bodyRowStates = visibleRows.filter((rs) => !isHeadKind(rs.kind));
+    const onlyKeptBodyRows =
+      bodyRowStates.length > 0 && bodyRowStates.every((rs) => rs.isKept || rs.kind === KEPT_GROUP);
+    const lastBodyRs = !onlyKeptBodyRows ? bodyRowStates[bodyRowStates.length - 1] : undefined;
     let foundFirstBodyRow = false;
     let foundFirstHeadRow = false;
 
     // Get the flat list or rows from the header down...
     visibleRows.forEach((rs) => {
-      const isHeadRow = [HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      const isHeadRow = isHeadKind(rs.kind);
       const isFirstHeadRow = isHeadRow && !foundFirstHeadRow;
-      const isBodyRow = ![HEADER, EXPANDABLE_HEADER, TOTALS].includes(rs.kind);
+      const isBodyRow = !isHeadRow;
       const isFirstBodyRow = isBodyRow && !foundFirstBodyRow;
       if (isHeadRow) foundFirstHeadRow = true;
-      if (isBodyRow) bodyRowsSeen += 1;
       if (isBodyRow) foundFirstBodyRow = true;
-      const isLastBodyRow = isBodyRow && bodyRowsSeen === bodyRowsCount && !onlyKeptBodyRows;
 
-      const row = makeRow(rs, isFirstHeadRow, isFirstBodyRow, isLastBodyRow);
       if (rs.kind === "header") {
-        headerRows.push(row);
+        headerRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
       } else if (rs.kind === "expandableHeader") {
-        expandableHeaderRows.push(row);
+        expandableHeaderRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
       } else if (rs.kind === "totals") {
-        totalsRows.push(row);
+        totalsRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
       } else if (rs.isKept || rs.kind === KEPT_GROUP) {
-        keptSelectedRows.push(row);
+        keptSelectedRows.push(makeRowGroup(rs, isFirstBodyRow, rs === lastBodyRs, false));
       } else {
-        visibleDataRows.push(row);
+        visibleDataRows.push(makeRowGroup(rs, isFirstBodyRow, rs === lastBodyRs, false));
       }
     });
 
@@ -585,15 +645,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     // Build the runtime pinned section from `pinnedRowStates` (sourced from all states, so pins the
     // current filter would otherwise hide still show — mirroring how kept rows are sourced).
-    const pinnedRows = pinnedRowStates.map((rs) => makeRow(rs, false, false, false));
+    const pinnedRows = pinnedRowStates.map((rs) => makeRowGroup(rs, false, false, as === "table"));
 
     const tooManyClientSideRows = !!filterMaxRows && visibleDataRows.length > filterMaxRows;
     if (tooManyClientSideRows) {
-      visibleDataRows = visibleDataRows.slice(0, filterMaxRows + keptSelectedRows.length);
+      visibleDataRows = visibleDataRows.slice(0, filterMaxRows);
     }
 
     return [tableHeadRows, visibleDataRows, keptSelectedRows, pinnedRows, tooManyClientSideRows];
-  }, [as, api, style, rowStyles, maybeStyle, columnSizes, getCount, filterMaxRows]);
+  }, [as, api, style, rowStyles, maybeStyle, columnSizes, columns.length, getCount, filterMaxRows]);
 
   // Push back to the caller a way to ask us where a row is.
   // Refs are cheap to assign to, so we don't bother doing this in a useEffect
@@ -655,7 +715,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} />
+        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} {...tid.probe} />
         {as === "card" ? (
           <CardView
             cardRows={visibleDataRows}
@@ -830,10 +890,10 @@ function renderTable<R extends Kinded>(
         {tableHeadRows}
         {pinnedRows}
       </thead>
-      <tbody>
-        {keptSelectedRows}
-        {/* Show an all-column-span info message if it's set. */}
-        {firstRowMessage && (
+      {keptSelectedRows}
+      {/* Own tbody so we never mix bare `<tr>`s with row groups. */}
+      {firstRowMessage && (
+        <tbody>
           <tr
             css={{
               ...tableRowPrintBreakCss,
@@ -854,9 +914,9 @@ function renderTable<R extends Kinded>(
               {firstRowMessage}
             </td>
           </tr>
-        )}
-        {visibleDataRows}
-      </tbody>
+        </tbody>
+      )}
+      {visibleDataRows}
     </table>
   );
 }

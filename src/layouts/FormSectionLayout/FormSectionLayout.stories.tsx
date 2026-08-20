@@ -43,6 +43,19 @@ export function Basic() {
   );
 }
 
+export function WithAutoSave() {
+  return (
+    <FormSectionLayout
+      title="Trade Partners"
+      description="Assign and manage trade partners for this project."
+      withAutoSave
+      actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
+      initialFields={<PlaceholderFields count={2} />}
+      sections={[{ title: "General Contractor", fields: <PlaceholderFields count={2} /> }]}
+    />
+  );
+}
+
 export function NestedChildSections() {
   return (
     <FormSectionLayout

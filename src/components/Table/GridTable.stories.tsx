@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -19,6 +19,7 @@ import {
   GridDataRow,
   GridRowLookup,
   GridTable,
+  GridTableLayout,
   Icon,
   IconButton,
   insertAtIndex,
@@ -30,6 +31,7 @@ import {
   simpleHeader,
   SimpleHeaderAndData,
   useGridTableApi,
+  useGridTableLayoutState,
 } from "src/components/index";
 import {
   cardBadgeSlot,
@@ -39,14 +41,17 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
-import { Css, Palette } from "src/Css";
+import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
+import { PinToggle } from "src/components/Table/components/PinToggle";
+import { Css, Palette, Tokens } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
 import { type PlainDate } from "src/types";
 import { noop } from "src/utils";
-import { newStory, withRouter, zeroTo } from "src/utils/sb";
+import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { TestProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 
 export default {
@@ -578,7 +583,7 @@ export function StickyHeader() {
   );
 }
 
-/** Demonstrates interactive, user-driven row pinning via the `pinColumn` toggle (div render). */
+/** Interactive row pinning via `pinColumn`, including companions that hoist with their parent when pinned. */
 export function InteractiveRowPinning() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
@@ -597,6 +602,14 @@ export function InteractiveRowPinning() {
             // Pre-pin a couple rows so the sticky pinned section (and its separator) shows in the snapshot;
             // any row can be pinned/unpinned via the pin column.
             ...(i === 3 || i === 8 ? { initPinned: true } : {}),
+            // Row 8: pre-pinned trailing companion (also has a PinToggle in companion content).
+            ...(i === 8
+              ? { companion: createPinningCompanion(`${i}`, "Pre-pinned — companion hoists with parent.") }
+              : {}),
+            // Row 15: leading companion with a PinToggle — pin/unpin from the companion row.
+            ...(i === 15
+              ? { companion: createPinningCompanion(`${i}`, "Pin from companion content.", "leading") }
+              : {}),
           })),
         ]}
       />
@@ -621,6 +634,12 @@ export function InteractiveRowPinningVirtual() {
             id: `${i}`,
             data: { name: `row ${i}`, value: i },
             ...(i === 3 || i === 8 ? { initPinned: true } : {}),
+            ...(i === 8
+              ? { companion: createPinningCompanion(`${i}`, "Pre-pinned — companion hoists with parent.") }
+              : {}),
+            ...(i === 15
+              ? { companion: createPinningCompanion(`${i}`, "Pin from companion content.", "leading") }
+              : {}),
           })),
         ]}
       />
@@ -694,6 +713,128 @@ export function InteractiveGroupRowPinning() {
     </div>
   );
 }
+
+/** AI-suggestion style companions: full-width content with a data row and no mid separator. */
+export const CompanionRows = newStory(() => {
+  type OptionData = {
+    code: string;
+    name: string;
+    type: string;
+    location: string;
+    suggestion?: "add" | "remove";
+  };
+  type OptionRow = SimpleHeaderAndData<OptionData>;
+
+  const columns: GridColumn<OptionRow>[] = [
+    { header: "Option Code", data: ({ code, suggestion }) => styleOptionCell(code, suggestion) },
+    { header: "Option Name", data: ({ name, suggestion }) => styleOptionCell(name, suggestion) },
+    { header: "Type", data: ({ type, suggestion }) => styleOptionCell(type, suggestion) },
+    { header: "Location", data: ({ location, suggestion }) => styleOptionCell(location, suggestion) },
+  ];
+
+  const rows: GridDataRow<OptionRow>[] = [
+    simpleHeader,
+    {
+      kind: "data",
+      id: "1",
+      data: {
+        code: "—",
+        name: "Add Stained Wood Ceiling",
+        type: "—",
+        location: "Kitchen 109",
+        suggestion: "add",
+      },
+      companion: {
+        position: "leading",
+        content: () => (
+          <CompanionBanner
+            tone="error"
+            message="Add Stained Wood Ceiling was not found in the option library. Review 2 Possible matches."
+            actions={<Button label="Review Matches" variant="text" onClick={noop} />}
+          />
+        ),
+      },
+    },
+    {
+      kind: "data",
+      id: "2",
+      data: {
+        code: "TRMCLG0004",
+        name: "Slab Backsplash Upgrade",
+        type: "ADD-ON",
+        location: "Kitchen 109",
+        suggestion: "remove",
+      },
+      companion: () => (
+        <CompanionBanner
+          tone="warning"
+          message="Referenced by 1 takeoff line."
+          actions={
+            <>
+              <Button label="Keep" variant="text" onClick={noop} />
+              <Button label="Remove" variant="text" onClick={noop} />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      kind: "data",
+      id: "3",
+      data: {
+        code: "CAB001",
+        name: "Upper Cabinet Extension",
+        type: "ADD-ON",
+        location: "Kitchen 109",
+        suggestion: "remove",
+      },
+      companion: () => (
+        <CompanionBanner
+          tone="warning"
+          message="Used as a requirement for 2 other options."
+          actions={
+            <>
+              <Button label="Keep" variant="text" onClick={noop} />
+              <Button label="Remove" variant="text" onClick={noop} />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      kind: "data",
+      id: "4",
+      data: { code: "FLR100", name: "Standard Vinyl Plank", type: "BASE", location: "Kitchen 109" },
+    },
+  ];
+
+  return <GridTable columns={columns} rows={rows} />;
+}, {});
+
+/**
+ * Wide table in the document-scroll layout stack so horizontal overflow is a window scrollbar.
+ * Sticky left/right columns and companion chrome (message / actions) should stay in the viewport.
+ */
+export const CompanionRowsWideDocumentScroll = newStory(
+  () => {
+    const layoutState = useGridTableLayoutState({ search: "client" });
+    const columns = useMemo(() => createCompanionWideColumns(), []);
+    const rows = useMemo(() => createCompanionWideRows(), []);
+    return (
+      <TestProjectLayout pageTitle="Option library">
+        <GridTableLayout layoutState={layoutState} tableProps={{ as: "virtual", columns, rows }} />
+      </TestProjectLayout>
+    );
+  },
+  {
+    decorators: [withBeamDecorator],
+    parameters: { chromatic: { delay: 400 } },
+    play: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      window.scrollTo({ left: 420, top: 160 });
+    },
+  },
+);
 
 export const StyleDefault = newStory(() => {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
@@ -2981,4 +3122,264 @@ export function CardViewInfiniteScroll() {
       </div>
     </div>
   );
+}
+
+type CompanionOptionData = {
+  code: string;
+  name: string;
+  type: string;
+  location: string;
+  finish: string;
+  vendor: string;
+  leadTime: string;
+  notes: string;
+  cost: string;
+  suggestion?: "add" | "remove";
+};
+type CompanionOptionRow = SimpleHeaderAndData<CompanionOptionData>;
+
+function styleOptionCell(value: string, suggestion: "add" | "remove" | undefined) {
+  if (suggestion === "add") {
+    return { content: value, css: Css.purple700.fsyi.$ };
+  }
+  if (suggestion === "remove") {
+    return { content: value, css: Css.color(Tokens.OnSurfaceMuted).tdlt.$ };
+  }
+  return value;
+}
+
+/** Companion content with an inline {@link PinToggle} for the InteractiveRowPinning stories. */
+function createPinningCompanion(rowId: string, message: string, position?: "leading" | "trailing"): GridRowCompanion {
+  const content = () => (
+    <div css={Css.df.aic.jcsb.gap2.px1.w100.$}>
+      <span css={Css.xs.$}>{message}</span>
+      <PinToggle rowId={rowId} />
+    </div>
+  );
+  return position ? { position, content } : content;
+}
+
+function CompanionBanner(props: { tone: "error" | "warning"; message: string; actions: ReactNode }) {
+  const { tone, message, actions } = props;
+  const isError = tone === "error";
+  return (
+    <div
+      css={{
+        ...Css.df.aic.jcsb.gap2.w100.px1.py1.br4.xs.ba.$,
+        ...(isError ? Css.bgRed50.bc(Palette.Red400).$ : Css.bgOrange50.bc(Palette.Orange400).$),
+      }}
+    >
+      <div css={Css.df.aic.gap1.$}>
+        <Icon icon={isError ? "xCircle" : "error"} color={isError ? Palette.Red600 : Palette.Orange600} inc={2} />
+        <span>{message}</span>
+      </div>
+      <div css={Css.df.aic.gap1.fs0.$}>{actions}</div>
+    </div>
+  );
+}
+
+function createCompanionWideColumns(): GridColumn<CompanionOptionRow>[] {
+  return [
+    selectColumn<CompanionOptionRow>({ sticky: "left" }),
+    column<CompanionOptionRow>({
+      id: "code",
+      name: "Option Code",
+      header: "Option Code",
+      data: ({ code, suggestion }) => styleOptionCell(code, suggestion),
+      w: "140px",
+      sticky: "left",
+    }),
+    column<CompanionOptionRow>({
+      id: "name",
+      name: "Option Name",
+      header: "Option Name",
+      data: ({ name, suggestion }) => styleOptionCell(name, suggestion),
+      w: "280px",
+    }),
+    column<CompanionOptionRow>({
+      id: "type",
+      name: "Type",
+      header: "Type",
+      data: ({ type, suggestion }) => styleOptionCell(type, suggestion),
+      w: "160px",
+    }),
+    column<CompanionOptionRow>({
+      id: "location",
+      name: "Location",
+      header: "Location",
+      data: ({ location, suggestion }) => styleOptionCell(location, suggestion),
+      w: "220px",
+    }),
+    column<CompanionOptionRow>({
+      id: "finish",
+      name: "Finish",
+      header: "Finish",
+      data: ({ finish }) => finish,
+      w: "200px",
+    }),
+    column<CompanionOptionRow>({
+      id: "vendor",
+      name: "Vendor",
+      header: "Vendor",
+      data: ({ vendor }) => vendor,
+      w: "220px",
+    }),
+    column<CompanionOptionRow>({
+      id: "leadTime",
+      name: "Lead Time",
+      header: "Lead Time",
+      data: ({ leadTime }) => leadTime,
+      w: "160px",
+    }),
+    column<CompanionOptionRow>({ id: "notes", name: "Notes", header: "Notes", data: ({ notes }) => notes, w: "280px" }),
+    column<CompanionOptionRow>({ id: "cost", name: "Cost", header: "Cost", data: ({ cost }) => cost, w: "140px" }),
+    column<CompanionOptionRow>({
+      id: "actions",
+      name: "Actions",
+      header: "Actions",
+      data: () => "Actions",
+      w: "140px",
+      sticky: "right",
+      clientSideSort: false,
+    }),
+  ];
+}
+
+function createCompanionWideRows(): GridDataRow<CompanionOptionRow>[] {
+  const extra = zeroTo(12).map((i) => {
+    const row: GridDataRow<CompanionOptionRow> = {
+      kind: "data",
+      id: String(i + 5),
+      data: {
+        code: `OPT${String(i + 100).padStart(4, "0")}`,
+        name: `Additional Option ${i + 1}`,
+        type: i % 2 === 0 ? "ADD-ON" : "BASE",
+        location: `Kitchen ${109 + (i % 3)}`,
+        finish: i % 2 === 0 ? "Stained Oak" : "Matte White",
+        vendor: i % 2 === 0 ? "West Elm Millwork" : "Homebound Supply",
+        leadTime: `${4 + (i % 5)} weeks`,
+        notes: "Shown to force horizontal overflow in document scroll.",
+        cost: `$${(1200 + i * 85).toLocaleString()}`,
+      },
+      ...(i % 4 === 0
+        ? {
+            companion: () => (
+              <CompanionBanner
+                tone="warning"
+                message={`Referenced by ${i + 1} takeoff line${i === 0 ? "" : "s"}.`}
+                actions={
+                  <>
+                    <Button label="Keep" variant="text" onClick={noop} />
+                    <Button label="Remove" variant="text" onClick={noop} />
+                  </>
+                }
+              />
+            ),
+          }
+        : {}),
+    };
+    return row;
+  });
+
+  return [
+    simpleHeader,
+    {
+      kind: "data",
+      id: "1",
+      data: {
+        code: "—",
+        name: "Add Stained Wood Ceiling",
+        type: "—",
+        location: "Kitchen 109",
+        finish: "Stained Oak",
+        vendor: "—",
+        leadTime: "—",
+        notes: "Not in the option library.",
+        cost: "—",
+        suggestion: "add",
+      },
+      companion: {
+        position: "leading",
+        content: () => (
+          <CompanionBanner
+            tone="error"
+            message="Add Stained Wood Ceiling was not found in the option library. Review 2 Possible matches."
+            actions={<Button label="Review Matches" variant="text" onClick={noop} />}
+          />
+        ),
+      },
+    },
+    {
+      kind: "data",
+      id: "2",
+      data: {
+        code: "TRMCLG0004",
+        name: "Slab Backsplash Upgrade",
+        type: "ADD-ON",
+        location: "Kitchen 109",
+        finish: "Calacatta Gold",
+        vendor: "Stone Yard",
+        leadTime: "6 weeks",
+        notes: "Referenced by takeoff lines in this room.",
+        cost: "$4,200",
+        suggestion: "remove",
+      },
+      companion: () => (
+        <CompanionBanner
+          tone="warning"
+          message="Referenced by 1 takeoff line."
+          actions={
+            <>
+              <Button label="Keep" variant="text" onClick={noop} />
+              <Button label="Remove" variant="text" onClick={noop} />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      kind: "data",
+      id: "3",
+      data: {
+        code: "CAB001",
+        name: "Upper Cabinet Extension",
+        type: "ADD-ON",
+        location: "Kitchen 109",
+        finish: "Matte White",
+        vendor: "Cabinetworks",
+        leadTime: "8 weeks",
+        notes: "Used as a requirement for other options.",
+        cost: "$1,850",
+        suggestion: "remove",
+      },
+      companion: () => (
+        <CompanionBanner
+          tone="warning"
+          message="Used as a requirement for 2 other options."
+          actions={
+            <>
+              <Button label="Keep" variant="text" onClick={noop} />
+              <Button label="Remove" variant="text" onClick={noop} />
+            </>
+          }
+        />
+      ),
+    },
+    {
+      kind: "data",
+      id: "4",
+      data: {
+        code: "FLR100",
+        name: "Standard Vinyl Plank",
+        type: "BASE",
+        location: "Kitchen 109",
+        finish: "Oak",
+        vendor: "Homebound Supply",
+        leadTime: "2 weeks",
+        notes: "No companion on this row.",
+        cost: "$980",
+      },
+    },
+    ...extra,
+  ];
 }

@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
-import { EnvironmentBannerLayout } from "src/layouts";
+import { CenteredLayout, EnvironmentBannerLayout } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
@@ -102,7 +102,7 @@ export function ComposedGridTableWithoutSideNav() {
 }
 
 /**
- * Same as {@link ComposedWithEnvironmentBanner}, but the table sits in a 720px-wide content column.
+ * Same as {@link ComposedWithEnvironmentBanner}, but the table sits in a `sm` centered layout.
  * Confirms document-scroll table width (`min(100%, chrome)`) stays within that container instead of
  * expanding past it to the full viewport beside the side nav.
  */
@@ -113,9 +113,9 @@ export const ComposedConstrainedWidthTable = () => (
         <PageHeaderLayout
           pageHeader={{ title: "Page header", rightSlot: <Button label="Action" onClick={() => {}} /> }}
         >
-          <div css={Css.mx("auto").maxwPx(720).w100.$}>
+          <CenteredLayout size="sm">
             <GridTableLayoutExample storageKey="navbar-layout-composed-constrained" />
-          </div>
+          </CenteredLayout>
         </PageHeaderLayout>
       </SideNavLayout>
     </NavbarLayout>
