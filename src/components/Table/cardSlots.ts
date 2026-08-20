@@ -24,7 +24,7 @@ export type CardProgressSlot = CardSlotBase<"progress"> & { value: number };
 /** One thumbnail link in a carousel interactive footer. */
 export type CardCarouselThumbnail = {
   id: string;
-  swatchUrl: string;
+  imgUrl: string;
   label: string;
   to: string;
 };

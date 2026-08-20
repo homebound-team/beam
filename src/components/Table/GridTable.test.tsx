@@ -5410,8 +5410,8 @@ describe("card view", () => {
           kind: "carousel",
           title: "2 Colors",
           thumbnails: [
-            { id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" },
-            { id: "mv:2", swatchUrl: "black.png", label: "Black", to: "/mv/2" },
+            { id: "mv:1", imgUrl: "chrome.png", label: "Chrome", to: "/mv/1" },
+            { id: "mv:2", imgUrl: "black.png", label: "Black", to: "/mv/2" },
           ],
         }),
       }),

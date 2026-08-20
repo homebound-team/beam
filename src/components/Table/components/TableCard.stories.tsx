@@ -242,12 +242,12 @@ const data = [
 ];
 
 const thumbnails = [
-  { id: "mv:1", swatchUrl: "plan-exterior.png", label: "Chrome", to: "/mv/1" },
-  { id: "mv:2", swatchUrl: "disposal.png", label: "Matte Black", to: "/mv/2" },
-  { id: "mv:3", swatchUrl: "plan-exterior.png", label: "Bronze", to: "/mv/3" },
-  { id: "mv:4", swatchUrl: "disposal.png", label: "Nickel", to: "/mv/4" },
-  { id: "mv:5", swatchUrl: "plan-exterior.png", label: "Gold", to: "/mv/5" },
-  { id: "mv:6", swatchUrl: "disposal.png", label: "Copper", to: "/mv/6" },
-  { id: "mv:7", swatchUrl: "plan-exterior.png", label: "White", to: "/mv/7" },
-  { id: "mv:8", swatchUrl: "disposal.png", label: "Black", to: "/mv/8" },
+  { id: "mv:1", imgUrl: "plan-exterior.png", label: "Chrome", to: "/mv/1" },
+  { id: "mv:2", imgUrl: "disposal.png", label: "Matte Black", to: "/mv/2" },
+  { id: "mv:3", imgUrl: "plan-exterior.png", label: "Bronze", to: "/mv/3" },
+  { id: "mv:4", imgUrl: "disposal.png", label: "Nickel", to: "/mv/4" },
+  { id: "mv:5", imgUrl: "plan-exterior.png", label: "Gold", to: "/mv/5" },
+  { id: "mv:6", imgUrl: "disposal.png", label: "Copper", to: "/mv/6" },
+  { id: "mv:7", imgUrl: "plan-exterior.png", label: "White", to: "/mv/7" },
+  { id: "mv:8", imgUrl: "disposal.png", label: "Black", to: "/mv/8" },
 ];

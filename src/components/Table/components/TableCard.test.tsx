@@ -6,8 +6,8 @@ import { vi } from "vitest";
 describe("TableCardView", () => {
   const imgSrc = "home.jpg";
   const thumbnails = [
-    { id: "mv:1", swatchUrl: "chrome.png", label: "Polished Chrome", to: "/mv/1" },
-    { id: "mv:2", swatchUrl: "black.png", label: "Matte Black", to: "/mv/2" },
+    { id: "mv:1", imgUrl: "chrome.png", label: "Polished Chrome", to: "/mv/1" },
+    { id: "mv:2", imgUrl: "black.png", label: "Matte Black", to: "/mv/2" },
   ];
 
   it("renders title and image with title as alt text", async () => {
@@ -90,8 +90,8 @@ describe("TableCardView", () => {
   it("renders carousel title and thumbnails", async () => {
     // Given a card with a carousel
     const thumbnails = [
-      { id: "mv:1", swatchUrl: "chrome-swatch.png", label: "Polished Chrome", to: "/mv/1" },
-      { id: "mv:2", swatchUrl: "black-swatch.png", label: "Matte Black", to: "/mv/2" },
+      { id: "mv:1", imgUrl: "chrome-swatch.png", label: "Polished Chrome", to: "/mv/1" },
+      { id: "mv:2", imgUrl: "black-swatch.png", label: "Matte Black", to: "/mv/2" },
     ];
     // When rendered
     const r = await render(
@@ -113,7 +113,7 @@ describe("TableCardView", () => {
 
   it("covers the hero by default and can opt into contain", async () => {
     // Given a carousel card with no imageFit override
-    const thumbnails = [{ id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
+    const thumbnails = [{ id: "mv:1", imgUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
     // When rendered
     const r = await render(
       <TableCardView
@@ -142,7 +142,7 @@ describe("TableCardView", () => {
 
   it("renders progress and carousel stacked", async () => {
     // Given a card with both progress and a thumbnail carousel
-    const thumbnails = [{ id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
+    const thumbnails = [{ id: "mv:1", imgUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
     // When rendered
     const r = await render(
       <TableCardView
@@ -165,7 +165,7 @@ describe("TableCardView", () => {
     // Given many thumbnails that overflow the strip
     const thumbnails = Array.from({ length: 8 }, (_, i) => ({
       id: `mv:${i}`,
-      swatchUrl: `s${i}.png`,
+      imgUrl: `s${i}.png`,
       label: `Color ${i}`,
       to: `/mv/${i}`,
     }));

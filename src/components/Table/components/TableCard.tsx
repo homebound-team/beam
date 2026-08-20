@@ -338,7 +338,7 @@ function Thumbnail(props: ThumbnailProps) {
       >
         {/* `oh` clips the swatch to the border radius; it can't live on the link, which would clip its focus ring. */}
         <span css={Css.db.w100.h100.oh.br8.$}>
-          <img css={Css.w100.h100.objectFit("cover").db.$} src={item.swatchUrl} alt="" loading="lazy" />
+          <img css={Css.w100.h100.objectFit("cover").db.$} src={item.imgUrl} alt="" loading="lazy" />
         </span>
       </Link>
     </Tooltip>
