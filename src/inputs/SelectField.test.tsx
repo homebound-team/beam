@@ -726,6 +726,114 @@ describe("SelectFieldTest", () => {
     });
   });
 
+  describe("AI mode", () => {
+    it("shows the original option label struck-through next to the proposal", async () => {
+      // Given a SelectField with "One" on record and "Three" proposed
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"1"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      // Then both keys are resolved to their labels
+      expect(r.age_proposedValue).toHaveTextContent("One Three");
+      expect(r.age_proposedValue_original).toHaveTextContent("One");
+      expect(r.age).toHaveValue("Three");
+    });
+
+    it("shows the proposal as selected in the dropdown", async () => {
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"1"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      click(r.age);
+      expect(r.getAllByRole("option").find((o) => o.getAttribute("aria-selected") === "true")).toHaveTextContent(
+        "Three",
+      );
+    });
+
+    it("does not commit when re-picking the already-shown proposal", async () => {
+      const onSelect = vi.fn();
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"1"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          onSelect={onSelect}
+        />,
+      );
+      // When the user picks the option that AI mode already shows as selected
+      select(r.age, "3");
+      // Then nothing changed from the dropdown's perspective, so nothing commits and the field
+      // stays in AI mode. Accepting an untouched proposal is the caller's job (i.e. "Accept all").
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(r.age_proposedValue).toHaveTextContent("One Three");
+    });
+
+    it("commits and drops the AI treatment when the user picks some third option", async () => {
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"1"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      select(r.age, "2");
+      expect(r.query.age_proposedValue).not.toBeInTheDocument();
+      expect(r.age).toHaveValue("Two");
+    });
+
+    it("ends AI mode when the user rejects by picking the on-record option", async () => {
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"1"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      expect(r.age).toHaveValue("Three");
+      // When the user picks the option that was already on record, rejecting the proposal
+      select(r.age, "1");
+      // Then it sticks, rather than snapping back to the proposal
+      expect(r.age).toHaveValue("One");
+      expect(r.query.age_proposedValue).not.toBeInTheDocument();
+    });
+
+    it("omits the original when nothing was on record", async () => {
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={undefined}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      expect(r.age_proposedValue).toHaveTextContent("Three");
+      expect(r.query.age_proposedValue_original).not.toBeInTheDocument();
+    });
+  });
+
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options
   type HasLabelAndValue = {
     label: string;

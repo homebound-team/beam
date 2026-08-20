@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
 import { resolveTooltip } from "src/components";
 import { Only } from "src/Css";
+import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
@@ -20,7 +21,8 @@ export type TextAreaFieldProps<X> = {
 /** Returns a <textarea /> element that auto-adjusts height based on the field's value */
 export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFieldProps<X>) {
   const {
-    value = "",
+    value,
+    proposedValue,
     disabled = false,
     readOnly = false,
     onBlur,
@@ -30,13 +32,14 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
     maxLines,
     ...otherProps
   } = props;
+  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
-  const textFieldProps = { ...otherProps, value, isDisabled, isReadOnly };
+  const textFieldProps = { ...otherProps, value: effectiveValue ?? "", isDisabled, isReadOnly };
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
 
-  useGrowingTextField({ inputRef, inputWrapRef, value, maxLines });
+  useGrowingTextField({ inputRef, inputWrapRef, value: effectiveValue ?? "", maxLines });
 
   const { labelProps, inputProps } = useTextField<"textarea">(
     {
@@ -73,6 +76,9 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       inputWrapRef={inputWrapRef}
       textAreaMinHeight={preventNewLines ? 0 : undefined}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      proposedValue={isAiMode ? proposedValue : undefined}
+      originalValue={value}
+      onUserEdit={onUserEdit}
     />
   );
 }

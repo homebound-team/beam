@@ -6,6 +6,7 @@ import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
+import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { getFieldWidth } from "src/inputs/utils";
@@ -22,6 +23,8 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
+  /** Values proposed by an AI model; puts the field in AI mode. */
+  proposedValues?: V[];
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
   disabledOptions?: (V | { value: V; reason: string })[];
@@ -106,6 +109,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     options: propOptions,
     multiselect = false,
     values: propValues,
+    proposedValues,
     nothingSelectedText = "",
     disabledOptions,
     borderless,
@@ -168,12 +172,22 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       : [propOptions.current, propOptions.options, unsetLabel, autoSort],
   );
 
-  const values = useMemo(() => propValues ?? [], [propValues]);
+  // `values` below — and with it the input and the dropdown's selection — reflects the proposal.
+  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(propValues, proposedValues);
+
+  const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
   const inputStylePalette = useMemo(() => propsInputStylePalette, [propsInputStylePalette]);
 
   const selectedOptions = useMemo(
     () => options.filter((o) => values.includes(getOptionValue(o))),
     [options, values, getOptionValue],
+  );
+
+  // The struck-through original. As with `selectedOptions`, a lazily-loaded key that hasn't arrived
+  // yet won't resolve to a label.
+  const originalOptions = useMemo(
+    () => (isAiMode ? options.filter((o) => (propValues ?? []).includes(getOptionValue(o))) : []),
+    [isAiMode, options, propValues, getOptionValue],
   );
 
   const { contains } = useFilter({ sensitivity: "base" });
@@ -293,6 +307,9 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     // re-triggers onChange, causing an infinite loop. The native state handles menu close automatically
     // for single-select (closes on value change) and multi-select (stays open).
     onChange: (newValue: AriaKey | AriaKey[] | null) => {
+      // Selecting an option only updates the controlled `inputValue`, so no DOM change event reaches
+      // `TextFieldBase` — end AI mode here instead.
+      onUserEdit();
       if (multiselect) {
         const keys = (newValue as AriaKey[]) ?? [];
         const newSelectedOptions = options.filter((o) => keys.includes(valueToKey(getOptionValue(o))));
@@ -415,6 +432,9 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
+        proposedValue={isAiMode ? getAiDisplayValue(selectedOptions, getOptionLabel) : undefined}
+        originalValue={getAiDisplayValue(originalOptions, getOptionLabel)}
+        onUserEdit={onUserEdit}
       />
       {state.isOpen && (
         <Popover
@@ -478,6 +498,11 @@ function getInputValue<O>(
       : multiselect && selectedOptions.length === 0
         ? nothingSelectedText
         : "";
+}
+
+/** Like `getInputValue`, but always joins multi-selections as text — AI mode doesn't use chips. */
+function getAiDisplayValue<O>(options: O[], getOptionLabel: (o: O) => string): string {
+  return options.map(getOptionLabel).join(", ");
 }
 
 /** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */

@@ -135,4 +135,23 @@ describe("Autocomplete", () => {
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
     expect(optionTwo.closest("[data-testid='tooltip']")).toHaveAttribute("title", "foo");
   });
+
+  it("shows an AI proposal next to the struck-through original", async () => {
+    const options: HasIdAndName[] = [{ id: "u:1", name: "User 1" }];
+    const r = await render(
+      <Autocomplete<HasIdAndName>
+        label="Search"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        value={"User 2"}
+        proposedValue={"User 1"}
+        onInputChange={() => {}}
+        onSelect={() => {}}
+      />,
+    );
+    expect(r.search_proposedValue).toHaveTextContent("User 2 User 1");
+    expect(r.search_proposedValue_original).toHaveTextContent("User 2");
+    expect(r.search).toHaveValue("User 1");
+  });
 });

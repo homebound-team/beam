@@ -21,8 +21,10 @@ import { Css, increment, Only, Palette, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { ProposedValue } from "src/inputs/internal/ProposedValue";
 import { getFieldWidth } from "src/inputs/utils";
 import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
+import { maybeCall } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -45,6 +47,12 @@ export type TextFieldBaseProps<X> = {
   // Replaces empty input field and placeholder with node
   // IE: Multiselect renders list of selected items in the input field
   unfocusedPlaceholder?: ReactNode;
+  /** Value proposed by an AI model; puts the field in AI mode. Pre-formatted for display. */
+  proposedValue?: string;
+  /** The formatted value on record, struck-through in AI mode. Ignored unless `proposedValue` is set. */
+  originalValue?: string;
+  /** Called on any edit the user makes, so the owning field can end AI mode. */
+  onUserEdit?: VoidFunction;
   /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
 } & Pick<
@@ -104,6 +112,9 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     unfocusedPlaceholder,
     selectOnFocus = true,
     inputStylePalette,
+    proposedValue,
+    originalValue,
+    onUserEdit,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? "sm";
@@ -120,14 +131,19 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldHeight = 40;
   const compactFieldHeight = 32;
 
-  const [bgColor, hoverBgColor, disabledBgColor] = inputStylePalette
-    ? getInputStylePalette(inputStylePalette)
-    : borderOnHover
-      ? // Use transparent backgrounds to blend with the table row hover color
-        [Palette.Transparent, Palette.Blue100, Palette.Gray100]
-      : borderless && !compound
-        ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-        : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
+  // Takes precedence over the `inputStylePalette` / `borderless` / `borderOnHover` backgrounds below.
+  const showProposal = proposedValue !== undefined;
+
+  const [bgColor, hoverBgColor, disabledBgColor] = showProposal
+    ? [Tokens.AiFieldBg, Palette.Purple100, Tokens.FieldBgDisabled]
+    : inputStylePalette
+      ? getInputStylePalette(inputStylePalette)
+      : borderOnHover
+        ? // Use transparent backgrounds to blend with the table row hover color
+          [Palette.Transparent, Palette.Blue100, Palette.Gray100]
+        : borderless && !compound
+          ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+          : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 
@@ -195,6 +211,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
   function onDomChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    // Every field's text entry lands here, so this is where AI mode ends for typed edits.
+    maybeCall(onUserEdit);
     if (onChange) {
       let value: string | undefined = e.target.value;
       if (value === "") {
@@ -215,6 +233,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     fieldRef.current?.click();
   }
 
+  // Reusing the placeholder machinery gets us hide-the-input-while-unfocused and click-to-focus for
+  // free. It replaces any caller placeholder (MultiSelect's chips) — struck-through chips read badly.
+  const effectiveUnfocusedPlaceholder = showProposal ? (
+    <ProposedValue original={originalValue} proposed={proposedValue} {...tid.proposedValue} />
+  ) : (
+    unfocusedPlaceholder
+  );
+
   const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
   const fieldElementProps = mergeProps(
@@ -227,7 +253,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     ...fieldStyles.input,
     ...(inputProps.disabled ? fieldStyles.disabled : {}),
     ...(showHover ? fieldStyles.hover : {}),
-    ...(unfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
+    ...(effectiveUnfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
     ...xss,
   };
 
@@ -262,18 +288,23 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
-              {multiline
-                ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                    <p key={i} css={Css.py1.$}>
-                      {p.split("\n").map((sentence, j) => (
-                        <span key={j}>
-                          {sentence}
-                          <br />
-                        </span>
-                      ))}
-                    </p>
-                  ))
-                : inputProps.value}
+              {multiline ? (
+                (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
+                  <p key={i} css={Css.py1.$}>
+                    {p.split("\n").map((sentence, j) => (
+                      <span key={j}>
+                        {sentence}
+                        <br />
+                      </span>
+                    ))}
+                  </p>
+                ))
+              ) : showProposal ? (
+                // Read-only renders no input, so the placeholder machinery above doesn't apply.
+                <ProposedValue original={originalValue} proposed={proposedValue} {...tid.proposedValue} />
+              ) : (
+                inputProps.value
+              )}
             </div>
           ) : (
             <div
@@ -290,13 +321,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               className={BorderHoverChild}
               {...hoverProps}
               ref={inputWrapRef as any}
-              onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
+              onClick={effectiveUnfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
             >
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
-              {unfocusedPlaceholder && (
+              {effectiveUnfocusedPlaceholder && (
                 <div
                   // Setting -1 tabIndex as this is a scrollable container, which is focusable by default.
                   // However, we want the user's focus to move to the field element, which will hide this container.
@@ -305,12 +336,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   css={{
                     ...Css.df.asc.w100.maxhPx(74).oa.$,
                     ...fieldStyles.input,
+                    // Multiline grows, so top-align like the textarea's own text.
+                    ...(multiline && Css.asfs.$),
                     ...(showHover ? fieldStyles.hover : {}),
                     ...(inputProps.disabled ? fieldStyles.disabled : {}),
                     ...(isFocused && Css.visuallyHidden.$),
                   }}
                 >
-                  {unfocusedPlaceholder}
+                  {effectiveUnfocusedPlaceholder}
                 </div>
               )}
               {multiline ? (
@@ -336,6 +369,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   icon="xCircle"
                   color={Tokens.OnSurfaceMuted}
                   onClick={() => {
+                    maybeCall(onUserEdit);
                     onChange(undefined);
                     // Reset focus to input element
                     fieldRef.current?.focus();

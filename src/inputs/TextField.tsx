@@ -2,6 +2,7 @@ import { MutableRefObject, ReactNode, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
 import { resolveTooltip } from "src/components";
 import { Only } from "src/Css";
+import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 import { maybeCall } from "src/utils";
@@ -35,7 +36,8 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     readOnly = false,
     required,
     errorMsg,
-    value = "",
+    value,
+    proposedValue,
     onBlur,
     onFocus,
     api,
@@ -45,6 +47,8 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     ...otherProps
   } = props;
 
+  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
+
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
   const textFieldProps = {
@@ -53,7 +57,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     isReadOnly,
     isRequired: required,
     validationState: errorMsg ? ("invalid" as const) : ("valid" as const),
-    value,
+    value: effectiveValue ?? "",
   };
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps } = useTextField(
@@ -89,6 +93,9 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       inputRef={inputRef}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
       hideErrorMessage={hideErrorMessage}
+      proposedValue={isAiMode ? proposedValue : undefined}
+      originalValue={value}
+      onUserEdit={onUserEdit}
     />
   );
 }

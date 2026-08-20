@@ -13,7 +13,7 @@ import { Chips, CountBadge, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
-import { TextFieldBase } from "src/inputs/TextFieldBase";
+import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
@@ -47,7 +47,8 @@ type ComboBoxInputProps<O, V extends Value> = {
   isTree?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
-} & PresentationFieldProps;
+} & PresentationFieldProps &
+  Pick<TextFieldBaseProps<any>, "proposedValue" | "originalValue" | "onUserEdit">;
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
   const {
@@ -92,7 +93,8 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
 
   const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
   const selectedChipCount = chipLabels.length;
-  const showNumSelection = isMultiSelect && selectedChipCount > 1;
+  // The count badge exists to summarize the chips, which AI mode replaces with text, so hide it there.
+  const showNumSelection = isMultiSelect && selectedChipCount > 1 && otherProps.proposedValue === undefined;
 
   useGrowingTextField({
     // This says: When using a multiselect, then only enable the growing textfield when we are focused on it.

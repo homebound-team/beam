@@ -320,6 +320,43 @@ describe("MultiSelectFieldTest", () => {
     });
   });
 
+  describe("AI mode", () => {
+    it("shows both selections as joined labels rather than chips", async () => {
+      // Given "One" on record and "Two, Three" proposed
+      const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
+      // Then AI mode renders text, not chips, so the original can be struck through
+      // (labels follow the options' alphabetical `autoSort` order)
+      expect(r.age_proposedValue).toHaveTextContent("One Three, Two");
+      expect(r.age_proposedValue_original).toHaveTextContent("One");
+      expect(r.queryAllByTestId("chip")).toHaveLength(0);
+    });
+
+    it("shows the proposed options as selected in the dropdown", async () => {
+      const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
+      click(r.age);
+      const opts = r.queryAllByRole("option");
+      expect(opts.filter((o) => o.getAttribute("aria-selected") === "true").map((o) => o.textContent)).toEqual([
+        "Three",
+        "Two",
+      ]);
+    });
+
+    it("omits the original when nothing was on record", async () => {
+      const r = await render(<TestMultiSelectField values={[]} proposedValues={["2"]} options={options} />);
+      expect(r.age_proposedValue).toHaveTextContent("Two");
+      expect(r.query.age_proposedValue_original).not.toBeInTheDocument();
+    });
+
+    it("commits and drops the AI treatment when the selection changes", async () => {
+      const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
+      // When the user adds an option on top of the proposal
+      selectOption(r, "One");
+      // Then it commits through the usual onSelect, and the AI treatment drops
+      expect([...onSelect.mock.calls[0][0]].sort()).toEqual(["1", "2", "3"]);
+      expect(r.query.age_proposedValue).not.toBeInTheDocument();
+    });
+  });
+
   function TestMultiSelectField(
     props: Optional<
       MultiSelectFieldProps<HasIdAndName<string>, string>,
