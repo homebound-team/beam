@@ -1,4 +1,5 @@
 import { ReactNode, useMemo } from "react";
+import { useFocusRing } from "react-aria";
 import { Link } from "react-router-dom";
 import { Tag, Tooltip } from "src/components";
 import { CardTag, ImageFitType } from "src/components/Card";
@@ -155,12 +156,15 @@ export function TableCardView(props: TableCardViewProps) {
   const col1 = data.slice(0, Math.ceil(data.length / 2));
   const col2 = data.slice(Math.ceil(data.length / 2));
 
+  const { isFocusVisible, focusProps } = useFocusRing();
+
   const actionAttrs = {
     ...tid.action,
     "aria-label": title,
     // `getButtonOrLink` renders its `<button>` without a type, which would default to submit inside a form.
     type: typeof action === "string" ? undefined : "button",
     ...Css.props(contentStyles),
+    ...focusProps,
   };
 
   const content = (
@@ -248,18 +252,15 @@ export function TableCardView(props: TableCardViewProps) {
 
   return (
     <div
-      css={
-        Css.markerOf(cardHovered)
+      css={{
+        ...Css.markerOf(cardHovered)
           .w100.df.fdc.relative.ba.br12.bc(Tokens.FieldBorderDefault)
           .bgColor(Tokens.SurfaceRaised)
           .hPx(height)
-          // Ring the card for its own action's focus. The `>` is what keeps the carousel's links out of
-          // it -- they are nested deeper, so plain `:focus-within` would ring the card for them as well.
-          .when(":has(> a:focus-visible, > button:focus-visible)")
-          .bshFocus.end.if(!!action)
           .cursorPointer.onHover.bc(Tokens.FieldBorderHover)
-          .bgColor(Tokens.SurfaceRaisedHover).$
-      }
+          .bgColor(Tokens.SurfaceRaisedHover).$,
+        ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
+      }}
       {...tid}
     >
       {action ? (
