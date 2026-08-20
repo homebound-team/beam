@@ -294,9 +294,7 @@ function Thumbnail(props: ThumbnailProps) {
             .hPx(32)
             .wPx(32)
             .br8.ba.bcGray300.bgWhite.outline(0)
-            .onFocusVisible.bshFocus.end.onHover.o(0.5)
-            .end.onActive.o(1)
-            .bcBlue600.element("::after")
+            .onHover.bshHover.end.onFocusVisible.bshFocus.end.onActive.bcBlue600.element("::after")
             .contentEmpty.absolute.top0.left0.w100.h100.br8.bgBlue600.o(0.28)
             .add("pointerEvents", "none").$
         }
