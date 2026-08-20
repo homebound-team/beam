@@ -10,7 +10,7 @@ import { RowStyle } from "src/components/Table/TableStyles";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
-import { Css, Marker, Tokens } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -173,14 +173,7 @@ export function TableCardView(props: TableCardViewProps) {
         css={Css.relative.hPx(184).w100.bb.bc(Tokens.FieldBorderDefault).oh.borderRadius("12px 12px 0 0").$}
         {...tid.hero}
       >
-        <img
-          // Only the image washes on hover; the card's own background is behind it, so a bg color can't reach it.
-          css={Css.h100.w100.objectFit(imageFit).if(!!action).when(cardHovered, "ancestor", ":hover").o(0.5).$}
-          src={imgSrc}
-          alt={title}
-          loading="lazy"
-          {...tid.image}
-        />
+        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={title} loading="lazy" {...tid.image} />
         {status && (
           <div css={Css.absolute.top1.left1.df.$} {...tid.status}>
             <Tag {...status} />
@@ -253,12 +246,8 @@ export function TableCardView(props: TableCardViewProps) {
   return (
     <div
       css={{
-        ...Css.markerOf(cardHovered)
-          .w100.df.fdc.relative.ba.br12.bc(Tokens.FieldBorderDefault)
-          .bgColor(Tokens.SurfaceRaised)
-          .hPx(height)
-          .cursorPointer.onHover.bc(Tokens.FieldBorderHover)
-          .bgColor(Tokens.SurfaceRaisedHover).$,
+        ...Css.w100.df.fdc.relative.ba.br12.bc(Tokens.FieldBorderDefault).bgColor(Tokens.SurfaceRaised).hPx(height)
+          .cursorPointer.onHover.bshHover.$,
         ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
       }}
       {...tid}
@@ -327,9 +316,6 @@ function clampProgress(value: number): number {
   }
   return Math.min(100, Math.max(0, value));
 }
-
-/** Marks the card so its hero image can wash on card hover. */
-const cardHovered: Marker = Symbol("cardHovered");
 
 /**
  * The box holding everything above the carousel, i.e. the card's link/button, or a plain div for a
