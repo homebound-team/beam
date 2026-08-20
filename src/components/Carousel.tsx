@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { Children, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { Children, ReactNode, useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { Css, increment, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -44,7 +44,7 @@ export function Carousel(props: CarouselProps) {
 
   useResizeObserver({ ref: stripRef, onResize: updateOverflow });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateOverflow();
     const el = stripRef.current;
     if (!el) return;
