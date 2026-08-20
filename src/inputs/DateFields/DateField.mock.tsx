@@ -6,7 +6,8 @@ import { maybeCall, useTestIds } from "src/utils";
 /** Mocks out `DateField` as a text `<input>` field. */
 export function DateFieldMock(props: DateFieldProps) {
   const { onChange = () => {}, errorMsg, onBlur, onFocus } = props;
-  const [value, setValue] = useState(formatDate(props.value, dateFormats.short));
+  // The mock can't render the strike-through, but the proposal is still the effective value.
+  const [value, setValue] = useState(formatDate(props.proposedValue ?? props.value, dateFormats.short));
   const tid = useTestIds(props, "date");
   return (
     <input

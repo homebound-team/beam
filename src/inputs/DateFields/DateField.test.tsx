@@ -1,5 +1,7 @@
 import { fireEvent } from "@testing-library/react";
+import { useState } from "react";
 import { DateFieldImpl as DateField } from "src/inputs/DateFields/DateField";
+import { PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, render, type } from "src/utils/rtl";
 import { jan1, jan2, jan29 } from "src/utils/testDates";
@@ -77,4 +79,51 @@ describe("DateField", () => {
     // Then the format should reset to specified in props
     expect(r.date).toHaveValue("Thu, Jan 2");
   });
+
+  describe("AI mode", () => {
+    it("shows the original struck-through next to the proposal", async () => {
+      const r = await render(<DateField value={jan2} proposedValue={jan29} label="Date" onChange={noop} />);
+      expect(r.date_originalValue).toHaveTextContent("01/02/20");
+      expect(r.date).toHaveValue("01/29/20");
+    });
+
+    it("formats both values with the field's format", async () => {
+      const r = await render(
+        <DateField value={jan2} proposedValue={jan29} label="Date" onChange={noop} format="medium" />,
+      );
+      expect(r.date_originalValue).toHaveTextContent("Thu, Jan 2");
+      expect(r.date).toHaveValue("Wed, Jan 29");
+    });
+
+    it("omits the original when the field was empty", async () => {
+      const r = await render(<DateField value={undefined} proposedValue={jan29} label="Date" onChange={noop} />);
+      expect(r.date).toHaveValue("01/29/20");
+      expect(r.date).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.date_originalValue).not.toBeInTheDocument();
+    });
+
+    it("ends AI mode when a date is picked from the calendar", async () => {
+      // The picker never touches the input, so this path needs its own hook into AI mode
+      const r = await render(<TestDateField value={jan2} proposedValue={jan29} />);
+      expect(r.date).toHaveValue("01/29/20");
+      click(r.date);
+      click(r.datePickerDay_0);
+      expect(r.date).toHaveValue("01/01/20");
+      expect(r.date).not.toHaveAttribute("data-ai-mode");
+    });
+
+    it("commits on edit and drops the AI treatment", async () => {
+      const r = await render(<TestDateField value={jan2} proposedValue={jan29} />);
+      // When the user types a different date
+      type(r.date, "01/01/20");
+      // Then it commits, and the field stops looking AI-proposed
+      expect(r.date).not.toHaveAttribute("data-ai-mode");
+      expect(r.date).toHaveValue("01/01/20");
+    });
+  });
+
+  function TestDateField(props: { value: PlainDate | undefined; proposedValue?: PlainDate }) {
+    const [value, setValue] = useState(props.value);
+    return <DateField {...props} value={value} label="Date" onChange={setValue} />;
+  }
 });

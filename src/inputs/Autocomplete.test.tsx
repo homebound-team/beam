@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Autocomplete } from "src/inputs/Autocomplete";
 import { HasIdAndName } from "src/types";
 import { click, focus, render, type } from "src/utils/rtl";
@@ -134,5 +135,55 @@ describe("Autocomplete", () => {
     const optionTwo = r.getAllByRole("option")[1];
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
     expect(optionTwo.closest("[data-testid='tooltip']")).toHaveAttribute("title", "foo");
+  });
+
+  it("ends AI mode when an option is selected", async () => {
+    // Selecting only updates the controlled `inputValue`, so there is no DOM change event — a
+    // regression here silently discards the user's pick and keeps showing the proposal.
+    const options: HasIdAndName[] = [
+      { id: "u:1", name: "User 1" },
+      { id: "u:2", name: "User 2" },
+    ];
+    function TestAutocomplete() {
+      const [value, setValue] = useState<string | undefined>("Old");
+      return (
+        <Autocomplete<HasIdAndName>
+          label="Search"
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+          value={value}
+          proposedValue={"User 1"}
+          onInputChange={setValue}
+          onSelect={() => {}}
+        />
+      );
+    }
+    const r = await render(<TestAutocomplete />);
+    expect(r.search).toHaveValue("User 1");
+    // When picking an option other than the proposal
+    focus(r.search);
+    click(r.getByRole("option", { name: "User 2" }));
+    // Then it sticks, rather than snapping back to the proposal
+    expect(r.search).toHaveValue("User 2");
+    expect(r.search).not.toHaveAttribute("data-ai-mode");
+  });
+
+  it("shows an AI proposal next to the struck-through original", async () => {
+    const options: HasIdAndName[] = [{ id: "u:1", name: "User 1" }];
+    const r = await render(
+      <Autocomplete<HasIdAndName>
+        label="Search"
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        value={"User 2"}
+        proposedValue={"User 1"}
+        onInputChange={() => {}}
+        onSelect={() => {}}
+      />,
+    );
+    expect(r.search_originalValue).toHaveTextContent("User 2");
+    expect(r.search).toHaveValue("User 1");
   });
 });

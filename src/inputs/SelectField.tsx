@@ -7,13 +7,15 @@ import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 export type SelectFieldProps<O, V extends Value> = {
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   value: V | undefined;
+  /** Value proposed by an AI model; puts the field in AI mode. */
+  proposedValue?: V;
   /**
    * Called when a value is selected, or `undefined` if `unsetLabel` is being used.
    *
    * Ideally callers that didn't pass `unsetLabel` would not have to handle the ` | undefined` here.
    */
   onSelect: (value: V | undefined, opt: O | undefined) => void;
-} & Omit<ComboBoxBaseProps<O, V>, "values" | "onSelect" | "multiselect">;
+} & Omit<ComboBoxBaseProps<O, V>, "values" | "proposedValues" | "onSelect" | "multiselect">;
 
 /**
  * Provides a non-native select/dropdown widget.
@@ -40,9 +42,11 @@ export function SelectField<O, V extends Value>(
     options,
     onSelect,
     value,
+    proposedValue,
     ...otherProps
   } = props;
   const values = useMemo(() => [value], [value]);
+  const proposedValues = useMemo(() => (proposedValue === undefined ? undefined : [proposedValue]), [proposedValue]);
   return (
     <ComboBoxBase
       {...otherProps}
@@ -50,6 +54,7 @@ export function SelectField<O, V extends Value>(
       getOptionLabel={getOptionLabel}
       getOptionValue={getOptionValue}
       values={values}
+      proposedValues={proposedValues}
       onSelect={(values, options) => {
         // If the user used `unsetLabel`, then values will be `[undefined]` and options `[unsetOption]`
         if (values.length > 0 && options.length > 0) {

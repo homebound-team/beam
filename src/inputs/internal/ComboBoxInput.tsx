@@ -13,7 +13,7 @@ import { Chips, CountBadge, Icon, Tooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
-import { TextFieldBase } from "src/inputs/TextFieldBase";
+import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import { Value } from "src/inputs/Value";
@@ -47,7 +47,8 @@ type ComboBoxInputProps<O, V extends Value> = {
   isTree?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
-} & PresentationFieldProps;
+} & PresentationFieldProps &
+  Pick<TextFieldBaseProps<any>, "proposedValue" | "originalValue" | "onUserEdit" | "onUserBlur">;
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
   const {
