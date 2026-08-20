@@ -103,10 +103,7 @@ export function WithCarousel() {
         rightEyebrow="Shower Faucet"
         status={{ text: "Active", type: "success" }}
         data={[]}
-        carousel={{
-          title: "8 Variants",
-          thumbnails: thumbnails,
-        }}
+        interactiveFooter={{ kind: "carousel", title: "8 Variants", thumbnails: thumbnails }}
       />
     </CardContainer>
   );
@@ -124,10 +121,7 @@ export function WithProgressAndCarousel() {
         data={data}
         progress={72}
         height={480}
-        carousel={{
-          title: "3 Elevations",
-          thumbnails: thumbnails.slice(0, 3),
-        }}
+        interactiveFooter={{ kind: "carousel", title: "3 Elevations", thumbnails: thumbnails.slice(0, 3) }}
       />
     </CardContainer>
   );
@@ -144,10 +138,7 @@ export function WithContainImageFit() {
         status={{ text: "Active", type: "success" }}
         data={[]}
         imageFit="contain"
-        carousel={{
-          title: "8 Variants",
-          thumbnails: thumbnails,
-        }}
+        interactiveFooter={{ kind: "carousel", title: "8 Variants", thumbnails: thumbnails }}
       />
     </CardContainer>
   );
@@ -174,7 +165,7 @@ export function Interactive() {
             status={{ text: "Active", type: "success" }}
             data={[]}
             to="/plan/1"
-            carousel={{ title: "8 Variants", thumbnails }}
+            interactiveFooter={{ kind: "carousel", title: "8 Variants", thumbnails }}
             imageFit="contain"
           />
         </CardContainer>
@@ -221,7 +212,7 @@ function FocusStory() {
         title="Forté Showerhead"
         data={[]}
         to="/plan/1"
-        carousel={{ title: "3 Variants", thumbnails: thumbnails.slice(0, 3) }}
+        interactiveFooter={{ kind: "carousel", title: "3 Variants", thumbnails: thumbnails.slice(0, 3) }}
       />
     </CardContainer>
   );

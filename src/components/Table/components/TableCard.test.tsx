@@ -84,7 +84,7 @@ describe("TableCardView", () => {
     // Then optional sections are not in the document
     expect(r.query.tableCardView_progressValue).not.toBeInTheDocument();
     expect(r.query.tableCardView_eyebrow).not.toBeInTheDocument();
-    expect(r.query.tableCardView_carousel).not.toBeInTheDocument();
+    expect(r.query.tableCardView_interactiveFooter).not.toBeInTheDocument();
   });
 
   it("renders carousel title and thumbnails", async () => {
@@ -101,7 +101,7 @@ describe("TableCardView", () => {
         leftEyebrow="Kohler"
         rightEyebrow="Shower Faucet"
         data={[]}
-        carousel={{ title: "2 Variants", thumbnails }}
+        interactiveFooter={{ kind: "carousel", title: "2 Variants", thumbnails }}
       />,
       { at: { url: "/" } },
     );
@@ -116,7 +116,12 @@ describe("TableCardView", () => {
     const thumbnails = [{ id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" }];
     // When rendered
     const r = await render(
-      <TableCardView imgSrc={imgSrc} title="Forté Showerhead" data={[]} carousel={{ title: "1 Color", thumbnails }} />,
+      <TableCardView
+        imgSrc={imgSrc}
+        title="Forté Showerhead"
+        data={[]}
+        interactiveFooter={{ kind: "carousel", title: "1 Color", thumbnails }}
+      />,
       { at: { url: "/" } },
     );
     // Then the hero fills the frame
@@ -128,7 +133,7 @@ describe("TableCardView", () => {
         title="Forté Showerhead"
         data={[]}
         imageFit="contain"
-        carousel={{ title: "1 Color", thumbnails }}
+        interactiveFooter={{ kind: "carousel", title: "1 Color", thumbnails }}
       />,
     );
     // Then the full image is shown
@@ -146,7 +151,7 @@ describe("TableCardView", () => {
         data={[]}
         progress={40}
         height={480}
-        carousel={{ title: "1 Color", thumbnails }}
+        interactiveFooter={{ kind: "carousel", title: "1 Color", thumbnails }}
       />,
       { at: { url: "/" } },
     );
@@ -169,7 +174,7 @@ describe("TableCardView", () => {
         imgSrc={imgSrc}
         title="Forté Showerhead"
         data={[]}
-        carousel={{ title: "8 Variants", thumbnails }}
+        interactiveFooter={{ kind: "carousel", title: "8 Variants", thumbnails }}
       />,
       { at: { url: "/" } },
     );
@@ -215,7 +220,7 @@ describe("TableCardView", () => {
         title="Forté Showerhead"
         data={[]}
         to="/item/1"
-        carousel={{ title: "2 Colors", thumbnails }}
+        interactiveFooter={{ kind: "carousel", title: "2 Colors", thumbnails }}
       />,
       { at: { url: "/" } },
     );
@@ -235,7 +240,7 @@ describe("TableCardView", () => {
         title="Forté Showerhead"
         data={[]}
         onClick={onClick}
-        carousel={{ title: "2 Colors", thumbnails }}
+        interactiveFooter={{ kind: "carousel", title: "2 Colors", thumbnails }}
       />,
       { at: { url: "/" } },
     );

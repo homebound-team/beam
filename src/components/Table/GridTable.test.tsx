@@ -1,9 +1,9 @@
 import { act, fireEvent } from "@testing-library/react";
 import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import {
-  cardCarouselSlot,
   cardDataBlockSlot,
   cardEyebrowSlot,
+  cardInteractiveFooterSlot,
   cardLeftEyebrowSlot,
   cardProgressSlot,
   cardRightEyebrowSlot,
@@ -5406,7 +5406,8 @@ describe("card view", () => {
       data: () => ({
         content: "2",
         value: "2",
-        cardSlot: cardCarouselSlot({
+        cardSlot: cardInteractiveFooterSlot({
+          kind: "carousel",
           title: "2 Colors",
           thumbnails: [
             { id: "mv:1", swatchUrl: "chrome.png", label: "Chrome", to: "/mv/1" },
@@ -5422,7 +5423,7 @@ describe("card view", () => {
     { kind: "data", id: "row1", data: { name: "Showerhead" }, imgSrc: "hero.png" },
   ];
 
-  it("renders cardCarouselSlot as thumbnail links", async () => {
+  it("renders an interactiveFooter carousel as thumbnail links", async () => {
     // Given title + carousel columns
     // When rendered as card
     const r = await render(<GridTable as="card" columns={carouselColumns} rows={carouselRows} />, withRouter());

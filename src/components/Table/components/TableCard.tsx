@@ -4,7 +4,12 @@ import { Link } from "react-router-dom";
 import { Tag, Tooltip } from "src/components";
 import { CardTag, ImageFitType } from "src/components/Card";
 import { Carousel } from "src/components/Carousel";
-import type { CardBadgeTag, CardCarouselThumbnail } from "src/components/Table/cardSlots";
+import type {
+  CardBadgeTag,
+  CardCarouselFooter,
+  CardCarouselThumbnail,
+  CardInteractiveFooter,
+} from "src/components/Table/cardSlots";
 import { GridTableApi } from "src/components/Table/GridTableApi";
 import { RowStyle } from "src/components/Table/TableStyles";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
@@ -43,7 +48,7 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
   let badgeTags: CardBadgeTag[] | undefined;
   let status: CardTag | undefined;
   let progress: number | undefined;
-  let carousel: { title: string; thumbnails: CardCarouselThumbnail[] } | undefined;
+  let interactiveFooter: CardInteractiveFooter | undefined;
   const dataBlocks: CardData[] = [];
 
   for (const col of columns) {
@@ -75,8 +80,8 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
       case "progress":
         progress = slot.value;
         break;
-      case "carousel":
-        carousel = { title: slot.title, thumbnails: slot.thumbnails };
+      case "interactiveFooter":
+        interactiveFooter = slot.footer;
         break;
     }
   }
@@ -97,7 +102,7 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
       status={status}
       data={dataBlocks}
       progress={progress}
-      carousel={carousel}
+      interactiveFooter={interactiveFooter}
       to={rowStyle?.rowLink?.(rs.row)}
       onClick={onClick ? () => onClick(rs.row, api) : undefined}
       height={height}
@@ -117,7 +122,8 @@ export type TableCardViewProps = {
   status?: CardTag;
   /** A number between 0 and 100. Values outside this range are clamped. */
   progress?: number;
-  carousel?: { title: string; thumbnails: CardCarouselThumbnail[] };
+  /** Footer with its own interactive controls, rendered outside the card's row action. */
+  interactiveFooter?: CardInteractiveFooter;
   /** Makes the card's content a link. Takes precedence over `onClick`. */
   to?: string;
   /** Makes the card's content a button, for rows that act on click instead of navigating. */
@@ -139,7 +145,7 @@ export function TableCardView(props: TableCardViewProps) {
     data,
     status,
     progress,
-    carousel,
+    interactiveFooter,
     to,
     onClick,
     height = 430,
@@ -149,8 +155,8 @@ export function TableCardView(props: TableCardViewProps) {
   // `getButtonOrLink` renders a link when passed a string, and a button otherwise.
   const action = to || onClick;
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
-  const shownCarousel = carousel && carousel.thumbnails.length > 0 ? carousel : undefined;
-  // The carousel is a sibling of the action, so only the data/progress stack rides along inside of it.
+  const shownFooter = shownInteractiveFooter(interactiveFooter);
+  // The footer is a sibling of the action, so only the data/progress stack rides along inside of it.
   const hasDetails = data.length > 0 || progress !== undefined;
 
   const col1 = data.slice(0, Math.ceil(data.length / 2));
@@ -181,7 +187,7 @@ export function TableCardView(props: TableCardViewProps) {
         )}
       </div>
       {/* The hero is full-bleed, so each section pads itself and only the last one gets `pb3`. */}
-      <div css={Css.df.fdc.gap1.px3.if(!hasDetails && !shownCarousel).pb3.$}>
+      <div css={Css.df.fdc.gap1.px3.if(!hasDetails && !shownFooter).pb3.$}>
         {(leftEyebrow || rightEyebrow) && (
           <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
             <span css={Css.truncate.$} {...tid.leftEyebrow}>
@@ -209,7 +215,7 @@ export function TableCardView(props: TableCardViewProps) {
         </div>
       </div>
       {hasDetails && (
-        <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownCarousel).pb3.$}>
+        <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownFooter).pb3.$}>
           {data.length > 0 && (
             <dl css={Css.df.gap2.sm.$}>
               <div css={Css.df.fdc.fg1.$}>
@@ -258,20 +264,51 @@ export function TableCardView(props: TableCardViewProps) {
         // Keep the same box as the action, so the card's layout doesn't depend on it being interactive.
         <div css={contentStyles}>{content}</div>
       )}
-      {shownCarousel && (
-        <div css={Css.df.fdc.gap2.px3.pb3.pt2.$}>
-          <div css={Css.sm.$} {...tid.carouselTitle}>
-            {shownCarousel.title}
-          </div>
-          <Carousel {...tid.carousel}>
-            {shownCarousel.thumbnails.map((item) => (
-              <Thumbnail key={item.id} item={item} tid={tid.carousel_item} />
-            ))}
-          </Carousel>
+      {shownFooter && (
+        <div css={Css.df.fdc.gap2.px3.pb3.pt2.$} {...tid.interactiveFooter}>
+          <InteractiveFooter footer={shownFooter} tid={tid} />
         </div>
       )}
     </div>
   );
+}
+
+/** Renders the interactive footer union. Add new `CardInteractiveFooter` kinds here. */
+function InteractiveFooter(props: { footer: CardInteractiveFooter; tid: ReturnType<typeof useTestIds> }) {
+  const { footer, tid } = props;
+  switch (footer.kind) {
+    case "carousel":
+      return <CarouselFooter footer={footer} tid={tid} />;
+  }
+}
+
+type CarouselFooterProps = {
+  footer: CardCarouselFooter;
+  tid: ReturnType<typeof useTestIds>;
+};
+
+function CarouselFooter(props: CarouselFooterProps) {
+  const { footer, tid } = props;
+  return (
+    <>
+      <div css={Css.sm.$} {...tid.carouselTitle}>
+        {footer.title}
+      </div>
+      <Carousel {...tid.carousel}>
+        {footer.thumbnails.map((item) => (
+          <Thumbnail key={item.id} item={item} tid={tid.carousel_item} />
+        ))}
+      </Carousel>
+    </>
+  );
+}
+
+function shownInteractiveFooter(footer: CardInteractiveFooter | undefined): CardInteractiveFooter | undefined {
+  if (!footer) return undefined;
+  switch (footer.kind) {
+    case "carousel":
+      return footer.thumbnails.length > 0 ? footer : undefined;
+  }
 }
 
 type ThumbnailProps = {
@@ -316,7 +353,7 @@ function clampProgress(value: number): number {
 }
 
 /**
- * The box holding everything above the carousel, i.e. the card's link/button, or a plain div for a
- * static card.
+ * The box holding everything above the interactive footer, i.e. the card's link/button, or a plain
+ * div for a static card.
  */
 const contentStyles = Css.df.fdc.gap2.fg1.mw0.w100.tal.bn.p0.bgTransparent.color("unset").tdn.outline(0).$;
