@@ -1,0 +1,106 @@
+{
+  "version": "0.2.0",
+  "beamVersion": "3.31.2",
+  "figmaLibraryStatus": "partial-ready",
+  "figmaFileKey": "aWUE4pPeUTgrYZ4vaTYZQU",
+  "figmaFileName": "✨Beam Component Library",
+  "notes": [
+    "Layout shell components and PAGE HEADER are published in Figma with stable node IDs.",
+    "GridTableLayout has no dedicated Figma layout component yet — infer from table/card body content.",
+    "Consumer apps wrap EnvironmentBannerLayout and NavbarLayout in EnvBannerLayout and BeamNavbarLayout route components."
+  ],
+  "pairs": [
+    {
+      "figmaName": "Environment Banner",
+      "figmaNodeId": "49422:1994",
+      "figmaUrl": "https://www.figma.com/design/aWUE4pPeUTgrYZ4vaTYZQU/?node-id=49422-1994",
+      "figmaStatus": "ready",
+      "beamComponent": "EnvironmentBanner",
+      "beamPath": "src/components/EnvironmentBanner/EnvironmentBanner.tsx",
+      "layer": "route-tree-inner"
+    },
+    {
+      "figmaName": "Environment Banner Layout",
+      "figmaNodeId": "49419:1828",
+      "figmaUrl": "https://www.figma.com/design/aWUE4pPeUTgrYZ4vaTYZQU/?node-id=49419-1828",
+      "figmaStatus": "ready",
+      "beamLayout": "EnvironmentBannerLayout",
+      "beamPath": "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout.tsx",
+      "consumerRouteWrapper": "EnvBannerLayout",
+      "layer": "route-tree"
+    },
+    {
+      "figmaName": "Navbar",
+      "figmaNodeId": "49422:1829",
+      "figmaUrl": "https://www.figma.com/design/aWUE4pPeUTgrYZ4vaTYZQU/?node-id=49422-1829",
+      "figmaStatus": "ready",
+      "beamComponent": "Navbar",
+      "beamPath": "src/components/Navbar/Navbar.tsx",
+      "layer": "route-tree-inner"
+    },
+    {
+      "figmaName": "Navbar Layout",
+      "figmaNameAliases": ["Layout / Outer Shell"],
+      "figmaNodeId": "48958:257709",
+      "figmaUrl": "https://www.figma.com/design/aWUE4pPeUTgrYZ4vaTYZQU/?node-id=48958-257709",
+      "figmaStatus": "ready",
+      "beamLayout": "NavbarLayout",
+      "beamPath": "src/layouts/NavbarLayout/NavbarLayout.tsx",
+      "consumerRouteWrapper": "BeamNavbarLayout",
+      "layer": "route-tree"
+    },
+    {
+      "figmaName": "PAGE HEADER",
+      "figmaNodeId": "49471:918",
+      "figmaUrl": "https://www.figma.com/design/aWUE4pPeUTgrYZ4vaTYZQU/?node-id=49471-918",
+      "figmaStatus": "ready",
+      "beamComponent": "PageHeader",
+      "beamPath": "src/components/PageHeader.tsx",
+      "layer": "page-inner"
+    },
+    {
+      "figmaName": "PageContent Shell",
+      "figmaNameAliases": ["Layout / PageContent Shell", "PageHeader Layout"],
+      "figmaNodeId": "48958:257715",
+      "figmaUrl": "https://www.figma.com/design/aWUE4pPeUTgrYZ4vaTYZQU/?node-id=48958-257715",
+      "figmaStatus": "ready",
+      "beamLayout": "PageHeaderLayout",
+      "beamPath": "src/layouts/PageHeaderLayout/PageHeaderLayout.tsx",
+      "slotMapping": {
+        "Page header": "pageHeader prop",
+        "Page body": "children — GridTableLayout for list pages"
+      },
+      "layer": "page"
+    }
+  ],
+  "pageContentLayouts": [
+    {
+      "archetype": "layout-shell-only",
+      "figmaStatus": "ready",
+      "beamExports": ["PageHeaderLayout"],
+      "figmaExampleNodeId": "49463:6484",
+      "figmaExampleName": "Some example page",
+      "consumerSkillExample": "internal-frontend/.cursor/skills/scaffold-beam-page/examples/layout-shell-only.md"
+    },
+    {
+      "archetype": "grid-table-list",
+      "figmaStatus": "pending",
+      "beamExports": ["GridTableLayout", "useGridTableLayoutState"],
+      "beamPath": "src/components/Layout/GridTableLayout/GridTableLayout.tsx",
+      "consumerGoldReference": {
+        "app": "internal-frontend",
+        "route": "/libraries/product-offerings",
+        "page": "src/routes/libraries/product-offerings/GlobalProductOfferings.tsx"
+      }
+    }
+  ],
+  "consumerRouteStack": {
+    "description": "Standard new page in internal-frontend",
+    "layers": [
+      { "wrapper": "AppShell", "path": "src/routing/components/AppShell.tsx" },
+      { "wrapper": "EnvBannerLayout", "path": "src/routing/components/layouts/EnvBannerLayout.tsx" },
+      { "wrapper": "BeamNavbarLayout", "path": "src/routing/components/layouts/BeamNavbarLayout.tsx" },
+      { "page": "PageHeaderLayout + GridTableLayout", "importFrom": "@homebound/beam" }
+    ]
+  }
+}
