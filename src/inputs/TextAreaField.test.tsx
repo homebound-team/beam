@@ -56,6 +56,13 @@ describe("AI mode", () => {
     expect(r.note).toHaveValue("New note");
   });
 
+  it("shows the struck-through original when readOnly", async () => {
+    // readOnly + multiline takes a separate render path that skipped the proposal entirely
+    const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" readOnly />);
+    expect(r.note_proposedValue).toHaveTextContent("Old note New note");
+    expect(r.note_proposedValue_original).toHaveTextContent("Old note");
+  });
+
   it("commits on edit and drops the AI treatment", async () => {
     const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" />);
     type(r.note, "New notes");

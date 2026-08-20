@@ -101,6 +101,16 @@ describe("DateField", () => {
       expect(r.query.date_proposedValue_original).not.toBeInTheDocument();
     });
 
+    it("ends AI mode when a date is picked from the calendar", async () => {
+      // The picker never touches the input, so this path needs its own hook into AI mode
+      const r = await render(<TestDateField value={jan2} proposedValue={jan29} />);
+      expect(r.date).toHaveValue("01/29/20");
+      click(r.date);
+      click(r.datePickerDay_0);
+      expect(r.date).toHaveValue("01/01/20");
+      expect(r.query.date_proposedValue).not.toBeInTheDocument();
+    });
+
     it("commits on edit and drops the AI treatment", async () => {
       const r = await render(<TestDateField value={jan2} proposedValue={jan29} />);
       // When the user types a different date

@@ -76,6 +76,9 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
       if (key == null) return;
       const selectedItem = options.find((i) => getOptionValue(i) === key);
       if (selectedItem) {
+        // Selecting only updates the controlled `inputValue`, so no DOM change event reaches
+        // `TextFieldBase` — end AI mode here instead.
+        onUserEdit();
         onInputChange(getOptionLabel(selectedItem));
         onSelect(selectedItem);
       }

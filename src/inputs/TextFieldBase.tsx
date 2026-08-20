@@ -288,7 +288,11 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
-              {multiline ? (
+              {showProposal ? (
+                // Read-only renders no input, so the placeholder machinery above doesn't apply. Checked
+                // before `multiline` so a read-only TextAreaField still shows the struck-through original.
+                <ProposedValue original={originalValue} proposed={proposedValue} {...tid.proposedValue} />
+              ) : multiline ? (
                 (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
                   <p key={i} css={Css.py1.$}>
                     {p.split("\n").map((sentence, j) => (
@@ -299,9 +303,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                     ))}
                   </p>
                 ))
-              ) : showProposal ? (
-                // Read-only renders no input, so the placeholder machinery above doesn't apply.
-                <ProposedValue original={originalValue} proposed={proposedValue} {...tid.proposedValue} />
               ) : (
                 inputProps.value
               )}

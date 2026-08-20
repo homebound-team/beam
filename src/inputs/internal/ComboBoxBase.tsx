@@ -309,14 +309,15 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     onChange: (newValue: AriaKey | AriaKey[] | null) => {
       // Selecting an option only updates the controlled `inputValue`, so no DOM change event reaches
       // `TextFieldBase` — end AI mode here instead.
-      onUserEdit();
       if (multiselect) {
+        onUserEdit();
         const keys = (newValue as AriaKey[]) ?? [];
         const newSelectedOptions = options.filter((o) => keys.includes(valueToKey(getOptionValue(o))));
         onSelect(keys.map(keyToValue) as V[], newSelectedOptions);
       } else {
         const key = newValue as AriaKey | null;
         if (key === selectedKeys[0]) return; // Skip if value hasn't changed
+        onUserEdit();
         if (key === null || key === undefined) {
           onSelect([], []);
           return;
