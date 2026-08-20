@@ -5,6 +5,7 @@ import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Xss } from "src/Css";
+import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { maybeCall } from "src/utils";
 import { TextFieldBase } from "./TextFieldBase";
 
@@ -16,6 +17,8 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   /** If set, the label will be defined as 'aria-label` on the input element */
   type?: NumberFieldType;
   value: number | undefined;
+  /** Value proposed by an AI model; puts the field in AI mode. */
+  proposedValue?: number;
   onChange: (value: number | undefined) => void;
   compact?: boolean;
   clearable?: boolean;
@@ -69,6 +72,7 @@ export function NumberField(props: NumberFieldProps) {
     errorMsg,
     helperText,
     value,
+    proposedValue,
     onChange,
     xss,
     displayDirection = false,
@@ -125,6 +129,12 @@ export function NumberField(props: NumberFieldProps) {
   }, [type, numberFormatOptions, defaultFormatOptions, numFractionDigits]);
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale, formatOptions), [locale, formatOptions]);
+  const formatForDisplay = (v: number | undefined) =>
+    v === undefined ? undefined : numberFormatter.format(v / factor);
+
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue, formatForDisplay);
+
   // Keep a ref the last "before WIP" value that we passed into react-aria.
   //
   // This is b/c NumberFieldStateProps.onChange only actually calls during
@@ -151,7 +161,7 @@ export function NumberField(props: NumberFieldProps) {
   // Render-time sync: if the value prop changed externally while focused, update valueRef.
   // We compare against lastSentRef to avoid reacting to echoes of our own onChange calls,
   // which would cause react-aria to reformat the input and break cursor position.
-  const propValue = value === undefined ? Number.NaN : value / factor;
+  const propValue = effectiveValue === undefined ? Number.NaN : effectiveValue / factor;
   if (valueRef.current.wip && !Object.is(valueRef.current.value, propValue)) {
     const lastSentInternal = lastSentRef.current === undefined ? Number.NaN : lastSentRef.current / factor;
     if (!Object.is(propValue, lastSentInternal)) {
@@ -164,7 +174,11 @@ export function NumberField(props: NumberFieldProps) {
   const useProps: NumberFieldStateOptions = {
     locale,
     // We want percents && cents to be integers, useNumberFieldState excepts them as decimals
-    value: valueRef.current.wip ? valueRef.current.value : value === undefined ? Number.NaN : value / factor,
+    value: valueRef.current.wip
+      ? valueRef.current.value
+      : effectiveValue === undefined
+        ? Number.NaN
+        : effectiveValue / factor,
     // // This is called on blur with the final/committed value.
     onChange: (value) => {
       const formatted = formatValue(value, factor, numFractionDigits, numIntegerDigits, positiveOnly);
@@ -175,9 +189,9 @@ export function NumberField(props: NumberFieldProps) {
       onChange(formatted);
     },
     onFocus: () => {
-      valueRef.current = { wip: true, value: value === undefined ? Number.NaN : value / factor };
-      lastSentRef.current = value;
-      focusValueRef.current = value;
+      valueRef.current = { wip: true, value: effectiveValue === undefined ? Number.NaN : effectiveValue / factor };
+      lastSentRef.current = effectiveValue;
+      focusValueRef.current = effectiveValue;
     },
     onBlur: () => {
       valueRef.current = { wip: false };
@@ -198,6 +212,7 @@ export function NumberField(props: NumberFieldProps) {
     ...otherProps,
   };
 
+  // Same options react-aria formats the input with, so the display matches a typed-in value.
   const state = useNumberFieldState(useProps);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps, groupProps } = useNumberField(useProps, state, inputRef);
@@ -231,6 +246,7 @@ export function NumberField(props: NumberFieldProps) {
       errorMsg={errorMsg}
       helperText={helperText}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      {...proposalProps}
       {...otherProps}
     />
   );

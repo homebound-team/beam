@@ -48,6 +48,28 @@ describe("TextAreaFieldTest", () => {
   });
 });
 
+describe("AI mode", () => {
+  it("shows the original struck-through next to the proposal", async () => {
+    const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" />);
+    expect(r.note_originalValue).toHaveTextContent("Old note");
+    expect(r.note).toHaveValue("New note");
+  });
+
+  it("shows the struck-through original when readOnly", async () => {
+    // readOnly renders no input, so both halves are drawn as text on this separate path
+    const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" readOnly />);
+    expect(r.note_proposedValue).toHaveTextContent("Old note New note");
+    expect(r.note_proposedValue_original).toHaveTextContent("Old note");
+  });
+
+  it("commits on edit and drops the AI treatment", async () => {
+    const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" />);
+    type(r.note, "New notes");
+    expect(lastSet).toBe("New notes");
+    expect(r.note).not.toHaveAttribute("data-ai-mode");
+  });
+});
+
 function TestTextAreaField<X extends Only<TextFieldXss, X>>(props: Omit<TextAreaFieldProps<X>, "onChange" | "label">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);

@@ -37,6 +37,8 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   /** Marks the field as required or optional, the default is assumed ambiguous/unknown. */
   required?: boolean;
   value: string | undefined;
+  /** Value proposed by an AI model; puts the field in AI mode. */
+  proposedValue?: string;
   /** Handler called when the interactive element state changes. */
   onChange: (value: string | undefined) => void;
   /** Called when the component loses focus, mostly for BoundTextField to use. */

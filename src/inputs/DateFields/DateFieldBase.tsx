@@ -14,6 +14,7 @@ import {
   parseDate,
   parseDateRange,
 } from "src/inputs/DateFields/utils";
+import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
@@ -52,15 +53,20 @@ type DateFieldCommonProps = Pick<
   useYearPicker?: boolean;
 };
 
-export type DateFieldProps = DateFieldCommonProps & {
-  value: PlainDate | undefined;
-  onChange: (value: PlainDate | undefined) => void;
-};
+/** Value proposed by an AI model; puts the field in AI mode. */
+type ProposedValue<V> = { proposedValue?: V };
 
-export type DateRangeFieldProps = DateFieldCommonProps & {
-  value: DateRange | undefined;
-  onChange: (value: DateRange | undefined) => void;
-};
+export type DateFieldProps = DateFieldCommonProps &
+  ProposedValue<PlainDate> & {
+    value: PlainDate | undefined;
+    onChange: (value: PlainDate | undefined) => void;
+  };
+
+export type DateRangeFieldProps = DateFieldCommonProps &
+  ProposedValue<DateRange> & {
+    value: DateRange | undefined;
+    onChange: (value: DateRange | undefined) => void;
+  };
 
 type DateSingleFieldBaseProps = DateFieldProps & {
   mode: "single";
@@ -76,6 +82,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     disabled,
     required,
     value,
+    proposedValue,
     onFocus,
     onBlur,
     // Pull `onChange` out of the props, but we're not directly using it. Do not want to keep it in `...others`
@@ -103,12 +110,21 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   // Local focus ref used to avoid updating WIP values
   const isFocused = useRef(false);
   const dateFormat = getDateFormat(format);
+
+  const formatForDisplay = (v: PlainDate | DateRange | undefined) =>
+    (isRangeMode
+      ? formatDateRange(v as DateRange | undefined, dateFormat)
+      : formatDate(v as PlainDate | undefined, dateFormat)) ?? "";
+  const { effectiveValue, proposalProps } = useAiProposal<PlainDate | DateRange>(
+    value,
+    proposedValue,
+    formatForDisplay,
+  );
+
   // The `wipValue` allows the "range" mode to set the value to `undefined`, even if the `onChange` response cannot be undefined.
   // This makes working within the DateRangePicker much more user-friendly.
-  const [wipValue, setWipValue] = useState(value);
-  const [inputValue, setInputValue] = useState(
-    (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
-  );
+  const [wipValue, setWipValue] = useState(effectiveValue);
+  const [inputValue, setInputValue] = useState(formatForDisplay(effectiveValue));
   const tid = useTestIds(props, defaultTestId(label));
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
@@ -137,8 +153,8 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           // When focused, change to use the "short" date format, as it is simpler to update by hand and parse.
           setInputValue(
             (isRangeMode
-              ? formatDateRange(props.value, dateFormats.short)
-              : formatDate(props.value, dateFormats.short)) ?? "",
+              ? formatDateRange(effectiveValue as DateRange | undefined, dateFormats.short)
+              : formatDate(effectiveValue as PlainDate | undefined, dateFormats.short)) ?? "",
           );
         }
       },
@@ -160,15 +176,11 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
           : parseDate(inputValue, dateFormats.short);
         // If the user leaves the input and has an invalid date, reset to previous value.
         if (!isParsedDateValid(parsedDate)) {
-          setWipValue(value);
-          setInputValue(
-            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
-          );
+          setWipValue(effectiveValue);
+          setInputValue(formatForDisplay(effectiveValue));
         } else if (dateFormat !== dateFormats.short) {
           // Or if we need to reset the dateFormat back from `short` to whatever the user specified
-          setInputValue(
-            (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
-          );
+          setInputValue(formatForDisplay(effectiveValue));
         }
 
         // Only call `onBlur` if the DatePicker is closed, meaning the user has actually left the DateField component.
@@ -206,18 +218,18 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   useEffect(() => {
     // Avoid updating any WIP values.
     if (!isFocused.current && !state.isOpen) {
-      setWipValue(value);
-      setInputValue(
-        (isRangeMode ? formatDateRange(props.value, dateFormat) : formatDate(props.value, dateFormat)) ?? "",
-      );
+      setWipValue(effectiveValue);
+      setInputValue(formatForDisplay(effectiveValue));
     }
     // We don't want to update the internal `wipValue` or `inputValue` back to `value` just because focus state changes or the overlay opens
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, dateFormat]);
+  }, [effectiveValue, dateFormat]);
 
   // Create a type safe `onChange` to handle both Single and Range date fields.
   const onChange = useCallback(
     (d: PlainDate | DateRange | undefined) => {
+      // Covers the calendar overlay too, which never touches the input.
+      proposalProps.onUserEdit?.();
       setWipValue(d);
       if (d && isParsedDateValid(d)) {
         if (isRangeMode && isDateRangeValue(d)) {
@@ -299,6 +311,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         inputProps={{ ...inputProps, size: inputSize, onClick: state.open }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
+        {...proposalProps}
         onChange={(v) => {
           // hide the calendar if the user is manually entering the date
           state.close();

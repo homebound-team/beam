@@ -1,4 +1,4 @@
-import { change, render, type } from "@homebound/rtl-utils";
+import { blur, change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
@@ -344,6 +344,87 @@ describe("formatValue function", () => {
       expect(formatValue(value, factor, numFractionDigits, numIntegerDigits)).toBe(expected);
     },
   );
+});
+
+describe("AI mode", () => {
+  it("formats both values the way the field formats a typed value", async () => {
+    const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
+    expect(r.age_originalValue).toHaveTextContent("20");
+    expect(r.age).toHaveValue("25");
+  });
+
+  it.each([
+    ["cents" as const, 1000, 2050, "$10.00", "$20.50"],
+    ["dollars" as const, 1000.5, 2050.25, "$1,000.50", "$2,050.25"],
+    ["percent" as const, 20, 25, "20%", "25%"],
+  ])("applies the field's %s formatting", async (type, value, proposed, original, input) => {
+    const r = await render(<TestNumberField label="Price" type={type} value={value} proposedValue={proposed} />);
+    expect(r.price_originalValue).toHaveTextContent(original);
+    expect(r.price).toHaveValue(input);
+  });
+
+  it("keeps a zero original visible", async () => {
+    // `0` is falsy, so this guards the original from being dropped as if it were absent
+    const r = await render(<TestNumberField label="Age" value={0} proposedValue={5} />);
+    expect(r.age_originalValue).toHaveTextContent("0");
+    expect(r.age).toHaveValue("5");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
+  });
+
+  it("does not commit when the user tabs through without editing", async () => {
+    // Reviewing a form by tabbing through it shouldn't silently accept proposals
+    const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
+    lastSet = undefined;
+    focus(r.age);
+    expect(r.age).toHaveValue("25");
+    blur(r.age);
+    expect(lastSet).toBeUndefined();
+    // Tabbing through leaves both halves in place
+    expect(r.age).toHaveValue("25");
+    expect(r.age_originalValue).toHaveTextContent("20");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
+  });
+
+  it("ends AI mode when the user rejects by re-entering the on-record value", async () => {
+    // 20 on record, 25 proposed, user types 20 back. `value` never changes, so this can only work
+    // off the edit event — the regression that made the field impossible to reject into.
+    const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
+    expect(r.age).toHaveValue("25");
+    type(r.age, "20");
+    expect(r.age).toHaveValue("20");
+    expect(r.age).not.toHaveAttribute("data-ai-mode");
+    blur(r.age);
+    expect(r.age).toHaveValue("20");
+  });
+
+  it("stays out of AI mode if the user later re-enters the proposal", async () => {
+    const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
+    type(r.age, "20");
+    type(r.age, "25");
+    expect(r.age).toHaveValue("25");
+    expect(r.age).not.toHaveAttribute("data-ai-mode");
+  });
+
+  it("shows the proposal when readOnly", async () => {
+    const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} readOnly />);
+    expect(r.age_proposedValue).toHaveTextContent("20 25");
+  });
+
+  it("omits the original when the field was empty", async () => {
+    const r = await render(<TestNumberField label="Age" value={undefined} proposedValue={25} />);
+    expect(r.age).toHaveValue("25");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.age_originalValue).not.toBeInTheDocument();
+  });
+
+  it("commits on edit and drops the AI treatment", async () => {
+    const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
+    type(r.age, "30");
+    expect(lastSet).toBe(30);
+    expect(r.age).not.toHaveAttribute("data-ai-mode");
+    expect(r.age).toHaveValue("30");
+  });
 });
 
 function TestNumberField(props: Omit<NumberFieldProps, "onChange">) {

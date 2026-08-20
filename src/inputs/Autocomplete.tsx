@@ -4,6 +4,7 @@ import { Item, useComboBoxState } from "react-stately";
 import { Icon } from "src/components";
 import { Popover } from "src/components/internal";
 import { PresentationFieldProps } from "src/components/PresentationContext";
+import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
@@ -30,7 +31,7 @@ export type AutocompleteProps<T> = {
   /** A list of options that are disabled. Can be either the option itself or an object with the option and a reason why it is disabled */
   disabledOptions?: (Value | { value: Value; reason: string })[];
 } & Pick<PresentationFieldProps, "labelStyle"> &
-  Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth">;
+  Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth" | "proposedValue">;
 
 export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
   const {
@@ -39,12 +40,15 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     getOptionValue,
     getOptionMenuLabel,
     onInputChange,
-    value = "",
+    value,
+    proposedValue,
     options,
     disabled,
     disabledOptions,
     ...others
   } = props;
+
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
 
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
@@ -63,7 +67,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     isDisabled: !!disabled,
     disabledKeys: Object.keys(disabledOptionsWithReasons),
     onInputChange: onInputChange,
-    inputValue: value,
+    inputValue: effectiveValue ?? "",
     items: options,
     // Allow the user to type in a value that is not in the list. Allows for the text to stay in the input when the user clicks away
     allowsCustomValue: true,
@@ -72,6 +76,9 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
       if (key == null) return;
       const selectedItem = options.find((i) => getOptionValue(i) === key);
       if (selectedItem) {
+        // Selecting only updates the controlled `inputValue`, so no DOM change event reaches
+        // `TextFieldBase` — end AI mode here instead.
+        proposalProps.onUserEdit?.();
         onInputChange(getOptionLabel(selectedItem));
         onSelect(selectedItem);
       }
@@ -121,6 +128,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
         inputProps={inputProps}
         labelProps={labelProps}
         onChange={onInputChange}
+        {...proposalProps}
         clearable
         // Respect if caller to passes in `startAdornment={undefined}`
         startAdornment={"startAdornment" in props ? props.startAdornment : <Icon icon="search" />}
