@@ -47,7 +47,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     ...otherProps
   } = props;
 
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
 
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
@@ -93,9 +93,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       inputRef={inputRef}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
       hideErrorMessage={hideErrorMessage}
-      proposedValue={isAiMode ? proposedValue : undefined}
-      originalValue={value}
-      onUserEdit={onUserEdit}
+      {...proposalProps}
     />
   );
 }

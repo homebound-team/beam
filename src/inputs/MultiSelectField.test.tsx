@@ -321,14 +321,13 @@ describe("MultiSelectFieldTest", () => {
   });
 
   describe("AI mode", () => {
-    it("shows both selections as joined labels rather than chips", async () => {
+    it("shows the struck original alongside the proposal's chips", async () => {
       // Given "One" on record and "Two, Three" proposed
       const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
-      // Then AI mode renders text, not chips, so the original can be struck through
-      // (labels follow the options' alphabetical `autoSort` order)
-      expect(r.age_proposedValue).toHaveTextContent("One Three, Two");
-      expect(r.age_proposedValue_original).toHaveTextContent("One");
-      expect(r.queryAllByTestId("chip")).toHaveLength(0);
+      // The struck original is text; the proposal keeps rendering as chips, as it does normally
+      // (alphabetical, per the options' `autoSort`)
+      expect(r.age_originalValue).toHaveTextContent("One");
+      expect(r.queryAllByTestId("chip").map((c) => c.textContent)).toEqual(["Three", "Two"]);
     });
 
     it("shows the proposed options as selected in the dropdown", async () => {
@@ -343,8 +342,9 @@ describe("MultiSelectFieldTest", () => {
 
     it("omits the original when nothing was on record", async () => {
       const r = await render(<TestMultiSelectField values={[]} proposedValues={["2"]} options={options} />);
-      expect(r.age_proposedValue).toHaveTextContent("Two");
-      expect(r.query.age_proposedValue_original).not.toBeInTheDocument();
+      expect(r.age).toHaveValue("Two");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
     });
 
     it("commits and drops the AI treatment when the selection changes", async () => {
@@ -353,7 +353,7 @@ describe("MultiSelectFieldTest", () => {
       selectOption(r, "One");
       // Then it commits through the usual onSelect, and the AI treatment drops
       expect([...onSelect.mock.calls[0][0]].sort()).toEqual(["1", "2", "3"]);
-      expect(r.query.age_proposedValue).not.toBeInTheDocument();
+      expect(r.age).not.toHaveAttribute("data-ai-mode");
     });
   });
 

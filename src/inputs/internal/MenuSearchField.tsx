@@ -11,7 +11,7 @@ interface TextFieldProps<X> extends BeamTextFieldProps<X> {}
 
 export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const { value, proposedValue } = props;
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
   const tid = useTestIds(props);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps } = useTextField({ ...props, value: effectiveValue }, inputRef);
@@ -22,9 +22,7 @@ export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFiel
       labelProps={labelProps}
       inputProps={inputProps}
       startAdornment={<Icon icon="search" />}
-      proposedValue={isAiMode ? proposedValue : undefined}
-      originalValue={value}
-      onUserEdit={onUserEdit}
+      {...proposalProps}
       {...tid.search}
     />
   );

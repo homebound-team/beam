@@ -118,15 +118,15 @@ describe("TextFieldTest", () => {
 describe("AI mode", () => {
   it("shows the original struck-through next to the proposal", async () => {
     const r = await render(<TestTextField value="Old Cottage" proposedValue="Janes Cottage" />);
-    expect(r.name_proposedValue).toHaveTextContent("Old Cottage Janes Cottage");
-    expect(r.name_proposedValue_original).toHaveTextContent("Old Cottage");
+    expect(r.name_originalValue).toHaveTextContent("Old Cottage");
     expect(r.name).toHaveValue("Janes Cottage");
   });
 
   it("omits the original when the field was empty", async () => {
     const r = await render(<TestTextField value={undefined} proposedValue="Janes Cottage" />);
-    expect(r.name_proposedValue).toHaveTextContent("Janes Cottage");
-    expect(r.query.name_proposedValue_original).not.toBeInTheDocument();
+    expect(r.name).toHaveValue("Janes Cottage");
+    expect(r.name).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.name_originalValue).not.toBeInTheDocument();
   });
 
   it("commits on edit and drops the AI treatment", async () => {
@@ -136,7 +136,7 @@ describe("AI mode", () => {
     // Then it commits through the usual onChange
     expect(lastSet).toBe("Janes Cottages");
     // And the field stops looking AI-proposed, even though proposedValue is still passed
-    expect(r.query.name_proposedValue).not.toBeInTheDocument();
+    expect(r.name).not.toHaveAttribute("data-ai-mode");
     expect(r.name).toHaveValue("Janes Cottages");
   });
 
@@ -145,12 +145,12 @@ describe("AI mode", () => {
     expect(r.name).toHaveValue("Janes Cottage");
     type(r.name, "Old Cottage");
     expect(r.name).toHaveValue("Old Cottage");
-    expect(r.query.name_proposedValue).not.toBeInTheDocument();
+    expect(r.name).not.toHaveAttribute("data-ai-mode");
   });
 
   it("stays a normal field without a proposal", async () => {
     const r = await render(<TestTextField value="Old Cottage" />);
-    expect(r.query.name_proposedValue).not.toBeInTheDocument();
+    expect(r.name).not.toHaveAttribute("data-ai-mode");
     expect(r.name).toHaveValue("Old Cottage");
   });
 });

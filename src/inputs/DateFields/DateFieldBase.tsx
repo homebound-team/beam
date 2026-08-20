@@ -111,11 +111,15 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const isFocused = useRef(false);
   const dateFormat = getDateFormat(format);
 
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal<PlainDate | DateRange>(value, proposedValue);
   const formatForDisplay = (v: PlainDate | DateRange | undefined) =>
     (isRangeMode
       ? formatDateRange(v as DateRange | undefined, dateFormat)
       : formatDate(v as PlainDate | undefined, dateFormat)) ?? "";
+  const { effectiveValue, proposalProps } = useAiProposal<PlainDate | DateRange>(
+    value,
+    proposedValue,
+    formatForDisplay,
+  );
 
   // The `wipValue` allows the "range" mode to set the value to `undefined`, even if the `onChange` response cannot be undefined.
   // This makes working within the DateRangePicker much more user-friendly.
@@ -225,7 +229,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
   const onChange = useCallback(
     (d: PlainDate | DateRange | undefined) => {
       // Covers the calendar overlay too, which never touches the input.
-      onUserEdit();
+      proposalProps.onUserEdit?.();
       setWipValue(d);
       if (d && isParsedDateValid(d)) {
         if (isRangeMode && isDateRangeValue(d)) {
@@ -307,9 +311,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         inputProps={{ ...inputProps, size: inputSize, onClick: state.open }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
-        proposedValue={isAiMode ? formatForDisplay(proposedValue) : undefined}
-        originalValue={formatForDisplay(value)}
-        onUserEdit={onUserEdit}
+        {...proposalProps}
         onChange={(v) => {
           // hide the calendar if the user is manually entering the date
           state.close();

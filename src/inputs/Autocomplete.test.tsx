@@ -166,7 +166,7 @@ describe("Autocomplete", () => {
     click(r.getByRole("option", { name: "User 2" }));
     // Then it sticks, rather than snapping back to the proposal
     expect(r.search).toHaveValue("User 2");
-    expect(r.query.search_proposedValue).not.toBeInTheDocument();
+    expect(r.search).not.toHaveAttribute("data-ai-mode");
   });
 
   it("shows an AI proposal next to the struck-through original", async () => {
@@ -183,8 +183,7 @@ describe("Autocomplete", () => {
         onSelect={() => {}}
       />,
     );
-    expect(r.search_proposedValue).toHaveTextContent("User 2 User 1");
-    expect(r.search_proposedValue_original).toHaveTextContent("User 2");
+    expect(r.search_originalValue).toHaveTextContent("User 2");
     expect(r.search).toHaveValue("User 1");
   });
 });

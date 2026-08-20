@@ -87,8 +87,6 @@ export function NumberField(props: NumberFieldProps) {
     ...otherProps
   } = props;
 
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
-
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
   const factor =
@@ -130,6 +128,12 @@ export function NumberField(props: NumberFieldProps) {
     return { ...defaultFormatOptions, ...typeFormat } as any;
   }, [type, numberFormatOptions, defaultFormatOptions, numFractionDigits]);
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
+
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale, formatOptions), [locale, formatOptions]);
+  const formatForDisplay = (v: number | undefined) =>
+    v === undefined ? undefined : numberFormatter.format(v / factor);
+
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue, formatForDisplay);
 
   // Keep a ref the last "before WIP" value that we passed into react-aria.
   //
@@ -209,10 +213,6 @@ export function NumberField(props: NumberFieldProps) {
   };
 
   // Same options react-aria formats the input with, so the display matches a typed-in value.
-  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale, formatOptions), [locale, formatOptions]);
-  const formatForDisplay = (v: number | undefined) =>
-    v === undefined ? undefined : numberFormatter.format(v / factor);
-
   const state = useNumberFieldState(useProps);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { labelProps, inputProps, groupProps } = useNumberField(useProps, state, inputRef);
@@ -246,9 +246,7 @@ export function NumberField(props: NumberFieldProps) {
       errorMsg={errorMsg}
       helperText={helperText}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
-      proposedValue={isAiMode ? formatForDisplay(proposedValue) : undefined}
-      originalValue={formatForDisplay(value)}
-      onUserEdit={onUserEdit}
+      {...proposalProps}
       {...otherProps}
     />
   );

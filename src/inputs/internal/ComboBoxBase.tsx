@@ -173,7 +173,14 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   );
 
   // `values` below — and with it the input and the dropdown's selection — reflects the proposal.
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(propValues, proposedValues);
+  // Resolves either side's keys into labels. As with `selectedOptions`, a lazily-loaded key that
+  // hasn't arrived yet won't resolve to a label.
+  const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
+    getAiDisplayValue(
+      options.filter((o) => (vs ?? []).includes(getOptionValue(o))),
+      getOptionLabel,
+    ),
+  );
 
   const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
   const inputStylePalette = useMemo(() => propsInputStylePalette, [propsInputStylePalette]);
@@ -181,13 +188,6 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   const selectedOptions = useMemo(
     () => options.filter((o) => values.includes(getOptionValue(o))),
     [options, values, getOptionValue],
-  );
-
-  // The struck-through original. As with `selectedOptions`, a lazily-loaded key that hasn't arrived
-  // yet won't resolve to a label.
-  const originalOptions = useMemo(
-    () => (isAiMode ? options.filter((o) => (propValues ?? []).includes(getOptionValue(o))) : []),
-    [isAiMode, options, propValues, getOptionValue],
   );
 
   const { contains } = useFilter({ sensitivity: "base" });
@@ -310,14 +310,14 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       // Selecting an option only updates the controlled `inputValue`, so no DOM change event reaches
       // `TextFieldBase` — end AI mode here instead.
       if (multiselect) {
-        onUserEdit();
+        proposalProps.onUserEdit?.();
         const keys = (newValue as AriaKey[]) ?? [];
         const newSelectedOptions = options.filter((o) => keys.includes(valueToKey(getOptionValue(o))));
         onSelect(keys.map(keyToValue) as V[], newSelectedOptions);
       } else {
         const key = newValue as AriaKey | null;
         if (key === selectedKeys[0]) return; // Skip if value hasn't changed
-        onUserEdit();
+        proposalProps.onUserEdit?.();
         if (key === null || key === undefined) {
           onSelect([], []);
           return;
@@ -433,9 +433,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
-        proposedValue={isAiMode ? getAiDisplayValue(selectedOptions, getOptionLabel) : undefined}
-        originalValue={getAiDisplayValue(originalOptions, getOptionLabel)}
-        onUserEdit={onUserEdit}
+        {...proposalProps}
       />
       {state.isOpen && (
         <Popover

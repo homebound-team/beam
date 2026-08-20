@@ -349,26 +349,26 @@ describe("formatValue function", () => {
 describe("AI mode", () => {
   it("formats both values the way the field formats a typed value", async () => {
     const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
-    expect(r.age_proposedValue).toHaveTextContent("20 25");
-    expect(r.age_proposedValue_original).toHaveTextContent("20");
+    expect(r.age_originalValue).toHaveTextContent("20");
     expect(r.age).toHaveValue("25");
   });
 
   it.each([
-    ["cents" as const, 1000, 2050, "$10.00 $20.50", "$20.50"],
-    ["dollars" as const, 1000.5, 2050.25, "$1,000.50 $2,050.25", "$2,050.25"],
-    ["percent" as const, 20, 25, "20% 25%", "25%"],
-  ])("applies the field's %s formatting", async (type, value, proposed, overlay, input) => {
+    ["cents" as const, 1000, 2050, "$10.00", "$20.50"],
+    ["dollars" as const, 1000.5, 2050.25, "$1,000.50", "$2,050.25"],
+    ["percent" as const, 20, 25, "20%", "25%"],
+  ])("applies the field's %s formatting", async (type, value, proposed, original, input) => {
     const r = await render(<TestNumberField label="Price" type={type} value={value} proposedValue={proposed} />);
-    expect(r.price_proposedValue).toHaveTextContent(overlay);
+    expect(r.price_originalValue).toHaveTextContent(original);
     expect(r.price).toHaveValue(input);
   });
 
   it("keeps a zero original visible", async () => {
     // `0` is falsy, so this guards the original from being dropped as if it were absent
     const r = await render(<TestNumberField label="Age" value={0} proposedValue={5} />);
-    expect(r.age_proposedValue_original).toHaveTextContent("0");
-    expect(r.age_proposedValue).toHaveTextContent("0 5");
+    expect(r.age_originalValue).toHaveTextContent("0");
+    expect(r.age).toHaveValue("5");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
   });
 
   it("does not commit when the user tabs through without editing", async () => {
@@ -379,7 +379,11 @@ describe("AI mode", () => {
     expect(r.age).toHaveValue("25");
     blur(r.age);
     expect(lastSet).toBeUndefined();
-    expect(r.age_proposedValue).toHaveTextContent("20 25");
+    // Tabbing through leaves both halves in place
+    expect(r.age).toHaveValue("25");
+    expect(r.age_originalValue).toHaveTextContent("20");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
   });
 
   it("ends AI mode when the user rejects by re-entering the on-record value", async () => {
@@ -389,7 +393,7 @@ describe("AI mode", () => {
     expect(r.age).toHaveValue("25");
     type(r.age, "20");
     expect(r.age).toHaveValue("20");
-    expect(r.query.age_proposedValue).not.toBeInTheDocument();
+    expect(r.age).not.toHaveAttribute("data-ai-mode");
     blur(r.age);
     expect(r.age).toHaveValue("20");
   });
@@ -399,7 +403,7 @@ describe("AI mode", () => {
     type(r.age, "20");
     type(r.age, "25");
     expect(r.age).toHaveValue("25");
-    expect(r.query.age_proposedValue).not.toBeInTheDocument();
+    expect(r.age).not.toHaveAttribute("data-ai-mode");
   });
 
   it("shows the proposal when readOnly", async () => {
@@ -409,15 +413,16 @@ describe("AI mode", () => {
 
   it("omits the original when the field was empty", async () => {
     const r = await render(<TestNumberField label="Age" value={undefined} proposedValue={25} />);
-    expect(r.age_proposedValue).toHaveTextContent("25");
-    expect(r.query.age_proposedValue_original).not.toBeInTheDocument();
+    expect(r.age).toHaveValue("25");
+    expect(r.age).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.age_originalValue).not.toBeInTheDocument();
   });
 
   it("commits on edit and drops the AI treatment", async () => {
     const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
     type(r.age, "30");
     expect(lastSet).toBe(30);
-    expect(r.query.age_proposedValue).not.toBeInTheDocument();
+    expect(r.age).not.toHaveAttribute("data-ai-mode");
     expect(r.age).toHaveValue("30");
   });
 });

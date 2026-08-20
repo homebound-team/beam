@@ -49,10 +49,12 @@ export type TextFieldBaseProps<X> = {
   unfocusedPlaceholder?: ReactNode;
   /** Value proposed by an AI model; puts the field in AI mode. Pre-formatted for display. */
   proposedValue?: string;
-  /** The formatted value on record, struck-through in AI mode. Ignored unless `proposedValue` is set. */
+  /** The formatted value on record, rendered struck through beside the input. Independent of `proposedValue`. */
   originalValue?: string;
   /** Called on any edit the user makes, so the owning field can end AI mode. */
   onUserEdit?: VoidFunction;
+  /** Called when the user leaves the field, so the owning field can retire the struck-through original. */
+  onUserBlur?: VoidFunction;
   /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
 } & Pick<
@@ -115,6 +117,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     proposedValue,
     originalValue,
     onUserEdit,
+    onUserBlur,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? "sm";
@@ -133,6 +136,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   // Takes precedence over the `inputStylePalette` / `borderless` / `borderOnHover` backgrounds below.
   const showProposal = proposedValue !== undefined;
+  // Rendered as a sibling of the input rather than an overlay, so it survives focus.
+  const showOriginal = originalValue !== undefined && originalValue !== "";
 
   const [bgColor, hoverBgColor, disabledBgColor] = showProposal
     ? [Tokens.AiFieldBg, Palette.Purple100, Tokens.FieldBgDisabled]
@@ -200,6 +205,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$
         : Css.truncate.$),
+      ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
     },
     hover: Css.bgColor(hoverBgColor).bc(Tokens.FieldBorderHover).$,
     focus: Css.bc(Tokens.FieldBorderFocus).bgColor(hoverBgColor).if(borderOnHover).bc(Tokens.FieldBorderFocus).$,
@@ -233,27 +239,21 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     fieldRef.current?.click();
   }
 
-  // Reusing the placeholder machinery gets us hide-the-input-while-unfocused and click-to-focus for
-  // free. It replaces any caller placeholder (MultiSelect's chips) — struck-through chips read badly.
-  const effectiveUnfocusedPlaceholder = showProposal ? (
-    <ProposedValue original={originalValue} proposed={proposedValue} {...tid.proposedValue} />
-  ) : (
-    unfocusedPlaceholder
-  );
-
   const showFocus = (isFocused && !inputProps.readOnly) || forceFocus;
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
   const fieldElementProps = mergeProps(
     inputProps,
-    { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+    { onBlur: chain(() => maybeCall(onUserBlur), onBlur), onFocus: onFocusChained, onChange: onDomChange },
     { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
+    // Mirrors `data-readonly`, so callers and tests can see the AI treatment without reading styles.
+    { ...(showProposal ? { "data-ai-mode": "true" } : {}) },
   );
   const errorMessageProps = errorMsg ? { "aria-errormessage": errorMessageId } : {};
   const fieldElementCss = {
     ...fieldStyles.input,
     ...(inputProps.disabled ? fieldStyles.disabled : {}),
     ...(showHover ? fieldStyles.hover : {}),
-    ...(effectiveUnfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
+    ...(unfocusedPlaceholder && !isFocused && Css.visuallyHidden.$),
     ...xss,
   };
 
@@ -283,15 +283,20 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...xss,
               }}
               data-readonly="true"
+              data-ai-mode={showProposal ? "true" : undefined}
               {...tid}
             >
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {showProposal ? (
-                // Read-only renders no input, so the placeholder machinery above doesn't apply. Checked
+                // Read-only renders no input at all, so both halves are drawn as text here. Checked
                 // before `multiline` so a read-only TextAreaField still shows the struck-through original.
-                <ProposedValue original={originalValue} proposed={proposedValue} {...tid.proposedValue} />
+                <ProposedValue
+                  original={showOriginal ? originalValue : undefined}
+                  proposed={proposedValue}
+                  {...tid.proposedValue}
+                />
               ) : multiline ? (
                 (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
                   <p key={i} css={Css.py1.$}>
@@ -322,13 +327,21 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               className={BorderHoverChild}
               {...hoverProps}
               ref={inputWrapRef as any}
-              onClick={effectiveUnfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
+              onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
             >
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
-              {effectiveUnfocusedPlaceholder && (
+              {showOriginal && (
+                <span
+                  css={Css.df.aic.fs0.pr1.tdlt.color(Tokens.OnSurfaceMuted).if(multiline).asfs.pyPx(11).$}
+                  {...tid.originalValue}
+                >
+                  {originalValue}
+                </span>
+              )}
+              {unfocusedPlaceholder && (
                 <div
                   // Setting -1 tabIndex as this is a scrollable container, which is focusable by default.
                   // However, we want the user's focus to move to the field element, which will hide this container.
@@ -344,7 +357,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                     ...(isFocused && Css.visuallyHidden.$),
                   }}
                 >
-                  {effectiveUnfocusedPlaceholder}
+                  {unfocusedPlaceholder}
                 </div>
               )}
               {multiline ? (

@@ -48,7 +48,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     ...others
   } = props;
 
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
 
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
@@ -78,7 +78,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
       if (selectedItem) {
         // Selecting only updates the controlled `inputValue`, so no DOM change event reaches
         // `TextFieldBase` — end AI mode here instead.
-        onUserEdit();
+        proposalProps.onUserEdit?.();
         onInputChange(getOptionLabel(selectedItem));
         onSelect(selectedItem);
       }
@@ -128,9 +128,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
         inputProps={inputProps}
         labelProps={labelProps}
         onChange={onInputChange}
-        proposedValue={isAiMode ? proposedValue : undefined}
-        originalValue={value}
-        onUserEdit={onUserEdit}
+        {...proposalProps}
         clearable
         // Respect if caller to passes in `startAdornment={undefined}`
         startAdornment={"startAdornment" in props ? props.startAdornment : <Icon icon="search" />}

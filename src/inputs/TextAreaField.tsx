@@ -32,7 +32,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
     maxLines,
     ...otherProps
   } = props;
-  const { isAiMode, effectiveValue, onUserEdit } = useAiProposal(value, proposedValue);
+  const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
   const textFieldProps = { ...otherProps, value: effectiveValue ?? "", isDisabled, isReadOnly };
@@ -76,9 +76,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       inputWrapRef={inputWrapRef}
       textAreaMinHeight={preventNewLines ? 0 : undefined}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
-      proposedValue={isAiMode ? proposedValue : undefined}
-      originalValue={value}
-      onUserEdit={onUserEdit}
+      {...proposalProps}
     />
   );
 }

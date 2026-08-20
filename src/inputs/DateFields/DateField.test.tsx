@@ -83,8 +83,7 @@ describe("DateField", () => {
   describe("AI mode", () => {
     it("shows the original struck-through next to the proposal", async () => {
       const r = await render(<DateField value={jan2} proposedValue={jan29} label="Date" onChange={noop} />);
-      expect(r.date_proposedValue).toHaveTextContent("01/02/20 01/29/20");
-      expect(r.date_proposedValue_original).toHaveTextContent("01/02/20");
+      expect(r.date_originalValue).toHaveTextContent("01/02/20");
       expect(r.date).toHaveValue("01/29/20");
     });
 
@@ -92,13 +91,15 @@ describe("DateField", () => {
       const r = await render(
         <DateField value={jan2} proposedValue={jan29} label="Date" onChange={noop} format="medium" />,
       );
-      expect(r.date_proposedValue).toHaveTextContent("Thu, Jan 2 Wed, Jan 29");
+      expect(r.date_originalValue).toHaveTextContent("Thu, Jan 2");
+      expect(r.date).toHaveValue("Wed, Jan 29");
     });
 
     it("omits the original when the field was empty", async () => {
       const r = await render(<DateField value={undefined} proposedValue={jan29} label="Date" onChange={noop} />);
-      expect(r.date_proposedValue).toHaveTextContent("01/29/20");
-      expect(r.query.date_proposedValue_original).not.toBeInTheDocument();
+      expect(r.date).toHaveValue("01/29/20");
+      expect(r.date).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.date_originalValue).not.toBeInTheDocument();
     });
 
     it("ends AI mode when a date is picked from the calendar", async () => {
@@ -108,7 +109,7 @@ describe("DateField", () => {
       click(r.date);
       click(r.datePickerDay_0);
       expect(r.date).toHaveValue("01/01/20");
-      expect(r.query.date_proposedValue).not.toBeInTheDocument();
+      expect(r.date).not.toHaveAttribute("data-ai-mode");
     });
 
     it("commits on edit and drops the AI treatment", async () => {
@@ -116,7 +117,7 @@ describe("DateField", () => {
       // When the user types a different date
       type(r.date, "01/01/20");
       // Then it commits, and the field stops looking AI-proposed
-      expect(r.query.date_proposedValue).not.toBeInTheDocument();
+      expect(r.date).not.toHaveAttribute("data-ai-mode");
       expect(r.date).toHaveValue("01/01/20");
     });
   });

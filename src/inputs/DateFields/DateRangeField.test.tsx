@@ -135,8 +135,7 @@ describe("DateRangeField", () => {
         onChange={noop}
       />,
     );
-    expect(r.date_proposedValue).toHaveTextContent("01/02/20 - 01/10/20 01/01/20 - 01/19/20");
-    expect(r.date_proposedValue_original).toHaveTextContent("01/02/20 - 01/10/20");
+    expect(r.date_originalValue).toHaveTextContent("01/02/20 - 01/10/20");
     expect(r.date).toHaveValue("01/01/20 - 01/19/20");
   });
 });

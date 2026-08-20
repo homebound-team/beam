@@ -740,8 +740,7 @@ describe("SelectFieldTest", () => {
         />,
       );
       // Then both keys are resolved to their labels
-      expect(r.age_proposedValue).toHaveTextContent("One Three");
-      expect(r.age_proposedValue_original).toHaveTextContent("One");
+      expect(r.age_originalValue).toHaveTextContent("One");
       expect(r.age).toHaveValue("Three");
     });
 
@@ -780,7 +779,9 @@ describe("SelectFieldTest", () => {
       // Then nothing changed from the dropdown's perspective, so nothing commits and the field
       // stays in AI mode. Accepting an untouched proposal is the caller's job (i.e. "Accept all").
       expect(onSelect).not.toHaveBeenCalled();
-      expect(r.age_proposedValue).toHaveTextContent("One Three");
+      expect(r.age).toHaveValue("Three");
+      expect(r.age_originalValue).toHaveTextContent("One");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
     });
 
     it("commits and drops the AI treatment when the user picks some third option", async () => {
@@ -795,7 +796,7 @@ describe("SelectFieldTest", () => {
         />,
       );
       select(r.age, "2");
-      expect(r.query.age_proposedValue).not.toBeInTheDocument();
+      expect(r.age).not.toHaveAttribute("data-ai-mode");
       expect(r.age).toHaveValue("Two");
     });
 
@@ -815,7 +816,7 @@ describe("SelectFieldTest", () => {
       select(r.age, "1");
       // Then it sticks, rather than snapping back to the proposal
       expect(r.age).toHaveValue("One");
-      expect(r.query.age_proposedValue).not.toBeInTheDocument();
+      expect(r.age).not.toHaveAttribute("data-ai-mode");
     });
 
     it("omits the original when nothing was on record", async () => {
@@ -829,8 +830,9 @@ describe("SelectFieldTest", () => {
           getOptionValue={(o) => o.id}
         />,
       );
-      expect(r.age_proposedValue).toHaveTextContent("Three");
-      expect(r.query.age_proposedValue_original).not.toBeInTheDocument();
+      expect(r.age).toHaveValue("Three");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
     });
   });
 

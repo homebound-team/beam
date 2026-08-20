@@ -51,13 +51,12 @@ describe("TextAreaFieldTest", () => {
 describe("AI mode", () => {
   it("shows the original struck-through next to the proposal", async () => {
     const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" />);
-    expect(r.note_proposedValue).toHaveTextContent("Old note New note");
-    expect(r.note_proposedValue_original).toHaveTextContent("Old note");
+    expect(r.note_originalValue).toHaveTextContent("Old note");
     expect(r.note).toHaveValue("New note");
   });
 
   it("shows the struck-through original when readOnly", async () => {
-    // readOnly + multiline takes a separate render path that skipped the proposal entirely
+    // readOnly renders no input, so both halves are drawn as text on this separate path
     const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" readOnly />);
     expect(r.note_proposedValue).toHaveTextContent("Old note New note");
     expect(r.note_proposedValue_original).toHaveTextContent("Old note");
@@ -67,7 +66,7 @@ describe("AI mode", () => {
     const r = await render(<TestTextAreaField value="Old note" proposedValue="New note" />);
     type(r.note, "New notes");
     expect(lastSet).toBe("New notes");
-    expect(r.query.note_proposedValue).not.toBeInTheDocument();
+    expect(r.note).not.toHaveAttribute("data-ai-mode");
   });
 });
 

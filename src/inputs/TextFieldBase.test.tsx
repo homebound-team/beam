@@ -51,42 +51,38 @@ describe("TextFieldBase", () => {
   });
 
   describe("AI mode", () => {
-    it("shows the original struck-through next to the proposal", async () => {
+    it("renders the original struck through beside the input", async () => {
       const r = await render(
         <TextFieldBase inputProps={{ value: "Down" }} label="Test" originalValue="Up" proposedValue="Down" />,
       );
-      expect(r.test_proposedValue).toHaveTextContent("Up Down");
-      expect(r.test_proposedValue_original).toHaveTextContent("Up");
-      expect(r.test_proposedValue_original).toHaveStyle({ textDecoration: "line-through" });
+      // The proposal is the input's own value, styled — not a painted copy
+      expect(r.test).toHaveValue("Down");
+      expect(r.test).toHaveAttribute("data-ai-mode", "true");
+      expect(r.test_originalValue).toHaveTextContent("Up");
+      expect(r.test_originalValue).toHaveStyle({ textDecoration: "line-through" });
+    });
+
+    it("keeps the original visible on focus", async () => {
+      // The whole point of it being a sibling rather than an overlay
+      const r = await render(
+        <TextFieldBase inputProps={{ value: "Down" }} label="Test" originalValue="Up" proposedValue="Down" />,
+      );
+      focus(r.test);
+      expect(r.test_originalValue).toBeInTheDocument();
+      expect(r.test).toHaveAttribute("data-ai-mode", "true");
+      expect(r.test).not.toHaveStyle({ position: "absolute" });
     });
 
     it("omits the original when the field had no prior value", async () => {
       const r = await render(
         <TextFieldBase inputProps={{ value: "Janes Cottage" }} label="Test" proposedValue="Janes Cottage" />,
       );
-      expect(r.test_proposedValue).toHaveTextContent("Janes Cottage");
-      expect(r.query.test_proposedValue_original).not.toBeInTheDocument();
+      expect(r.test).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.test_originalValue).not.toBeInTheDocument();
     });
 
-    it("reveals the input holding the proposal on focus", async () => {
-      const r = await render(
-        <TextFieldBase inputProps={{ value: "Down" }} label="Test" originalValue="Up" proposedValue="Down" />,
-      );
-      // Given the proposal is shown as an overlay, with the input hidden behind it
-      expect(r.test_unfocusedPlaceholderContainer).not.toHaveStyle({ position: "absolute" });
-      expect(r.test).toHaveStyle({ position: "absolute" });
-
-      // When we focus the field
-      focus(r.test);
-
-      // Then the overlay hides and the input, holding the proposal, is editable
-      expect(r.test_unfocusedPlaceholderContainer).toHaveStyle({ position: "absolute" });
-      expect(r.test).not.toHaveStyle({ position: "absolute" });
-      expect(r.test).toHaveValue("Down");
-    });
-
-    it("replaces a caller-provided unfocusedPlaceholder", async () => {
-      // I.e. MultiSelect's chips, which don't read well struck-through
+    it("leaves a caller-provided unfocusedPlaceholder alone", async () => {
+      // AI mode no longer hijacks the slot, so MultiSelect keeps rendering its chips
       const r = await render(
         <TextFieldBase
           inputProps={{ value: "Blue" }}
@@ -96,12 +92,12 @@ describe("TextFieldBase", () => {
           proposedValue="Blue"
         />,
       );
-      expect(r.test_unfocusedPlaceholderContainer).not.toHaveTextContent("chips go here");
-      expect(r.test_proposedValue).toHaveTextContent("Green Blue");
+      expect(r.test_unfocusedPlaceholderContainer).toHaveTextContent("chips go here");
+      expect(r.test_originalValue).toHaveTextContent("Green");
     });
 
-    it("shows the proposal when readOnly", async () => {
-      // readOnly fields don't render an input at all, so they take a separate path
+    it("shows both halves as text when readOnly", async () => {
+      // readOnly renders no input at all, so it takes a separate path
       const r = await render(
         <TextFieldBase
           inputProps={{ value: "Down", readOnly: true }}
@@ -114,10 +110,17 @@ describe("TextFieldBase", () => {
       expect(r.test_proposedValue).toHaveTextContent("Up Down");
     });
 
-    it("stays a normal field when there is no proposal", async () => {
-      const r = await render(<TextFieldBase inputProps={{ value: "Up" }} label="Test" originalValue="Up" />);
-      expect(r.query.test_proposedValue).not.toBeInTheDocument();
-      expect(r.query.test_unfocusedPlaceholderContainer).not.toBeInTheDocument();
+    it("renders the original independently of the proposal", async () => {
+      // After the user types, the proposal styling is gone but the original stays as a reference
+      const r = await render(<TextFieldBase inputProps={{ value: "Sideways" }} label="Test" originalValue="Up" />);
+      expect(r.test).not.toHaveAttribute("data-ai-mode");
+      expect(r.test_originalValue).toHaveTextContent("Up");
+    });
+
+    it("stays a normal field when there is neither", async () => {
+      const r = await render(<TextFieldBase inputProps={{ value: "Up" }} label="Test" />);
+      expect(r.test).not.toHaveAttribute("data-ai-mode");
+      expect(r.query.test_originalValue).not.toBeInTheDocument();
     });
   });
 });
