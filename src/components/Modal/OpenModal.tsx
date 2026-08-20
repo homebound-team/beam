@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Modal, ModalProps } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 
-export type OpenModalProps = {
+export interface OpenModalProps {
   /** The custom modal content to show. */
   children: JSX.Element;
   /** The size to use. */
@@ -11,7 +11,7 @@ export type OpenModalProps = {
   keepOpen?: boolean;
   /** Applies the Blueprint AI style */
   aiMode?: boolean;
-};
+}
 
 /**
  * A component for testing open modals in stories and unit tests.

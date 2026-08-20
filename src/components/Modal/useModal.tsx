@@ -5,18 +5,17 @@ import { maybeCall } from "src/utils";
 import { ModalApi, ModalProps } from "./Modal";
 import { useModalContext } from "./ModalContext";
 
-export type UseModalHook = {
+export interface UseModalHook {
   openModal: (props: ModalProps) => void;
   closeModal: VoidFunction;
   addCanClose: (canClose: CheckFn) => void;
   setSize: (size: ModalProps["size"]) => void;
   inModal: boolean;
-  aiMode: boolean;
-};
+}
 
 export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
-  const { inModal, aiMode } = useModalContext();
+  const { inModal } = useModalContext();
   const lastCanClose = useRef<CheckFn | undefined>();
   const api = useRef<ModalApi>();
   useEffect(() => {
@@ -56,8 +55,7 @@ export function useModal(): UseModalHook {
         }
       },
       inModal,
-      aiMode,
     }),
-    [inModal, aiMode, modalState, modalCanCloseChecks],
+    [inModal, modalState, modalCanCloseChecks],
   );
 }

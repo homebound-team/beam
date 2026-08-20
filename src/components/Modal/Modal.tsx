@@ -42,7 +42,7 @@ export type ModalProps = {
    * */
   allowClosing?: boolean;
   /**
-   * Applies the Blueprint AI style: AiLogo, gradient title, ai primary action variant
+   * Applies the Blueprint AI style: AiLogo & gradient title
    */
   aiMode?: boolean;
 };
@@ -148,7 +148,7 @@ export function Modal(props: ModalProps) {
   );
 
   return (
-    <ModalProvider aiMode={aiMode}>
+    <ModalProvider>
       <OverlayContainer>
         <AutoSaveStatusProvider>
           <div css={Css.underlay.z(zIndices.modalUnderlay).$} {...underlayProps} {...testId.underlay}>

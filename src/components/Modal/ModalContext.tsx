@@ -1,19 +1,17 @@
 import { createContext, ReactNode, useContext, useMemo } from "react";
 
-type ModalContextState = {
+interface ModalContextState {
   inModal: boolean;
-  aiMode: boolean;
-};
+}
 
-export const ModalContext = createContext<ModalContextState>({ inModal: false, aiMode: false });
+export const ModalContext = createContext<ModalContextState>({ inModal: false });
 
-type ModalProviderProps = {
+interface ModalProviderProps {
   children: ReactNode;
-  aiMode?: boolean;
-};
+}
 
-export function ModalProvider({ children, aiMode = false }: ModalProviderProps) {
-  const value = useMemo(() => ({ inModal: true, aiMode }), [aiMode]);
+export function ModalProvider({ children }: ModalProviderProps) {
+  const value = useMemo(() => ({ inModal: true }), []);
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }
 

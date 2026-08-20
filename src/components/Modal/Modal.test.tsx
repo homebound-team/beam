@@ -101,18 +101,6 @@ describe("Modal", () => {
       expect(r.modal_aiTitle.querySelector("svg")).toBeTruthy();
       expect(r.modal_aiTitle).toContainElement(r.modal_title);
     });
-
-    it("is readable from useModal so content can style its own actions", async () => {
-      // Given content that reads `aiMode` back off the modal
-      function AiAwareContent() {
-        const { aiMode } = useModal();
-        return <ModalBody>{aiMode ? "ai" : "not ai"}</ModalBody>;
-      }
-      // When rendered with `aiMode`
-      const r = await render(<TestModalApp aiMode content={<AiAwareContent />} />);
-      // Then expect the content to see it
-      expect(r.modal_content.textContent).toBe("ai");
-    });
   });
 
   it("supports testing modal components on their own", async () => {

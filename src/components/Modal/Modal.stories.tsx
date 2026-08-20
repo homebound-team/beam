@@ -216,8 +216,7 @@ function AiModalExample(props: AiModalContentProps) {
 type AiModalContentProps = { withBanner?: boolean; numSentences?: number };
 
 function AiModalContent({ withBanner, numSentences = 1 }: AiModalContentProps) {
-  // The content doesn't know how it was opened, so it reads `aiMode` back off the modal to style its actions.
-  const { aiMode, closeModal } = useModal();
+  const { closeModal } = useModal();
   return (
     <>
       <ModalHeader>Import From Document</ModalHeader>
@@ -231,7 +230,7 @@ function AiModalContent({ withBanner, numSentences = 1 }: AiModalContentProps) {
       </ModalBody>
       <ModalFooter>
         <Button label="Cancel" onClick={closeModal} variant="quaternary" />
-        <Button label="Import" onClick={noop} variant={aiMode ? "ai" : "primary"} />
+        <Button label="Import" onClick={noop} variant="ai" />
       </ModalFooter>
     </>
   );
