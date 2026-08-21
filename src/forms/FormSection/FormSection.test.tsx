@@ -57,7 +57,8 @@ describe("FormSection", () => {
     // Given a top-level FormSection
     // When rendered
     const r = await render(<FormSection title="Trade Partners" />);
-    // Then it renders at the section (lg) heading size
+    // Then it renders as an h3 at the section (lg) heading size
+    expect(r.formSection_title.tagName).toBe("H3");
     expect(r.formSection_title).toHaveStyle({ fontSize: "18px" });
   });
 
@@ -77,10 +78,11 @@ describe("FormSection", () => {
     expect(r.formSection_title).toHaveTextContent("Trade Partners");
     expect(r.electricalFields).toBeInTheDocument();
     expect(r.plumbingFields).toBeInTheDocument();
-    // And each child section's title renders at the child heading size
-    [r.formSection_childSection_title_0, r.formSection_childSection_title_1].forEach((title) =>
-      expect(title).toHaveStyle({ fontSize: "16px" }),
-    );
+    // And each child section's title renders as an h4 at the child heading size
+    [r.formSection_childSection_header_title_0, r.formSection_childSection_header_title_1].forEach((title) => {
+      expect(title.tagName).toBe("H4");
+      expect(title).toHaveStyle({ fontSize: "16px" });
+    });
   });
 
   it("does not render a DnDGrid or drag handles when childSections have no orderField", async () => {
@@ -184,8 +186,8 @@ describe("FormSection", () => {
       />,
     );
     // Then they render in orderField order (Electrical first), not array order
-    expect(r.formSection_childSection_title_0).toHaveTextContent("Electrical");
-    expect(r.formSection_childSection_title_1).toHaveTextContent("Plumbing");
+    expect(r.formSection_childSection_header_title_0).toHaveTextContent("Electrical");
+    expect(r.formSection_childSection_header_title_1).toHaveTextContent("Plumbing");
   });
 
   it("permutes existing (non-zero-based) order values rather than resetting them to 0-based indices", async () => {

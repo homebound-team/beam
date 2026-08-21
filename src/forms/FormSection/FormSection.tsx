@@ -1,23 +1,18 @@
 import { ReactNode } from "react";
-import { Button, ButtonProps } from "src/components/Button";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
-import { IconButton, IconButtonProps } from "src/components/IconButton";
-import { Css, Tokens } from "src/Css";
+import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { HeaderAction } from "src/components/Headers/HeaderActions";
+import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 import { FormSectionChild, type PlainFormSectionChild, type ReorderableFormSectionChild } from "./FormSectionChild";
 
-/**
- * An action in a `FormSection`/`FormSectionLayout` title row — a `Button`, or an icon-only `IconButton` via `kind: "icon"`.
- * Uses `kind` rather than `type` since `ButtonProps` already has its own `type` (button/submit/reset).
- */
-export type FormSectionAction =
-  | ({ kind?: "default" } & ButtonProps)
-  | ({ kind: "icon" } & Omit<IconButtonProps, "variant">);
+/** @see {@link HeaderAction} */
+export type FormSectionAction = HeaderAction;
 
 export type FormSectionProps = {
   title: string;
   description?: ReactNode;
-  actions?: FormSectionAction[];
+  actions?: HeaderAction[];
   fields?: ReactNode;
   childSections?: PlainFormSectionChild[] | ReorderableFormSectionChild[];
 };
@@ -27,32 +22,8 @@ export function FormSection(props: FormSectionProps) {
   const tid = useTestIds(props, "formSection");
 
   return (
-    <div css={Css.df.fdc.gap2.$} {...tid}>
-      <div css={Css.df.fdc.gapPx(12).$}>
-        <div css={Css.df.jcsb.$}>
-          <div css={Css.df.aic.gap1.$}>
-            <h2 css={Css.lg.$} {...tid.title}>
-              {title}
-            </h2>
-          </div>
-          {actions && (
-            <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-              {actions.map((action) =>
-                action.kind === "icon" ? (
-                  <IconButton key={action.icon} {...action} variant="outline" />
-                ) : (
-                  <Button key={`${action.label}`} {...action} />
-                ),
-              )}
-            </div>
-          )}
-        </div>
-        {description && (
-          <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-            {description}
-          </div>
-        )}
-      </div>
+    <div css={Css.df.fdc.gap2.$}>
+      <ContentHeader {...tid} title={title} description={description} actions={actions} level={3} />
       {fields}
       {childSections &&
         (isReorderable(childSections) ? (

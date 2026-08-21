@@ -1,14 +1,23 @@
 import { ReactNode } from "react";
+import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
 import { HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Css, Only, Padding, Tokens, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type ContentHeaderXss = Xss<Padding>;
 
+export type ContentHeaderLevel = 2 | 3 | 4;
+
 export type ContentHeaderProps<X = ContentHeaderXss> = {
   title?: string;
   description?: ReactNode;
   actions?: HeaderAction[];
+  /** When true, prepends `AutoSaveIndicator` in the actions area. */
+  withAutoSave?: boolean;
+  /** Heading tag and size. `2` = `h2`/`xl` (default); `3` = `h3`/`lg`; `4` = `h4`/`mdSb`. Never `h1`. */
+  level?: ContentHeaderLevel;
+  /** Rendered before the title, e.g. a drag handle on `FormSectionChild`. */
+  startAdornment?: ReactNode;
   /** Style overrides for padding. */
   xss?: X;
 };
@@ -30,10 +39,11 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
  * from padded ancestors (e.g. {@link CenteredLayout}).
  */
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
-  const { title, description, actions, xss } = props;
+  const { title, description, actions, withAutoSave, level = 2, startAdornment, xss } = props;
   const tid = useTestIds(props, "contentHeader");
+  const { tag: Heading, css: headingCss } = headingByLevel[level];
 
-  if (!title && !description && !actions) {
+  if (!title && !description && !actions && !withAutoSave) {
     return null;
   }
 
@@ -44,18 +54,38 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
   );
 
   return (
-    <div css={{ ...Css.df.fdc.gapPx(12).layoutContainer.mw0.bgColor(Tokens.Surface).$, ...xss }} {...tid}>
+    <div
+      css={{
+        ...Css.df.fdc.gapPx(12).layoutContainer.mw0.bgColor(Tokens.Surface).$,
+        ...xss,
+      }}
+      {...tid}
+    >
       <div css={Css.df.aic.jcsb.mw0.$}>
         {title ? (
-          <h2 css={Css.xl.$} {...tid.title}>
-            {title}
-          </h2>
+          <div css={Css.df.aic.gap1.mw0.$}>
+            {startAdornment}
+            <Heading css={headingCss} {...tid.title}>
+              {title}
+            </Heading>
+          </div>
         ) : (
           descriptionEl
         )}
-        {actions && <HeaderActions actions={actions} {...tid.actions} />}
+        {(withAutoSave || actions) && (
+          <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+            {withAutoSave && <AutoSaveIndicator />}
+            {actions && <HeaderActions actions={actions} />}
+          </div>
+        )}
       </div>
       {title && descriptionEl}
     </div>
   );
 }
+
+const headingByLevel = {
+  2: { tag: "h2", css: Css.xl.$ },
+  3: { tag: "h3", css: Css.lg.$ },
+  4: { tag: "h4", css: Css.mdSb.$ },
+} as const;
