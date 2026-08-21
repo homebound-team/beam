@@ -9,6 +9,8 @@ export interface OpenModalProps {
   size?: ModalProps["size"];
   /** Whether to force the modal to stay open. This is useful for stories where ruler/tape extensions cause the modal to close. */
   keepOpen?: boolean;
+  /** Applies the Blueprint AI style */
+  aiMode?: boolean;
 }
 
 /**
@@ -32,14 +34,14 @@ export interface OpenModalProps {
  */
 export function OpenModal(props: OpenModalProps): JSX.Element {
   const { openModal } = useModal();
-  const { size, children, keepOpen } = props;
+  const { size, children, keepOpen, aiMode } = props;
   useEffect(() => {
     if (!keepOpen) {
-      openModal({ size, content: children });
+      openModal({ size, content: children, aiMode });
     }
-  }, [keepOpen, openModal, size, children]);
+  }, [keepOpen, openModal, size, children, aiMode]);
   if (keepOpen) {
-    return <Modal size={size} content={children} />;
+    return <Modal size={size} content={children} aiMode={aiMode} />;
   } else {
     return <div>dummy content</div>;
   }

@@ -18,6 +18,8 @@ export type BeamContextState = {
   modalCanCloseChecks: MutableRefObject<CheckFn[]>;
   /** The div for ModalHeader to portal into. */
   modalHeaderDiv: HTMLDivElement;
+  /** The div for ModalBanner to portal into. */
+  modalBannerDiv: HTMLDivElement;
   /** The div for ModalBody to portal into; note this can't be a ref b/c Modal hasn't set the ref at the time ModalBody renders. */
   modalBodyDiv: HTMLDivElement;
   /** The div for ModalFooter to portal into. */
@@ -37,6 +39,7 @@ export const BeamContext = createContext<BeamContextState>({
   modalState: new EmptyRef(),
   modalCanCloseChecks: new EmptyRef(),
   modalHeaderDiv: undefined!,
+  modalBannerDiv: undefined!,
   modalBodyDiv: undefined!,
   modalFooterDiv: undefined!,
   drawerContentStack: new EmptyRef(),
@@ -57,6 +60,7 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
   const [, tick] = useReducer((prev) => prev + 1, 0);
   const modalRef = useRef<ModalProps | undefined>();
   const modalHeaderDiv = useMemo(() => document.createElement("div"), []);
+  const modalBannerDiv = useMemo(() => document.createElement("div"), []);
   const modalBodyDiv = useMemo(() => {
     const el = document.createElement("div");
     // Ensure this wrapping div takes up the full height of its container in the case of a virtualized table within.
@@ -80,13 +84,14 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
       // The rest we don't need to re-render when these are mutated, so just expose as-is
       modalCanCloseChecks: modalCanCloseChecksRef,
       modalHeaderDiv,
+      modalBannerDiv,
       modalBodyDiv,
       modalFooterDiv,
       drawerCanCloseChecks,
       drawerCanCloseDetailsChecks,
       sdHeaderDiv,
     };
-  }, [modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
+  }, [modalBannerDiv, modalBodyDiv, modalFooterDiv, modalHeaderDiv, sdHeaderDiv]);
 
   const beamTree = (
     <PresentationProvider {...presentationProps}>

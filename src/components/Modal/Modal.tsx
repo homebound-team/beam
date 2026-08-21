@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { AutoSaveStatusProvider } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
+import { BlueprintAiLogo } from "src/components/Logos";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, Only, Tokens, Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks";
@@ -40,6 +41,10 @@ export type ModalProps = {
    * Useful if you definitely need to force the user to make a choice.
    * */
   allowClosing?: boolean;
+  /**
+   * Applies the Blueprint AI style: AiLogo & gradient title
+   */
+  aiMode?: boolean;
 };
 
 export type ModalApi = {
@@ -52,10 +57,18 @@ export type ModalApi = {
  * Provides underlay, modal container, and header. Will disable scrolling of page under the modal.
  */
 export function Modal(props: ModalProps) {
-  const { size = "md", content, forceScrolling, api, drawHeaderBorder = false, allowClosing = true } = props;
+  const {
+    size = "md",
+    content,
+    forceScrolling,
+    api,
+    drawHeaderBorder = false,
+    allowClosing = true,
+    aiMode = false,
+  } = props;
   const isFixedHeight = typeof size !== "string";
   const ref = useRef(null);
-  const { modalBodyDiv, modalFooterDiv, modalHeaderDiv } = useBeamContext();
+  const { modalBannerDiv, modalBodyDiv, modalFooterDiv, modalHeaderDiv } = useBeamContext();
   const { closeModal } = ourUseModal();
   const { overlayProps, underlayProps } = useOverlay(
     {
@@ -82,6 +95,7 @@ export function Modal(props: ModalProps) {
   const { modalProps } = useModal();
   const { dialogProps, titleProps } = useDialog({ role: "dialog" }, ref);
   const [[width, height], setSize] = useState(getSize(size));
+  const modalBannerRef = useRef<HTMLDivElement | null>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const modalHeaderRef = useRef<HTMLHeadingElement | null>(null);
@@ -115,12 +129,22 @@ export function Modal(props: ModalProps) {
   useEffect(
     () => {
       modalHeaderRef.current!.appendChild(modalHeaderDiv);
+      modalBannerRef.current!.appendChild(modalBannerDiv);
       modalBodyRef.current!.appendChild(modalBodyDiv);
       modalFooterRef.current!.appendChild(modalFooterDiv);
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [modalBodyRef, modalFooterRef, modalHeaderRef],
+    [modalBannerRef, modalBodyRef, modalFooterRef, modalHeaderRef],
+  );
+
+  const title = (
+    <h1
+      css={Css.fg1.xl2.if(aiMode).aiBoldText.else.color(Tokens.OnSurface).$}
+      ref={modalHeaderRef}
+      {...titleProps}
+      {...testId.title}
+    />
   );
 
   return (
@@ -150,7 +174,7 @@ export function Modal(props: ModalProps) {
                 {...testId}
               >
                 {/*
-                  Setup three children (header, content, footer), and flex grow the content.
+                  Setup four children (header, banner, content, footer), and flex grow the content.
 
                   Use `fdrr` so that the close icon won't sit between "modal header search field"
                   and the modal body results in the DOM focus order, i.e. in our global search modal.
@@ -159,13 +183,17 @@ export function Modal(props: ModalProps) {
                   <span css={Css.fs0.pl1.$}>
                     {allowClosing && <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />}
                   </span>
-                  <h1
-                    css={Css.fg1.xl2.color(Tokens.OnSurface).$}
-                    ref={modalHeaderRef}
-                    {...titleProps}
-                    {...testId.title}
-                  />
+                  {aiMode ? (
+                    <div css={Css.df.fdc.aifs.gapPx(4).fg1.mw0.$} {...testId.aiTitle}>
+                      <BlueprintAiLogo height={2} />
+                      {title}
+                    </div>
+                  ) : (
+                    title
+                  )}
                 </header>
+                {/* Full-bleed and outside `main` so a banner spans the modal and stays put as the body scrolls. */}
+                <div ref={modalBannerRef} css={Css.fs0.$} />
                 <main
                   ref={modalBodyRef}
                   css={Css.fg1.oya.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
@@ -188,6 +216,19 @@ export function Modal(props: ModalProps) {
 export function ModalHeader({ children }: { children: ReactNode }): JSX.Element {
   const { modalHeaderDiv } = useBeamContext();
   return createPortal(<>{children}</>, modalHeaderDiv);
+}
+
+/** A full-bleed slot between the header and the body, i.e. for an `AiSlimBanner`. */
+export function ModalBanner({ children }: { children: ReactNode }): JSX.Element {
+  const { modalBannerDiv } = useBeamContext();
+  const testId = useTestIds({}, testIdPrefix);
+  // The body has no top padding of its own, so the banner restores the gap the header would have left.
+  return createPortal(
+    <div css={Css.mb3.$} {...testId.banner}>
+      {children}
+    </div>,
+    modalBannerDiv,
+  );
 }
 
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */

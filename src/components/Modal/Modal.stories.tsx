@@ -1,7 +1,17 @@
 import { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
+import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Chip } from "src/components/Chip";
-import { Button, ModalBody, ModalFooter, ModalHeader, ModalProps, OpenModal, useModal } from "src/components/index";
+import {
+  Button,
+  ModalBanner,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalProps,
+  OpenModal,
+  useModal,
+} from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import {
   TestModalContent,
@@ -42,6 +52,12 @@ export const WithDatePicker = () => <ModalExample withDateField />;
 export const WithFieldInHeader = () => <ModalExample withTextArea />;
 export const WithTextFieldInHeader = () => <ModalExample withTextField />;
 export const WithDrawHeaderBorder = () => <ModalExample drawHeaderBorder={true} />;
+
+/** `aiMode` puts the Blueprint AI logo over the header and the brand gradient on the title. */
+export const AiMode = () => <AiModalExample />;
+/** A `ModalBanner` bleeds edge-to-edge and stays put while the body scrolls under it. */
+export const AiModeWithBanner = () => <AiModalExample withBanner />;
+export const AiModeWithBannerAndScroll = () => <AiModalExample withBanner numSentences={30} />;
 export const VirtualizedTableInBody = () => {
   const { openModal } = useModal();
   const open = () =>
@@ -187,3 +203,35 @@ export const WithTooltip = () => {
     </OpenModal>
   );
 };
+
+function AiModalExample(props: AiModalContentProps) {
+  const { openModal } = useModal();
+  const open = () => openModal({ size: "lg", aiMode: true, content: <AiModalContent {...props} /> });
+  // Immediately open the modal for Chromatic snapshots
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(open, [openModal]);
+  return <Button label="Open" onClick={open} />;
+}
+
+type AiModalContentProps = { withBanner?: boolean; numSentences?: number };
+
+function AiModalContent({ withBanner, numSentences = 1 }: AiModalContentProps) {
+  const { closeModal } = useModal();
+  return (
+    <>
+      <ModalHeader>Import From Document</ModalHeader>
+      {withBanner && (
+        <ModalBanner>
+          <AiSlimBanner title="Review 4 Suggested Changes" action={{ label: "Ignore All", onClick: noop }} />
+        </ModalBanner>
+      )}
+      <ModalBody>
+        <p>{"We found details in your document that we can bring over for you. ".repeat(numSentences)}</p>
+      </ModalBody>
+      <ModalFooter>
+        <Button label="Cancel" onClick={closeModal} variant="quaternary" />
+        <Button label="Import" onClick={noop} variant="ai" />
+      </ModalFooter>
+    </>
+  );
+}

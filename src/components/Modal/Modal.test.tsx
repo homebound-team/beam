@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
 import { vi } from "vitest";
 
-import { ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";
+import { ModalBanner, ModalBody, ModalFooter, ModalProps, useModal } from "src/components/Modal";
 import { ModalHeader } from "src/components/Modal/Modal";
 import { OpenModal } from "src/components/Modal/OpenModal";
 import { Tooltip } from "src/components/Tooltip";
@@ -68,6 +68,41 @@ describe("Modal", () => {
     });
   });
 
+  describe("ModalBanner", () => {
+    it("renders between the header and the body", async () => {
+      // When rendered with a banner
+      const r = await render(<TestModalApp content={<TestModalComponent withBanner />} />);
+      // Then expect the banner to show
+      expect(r.modal_banner.textContent).toBe("Modal Banner");
+      // And to sit outside the body's scroll container, i.e. so it stays put as the body scrolls
+      expect(r.modal_banner.closest("main")).toBeNull();
+    });
+
+    it("is not rendered when unused", async () => {
+      // When rendered without a banner
+      const r = await render(<TestModalApp content={<TestModalComponent />} />);
+      // Then expect no banner in the DOM
+      expect(r.query.modal_banner).toBeNull();
+    });
+  });
+
+  describe("aiMode", () => {
+    it("is off by default", async () => {
+      // When rendered without `aiMode`
+      const r = await render(<TestModalApp content={<TestModalComponent />} />);
+      // Then expect no AI treatment on the header
+      expect(r.query.modal_aiTitle).toBeNull();
+    });
+
+    it("adds the Blueprint AI wordmark to the header", async () => {
+      // When rendered with `aiMode`
+      const r = await render(<TestModalApp aiMode content={<TestModalComponent />} />);
+      // Then expect the wordmark to sit above the title
+      expect(r.modal_aiTitle.querySelector("svg")).toBeTruthy();
+      expect(r.modal_aiTitle).toContainElement(r.modal_title);
+    });
+  });
+
   it("supports testing modal components on their own", async () => {
     // Given a test wants to directly render a modal component
     const r = await render(
@@ -92,10 +127,17 @@ function TestModalApp(props: ModalProps & { canClose?: () => boolean }) {
   return <h1>Page title</h1>;
 }
 
-function TestModalComponent({ withTooltip = false }: { withTooltip?: boolean }) {
+function TestModalComponent({
+  withTooltip = false,
+  withBanner = false,
+}: {
+  withTooltip?: boolean;
+  withBanner?: boolean;
+}) {
   return (
     <>
       <ModalHeader>Title</ModalHeader>
+      {withBanner && <ModalBanner>Modal Banner</ModalBanner>}
       <ModalBody>
         Modal Body
         {withTooltip && (
