@@ -17,6 +17,7 @@ describe("FormSectionLayout", () => {
     );
     // Then the form-level title/description render
     expect(r.formSectionLayout_title).toHaveTextContent("Trade Partners");
+    expect(r.formSectionLayout_title.tagName).toBe("H2");
     expect(r.formSectionLayout_description).toHaveTextContent("Set up trade partner assignments for this project");
     // And each section is delegated to FormSection, rendering its own content
     expect(r.gcFields).toBeInTheDocument();

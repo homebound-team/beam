@@ -42,3 +42,38 @@ export function DescriptionAndActions() {
     />
   );
 }
+
+export function WithAutoSave() {
+  return (
+    <ContentHeader
+      title="Trade Partners"
+      description="Assign and manage trade partners for this project."
+      withAutoSave
+      actions={[{ label: "Add", onClick: () => {} }]}
+    />
+  );
+}
+
+/** `level={3}` is the `FormSection` heading — `h3` / `lg`. Default `level={2}` is `h2` / `xl`. */
+export function Level3() {
+  return (
+    <ContentHeader
+      title="General Contractor"
+      description="The primary contractor responsible for this project."
+      level={3}
+      actions={[{ label: "Add", onClick: () => {} }]}
+    />
+  );
+}
+
+/** `level={4}` is the `FormSectionChild` heading — `h4` / `mdSb`. */
+export function Level4() {
+  return (
+    <ContentHeader
+      title="Electrical"
+      description="Electrical contracts are needed for the construction to continue."
+      level={4}
+      actions={[{ label: "Add", onClick: () => {} }]}
+    />
+  );
+}
