@@ -21,7 +21,7 @@ export function AiLoadingPanel(props: AiLoadingPanelProps) {
     // `status` rather than `alert` so assistive tech waits for a pause instead of interrupting, and
     // `aria-busy` so it knows the surrounding content is still settling.
     <AiPanel role="status" aria-busy={true} {...tid}>
-      <div css={Css.df.fdc.aic.gap1.w100.$}>
+      <div css={Css.df.fdc.aic.gap1.w100.px1.$}>
         <AiLoader />
         <span css={Css.lg.aiBoldText.$} {...tid.title}>
           {title}
