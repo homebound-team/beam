@@ -37,6 +37,15 @@ export function Default() {
         />
       </Sample>
 
+      <Sample title="Long copy that wraps">
+        <div css={Css.wPx(640).$}>
+          <AiSlimBanner
+            title={`${title} found across every plan in this project, including the ones you archived last month`}
+            action={action}
+          />
+        </div>
+      </Sample>
+
       <Sample title="Inline above the content it's about">
         <div css={Css.ba.bcGray200.br8.oh.$}>
           <AiSlimBanner title={title} action={action} />
