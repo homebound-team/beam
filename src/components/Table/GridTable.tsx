@@ -2,6 +2,7 @@ import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
 import React, { MutableRefObject, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Components, ListRange, Virtuoso, VirtuosoGrid, VirtuosoHandle } from "react-virtuoso";
+import type { ImageFitType } from "src/components/Card";
 import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -217,6 +218,10 @@ export type GridTableProps<R extends Kinded, X> = {
   disableColumnResizing?: boolean;
   /** Injects fixed left/right gutter columns when inside a document-scroll layout. */
   columnGutter?: boolean;
+  /** Fixed height for `as="card"` cards in px. Defaults to 430. */
+  cardHeight?: number;
+  /** How card hero images fill their frame when `as="card"`. Defaults to `"cover"`. */
+  cardImageFit?: ImageFitType;
 };
 
 /**
@@ -267,6 +272,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     csvPrefixRows,
     disableColumnResizing = false,
     columnGutter = false,
+    cardHeight,
+    cardImageFit,
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
@@ -491,6 +498,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             columns={columns}
             rowStyle={rowStyles?.[rs.row.kind as R["kind"]]}
             api={tableState.api}
+            height={cardHeight}
+            imageFit={cardImageFit}
           />
         ));
       // No pinned (sticky) section in card mode; the 4th slot is the empty `pinnedRows` bucket.
@@ -653,7 +662,19 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     }
 
     return [tableHeadRows, visibleDataRows, keptSelectedRows, pinnedRows, tooManyClientSideRows];
-  }, [as, api, style, rowStyles, maybeStyle, columnSizes, columns.length, getCount, filterMaxRows]);
+  }, [
+    as,
+    api,
+    style,
+    rowStyles,
+    maybeStyle,
+    columnSizes,
+    columns.length,
+    getCount,
+    filterMaxRows,
+    cardHeight,
+    cardImageFit,
+  ]);
 
   // Push back to the caller a way to ask us where a row is.
   // Refs are cheap to assign to, so we don't bother doing this in a useEffect

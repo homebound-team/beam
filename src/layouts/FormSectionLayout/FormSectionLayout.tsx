@@ -1,9 +1,8 @@
 import { ReactNode } from "react";
-import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
-import { Button } from "src/components/Button";
-import { IconButton } from "src/components/IconButton";
-import { Css, Tokens } from "src/Css";
-import { FormSection, FormSectionAction, FormSectionProps } from "src/forms/FormSection";
+import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { HeaderAction } from "src/components/Headers/HeaderActions";
+import { Css } from "src/Css";
+import { FormSection, FormSectionProps } from "src/forms/FormSection";
 import { CenteredLayout } from "src/layouts/CenteredLayout";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -15,7 +14,7 @@ export type FormSectionLayoutProps = {
   /** Rendered before form sections. Useful in forms that only need the main form title, or for form fields that shape the context of a form beforehand.  */
   initialFields?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add items" Button. */
-  actions?: FormSectionAction[];
+  actions?: HeaderAction[];
   /** When true, prepends `AutoSaveIndicator` in the actions area. */
   withAutoSave?: boolean;
   sections?: FormSectionProps[];
@@ -28,32 +27,16 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
 
   return (
     <CenteredLayout size="sm">
-      <div css={Css.df.fdc.gap8.pt4.$} {...tid}>
+      <div css={Css.df.fdc.gap8.pt4.$}>
         <div css={Css.df.fdc.gap3.$}>
-          <div css={Css.df.fdc.jcsb.gapPx(12).$}>
-            <div css={Css.df.jcsb.aic.$}>
-              <h1 css={Css.xl.$} {...tid.title}>
-                {title}
-              </h1>
-              {(withAutoSave || actions) && (
-                <div css={Css.df.gap1.fs0.$} {...tid.actions}>
-                  {withAutoSave && <AutoSaveIndicator />}
-                  {actions?.map((action) =>
-                    action.kind === "icon" ? (
-                      <IconButton key={action.icon} {...action} variant="outline" />
-                    ) : (
-                      <Button key={`${action.label}`} {...action} />
-                    ),
-                  )}
-                </div>
-              )}
-            </div>
-            {description && (
-              <div css={Css.sm.color(Tokens.OnSurface).$} {...tid.description}>
-                {description}
-              </div>
-            )}
-          </div>
+          <ContentHeader
+            {...tid}
+            title={title}
+            description={description}
+            actions={actions}
+            withAutoSave={withAutoSave}
+            level={2}
+          />
           {initialFields}
         </div>
         {sections && (

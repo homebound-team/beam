@@ -21,8 +21,10 @@ import { Css, increment, Only, Palette, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
+import { ProposedValue } from "src/inputs/internal/ProposedValue";
 import { getFieldWidth } from "src/inputs/utils";
 import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
+import { maybeCall } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -45,6 +47,14 @@ export type TextFieldBaseProps<X> = {
   // Replaces empty input field and placeholder with node
   // IE: Multiselect renders list of selected items in the input field
   unfocusedPlaceholder?: ReactNode;
+  /** Value proposed by an AI model; puts the field in AI mode. Pre-formatted for display. */
+  proposedValue?: string;
+  /** The formatted value on record, rendered struck through beside the input. Independent of `proposedValue`. */
+  originalValue?: string;
+  /** Called on any edit the user makes, so the owning field can end AI mode. */
+  onUserEdit?: VoidFunction;
+  /** Called when the user leaves the field, so the owning field can retire the struck-through original. */
+  onUserBlur?: VoidFunction;
   /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
 } & Pick<
@@ -104,6 +114,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     unfocusedPlaceholder,
     selectOnFocus = true,
     inputStylePalette,
+    proposedValue,
+    originalValue,
+    onUserEdit,
+    onUserBlur,
   } = props;
 
   const typeScale = fieldProps?.typeScale ?? "sm";
@@ -120,14 +134,21 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const fieldHeight = 40;
   const compactFieldHeight = 32;
 
-  const [bgColor, hoverBgColor, disabledBgColor] = inputStylePalette
-    ? getInputStylePalette(inputStylePalette)
-    : borderOnHover
-      ? // Use transparent backgrounds to blend with the table row hover color
-        [Palette.Transparent, Palette.Blue100, Palette.Gray100]
-      : borderless && !compound
-        ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-        : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
+  // Takes precedence over the `inputStylePalette` / `borderless` / `borderOnHover` backgrounds below.
+  const showProposal = proposedValue !== undefined;
+  // Rendered as a sibling of the input rather than an overlay, so it survives focus.
+  const showOriginal = originalValue !== undefined && originalValue !== "";
+
+  const [bgColor, hoverBgColor, disabledBgColor] = showProposal
+    ? [Tokens.AiFieldBg, Palette.Purple100, Tokens.FieldBgDisabled]
+    : inputStylePalette
+      ? getInputStylePalette(inputStylePalette)
+      : borderOnHover
+        ? // Use transparent backgrounds to blend with the table row hover color
+          [Palette.Transparent, Palette.Blue100, Palette.Gray100]
+        : borderless && !compound
+          ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
+          : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
 
@@ -184,6 +205,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
       ...(multiline
         ? Css.br4.pyPx(compact ? 7 : textFieldBaseMultilineTopPadding).add("resize", "none").$
         : Css.truncate.$),
+      ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
     },
     hover: Css.bgColor(hoverBgColor).bc(Tokens.FieldBorderHover).$,
     focus: Css.bc(Tokens.FieldBorderFocus).bgColor(hoverBgColor).if(borderOnHover).bc(Tokens.FieldBorderFocus).$,
@@ -195,6 +217,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
   function onDomChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    // Every field's text entry lands here, so this is where AI mode ends for typed edits.
+    maybeCall(onUserEdit);
     if (onChange) {
       let value: string | undefined = e.target.value;
       if (value === "") {
@@ -219,8 +243,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const showHover = (isHovered && !inputProps.disabled && !inputProps.readOnly && !isFocused) || forceHover;
   const fieldElementProps = mergeProps(
     inputProps,
-    { onBlur, onFocus: onFocusChained, onChange: onDomChange },
+    { onBlur: chain(() => maybeCall(onUserBlur), onBlur), onFocus: onFocusChained, onChange: onDomChange },
     { "aria-invalid": Boolean(errorMsg), ...(labelStyle === "hidden" ? { "aria-label": label } : {}) },
+    // Mirrors `data-readonly`, so callers and tests can see the AI treatment without reading styles.
+    { ...(showProposal ? { "data-ai-mode": "true" } : {}) },
   );
   const errorMessageProps = errorMsg ? { "aria-errormessage": errorMessageId } : {};
   const fieldElementCss = {
@@ -257,23 +283,34 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 ...xss,
               }}
               data-readonly="true"
+              data-ai-mode={showProposal ? "true" : undefined}
               {...tid}
             >
               {labelStyle === "inline" && label && (
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
-              {multiline
-                ? (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
-                    <p key={i} css={Css.py1.$}>
-                      {p.split("\n").map((sentence, j) => (
-                        <span key={j}>
-                          {sentence}
-                          <br />
-                        </span>
-                      ))}
-                    </p>
-                  ))
-                : inputProps.value}
+              {showProposal ? (
+                // Read-only renders no input at all, so both halves are drawn as text here. Checked
+                // before `multiline` so a read-only TextAreaField still shows the struck-through original.
+                <ProposedValue
+                  original={showOriginal ? originalValue : undefined}
+                  proposed={proposedValue}
+                  {...tid.proposedValue}
+                />
+              ) : multiline ? (
+                (inputProps.value as string | undefined)?.split("\n\n").map((p, i) => (
+                  <p key={i} css={Css.py1.$}>
+                    {p.split("\n").map((sentence, j) => (
+                      <span key={j}>
+                        {sentence}
+                        <br />
+                      </span>
+                    ))}
+                  </p>
+                ))
+              ) : (
+                inputProps.value
+              )}
             </div>
           ) : (
             <div
@@ -296,6 +333,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
+              {showOriginal && (
+                <span
+                  css={Css.df.aic.fs0.pr1.tdlt.color(Tokens.OnSurfaceMuted).if(multiline).asfs.pyPx(11).$}
+                  {...tid.originalValue}
+                >
+                  {originalValue}
+                </span>
+              )}
               {unfocusedPlaceholder && (
                 <div
                   // Setting -1 tabIndex as this is a scrollable container, which is focusable by default.
@@ -305,6 +350,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   css={{
                     ...Css.df.asc.w100.maxhPx(74).oa.$,
                     ...fieldStyles.input,
+                    // Multiline grows, so top-align like the textarea's own text.
+                    ...(multiline && Css.asfs.$),
                     ...(showHover ? fieldStyles.hover : {}),
                     ...(inputProps.disabled ? fieldStyles.disabled : {}),
                     ...(isFocused && Css.visuallyHidden.$),
@@ -336,6 +383,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                   icon="xCircle"
                   color={Tokens.OnSurfaceMuted}
                   onClick={() => {
+                    maybeCall(onUserEdit);
                     onChange(undefined);
                     // Reset focus to input element
                     fieldRef.current?.focus();

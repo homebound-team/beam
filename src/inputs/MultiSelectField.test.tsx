@@ -320,6 +320,43 @@ describe("MultiSelectFieldTest", () => {
     });
   });
 
+  describe("AI mode", () => {
+    it("shows the struck original alongside the proposal's chips", async () => {
+      // Given "One" on record and "Two, Three" proposed
+      const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
+      // The struck original is text; the proposal keeps rendering as chips, as it does normally
+      // (alphabetical, per the options' `autoSort`)
+      expect(r.age_originalValue).toHaveTextContent("One");
+      expect(r.queryAllByTestId("chip").map((c) => c.textContent)).toEqual(["Three", "Two"]);
+    });
+
+    it("shows the proposed options as selected in the dropdown", async () => {
+      const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
+      click(r.age);
+      const opts = r.queryAllByRole("option");
+      expect(opts.filter((o) => o.getAttribute("aria-selected") === "true").map((o) => o.textContent)).toEqual([
+        "Three",
+        "Two",
+      ]);
+    });
+
+    it("omits the original when nothing was on record", async () => {
+      const r = await render(<TestMultiSelectField values={[]} proposedValues={["2"]} options={options} />);
+      expect(r.age).toHaveValue("Two");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
+    });
+
+    it("commits and drops the AI treatment when the selection changes", async () => {
+      const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
+      // When the user adds an option on top of the proposal
+      selectOption(r, "One");
+      // Then it commits through the usual onSelect, and the AI treatment drops
+      expect([...onSelect.mock.calls[0][0]].sort()).toEqual(["1", "2", "3"]);
+      expect(r.age).not.toHaveAttribute("data-ai-mode");
+    });
+  });
+
   function TestMultiSelectField(
     props: Optional<
       MultiSelectFieldProps<HasIdAndName<string>, string>,

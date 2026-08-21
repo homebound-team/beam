@@ -135,7 +135,9 @@ function GridTableLayoutComponent<
     withCardView ||
     actionMenu
   );
-  const isVirtualized = tableProps.as === "virtual" || (!!withCardView && view === "card");
+  // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
+  // (which only controls whether the list/card toggle is shown).
+  const isVirtualized = tableProps.as === "virtual" || view === "card";
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const tableActionsRef = useRef<HTMLDivElement>(null);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
@@ -188,7 +190,7 @@ function GridTableLayoutComponent<
     />
   );
 
-  const cardAs = withCardView && view === "card" ? ("card" as const) : undefined;
+  const cardAs = view === "card" ? ("card" as const) : undefined;
   const tableStyle = resolveGridTableLayoutStyle(tableProps.style, inDocumentScrollLayout);
 
   const tableBody = (

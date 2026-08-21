@@ -3,7 +3,10 @@ import { MutableRefObject, useCallback, useContext, useMemo, useState } from "re
 import {
   cardDataBlockSlot,
   cardEyebrowSlot,
+  cardInteractiveFooterSlot,
+  cardLeftEyebrowSlot,
   cardProgressSlot,
+  cardRightEyebrowSlot,
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
@@ -5315,7 +5318,7 @@ describe("card view", () => {
     expect(r.query.tableCard).not.toBeInTheDocument();
   });
 
-  it("wraps card in Link when rowStyle.rowLink is set", async () => {
+  it("makes the card's content a Link when rowStyle.rowLink is set", async () => {
     // Given a title column and a rowLink style
     const columns = [
       column<CardRow>({
@@ -5342,11 +5345,12 @@ describe("card view", () => {
       <GridTable as="card" columns={columns} rows={rows} rowStyles={{ data: { rowLink: () => "/detail/1" } }} />,
       withRouter(),
     );
-    // Then the card is wrapped in an anchor tag
-    const cards = r.queryAllByTestId("tableCard");
-    for (const card of cards) {
-      expect(card.parentElement?.tagName).toBe("A");
-      expect(card.parentElement).toHaveAttribute("href", "/detail/1");
+    // Then each card's content is an anchor tag
+    const actions = r.queryAllByTestId("tableCard_action");
+    expect(actions).toHaveLength(2);
+    for (const action of actions) {
+      expect(action.tagName).toBe("A");
+      expect(action).toHaveAttribute("href", "/detail/1");
     }
   });
 
@@ -5372,8 +5376,101 @@ describe("card view", () => {
     const r = await render(
       <GridTable as="card" columns={columns} rows={rows} rowStyles={{ data: { onClick: handler } }} />,
     );
-    click(r.tableCard);
+    click(r.tableCard_action);
     // Then the handler is called
+    expect(handler).toHaveBeenCalled();
+  });
+
+  type CarouselData = { name: string };
+  type CarouselRow = SimpleHeaderAndData<CarouselData>;
+
+  const carouselColumns = [
+    column<CarouselRow>({
+      id: "name",
+      header: "Name",
+      data: ({ name }) => ({ content: name, value: name, cardSlot: cardTitleSlot(name) }),
+    }),
+    column<CarouselRow>({
+      id: "brand",
+      header: "Brand",
+      data: () => ({ content: "Kohler", cardSlot: cardLeftEyebrowSlot("Kohler") }),
+    }),
+    column<CarouselRow>({
+      id: "item",
+      header: "Item",
+      data: () => ({ content: "Shower Faucet", cardSlot: cardRightEyebrowSlot("Shower Faucet") }),
+    }),
+    column<CarouselRow>({
+      id: "variants",
+      header: "Variants",
+      data: () => ({
+        content: "2",
+        value: "2",
+        cardSlot: cardInteractiveFooterSlot({
+          kind: "carousel",
+          title: "2 Colors",
+          thumbnails: [
+            { id: "mv:1", imgUrl: "chrome.png", label: "Chrome", to: "/mv/1" },
+            { id: "mv:2", imgUrl: "black.png", label: "Black", to: "/mv/2" },
+          ],
+        }),
+      }),
+    }),
+  ];
+
+  const carouselRows: GridDataRow<CarouselRow>[] = [
+    simpleHeader,
+    { kind: "data", id: "row1", data: { name: "Showerhead" }, imgSrc: "hero.png" },
+  ];
+
+  it("renders an interactiveFooter carousel as thumbnail links", async () => {
+    // Given title + carousel columns
+    // When rendered as card
+    const r = await render(<GridTable as="card" columns={carouselColumns} rows={carouselRows} />, withRouter());
+    // Then listing-level content stays put and thumbnails are links
+    expect(r.tableCard_title).toHaveTextContent("Showerhead");
+    expect(r.tableCard_image).toHaveAttribute("src", "hero.png");
+    expect(r.tableCard_leftEyebrow).toHaveTextContent("Kohler");
+    expect(r.tableCard_rightEyebrow).toHaveTextContent("Shower Faucet");
+    expect(r.tableCard_carouselTitle).toHaveTextContent("2 Colors");
+    expect(r.tableCard_carousel_item_0).toHaveAttribute("href", "/mv/1");
+    expect(r.tableCard_carousel_item_1).toHaveAttribute("href", "/mv/2");
+    // And the card is not wrapped in a full-card link
+    expect(r.tableCard.parentElement?.tagName).not.toBe("A");
+  });
+
+  it("stretches rowLink across the whole carousel card instead of wrapping it", async () => {
+    // Given a carousel card with a rowLink
+    // When rendered as card
+    const r = await render(
+      <GridTable
+        as="card"
+        columns={carouselColumns}
+        rows={carouselRows}
+        rowStyles={{ data: { rowLink: () => "/detail/1" } }}
+      />,
+      withRouter(),
+    );
+    // Then the card is not wrapped in an anchor (that would nest the thumbnail links)
+    expect(r.tableCard.parentElement?.tagName).not.toBe("A");
+    // And instead a card-level link covers everything but the thumbnails
+    expect(r.tableCard_action).toHaveAttribute("href", "/detail/1");
+    expect(r.tableCard_action).not.toContainElement(r.tableCard_carousel_item_0);
+    expect(r.tableCard_carousel_item_0).toHaveAttribute("href", "/mv/1");
+  });
+
+  it("calls onClick from a carousel card's stretched button", async () => {
+    // Given a carousel card with an onClick handler
+    const handler = vi.fn();
+    // When rendered as card
+    const r = await render(
+      <GridTable as="card" columns={carouselColumns} rows={carouselRows} rowStyles={{ data: { onClick: handler } }} />,
+      withRouter(),
+    );
+    // Then the row action is a keyboard-reachable button
+    expect(r.tableCard_action.tagName).toBe("BUTTON");
+    // And clicking it calls the handler
+    click(r.tableCard_action);
     expect(handler).toHaveBeenCalled();
   });
 });

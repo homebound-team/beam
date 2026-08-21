@@ -125,4 +125,17 @@ describe("DateRangeField", () => {
     // Then the format should reset to specified in props
     expect(r.date).toHaveValue("Thu, Jan 2 - Fri, Jan 10");
   });
+
+  it("shows an AI proposal next to the struck-through original range", async () => {
+    const r = await render(
+      <DateRangeField
+        value={{ from: jan2, to: jan10 }}
+        proposedValue={{ from: jan1, to: jan19 }}
+        label="Date"
+        onChange={noop}
+      />,
+    );
+    expect(r.date_originalValue).toHaveTextContent("01/02/20 - 01/10/20");
+    expect(r.date).toHaveValue("01/01/20 - 01/19/20");
+  });
 });
