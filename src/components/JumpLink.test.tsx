@@ -4,7 +4,7 @@ import { beforeEach, vi } from "vitest";
 
 describe("JumpLink", () => {
   beforeEach(() => {
-    vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    Element.prototype.scrollIntoView = vi.fn();
   });
 
   it("renders the label", async () => {
@@ -26,8 +26,11 @@ describe("JumpLink", () => {
       </div>,
     );
     click(r.jumpLink);
-    expect(window.scrollTo).toHaveBeenCalledTimes(1);
-    expect(window.scrollTo).toHaveBeenCalledWith({ top: expect.any(Number), behavior: "smooth" });
+    expect(document.getElementById("section-one")!.scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(document.getElementById("section-one")!.scrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "start",
+    });
   });
 
   it("does not scroll when disabled", async () => {
@@ -39,6 +42,6 @@ describe("JumpLink", () => {
     );
     expect(r.jumpLink).toHaveAttribute("aria-disabled", "true");
     click(r.jumpLink);
-    expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(document.getElementById("section-one")!.scrollIntoView).not.toHaveBeenCalled();
   });
 });

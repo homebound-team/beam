@@ -12,7 +12,7 @@ export type AiPanelProps = {
 } & AriaAttributes & { role?: AriaRole };
 
 /**
- * Escape hatch for one-off AI chrome — prefer a pre-composed component. See {@link AiBanner}, {@link AiLoadingPanel}, {@link AiSlimBanner}, or `aiMode` on {@link FormSectionLayout} / {@link WorkflowLayout} / {@link Modal}.
+ * Escape hatch for one-off AI chrome — prefer a pre-composed component. See {@link AiBanner}, {@link AiLoadingPanel}, {@link AiSlimBanner}, or `aiMode` on {@link FormSectionLayout} / {@link StepperLayout} / {@link FocusedFormLayout} / {@link Modal}.
  * If none fit, ask the Design System team whether a component exists or should. Full rule: `docs/layouts.md`.
  */
 export function AiPanel(props: AiPanelProps) {
@@ -34,7 +34,7 @@ export type AiCardProps = {
 };
 
 /**
- * Escape hatch for one-off AI chrome — prefer a pre-composed component. See {@link AiBanner}, {@link AiLoadingPanel}, {@link AiSlimBanner}, or `aiMode` on {@link FormSectionLayout} / {@link WorkflowLayout} / {@link Modal}.
+ * Escape hatch for one-off AI chrome — prefer a pre-composed component. See {@link AiBanner}, {@link AiLoadingPanel}, {@link AiSlimBanner}, or `aiMode` on {@link FormSectionLayout} / {@link StepperLayout} / {@link FocusedFormLayout} / {@link Modal}.
  * If none fit, ask the Design System team whether a component exists or should. Full rule: `docs/layouts.md`.
  */
 export function AiCard(props: AiCardProps) {

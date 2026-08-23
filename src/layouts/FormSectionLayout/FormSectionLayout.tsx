@@ -19,11 +19,15 @@ export type FormSectionLayoutProps = {
   /** When true, prepends `AutoSaveIndicator` in the actions area. */
   withAutoSave?: boolean;
   sections?: FormSectionProps[];
-  /** When true, wraps in {@link AiCard} and applies AI title styling; pair with `aiMode` on {@link WorkflowLayout} for the page background. */
+  /**
+   * When true, wraps in {@link AiCard} and applies AI title styling. Pair with `aiMode` on
+   * {@link StepperLayout} / {@link FocusedFormLayout} for the page wash. {@link FocusedFormLayout}
+   * forwards its `aiMode` here — do not also set `form.aiMode`.
+   */
   aiMode?: boolean;
 };
 
-/** Form sections in a `sm` {@link CenteredLayout} — use `aiMode` for the AI card + title treatment. */
+/** Form of `FormSection`s in a `sm` {@link CenteredLayout} — e.g. a `StepperLayout` step's `content`. Use `aiMode` for the AI card + title treatment. */
 export function FormSectionLayout(props: FormSectionLayoutProps) {
   const { title, description, actions, withAutoSave, initialFields, sections, aiMode = false } = props;
   const tid = useTestIds(props, "formSectionLayout");

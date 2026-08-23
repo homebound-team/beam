@@ -1,21 +1,21 @@
 import { act } from "@testing-library/react";
 import { setViewport } from "src/tests/viewport";
 import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
-import { WorkflowLayout, WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout";
+import { StepperLayout, StepperLayoutProps, StepperLayoutStep } from "./StepperLayout";
 
-describe("WorkflowLayout", () => {
+describe("StepperLayout", () => {
   it("renders the header and the active step's content", async () => {
-    // Given a WorkflowLayout on its first step
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    // Given a StepperLayout on its first step
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
 
     // Then the header and the first step's content both render
-    expect(r.workflowLayout_header).toHaveTextContent("Test Workflow");
-    expect(r.workflowLayout_body).toBeInTheDocument();
+    expect(r.stepperLayout_header).toHaveTextContent("Test Workflow");
+    expect(r.stepperLayout_body).toBeInTheDocument();
   });
 
   it("starts on defaultStep instead of the first step", async () => {
-    // Given a WorkflowLayout whose defaultStep is its second step
-    const r = await render(<WorkflowLayout {...baseProps({ defaultStep: "stepTwo" })} />, withRouter());
+    // Given a StepperLayout whose defaultStep is its second step
+    const r = await render(<StepperLayout {...baseProps({ defaultStep: "stepTwo" })} />, withRouter());
 
     // Then only the second step's content renders
     expect(r.query.body).not.toBeInTheDocument();
@@ -24,27 +24,27 @@ describe("WorkflowLayout", () => {
 
   it("renders the CTAs in the header on desktop", async () => {
     // Given a desktop viewport (the test default)
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
 
     // Then the CTAs render inside the header, and no footer is rendered
-    expect(r.workflowLayout_header).toHaveTextContent("Continue");
-    expect(r.query.workflowLayout_footer).not.toBeInTheDocument();
+    expect(r.stepperLayout_header).toHaveTextContent("Continue");
+    expect(r.query.stepperLayout_footer).not.toBeInTheDocument();
   });
 
   it("moves the CTAs to a mobile footer at the sm breakpoint", async () => {
     // Given a mobile viewport
     setViewport("sm");
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
 
     // Then the CTAs render in the footer instead of the header
-    expect(r.workflowLayout_footer).toHaveTextContent("Continue");
-    expect(r.workflowLayout_header).not.toHaveTextContent("Continue");
+    expect(r.stepperLayout_footer).toHaveTextContent("Continue");
+    expect(r.stepperLayout_header).not.toHaveTextContent("Continue");
   });
 
   it("calls onCancel when Cancel is clicked", async () => {
-    // Given a WorkflowLayout with a spy onCancel
+    // Given a StepperLayout with a spy onCancel
     const onCancel = vi.fn();
-    const r = await render(<WorkflowLayout {...baseProps({ onCancel })} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps({ onCancel })} />, withRouter());
 
     // When Cancel is clicked
     click(r.cancel);
@@ -54,9 +54,9 @@ describe("WorkflowLayout", () => {
   });
 
   it("calls onCancel immediately when Cancel is clicked and the form is clean", async () => {
-    // Given a WorkflowLayout that reports not dirty
+    // Given a StepperLayout that reports not dirty
     const onCancel = vi.fn();
-    const r = await render(<WorkflowLayout {...baseProps({ onCancel, isDirty: () => false })} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps({ onCancel, isDirty: () => false })} />, withRouter());
 
     // When Cancel is clicked
     click(r.cancel);
@@ -67,9 +67,9 @@ describe("WorkflowLayout", () => {
   });
 
   it("confirms before calling onCancel when Cancel is clicked and the form is dirty", async () => {
-    // Given a WorkflowLayout that reports dirty
+    // Given a StepperLayout that reports dirty
     const onCancel = vi.fn();
-    const r = await render(<WorkflowLayout {...baseProps({ onCancel, isDirty: () => true })} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps({ onCancel, isDirty: () => true })} />, withRouter());
 
     // When Cancel is clicked
     click(r.cancel);
@@ -86,9 +86,9 @@ describe("WorkflowLayout", () => {
   });
 
   it("does not call onCancel when Continue Editing is chosen on Cancel confirm", async () => {
-    // Given a dirty WorkflowLayout whose Cancel confirm is open
+    // Given a dirty StepperLayout whose Cancel confirm is open
     const onCancel = vi.fn();
-    const r = await render(<WorkflowLayout {...baseProps({ onCancel, isDirty: () => true })} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps({ onCancel, isDirty: () => true })} />, withRouter());
     click(r.cancel);
 
     // When Continue Editing is clicked
@@ -99,9 +99,9 @@ describe("WorkflowLayout", () => {
   });
 
   it("blocks in-app navigation when dirty and proceeds after Discard Changes", async () => {
-    // Given a dirty WorkflowLayout
+    // Given a dirty StepperLayout
     const router = withRouter("/");
-    const r = await render(<WorkflowLayout {...baseProps({ isDirty: () => true })} />, router);
+    const r = await render(<StepperLayout {...baseProps({ isDirty: () => true })} />, router);
 
     // When navigating away
     await act(async () => {
@@ -120,9 +120,9 @@ describe("WorkflowLayout", () => {
   });
 
   it("stays on the page when Continue Editing is chosen after a blocked navigation", async () => {
-    // Given a dirty WorkflowLayout with a blocked navigation
+    // Given a dirty StepperLayout with a blocked navigation
     const router = withRouter("/");
-    const r = await render(<WorkflowLayout {...baseProps({ isDirty: () => true })} />, router);
+    const r = await render(<StepperLayout {...baseProps({ isDirty: () => true })} />, router);
     await act(async () => {
       await router.navigate("/other");
     });
@@ -135,9 +135,9 @@ describe("WorkflowLayout", () => {
   });
 
   it("calls onComplete when Save is clicked on the last step", async () => {
-    // Given a WorkflowLayout on its last step with a spy onComplete
+    // Given a StepperLayout on its last step with a spy onComplete
     const onComplete = vi.fn();
-    const r = await render(<WorkflowLayout {...baseProps({ onComplete, defaultStep: "stepTwo" })} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps({ onComplete, defaultStep: "stepTwo" })} />, withRouter());
 
     // When Save is clicked
     click(r.save);
@@ -147,26 +147,23 @@ describe("WorkflowLayout", () => {
   });
 
   it("disables Continue when the active step is invalid, and enables it once valid", async () => {
-    // Given a WorkflowLayout whose first (active) step is invalid
-    const r = await render(
-      <WorkflowLayout {...baseProps({ steps: makeSteps({ oneIsValid: false }) })} />,
-      withRouter(),
-    );
+    // Given a StepperLayout whose first (active) step is invalid
+    const r = await render(<StepperLayout {...baseProps({ steps: makeSteps({ oneIsValid: false }) })} />, withRouter());
 
     // Then Continue is disabled
     expect(r.continue).toBeDisabled();
 
     // When the same step becomes valid
-    r.rerender(<WorkflowLayout {...baseProps({ steps: makeSteps({ oneIsValid: true }) })} />);
+    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps({ oneIsValid: true }) })} />);
 
     // Then Continue is enabled
     expect(r.continue).not.toBeDisabled();
   });
 
   it("disables Save when the active (last) step is invalid, and enables it once valid", async () => {
-    // Given a WorkflowLayout on its last step, which is invalid
+    // Given a StepperLayout on its last step, which is invalid
     const r = await render(
-      <WorkflowLayout {...baseProps({ steps: makeSteps({ twoIsValid: false }), defaultStep: "stepTwo" })} />,
+      <StepperLayout {...baseProps({ steps: makeSteps({ twoIsValid: false }), defaultStep: "stepTwo" })} />,
       withRouter(),
     );
 
@@ -174,22 +171,22 @@ describe("WorkflowLayout", () => {
     expect(r.save).toBeDisabled();
 
     // When the same step becomes valid
-    r.rerender(<WorkflowLayout {...baseProps({ steps: makeSteps({ twoIsValid: true }), defaultStep: "stepTwo" })} />);
+    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps({ twoIsValid: true }), defaultStep: "stepTwo" })} />);
 
     // Then Save is enabled
     expect(r.save).not.toBeDisabled();
   });
 
   it("uses the ai button variant for Continue when aiMode is true", async () => {
-    // Given a WorkflowLayout in aiMode on its first step
-    const r = await render(<WorkflowLayout {...baseProps({ aiMode: true })} />, withRouter());
+    // Given a StepperLayout in aiMode on its first step
+    const r = await render(<StepperLayout {...baseProps({ aiMode: true })} />, withRouter());
     // Then Continue uses the ai variant styling
     expect(r.continue.className).toContain("aiBoldBg");
   });
 
   it("navigates between steps by clicking their tab on desktop", async () => {
-    // Given a WorkflowLayout on its first step, on a desktop viewport (the test default)
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    // Given a StepperLayout on its first step, on a desktop viewport (the test default)
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
 
     // Then clicking the second step's tab navigates to it
     click(r.header_stepperTabs_tab_stepTwo);
@@ -199,17 +196,17 @@ describe("WorkflowLayout", () => {
   });
 
   it("collapses the tabs to a non-interactive indicator bar on mobile", async () => {
-    // Given a WorkflowLayout on a mobile viewport
+    // Given a StepperLayout on a mobile viewport
     setViewport("sm");
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
 
     // Then the tab collapses to its 0px indicator bar
     expect(r.header_stepperTabs_tab_stepTwo).toHaveStyle({ height: "0px" });
   });
 
   it("advances on Continue when the step has no onContinue", async () => {
-    // Given a WorkflowLayout whose steps don't intercept Continue
-    const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());
+    // Given a StepperLayout whose steps don't intercept Continue
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
     // When Continue is clicked
     await clickAndWait(r.continue);
     // Then we advance to the next step
@@ -222,7 +219,7 @@ describe("WorkflowLayout", () => {
     const onContinue = vi.fn(() => new Promise<void>((resolve) => (resolveContinue = () => resolve())));
     const steps = makeSteps();
     const r = await render(
-      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue }, steps[1]] })} />,
+      <StepperLayout {...baseProps({ steps: [{ ...steps[0], onContinue }, steps[1]] })} />,
       withRouter(),
     );
     // When Continue is clicked
@@ -241,7 +238,7 @@ describe("WorkflowLayout", () => {
     // Given a first step whose onContinue vetoes synchronously
     const steps = makeSteps();
     const r = await render(
-      <WorkflowLayout {...baseProps({ steps: [{ ...steps[0], onContinue: () => false }, steps[1]] })} />,
+      <StepperLayout {...baseProps({ steps: [{ ...steps[0], onContinue: () => false }, steps[1]] })} />,
       withRouter(),
     );
     // When Continue is clicked
@@ -252,7 +249,7 @@ describe("WorkflowLayout", () => {
   });
 });
 
-function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): WorkflowLayoutStep[] {
+function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): StepperLayoutStep[] {
   const { oneIsValid = true, twoIsValid = true } = overrides;
   return [
     { label: "Step One", isValid: oneIsValid, content: <div data-testid="body">Body content</div> },
@@ -264,7 +261,7 @@ function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {
   ];
 }
 
-function baseProps(overrides: Partial<WorkflowLayoutProps> = {}): WorkflowLayoutProps {
+function baseProps(overrides: Partial<StepperLayoutProps> = {}): StepperLayoutProps {
   const { steps = makeSteps(), ...rest } = overrides;
   return {
     title: "Test Workflow",

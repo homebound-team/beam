@@ -25,6 +25,17 @@ describe("FormSection", () => {
     expect(r.formSection_title).toHaveTextContent("Trade Partners");
     expect(r.formSection_description).toHaveTextContent("Manage trade partner assignments");
     expect(r.customFields).toBeInTheDocument();
+    // And the section root is the scroll target for JumpLinks
+    expect(r.formSection_section).toHaveAttribute("id", "tradePartners");
+  });
+
+  it("still renders when excludeJumpLink is set", async () => {
+    // Given a FormSection with excludeJumpLink
+    const r = await render(<FormSection title="Trade Partners" excludeJumpLink />);
+
+    // Then the section chrome is unchanged
+    expect(r.formSection_title).toHaveTextContent("Trade Partners");
+    expect(r.formSection_section).toHaveAttribute("id", "tradePartners");
   });
 
   it("renders actions as Buttons / IconButtons", async () => {

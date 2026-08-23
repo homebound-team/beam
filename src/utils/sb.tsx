@@ -94,7 +94,7 @@ export const withDimensions =
     </div>
   );
 
-/** Paints `aiBackground` behind a story so AI surfaces can be previewed outside {@link WorkflowLayout}. */
+/** Paints `aiBackground` behind a story so AI surfaces can be previewed outside {@link StepperLayout} / {@link FocusedFormLayout}. */
 export const withAiBackground: Decorator = (Story) => (
   <div css={Css.aiBackground.mh(documentScrollBodyMinHeight()).$}>
     <Story />
