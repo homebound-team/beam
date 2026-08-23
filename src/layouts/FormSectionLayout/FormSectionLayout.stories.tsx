@@ -1,11 +1,12 @@
 import { Meta } from "@storybook/react-vite";
 import { Css, Tokens } from "src/Css";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
-import { withBeamDecorator } from "src/utils/sb";
+import { newStory, withAiBackground, withBeamDecorator } from "src/utils/sb";
 
 export default {
   component: FormSectionLayout,
   decorators: [withBeamDecorator],
+  parameters: { layout: "fullscreen" },
 } as Meta;
 
 export function Default() {
@@ -55,6 +56,27 @@ export function WithAutoSave() {
     />
   );
 }
+
+/** `aiMode` wraps the form in {@link AiCard} and applies the gradient title. */
+export const AiMode = newStory(
+  () => (
+    <FormSectionLayout
+      aiMode
+      title="Trade Partners"
+      description="Assign and manage trade partners for this project."
+      actions={[{ label: "Save draft", onClick: () => {}, variant: "tertiary" }]}
+      initialFields={<PlaceholderFields count={2} />}
+      sections={[
+        {
+          title: "General Contractor",
+          description: "The primary contractor responsible for this project.",
+          fields: <PlaceholderFields count={2} />,
+        },
+      ]}
+    />
+  ),
+  { decorators: [withAiBackground] },
+);
 
 export function NestedChildSections() {
   return (

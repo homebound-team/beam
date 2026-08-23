@@ -16,6 +16,8 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   withAutoSave?: boolean;
   /** Heading tag and size. `2` = `h2`/`xl` (default); `3` = `h3`/`lg`; `4` = `h4`/`mdSb`. Never `h1`. */
   level?: ContentHeaderLevel;
+  /** Applies AI gradient title styling (`aiBoldText`). */
+  aiMode?: boolean;
   /** Rendered before the title, e.g. a drag handle on `FormSectionChild`. */
   startAdornment?: ReactNode;
   /** Style overrides for padding. */
@@ -39,9 +41,10 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
  * from padded ancestors (e.g. {@link CenteredLayout}).
  */
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
-  const { title, description, actions, withAutoSave, level = 2, startAdornment, xss } = props;
+  const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, xss } = props;
   const tid = useTestIds(props, "contentHeader");
   const { tag: Heading, css: headingCss } = headingByLevel[level];
+  const titleCss = aiMode ? { ...headingCss, ...Css.aiBoldText.$ } : headingCss;
 
   if (!title && !description && !actions && !withAutoSave) {
     return null;
@@ -65,7 +68,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
         {title ? (
           <div css={Css.df.aic.gap1.mw0.$}>
             {startAdornment}
-            <Heading css={headingCss} {...tid.title}>
+            <Heading css={titleCss} {...tid.title}>
               {title}
             </Heading>
           </div>

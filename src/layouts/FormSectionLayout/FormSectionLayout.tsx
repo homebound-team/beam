@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { HeaderAction } from "src/components/Headers/HeaderActions";
 import { Css } from "src/Css";
@@ -18,35 +19,48 @@ export type FormSectionLayoutProps = {
   /** When true, prepends `AutoSaveIndicator` in the actions area. */
   withAutoSave?: boolean;
   sections?: FormSectionProps[];
+  /** When true, wraps in {@link AiCard} and applies AI title styling; pair with `aiMode` on {@link WorkflowLayout} for the page background. */
+  aiMode?: boolean;
 };
 
-/** Form of `FormSection`s in a `sm` {@link CenteredLayout} — e.g. a `WorkflowLayoutStep`'s `content`. */
+/** Form sections in a `sm` {@link CenteredLayout} — use `aiMode` for the AI card + title treatment. */
 export function FormSectionLayout(props: FormSectionLayoutProps) {
-  const { title, description, actions, withAutoSave, initialFields, sections } = props;
+  const { title, description, actions, withAutoSave, initialFields, sections, aiMode = false } = props;
   const tid = useTestIds(props, "formSectionLayout");
+
+  const content = (
+    <div css={Css.df.fdc.gap8.if(aiMode).p3.$}>
+      <div css={Css.df.fdc.gap3.$}>
+        <ContentHeader
+          {...tid}
+          title={title}
+          description={description}
+          actions={actions}
+          withAutoSave={withAutoSave}
+          level={2}
+          aiMode={aiMode}
+        />
+        {initialFields}
+      </div>
+      {sections && (
+        <div css={Css.df.fdc.gap8.$}>
+          {sections.map((section, i) => (
+            <FormSection key={defaultTestId(section.title) || i} {...section} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <CenteredLayout size="sm">
-      <div css={Css.df.fdc.gap8.pt4.$}>
-        <div css={Css.df.fdc.gap3.$}>
-          <ContentHeader
-            {...tid}
-            title={title}
-            description={description}
-            actions={actions}
-            withAutoSave={withAutoSave}
-            level={2}
-          />
-          {initialFields}
-        </div>
-        {sections && (
-          <div css={Css.df.fdc.gap8.$}>
-            {sections.map((section, i) => (
-              <FormSection key={defaultTestId(section.title) || i} {...section} />
-            ))}
-          </div>
-        )}
-      </div>
+      {aiMode ? (
+        <AiCard size="lg" {...tid}>
+          {content}
+        </AiCard>
+      ) : (
+        content
+      )}
     </CenteredLayout>
   );
 }

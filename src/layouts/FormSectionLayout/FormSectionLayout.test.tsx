@@ -76,4 +76,28 @@ describe("FormSectionLayout", () => {
     expect(r.topLevelFields).toBeInTheDocument();
     expect(r.topLevelFields.compareDocumentPosition(r.gcFields)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
+
+  it("renders form content in a sm CenteredLayout", async () => {
+    // Given a FormSectionLayout
+    const r = await render(<FormSectionLayout title="Trade Partners" />);
+    // Then the sm shell wraps the form title
+    expect(r.centeredLayout).toHaveStyle({ width: "100%", maxWidth: "768px" });
+    expect(r.formSectionLayout_title).toHaveTextContent("Trade Partners");
+  });
+
+  it("wraps form content in an AiCard when aiMode is true", async () => {
+    // Given a FormSectionLayout with aiMode
+    const r = await render(<FormSectionLayout aiMode title="Trade Partners" />);
+    // Then the card wraps the form title
+    expect(r.formSectionLayout_card).toHaveTextContent("Trade Partners");
+  });
+
+  it("omits AiCard when aiMode is false", async () => {
+    // Given a FormSectionLayout without aiMode
+    const r = await render(<FormSectionLayout title="Trade Partners" />);
+    // Then the form title renders without the card wrapper
+    expect(r.formSectionLayout_title).toHaveTextContent("Trade Partners");
+    expect(r.query.formSectionLayout_card).not.toBeInTheDocument();
+    expect(r.query.formSectionLayout_column).not.toBeInTheDocument();
+  });
 });

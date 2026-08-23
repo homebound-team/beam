@@ -180,6 +180,13 @@ describe("WorkflowLayout", () => {
     expect(r.save).not.toBeDisabled();
   });
 
+  it("uses the ai button variant for Continue when aiMode is true", async () => {
+    // Given a WorkflowLayout in aiMode on its first step
+    const r = await render(<WorkflowLayout {...baseProps({ aiMode: true })} />, withRouter());
+    // Then Continue uses the ai variant styling
+    expect(r.continue.className).toContain("aiBoldBg");
+  });
+
   it("navigates between steps by clicking their tab on desktop", async () => {
     // Given a WorkflowLayout on its first step, on a desktop viewport (the test default)
     const r = await render(<WorkflowLayout {...baseProps()} />, withRouter());

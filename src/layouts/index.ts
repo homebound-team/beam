@@ -22,6 +22,7 @@ export {
   beamSideNavLayoutWidthVar,
   beamTableActionsHeightVar,
   beamWorkflowLayoutFooterHeightVar,
+  documentScrollBodyMinHeight,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
   documentScrollContentLeft,

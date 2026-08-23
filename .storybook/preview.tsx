@@ -1,8 +1,8 @@
 import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
 import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from "storybook/viewport";
-import { contrastDataTheme } from "../src/components/ContrastScope";
 import { CssReset, Tokens } from "../src";
+import { contrastDataTheme } from "../src/components/ContrastScope";
 import beamTheme from "./beamTheme";
 
 // formState doesn't use actions

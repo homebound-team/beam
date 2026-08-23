@@ -14,7 +14,7 @@ describe("CenteredLayout", () => {
 
     // Then the shell is 1440px max (1392px content + padding) and publishes padding for sticky chrome
     expect(r.centeredLayout).toHaveTextContent("Dashboard body");
-    expect(r.centeredLayout).toHaveStyle({ maxWidth: "1440px" });
+    expect(r.centeredLayout).toHaveStyle({ width: "100%", maxWidth: "1440px" });
     expect(r.centeredLayout.style.getPropertyValue(beamLayoutContentPaddingXVar)).toBe(pageContentPaddingXValue);
   });
 
@@ -41,6 +41,6 @@ describe("CenteredLayout", () => {
 
     // Then the shell is 768px max (720px content + padding)
     expect(r.centeredLayout).toHaveTextContent("Form body");
-    expect(r.centeredLayout).toHaveStyle({ maxWidth: "768px" });
+    expect(r.centeredLayout).toHaveStyle({ width: "100%", maxWidth: "768px" });
   });
 });
