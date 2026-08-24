@@ -12,6 +12,7 @@ export * from "./AiLoader";
 export * from "./AiLoadingPanel";
 export * from "./AiPanel";
 export * from "./AiSlimBanner";
+export * from "./AiTagIcon";
 export * from "./AppNav";
 export * from "./AutoSaveIndicator";
 export * from "./Avatar";

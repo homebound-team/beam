@@ -37,6 +37,7 @@ export function TabBaseStates() {
         <div css={{ ...styles.baseStyles, ...styles.disabledStyles }}>{getChildren("disabled")}</div>
         <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
         <div css={{ ...styles.baseStyles, ...styles.activeHoverStyles }}>{getChildren("active hover")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.aiStyles }}>{getChildren("ai proposals")}</div>
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h2>
@@ -77,6 +78,27 @@ export function TabsWithEndAdornment() {
   ];
   const [tab, setTab] = useState<TabValue>("tab1");
   return <TabsWithContent tabs={tabsWithAdornment} onChange={setTab} selected={tab} contentXss={Css.m3.p0.$} />;
+}
+
+export function TabsWithAiProposals() {
+  const tabsWithAi: TabWithContent<TabValue>[] = [
+    { name: "Overview", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
+    {
+      name: "Elevations",
+      value: "tab2",
+      hasAiProposals: true,
+      render: () => <TestTabContent content="Tab 2 Content" />,
+    },
+    {
+      name: "Program Data",
+      value: "tab3",
+      hasAiProposals: true,
+      render: () => <TestTabContent content="Tab 3 Content" />,
+    },
+    { name: "Takeoffs", value: "tab4", render: () => <TestTabContent content="Tab 4 Content" /> },
+  ];
+  const [tab, setTab] = useState<TabValue>("tab2");
+  return <TabsWithContent tabs={tabsWithAi} onChange={setTab} selected={tab} includeBottomBorder />;
 }
 
 export function TabsSeparateFromContent() {

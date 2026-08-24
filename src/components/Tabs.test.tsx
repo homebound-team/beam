@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { useParams } from "react-router";
 import { ScrollableContent, ScrollableParent } from "src";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { click, render, withRouter } from "src/utils/rtl";
 import { getNextTabValue, RouteTabWithContent, TabContent, TabsWithContent, TabWithContent } from "./Tabs";
 import { TabValue, TestTabContent, testTabs } from "./testData";
@@ -49,6 +49,27 @@ describe("TabsWithContent", () => {
     click(r.tabs_tab3);
     // Then nothing happens
     expectActiveTab(r.tabs_tab1);
+  });
+
+  describe("hasAiProposals", () => {
+    it("decorates the tab with an AI tag", async () => {
+      const r = await render(<TestAiTabs />, withRouter());
+      expect(r.tabs_tab2).toContainElement(r.aiTagIcon);
+      expect(r.query.tabs_tab1).not.toContainElement(r.query.aiTagIcon);
+    });
+
+    it("tints the label while the tab is unselected", async () => {
+      const r = await render(<TestAiTabs />, withRouter());
+      expect(r.tabs_tab2).toHaveStyle({ color: Palette.Purple700 });
+    });
+
+    it("keeps the selected tab's own color", async () => {
+      // Given the decorated tab is the selected one
+      const r = await render(<TestAiTabs selected="tab2" />, withRouter());
+      // Then it stays with the active treatment rather than going purple
+      expect(r.tabs_tab2).not.toHaveStyle({ color: Palette.Purple700 });
+      expect(r.tabs_tab2).toContainElement(r.aiTagIcon);
+    });
   });
 
   describe("getNextTabValue function", () => {
@@ -255,6 +276,14 @@ function TestTabs() {
       <button data-testid="goToTab2" onClick={() => setSelectedTab("tab2")} />
     </div>
   );
+}
+
+function TestAiTabs({ selected = "tab1" }: { selected?: TabValue }) {
+  const aiTabs: TabWithContent<TabValue>[] = [
+    { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
+    { name: "Tab 2", value: "tab2", hasAiProposals: true, render: () => <TestTabContent content="Tab 2 Content" /> },
+  ];
+  return <TabsWithContent tabs={aiTabs} onChange={() => {}} selected={selected} />;
 }
 
 function TestRouteTab() {
