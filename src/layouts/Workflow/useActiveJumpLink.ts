@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { stickyNavAndHeaderOffsetPx } from "../layoutVars";
+
+/** Activate the next section once its top is this far below the sticky header. */
+const activationLeadPx = 120;
 
 /** Tracks which jump-link section is under the sticky header as the page scrolls. */
 export function useActiveJumpLink(sectionIds: string[]): string | undefined {
   const idsKey = sectionIds.join("\0");
   const [activeId, setActiveId] = useState(sectionIds[0]);
 
-  useEffect(() => {
-    const ids = idsKey.length === 0 ? [] : idsKey.split("\0");
-    setActiveId((current) => (current && ids.includes(current) ? current : ids[0]));
-  }, [idsKey]);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const ids = idsKey.length === 0 ? [] : idsKey.split("\0");
     if (ids.length === 0) return;
 
@@ -22,7 +20,7 @@ export function useActiveJumpLink(sectionIds: string[]): string | undefined {
       let current = ids[0];
       for (const id of ids) {
         const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top - headerOffset <= 1) {
+        if (el && el.getBoundingClientRect().top - headerOffset <= activationLeadPx) {
           current = id;
         }
       }
@@ -34,5 +32,5 @@ export function useActiveJumpLink(sectionIds: string[]): string | undefined {
     return () => window.removeEventListener("scroll", update);
   }, [idsKey]);
 
-  return activeId;
+  return sectionIds.includes(activeId ?? "") ? activeId : sectionIds[0];
 }

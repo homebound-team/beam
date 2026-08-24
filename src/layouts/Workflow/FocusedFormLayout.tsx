@@ -1,5 +1,6 @@
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { Css } from "src/Css";
+import { FormSectionProps } from "src/forms/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { FormSectionLayout, FormSectionLayoutProps } from "src/layouts/FormSectionLayout";
 import { useTestIds } from "src/utils";
@@ -9,32 +10,25 @@ import { useActiveJumpLink } from "./useActiveJumpLink";
 import { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
+type FocusedFormSection = FormSectionProps & {
+  /** When true, omit this section from the JumpLinks rail. */
+  excludeJumpLink?: boolean;
+};
+
 export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
   Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
     /** Gates the Create/Save CTA. */
     isValid: boolean;
-    /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
+    /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
-    /**
-     * When false, never show the JumpLinks rail. Defaults to true — the rail still hides when there
-     * are fewer than two includable sections.
-     */
+    /** When false, never show the JumpLinks rail. */
     withJumpLinks?: boolean;
-    /**
-     * Page wash, `ai` Continue/Complete variant, and forwarded onto `form`'s `FormSectionLayout`.
-     * Do not also set `form.aiMode`.
-     */
+    /** Page wash, `ai` CTA, and forwarded to `form`. */
     aiMode?: boolean;
-    /** Always rendered as the body. Page `aiMode` is forwarded; do not set `form.aiMode`. */
-    form: FormSectionLayoutProps;
+    form: Omit<FormSectionLayoutProps, "sections"> & { sections?: FocusedFormSection[] };
   };
 
-/**
- * Standalone single-form workflow page. Contract: `docs/layouts.md`.
- *
- * Nest directly under `EnvironmentBannerLayout`. No stepper — optional JumpLinks come from
- * `form.sections` titles. Use this (not a stepless `StepperLayout`) when the page has no steps.
- */
+/** Standalone single-form workflow page. Contract: `docs/layouts.md`. */
 export function FocusedFormLayout(props: FocusedFormLayoutProps) {
   const {
     onCancel,
@@ -74,7 +68,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
     >
       <div css={Css.df.w100.$}>
         {showRail && <JumpLinksRail links={jumpLinks} activeId={activeId} {...tid.jumpLinks} />}
-        <div css={Css.fg1.mw0.$}>
+        <div css={Css.fg1.mw0.mb4.$}>
           <FormSectionLayout {...form} aiMode={aiMode} />
         </div>
       </div>

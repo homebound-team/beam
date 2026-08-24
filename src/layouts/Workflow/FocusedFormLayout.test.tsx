@@ -117,22 +117,6 @@ describe("FocusedFormLayout", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it("forwards aiMode to wrap the form in the AI card", async () => {
-    // Given a focused form with aiMode
-    const r = await render(<FocusedFormLayout {...baseProps({ aiMode: true })} />, withRouter());
-
-    // Then the form card wrap is present
-    expect(r.formSectionLayout_card).toBeInTheDocument();
-  });
-
-  it("uses the ai button variant for Create when aiMode is true", async () => {
-    // Given a focused form in aiMode
-    const r = await render(<FocusedFormLayout {...baseProps({ aiMode: true })} />, withRouter());
-
-    // Then Create uses the ai variant styling
-    expect(r.create.className).toContain("aiBoldBg");
-  });
-
   it("calls onCancel when Cancel is clicked and the form is clean", async () => {
     // Given a focused form that reports not dirty
     const onCancel = vi.fn();

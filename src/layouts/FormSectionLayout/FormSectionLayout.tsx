@@ -19,11 +19,7 @@ export type FormSectionLayoutProps = {
   /** When true, prepends `AutoSaveIndicator` in the actions area. */
   withAutoSave?: boolean;
   sections?: FormSectionProps[];
-  /**
-   * When true, wraps in {@link AiCard} and applies AI title styling. Pair with `aiMode` on
-   * {@link StepperLayout} / {@link FocusedFormLayout} for the page wash. {@link FocusedFormLayout}
-   * forwards its `aiMode` here — do not also set `form.aiMode`.
-   */
+  /** When true, wraps in {@link AiCard} and applies AI title styling. */
   aiMode?: boolean;
 };
 

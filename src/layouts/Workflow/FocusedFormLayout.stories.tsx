@@ -54,24 +54,6 @@ export function WithoutJumpLinks() {
   );
 }
 
-export function SingleSection() {
-  return (
-    <WithEnvironmentBanner>
-      <FocusedFormLayout
-        title="Create Design Package"
-        onCancel={action("cancel clicked")}
-        completeLabel="Create"
-        onComplete={action("complete clicked")}
-        isValid
-        form={{
-          title: "Link Design Package",
-          sections: [{ title: "Setup", fields: <PlaceholderFields count={2} /> }],
-        }}
-      />
-    </WithEnvironmentBanner>
-  );
-}
-
 export function AiMode() {
   return (
     <WithEnvironmentBanner>

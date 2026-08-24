@@ -39,11 +39,5 @@ export { NavbarLayout } from "./NavbarLayout";
 export type { NavbarLayoutProps } from "./NavbarLayout";
 export { PageHeaderLayout } from "./PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./PageHeaderLayout";
-export { FocusedFormLayout, StepperLayout, WorkflowLayout } from "./Workflow";
-export type {
-  FocusedFormLayoutProps,
-  StepperLayoutProps,
-  StepperLayoutStep,
-  WorkflowLayoutProps,
-  WorkflowLayoutStep,
-} from "./Workflow";
+export { FocusedFormLayout, StepperLayout } from "./Workflow";
+export type { FocusedFormLayoutProps, StepperLayoutProps, StepperLayoutStep } from "./Workflow";

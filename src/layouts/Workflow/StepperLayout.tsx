@@ -24,7 +24,7 @@ export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleS
     steps: StepperLayoutStep[];
     /** The step shown initially (matched against `defaultTestId(step.label)`); falls back to the first step if omitted or if it doesn't match any step. Uncontrolled — the layout owns step navigation from here. */
     defaultStep?: string;
-    /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
+    /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
     /** Full-bleed AI wash on the body. Pair with `aiMode` on a step's `FormSectionLayout`. */
     aiMode?: boolean;
@@ -44,9 +44,7 @@ export function StepperLayout(props: StepperLayoutProps) {
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(stepTabs, defaultStep));
   const tid = useTestIds(props, "stepperLayout");
 
-  const currentIndex = isValidStep(stepTabs, currentStep)
-    ? stepTabs.findIndex((step) => step.value === currentStep)
-    : 0;
+  const currentIndex = hasStep(stepTabs, currentStep) ? stepTabs.findIndex((step) => step.value === currentStep) : 0;
   const isFirstStep = currentIndex <= 0;
   const isLastStep = currentIndex >= stepTabs.length - 1;
   const activeStep = stepTabs[currentIndex];
@@ -84,17 +82,10 @@ export function StepperLayout(props: StepperLayoutProps) {
   );
 }
 
-/** @deprecated Use {@link StepperLayout}. */
-export const WorkflowLayout = StepperLayout;
-/** @deprecated Use {@link StepperLayoutStep}. */
-export type WorkflowLayoutStep = StepperLayoutStep;
-/** @deprecated Use {@link StepperLayoutProps}. */
-export type WorkflowLayoutProps = StepperLayoutProps;
-
-function isValidStep(steps: { value: string }[], value: string | undefined): boolean {
+function hasStep(steps: { value: string }[], value: string | undefined): boolean {
   return steps.some((step) => step.value === value);
 }
 
 function getInitialStep(steps: { value: string }[], defaultStep: string | undefined): string {
-  return defaultStep !== undefined && isValidStep(steps, defaultStep) ? defaultStep : (steps[0]?.value ?? "");
+  return defaultStep !== undefined && hasStep(steps, defaultStep) ? defaultStep : (steps[0]?.value ?? "");
 }

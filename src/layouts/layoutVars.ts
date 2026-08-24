@@ -96,7 +96,7 @@ export function stickyNavAndHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
 }
 
-/** Pixel equivalent of {@link stickyNavAndHeaderOffset}, read from `el`'s computed (inherited) CSS vars. */
+/** Pixel equivalent of {@link stickyNavAndHeaderOffset}, read from `el`'s computed (inherited) CSS vars. Used by JumpLink scroll-spy, which needs a number rather than a CSS `calc()`. */
 export function stickyNavAndHeaderOffsetPx(el: Element): number {
   const styles = getComputedStyle(el);
   const read = (name: string) => parseFloat(styles.getPropertyValue(name)) || 0;

@@ -17,11 +17,6 @@ export type FormSectionProps = {
   actions?: HeaderAction[];
   fields?: ReactNode;
   childSections?: PlainFormSectionChild[] | ReorderableFormSectionChild[];
-  /**
-   * When true, `FocusedFormLayout` omits this section from the JumpLinks rail. The section root `id`
-   * is still `defaultTestId(title)` (keep titles unique on a page).
-   */
-  excludeJumpLink?: boolean;
 };
 
 export function FormSection(props: FormSectionProps) {

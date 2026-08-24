@@ -24,7 +24,7 @@ export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentT
     stepperTabs?: StepperTabsProps;
     /** Full-bleed AI wash on the body, and the `ai` Continue/Complete variant. */
     aiMode?: boolean;
-    /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
+    /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
     children: ReactNode;
   };
