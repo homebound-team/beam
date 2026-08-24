@@ -12,7 +12,7 @@ import { FormSectionLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layou
  * Demos `WorkflowLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab
  * strip, Back/Cancel/Save CTAs) and the active step's content are both driven from the same `steps` array.
  */
-export function WorkflowLayoutFormApp() {
+export function WorkflowLayoutFormApp({ aiMode = false }: { aiMode?: boolean }) {
   const formState = useFormState({
     config: formConfig,
     init: { input: {} as AuthorInput, map: (i) => i },
@@ -22,10 +22,10 @@ export function WorkflowLayoutFormApp() {
       });
     },
   });
-  return <WorkflowLayoutForm formState={formState} />;
+  return <WorkflowLayoutForm formState={formState} aiMode={aiMode} />;
 }
 
-function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
+function WorkflowLayoutForm({ formState, aiMode }: { formState: FormValue; aiMode: boolean }) {
   const [showFormData, setShowFormData] = useState(false);
 
   return (
@@ -38,19 +38,19 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
           {
             label: "Author Details",
             isValid: step1Valid,
-            content: <AuthorDetails formState={formState} />,
+            content: <AuthorDetails formState={formState} aiMode={aiMode} />,
           },
           {
             label: "Books",
             isValid: step2Valid,
             disabled: !step1Valid,
-            content: <BookList formState={formState} />,
+            content: <BookList formState={formState} aiMode={aiMode} />,
           },
           {
             label: "Miscellaneous Author Information",
             isValid: formState.birthday.valid,
             disabled: !step2Valid,
-            content: <MiscAuthorDetails formState={formState} showFormData={showFormData} />,
+            content: <MiscAuthorDetails formState={formState} showFormData={showFormData} aiMode={aiMode} />,
           },
         ];
 
@@ -64,6 +64,7 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
         return (
           <WorkflowLayout
             title="Workflow Layout Form"
+            aiMode={aiMode}
             onCancel={() => {}}
             completeLabel="Save"
             onComplete={onSave}
@@ -76,9 +77,10 @@ function WorkflowLayoutForm({ formState }: { formState: FormValue }) {
   );
 }
 
-function AuthorDetails({ formState }: { formState: FormValue }) {
+function AuthorDetails({ formState, aiMode }: { formState: FormValue; aiMode: boolean }) {
   return (
     <FormSectionLayout
+      aiMode={aiMode}
       title="Author Details"
       sections={[
         {
@@ -99,11 +101,12 @@ function AuthorDetails({ formState }: { formState: FormValue }) {
   );
 }
 
-function BookList({ formState }: { formState: FormValue }) {
+function BookList({ formState, aiMode }: { formState: FormValue; aiMode: boolean }) {
   return (
     <Observer>
       {() => (
         <FormSectionLayout
+          aiMode={aiMode}
           title="Books"
           sections={[
             {
@@ -136,9 +139,18 @@ function BookList({ formState }: { formState: FormValue }) {
   );
 }
 
-function MiscAuthorDetails({ formState, showFormData }: { formState: FormValue; showFormData: boolean }) {
+function MiscAuthorDetails({
+  formState,
+  showFormData,
+  aiMode,
+}: {
+  formState: FormValue;
+  showFormData: boolean;
+  aiMode: boolean;
+}) {
   return (
     <FormSectionLayout
+      aiMode={aiMode}
       title="Miscellaneous Details"
       sections={[
         {

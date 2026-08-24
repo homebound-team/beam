@@ -73,6 +73,11 @@ export function documentScrollRightPaneHeight(): string {
   return `calc(var(${beamLayoutViewportHeightVar}, 100vh) - ${stickyTableHeaderOffset()})`;
 }
 
+/** `min-height` so a document-scroll step surface fills the first screen below sticky chrome. */
+export function documentScrollBodyMinHeight(): string {
+  return `calc(var(${beamLayoutViewportHeightVar}, 100vh) - ${stickyNavAndHeaderOffset()} - var(${beamWorkflowLayoutFooterHeightVar}, 0px))`;
+}
+
 /**
  * `width` for the document-scroll right pane: the configured max px, capped by available chrome
  * width so the pane fits the viewport on mobile (side nav collapses to `0px` there).

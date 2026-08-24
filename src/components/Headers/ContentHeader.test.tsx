@@ -99,4 +99,11 @@ describe("ContentHeader", () => {
     // Then the adornment renders before the title
     expect(r.getByText("Drag").compareDocumentPosition(r.contentHeader_title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
+
+  it("applies aiBoldText to the title when aiMode is true", async () => {
+    // Given a ContentHeader with aiMode
+    const r = await render(<ContentHeader title="Trade Partners" aiMode />);
+    // Then the title uses AI gradient text styling
+    expect(r.contentHeader_title).toHaveStyle({ WebkitBackgroundClip: "text" });
+  });
 });

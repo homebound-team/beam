@@ -1,5 +1,6 @@
 import {
   bannerAndNavbarChromeTop,
+  documentScrollBodyMinHeight,
   documentScrollChromeWidth,
   documentScrollContentWidth,
   documentScrollRightPaneHeight,
@@ -44,6 +45,19 @@ describe("layoutVars", () => {
       // Then it subtracts the sticky table header offset from the layout viewport height
       expect(result).toBe(
         "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-table-actions-height, 0px)))",
+      );
+    });
+  });
+
+  describe("documentScrollBodyMinHeight", () => {
+    it("fills the viewport below banner, nav, header, and workflow footer", () => {
+      // Given the document-scroll body min-height helper
+      // When computing the min-height expression
+      const result = documentScrollBodyMinHeight();
+
+      // Then it subtracts sticky chrome and the workflow footer from the layout viewport height
+      expect(result).toBe(
+        "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px)) - var(--beam-workflow-layout-footer-height, 0px))",
       );
     });
   });

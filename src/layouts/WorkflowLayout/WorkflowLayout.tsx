@@ -13,6 +13,7 @@ import {
   bannerAndNavbarChromeTop,
   beamPageHeaderLayoutHeightVar,
   beamWorkflowLayoutFooterHeightVar,
+  documentScrollBodyMinHeight,
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useMeasuredHeight } from "../useMeasuredHeight";
@@ -39,6 +40,8 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
     defaultStep?: string;
     /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
     isDirty?: () => boolean;
+    /** Paints the workflow body with the AI background (e.g. when steps use {@link FormSectionLayout}). */
+    aiMode?: boolean;
   };
 
 /**
@@ -54,7 +57,17 @@ export type WorkflowLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitle
  * of the public API. Pass `isDirty` to confirm before Cancel, in-app navigation, or tab close.
  */
 export function WorkflowLayout(props: WorkflowLayoutProps) {
-  const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, isDirty, ...headerProps } = props;
+  const {
+    steps,
+    defaultStep,
+    onCancel,
+    completeLabel,
+    onComplete,
+    onSaveAndExit,
+    isDirty,
+    aiMode = false,
+    ...headerProps
+  } = props;
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(stepTabs, defaultStep));
   const tid = useTestIds(props, "workflowLayout");
@@ -89,6 +102,7 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={!activeStep?.isValid}
+      aiMode={aiMode}
       onContinue={async () => {
         const onContinue = activeStep?.onContinue;
         if (onContinue) {
@@ -137,7 +151,13 @@ export function WorkflowLayout(props: WorkflowLayoutProps) {
           {headerEl}
         </div>
 
-        <div css={Css.df.fdc.fg1.mh0.w100.$} {...tid.body}>
+        <div
+          css={{
+            ...Css.df.fdc.fg1.mh0.w100.pt4.ifMdAndUp.pt6.$,
+            ...(aiMode && Css.aiBackground.mh(documentScrollBodyMinHeight()).$),
+          }}
+          {...tid.body}
+        >
           {activeStep?.content}
         </div>
 

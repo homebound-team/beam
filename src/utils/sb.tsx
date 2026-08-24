@@ -2,6 +2,7 @@ import { type Decorator, type StoryObj } from "@storybook/react-vite";
 import { ReactNode } from "react";
 import { BeamProvider } from "src/components";
 import { Css, Properties } from "src/Css";
+import { documentScrollBodyMinHeight } from "src/layouts/layoutVars";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
 import type { InitialViewportKeys, MINIMAL_VIEWPORTS } from "storybook/viewport";
 
@@ -92,3 +93,10 @@ export const withDimensions =
       <Story />
     </div>
   );
+
+/** Paints `aiBackground` behind a story so AI surfaces can be previewed outside {@link WorkflowLayout}. */
+export const withAiBackground: Decorator = (Story) => (
+  <div css={Css.aiBackground.mh(documentScrollBodyMinHeight()).$}>
+    <Story />
+  </div>
+);

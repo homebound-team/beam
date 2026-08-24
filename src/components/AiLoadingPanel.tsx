@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { AiLoader } from "src/components/AiLoader";
-import { AiPanel } from "src/components/AiPanel";
+import { AiCard, AiPanel } from "src/components/AiPanel";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
@@ -20,16 +20,18 @@ export function AiLoadingPanel(props: AiLoadingPanelProps) {
   return (
     // `status` rather than `alert` so assistive tech waits for a pause instead of interrupting, and
     // `aria-busy` so it knows the surrounding content is still settling.
-    <AiPanel role="status" aria-busy={true} {...tid}>
-      <div css={Css.df.fdc.aic.gap1.w100.px1.$}>
-        <AiLoader />
-        <span css={Css.lg.aiBoldText.$} {...tid.title}>
-          {title}
-        </span>
-        <span css={Css.sm.color(Tokens.OnSurface).tac.$} {...tid.message}>
-          {message}
-        </span>
-      </div>
+    <AiPanel role="status" aria-busy={true} padding="lg" {...tid}>
+      <AiCard size="lg" {...tid}>
+        <div css={Css.df.fdc.aic.gap1.w100.py2.px3.$}>
+          <AiLoader />
+          <span css={Css.lg.aiBoldText.$} {...tid.title}>
+            {title}
+          </span>
+          <span css={Css.sm.color(Tokens.OnSurface).tac.$} {...tid.message}>
+            {message}
+          </span>
+        </div>
+      </AiCard>
     </AiPanel>
   );
 }

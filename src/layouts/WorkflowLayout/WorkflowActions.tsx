@@ -20,6 +20,8 @@ export type WorkflowActionsProps = {
   onContinue: () => boolean | void | Promise<boolean | void>;
   /** Disables whichever of Continue/Complete is currently shown, e.g. while the active step is invalid. */
   primaryDisabled?: boolean;
+  /** When true, Continue/Complete use the `ai` button variant instead of `primary`. */
+  aiMode?: boolean;
 };
 
 /** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete); shared by `WorkflowLayout`'s header and mobile footer. */
@@ -35,7 +37,10 @@ export function WorkflowActions(props: WorkflowActionsProps) {
     onComplete,
     onContinue,
     primaryDisabled,
+    aiMode = false,
   } = props;
+
+  const primaryVariant = aiMode ? "ai" : "primary";
 
   return (
     <div css={Css.df.aic.jcsb.ifSm.w100.$}>
@@ -46,9 +51,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />
         {onSaveAndExit && <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} />}
         {isLastStep ? (
-          <Button label={completeLabel} variant="primary" onClick={onComplete} disabled={primaryDisabled} />
+          <Button label={completeLabel} variant={primaryVariant} onClick={onComplete} disabled={primaryDisabled} />
         ) : (
-          <Button label="Continue" variant="primary" onClick={onContinue} disabled={primaryDisabled} />
+          <Button label="Continue" variant={primaryVariant} onClick={onContinue} disabled={primaryDisabled} />
         )}
       </div>
     </div>

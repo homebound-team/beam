@@ -1,12 +1,13 @@
 import { Meta } from "@storybook/react-vite";
+import { ReactNode } from "react";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { Css } from "src/Css";
+import { WorkflowLayoutFormApp } from "src/forms/WorkflowLayoutFormApp";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
-import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
-import { TableExample } from "src/utils/sbComponents";
+import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { CenteredLayout } from "../CenteredLayout";
-import { WorkflowLayout, WorkflowLayoutStep } from "./WorkflowLayout";
+import { pageContentPaddingX } from "../layoutSpacing";
+import { WorkflowLayout } from "./WorkflowLayout";
 
 export default {
   component: WorkflowLayout,
@@ -17,120 +18,55 @@ export default {
   },
 } satisfies Meta;
 
-export function Default() {
+/** Real form-state steps in {@link FormSectionLayout}, under an environment banner. */
+export function WithFormSectionLayout() {
   return (
-    <WorkflowLayout
-      title="Workflow Layout"
-      onCancel={action("cancel clicked")}
-      completeLabel="Save"
-      onComplete={action("complete clicked")}
-      onSaveAndExit={action("save and exit clicked")}
-      steps={makeSteps()}
-    />
+    <WithEnvironmentBanner>
+      <WorkflowLayoutFormApp />
+    </WithEnvironmentBanner>
   );
 }
 
-/**
- * A step whose content is a wide table — it overflows horizontally instead of shrinking to fit the
- * viewport. Most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px.
- */
-export function WideStepContentOverflows() {
-  const steps = makeSteps();
-  steps[0] = { ...steps[0], content: <TableExample numCols={10} numRows={20} /> };
+/** Same form as {@link WithFormSectionLayout}, with `aiMode` on the workflow and form layout. */
+export function AiMode() {
   return (
-    <WorkflowLayout
-      title="Workflow Layout"
-      onCancel={action("cancel clicked")}
-      completeLabel="Save"
-      onComplete={action("complete clicked")}
-      steps={steps}
-    />
+    <WithEnvironmentBanner>
+      <WorkflowLayoutFormApp aiMode />
+    </WithEnvironmentBanner>
   );
 }
 
-/**
- * A step whose content leads with a `ContentHeader` above a wide table. Scroll the page horizontally
- * (most visible at the `mobile1` Chromatic viewport, or by resizing the window below 600px) — the table
- * scrolls away, but `ContentHeader` stays pinned to the visible left/right edges since it only sticks
- * horizontally (it has no `top` set, so it still scrolls away normally on the vertical axis).
- *
- * The wrapping div needs `mw("fit-content")` for this to work — `ContentHeader`'s sticky positioning
- * has no "room" to operate unless its containing block is at least as wide as the table's full content
- * width (see the doc comment on `ContentHeader` itself), the same technique `GridTable` uses internally.
- */
-export function WideContentWithContentHeader() {
-  const steps = makeSteps();
-  steps[0] = {
-    ...steps[0],
-    content: (
-      <CenteredLayout size="lg">
-        <div css={Css.df.fdc.gap2.pt3.$}>
-          <ContentHeader
-            title="Trade Partners"
-            description="Sticky to the left/right document-scroll bounds, but scrolls away vertically."
-            actions={[{ label: "Add", onClick: action("add clicked") }]}
-          />
-          <TableExample numCols={10} numRows={20} />
-        </div>
-      </CenteredLayout>
-    ),
-  };
+/** A table step: {@link ContentHeader} above `GridTableLayout`. */
+export function WithContentHeaderAndTable() {
   return (
-    <WorkflowLayout
-      title="Workflow Layout"
-      onCancel={action("cancel clicked")}
-      completeLabel="Save"
-      onComplete={action("complete clicked")}
-      steps={steps}
-    />
-  );
-}
-
-/**
- * `WorkflowLayout` nested under `EnvironmentBannerLayout` with a banner actually displayed, pushing the
- * whole layout down by `environmentBannerSizePx`. Tall step content so the page scrolls — sanity check
- * that the header renders correctly in that composed position and stays pinned while scrolling.
- */
-export function Composed() {
-  return (
-    <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>
+    <WithEnvironmentBanner>
       <WorkflowLayout
-        title="Workflow Layout"
+        title="Trade Partners"
         onCancel={action("cancel clicked")}
         completeLabel="Save"
         onComplete={action("complete clicked")}
-        steps={makeSteps(50)}
+        steps={[
+          {
+            label: "Trade Partners",
+            isValid: true,
+            content: (
+              <div>
+                <ContentHeader
+                  title="Trade Partners"
+                  description="Assign and manage trade partners for this project."
+                  actions={[{ label: "Add", onClick: action("add clicked") }]}
+                  xss={pageContentPaddingX}
+                />
+                <GridTableLayoutExample storageKey="workflow-layout-grid-table" />
+              </div>
+            ),
+          },
+        ]}
       />
-    </EnvironmentBannerLayout>
+    </WithEnvironmentBanner>
   );
 }
 
-const tabValues = ["trade", "draft", "send"] as const;
-const tabLabels: Record<(typeof tabValues)[number], string> = {
-  trade: "Trade Partners",
-  draft: "Draft Email",
-  send: "Send Email",
-};
-
-function makeSteps(contentRows = 0): WorkflowLayoutStep[] {
-  return tabValues.map((value) => ({
-    label: tabLabels[value],
-    isValid: false,
-    content: <StepContent title={tabLabels[value]} numRows={contentRows} />,
-  }));
-}
-
-function StepContent({ title, numRows = 0 }: { title: string; numRows?: number }) {
-  return (
-    <div css={Css.p3.$}>
-      <h1 css={Css.xl2.mb2.$}>{title}</h1>
-      <div css={Css.df.fdc.gap1.$}>
-        {zeroTo(numRows).map((i) => (
-          <div key={i} css={Css.hPx(48).br4.bgGray100.df.aic.pl2.$}>
-            Row {i + 1}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+function WithEnvironmentBanner({ children }: { children: ReactNode }) {
+  return <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>{children}</EnvironmentBannerLayout>;
 }
