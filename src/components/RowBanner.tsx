@@ -29,11 +29,7 @@ export function RowBanner(props: RowBannerProps) {
       {/* Matches the copy's 16px line box, so the taller icon centers on the first line rather than
           drifting to the middle of wrapped copy — and overflows the line instead of growing it. */}
       <span css={Css.df.aic.fs0.h2.$}>
-        {/* TODO: Check with design on the icon padding here. The tint sits on this wrapper rather than
-            on `Icon`'s `bgColor` because the design insets the 12px glyph by 3px inside an 18px swatch,
-            where `bgColor` paints the svg box itself and leaves our icons only ~1.5px of slack. That
-            makes this swatch noticeably roomier than every other tinted icon in Beam — worth confirming
-            it's intended here, and whether the rest should follow. */}
+        {/* Padding and icon spacing is slightly different than our default icon atm */}
         <span css={Css.df.aic.jcc.fs0.hPx(18).wPx(18).br4.bgColor(bgColor).$}>
           <Icon icon={icon} inc={1.75} color={color} {...tid.type} />
         </span>
