@@ -1,5 +1,7 @@
 import {
   bannerAndNavbarChromeTop,
+  beamEnvironmentBannerLayoutHeightVar,
+  beamPageHeaderLayoutHeightVar,
   documentScrollBodyMinHeight,
   documentScrollChromeWidth,
   documentScrollContentWidth,
@@ -8,6 +10,7 @@ import {
   getFloatingBottomOffset,
   getFloatingRightOffset,
   stickyNavAndHeaderOffset,
+  stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,
 } from "src/layouts/layoutVars";
 
@@ -129,6 +132,25 @@ describe("layoutVars", () => {
       expect(result).toBe(
         "calc(12px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px))",
       );
+    });
+  });
+
+  describe("stickyNavAndHeaderOffsetPx", () => {
+    it("sums banner + nav + header vars from the layout element, not documentElement", () => {
+      // Given documentElement with a misleading header height, and a layout element with the real vars
+      document.documentElement.style.setProperty(beamPageHeaderLayoutHeightVar, "0px");
+      const el = document.createElement("div");
+      el.style.setProperty(beamEnvironmentBannerLayoutHeightVar, "32px");
+      el.style.setProperty(beamPageHeaderLayoutHeightVar, "80px");
+      document.body.appendChild(el);
+
+      // When reading the pixel offset from the layout element
+      const result = stickyNavAndHeaderOffsetPx(el);
+      el.remove();
+      document.documentElement.style.removeProperty(beamPageHeaderLayoutHeightVar);
+
+      // Then banner + header come from the element and the unset navbar var is 0
+      expect(result).toBe(112);
     });
   });
 

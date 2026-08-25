@@ -3,7 +3,9 @@ import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { HeaderAction } from "src/components/Headers/HeaderActions";
 import { Css } from "src/Css";
+import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { FormSectionChild, type PlainFormSectionChild, type ReorderableFormSectionChild } from "./FormSectionChild";
 
 /** @see {@link HeaderAction} */
@@ -22,7 +24,11 @@ export function FormSection(props: FormSectionProps) {
   const tid = useTestIds(props, "formSection");
 
   return (
-    <div css={Css.df.fdc.gap2.$}>
+    <div
+      id={defaultTestId(title)}
+      css={Css.df.fdc.gap2.add("scrollMarginTop", stickyNavAndHeaderOffset()).$}
+      {...tid.section}
+    >
       <ContentHeader {...tid} title={title} description={description} actions={actions} level={3} />
       {fields}
       {childSections &&

@@ -2,50 +2,49 @@ import type { PressEvent } from "@react-types/shared";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 
 export type WorkflowActionsProps = {
-  isFirstStep: boolean;
-  isLastStep: boolean;
-  isMobile: boolean;
-  onBack: () => void;
   /** Leaves the workflow without saving. Always shown. */
   onCancel: (e: PressEvent) => void;
   /** Saves partial progress and exits. Used whenever canExitEarly is true. */
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
-  /** Label for the completion button shown on the last step. */
+  /** Label for the completion button shown on the last step (or when there is no next step). */
   completeLabel: "Create" | "Save";
-  /** Called when the completion button is clicked. Only shown on the last step. */
+  /** Called when the completion button is clicked. */
   onComplete: (e: PressEvent) => void | Promise<void>;
-  /** Runs before continuing to the next step. Return `false` to stay put, like when the save failed. */
-  onContinue: () => boolean | void | Promise<boolean | void>;
   /** Disables whichever of Continue/Complete is currently shown, e.g. while the active step is invalid. */
   primaryDisabled?: boolean;
   /** When true, Continue/Complete use the `ai` button variant instead of `primary`. */
   aiMode?: boolean;
+  isFirstStep?: boolean;
+  isLastStep?: boolean;
+  onBack?: () => void;
+  /** Runs before continuing to the next step. Return `false` to stay put, like when the save failed. */
+  onContinue?: () => boolean | void | Promise<boolean | void>;
 };
 
-/** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete); shared by `WorkflowLayout`'s header and mobile footer. */
+/** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete); shared by stepper and focused-form chrome. */
 export function WorkflowActions(props: WorkflowActionsProps) {
   const {
-    isFirstStep,
-    isLastStep,
-    isMobile,
-    onBack,
     onCancel,
     onSaveAndExit,
     completeLabel,
     onComplete,
-    onContinue,
     primaryDisabled,
     aiMode = false,
+    isFirstStep = true,
+    isLastStep = true,
+    onBack,
+    onContinue,
   } = props;
-
+  const { sm: isMobile } = useBreakpoint();
   const primaryVariant = aiMode ? "ai" : "primary";
 
   return (
     <div css={Css.df.aic.jcsb.ifSm.w100.$}>
       <div css={Css.df.aic.$}>
-        {!isFirstStep && isMobile && <IconButton icon="arrowBack" label="Back" onClick={onBack} />}
+        {!isFirstStep && isMobile && onBack && <IconButton icon="arrowBack" label="Back" onClick={onBack} />}
       </div>
       <div css={Css.df.aic.gap1.$}>
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />
@@ -53,7 +52,14 @@ export function WorkflowActions(props: WorkflowActionsProps) {
         {isLastStep ? (
           <Button label={completeLabel} variant={primaryVariant} onClick={onComplete} disabled={primaryDisabled} />
         ) : (
-          <Button label="Continue" variant={primaryVariant} onClick={onContinue} disabled={primaryDisabled} />
+          <Button
+            label="Continue"
+            variant={primaryVariant}
+            onClick={async () => {
+              await onContinue?.();
+            }}
+            disabled={primaryDisabled}
+          />
         )}
       </div>
     </div>

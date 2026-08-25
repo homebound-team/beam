@@ -6,13 +6,13 @@ import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import { AuthorInput } from "src/forms/formStateDomain";
-import { FormSectionLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
+import { FormSectionLayout, StepperLayout, StepperLayoutStep } from "src/layouts";
 
 /**
- * Demos `WorkflowLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab
+ * Demos `StepperLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab
  * strip, Back/Cancel/Save CTAs) and the active step's content are both driven from the same `steps` array.
  */
-export function WorkflowLayoutFormApp({ aiMode = false }: { aiMode?: boolean }) {
+export function StepperLayoutFormApp({ aiMode = false }: { aiMode?: boolean }) {
   const formState = useFormState({
     config: formConfig,
     init: { input: {} as AuthorInput, map: (i) => i },
@@ -22,10 +22,10 @@ export function WorkflowLayoutFormApp({ aiMode = false }: { aiMode?: boolean }) 
       });
     },
   });
-  return <WorkflowLayoutForm formState={formState} aiMode={aiMode} />;
+  return <StepperLayoutForm formState={formState} aiMode={aiMode} />;
 }
 
-function WorkflowLayoutForm({ formState, aiMode }: { formState: FormValue; aiMode: boolean }) {
+function StepperLayoutForm({ formState, aiMode }: { formState: FormValue; aiMode: boolean }) {
   const [showFormData, setShowFormData] = useState(false);
 
   return (
@@ -34,7 +34,7 @@ function WorkflowLayoutForm({ formState, aiMode }: { formState: FormValue; aiMod
         const step1Valid = formState.firstName.valid && formState.lastName.valid;
         const step2Valid = formState.books.valid;
 
-        const steps: WorkflowLayoutStep[] = [
+        const steps: StepperLayoutStep[] = [
           {
             label: "Author Details",
             isValid: step1Valid,
@@ -62,8 +62,8 @@ function WorkflowLayoutForm({ formState, aiMode }: { formState: FormValue; aiMod
         };
 
         return (
-          <WorkflowLayout
-            title="Workflow Layout Form"
+          <StepperLayout
+            title="Stepper Layout Form"
             aiMode={aiMode}
             onCancel={() => {}}
             completeLabel="Save"
