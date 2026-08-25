@@ -1,5 +1,13 @@
+import { Button } from "src/components/Button";
+import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
+import {
+  beamFloatingRightOffsetVar,
+  beamRightPaneWidthVar,
+  documentScrollChromeWidth,
+  documentScrollRightPaneWidth,
+} from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { click, render, withRouter } from "src/utils/rtl";
+import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
 import { FocusedFormLayout, FocusedFormLayoutProps } from "./FocusedFormLayout";
 
 describe("FocusedFormLayout", () => {
@@ -172,6 +180,127 @@ describe("FocusedFormLayout", () => {
     // Then the matching section scrolls into view
     expect(document.getElementById("setup")!.scrollIntoView).toHaveBeenCalledTimes(1);
   });
+
+  it("renders a right pane spacer when mode is overlay", async () => {
+    // Given a FocusedFormLayout that opted into overlay (spacer) mode
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          withRightPane: { width: 280, mode: "overlay" },
+          form: {
+            title: "Link Design Package",
+            sections: [
+              { title: "Setup", fields: <OpenPaneButton /> },
+              { title: "Package Options", fields: <div /> },
+            ],
+          },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // Then there is no spacer while the pane is closed
+    expect(r.query.rightPaneSpacer).toBeNull();
+    expect(r.query.rightPaneContent).toBeNull();
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then the pane renders and a spacer matching the pane width is rendered after the body
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.rightPaneSpacer).toBeInTheDocument();
+    expect(r.rightPaneSpacer).toHaveStyle({ width: documentScrollRightPaneWidth(280) });
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
+      documentScrollRightPaneWidth(280),
+    );
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(280),
+    );
+  });
+
+  it("default auto mode pushes on a typical desktop chrome without an empty spacer", async () => {
+    // Given default withRightPane (auto) on lg chrome where the sm shell collides but can push
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          withRightPane: 280,
+          form: {
+            title: "Link Design Package",
+            sections: [
+              { title: "Setup", fields: <OpenPaneButton /> },
+              { title: "Package Options", fields: <div /> },
+            ],
+          },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then push constrains the column; no overlay spacer
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.query.rightPaneSpacer).toBeNull();
+    expect(r.rightPaneSpacer_push).toBeInTheDocument();
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(280),
+    );
+  });
+
+  it("pins the header to the viewport when the right pane is open", async () => {
+    // Given a FocusedFormLayout that opted into the right pane
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          withRightPane: { width: 280, mode: "overlay" },
+          form: {
+            title: "Link Design Package",
+            sections: [
+              { title: "Setup", fields: <OpenPaneButton /> },
+              { title: "Package Options", fields: <div /> },
+            ],
+          },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then the header is viewport-fixed at chrome width (does not ride the horizontal spacer)
+    expect(r.focusedFormLayout_header).toHaveStyle({
+      position: "fixed",
+      width: documentScrollChromeWidth(),
+    });
+  });
+
+  it("does not wrap in DocumentScrollRightPaneLayout without withRightPane", async () => {
+    // Given a FocusedFormLayout that did not opt into the right pane
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          form: {
+            title: "Link Design Package",
+            sections: [
+              { title: "Setup", fields: <OpenPaneButton /> },
+              { title: "Package Options", fields: <div /> },
+            ],
+          },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // When the pane context is opened
+    await clickAndWait(r.openPane);
+
+    // Then FocusedFormLayout does not host the document-scroll pane wrapper
+    expect(r.query.documentScrollRightPaneLayout).toBeNull();
+    expect(r.query.rightPaneContent).toBeNull();
+    expect(r.query.rightPaneSpacer).toBeNull();
+  });
 });
 
 function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedFormLayoutProps {
@@ -194,4 +323,9 @@ function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedForm
     form,
     ...rest,
   };
+}
+
+function OpenPaneButton() {
+  const { openRightPane } = useRightPane();
+  return <Button label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />;
 }

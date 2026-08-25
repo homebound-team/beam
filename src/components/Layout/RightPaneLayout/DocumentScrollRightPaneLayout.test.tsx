@@ -114,6 +114,53 @@ describe("DocumentScrollRightPaneLayout", () => {
     );
     expect(r.query.rightPaneContent).toBeNull();
   });
+
+  it("push mode constrains the main column without a spacer", async () => {
+    // Given a push-mode document-scroll right pane
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollRightPaneLayout paneWidth={320} mode="push">
+          <div>Main content</div>
+        </DocumentScrollRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then there is no overlay spacer; push constraint is present; floating offset is still published
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.query.rightPaneSpacer).toBeNull();
+    expect(r.rightPaneSpacer_push).toBeInTheDocument();
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(320),
+    );
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
+  });
+
+  it("auto mode with a clearing shell skips the spacer", async () => {
+    // Given auto mode and a shell small enough to clear the pane on typical test chrome
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollRightPaneLayout paneWidth={320} mode="auto" shellMaxPx={280}>
+          <div>Main content</div>
+        </DocumentScrollRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then neither spacer nor push wrapper is needed
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.query.rightPaneSpacer).toBeNull();
+    expect(r.query.rightPaneSpacer_push).toBeNull();
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(320),
+    );
+  });
 });
 
 function OpenCloseButtons() {

@@ -44,7 +44,10 @@ export function DocumentScrollRightPane({ paneWidth }: { paneWidth: number }) {
                   .right(0)
                   .h(documentScrollRightPaneHeight())
                   .w(documentScrollRightPaneWidth(paneWidth))
-                  .oya.bgColor(Tokens.Surface)
+                  // Keep shell overflow visible so edge close controls can sit on the border.
+                  // (oy:auto + ox:visible is computed as ox:auto and clips.) Body scroll lives in RightPanePanel.
+                  .overflow("visible")
+                  .bgColor(Tokens.Surface)
                   .z(zIndices.rightPane)
                   .bl.bc(Tokens.SurfaceSeparator).$
           }

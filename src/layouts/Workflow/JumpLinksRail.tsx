@@ -13,7 +13,8 @@ type JumpLinksRailProps = {
   activeId: string | undefined;
 };
 
-const jumpLinksRailWidthPx = 180;
+/** Width of the FocusedForm JumpLinks rail; used by right-pane `auto` math. */
+export const jumpLinksRailWidthPx = 180;
 
 /** Sticky left rail of `JumpLink`s. Internal to `FocusedFormLayout`. */
 export function JumpLinksRail(props: JumpLinksRailProps) {
