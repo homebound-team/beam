@@ -23,6 +23,7 @@ export function Examples() {
         <Tag text="warning" type="warning" />
         <Tag text="success" type="success" />
         <Tag text="Neutral" />
+        <Tag text="ai" type="ai" />
       </div>
       <div css={Css.df.fdc.aifs.gap1.$}>
         <h3 css={Css.mb1.mdSb.$}>Label & Icon</h3>
@@ -67,6 +68,17 @@ export function Truncated() {
     <div css={Css.wPx(200).$}>
       <Tag text="Tag text that will truncate as it is too long." />
       <Tag text="Tag text that will truncate as it is too long." icon="infoCircle" />
+    </div>
+  );
+}
+
+export function Secondary() {
+  return (
+    <div css={Css.df.fdc.aifs.gap1.$}>
+      <h3 css={Css.mb1.mdSb.$}>Secondary</h3>
+      <Tag text="Secondary Label" variant="secondary" />
+      <Tag text="Secondary Label" variant="secondary" icon="helpCircle" />
+      <Tag text="Secondary Label" variant="secondary" type="ai" />
     </div>
   );
 }
