@@ -4,11 +4,12 @@ import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath } from "react-router";
 import { Link, useLocation } from "react-router-dom";
 import { FullBleed, IconKey, maybeTooltip, resolveTooltip } from "src/components";
-import { Css, Margin, Only, Padding, Tokens, Xss } from "src/Css";
+import { Css, Margin, Only, Padding, Palette, Tokens, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { AiBadge } from "./AiBadge";
 import { Icon } from "./Icon";
 
 export type Tab<V extends string = string> = {
@@ -18,6 +19,8 @@ export type Tab<V extends string = string> = {
   icon?: IconKey;
   // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
   endAdornment?: ReactNode;
+  /** Whether the tab's content is AI-driven, which adds AiBadge. Takes precedence over `icon` and `endAdornment`. */
+  aiMode?: boolean;
   /** Whether the Tab is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
 };
@@ -217,13 +220,11 @@ type TabImplProps<V extends string> = {
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
-  const { disabled = false, name: label, icon, endAdornment } = tab;
+  const { disabled = false, name: label, icon, endAdornment, aiMode = false } = tab;
   const isDisabled = !!disabled;
   const { hoverProps, isHovered } = useHover({ isDisabled });
-  const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles } = useMemo(
-    () => getTabStyles(),
-    [],
-  );
+  const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles, aiStyles } =
+    useMemo(() => getTabStyles(), []);
   const uniqueValue = uniqueTabValue(tab);
 
   const tabProps = {
@@ -236,6 +237,8 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     ...others,
     ...Css.props({
       ...baseStyles,
+      // Only tints the label while the tab is unselected; selected keeps its own darker treatment.
+      ...(aiMode && aiStyles),
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isHovered && hoverStyles),
@@ -249,10 +252,12 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     ...(isRouteTab(tab) ? {} : { onClick: () => onClick(tab.value) }),
   });
 
+  const decoration = aiMode ? <AiBadge /> : icon ? <Icon icon={icon} /> : endAdornment;
+
   const tabLabel = (
     <>
       {label}
-      {(icon || endAdornment) && <span css={Css.ml1.$}>{icon ? <Icon icon={icon} /> : endAdornment}</span>}
+      {decoration && <span css={Css.ml1.df.aic.$}>{decoration}</span>}
     </>
   );
 
@@ -288,6 +293,8 @@ export function getTabStyles() {
     // Blue50 active hover fill has no semantic token — keep palette.
     activeStyles: { ...Css.bc(Tokens.FieldBorderFocus).smSb.color(Tokens.OnSurface).$, ...borderBottomStyles },
     disabledStyles: Css.color(Tokens.TextDisabled).cursorNotAllowed.$,
+    // The AI label tint is part of the brand ramp rather than a semantic token, same as the sparkle's gradient.
+    aiStyles: Css.color(Palette.Purple700).$,
     focusRingStyles: Css.bgBlue50.bshFocus.$,
     hoverStyles: { ...Css.bc(Tokens.FieldBorderHover).$, ...borderBottomStyles },
     activeHoverStyles: { ...Css.bgBlue50.bc(Tokens.FieldBorderFocus).$, ...borderBottomStyles },
