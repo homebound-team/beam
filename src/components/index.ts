@@ -44,6 +44,7 @@ export type { HeaderAction } from "./Headers/HeaderActions";
 export * from "./HelperText";
 export * from "./Icon";
 export * from "./IconButton";
+export * from "./InlineFeedbackBanner";
 export * from "./JumpLink";
 export * from "./Layout";
 export * from "./Loader";
