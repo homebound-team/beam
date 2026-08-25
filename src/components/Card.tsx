@@ -86,7 +86,7 @@ export function Card(props: CardProps) {
           />
         </div>
       )}
-      {/* Tag - list cards flow it below the text, otherwise it overlays the image */}
+      {/* Tag - list cards flow it above the text, otherwise it overlays the image */}
       {tag && !isList && (
         <div css={Css.absolute.left1.topPx(4).$}>
           <Tag type={tag.type} text={tag.text} {...tid.tag} />
@@ -94,6 +94,7 @@ export function Card(props: CardProps) {
       )}
       {/* Titles and detailContent */}
       <div css={Css.df.fdc.aifs.gap1.$}>
+        {tag && isList && <Tag type={tag.type} text={tag.text} {...tid.tag} />}
         <div>
           <div css={Css.xsSb.color(Tokens.OnSurfaceMuted).$} {...tid.subtitle}>
             {subtitle}
@@ -103,7 +104,6 @@ export function Card(props: CardProps) {
           </div>
         </div>
         <div {...tid.details}>{detailContent}</div>
-        {tag && isList && <Tag type={tag.type} text={tag.text} {...tid.tag} />}
       </div>
     </div>
   );
