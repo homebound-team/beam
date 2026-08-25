@@ -58,6 +58,7 @@ export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
 export type { InputStylePalette, PresentationFieldProps } from "./PresentationContext";
 export * from "./RightSidebar";
+export * from "./RowBanner";
 export * from "./ScrollShadows";
 export * from "./SideNav";
 export * from "./Snackbar";
