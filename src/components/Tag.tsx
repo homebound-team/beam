@@ -86,6 +86,7 @@ function getVariantStyles(variant: TagVariant, type?: TagType): TagVariantStyles
     const isAi = type === "ai";
     return {
       background: isAi ? Css.bgWhite.bcPurple600.bw2.ba.purple800.$ : Css.bgWhite.bcGray300.bw1.ba.$,
+      // Note: Ai tags shouldn't be using any icon, the purple outline/text is enough
       iconColor: isAi ? Palette.Purple600 : Palette.Gray700,
       typography: isAi ? Css.xsSb.ttu.$ : Css.xs.$,
       padding: Css.pxPx(8).$,
@@ -111,6 +112,7 @@ function getPrimaryStyles(type?: TagType): Pick<TagVariantStyles, "background" |
       return { background: Css.bgRed100.$, iconColor: Palette.Orange700 };
     case "success":
       return { background: Css.bgGreen100.$, iconColor: Palette.Green600 };
+    // Note: Ai tags shouldn't be using any icon, the purple background is enough
     case "ai":
       return { background: Css.bgPurple200.$, iconColor: Palette.Purple600 };
     default:
