@@ -2,8 +2,12 @@ import { AiLinkCardGroup } from "src";
 import { click, render, withRouter } from "src/utils/rtl";
 
 const cards = [
-  { title: "Review 1 changed elevation.", message: "Describe change", onClick: "/plans/1/elevations" },
-  { title: "Review 1 changed program value.", onClick: "/plans/1/program" },
+  {
+    title: "Review 1 changed elevation.",
+    message: "Describe change",
+    action: { onClick: "/plans/1/elevations" },
+  },
+  { title: "Review 1 changed program value.", action: { onClick: "/plans/1/program" } },
 ];
 
 describe("AiLinkCardGroup", () => {
@@ -23,14 +27,14 @@ describe("AiLinkCardGroup", () => {
 
   it("fires a card's callback", async () => {
     const onClick = vi.fn();
-    const r = await render(<AiLinkCardGroup cards={[{ title: "Review 1 changed elevation.", onClick }]} />);
+    const r = await render(<AiLinkCardGroup cards={[{ title: "Review 1 changed elevation.", action: { onClick } }]} />);
     click(r.linkCard_action);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it("renders nothing but its chrome when it has no cards", async () => {
+  it("renders nothing when it has no cards", async () => {
     const r = await render(<AiLinkCardGroup cards={[]} />);
-    expect(r.aiLinkCardGroup).toBeInTheDocument();
-    expect(r.query.linkCard).not.toBeInTheDocument();
+    // No bare AI panel + logo for callers to have to guard against.
+    expect(r.query.aiLinkCardGroup).not.toBeInTheDocument();
   });
 });

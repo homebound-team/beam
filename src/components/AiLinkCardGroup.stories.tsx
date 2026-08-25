@@ -32,15 +32,15 @@ const cards: LinkCardProps[] = [
         According to the latest document upload <a href="/documents/1">Document Name Here</a> describe change
       </>
     ),
-    onClick: "/plans/1/elevations",
+    action: { onClick: "/plans/1/elevations" },
   },
   {
     title: "Review location changes: 1 added, 1 renumbered, 1 removed.",
     message: summary,
-    onClick: "/plans/1/locations",
+    action: { onClick: "/plans/1/locations" },
   },
-  { title: "Review 2 new options, 1 changed, 1 removed.", message: summary, onClick: "/plans/1/options" },
-  { title: "Review 1 changed program value.", message: summary, onClick: "/plans/1/program" },
+  { title: "Review 2 new options, 1 changed, 1 removed.", message: summary, action: { onClick: "/plans/1/options" } },
+  { title: "Review 1 changed program value.", message: summary, action: { onClick: "/plans/1/program" } },
 ];
 
 export function Default() {

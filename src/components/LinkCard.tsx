@@ -8,7 +8,8 @@ export type LinkCardProps = {
   title: string;
   /** Supporting copy, i.e. a `ReactNode` so it can carry its own inline links as needed. */
   message?: ReactNode;
-} & Pick<BeamButtonProps, "onClick" | "openInNew">;
+  action: Pick<BeamButtonProps, "onClick" | "openInNew">;
+};
 
 /**
  * A raised card that summarizes something and links to it via a trailing arrow.
@@ -16,11 +17,11 @@ export type LinkCardProps = {
  * Only the arrow is interactive, so `message` is free to hold its own links.
  */
 export function LinkCard(props: LinkCardProps) {
-  const { title, message, onClick, openInNew } = props;
+  const { title, message, action } = props;
   const tid = useTestIds(props, "linkCard");
   return (
     <div
-      // line up arrow icon with title when we have no message
+      // Line up the arrow with the title when there's no message.
       css={Css.df.ais.gap2.w100.p2.br16.bgColor(Tokens.Surface).bshBasic.if(!message).aic.$}
       {...tid}
     >
@@ -38,9 +39,8 @@ export function LinkCard(props: LinkCardProps) {
         <IconButton
           icon="arrowRight"
           color={Tokens.TextLinkDefault}
-          onClick={onClick}
-          openInNew={openInNew}
-          label={title + "action link"}
+          {...action}
+          label={title}
           preventTooltip
           {...tid.action}
         />

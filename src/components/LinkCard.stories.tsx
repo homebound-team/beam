@@ -40,20 +40,20 @@ export function Default() {
   return (
     <div css={Css.df.fdc.gap5.$}>
       <Sample title="Title and message">
-        <LinkCard title={title} message={message} onClick="/plans/1/locations" />
+        <LinkCard title={title} message={message} action={{ onClick: "/plans/1/locations" }} />
       </Sample>
 
       <Sample title="Without a message">
-        <LinkCard title={title} onClick="/plans/1/locations" />
+        <LinkCard title={title} action={{ onClick: "/plans/1/locations" }} />
       </Sample>
 
       <Sample title="Long copy that wraps at full width">
-        <LinkCard title={longTitle} message={longMessage} onClick="/plans/1/locations" />
+        <LinkCard title={longTitle} message={longMessage} action={{ onClick: "/plans/1/locations" }} />
       </Sample>
 
       <Sample title="Long copy that wraps in a narrow container">
         <div css={Css.wPx(480).$}>
-          <LinkCard title={title} message={message} onClick="/plans/1/locations" />
+          <LinkCard title={title} message={message} action={{ onClick: "/plans/1/locations" }} />
         </div>
       </Sample>
 
@@ -62,7 +62,7 @@ export function Default() {
           <LinkCard
             title="Review Plan-2026-Elevation-Revision-Package-Final-v12.pdf"
             message="https://example.com/documents/plan-2026-elevation-revision-package-final-v12.pdf"
-            onClick="/documents/1"
+            action={{ onClick: "/documents/1" }}
           />
         </div>
       </Sample>
