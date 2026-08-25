@@ -44,13 +44,11 @@ describe("Tag", () => {
     expect(r.query.tooltip).toBeNull();
   });
 
-  it("secondary ai tag is uppercased and outlined in purple", async () => {
+  it("secondary ai tag is outlined in purple", async () => {
     // Given a secondary ai tag
     const r = await render(<Tag text="Secondary Label" variant="secondary" type="ai" data-testid="tag" />);
 
-    // Then, unlike other secondary tags, it is uppercased and purple
     expect(r.tag).toHaveStyle({
-      textTransform: "uppercase",
       color: Palette.Purple800,
       borderColor: Palette.Purple600,
     });

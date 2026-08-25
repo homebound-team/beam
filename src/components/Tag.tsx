@@ -88,7 +88,7 @@ function getVariantStyles(variant: TagVariant, type?: TagType): TagVariantStyles
       background: isAi ? Css.bgWhite.bcPurple600.bw2.ba.purple800.$ : Css.bgWhite.bcGray300.bw1.ba.$,
       // Note: Ai tags shouldn't be using any icon, the purple outline/text is enough
       iconColor: isAi ? Palette.Purple600 : Palette.Gray700,
-      typography: isAi ? Css.xsSb.ttu.$ : Css.xs.$,
+      typography: isAi ? Css.xsSb.$ : Css.xs.$,
       padding: Css.pxPx(8).$,
     };
   }
