@@ -53,7 +53,11 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
         ...(inDocumentScrollLayout ? pageContentPaddingX : undefined),
       }}
     >
-      {groupBy && <GroupByField {...groupBy} />}
+      {groupBy && (
+        <div>
+          <GroupByField {...groupBy} />
+        </div>
+      )}
       {filterControls}
       {activeFilterCount > 0 && (
         <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
