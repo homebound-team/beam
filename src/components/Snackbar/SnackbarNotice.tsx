@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { useLayoutEffect, useResizeObserver } from "@react-aria/utils";
+import { ReactNode, useCallback, useRef, useState } from "react";
 import { Button, ButtonProps } from "src/components/Button";
 import { contrastDataTheme } from "src/components/ContrastScope";
 import { Icon, IconProps } from "src/components/Icon";
@@ -28,9 +29,24 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
   const tid = useTestIds(props, "snackbar");
   // Only allow the "close" button to be hidden if not a `persistent` notice. Otherwise we could get in a state where the user cannot remove the notice from the screen.
   const reallyHideClose = hideCloseButton && !persistent;
+  const messageRef = useRef<HTMLSpanElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  const measureOverflow = useCallback(() => {
+    if (!messageRef.current || expanded) return;
+    setHasOverflow(messageRef.current.scrollHeight > messageRef.current.clientHeight);
+  }, [expanded]);
+
+  useLayoutEffect(measureOverflow, [measureOverflow, message]);
+  useResizeObserver({ ref: messageRef, onResize: measureOverflow });
+
   return (
     <div
-      css={Css.color(Tokens.OnSurface).bgColor(Tokens.SurfaceRaised).br4.md.df.aic.maxwPx(420).$}
+      css={{
+        ...Css.color(Tokens.OnSurface).bgColor(Tokens.SurfaceRaised).br4.md.df.pyPx(12).maxwPx(noticeMaxWidthPx).aifs.$,
+        ...(expanded ? Css.maxw(expandedNoticeMaxWidth).$ : undefined),
+      }}
       data-theme={contrastDataTheme}
       {...tid}
       role="alert"
@@ -41,14 +57,27 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
         </span>
       )}
 
-      <span
-        css={Css.lineClamp3.pr2.myPx(12).plPx(icon ? 8 : 16).$}
-        // Provide a 'title' attribute if we can in case the text is truncated
-        {...(typeof message === "string" ? { title: message } : undefined)}
-        {...tid.message}
-      >
-        {message}
-      </span>
+      <div css={Css.fg1.mw0.df.fdc.aifs.gap1.pr2.plPx(icon ? 8 : 16).$}>
+        <span
+          ref={messageRef}
+          css={Css.if(!expanded).lineClamp3.$}
+          // Provide a 'title' attribute if we can in case the text is truncated
+          {...(typeof message === "string" && !expanded ? { title: message } : undefined)}
+          {...tid.message}
+        >
+          {message}
+        </span>
+        {hasOverflow && (
+          <Button
+            variant="text"
+            size="sm"
+            label={expanded ? "Collapse" : "Expand"}
+            aria-expanded={expanded}
+            onClick={() => setExpanded((prev) => !prev)}
+            {...tid.expand}
+          />
+        )}
+      </div>
 
       {(action || !reallyHideClose) && (
         <span css={Css.fs0.df.aic.$}>
@@ -67,6 +96,10 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
     </div>
   );
 }
+
+const noticeMaxWidthPx = 420;
+/** Twice the collapsed width, capped so both sides keep the Snackbar `left3` inset. */
+const expandedNoticeMaxWidth = `min(${noticeMaxWidthPx * 2}px, calc(100vw - (2 * var(--t-spacing) * 3)))`;
 
 const typeToIcon: Record<SnackbarNoticeTypes, Pick<IconProps, "icon" | "color">> = {
   // Can change to a Tupple with IconKey and color?
