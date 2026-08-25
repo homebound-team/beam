@@ -9,7 +9,7 @@ import { BeamFocusableProps } from "src/interfaces";
 import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { AiTagIcon } from "./AiTagIcon";
+import { AiBadge } from "./AiBadge";
 import { Icon } from "./Icon";
 
 export type Tab<V extends string = string> = {
@@ -19,8 +19,8 @@ export type Tab<V extends string = string> = {
   icon?: IconKey;
   // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
   endAdornment?: ReactNode;
-  /** Whether the tab's content has AI proposals waiting on it. Takes precedence over `icon` and `endAdornment`. */
-  hasAiProposals?: boolean;
+  /** Whether the tab's content is AI-driven, which adds AiBadge. Takes precedence over `icon` and `endAdornment`. */
+  aiMode?: boolean;
   /** Whether the Tab is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
 };
@@ -220,7 +220,7 @@ type TabImplProps<V extends string> = {
 
 function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { tab, onClick, active, onKeyUp, onBlur, focusProps, isFocusVisible = false, ...others } = props;
-  const { disabled = false, name: label, icon, endAdornment, hasAiProposals = false } = tab;
+  const { disabled = false, name: label, icon, endAdornment, aiMode = false } = tab;
   const isDisabled = !!disabled;
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles, aiStyles } =
@@ -238,7 +238,7 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     ...Css.props({
       ...baseStyles,
       // Only tints the label while the tab is unselected; selected keeps its own darker treatment.
-      ...(hasAiProposals && aiStyles),
+      ...(aiMode && aiStyles),
       ...(active && activeStyles),
       ...(isDisabled && disabledStyles),
       ...(isHovered && hoverStyles),
@@ -252,7 +252,7 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     ...(isRouteTab(tab) ? {} : { onClick: () => onClick(tab.value) }),
   });
 
-  const decoration = hasAiProposals ? <AiTagIcon /> : icon ? <Icon icon={icon} /> : endAdornment;
+  const decoration = aiMode ? <AiBadge /> : icon ? <Icon icon={icon} /> : endAdornment;
 
   const tabLabel = (
     <>

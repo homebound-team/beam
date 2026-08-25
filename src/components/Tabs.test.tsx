@@ -51,11 +51,11 @@ describe("TabsWithContent", () => {
     expectActiveTab(r.tabs_tab1);
   });
 
-  describe("hasAiProposals", () => {
-    it("decorates the tab with an AI tag", async () => {
+  describe("aiMode", () => {
+    it("badges the tab", async () => {
       const r = await render(<TestAiTabs />, withRouter());
-      expect(r.tabs_tab2).toContainElement(r.aiTagIcon);
-      expect(r.query.tabs_tab1).not.toContainElement(r.query.aiTagIcon);
+      expect(r.tabs_tab2).toContainElement(r.aiBadge);
+      expect(r.query.tabs_tab1).not.toContainElement(r.query.aiBadge);
     });
 
     it("tints the label while the tab is unselected", async () => {
@@ -68,7 +68,7 @@ describe("TabsWithContent", () => {
       const r = await render(<TestAiTabs selected="tab2" />, withRouter());
       // Then it stays with the active treatment rather than going purple
       expect(r.tabs_tab2).not.toHaveStyle({ color: Palette.Purple700 });
-      expect(r.tabs_tab2).toContainElement(r.aiTagIcon);
+      expect(r.tabs_tab2).toContainElement(r.aiBadge);
     });
   });
 
@@ -281,7 +281,7 @@ function TestTabs() {
 function TestAiTabs({ selected = "tab1" }: { selected?: TabValue }) {
   const aiTabs: TabWithContent<TabValue>[] = [
     { name: "Tab 1", value: "tab1", render: () => <TestTabContent content="Tab 1 Content" /> },
-    { name: "Tab 2", value: "tab2", hasAiProposals: true, render: () => <TestTabContent content="Tab 2 Content" /> },
+    { name: "Tab 2", value: "tab2", aiMode: true, render: () => <TestTabContent content="Tab 2 Content" /> },
   ];
   return <TabsWithContent tabs={aiTabs} onChange={() => {}} selected={selected} />;
 }

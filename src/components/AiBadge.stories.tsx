@@ -1,10 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
-import { AiTagIcon } from "src/components/AiTagIcon";
+import { AiBadge } from "src/components/AiBadge";
 import { Css } from "src/Css";
 
 export default {
-  component: AiTagIcon,
+  component: AiBadge,
   parameters: {
     design: {
       type: "figma",
@@ -20,7 +20,7 @@ export function Default() {
         <div css={Css.df.aic.gap2.$}>
           {[1, 2, 3, 4, 6].map((inc) => (
             <div key={inc} css={Css.df.fdc.aic.gap1.$}>
-              <AiTagIcon inc={inc} />
+              <AiBadge inc={inc} />
               <span css={Css.xs2.$}>{`inc={${inc}}`}</span>
             </div>
           ))}
@@ -30,7 +30,7 @@ export function Default() {
       <Sample title="Against text, at the 16px default">
         <span css={Css.df.aic.gap1.sm.$}>
           Program Data
-          <AiTagIcon />
+          <AiBadge />
         </span>
       </Sample>
     </div>
