@@ -2,8 +2,9 @@ import { Meta } from "@storybook/react-vite";
 import { capitalCase } from "change-case";
 import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
-import { withBeamDecorator } from "src/utils/sb";
+import { newStory, withBeamDecorator } from "src/utils/sb";
 import { action } from "storybook/actions";
+import { userEvent, within } from "storybook/test";
 
 export default {
   component: SnackbarNotice,
@@ -41,6 +42,23 @@ export function NoticeExamples() {
     </div>
   );
 }
+
+export const NoticeOverflowExpanded = newStory(
+  () => (
+    <SnackbarNotice
+      onClose={action("Close notice")}
+      id="1"
+      icon="error"
+      message={"Snackbar notice that will truncate past three lines. ".repeat(3)}
+      action={{ label: "Action", onClick: action("Action clicked"), variant: "tertiary" }}
+    />
+  ),
+  {
+    play: async ({ canvasElement }) => {
+      await userEvent.click(within(canvasElement).getByTestId("snackbar_expand"));
+    },
+  },
+);
 
 export function NoticeIconExamples() {
   // export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info";
