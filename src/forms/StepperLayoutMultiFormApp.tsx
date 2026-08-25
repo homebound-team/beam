@@ -3,18 +3,18 @@ import { Observer } from "mobx-react";
 import { useCallback, useEffect, useState } from "react";
 import { Css, Tokens } from "src/Css";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { FormSectionLayout, WorkflowLayout, WorkflowLayoutStep } from "src/layouts";
+import { FormSectionLayout, StepperLayout, StepperLayoutStep } from "src/layouts";
 
 type ProjectBasics = { name?: string | null; code?: string | null };
 type ProjectContact = { email?: string | null; phone?: string | null };
 type ProjectNotes = { summary?: string | null };
 
 /**
- * Demos `WorkflowLayout` when each step owns its own form-state: keep forms alive at the page,
+ * Demos `StepperLayout` when each step owns its own form-state: keep forms alive at the page,
  * load step data on demand via `init` (so hydration is not dirty), and OR their `.dirty` flags
  * into `isDirty`.
  */
-export function WorkflowLayoutMultiFormApp() {
+export function StepperLayoutMultiFormApp() {
   // Keep form states mounted for the whole workflow so leave-guards can see every step's dirty flag.
   // Start with config only — light until each step's data is fetched into `init`.
   const [basicsInput, setBasicsInput] = useState<ProjectBasics | undefined>();
@@ -41,7 +41,7 @@ export function WorkflowLayoutMultiFormApp() {
   return (
     <Observer>
       {() => {
-        const steps: WorkflowLayoutStep[] = [
+        const steps: StepperLayoutStep[] = [
           {
             label: "Basics",
             isValid: basicsForm.valid,
@@ -62,7 +62,7 @@ export function WorkflowLayoutMultiFormApp() {
         ];
 
         return (
-          <WorkflowLayout
+          <StepperLayout
             title="Multi-form Workflow"
             onCancel={() => {}}
             completeLabel="Create"

@@ -1,16 +1,16 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { WorkflowLayoutFormApp } from "src/forms/WorkflowLayoutFormApp";
+import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 import { pageContentPaddingX } from "../layoutSpacing";
-import { WorkflowLayout } from "./WorkflowLayout";
+import { StepperLayout } from "./StepperLayout";
 
 export default {
-  component: WorkflowLayout,
+  component: StepperLayout,
   decorators: [withBeamDecorator, withRouter()],
   parameters: {
     layout: "fullscreen",
@@ -22,7 +22,7 @@ export default {
 export function WithFormSectionLayout() {
   return (
     <WithEnvironmentBanner>
-      <WorkflowLayoutFormApp />
+      <StepperLayoutFormApp />
     </WithEnvironmentBanner>
   );
 }
@@ -31,7 +31,7 @@ export function WithFormSectionLayout() {
 export function AiMode() {
   return (
     <WithEnvironmentBanner>
-      <WorkflowLayoutFormApp aiMode />
+      <StepperLayoutFormApp aiMode />
     </WithEnvironmentBanner>
   );
 }
@@ -40,7 +40,7 @@ export function AiMode() {
 export function WithContentHeaderAndTable() {
   return (
     <WithEnvironmentBanner>
-      <WorkflowLayout
+      <StepperLayout
         title="Trade Partners"
         onCancel={action("cancel clicked")}
         completeLabel="Save"
@@ -57,7 +57,7 @@ export function WithContentHeaderAndTable() {
                   actions={[{ label: "Add", onClick: action("add clicked") }]}
                   xss={pageContentPaddingX}
                 />
-                <GridTableLayoutExample storageKey="workflow-layout-grid-table" />
+                <GridTableLayoutExample storageKey="stepper-layout-grid-table" />
               </div>
             ),
           },

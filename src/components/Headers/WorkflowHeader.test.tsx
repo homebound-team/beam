@@ -40,6 +40,14 @@ describe("WorkflowHeader", () => {
     // Then onChange is invoked with that step's value
     expect(onChange).toHaveBeenCalledWith("send");
   });
+
+  it("omits the stepper strip when stepperTabs is not passed", async () => {
+    // Given a WorkflowHeader without stepperTabs
+    const r = await render(<WorkflowHeader title="Test Title" />);
+
+    // Then no stepper tabs render
+    expect(r.query.header_stepperTabs).toBeNull();
+  });
 });
 
 function makeSteps(): StepperTabsStep[] {

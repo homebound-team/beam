@@ -42,9 +42,9 @@ export const beamRightPaneWidthVar = "--beam-right-pane-width";
 export const beamFloatingRightOffsetVar = "--beam-floating-right-offset";
 
 /**
- * `WorkflowLayout`'s mobile action-footer height (px); `0px` when absent. Published directly on
+ * Workflow layouts' mobile action-footer height (px); `0px` when absent. Published directly on
  * `document.documentElement` (not via inline `style` on a React-tree wrapper) since consumers like
- * `DocumentScrollToTopButton` are siblings of `WorkflowLayout`'s subtree, not descendants.
+ * `DocumentScrollToTopButton` are siblings of the workflow subtree, not descendants.
  */
 export const beamWorkflowLayoutFooterHeightVar = "--beam-workflow-layout-footer-height";
 
@@ -96,6 +96,15 @@ export function stickyNavAndHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
 }
 
+/** Pixel equivalent of {@link stickyNavAndHeaderOffset}, read from `el`'s computed (inherited) CSS vars. Used by JumpLink scroll-spy, which needs a number rather than a CSS `calc()`. */
+export function stickyNavAndHeaderOffsetPx(el: Element): number {
+  const styles = getComputedStyle(el);
+  const read = (name: string) => parseFloat(styles.getPropertyValue(name)) || 0;
+  return (
+    read(beamEnvironmentBannerLayoutHeightVar) + read(beamNavbarLayoutHeightVar) + read(beamPageHeaderLayoutHeightVar)
+  );
+}
+
 /** `top` offset for sticky table column headers (environment banner + navbar + page header + table actions). */
 export function stickyTableHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
@@ -103,7 +112,7 @@ export function stickyTableHeaderOffset(basePx = 0): string {
 
 /**
  * `bottom` offset for floating page chrome (e.g. `DocumentScrollToTopButton`) that must clear other
- * fixed-position bottom chrome — currently just `WorkflowLayout`'s mobile action footer, but stacks with
+ * fixed-position bottom chrome — currently just the workflow mobile action footer, but stacks with
  * future bottom-anchored elements the same way. `basePx` is the element's own resting offset.
  */
 export function getFloatingBottomOffset(basePx = 0): string {

@@ -7,7 +7,7 @@ import { useLayoutEffect, useRef, useState } from "react";
  * Unlike `useAutoHideOnScroll`, this tracks plain `window.scrollY` rather than a spacer's rect, since
  * callers here rest at a fixed, computable offset rather than needing a measured DOM anchor.
  *
- * Currently **unused** — kept for a future revisit. `WorkflowLayout` was its only caller (collapsing the
+ * Currently **unused** — kept for a future revisit. `StepperLayout` was its only caller (collapsing the
  * stepper tabs on scroll-down at `md`+) and no longer wires it up; its tabs now collapse on mobile only.
  * Before re-adopting it, note that `restingOffset` is meant to be a *stable* value: passing a live
  * measured height of the very chrome being collapsed feeds the collapse back into its own threshold.
