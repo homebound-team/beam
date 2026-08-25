@@ -28,7 +28,10 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
     form: Omit<FormSectionLayoutProps, "sections"> & { sections?: FocusedFormSection[] };
   };
 
-/** Standalone single-form workflow page. Contract: `docs/layouts.md`. */
+/**
+ * Standalone single-form workflow page. Contract: `docs/layouts.md`.
+ * Nest under `EnvironmentBannerLayout` only — no navbar/side nav, so attention stays on the form.
+ */
 export function FocusedFormLayout(props: FocusedFormLayoutProps) {
   const {
     onCancel,

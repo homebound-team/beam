@@ -32,10 +32,8 @@ export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleS
 
 /**
  * Standalone step-based workflow page. Contract: `docs/layouts.md`.
- *
- * Nest directly under `EnvironmentBannerLayout`, never under `NavbarLayout`/`SideNavLayout`/`PageHeaderLayout`.
- * The header never auto-hides. Stepper tabs collapse on mobile only. Body is the active step's `content`
- * and does not require `FormSectionLayout`.
+ * Nest under `EnvironmentBannerLayout` only — no navbar/side nav, so attention stays on the workflow.
+ * Header does not auto-hide; stepper tabs collapse on mobile; body is the active step's `content`.
  */
 export function StepperLayout(props: StepperLayoutProps) {
   const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, isDirty, aiMode, ...headerProps } =
