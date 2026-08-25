@@ -42,8 +42,7 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
         {description}
       </span>
       {actions.length > 0 && (
-        // Held to the tag's height so a text button's taller line box can't grow the banner.
-        <div css={Css.df.aic.gap(1.5).fs0.hPx(18).$}>
+        <div css={Css.df.aic.gap(1.5).fs0.$}>
           {actions.map((action) => (
             <Button key={`${action.label}`} {...action} variant="text" />
           ))}
