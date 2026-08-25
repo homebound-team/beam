@@ -1,6 +1,5 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
-import { Button } from "src/components/Button";
 import { GridColumn, GridTable, simpleHeader, SimpleHeaderAndData } from "src/components/index";
 import { RowBanner } from "src/components/RowBanner";
 import { Css } from "src/Css";
@@ -42,24 +41,10 @@ export function Default() {
       </Sample>
 
       <Sample title="Long copy that wraps">
-        <div css={Css.wPx(480).$}>
-          <RowBanner
-            type="error"
-            description={`${errorCopy} It was last seen in the archived catalog from a project that closed out two quarters ago.`}
-            actions={[reviewMatches]}
-          />
-        </div>
-      </Sample>
-
-      <Sample title="Inline control in the description">
         <RowBanner
           type="error"
-          description={
-            <span>
-              Add Stained Wood Ceiling was not found in the option library.{" "}
-              <Button variant="text" label="Review 2 possible matches" onClick={noop} />
-            </span>
-          }
+          description={`${errorCopy}${errorCopy}${errorCopy} It was last seen in the archived catalog from a project that closed out two quarters ago.`}
+          actions={[reviewMatches]}
         />
       </Sample>
     </div>
