@@ -31,7 +31,7 @@ export function JumpLink(props: JumpLinkProps) {
     e.preventDefault();
     const target = document.getElementById(href.replace(/^#/, ""));
     if (target) {
-      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: "smooth" });
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 

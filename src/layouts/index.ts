@@ -32,11 +32,12 @@ export {
   getFloatingBottomOffset,
   getFloatingRightOffset,
   stickyNavAndHeaderOffset,
+  stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,
 } from "./layoutVars";
 export { NavbarLayout } from "./NavbarLayout";
 export type { NavbarLayoutProps } from "./NavbarLayout";
 export { PageHeaderLayout } from "./PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./PageHeaderLayout";
-export { WorkflowLayout } from "./WorkflowLayout/WorkflowLayout";
-export type { WorkflowLayoutProps, WorkflowLayoutStep } from "./WorkflowLayout/WorkflowLayout";
+export { FocusedFormLayout, StepperLayout } from "./Workflow";
+export type { FocusedFormLayoutProps, StepperLayoutProps, StepperLayoutStep } from "./Workflow";

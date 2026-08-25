@@ -13,7 +13,7 @@ type ConfirmCloseModalProps = {
   continueText?: string;
 };
 
-/** Modal content for discarding unsaved changes (SuperDrawer close, WorkflowLayout leave, etc.). */
+/** Modal content for discarding unsaved changes (SuperDrawer close, workflow leave, etc.). */
 export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
   const {
     onClose,

@@ -12,7 +12,7 @@ export type CenteredLayoutProps = {
   children?: ReactNode;
 };
 
-/** Centered body-width shell. Nest inside page-header layout / workflow layout children — see `docs/layouts.md`. */
+/** Centered body-width shell. Nest inside page-header / stepper layout children — see `docs/layouts.md`. */
 export function CenteredLayout(props: CenteredLayoutProps) {
   const { size, children } = props;
   const tid = useTestIds(props, "centeredLayout");

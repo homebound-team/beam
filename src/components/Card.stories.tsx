@@ -93,7 +93,7 @@ export const FullWidthListCards = newStory(
       <div>
         <h2>fullWidth (follows its column, narrow or wide)</h2>
         <div css={Css.wPx(800).dg.gtc("1fr 1fr").gap2.$}>
-          <CardComponent {...baseArgs} type="list" bordered fullWidth />
+          <CardComponent {...baseArgs} type="list" bordered fullWidth tag={{ text: "Active", type: "success" }} />
           <CardComponent {...baseArgs} type="list" bordered fullWidth />
         </div>
       </div>
