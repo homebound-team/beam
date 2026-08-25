@@ -49,7 +49,12 @@ export function RightSidebar({ content, headerHeightPx }: RightSidebarProps) {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.2, ease: [0.51, 0.92, 0.24, 1], duration: 0.3 }}
             exit={{ transition: { ease: "linear", duration: 0.2 }, x: "100%" }}
-            css={Css.w100.mw(RIGHT_SIDEBAR_MIN_WIDTH).z0.maxh(`calc(100vh - ${headerHeightPx}px)`).oya.pl4.pr3.$}
+            css={
+              Css.w100
+                .mw(RIGHT_SIDEBAR_MIN_WIDTH)
+                .z0.mh(`calc(100vh - ${headerHeightPx}px)`)
+                .maxh(`calc(100vh - ${headerHeightPx}px)`).oya.pl4.pr3.$
+            }
           >
             <>
               {/* Sticky header section */}
