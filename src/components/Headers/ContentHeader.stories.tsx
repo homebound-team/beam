@@ -1,7 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
-import { withBeamDecorator } from "src/utils/sb";
+import { newStory, withBeamDecorator, withRouter } from "src/utils/sb";
 
 export default {
   component: ContentHeader,
@@ -77,3 +77,26 @@ export function Level4() {
     />
   );
 }
+
+/** Overflow / more-actions `ButtonMenu` via `kind: "menu"` (always a `verticalDots` trigger). */
+export const WithOverflowMenu = newStory(
+  () => (
+    <ContentHeader
+      title="Trade Partners"
+      description="Assign and manage trade partners for this project."
+      actions={[
+        { label: "Add", onClick: () => {} },
+        { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
+        {
+          kind: "menu",
+          defaultOpen: true,
+          items: [
+            { label: "Export", onClick: () => {} },
+            { label: "Archive", onClick: () => {} },
+          ],
+        },
+      ]}
+    />
+  ),
+  { decorators: [withRouter()] },
+);
