@@ -28,6 +28,7 @@ export function WithChildSections() {
         { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
         {
           kind: "menu",
+          trigger: { icon: "verticalDots", variant: "outline" },
           items: [
             { label: "Export", onClick: () => {} },
             { label: "Archive", onClick: () => {} },

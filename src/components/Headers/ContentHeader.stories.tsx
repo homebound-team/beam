@@ -90,6 +90,7 @@ export const WithOverflowMenu = newStory(
         {
           kind: "menu",
           defaultOpen: true,
+          trigger: { icon: "verticalDots", variant: "outline" },
           items: [
             { label: "Export", onClick: () => {} },
             { label: "Archive", onClick: () => {} },

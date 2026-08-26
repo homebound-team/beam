@@ -4,9 +4,6 @@ import { IconButton, IconButtonProps } from "src/components/IconButton";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 
-/** Overflow `ButtonMenu` props; the trigger is always a `verticalDots` IconButton. */
-type HeaderMenuAction = Omit<ButtonMenuProps, "trigger">;
-
 /**
  * A single action rendered by `HeaderActions` — a `Button`, an icon-only `IconButton`, or a
  * `ButtonMenu` (typically the overflow / more-actions menu).
@@ -20,7 +17,7 @@ type HeaderMenuAction = Omit<ButtonMenuProps, "trigger">;
 export type HeaderAction =
   | ({ kind?: "default" } & ButtonProps)
   | ({ kind: "icon" } & Omit<IconButtonProps, "variant">)
-  | ({ kind: "menu" } & HeaderMenuAction);
+  | ({ kind: "menu" } & ButtonMenuProps);
 
 export type HeaderActionsProps = {
   actions: HeaderAction[];
@@ -41,7 +38,7 @@ export function HeaderActions(props: HeaderActionsProps) {
         if (action.kind === "menu") {
           const { kind, ...menuProps } = action;
           void kind;
-          return <ButtonMenu key={key} {...menuProps} trigger={{ icon: "verticalDots" }} />;
+          return <ButtonMenu key={key} {...menuProps} />;
         }
         return <Button key={key} {...action} />;
       })}
