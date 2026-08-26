@@ -25,6 +25,7 @@ describe("HeaderActions", () => {
           { label: "Add", onClick: () => {} },
           {
             kind: "menu",
+            trigger: { icon: "verticalDots", variant: "outline" },
             items: [
               { label: "Export", onClick: () => {} },
               { label: "Archive", onClick: () => {} },

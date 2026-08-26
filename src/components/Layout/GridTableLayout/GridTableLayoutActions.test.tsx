@@ -178,7 +178,11 @@ describe("actions", () => {
       <GridTableLayoutActions
         actions={[
           { label: "Add", onClick: noop },
-          { kind: "menu", items: [{ label: "Action", onClick: noop }] },
+          {
+            kind: "menu",
+            trigger: { icon: "verticalDots", variant: "outline" },
+            items: [{ label: "Action", onClick: noop }],
+          },
         ]}
       />,
       withRouter(),

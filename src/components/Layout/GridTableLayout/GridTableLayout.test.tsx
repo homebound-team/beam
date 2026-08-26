@@ -429,7 +429,13 @@ describe("GridTableLayout", () => {
         <TestWrapper
           layoutStateProps={{}}
           hideEditColumns
-          actions={[{ kind: "menu", items: [{ label: "First Action", onClick: noop }] }]}
+          actions={[
+            {
+              kind: "menu",
+              trigger: { icon: "verticalDots", variant: "outline" },
+              items: [{ label: "First Action", onClick: noop }],
+            },
+          ]}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],

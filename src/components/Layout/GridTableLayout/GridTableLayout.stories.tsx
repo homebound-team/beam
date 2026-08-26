@@ -77,6 +77,7 @@ export function GridTableLayout() {
           {
             kind: "menu",
             tooltip: "I am the action menu",
+            trigger: { icon: "verticalDots", variant: "outline" },
             items: [
               { label: "First Action", onClick: noop },
               { label: "Second Action", onClick: noop },

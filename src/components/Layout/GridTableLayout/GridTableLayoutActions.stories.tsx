@@ -120,6 +120,7 @@ export function WithActions() {
         {
           kind: "menu",
           tooltip: "More actions",
+          trigger: { icon: "verticalDots", variant: "outline" },
           defaultOpen: true,
           items: [
             { label: "Export", onClick: () => {} },
@@ -152,6 +153,7 @@ export function AllFeatures() {
         {
           kind: "menu",
           tooltip: "More actions",
+          trigger: { icon: "verticalDots", variant: "outline" },
           items: [
             { label: "Export", onClick: () => {} },
             { label: "Import", onClick: () => {} },
