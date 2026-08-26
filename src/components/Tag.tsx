@@ -5,7 +5,7 @@ import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type TagXss = Margin | "backgroundColor" | "color";
-export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral";
+export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral" | "ai";
 export type TagVariant = "primary" | "secondary";
 
 type TagPropsBase<X> = {
@@ -83,10 +83,12 @@ type TagVariantStyles = {
 
 function getVariantStyles(variant: TagVariant, type?: TagType): TagVariantStyles {
   if (variant === "secondary") {
+    const isAi = type === "ai";
     return {
-      background: Css.bgWhite.bcGray300.bw1.ba.$,
-      iconColor: Palette.Gray700,
-      typography: Css.xs.$,
+      background: isAi ? Css.bgWhite.bcPurple600.bw2.ba.purple800.$ : Css.bgWhite.bcGray300.bw1.ba.$,
+      // Note: Ai tags shouldn't be using any icon, the purple outline/text is enough
+      iconColor: isAi ? Palette.Purple600 : Palette.Gray700,
+      typography: isAi ? Css.xsSb.$ : Css.xs.$,
       padding: Css.pxPx(8).$,
     };
   }
@@ -110,6 +112,9 @@ function getPrimaryStyles(type?: TagType): Pick<TagVariantStyles, "background" |
       return { background: Css.bgRed100.$, iconColor: Palette.Orange700 };
     case "success":
       return { background: Css.bgGreen100.$, iconColor: Palette.Green600 };
+    // Note: Ai tags shouldn't be using any icon, the purple background is enough
+    case "ai":
+      return { background: Css.bgPurple200.$, iconColor: Palette.Purple600 };
     default:
       // Neutral case
       return { background: Css.bgGray200.$, iconColor: Palette.Gray700 };

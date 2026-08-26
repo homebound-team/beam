@@ -1,6 +1,6 @@
 import { render } from "@homebound/rtl-utils";
 import { Tag } from "src/components/Tag";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 
 describe("Tag", () => {
   it("renders", async () => {
@@ -42,6 +42,16 @@ describe("Tag", () => {
 
     // Then no tooltip wrapper is rendered
     expect(r.query.tooltip).toBeNull();
+  });
+
+  it("secondary ai tag is outlined in purple", async () => {
+    // Given a secondary ai tag
+    const r = await render(<Tag text="Secondary Label" variant="secondary" type="ai" data-testid="tag" />);
+
+    expect(r.tag).toHaveStyle({
+      color: Palette.Purple800,
+      borderColor: Palette.Purple600,
+    });
   });
 
   it("secondary variant does not uppercase text", async () => {
