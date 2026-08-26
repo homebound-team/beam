@@ -171,20 +171,38 @@ describe("GridTableLayoutActions", () => {
   });
 });
 
-describe("actionMenu", () => {
-  it("renders the action menu when actionMenu is provided", async () => {
-    // Given actionMenu is provided
+describe("actions", () => {
+  it("renders inline buttons and a menu when actions are provided", async () => {
+    // Given actions with a button and a menu
     const r = await render(
-      <GridTableLayoutActions actionMenu={{ items: [{ label: "Action", onClick: noop }] }} />,
+      <GridTableLayoutActions
+        actions={[
+          { label: "Add", onClick: noop },
+          { kind: "menu", items: [{ label: "Action", onClick: noop }] },
+        ]}
+      />,
       withRouter(),
     );
-    // Then the vertical-dots menu trigger is shown
+    // Then the button and vertical-dots menu trigger are shown
+    expect(r.add).toBeInTheDocument();
     expect(r.verticalDots).toBeInTheDocument();
+    expect(r.query.verticalDots_action).toBeNull();
+    // When opening the menu
+    click(r.verticalDots);
+    // Then the menu item is shown
+    expect(r.verticalDots_action).toBeInTheDocument();
   });
 
-  it("does not render the action menu when actionMenu is not provided", async () => {
-    // Given no actionMenu
+  it("does not render the action menu when actions are not provided", async () => {
+    // Given no actions
     const r = await render(<GridTableLayoutActions />, withRouter());
+    // Then the vertical-dots menu trigger is not shown
+    expect(r.query.verticalDots).not.toBeInTheDocument();
+  });
+
+  it("does not render the action menu when actions is empty", async () => {
+    // Given an empty actions array
+    const r = await render(<GridTableLayoutActions actions={[]} />, withRouter());
     // Then the vertical-dots menu trigger is not shown
     expect(r.query.verticalDots).not.toBeInTheDocument();
   });

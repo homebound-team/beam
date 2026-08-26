@@ -1,9 +1,9 @@
 import { memo, MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
-import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { CountBadge } from "src/components/CountBadge";
 import { FilterDefs, FilterImpls, filterTestIdPrefix } from "src/components/Filters";
 import { getActiveFilterCount } from "src/components/Filters/utils";
+import { HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
@@ -30,9 +30,6 @@ export type SearchBoxApi = {
   clear: VoidFunction;
 };
 
-// Omit to force all action button menus to look the same
-export type ActionButtonMenuProps = Omit<ButtonMenuProps, "trigger">;
-
 type GridTableLayoutActionsProps<
   F extends Record<string, unknown>,
   G extends Value = string,
@@ -51,7 +48,7 @@ type GridTableLayoutActionsProps<
   setView?: (v: TableView) => void;
   clearFilters?: () => void;
   searchApi?: MutableRefObject<SearchBoxApi | undefined>;
-  actionMenu?: ActionButtonMenuProps;
+  actions?: HeaderAction[];
 };
 
 function GridTableLayoutActionsComponent<
@@ -73,7 +70,7 @@ function GridTableLayoutActionsComponent<
     setView,
     clearFilters,
     searchApi,
-    actionMenu,
+    actions,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
   // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
@@ -194,13 +191,13 @@ function GridTableLayoutActionsComponent<
             />
           )}
         </div>
-        {(hasHideableColumns || withCardView || actionMenu) && (
+        {(hasHideableColumns || withCardView || !!actions?.length) && (
           <div css={Css.df.aic.gapPx(12).$}>
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}
             {withCardView && view !== undefined && setView && <ViewToggleButton view={view} onChange={setView} />}
-            {actionMenu && <ButtonMenu {...actionMenu} trigger={{ icon: "verticalDots" }} />}
+            {!!actions?.length && <HeaderActions actions={actions} {...testId.actions} />}
           </div>
         )}
       </div>

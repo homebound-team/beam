@@ -112,18 +112,22 @@ export function WithCardView() {
   return <GridTableLayoutActions withCardView view={view} setView={setView} />;
 }
 
-export function WithActionMenu() {
+export function WithActions() {
   return (
     <GridTableLayoutActions
-      actionMenu={{
-        tooltip: "More actions",
-        defaultOpen: true,
-        items: [
-          { label: "Export", onClick: () => {} },
-          { label: "Import", onClick: () => {} },
-          { label: "Archive", onClick: () => {} },
-        ],
-      }}
+      actions={[
+        { label: "Add", onClick: () => {} },
+        {
+          kind: "menu",
+          tooltip: "More actions",
+          defaultOpen: true,
+          items: [
+            { label: "Export", onClick: () => {} },
+            { label: "Import", onClick: () => {} },
+            { label: "Archive", onClick: () => {} },
+          ],
+        },
+      ]}
     />
   );
 }
@@ -143,14 +147,18 @@ export function AllFeatures() {
       withCardView
       view={view}
       setView={setView}
-      actionMenu={{
-        tooltip: "More actions",
-        items: [
-          { label: "Export", onClick: () => {} },
-          { label: "Import", onClick: () => {} },
-          { label: "Archive", onClick: () => {} },
-        ],
-      }}
+      actions={[
+        { label: "Add", onClick: () => {} },
+        {
+          kind: "menu",
+          tooltip: "More actions",
+          items: [
+            { label: "Export", onClick: () => {} },
+            { label: "Import", onClick: () => {} },
+            { label: "Archive", onClick: () => {} },
+          ],
+        },
+      ]}
     />
   );
 }

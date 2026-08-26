@@ -26,13 +26,7 @@ export type HeaderActionsProps = {
   actions: HeaderAction[];
 };
 
-/**
- * Internal actions-row shared by header/section title rows.
- *
- * Used by `ContentHeader` today; expected to also back `PageHeader`, `WorkflowHeader`,
- * `FormSection`, and `FormSectionLayout`'s `actions` props. Not part of the public API —
- * consumers configure actions via each of those components' own `actions` prop instead.
- */
+/** Internal renderer for `HeaderAction[]`. Not public — pass `actions` on `ContentHeader` or `GridTableLayout`. */
 export function HeaderActions(props: HeaderActionsProps) {
   const { actions, ...otherProps } = props;
   const tid = useTestIds(otherProps, "headerActions");

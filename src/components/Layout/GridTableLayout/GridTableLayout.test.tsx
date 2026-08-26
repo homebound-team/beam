@@ -422,16 +422,14 @@ describe("GridTableLayout", () => {
     });
   });
 
-  describe("actionMenu", () => {
-    it("renders the action menu in table actions", async () => {
-      // Given a GridTableLayout with only an actionMenu configured
+  describe("actions", () => {
+    it("renders actions in table actions", async () => {
+      // Given a GridTableLayout with only actions configured
       const r = await render(
         <TestWrapper
           layoutStateProps={{}}
           hideEditColumns
-          actionMenu={{
-            items: [{ label: "First Action", onClick: noop }],
-          }}
+          actions={[{ kind: "menu", items: [{ label: "First Action", onClick: noop }] }]}
           tableProps={{
             columns: getColumns(),
             rows: [simpleHeader, ...getRows()],

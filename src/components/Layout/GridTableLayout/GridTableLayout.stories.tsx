@@ -72,14 +72,18 @@ export function GridTableLayout() {
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
         }}
-        actionMenu={{
-          tooltip: "I am the actionMenu",
-          items: [
-            { label: "First Action", onClick: noop },
-            { label: "Second Action", onClick: noop },
-            { label: "Third Action", onClick: noop },
-          ],
-        }}
+        actions={[
+          { label: "Add", onClick: noop },
+          {
+            kind: "menu",
+            tooltip: "I am the action menu",
+            items: [
+              { label: "First Action", onClick: noop },
+              { label: "Second Action", onClick: noop },
+              { label: "Third Action", onClick: noop },
+            ],
+          },
+        ]}
       />
     </TestProjectLayout>
   );

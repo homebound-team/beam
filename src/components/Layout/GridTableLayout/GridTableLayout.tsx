@@ -3,6 +3,7 @@ import React, { RefObject, useCallback, useEffect, useLayoutEffect, useMemo, use
 import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { getActiveFilterCount } from "src/components/Filters/utils";
+import { HeaderAction } from "src/components/Headers/HeaderActions";
 import { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -25,7 +26,7 @@ import {
   defaultDocumentScrollRightPaneWidth,
   DocumentScrollRightPaneLayout,
 } from "../RightPaneLayout/DocumentScrollRightPaneLayout";
-import { ActionButtonMenuProps, GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
+import { GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
 
@@ -49,8 +50,8 @@ export type GridTableLayoutProps<
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   /** Title for the empty state when the table has no data rows. */
   emptyFallback?: string;
-  /** Renders a ButtonMenu with "verticalDots" icon as trigger */
-  actionMenu?: ActionButtonMenuProps;
+  /** Inline buttons, icon buttons, and an optional overflow menu (`kind: "menu"`). */
+  actions?: HeaderAction[];
   hideEditColumns?: boolean;
   totalCount?: number;
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
@@ -98,7 +99,7 @@ function GridTableLayoutComponent<
   const {
     tableProps,
     layoutState,
-    actionMenu,
+    actions,
     hideEditColumns = false,
     withCardView,
     defaultView = "list",
@@ -133,7 +134,7 @@ function GridTableLayoutComponent<
     layoutState?.search ||
     hasHideableColumns ||
     withCardView ||
-    actionMenu
+    actions?.length
   );
   // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
   // (which only controls whether the list/card toggle is shown).
@@ -186,7 +187,7 @@ function GridTableLayoutComponent<
       setView={setView}
       clearFilters={clearFilters}
       searchApi={searchApiRef}
-      actionMenu={actionMenu}
+      actions={actions}
     />
   );
 
