@@ -2,11 +2,11 @@ import { createObjectState, ObjectConfig } from "@homebound/form-state";
 import { Meta } from "@storybook/react-vite";
 import { Css, Tokens } from "src/Css";
 import { FormSection } from "src/forms/FormSection/FormSection";
-import { withBeamDecorator } from "src/utils/sb";
+import { withBeamDecorator, withRouter } from "src/utils/sb";
 
 export default {
   component: FormSection,
-  decorators: [withBeamDecorator],
+  decorators: [withBeamDecorator, withRouter()],
 } as Meta;
 
 export function WithoutChildren() {
@@ -26,6 +26,13 @@ export function WithChildSections() {
       actions={[
         { label: "Add", onClick: () => {}, variant: "tertiary" },
         { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },
+        {
+          kind: "menu",
+          items: [
+            { label: "Export", onClick: () => {} },
+            { label: "Archive", onClick: () => {} },
+          ],
+        },
       ]}
       childSections={[
         {
