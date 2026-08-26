@@ -22,7 +22,7 @@ export function AiLinkCardGroup(props: AiLinkCardGroupProps) {
       <div css={Css.df.fdc.aifs.gap2.w100.$}>
         <BlueprintAiLogo height={3} />
         {cards.map((card) => (
-          <LinkCard key={`cardGroup_${card.title}_card`} {...card} />
+          <LinkCard key={card.title} {...card} />
         ))}
       </div>
     </AiPanel>

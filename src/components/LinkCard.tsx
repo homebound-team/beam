@@ -35,7 +35,8 @@ export function LinkCard(props: LinkCardProps) {
           </span>
         )}
       </div>
-      <div css={Css.df.aic.fs0.hPx(40).$}>
+      {/* Add a height to button box so the arrow centers and it holds that position as the message wraps. */}
+      <div css={Css.df.aic.fs0.h5.$}>
         <IconButton
           icon="arrowRight"
           color={Tokens.TextLinkDefault}
