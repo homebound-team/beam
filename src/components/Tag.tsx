@@ -9,6 +9,7 @@ export type TagType = "info" | "update" | "warning" | "error" | "success" | "neu
 export type TagVariant = "primary" | "secondary";
 
 type TagPropsBase<X> = {
+  /** Required even if using `iconOnly + preventTooltip`. In those cases an accessibility friendly message is expected */
   text: ReactNode;
   // Defaults to "neutral"
   type?: TagType;

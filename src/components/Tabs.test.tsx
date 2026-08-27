@@ -52,10 +52,27 @@ describe("TabsWithContent", () => {
   });
 
   describe("aiMode", () => {
-    it("badges the tab", async () => {
+    it("tags the tab", async () => {
       const r = await render(<TestAiTabs />, withRouter());
-      expect(r.tabs_tab2).toContainElement(r.aiBadge);
-      expect(r.query.tabs_tab1).not.toContainElement(r.query.aiBadge);
+      // Then only the ai tab is decorated
+      expect(r.tabs_tab2).toContainElement(r.tabs_tab2_aiTag);
+      expect(r.query.tabs_tab1_aiTag).toBeNull();
+    });
+
+    it("tags with the ai sparkle", async () => {
+      const r = await render(<TestAiTabs />, withRouter());
+      // Then the tag is the purple, icon-only ai treatment
+      expect(r.tabs_tab2_aiTag).toHaveStyle({ backgroundColor: Palette.Purple200 });
+      expect(r.tabs_tab2_aiTag.querySelector("[data-icon='aiStar']")).toBeInTheDocument();
+    });
+
+    it("labels the tag for screen readers only", async () => {
+      const r = await render(<TestAiTabs />, withRouter());
+      // Then the tag carries a label, since the sparkle alone says nothing to a screen reader
+      const label = r.getByText("Tab has AI proposals ready for review");
+      expect(r.tabs_tab2_aiTag).toContainElement(label);
+      // But it's not drawn, so the tab still reads as just its name plus the sparkle
+      expect(label).not.toBeVisible();
     });
 
     it("tints the label while the tab is unselected", async () => {
@@ -68,7 +85,7 @@ describe("TabsWithContent", () => {
       const r = await render(<TestAiTabs selected="tab2" />, withRouter());
       // Then it stays with the active treatment rather than going purple
       expect(r.tabs_tab2).not.toHaveStyle({ color: Palette.Purple700 });
-      expect(r.tabs_tab2).toContainElement(r.aiBadge);
+      expect(r.tabs_tab2).toContainElement(r.tabs_tab2_aiTag);
     });
   });
 
