@@ -253,7 +253,15 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   });
 
   const decoration = aiMode ? (
-    <Tag text="" preventTooltip icon="aiStar" type="ai" variant="primary" iconOnly {...tid.aiTag} />
+    <Tag
+      text="Tab has AI proposals ready for review"
+      preventTooltip
+      icon="aiStar"
+      type="ai"
+      variant="primary"
+      iconOnly
+      {...tid.aiTag}
+    />
   ) : icon ? (
     <Icon icon={icon} />
   ) : (
