@@ -1,8 +1,9 @@
 import { Meta } from "@storybook/react-vite";
+import { Icon } from "src/components";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
-import { CenteredLayout, EnvironmentBannerLayout } from "src/layouts";
+import { CenteredLayout, EnvironmentBannerLayout, useSideNavLayoutContext } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
@@ -35,7 +36,7 @@ export function Default() {
  */
 export const Composed = () => (
   <NavbarLayout navbar={createNavbar()}>
-    <SideNavLayout sideNav={{ items: sideNavItems() }}>
+    <SideNavLayout sideNav={{ top: <Brand />, items: sideNavItems() }}>
       <PageHeaderLayout pageHeader={{ title: "Page header", rightSlot: <Button label="Action" onClick={() => {}} /> }}>
         <GridTableLayoutExample storageKey="navbar-layout-composed" />
       </PageHeaderLayout>
@@ -121,6 +122,23 @@ export const ComposedConstrainedWidthTable = () => (
     </NavbarLayout>
   </EnvironmentBannerLayout>
 );
+
+function Brand() {
+  const { navState } = useSideNavLayoutContext();
+  if (navState === "collapse") return <></>;
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
+        <span css={Css.fs0.$}>
+          <Icon icon="houseFilled" inc={3} />
+        </span>
+        <span css={Css.smSb.$}>Structure</span>
+      </div>
+      <h1 css={Css.lg.$}>1092 Beverly Way - Milam</h1>
+      <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>Altadena, CA 91001</p>
+    </div>
+  );
+}
 
 function sideNavItems(): AppNavItem[] {
   return [

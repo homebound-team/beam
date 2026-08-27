@@ -173,7 +173,11 @@ function NavbarMobileDrawer({
                 }}
                 {...tid.mobileMenuPanel}
               >
-                {showSubLevel && mobileSubNav?.top}
+                {showSubLevel && mobileSubNav.top && (
+                  <div css={Css.fs0.px1.pb2.$} {...tid.top}>
+                    {mobileSubNav.top}
+                  </div>
+                )}
                 <AppNavItems
                   items={showSubLevel && mobileSubNav ? mobileSubNav.items : items}
                   panelCollapsed={false}
