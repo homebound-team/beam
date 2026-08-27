@@ -185,7 +185,8 @@ export function Modal(props: ModalProps) {
                   </span>
                   {aiMode ? (
                     <div css={Css.df.fdc.aifs.gapPx(4).fg1.mw0.$} {...testId.aiTitle}>
-                      <BlueprintAiLogo height={2} />
+                      {/* 2.25 increments == the design's 18px, which is off the 8px grid. */}
+                      <BlueprintAiLogo height={2.25} />
                       {title}
                     </div>
                   ) : (
