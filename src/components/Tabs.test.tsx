@@ -59,13 +59,20 @@ describe("TabsWithContent", () => {
       expect(r.query.tabs_tab1_aiTag).toBeNull();
     });
 
-    it("tags with the ai sparkle and no visible text", async () => {
+    it("tags with the ai sparkle", async () => {
       const r = await render(<TestAiTabs />, withRouter());
       // Then the tag is the purple, icon-only ai treatment
       expect(r.tabs_tab2_aiTag).toHaveStyle({ backgroundColor: Palette.Purple200 });
       expect(r.tabs_tab2_aiTag.querySelector("[data-icon='aiStar']")).toBeInTheDocument();
-      // And it adds no label of its own, since the tab name already says what the tab is
-      expect(r.tabs_tab2_aiTag.textContent).toBe("");
+    });
+
+    it("labels the tag for screen readers only", async () => {
+      const r = await render(<TestAiTabs />, withRouter());
+      // Then the tag carries a label, since the sparkle alone says nothing to a screen reader
+      const label = r.getByText("Tab has AI proposals ready for review");
+      expect(r.tabs_tab2_aiTag).toContainElement(label);
+      // But it's not drawn, so the tab still reads as just its name plus the sparkle
+      expect(label).not.toBeVisible();
     });
 
     it("tints the label while the tab is unselected", async () => {
