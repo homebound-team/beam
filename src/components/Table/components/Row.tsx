@@ -108,7 +108,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const { tableState } = useContext(TableStateContext);
   // We're wrapped in observer, so can access these without useComputeds
   const { api, visibleColumns: columns } = tableState;
-  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level } = rs;
+  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level, aiMode } = rs;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === HEADER;
@@ -139,7 +139,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   // Narrow away `"none"` so the CSS var value is a plain color string (no cast needed).
   // Token names (`--b-*`) need `var(...)` when assigned to `--beam-row-hover-bg`.
   const rowHoverBg: string = maybeCssVar(
-    style.rowHoverColor !== undefined && style.rowHoverColor !== "none" ? style.rowHoverColor : Tokens.SurfaceHover,
+    aiMode && !reservedRowKinds.includes(row.kind)
+      ? Palette.Purple100
+      : style.rowHoverColor !== undefined && style.rowHoverColor !== "none"
+        ? style.rowHoverColor
+        : Tokens.SurfaceHover,
   );
 
   const rowCss = {
@@ -403,6 +407,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isLastKeptRow && style.keptLastRowCss),
             // Apply the blue highlight to every runtime-pinned row's cells (wins over `isActive`)
             ...(pinned && style.pinnedRowCss),
+            // AI wash wins over pinned/active; reserved kinds never get it.
+            ...(aiMode && !reservedRowKinds.includes(row.kind) && Css.bgColor(Tokens.AiFieldBg).$),
             // Apply cell highlight styles to active cell and hover
             ...Css.if(applyCellHighlight && isCellActive).br4.boxShadow(
               `inset 0 0 0 1px ${maybeCssVar(Tokens.FocusRingInset)}`,
@@ -565,6 +571,8 @@ export type GridDataRow<R extends Kinded> = {
   draggable?: boolean;
   /** Image src for the row, to be used for card view */
   imgSrc?: string;
+  /** Paints the row with `Tokens.AiFieldBg`. Re-read on every `rows` update (unlike `initSelected`). */
+  aiMode?: boolean;
   /**
    * Full-width content rendered with this row (no separator between them).
    * Plain content / render fn defaults to `"trailing"`; use `{ position, content }` for `"leading"`.

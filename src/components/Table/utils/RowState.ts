@@ -35,6 +35,8 @@ export class RowState<R extends Kinded> {
    * at which point this would become `"top" | "bottom"`.
    */
   pinned = false;
+  /** Controlled AI row wash; re-read from `row.aiMode` on every `setRows`. */
+  aiMode = false;
   /** Whether we are dragged over. */
   isDraggedOver: DraggedOver = DraggedOver.None;
   /**
@@ -103,6 +105,9 @@ export class RowState<R extends Kinded> {
     // then anyone watching `.row` will see the new row instance + new data.
     this._row = row;
     this._data = row.data;
+    // Primitive so unchanged `aiMode` across 500-row `setRows` does not notify.
+    const nextAiMode = !!row.aiMode;
+    if (this.aiMode !== nextAiMode) this.aiMode = nextAiMode;
   }
 
   /**
