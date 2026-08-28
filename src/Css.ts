@@ -3585,9 +3585,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get xl() {
     return this.add("fontWeight", 600).add("fontSize", "20px").add("lineHeight", "28px");
   }
-  /** Sets `fontWeight: 600; fontSize: "30px"; lineHeight: "36px"`. */
+  /** Sets `fontWeight: 600; fontSize: "24px"; lineHeight: "32px"`. */
   get xl2() {
-    return this.add("fontWeight", 600).add("fontSize", "30px").add("lineHeight", "36px");
+    return this.add("fontWeight", 600).add("fontSize", "24px").add("lineHeight", "32px");
   }
 
   // typography

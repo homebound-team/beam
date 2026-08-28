@@ -3,13 +3,12 @@ import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, u
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath } from "react-router";
 import { Link, useLocation } from "react-router-dom";
-import { FullBleed, IconKey, maybeTooltip, resolveTooltip } from "src/components";
+import { FullBleed, IconKey, maybeTooltip, resolveTooltip, Tag } from "src/components";
 import { Css, Margin, Only, Padding, Palette, Tokens, Xss } from "src/Css";
 import { BeamFocusableProps } from "src/interfaces";
 import { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { AiBadge } from "./AiBadge";
 import { Icon } from "./Icon";
 
 export type Tab<V extends string = string> = {
@@ -19,7 +18,7 @@ export type Tab<V extends string = string> = {
   icon?: IconKey;
   // Suffixes label with specified node. Expected to be used for cases where the decoration is not just an icon.
   endAdornment?: ReactNode;
-  /** Whether the tab's content is AI-driven, which adds AiBadge. Takes precedence over `icon` and `endAdornment`. */
+  /** Whether the tab's content is AI-driven, which adds an AI tag. Takes precedence over `icon` and `endAdornment`. */
   aiMode?: boolean;
   /** Whether the Tab is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
@@ -226,6 +225,7 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles, aiStyles } =
     useMemo(() => getTabStyles(), []);
   const uniqueValue = uniqueTabValue(tab);
+  const tid = useTestIds(others);
 
   const tabProps = {
     "aria-controls": `${uniqueValue}-tabPanel`,
@@ -252,7 +252,21 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     ...(isRouteTab(tab) ? {} : { onClick: () => onClick(tab.value) }),
   });
 
-  const decoration = aiMode ? <AiBadge /> : icon ? <Icon icon={icon} /> : endAdornment;
+  const decoration = aiMode ? (
+    <Tag
+      text="Tab has AI proposals ready for review"
+      preventTooltip
+      icon="aiStar"
+      type="ai"
+      variant="primary"
+      iconOnly
+      {...tid.aiTag}
+    />
+  ) : icon ? (
+    <Icon icon={icon} />
+  ) : (
+    endAdornment
+  );
 
   const tabLabel = (
     <>

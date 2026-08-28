@@ -815,7 +815,7 @@
     "mdSb": {"kind":"static","defs":{"fontWeight":600,"fontSize":"16px","lineHeight":"24px"}},
     "lg": {"kind":"static","defs":{"fontWeight":600,"fontSize":"18px","lineHeight":"28px"}},
     "xl": {"kind":"static","defs":{"fontWeight":600,"fontSize":"20px","lineHeight":"28px"}},
-    "xl2": {"kind":"static","defs":{"fontWeight":600,"fontSize":"30px","lineHeight":"36px"}},
+    "xl2": {"kind":"static","defs":{"fontWeight":600,"fontSize":"24px","lineHeight":"32px"}},
     "measure": {"kind":"static","defs":{"maxWidth":"30em"}},
     "measureWide": {"kind":"static","defs":{"maxWidth":"34em"}},
     "measureNarrow": {"kind":"static","defs":{"maxWidth":"20em"}},
