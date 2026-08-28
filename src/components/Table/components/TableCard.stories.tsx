@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { ProposedValue } from "src/components/ProposedValue";
 import { TableCardView } from "src/components/Table/components/TableCard";
 import { Css, Tokens } from "src/Css";
 import { newStory, withRouter } from "src/utils/sb";
@@ -144,6 +145,42 @@ export function WithContainImageFit() {
   );
 }
 
+export function AiStyling() {
+  return (
+    <div css={Css.df.gap3.$}>
+      <CardContainer>
+        <TableCardView
+          imgSrc={imgSrc}
+          leftEyebrow="002"
+          title="H1 - A - Janes Cottage"
+          data={createElevationData()}
+          progress={72}
+        />
+      </CardContainer>
+      <CardContainer>
+        <TableCardView
+          imgSrc={imgSrc}
+          leftEyebrow="002"
+          title="E1 - C - Craftsman"
+          data={createElevationData({ height: <ProposedValue original="20" proposed="25 ft" /> })}
+          progress={69}
+          aiMode="updated"
+        />
+      </CardContainer>
+      <CardContainer>
+        <TableCardView
+          imgSrc={imgSrc}
+          leftEyebrow="002"
+          title="I1 - B - Spanish"
+          data={createElevationData()}
+          progress={41}
+          aiMode="new"
+        />
+      </CardContainer>
+    </div>
+  );
+}
+
 /**
  * Demonstrates the card's interactive states.
  *
@@ -225,6 +262,17 @@ function tabPlayFn(times: number): PlayFunction {
       await userEvent.tab();
     }
   };
+}
+
+/** The elevation blocks from the AI frame; `height` is overridable so one card can carry a proposal. */
+function createElevationData(opts: { height?: ReactNode } = {}) {
+  const { height = "25 ft" } = opts;
+  return [
+    { label: "Sqft", value: "3500 - 4500" },
+    { label: "Height", value: height },
+    { label: "Depth", value: "68 ft" },
+    { label: "Width", value: "65 ft" },
+  ];
 }
 
 function CardContainer({ children }: { children: JSX.Element }) {

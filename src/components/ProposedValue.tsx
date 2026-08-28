@@ -1,18 +1,18 @@
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 
-type ProposedValueProps = {
+export type ProposedValueProps = {
   /** The value on record, struck-through. */
   original?: string;
-  /** The AI's proposal, i.e. the value the field is actually holding. */
+  /** The AI's proposal, i.e. the value now standing. */
   proposed: string;
 };
 
 /**
- * Renders a field's AI proposal as `original proposed`, with the original struck through.
+ * Renders an AI proposal as `original proposed`, with the value on record struck through.
  *
- * Only used on the read-only path, which renders no input. Editable fields instead style the input's
- * own text and render the original as a sibling, so it survives focus. See `TextFieldBase`.
+ * For read-only surfaces, i.e. card data blocks and table cells. Editable fields instead style the
+ * input's own text so the proposal survives focus — see `TextFieldBase`.
  */
 export function ProposedValue(props: ProposedValueProps) {
   const { original, proposed } = props;

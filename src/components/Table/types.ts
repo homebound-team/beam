@@ -13,6 +13,9 @@ export type MaybeFn<T> = T | (() => T);
 export type GridCellAlignment = "left" | "right" | "center";
 export type GridColumnBorder = "left" | "right";
 
+/** How much of a card's entity AI is responsible for: some of its values, or all of it. */
+export type CardAiMode = "updated" | "new";
+
 export type GridTableScrollOptions =
   | number
   | {

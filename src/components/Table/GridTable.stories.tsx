@@ -25,6 +25,7 @@ import {
   insertAtIndex,
   numericColumn,
   pinColumn,
+  ProposedValue,
   recursivelyGetContainingRow,
   RowStyles,
   selectColumn,
@@ -37,6 +38,7 @@ import {
   cardBadgeSlot,
   cardDataBlockSlot,
   cardEyebrowSlot,
+  cardLeftEyebrowSlot,
   cardProgressSlot,
   cardStatusSlot,
   cardTitleSlot,
@@ -3015,6 +3017,154 @@ export function CardView() {
       </div>
     </div>
   );
+}
+
+type PlanProgramData = {
+  code: string;
+  name: string;
+  version: string;
+  status: string;
+  // Program values are `ReactNode` so any of them can carry a `ProposedValue` instead of a plain string.
+  sqft: ReactNode;
+  beds: ReactNode;
+  baths: ReactNode;
+  elevations: ReactNode;
+  width: ReactNode;
+  depth: ReactNode;
+  bidOut: number;
+};
+type PlanProgramRow = SimpleHeaderAndData<PlanProgramData>;
+
+export function CardViewAiStates() {
+  const columns: GridColumn<PlanProgramRow>[] = [
+    { header: "Plan Code", data: ({ code }) => ({ content: code, cardSlot: cardLeftEyebrowSlot(code) }) },
+    { header: "Offering Name", data: ({ name }) => ({ content: name, cardSlot: cardTitleSlot(name) }) },
+    { header: "Version", data: ({ version }) => ({ content: version, cardSlot: cardBadgeSlot(version) }) },
+    {
+      header: "Sqft",
+      data: ({ sqft }) => ({ content: sqft, cardSlot: cardDataBlockSlot({ label: "Sqft", value: sqft }) }),
+    },
+    {
+      header: "Beds",
+      data: ({ beds }) => ({ content: beds, cardSlot: cardDataBlockSlot({ label: "Beds", value: beds }) }),
+    },
+    {
+      header: "Baths",
+      data: ({ baths }) => ({ content: baths, cardSlot: cardDataBlockSlot({ label: "Baths", value: baths }) }),
+    },
+    {
+      header: "Elevations",
+      data: ({ elevations }) => ({
+        content: elevations,
+        cardSlot: cardDataBlockSlot({ label: "Elevations", value: elevations }),
+      }),
+    },
+    {
+      header: "Width",
+      data: ({ width }) => ({ content: width, cardSlot: cardDataBlockSlot({ label: "Width", value: width }) }),
+    },
+    {
+      header: "Depth",
+      data: ({ depth }) => ({ content: depth, cardSlot: cardDataBlockSlot({ label: "Depth", value: depth }) }),
+    },
+    { header: "Bid out", data: ({ bidOut }) => ({ content: bidOut, cardSlot: cardProgressSlot(bidOut) }) },
+    { header: "Status", data: ({ status }) => ({ content: status, cardSlot: planStatusCardSlot(status) }) },
+  ];
+
+  const rows: GridDataRow<PlanProgramRow>[] = [
+    simpleHeader,
+    {
+      kind: "data",
+      id: "e1",
+      imgSrc: "plan-exterior.png",
+      data: {
+        code: "002",
+        name: "H1 - A - Janes Cottage",
+        version: "v4",
+        status: "Active",
+        sqft: "2,400",
+        beds: "4",
+        baths: "3",
+        elevations: "2",
+        width: "52",
+        depth: "68",
+        bidOut: 72,
+      },
+    },
+    {
+      kind: "data",
+      id: "e2",
+      imgSrc: "plan-exterior.png",
+      aiMode: "updated",
+      data: {
+        code: "002",
+        name: "E1 - C - Craftsman",
+        version: "v5",
+        status: "In Progress",
+        sqft: aiProposal("2,400", "2,650"),
+        beds: aiProposal("4", "5"),
+        baths: aiProposal("3", "3.5"),
+        elevations: aiProposal("2", "3"),
+        width: aiProposal("52", "54"),
+        depth: aiProposal("68", "70.5"),
+        bidOut: 69,
+      },
+    },
+    {
+      kind: "data",
+      id: "e3",
+      imgSrc: "plan-exterior.png",
+      // A second touched plan, so the grid shows how a run of updated cards reads together.
+      aiMode: "updated",
+      data: {
+        code: "004",
+        name: "E2 - A - Farmhouse",
+        version: "v2",
+        status: "In Progress",
+        sqft: aiProposal("3,050", "3,180"),
+        beds: aiProposal("3", "4"),
+        baths: aiProposal("2.5", "3"),
+        elevations: aiProposal("1", "2"),
+        width: aiProposal("46", "48"),
+        depth: aiProposal("62", "64.5"),
+        bidOut: 24,
+      },
+    },
+    {
+      kind: "data",
+      id: "e4",
+      imgSrc: "plan-exterior.png",
+      // A wholly new plan has nothing on record to strike through, so its values are plain — the purple
+      // text is what marks the card as the AI's.
+      aiMode: "new",
+      data: {
+        code: "002",
+        name: "I1 - B - Spanish",
+        version: "v1",
+        status: "Draft",
+        sqft: "3,100",
+        beds: "5",
+        baths: "4",
+        elevations: "3",
+        width: "58",
+        depth: "72",
+        bidOut: 41,
+      },
+    },
+  ];
+
+  return (
+    <div css={Css.df.fdc.vh100.$}>
+      <div css={Css.fg1.$}>
+        <GridTable as="card" columns={columns} rows={rows} />
+      </div>
+    </div>
+  );
+}
+
+/** Shorthand for a program value the AI moved: `was` struck through, then the value now standing. */
+function aiProposal(was: string, now: string) {
+  return <ProposedValue original={was} proposed={now} />;
 }
 
 export function CardViewInfiniteScroll() {
