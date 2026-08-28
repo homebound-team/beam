@@ -26,7 +26,7 @@ const fonts: Record<string, { fontWeight: 400 | 500 | 600 | 700, fontSize: strin
   xl:   { fontWeight: 600, fontSize: "20px", lineHeight: "28px" },
 
   // Using xl2 vs 2xl so that we can use it via Css.xl2 vs Css['2xl']
-  xl2:  { fontWeight: 600, fontSize: "30px", lineHeight: "36px" },
+  xl2:  { fontWeight: 600, fontSize: "24px", lineHeight: "32px" },
 };
 
 // Default transition list, driven by motion tokens. `width` and `opacity` are included so
