@@ -1,4 +1,5 @@
 import { act, fireEvent } from "@testing-library/react";
+import { observable } from "mobx";
 import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import {
   cardDataBlockSlot,
@@ -269,6 +270,69 @@ describe("GridTable", () => {
     // Then the rows are styled appropriately
     expect(cell(r, 0, 0)).toHaveStyle({ backgroundColor: Palette.Red500 });
     expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Red100 });
+  });
+
+  describe("aiMode", () => {
+    it("paints data row cells with AiFieldBg", async () => {
+      // Given one data row with aiMode and one without
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      ];
+      // When rendered
+      const r = await render(<GridTable columns={columns} rows={rows} />);
+      // Then the aiMode row's cells use the AI field background
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+      expect(cell(r, 1, 1)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+      // And the sibling without aiMode does not
+      expect(cell(r, 2, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+    });
+
+    it("wins over the pinned row highlight", async () => {
+      // Given an aiMode row
+      const api = new GridTableApiImpl<Row>();
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: true },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      ];
+      const r = await render(<GridTable api={api} columns={columns} rows={rows} />);
+      // When the row is also pinned
+      act(() => api.pinRow("1"));
+      // Then the AI wash still wins over Blue50
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+      expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: Palette.Blue50 });
+    });
+
+    it("clears the fill when rerendered with the same data and aiMode false", async () => {
+      // Given a stable data object on an aiMode row
+      const data = { name: "foo", value: 1 };
+      function Harness({ aiMode }: { aiMode: boolean }) {
+        return <GridTable columns={columns} rows={[simpleHeader, { kind: "data", id: "1", data, aiMode }]} />;
+      }
+      const r = await render(<Harness aiMode />);
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+      // When the same data is passed with aiMode off
+      await r.rerender(<Harness aiMode={false} />);
+      // Then the AI fill is gone
+      expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+    });
+
+    it("reevaluates a function aiMode when its observables change", async () => {
+      // Given aiMode that reads a MobX box
+      const pending = observable.box(true);
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: () => pending.get() },
+      ];
+      const r = await render(<GridTable columns={columns} rows={rows} />);
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+      // When the observable flips without rebuilding rows
+      act(() => pending.set(false));
+      // Then the wash is gone
+      expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+    });
   });
 
   it("can draw left and right borders on specific columns", async () => {

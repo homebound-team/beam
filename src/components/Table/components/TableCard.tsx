@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import { ReactNode, useMemo } from "react";
 import { useFocusRing } from "react-aria";
 import { Link } from "react-router-dom";
@@ -37,7 +38,7 @@ export type TableCardProps<R extends Kinded> = {
   imageFit?: ImageFitType;
 };
 
-export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
+function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
   const { rs, columns, rowStyle, api, height, imageFit } = props;
   const tid = useTestIds(props, "tableCard");
 
@@ -107,9 +108,12 @@ export function TableCard<R extends Kinded>(props: TableCardProps<R>) {
       onClick={onClick ? () => onClick(rs.row, api) : undefined}
       height={height}
       imageFit={imageFit}
+      aiMode={rs.aiMode}
     />
   );
 }
+
+export const TableCard = observer(TableCardImpl) as typeof TableCardImpl;
 
 export type TableCardViewProps = {
   imgSrc: string;
@@ -132,6 +136,8 @@ export type TableCardViewProps = {
   height?: number;
   /** How the hero image fills its frame. Defaults to `"cover"`. */
   imageFit?: ImageFitType;
+  /** Paints the card with `Tokens.AiFieldBg`. */
+  aiMode?: boolean;
 };
 
 export function TableCardView(props: TableCardViewProps) {
@@ -150,6 +156,7 @@ export function TableCardView(props: TableCardViewProps) {
     onClick,
     height = 430,
     imageFit = "cover",
+    aiMode = false,
   } = props;
   const tid = useTestIds(props, "tableCardView");
   // `getButtonOrLink` renders a link when passed a string, and a button otherwise.
@@ -252,8 +259,10 @@ export function TableCardView(props: TableCardViewProps) {
   return (
     <div
       css={{
-        ...Css.w100.df.fdc.relative.ba.br12.bc(Tokens.FieldBorderDefault).bgColor(Tokens.SurfaceRaised).hPx(height)
-          .cursorPointer.onHover.bshHover.$,
+        ...Css.w100.df.fdc.relative.ba.br12
+          .bc(Tokens.FieldBorderDefault)
+          .bgColor(aiMode ? Tokens.AiFieldBg : Tokens.SurfaceRaised)
+          .hPx(height).cursorPointer.onHover.bshHover.$,
         ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
       }}
       {...tid}
