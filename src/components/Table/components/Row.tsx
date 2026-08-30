@@ -13,7 +13,15 @@ import type { GridRowCompanion } from "src/components/Table/components/Companion
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
-import { DiscriminateUnion, FixedSort, GridColumnWithId, IfAny, Kinded, RenderAs } from "src/components/Table/types";
+import {
+  DiscriminateUnion,
+  FixedSort,
+  GridColumnWithId,
+  IfAny,
+  Kinded,
+  MaybeFn,
+  RenderAs,
+} from "src/components/Table/types";
 import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
@@ -571,8 +579,8 @@ export type GridDataRow<R extends Kinded> = {
   draggable?: boolean;
   /** Image src for the row, to be used for card view */
   imgSrc?: string;
-  /** Paints the row with `Tokens.AiFieldBg`. Re-read on every `rows` update (unlike `initSelected`). */
-  aiMode?: boolean;
+  /** Paints the row with `Tokens.AiFieldBg`. Use `() => boolean` to read MobX without rebuilding `rows`. */
+  aiMode?: MaybeFn<boolean>;
   /**
    * Full-width content rendered with this row (no separator between them).
    * Plain content / render fn defaults to `"trailing"`; use `{ position, content }` for `"leading"`.

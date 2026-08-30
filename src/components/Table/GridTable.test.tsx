@@ -1,4 +1,5 @@
 import { act, fireEvent } from "@testing-library/react";
+import { observable } from "mobx";
 import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import {
   cardDataBlockSlot,
@@ -315,6 +316,21 @@ describe("GridTable", () => {
       // When the same data is passed with aiMode off
       await r.rerender(<Harness aiMode={false} />);
       // Then the AI fill is gone
+      expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+    });
+
+    it("reevaluates a function aiMode when its observables change", async () => {
+      // Given aiMode that reads a MobX box
+      const pending = observable.box(true);
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: () => pending.get() },
+      ];
+      const r = await render(<GridTable columns={columns} rows={rows} />);
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+      // When the observable flips without rebuilding rows
+      act(() => pending.set(false));
+      // Then the wash is gone
       expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
     });
   });
