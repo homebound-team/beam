@@ -34,12 +34,10 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
 
   return (
     <div css={Css.df.ais.gap1.w100.p1.br4.xs.bgColor(Tokens.Surface).ba.bc(borderColor).bshBasic.$} {...tid}>
-      {/* The 2px nudge lets a single line read centered against the tag while wrapped copy stays top-aligned;
-          the tag's box is that nudge plus the description's 16px line height, so it centers on the first line. */}
-      <span css={Css.df.aic.fs0.ptPx(2).hPx(18).$}>
+      <span css={Css.df.fs0.$}>
         <Tag {...tagProps} {...tid.tag} />
       </span>
-      <span css={Css.fg1.mw0.ptPx(2).color(Tokens.OnSurface).$} {...tid.description}>
+      <span css={Css.fg1.mw0.ptPx(1).color(Tokens.OnSurface).$} {...tid.description}>
         {description}
       </span>
       {actions.length > 0 && (
