@@ -1,5 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { TableCardView } from "src/components/Table/components/TableCard";
+import { maybeCssVar, Tokens } from "src/Css";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -17,6 +18,14 @@ describe("TableCardView", () => {
     // Then title text is displayed and used as the image alt
     expect(r.tableCardView_title).toHaveTextContent("123 Main St");
     expect(r.tableCardView_image).toHaveAttribute("alt", "123 Main St");
+  });
+
+  it("paints AiFieldBg when aiMode is true", async () => {
+    // Given a card in aiMode
+    // When rendered
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} aiMode />);
+    // Then the card uses the AI field background
+    expect(r.tableCardView).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
   });
 
   it("renders left eyebrow above title", async () => {

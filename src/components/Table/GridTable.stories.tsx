@@ -1524,6 +1524,36 @@ export function ActiveRow() {
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
 }
 
+/** Mixed `aiMode` rows; Accept flips MobX so the functions re-evaluate without rebuilding `rows`. */
+export function AiModeRows() {
+  const pending = useMemo(() => observable({ first: true, third: true }), []);
+  const rows = useMemo<GridDataRow<Row>[]>(
+    () => [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "AI suggested", value: 1 }, aiMode: () => pending.first },
+      { kind: "data", id: "2", data: { name: "Normal", value: 2 } },
+      { kind: "data", id: "3", data: { name: "Also AI", value: 3 }, aiMode: () => pending.third },
+    ],
+    [pending],
+  );
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <div>
+        <Button
+          label="Accept AI suggestions"
+          onClick={() => {
+            pending.first = false;
+            pending.third = false;
+          }}
+        />
+      </div>
+      <GridTable columns={[nameColumn, valueColumn]} rows={rows} />
+    </div>
+  );
+}
+
 export function TruncatingCells() {
   const textCol: GridColumn<Row> = {
     header: "As Text",

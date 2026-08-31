@@ -1,7 +1,8 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import { Kinded } from "src";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { GridRowApi } from "src/components/Table/GridTableApi";
+import { GridRowApi, maybeApply } from "src/components/Table/GridTableApi";
+import type { MaybeFn } from "src/components/Table/types";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -35,6 +36,7 @@ export class RowState<R extends Kinded> {
    * at which point this would become `"top" | "bottom"`.
    */
   pinned = false;
+  private _aiMode: MaybeFn<boolean> | undefined;
   /** Whether we are dragged over. */
   isDraggedOver: DraggedOver = DraggedOver.None;
   /**
@@ -73,6 +75,7 @@ export class RowState<R extends Kinded> {
       {
         _row: false,
         _data: observable.ref,
+        _aiMode: observable.ref,
         isCalculatingDirectMatch: false,
       } as any,
       { name: `RowState@${row.id}` },
@@ -103,6 +106,13 @@ export class RowState<R extends Kinded> {
     // then anyone watching `.row` will see the new row instance + new data.
     this._row = row;
     this._data = row.data;
+    // Same boolean/fn identity across new row literals must not notify every row.
+    if (this._aiMode !== row.aiMode) this._aiMode = row.aiMode;
+  }
+
+  /** True when `row.aiMode` is true or its function returns true. */
+  get aiMode(): boolean {
+    return !!maybeApply(this._aiMode);
   }
 
   /**
