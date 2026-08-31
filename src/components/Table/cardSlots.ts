@@ -11,11 +11,11 @@ export type CardBadgeTag = {
   type?: TagType;
 } & ({ iconOnly?: false; icon?: IconKey } | { iconOnly: true; icon: IconKey });
 
-export type CardTitleSlot = CardSlotBase<"title"> & { text: string };
+export type CardTitleSlot = CardSlotBase<"title"> & { text: string; proposed?: boolean };
 /** Left meta text above the title */
-export type CardLeftEyebrowSlot = CardSlotBase<"leftEyebrow"> & { text: string };
+export type CardLeftEyebrowSlot = CardSlotBase<"leftEyebrow"> & { text: string; proposed?: boolean };
 /** Right meta text above the title. Distinct from title-row `cardBadgeSlot`. */
-export type CardRightEyebrowSlot = CardSlotBase<"rightEyebrow"> & { text: string };
+export type CardRightEyebrowSlot = CardSlotBase<"rightEyebrow"> & { text: string; proposed?: boolean };
 export type CardBadgeSlot = CardSlotBase<"badge"> & { text: string; tags?: CardBadgeTag[] };
 export type CardStatusSlot = CardSlotBase<"status"> & { tag: CardTag };
 export type CardDataBlockSlot = CardSlotBase<"dataBlock"> & { label: string; value: ReactNode | string | number };
@@ -55,16 +55,17 @@ export type CardSlot =
   | CardProgressSlot
   | CardInteractiveFooterSlot;
 
-export function cardTitleSlot(text: string): CardTitleSlot {
-  return { kind: "title", text };
+/** `proposed` renders the text as an AI proposal; `text` stays a string for `alt` / `aria-label`. */
+export function cardTitleSlot(text: string, proposed?: boolean): CardTitleSlot {
+  return { kind: "title", text, proposed };
 }
 
-export function cardLeftEyebrowSlot(text: string): CardLeftEyebrowSlot {
-  return { kind: "leftEyebrow", text };
+export function cardLeftEyebrowSlot(text: string, proposed?: boolean): CardLeftEyebrowSlot {
+  return { kind: "leftEyebrow", text, proposed };
 }
 
-export function cardRightEyebrowSlot(text: string): CardRightEyebrowSlot {
-  return { kind: "rightEyebrow", text };
+export function cardRightEyebrowSlot(text: string, proposed?: boolean): CardRightEyebrowSlot {
+  return { kind: "rightEyebrow", text, proposed };
 }
 
 /** @deprecated Prefer `cardLeftEyebrowSlot`. */

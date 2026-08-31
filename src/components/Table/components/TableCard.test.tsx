@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { TableCardView } from "src/components/Table/components/TableCard";
-import { maybeCssVar, Tokens } from "src/Css";
+import { maybeCssVar, Palette, Tokens } from "src/Css";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -26,6 +26,42 @@ describe("TableCardView", () => {
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} aiMode />);
     // Then the card uses the AI field background
     expect(r.tableCardView).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+  });
+
+  it("draws the AI border and tints the progress track when aiMode is true", async () => {
+    // Given a card in aiMode
+    // When rendered
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} progress={69} aiMode />);
+    // Then it takes the heavier AI border. Tokenized *border colors* can't be asserted via toHaveStyle —
+    // jsdom resolves an unresolved var() to black — so the width stands in, same as Tabs.test.tsx notes.
+    expect(r.tableCardView).toHaveStyle({ borderWidth: "2px" });
+    // And the track tints so it stays visible on the AI background, while the fill stays blue — a progress
+    // bar isn't a proposal, so it never reads as AI
+    expect(r.tableCardView_progressTrack).toHaveStyle({ backgroundColor: Palette.Purple200 });
+    expect(r.tableCardView_progressFill).toHaveStyle({ backgroundColor: Palette.Blue500 });
+  });
+
+  it("renders a proposed title and eyebrow as AI proposals", async () => {
+    // Given a card the AI invented outright
+    // When rendered
+    const r = await render(
+      <TableCardView imgSrc={imgSrc} leftEyebrow="002" leftEyebrowProposed title="Spanish" titleProposed data={[]} />,
+    );
+    // Then both read as proposals, while the title stays plain text for the image's alt
+    expect(r.tableCardView_title).toHaveTextContent("Spanish");
+    expect(r.tableCardView_image).toHaveAttribute("alt", "Spanish");
+    expect(r.tableCardView_titleProposal_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
+    expect(r.tableCardView_leftEyebrowProposal_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
+  });
+
+  it("applies no AI styling when aiMode is unset", async () => {
+    // Given a card on record
+    // When rendered
+    const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} progress={72} />);
+    // Then it keeps the default border, background, text, and progress colors
+    expect(r.tableCardView).toHaveStyle({ borderWidth: "1px", backgroundColor: maybeCssVar(Tokens.SurfaceRaised) });
+    expect(r.tableCardView_progressTrack).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.SurfaceSubtle) });
+    expect(r.tableCardView_progressFill).toHaveStyle({ backgroundColor: Palette.Blue500 });
   });
 
   it("renders left eyebrow above title", async () => {

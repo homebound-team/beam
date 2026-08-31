@@ -164,17 +164,19 @@ export function AiStyling() {
           title="E1 - C - Craftsman"
           data={createElevationData({ height: <ProposedValue original="20" proposed="25 ft" /> })}
           progress={69}
-          aiMode="updated"
+          aiMode
         />
       </CardContainer>
       <CardContainer>
         <TableCardView
           imgSrc={imgSrc}
           leftEyebrow="002"
+          leftEyebrowProposed
           title="I1 - B - Spanish"
-          data={createElevationData()}
+          titleProposed
+          data={createElevationData({ allProposed: true })}
           progress={41}
-          aiMode="new"
+          aiMode
         />
       </CardContainer>
     </div>
@@ -264,15 +266,19 @@ function tabPlayFn(times: number): PlayFunction {
   };
 }
 
-/** The elevation blocks from the AI frame; `height` is overridable so one card can carry a proposal. */
-function createElevationData(opts: { height?: ReactNode } = {}) {
-  const { height = "25 ft" } = opts;
-  return [
+/**
+ * The elevation blocks from the AI frame. `height` overrides one value so a card can show a single moved
+ * value; `allProposed` wraps every value, for a card the AI invented outright.
+ */
+function createElevationData(opts: { height?: ReactNode; allProposed?: boolean } = {}) {
+  const { height = "25 ft", allProposed = false } = opts;
+  const blocks = [
     { label: "Sqft", value: "3500 - 4500" },
     { label: "Height", value: height },
     { label: "Depth", value: "68 ft" },
     { label: "Width", value: "65 ft" },
   ];
+  return allProposed ? blocks.map((b) => ({ ...b, value: <ProposedValue proposed={String(b.value)} /> })) : blocks;
 }
 
 function CardContainer({ children }: { children: JSX.Element }) {

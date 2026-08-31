@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Tag, Tooltip } from "src/components";
 import { CardTag, ImageFitType } from "src/components/Card";
 import { Carousel } from "src/components/Carousel";
+import { ProposedValue } from "src/components/ProposedValue";
 import type {
   CardBadgeTag,
   CardCarouselFooter,
@@ -16,7 +17,7 @@ import { RowStyle } from "src/components/Table/TableStyles";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
-import { Css, Tokens } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -43,8 +44,11 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
   const tid = useTestIds(props, "tableCard");
 
   let title: string | undefined;
+  let titleProposed: boolean | undefined;
   let leftEyebrow: string | undefined;
+  let leftEyebrowProposed: boolean | undefined;
   let rightEyebrow: string | undefined;
+  let rightEyebrowProposed: boolean | undefined;
   let badge: string | undefined;
   let badgeTags: CardBadgeTag[] | undefined;
   let status: CardTag | undefined;
@@ -61,12 +65,15 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
     switch (slot.kind) {
       case "title":
         title = slot.text;
+        titleProposed = slot.proposed;
         break;
       case "leftEyebrow":
         leftEyebrow = slot.text;
+        leftEyebrowProposed = slot.proposed;
         break;
       case "rightEyebrow":
         rightEyebrow = slot.text;
+        rightEyebrowProposed = slot.proposed;
         break;
       case "badge":
         badge = slot.text;
@@ -96,8 +103,11 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
       {...tid}
       imgSrc={rs.row.imgSrc ?? ""}
       title={title}
+      titleProposed={titleProposed}
       leftEyebrow={leftEyebrow}
+      leftEyebrowProposed={leftEyebrowProposed}
       rightEyebrow={rightEyebrow}
+      rightEyebrowProposed={rightEyebrowProposed}
       badge={badge}
       badgeTags={badgeTags}
       status={status}
@@ -120,6 +130,12 @@ export type TableCardViewProps = {
   leftEyebrow?: string;
   rightEyebrow?: string;
   title: string;
+  /** Renders the title as an AI proposal. `title` itself stays plain text for `alt` / `aria-label`. */
+  titleProposed?: boolean;
+  /** Renders the left eyebrow as an AI proposal. */
+  leftEyebrowProposed?: boolean;
+  /** Renders the right eyebrow as an AI proposal. */
+  rightEyebrowProposed?: boolean;
   badge?: string;
   badgeTags?: CardBadgeTag[];
   data: CardData[];
@@ -146,6 +162,9 @@ export function TableCardView(props: TableCardViewProps) {
     imgSrc,
     leftEyebrow,
     rightEyebrow,
+    titleProposed = false,
+    leftEyebrowProposed = false,
+    rightEyebrowProposed = false,
     badge,
     badgeTags,
     data,
@@ -183,7 +202,12 @@ export function TableCardView(props: TableCardViewProps) {
   const content = (
     <>
       <div
-        css={Css.relative.hPx(184).w100.bb.bc(Tokens.FieldBorderDefault).oh.borderRadius("12px 12px 0 0").$}
+        css={
+          Css.relative
+            .hPx(184)
+            .w100.bb.bc(aiMode ? Tokens.AiFieldBg : Tokens.FieldBorderDefault)
+            .oh.borderRadius("12px 12px 0 0").$
+        }
         {...tid.hero}
       >
         <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={title} loading="lazy" {...tid.image} />
@@ -198,18 +222,26 @@ export function TableCardView(props: TableCardViewProps) {
         {(leftEyebrow || rightEyebrow) && (
           <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
             <span css={Css.truncate.$} {...tid.leftEyebrow}>
-              {leftEyebrow}
+              {leftEyebrowProposed && leftEyebrow ? (
+                <ProposedValue proposed={leftEyebrow} {...tid.leftEyebrowProposal} />
+              ) : (
+                leftEyebrow
+              )}
             </span>
             {rightEyebrow && (
               <span css={Css.fs0.$} {...tid.rightEyebrow}>
-                {rightEyebrow}
+                {rightEyebrowProposed ? (
+                  <ProposedValue proposed={rightEyebrow} {...tid.rightEyebrowProposal} />
+                ) : (
+                  rightEyebrow
+                )}
               </span>
             )}
           </div>
         )}
         <div css={Css.dif.w100.jcsb.aic.$}>
           <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
-            {title}
+            {titleProposed ? <ProposedValue proposed={title} {...tid.titleProposal} /> : title}
           </h4>
           {(badge || badgeTags?.length) && (
             <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
@@ -245,8 +277,12 @@ export function TableCardView(props: TableCardViewProps) {
           )}
           {progress !== undefined && (
             <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-              <div css={Css.w25.hPx(8).br4.bgColor(Tokens.SurfaceSubtle).$}>
-                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
+              {/* `SurfaceSubtle` is Gray200, which all but vanishes on the AI fill. */}
+              <div
+                css={Css.w25.hPx(8).br4.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$}
+                {...tid.progressTrack}
+              >
+                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} {...tid.progressFill} />
               </div>
               <span {...tid.progressValue}>{progressValue}%</span>
             </div>
@@ -264,6 +300,8 @@ export function TableCardView(props: TableCardViewProps) {
           .bgColor(aiMode ? Tokens.AiFieldBg : Tokens.SurfaceRaised)
           .hPx(height).cursorPointer.onHover.bshHover.$,
         ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
+        // Must follow the focus ring, whose `ba` would reset the AI border back to 1px.
+        ...(aiMode ? Css.bw2.bc(Tokens.AiFieldFg).$ : {}),
       }}
       {...tid}
     >

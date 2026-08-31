@@ -3024,6 +3024,8 @@ type PlanProgramData = {
   name: string;
   version: string;
   status: string;
+  /** The AI invented the whole plan, so its code and name are proposals too. */
+  isNewPlan?: boolean;
   // Program values are `ReactNode` so any of them can carry a `ProposedValue` instead of a plain string.
   sqft: ReactNode;
   beds: ReactNode;
@@ -3037,8 +3039,14 @@ type PlanProgramRow = SimpleHeaderAndData<PlanProgramData>;
 
 export function CardViewAiStates() {
   const columns: GridColumn<PlanProgramRow>[] = [
-    { header: "Plan Code", data: ({ code }) => ({ content: code, cardSlot: cardLeftEyebrowSlot(code) }) },
-    { header: "Offering Name", data: ({ name }) => ({ content: name, cardSlot: cardTitleSlot(name) }) },
+    {
+      header: "Plan Code",
+      data: ({ code, isNewPlan }) => ({ content: code, cardSlot: cardLeftEyebrowSlot(code, isNewPlan) }),
+    },
+    {
+      header: "Offering Name",
+      data: ({ name, isNewPlan }) => ({ content: name, cardSlot: cardTitleSlot(name, isNewPlan) }),
+    },
     { header: "Version", data: ({ version }) => ({ content: version, cardSlot: cardBadgeSlot(version) }) },
     {
       header: "Sqft",
@@ -3095,18 +3103,18 @@ export function CardViewAiStates() {
       kind: "data",
       id: "e2",
       imgSrc: "plan-exterior.png",
-      aiMode: "updated",
+      aiMode: true,
       data: {
         code: "002",
         name: "E1 - C - Craftsman",
         version: "v5",
         status: "In Progress",
-        sqft: aiProposal("2,400", "2,650"),
-        beds: aiProposal("4", "5"),
-        baths: aiProposal("3", "3.5"),
-        elevations: aiProposal("2", "3"),
-        width: aiProposal("52", "54"),
-        depth: aiProposal("68", "70.5"),
+        sqft: aiProposal("2,650", "2,400"),
+        beds: aiProposal("5", "4"),
+        baths: aiProposal("3.5", "3"),
+        elevations: aiProposal("3", "2"),
+        width: aiProposal("54", "52"),
+        depth: aiProposal("70.5", "68"),
         bidOut: 69,
       },
     },
@@ -3114,19 +3122,19 @@ export function CardViewAiStates() {
       kind: "data",
       id: "e3",
       imgSrc: "plan-exterior.png",
-      // A second touched plan, so the grid shows how a run of updated cards reads together.
-      aiMode: "updated",
+      // A second touched plan, so the grid shows how a run of AI cards reads together.
+      aiMode: true,
       data: {
         code: "004",
         name: "E2 - A - Farmhouse",
         version: "v2",
         status: "In Progress",
-        sqft: aiProposal("3,050", "3,180"),
-        beds: aiProposal("3", "4"),
-        baths: aiProposal("2.5", "3"),
-        elevations: aiProposal("1", "2"),
-        width: aiProposal("46", "48"),
-        depth: aiProposal("62", "64.5"),
+        sqft: aiProposal("3,180", "3,050"),
+        beds: aiProposal("4", "3"),
+        baths: aiProposal("3", "2.5"),
+        elevations: aiProposal("2", "1"),
+        width: aiProposal("48", "46"),
+        depth: aiProposal("64.5", "62"),
         bidOut: 24,
       },
     },
@@ -3134,20 +3142,20 @@ export function CardViewAiStates() {
       kind: "data",
       id: "e4",
       imgSrc: "plan-exterior.png",
-      // A wholly new plan has nothing on record to strike through, so its values are plain — the purple
-      // text is what marks the card as the AI's.
-      aiMode: "new",
+      // A plan the AI invented outright, so every value is a proposal with nothing to strike through.
+      aiMode: true,
       data: {
         code: "002",
         name: "I1 - B - Spanish",
+        isNewPlan: true,
         version: "v1",
         status: "Draft",
-        sqft: "3,100",
-        beds: "5",
-        baths: "4",
-        elevations: "3",
-        width: "58",
-        depth: "72",
+        sqft: aiProposal("3,100"),
+        beds: aiProposal("5"),
+        baths: aiProposal("4"),
+        elevations: aiProposal("3"),
+        width: aiProposal("58"),
+        depth: aiProposal("72"),
         bidOut: 41,
       },
     },
@@ -3162,9 +3170,9 @@ export function CardViewAiStates() {
   );
 }
 
-/** Shorthand for a program value the AI moved: `was` struck through, then the value now standing. */
-function aiProposal(was: string, now: string) {
-  return <ProposedValue original={was} proposed={now} />;
+/** A program value the AI proposed, striking through `original` when the plan had one on record. */
+function aiProposal(proposed: string, original?: string) {
+  return <ProposedValue original={original} proposed={proposed} />;
 }
 
 export function CardViewInfiniteScroll() {

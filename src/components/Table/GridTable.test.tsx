@@ -5524,17 +5524,18 @@ describe("card view", () => {
   });
 
   it("carries a row's aiMode through to its card", async () => {
-    // Given one plain row and one the AI created
+    // Given one plain row and one the AI touched
     const rows: GridDataRow<CarouselRow>[] = [
       simpleHeader,
       { kind: "data", id: "row1", data: { name: "Showerhead" }, imgSrc: "hero.png" },
-      { kind: "data", id: "row2", data: { name: "Faucet" }, imgSrc: "hero.png", aiMode: "new" },
+      { kind: "data", id: "row2", data: { name: "Faucet" }, imgSrc: "hero.png", aiMode: true },
     ];
     // When rendered as cards
     const r = await render(<GridTable as="card" columns={carouselColumns} rows={rows} />, withRouter());
     // Then only the flagged row's card is painted, i.e. the row-level flag reaches the card
-    expect(r.getAllByTestId("tableCard_title")[1]).toHaveStyle({ color: "var(--b-ai-field-fg)" });
-    expect(r.getAllByTestId("tableCard_title")[0]).toHaveStyle({ color: "var(--b-on-surface)" });
+    const cards = r.getAllByTestId("tableCard");
+    expect(cards[1]).toHaveStyle({ borderWidth: "2px", backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+    expect(cards[0]).toHaveStyle({ borderWidth: "1px", backgroundColor: maybeCssVar(Tokens.SurfaceRaised) });
   });
 
   it("calls onClick from a carousel card's stretched button", async () => {
