@@ -34,11 +34,10 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
 
   return (
     <div css={Css.df.ais.gap1.w100.p1.br4.xs.bgColor(Tokens.Surface).ba.bc(borderColor).bshBasic.$} {...tid}>
-      {/* `df` so Tag's inline-flex box doesn't pick up a line box's descender space. */}
       <span css={Css.df.fs0.$}>
         <Tag {...tagProps} {...tid.tag} />
       </span>
-      <span css={Css.fg1.mw0.color(Tokens.OnSurface).$} {...tid.description}>
+      <span css={Css.fg1.mw0.ptPx(1).color(Tokens.OnSurface).$} {...tid.description}>
         {description}
       </span>
       {actions.length > 0 && (
