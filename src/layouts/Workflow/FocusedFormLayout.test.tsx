@@ -1,10 +1,11 @@
+import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { setViewport } from "src/tests/viewport";
 import { click, render, withRouter } from "src/utils/rtl";
 import { FocusedFormLayout, FocusedFormLayoutProps } from "./FocusedFormLayout";
 
 describe("FocusedFormLayout", () => {
-  it("renders the header without stepper tabs and the form body", async () => {
-    // Given a FocusedFormLayout with two sections
+  it("renders the header without stepper tabs and the body", async () => {
+    // Given a FocusedFormLayout with a FormSectionLayout body
     const r = await render(<FocusedFormLayout {...baseProps()} />, withRouter());
 
     // Then the page title is in the header, there is no stepper, and the form title renders
@@ -12,73 +13,6 @@ describe("FocusedFormLayout", () => {
     expect(r.query.header_stepperTabs).toBeNull();
     expect(r.formSectionLayout_title).toHaveTextContent("Link Design Package");
     expect(r.focusedFormLayout_body).toBeInTheDocument();
-  });
-
-  it("renders JumpLinks from section titles", async () => {
-    // Given a FocusedFormLayout with two includable sections
-    const r = await render(<FocusedFormLayout {...baseProps()} />, withRouter());
-
-    // Then both section titles appear as jump links, and each section has an id
-    expect(r.focusedFormLayout_jumpLinks).toHaveTextContent("Setup");
-    expect(r.focusedFormLayout_jumpLinks).toHaveTextContent("Package Options");
-    expect(r.formSection_section_0).toHaveAttribute("id", "setup");
-    expect(r.formSection_section_1).toHaveAttribute("id", "packageOptions");
-  });
-
-  it("omits excludeJumpLink sections from the rail", async () => {
-    // Given a third section marked excludeJumpLink
-    const r = await render(
-      <FocusedFormLayout
-        {...baseProps({
-          form: {
-            title: "Link Design Package",
-            sections: [
-              { title: "Setup", fields: <div /> },
-              { title: "Package Options", fields: <div /> },
-              { title: "Internal", excludeJumpLink: true, fields: <div /> },
-            ],
-          },
-        })}
-      />,
-      withRouter(),
-    );
-
-    // Then Internal is not in the rail but still renders as a section
-    expect(r.focusedFormLayout_jumpLinks).not.toHaveTextContent("Internal");
-    expect(r.formSection_section_2).toHaveAttribute("id", "internal");
-  });
-
-  it("hides the rail when withJumpLinks is false", async () => {
-    // Given a multi-section form with withJumpLinks={false}
-    const r = await render(<FocusedFormLayout {...baseProps({ withJumpLinks: false })} />, withRouter());
-
-    // Then no jump-link rail renders
-    expect(r.query.focusedFormLayout_jumpLinks).toBeNull();
-  });
-
-  it("hides the rail when fewer than two includable sections exist", async () => {
-    // Given a form with one section
-    const r = await render(
-      <FocusedFormLayout
-        {...baseProps({
-          form: { title: "Link Design Package", sections: [{ title: "Setup", fields: <div /> }] },
-        })}
-      />,
-      withRouter(),
-    );
-
-    // Then no jump-link rail renders
-    expect(r.query.focusedFormLayout_jumpLinks).toBeNull();
-  });
-
-  it("hides the rail on mobile", async () => {
-    // Given a mobile viewport
-    setViewport("sm");
-    const r = await render(<FocusedFormLayout {...baseProps()} />, withRouter());
-
-    // Then the rail is hidden and CTAs move to the footer
-    expect(r.query.focusedFormLayout_jumpLinks).toBeNull();
-    expect(r.focusedFormLayout_footer).toContainElement(r.create);
   });
 
   it("disables Create when isValid is false, and enables it once valid", async () => {
@@ -161,37 +95,33 @@ describe("FocusedFormLayout", () => {
     expect(onSaveAndExit).toHaveBeenCalledTimes(1);
   });
 
-  it("scrolls to the section when a JumpLink is clicked", async () => {
-    // Given a focused form with jump links
-    Element.prototype.scrollIntoView = vi.fn();
+  it("moves CTAs to the footer on mobile", async () => {
+    // Given a mobile viewport
+    setViewport("sm");
     const r = await render(<FocusedFormLayout {...baseProps()} />, withRouter());
 
-    // When the first jump link is clicked
-    click(r.focusedFormLayout_jumpLinks_link_0);
-
-    // Then the matching section scrolls into view
-    expect(document.getElementById("setup")!.scrollIntoView).toHaveBeenCalledTimes(1);
+    // Then Create is in the footer
+    expect(r.focusedFormLayout_footer).toContainElement(r.create);
   });
 });
 
 function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedFormLayoutProps {
-  const {
-    form = {
-      title: "Link Design Package",
-      sections: [
-        { title: "Setup", fields: <div /> },
-        { title: "Package Options", fields: <div /> },
-      ],
-    },
-    ...rest
-  } = overrides;
+  const { children, ...rest } = overrides;
   return {
     title: "Create Design Package",
     onCancel: () => {},
     completeLabel: "Create",
     onComplete: () => {},
     isValid: true,
-    form,
+    children: children ?? (
+      <FormSectionLayout
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />
+    ),
     ...rest,
   };
 }

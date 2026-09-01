@@ -2,6 +2,7 @@ import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
+import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
 import { FocusedFormLayout } from "./FocusedFormLayout";
@@ -24,12 +25,14 @@ export function Default() {
         completeLabel="Create"
         onComplete={action("complete clicked")}
         isValid
-        form={{
-          title: "Link Design Package",
-          description: "Connect this package to a market and give it a name.",
-          sections: createSections(),
-        }}
-      />
+      >
+        <FormSectionLayout
+          withJumpLinks
+          title="Link Design Package"
+          description="Connect this package to a market and give it a name."
+          sections={createSections()}
+        />
+      </FocusedFormLayout>
     </WithEnvironmentBanner>
   );
 }
@@ -43,13 +46,13 @@ export function WithoutJumpLinks() {
         completeLabel="Create"
         onComplete={action("complete clicked")}
         isValid
-        withJumpLinks={false}
-        form={{
-          title: "Link Design Package",
-          description: "Connect this package to a market and give it a name.",
-          sections: createSections(),
-        }}
-      />
+      >
+        <FormSectionLayout
+          title="Link Design Package"
+          description="Connect this package to a market and give it a name."
+          sections={createSections()}
+        />
+      </FocusedFormLayout>
     </WithEnvironmentBanner>
   );
 }
@@ -64,12 +67,15 @@ export function AiMode() {
         onComplete={action("complete clicked")}
         isValid
         aiMode
-        form={{
-          title: "Link Design Package",
-          description: "Connect this package to a market and give it a name.",
-          sections: createSections(),
-        }}
-      />
+      >
+        <FormSectionLayout
+          withJumpLinks
+          aiMode
+          title="Link Design Package"
+          description="Connect this package to a market and give it a name."
+          sections={createSections()}
+        />
+      </FocusedFormLayout>
     </WithEnvironmentBanner>
   );
 }

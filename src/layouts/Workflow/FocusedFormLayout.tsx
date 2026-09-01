@@ -1,19 +1,8 @@
+import { ReactNode } from "react";
 import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import { Css } from "src/Css";
-import { FormSectionProps } from "src/forms/FormSection";
-import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { FormSectionLayout, FormSectionLayoutProps } from "src/layouts/FormSectionLayout";
 import { useTestIds } from "src/utils";
-import { defaultTestId } from "src/utils/defaultTestId";
-import { JumpLinksRail } from "./JumpLinksRail";
-import { useActiveJumpLink } from "./useActiveJumpLink";
 import { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
-
-type FocusedFormSection = FormSectionProps & {
-  /** When true, omit this section from the JumpLinks rail. */
-  excludeJumpLink?: boolean;
-};
 
 export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
   Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
@@ -21,41 +10,21 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
     isValid: boolean;
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
-    /** When false, never show the JumpLinks rail. */
-    withJumpLinks?: boolean;
-    /** Page wash, `ai` CTA, and forwarded to `form`. */
+    /** Full-bleed AI wash on the body and the `ai` Create/Save variant. Pair with body `aiMode` (e.g. FormSectionLayout). */
     aiMode?: boolean;
-    form: Omit<FormSectionLayoutProps, "sections"> & { sections?: FocusedFormSection[] };
+    /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks`). */
+    children: ReactNode;
   };
 
 /**
- * Standalone single-form workflow page. Contract: `docs/layouts.md`.
- * Nest under `EnvironmentBannerLayout` only — no navbar/side nav, so attention stays on the form.
+ * Standalone workflow page without steps: workflow header + body.
+ * Nest under `EnvironmentBannerLayout` only. JumpLinks live on the body (e.g. `FormSectionLayout withJumpLinks`).
+ * Contract: `docs/layouts.md`.
  */
 export function FocusedFormLayout(props: FocusedFormLayoutProps) {
-  const {
-    onCancel,
-    completeLabel,
-    onComplete,
-    onSaveAndExit,
-    isValid,
-    isDirty,
-    withJumpLinks = true,
-    aiMode,
-    form,
-    ...headerProps
-  } = props;
+  const { onCancel, completeLabel, onComplete, onSaveAndExit, isValid, isDirty, aiMode, children, ...headerProps } =
+    props;
   const tid = useTestIds(props, "focusedFormLayout");
-  const { sm: isMobile } = useBreakpoint();
-
-  const jumpLinks = (form.sections ?? [])
-    .filter((section) => !section.excludeJumpLink)
-    .map((section) => {
-      const id = defaultTestId(section.title);
-      return { id, label: section.title };
-    });
-  const activeId = useActiveJumpLink(jumpLinks.map((link) => link.id));
-  const showRail = withJumpLinks && jumpLinks.length >= 2 && !isMobile;
 
   return (
     <WorkflowPageLayout
@@ -69,12 +38,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
       onComplete={onComplete}
       primaryDisabled={!isValid}
     >
-      <div css={Css.df.w100.$}>
-        {showRail && <JumpLinksRail links={jumpLinks} activeId={activeId} {...tid.jumpLinks} />}
-        <div css={Css.fg1.mw0.mb4.$}>
-          <FormSectionLayout {...form} aiMode={aiMode} />
-        </div>
-      </div>
+      {children}
     </WorkflowPageLayout>
   );
 }
