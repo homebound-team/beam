@@ -5,7 +5,7 @@ import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import { TabContent } from "src/components/Tabs";
 import { testTabs } from "src/components/testData";
-import { withBeamDecorator, withRouter } from "src/utils/sb";
+import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
 
 export default {
@@ -30,6 +30,20 @@ export function WithRightSlot() {
     />
   );
 }
+
+/** Two or more `actions` render as buttons on desktop and collapse into a kebab at `sm`. */
+export const WithActions = newStory(
+  () => (
+    <PageHeader
+      title="Test Title"
+      actions={[
+        { label: "Upload", variant: "primary", onClick: action("upload") },
+        { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
+      ]}
+    />
+  ),
+  { parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } } },
+);
 
 export function WithTabs() {
   const [selected, setSelected] = useState(testTabs[0].value);
