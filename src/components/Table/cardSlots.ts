@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { IconKey } from "src/components";
 import type { CardTag } from "src/components/Card";
+import type { ProposedValueProps } from "src/components/ProposedValue";
 import type { TagType } from "src/components/Tag";
 
 type CardSlotBase<K extends string> = { kind: K };
@@ -11,15 +12,12 @@ export type CardBadgeTag = {
   type?: TagType;
 } & ({ iconOnly?: false; icon?: IconKey } | { iconOnly: true; icon: IconKey });
 
-export type CardTitleSlot = CardSlotBase<"title"> & {
-  text: string;
-  /** Marks `text` as the AI's proposal; `original` is struck through when the title had one on record. */
-  proposed?: { original?: string };
-};
-/** Left meta text above the title */
-export type CardLeftEyebrowSlot = CardSlotBase<"leftEyebrow"> & { text: ReactNode };
-/** Right meta text above the title. Distinct from title-row `cardBadgeSlot`. */
-export type CardRightEyebrowSlot = CardSlotBase<"rightEyebrow"> & { text: ReactNode };
+/** `text` is either plain, or a `ProposedValueProps` the card renders via `ProposedValue`. */
+export type CardTitleSlot = CardSlotBase<"title"> & { text: string | ProposedValueProps };
+/** Left meta text above the title. `text` is plain, or a `ProposedValueProps` rendered via `ProposedValue`. */
+export type CardLeftEyebrowSlot = CardSlotBase<"leftEyebrow"> & { text: string | ProposedValueProps };
+/** Right meta text above the title. Distinct from title-row `cardBadgeSlot`. Same `text` shape as left. */
+export type CardRightEyebrowSlot = CardSlotBase<"rightEyebrow"> & { text: string | ProposedValueProps };
 export type CardBadgeSlot = CardSlotBase<"badge"> & { text: string; tags?: CardBadgeTag[] };
 export type CardStatusSlot = CardSlotBase<"status"> & { tag: CardTag };
 export type CardDataBlockSlot = CardSlotBase<"dataBlock"> & { label: string; value: ReactNode | string | number };
@@ -60,15 +58,15 @@ export type CardSlot =
   | CardInteractiveFooterSlot;
 
 /** `text` stays a string for `alt` / `aria-label`, so a proposed title is declared rather than composed. */
-export function cardTitleSlot(text: string, proposed?: { original?: string }): CardTitleSlot {
-  return { kind: "title", text, proposed };
+export function cardTitleSlot(text: string | ProposedValueProps): CardTitleSlot {
+  return { kind: "title", text };
 }
 
-export function cardLeftEyebrowSlot(text: ReactNode): CardLeftEyebrowSlot {
+export function cardLeftEyebrowSlot(text: string | ProposedValueProps): CardLeftEyebrowSlot {
   return { kind: "leftEyebrow", text };
 }
 
-export function cardRightEyebrowSlot(text: ReactNode): CardRightEyebrowSlot {
+export function cardRightEyebrowSlot(text: string | ProposedValueProps): CardRightEyebrowSlot {
   return { kind: "rightEyebrow", text };
 }
 

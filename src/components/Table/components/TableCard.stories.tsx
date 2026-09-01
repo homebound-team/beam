@@ -161,8 +161,7 @@ export function AiStyling() {
         <TableCardView
           imgSrc={imgSrc}
           leftEyebrow="002"
-          title="E1 - C - Spanish"
-          titleProposed={{ original: "E1 - C - Craftsman" }}
+          title={{ original: "E1 - C - Craftsman", proposed: "E1 - C - Spanish" }}
           data={createElevationData({
             height: <ProposedValue original="20" proposed="25 ft" />,
             sqft: <ProposedValue original="3500 - 4500" proposed="4000 - 5000" />,
@@ -174,9 +173,8 @@ export function AiStyling() {
       <CardContainer>
         <TableCardView
           imgSrc={imgSrc}
-          leftEyebrow={<ProposedValue proposed="002" />}
-          title="I1 - B - Spanish"
-          titleProposed={{}}
+          leftEyebrow={{ proposed: "002" }}
+          title={{ proposed: "I1 - B - Spanish" }}
           data={createElevationData({ allProposed: true })}
           progress={41}
           aiMode

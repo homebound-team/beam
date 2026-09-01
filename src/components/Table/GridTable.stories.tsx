@@ -3024,8 +3024,8 @@ type PlanProgramData = {
   name: string;
   version: string;
   status: string;
-  /** Set when the AI proposed this name; `original` is struck through before `name`. */
-  proposedName?: { original?: string };
+  /** Set when the AI renamed the plan; struck through before `name`. */
+  originalName?: string;
   // Program values are `ReactNode` so any of them can carry a `ProposedValue` instead of a plain string.
   sqft: ReactNode;
   beds: ReactNode;
@@ -3048,7 +3048,10 @@ export function CardViewAiStates() {
     },
     {
       header: "Offering Name",
-      data: ({ name, proposedName }) => ({ content: name, cardSlot: cardTitleSlot(name, proposedName) }),
+      data: ({ name, originalName }) => ({
+        content: name,
+        cardSlot: cardTitleSlot(originalName ? { original: originalName, proposed: name } : name),
+      }),
     },
     { header: "Version", data: ({ version }) => ({ content: version, cardSlot: cardBadgeSlot(version) }) },
     {
@@ -3110,7 +3113,7 @@ export function CardViewAiStates() {
       data: {
         code: "002",
         name: "E1 - C - Spanish",
-        proposedName: { original: "E1 - C - Craftsman" },
+        originalName: "E1 - C - Craftsman",
         version: "v5",
         status: "In Progress",
         sqft: aiProposal("2,650", "2,400"),

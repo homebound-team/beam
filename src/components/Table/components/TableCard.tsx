@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Tag, Tooltip } from "src/components";
 import { CardTag, ImageFitType } from "src/components/Card";
 import { Carousel } from "src/components/Carousel";
-import { ProposedValue } from "src/components/ProposedValue";
+import { ProposedValue, ProposedValueProps } from "src/components/ProposedValue";
 import type {
   CardBadgeTag,
   CardCarouselFooter,
@@ -43,10 +43,9 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
   const { rs, columns, rowStyle, api, height, imageFit } = props;
   const tid = useTestIds(props, "tableCard");
 
-  let title: string | undefined;
-  let titleProposed: { original?: string } | undefined;
-  let leftEyebrow: ReactNode;
-  let rightEyebrow: ReactNode;
+  let title: string | ProposedValueProps | undefined;
+  let leftEyebrow: string | ProposedValueProps | undefined;
+  let rightEyebrow: string | ProposedValueProps | undefined;
   let badge: string | undefined;
   let badgeTags: CardBadgeTag[] | undefined;
   let status: CardTag | undefined;
@@ -63,7 +62,6 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
     switch (slot.kind) {
       case "title":
         title = slot.text;
-        titleProposed = slot.proposed;
         break;
       case "leftEyebrow":
         leftEyebrow = slot.text;
@@ -99,7 +97,6 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
       {...tid}
       imgSrc={rs.row.imgSrc ?? ""}
       title={title}
-      titleProposed={titleProposed}
       leftEyebrow={leftEyebrow}
       rightEyebrow={rightEyebrow}
       badge={badge}
@@ -121,11 +118,10 @@ export const TableCard = observer(TableCardImpl) as typeof TableCardImpl;
 
 export type TableCardViewProps = {
   imgSrc: string;
-  leftEyebrow?: ReactNode;
-  rightEyebrow?: ReactNode;
-  title: string;
-  /** Marks the title as the AI's proposal; `original` is struck through when there was one on record. */
-  titleProposed?: { original?: string };
+  leftEyebrow?: string | ProposedValueProps;
+  rightEyebrow?: string | ProposedValueProps;
+  /** Plain text, or a `ProposedValueProps` the card renders via `ProposedValue`. */
+  title: string | ProposedValueProps;
   badge?: string;
   badgeTags?: CardBadgeTag[];
   data: CardData[];
@@ -152,7 +148,6 @@ export function TableCardView(props: TableCardViewProps) {
     imgSrc,
     leftEyebrow,
     rightEyebrow,
-    titleProposed,
     badge,
     badgeTags,
     data,
@@ -166,6 +161,8 @@ export function TableCardView(props: TableCardViewProps) {
     aiMode = false,
   } = props;
   const tid = useTestIds(props, "tableCardView");
+  // `alt` / `aria-label` need plain text even when `title` is a proposal.
+  const titleText = typeof title === "string" ? title : title.proposed;
   // `getButtonOrLink` renders a link when passed a string, and a button otherwise.
   const action = to || onClick;
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
@@ -180,7 +177,7 @@ export function TableCardView(props: TableCardViewProps) {
 
   const actionAttrs = {
     ...tid.action,
-    "aria-label": title,
+    "aria-label": titleText,
     // `getButtonOrLink` renders its `<button>` without a type, which would default to submit inside a form.
     type: typeof action === "string" ? undefined : "button",
     ...Css.props(contentStyles),
@@ -198,7 +195,7 @@ export function TableCardView(props: TableCardViewProps) {
         }
         {...tid.hero}
       >
-        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={title} loading="lazy" {...tid.image} />
+        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={titleText} loading="lazy" {...tid.image} />
         {status && (
           <div css={Css.absolute.top1.left1.df.$} {...tid.status}>
             <Tag {...status} />
@@ -210,22 +207,18 @@ export function TableCardView(props: TableCardViewProps) {
         {(leftEyebrow || rightEyebrow) && (
           <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
             <span css={Css.truncate.$} {...tid.leftEyebrow}>
-              {leftEyebrow}
+              {renderMaybeProposed(leftEyebrow, tid.leftEyebrowProposal)}
             </span>
             {rightEyebrow && (
               <span css={Css.fs0.$} {...tid.rightEyebrow}>
-                {rightEyebrow}
+                {renderMaybeProposed(rightEyebrow, tid.rightEyebrowProposal)}
               </span>
             )}
           </div>
         )}
         <div css={Css.dif.w100.jcsb.aic.$}>
           <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
-            {titleProposed ? (
-              <ProposedValue original={titleProposed.original} proposed={title} {...tid.titleProposal} />
-            ) : (
-              title
-            )}
+            {renderMaybeProposed(title, tid.titleProposal)}
           </h4>
           {(badge || badgeTags?.length) && (
             <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
@@ -378,6 +371,11 @@ function Thumbnail(props: ThumbnailProps) {
       </Link>
     </Tooltip>
   );
+}
+
+/** Renders the title/eyebrow union: plain text, or a proposal via `ProposedValue`. */
+function renderMaybeProposed(value: string | ProposedValueProps | undefined, tid?: object): ReactNode {
+  return typeof value === "string" || value === undefined ? value : <ProposedValue {...value} {...tid} />;
 }
 
 function clampProgress(value: number): number {

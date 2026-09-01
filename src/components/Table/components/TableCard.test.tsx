@@ -1,5 +1,4 @@
 import { fireEvent } from "@testing-library/react";
-import { ProposedValue } from "src/components/ProposedValue";
 import { TableCardView } from "src/components/Table/components/TableCard";
 import { maybeCssVar, Palette, Tokens } from "src/Css";
 import { click, render } from "src/utils/rtl";
@@ -48,9 +47,8 @@ describe("TableCardView", () => {
     const r = await render(
       <TableCardView
         imgSrc={imgSrc}
-        leftEyebrow={<ProposedValue proposed="002" />}
-        title="Spanish"
-        titleProposed={{ original: "Espanol" }}
+        leftEyebrow={{ proposed: "002" }}
+        title={{ original: "Espanol", proposed: "Spanish" }}
         data={[]}
       />,
     );
@@ -58,7 +56,7 @@ describe("TableCardView", () => {
     expect(r.tableCardView_title).toHaveTextContent("Spanish");
     expect(r.tableCardView_image).toHaveAttribute("alt", "Spanish");
     expect(r.tableCardView_titleProposal_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
-    expect(r.proposedValue_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
+    expect(r.tableCardView_leftEyebrowProposal_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
     // And a renamed title strikes through what it replaced
     expect(r.tableCardView_titleProposal_original).toHaveTextContent("Espanol");
   });
