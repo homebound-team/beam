@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Tag, Tooltip } from "src/components";
 import { CardTag, ImageFitType } from "src/components/Card";
 import { Carousel } from "src/components/Carousel";
+import { ProposedValue, ProposedValueProps } from "src/components/ProposedValue";
 import type {
   CardBadgeTag,
   CardCarouselFooter,
@@ -16,7 +17,7 @@ import { RowStyle } from "src/components/Table/TableStyles";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
-import { Css, Tokens } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -42,9 +43,9 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
   const { rs, columns, rowStyle, api, height, imageFit } = props;
   const tid = useTestIds(props, "tableCard");
 
-  let title: string | undefined;
-  let leftEyebrow: string | undefined;
-  let rightEyebrow: string | undefined;
+  let title: string | ProposedValueProps | undefined;
+  let leftEyebrow: string | ProposedValueProps | undefined;
+  let rightEyebrow: string | ProposedValueProps | undefined;
   let badge: string | undefined;
   let badgeTags: CardBadgeTag[] | undefined;
   let status: CardTag | undefined;
@@ -117,9 +118,10 @@ export const TableCard = observer(TableCardImpl) as typeof TableCardImpl;
 
 export type TableCardViewProps = {
   imgSrc: string;
-  leftEyebrow?: string;
-  rightEyebrow?: string;
-  title: string;
+  leftEyebrow?: string | ProposedValueProps;
+  rightEyebrow?: string | ProposedValueProps;
+  /** Plain text, or a `ProposedValueProps` the card renders via `ProposedValue`. */
+  title: string | ProposedValueProps;
   badge?: string;
   badgeTags?: CardBadgeTag[];
   data: CardData[];
@@ -159,6 +161,8 @@ export function TableCardView(props: TableCardViewProps) {
     aiMode = false,
   } = props;
   const tid = useTestIds(props, "tableCardView");
+  // `alt` / `aria-label` need plain text even when `title` is a proposal.
+  const titleText = typeof title === "string" ? title : title.proposed;
   // `getButtonOrLink` renders a link when passed a string, and a button otherwise.
   const action = to || onClick;
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
@@ -173,7 +177,7 @@ export function TableCardView(props: TableCardViewProps) {
 
   const actionAttrs = {
     ...tid.action,
-    "aria-label": title,
+    "aria-label": titleText,
     // `getButtonOrLink` renders its `<button>` without a type, which would default to submit inside a form.
     type: typeof action === "string" ? undefined : "button",
     ...Css.props(contentStyles),
@@ -183,10 +187,15 @@ export function TableCardView(props: TableCardViewProps) {
   const content = (
     <>
       <div
-        css={Css.relative.hPx(184).w100.bb.bc(Tokens.FieldBorderDefault).oh.borderRadius("12px 12px 0 0").$}
+        css={
+          Css.relative
+            .hPx(184)
+            .w100.bb.bc(aiMode ? Tokens.AiFieldBg : Tokens.FieldBorderDefault)
+            .oh.borderRadius("12px 12px 0 0").$
+        }
         {...tid.hero}
       >
-        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={title} loading="lazy" {...tid.image} />
+        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={titleText} loading="lazy" {...tid.image} />
         {status && (
           <div css={Css.absolute.top1.left1.df.$} {...tid.status}>
             <Tag {...status} />
@@ -198,18 +207,18 @@ export function TableCardView(props: TableCardViewProps) {
         {(leftEyebrow || rightEyebrow) && (
           <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
             <span css={Css.truncate.$} {...tid.leftEyebrow}>
-              {leftEyebrow}
+              {renderMaybeProposed(leftEyebrow, tid.leftEyebrowProposal)}
             </span>
             {rightEyebrow && (
               <span css={Css.fs0.$} {...tid.rightEyebrow}>
-                {rightEyebrow}
+                {renderMaybeProposed(rightEyebrow, tid.rightEyebrowProposal)}
               </span>
             )}
           </div>
         )}
         <div css={Css.dif.w100.jcsb.aic.$}>
           <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
-            {title}
+            {renderMaybeProposed(title, tid.titleProposal)}
           </h4>
           {(badge || badgeTags?.length) && (
             <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
@@ -225,19 +234,23 @@ export function TableCardView(props: TableCardViewProps) {
         <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownFooter).pb3.$}>
           {data.length > 0 && (
             <dl css={Css.df.gap2.sm.$}>
-              <div css={Css.df.fdc.fg1.$}>
+              <div css={Css.df.fdc.fg1.fb2.mw0.$}>
                 {col1.map((d) => (
                   <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                    <dt>{d.label}:</dt>
-                    <dd>{d.value}</dd>
+                    <dt css={Css.fs0.$}>{d.label}:</dt>
+                    {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
+                        instead of widening the column. */}
+                    <dd css={Css.mw0.$}>{d.value}</dd>
                   </div>
                 ))}
               </div>
-              <div css={Css.df.fdc.fg1.$}>
+              <div css={Css.df.fdc.fg1.fb2.mw0.$}>
                 {col2.map((d) => (
                   <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                    <dt>{d.label}:</dt>
-                    <dd>{d.value}</dd>
+                    <dt css={Css.fs0.$}>{d.label}:</dt>
+                    {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
+                        instead of widening the column. */}
+                    <dd css={Css.mw0.$}>{d.value}</dd>
                   </div>
                 ))}
               </div>
@@ -245,8 +258,12 @@ export function TableCardView(props: TableCardViewProps) {
           )}
           {progress !== undefined && (
             <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-              <div css={Css.w25.hPx(8).br4.bgColor(Tokens.SurfaceSubtle).$}>
-                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} />
+              {/* `SurfaceSubtle` is Gray200, which all but vanishes on the AI fill. */}
+              <div
+                css={Css.w25.hPx(8).br4.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$}
+                {...tid.progressTrack}
+              >
+                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} {...tid.progressFill} />
               </div>
               <span {...tid.progressValue}>{progressValue}%</span>
             </div>
@@ -264,6 +281,8 @@ export function TableCardView(props: TableCardViewProps) {
           .bgColor(aiMode ? Tokens.AiFieldBg : Tokens.SurfaceRaised)
           .hPx(height).cursorPointer.onHover.bshHover.$,
         ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
+        // Must follow the focus ring, whose `ba` would reset the AI border back to 1px.
+        ...(aiMode ? Css.bw2.bc(Tokens.AiFieldFg).$ : {}),
       }}
       {...tid}
     >
@@ -352,6 +371,11 @@ function Thumbnail(props: ThumbnailProps) {
       </Link>
     </Tooltip>
   );
+}
+
+/** Renders the title/eyebrow union: plain text, or a proposal via `ProposedValue`. */
+function renderMaybeProposed(value: string | ProposedValueProps | undefined, tid?: object): ReactNode {
+  return typeof value === "string" || value === undefined ? value : <ProposedValue {...value} {...tid} />;
 }
 
 function clampProgress(value: number): number {

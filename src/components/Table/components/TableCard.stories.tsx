@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { ProposedValue } from "src/components/ProposedValue";
 import { TableCardView } from "src/components/Table/components/TableCard";
 import { Css, Tokens } from "src/Css";
 import { newStory, withRouter } from "src/utils/sb";
@@ -144,6 +145,45 @@ export function WithContainImageFit() {
   );
 }
 
+export function AiStyling() {
+  return (
+    <div css={Css.df.gap3.$}>
+      <CardContainer>
+        <TableCardView
+          imgSrc={imgSrc}
+          leftEyebrow="002"
+          title="H1 - A - Janes Cottage"
+          data={createElevationData()}
+          progress={72}
+        />
+      </CardContainer>
+      <CardContainer>
+        <TableCardView
+          imgSrc={imgSrc}
+          leftEyebrow="002"
+          title={{ original: "E1 - C - Craftsman", proposed: "E1 - C - Spanish" }}
+          data={createElevationData({
+            height: <ProposedValue original="20" proposed="25 ft" />,
+            sqft: <ProposedValue original="3500 - 4500" proposed="4000 - 5000" />,
+          })}
+          progress={69}
+          aiMode
+        />
+      </CardContainer>
+      <CardContainer>
+        <TableCardView
+          imgSrc={imgSrc}
+          leftEyebrow={{ proposed: "002" }}
+          title={{ proposed: "I1 - B - Spanish" }}
+          data={createElevationData({ allProposed: true })}
+          progress={41}
+          aiMode
+        />
+      </CardContainer>
+    </div>
+  );
+}
+
 /**
  * Demonstrates the card's interactive states.
  *
@@ -225,6 +265,21 @@ function tabPlayFn(times: number): PlayFunction {
       await userEvent.tab();
     }
   };
+}
+
+/**
+ * The elevation blocks from the AI frame. `height` / `sqft` override one value so a card can show a move;
+ * `allProposed` marks every value, for a plan the AI put forward whole.
+ */
+function createElevationData(opts: { height?: ReactNode; sqft?: ReactNode; allProposed?: boolean } = {}) {
+  const { height = "25 ft", sqft = "3500 - 4500", allProposed = false } = opts;
+  const blocks = [
+    { label: "Sqft", value: sqft },
+    { label: "Height", value: height },
+    { label: "Depth", value: "68 ft" },
+    { label: "Width", value: "65 ft" },
+  ];
+  return allProposed ? blocks.map((b) => ({ ...b, value: <ProposedValue proposed={String(b.value)} /> })) : blocks;
 }
 
 function CardContainer({ children }: { children: JSX.Element }) {

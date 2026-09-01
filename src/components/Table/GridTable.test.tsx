@@ -5523,6 +5523,21 @@ describe("card view", () => {
     expect(r.tableCard_carousel_item_0).toHaveAttribute("href", "/mv/1");
   });
 
+  it("carries a row's aiMode through to its card", async () => {
+    // Given one plain row and one the AI touched
+    const rows: GridDataRow<CarouselRow>[] = [
+      simpleHeader,
+      { kind: "data", id: "row1", data: { name: "Showerhead" }, imgSrc: "hero.png" },
+      { kind: "data", id: "row2", data: { name: "Faucet" }, imgSrc: "hero.png", aiMode: true },
+    ];
+    // When rendered as cards
+    const r = await render(<GridTable as="card" columns={carouselColumns} rows={rows} />, withRouter());
+    // Then only the flagged row's card is painted, i.e. the row-level flag reaches the card
+    const cards = r.getAllByTestId("tableCard");
+    expect(cards[1]).toHaveStyle({ borderWidth: "2px", backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
+    expect(cards[0]).toHaveStyle({ borderWidth: "1px", backgroundColor: maybeCssVar(Tokens.SurfaceRaised) });
+  });
+
   it("calls onClick from a carousel card's stretched button", async () => {
     // Given a carousel card with an onClick handler
     const handler = vi.fn();

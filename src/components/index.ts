@@ -61,6 +61,7 @@ export type { NavLinkProps, NavLinkVariant } from "./NavLinks";
 export * from "./Pagination";
 export { PresentationProvider } from "./PresentationContext";
 export type { InputStylePalette, PresentationFieldProps } from "./PresentationContext";
+export * from "./ProposedValue";
 export * from "./RightSidebar";
 export * from "./ScrollShadows";
 export * from "./SideNav";
