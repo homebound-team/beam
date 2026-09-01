@@ -82,3 +82,15 @@ export function Secondary() {
     </div>
   );
 }
+
+export function Strikethrough() {
+  return (
+    <div css={Css.df.fdc.aifs.gap1.$}>
+      <h3 css={Css.mb1.mdSb.$}>Strikethrough</h3>
+      <p>Indicates a value that has been declined, i.e. a rejected AI suggestion.</p>
+      <Tag text="TRMCLG0004" type="strikethrough" variant="secondary" />
+      <Tag text="TRMCLG0004" type="strikethrough" variant="secondary" icon="xCircle" />
+      <Tag text="Rejected Label" type="strikethrough" />
+    </div>
+  );
+}

@@ -5,13 +5,13 @@ import { Css, Margin, Only, Palette, Properties, Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type TagXss = Margin | "backgroundColor" | "color";
-export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral" | "ai";
+export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral" | "ai" | "strikethrough";
 export type TagVariant = "primary" | "secondary";
 
 type TagPropsBase<X> = {
   /** Required even if using `iconOnly + preventTooltip`. In those cases an accessibility friendly message is expected */
   text: ReactNode;
-  // Defaults to "neutral"
+  // Defaults to "neutral".
   type?: TagType;
   /** Defaults to "primary". Secondary is intended for use in TagGroup. */
   variant?: TagVariant;
@@ -28,6 +28,7 @@ export type TagProps<X> = TagPropsBase<X> & ({ iconOnly?: false; icon?: IconKey 
 export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
   const { text, type, variant = "primary", xss, preventTooltip = false, iconOnly, icon, ...otherProps } = props;
   const isIconOnly = !!iconOnly && !!icon;
+  const isStrikethrough = type === "strikethrough";
   const { background, iconColor, typography, padding } = getVariantStyles(variant, type);
   const tid = useTestIds(otherProps);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -53,6 +54,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
           ...typography,
           ...(isIconOnly ? Css.pxPx(2).$ : padding),
           ...background,
+          ...(isStrikethrough ? Css.o50.$ : {}),
           ...xss,
         }}
       >
@@ -66,7 +68,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
         {isIconOnly ? (
           <span css={Css.visuallyHidden.$}>{text}</span>
         ) : (
-          <span ref={ref} css={Css.lineClamp1.wbba.$}>
+          <span ref={ref} css={Css.lineClamp1.wbba.if(isStrikethrough).tdlt.$}>
             {text}
           </span>
         )}
