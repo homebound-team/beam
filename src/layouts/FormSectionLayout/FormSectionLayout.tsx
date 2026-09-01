@@ -99,13 +99,15 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     </CenteredLayout>
   );
 
-  if (!showRail) return form;
+  if (!showRail) {
+    return <div css={Css.mb4.$}>{form}</div>;
+  }
 
   return (
-    <div css={Css.df.w100.$}>
+    <div css={Css.df.w100.mb4.$}>
       <JumpLinksRail links={jumpLinks} activeId={activeId} {...tid.jumpLinks} />
       {/* Mirror the rail's width so the form stays centered on the page, as it is without the rail. */}
-      <div css={Css.fg1.mw0.mb4.mr(jumpLinksRailReservation).$} {...tid.column}>
+      <div css={Css.fg1.mw0.mr(jumpLinksRailReservation).$} {...tid.column}>
         {form}
       </div>
     </div>
