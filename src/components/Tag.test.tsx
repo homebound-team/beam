@@ -54,6 +54,17 @@ describe("Tag", () => {
     });
   });
 
+  it("rejected type dims the tag and strikes through its text", async () => {
+    // Given a secondary rejected tag
+    const r = await render(<Tag text="TRMCLG0004" variant="secondary" type="rejected" data-testid="tag" />);
+
+    // Then it keeps the secondary outline, but is dimmed
+    expect(r.tag).toHaveStyle({ borderColor: Palette.Gray300, opacity: "0.5" });
+
+    // And its text is struck through
+    expect(r.getByText("TRMCLG0004")).toHaveStyle({ textDecoration: "line-through" });
+  });
+
   it("secondary variant does not uppercase text", async () => {
     // Given a secondary tag
     const r = await render(<Tag text="Secondary Label" variant="secondary" data-testid="tag" />);
