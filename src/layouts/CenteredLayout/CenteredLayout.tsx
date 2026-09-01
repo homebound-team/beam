@@ -38,7 +38,7 @@ const centeredContentMaxPx = { sm: 720, lg: 1392 } as const;
 const mdContentPaddingPx = parseInt(pageContentPaddingXValue, 10);
 
 /** Shell max-width (content + horizontal padding at md+): 768 / 1440. */
-const centeredShellMaxPx = {
+export const centeredShellMaxPx = {
   sm: centeredContentMaxPx.sm + mdContentPaddingPx * 2,
   lg: centeredContentMaxPx.lg + mdContentPaddingPx * 2,
 } as const;

@@ -114,6 +114,22 @@ export function NestedChildSections() {
   );
 }
 
+/** JumpLinks rail from section titles (2+ includable sections; hidden on `sm`). */
+export function WithJumpLinks() {
+  return (
+    <FormSectionLayout
+      withJumpLinks
+      title="Link Design Package"
+      description="Connect this package to a market and give it a name."
+      sections={[
+        { title: "Setup", description: "Basic package details.", fields: <PlaceholderFields count={2} /> },
+        { title: "Package Options", fields: <PlaceholderFields count={3} /> },
+        { title: "Internal", excludeJumpLink: true, fields: <PlaceholderFields count={1} /> },
+      ]}
+    />
+  );
+}
+
 function PlaceholderFields({ count }: { count: number }) {
   return (
     <div css={Css.df.fdc.gap1.$}>

@@ -1,8 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { Css, Tokens } from "src/Css";
 import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
+import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -67,6 +69,67 @@ export function WithContentHeaderAndTable() {
   );
 }
 
+/** Form step with JumpLinks on {@link FormSectionLayout} — Stepper itself does not own the rail. */
+export function WithJumpLinks() {
+  return (
+    <WithEnvironmentBanner>
+      <StepperLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        steps={[
+          {
+            label: "Details",
+            isValid: true,
+            content: (
+              <FormSectionLayout
+                withJumpLinks
+                title="Link Design Package"
+                description="Connect this package to a market and give it a name."
+                sections={[
+                  {
+                    title: "Setup",
+                    description: "Basic package details.",
+                    fields: <JumpLinkPlaceholderFields count={2} />,
+                  },
+                  { title: "Package Options", fields: <JumpLinkPlaceholderFields count={3} /> },
+                  {
+                    title: "Internal",
+                    excludeJumpLink: true,
+                    fields: <JumpLinkPlaceholderFields count={1} />,
+                  },
+                ]}
+              />
+            ),
+          },
+          {
+            label: "Review",
+            isValid: true,
+            content: (
+              <FormSectionLayout
+                title="Review"
+                description="Confirm before creating."
+                sections={[{ title: "Summary", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+        ]}
+      />
+    </WithEnvironmentBanner>
+  );
+}
+
 function WithEnvironmentBanner({ children }: { children: ReactNode }) {
   return <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>{children}</EnvironmentBannerLayout>;
+}
+
+function JumpLinkPlaceholderFields({ count }: { count: number }) {
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
+    </div>
+  );
 }
