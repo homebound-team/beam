@@ -1,5 +1,7 @@
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
-import { render } from "src/utils/rtl";
+import { jumpLinksRailReservation } from "src/layouts/FormSectionLayout/JumpLinksRail";
+import { setViewport } from "src/tests/viewport";
+import { click, render } from "src/utils/rtl";
 
 describe("FormSectionLayout", () => {
   it("renders the form title, description, and delegates sections to FormSection", async () => {
@@ -99,5 +101,128 @@ describe("FormSectionLayout", () => {
     expect(r.formSectionLayout_title).toHaveTextContent("Trade Partners");
     expect(r.query.formSectionLayout_card).not.toBeInTheDocument();
     expect(r.query.formSectionLayout_column).not.toBeInTheDocument();
+  });
+
+  it("renders JumpLinks from section titles when withJumpLinks is true", async () => {
+    // Given two includable sections and withJumpLinks
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then both section titles appear as jump links, and each section has an id
+    expect(r.formSectionLayout_jumpLinks).toHaveTextContent("Setup");
+    expect(r.formSectionLayout_jumpLinks).toHaveTextContent("Package Options");
+    expect(r.formSection_section_0).toHaveAttribute("id", "setup");
+    expect(r.formSection_section_1).toHaveAttribute("id", "packageOptions");
+  });
+
+  it("mirrors the rail width so the form stays centered on the page", async () => {
+    // Given a form with the rail showing
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then the content column reserves the rail's width on its other side
+    // (truss passes dynamic values through a custom property; jsdom drops `clamp()` from computed style)
+    expect(r.formSectionLayout_column.style.getPropertyValue("--marginRight")).toBe(jumpLinksRailReservation);
+  });
+
+  it("omits excludeJumpLink sections from the rail", async () => {
+    // Given a third section marked excludeJumpLink
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+          { title: "Internal", excludeJumpLink: true, fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then Internal is not in the rail but still renders as a section
+    expect(r.formSectionLayout_jumpLinks).not.toHaveTextContent("Internal");
+    expect(r.formSection_section_2).toHaveAttribute("id", "internal");
+  });
+
+  it("does not render the rail when withJumpLinks is omitted", async () => {
+    // Given a multi-section form without withJumpLinks
+    const r = await render(
+      <FormSectionLayout
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then no jump-link rail renders, and no column reserves space for one
+    expect(r.query.formSectionLayout_jumpLinks).toBeNull();
+    expect(r.query.formSectionLayout_column).toBeNull();
+  });
+
+  it("hides the rail when fewer than two includable sections exist", async () => {
+    // Given withJumpLinks but only one section
+    const r = await render(
+      <FormSectionLayout withJumpLinks title="Link Design Package" sections={[{ title: "Setup", fields: <div /> }]} />,
+    );
+
+    // Then no jump-link rail renders
+    expect(r.query.formSectionLayout_jumpLinks).toBeNull();
+  });
+
+  it("hides the rail on mobile", async () => {
+    // Given a mobile viewport
+    setViewport("sm");
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then the rail is hidden
+    expect(r.query.formSectionLayout_jumpLinks).toBeNull();
+  });
+
+  it("scrolls to the section when a JumpLink is clicked", async () => {
+    // Given a form with jump links
+    Element.prototype.scrollIntoView = vi.fn();
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // When the first jump link is clicked
+    click(r.formSectionLayout_jumpLinks_link_0);
+
+    // Then the matching section scrolls into view
+    expect(document.getElementById("setup")!.scrollIntoView).toHaveBeenCalledTimes(1);
   });
 });
