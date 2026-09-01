@@ -54,9 +54,9 @@ describe("Tag", () => {
     });
   });
 
-  it("rejected type dims the tag and strikes through its text", async () => {
-    // Given a secondary rejected tag
-    const r = await render(<Tag text="TRMCLG0004" variant="secondary" type="rejected" data-testid="tag" />);
+  it("strikethrough type dims the tag and strikes through its text", async () => {
+    // Given a secondary strikethrough tag
+    const r = await render(<Tag text="TRMCLG0004" variant="secondary" type="strikethrough" data-testid="tag" />);
 
     // Then it keeps the secondary outline, but is dimmed
     expect(r.tag).toHaveStyle({ borderColor: Palette.Gray300, opacity: "0.5" });
