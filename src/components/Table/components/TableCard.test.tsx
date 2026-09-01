@@ -1,4 +1,5 @@
 import { fireEvent } from "@testing-library/react";
+import { ProposedValue } from "src/components/ProposedValue";
 import { TableCardView } from "src/components/Table/components/TableCard";
 import { maybeCssVar, Palette, Tokens } from "src/Css";
 import { click, render } from "src/utils/rtl";
@@ -41,17 +42,25 @@ describe("TableCardView", () => {
     expect(r.tableCardView_progressFill).toHaveStyle({ backgroundColor: Palette.Blue500 });
   });
 
-  it("renders a proposed title and eyebrow as AI proposals", async () => {
-    // Given a card the AI invented outright
+  it("renders a renamed title and a proposed eyebrow as AI proposals", async () => {
+    // Given a card whose title the AI renamed and whose eyebrow it proposed
     // When rendered
     const r = await render(
-      <TableCardView imgSrc={imgSrc} leftEyebrow="002" leftEyebrowProposed title="Spanish" titleProposed data={[]} />,
+      <TableCardView
+        imgSrc={imgSrc}
+        leftEyebrow={<ProposedValue proposed="002" />}
+        title="Spanish"
+        titleProposed={{ original: "Espanol" }}
+        data={[]}
+      />,
     );
     // Then both read as proposals, while the title stays plain text for the image's alt
     expect(r.tableCardView_title).toHaveTextContent("Spanish");
     expect(r.tableCardView_image).toHaveAttribute("alt", "Spanish");
     expect(r.tableCardView_titleProposal_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
-    expect(r.tableCardView_leftEyebrowProposal_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
+    expect(r.proposedValue_proposed).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
+    // And a renamed title strikes through what it replaced
+    expect(r.tableCardView_titleProposal_original).toHaveTextContent("Espanol");
   });
 
   it("applies no AI styling when aiMode is unset", async () => {

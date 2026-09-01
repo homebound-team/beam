@@ -44,11 +44,9 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
   const tid = useTestIds(props, "tableCard");
 
   let title: string | undefined;
-  let titleProposed: boolean | undefined;
-  let leftEyebrow: string | undefined;
-  let leftEyebrowProposed: boolean | undefined;
-  let rightEyebrow: string | undefined;
-  let rightEyebrowProposed: boolean | undefined;
+  let titleProposed: { original?: string } | undefined;
+  let leftEyebrow: ReactNode;
+  let rightEyebrow: ReactNode;
   let badge: string | undefined;
   let badgeTags: CardBadgeTag[] | undefined;
   let status: CardTag | undefined;
@@ -69,11 +67,9 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
         break;
       case "leftEyebrow":
         leftEyebrow = slot.text;
-        leftEyebrowProposed = slot.proposed;
         break;
       case "rightEyebrow":
         rightEyebrow = slot.text;
-        rightEyebrowProposed = slot.proposed;
         break;
       case "badge":
         badge = slot.text;
@@ -105,9 +101,7 @@ function TableCardImpl<R extends Kinded>(props: TableCardProps<R>) {
       title={title}
       titleProposed={titleProposed}
       leftEyebrow={leftEyebrow}
-      leftEyebrowProposed={leftEyebrowProposed}
       rightEyebrow={rightEyebrow}
-      rightEyebrowProposed={rightEyebrowProposed}
       badge={badge}
       badgeTags={badgeTags}
       status={status}
@@ -127,15 +121,11 @@ export const TableCard = observer(TableCardImpl) as typeof TableCardImpl;
 
 export type TableCardViewProps = {
   imgSrc: string;
-  leftEyebrow?: string;
-  rightEyebrow?: string;
+  leftEyebrow?: ReactNode;
+  rightEyebrow?: ReactNode;
   title: string;
-  /** Renders the title as an AI proposal. `title` itself stays plain text for `alt` / `aria-label`. */
-  titleProposed?: boolean;
-  /** Renders the left eyebrow as an AI proposal. */
-  leftEyebrowProposed?: boolean;
-  /** Renders the right eyebrow as an AI proposal. */
-  rightEyebrowProposed?: boolean;
+  /** Marks the title as the AI's proposal; `original` is struck through when there was one on record. */
+  titleProposed?: { original?: string };
   badge?: string;
   badgeTags?: CardBadgeTag[];
   data: CardData[];
@@ -162,9 +152,7 @@ export function TableCardView(props: TableCardViewProps) {
     imgSrc,
     leftEyebrow,
     rightEyebrow,
-    titleProposed = false,
-    leftEyebrowProposed = false,
-    rightEyebrowProposed = false,
+    titleProposed,
     badge,
     badgeTags,
     data,
@@ -222,26 +210,22 @@ export function TableCardView(props: TableCardViewProps) {
         {(leftEyebrow || rightEyebrow) && (
           <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
             <span css={Css.truncate.$} {...tid.leftEyebrow}>
-              {leftEyebrowProposed && leftEyebrow ? (
-                <ProposedValue proposed={leftEyebrow} {...tid.leftEyebrowProposal} />
-              ) : (
-                leftEyebrow
-              )}
+              {leftEyebrow}
             </span>
             {rightEyebrow && (
               <span css={Css.fs0.$} {...tid.rightEyebrow}>
-                {rightEyebrowProposed ? (
-                  <ProposedValue proposed={rightEyebrow} {...tid.rightEyebrowProposal} />
-                ) : (
-                  rightEyebrow
-                )}
+                {rightEyebrow}
               </span>
             )}
           </div>
         )}
         <div css={Css.dif.w100.jcsb.aic.$}>
           <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
-            {titleProposed ? <ProposedValue proposed={title} {...tid.titleProposal} /> : title}
+            {titleProposed ? (
+              <ProposedValue original={titleProposed.original} proposed={title} {...tid.titleProposal} />
+            ) : (
+              title
+            )}
           </h4>
           {(badge || badgeTags?.length) && (
             <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
@@ -257,19 +241,23 @@ export function TableCardView(props: TableCardViewProps) {
         <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownFooter).pb3.$}>
           {data.length > 0 && (
             <dl css={Css.df.gap2.sm.$}>
-              <div css={Css.df.fdc.fg1.$}>
+              <div css={Css.df.fdc.fg1.fb2.mw0.$}>
                 {col1.map((d) => (
                   <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                    <dt>{d.label}:</dt>
-                    <dd>{d.value}</dd>
+                    <dt css={Css.fs0.$}>{d.label}:</dt>
+                    {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
+                        instead of widening the column. */}
+                    <dd css={Css.mw0.$}>{d.value}</dd>
                   </div>
                 ))}
               </div>
-              <div css={Css.df.fdc.fg1.$}>
+              <div css={Css.df.fdc.fg1.fb2.mw0.$}>
                 {col2.map((d) => (
                   <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                    <dt>{d.label}:</dt>
-                    <dd>{d.value}</dd>
+                    <dt css={Css.fs0.$}>{d.label}:</dt>
+                    {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
+                        instead of widening the column. */}
+                    <dd css={Css.mw0.$}>{d.value}</dd>
                   </div>
                 ))}
               </div>

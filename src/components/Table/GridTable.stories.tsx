@@ -3024,8 +3024,8 @@ type PlanProgramData = {
   name: string;
   version: string;
   status: string;
-  /** The AI invented the whole plan, so its code and name are proposals too. */
-  isNewPlan?: boolean;
+  /** Set when the AI proposed this name; `original` is struck through before `name`. */
+  proposedName?: { original?: string };
   // Program values are `ReactNode` so any of them can carry a `ProposedValue` instead of a plain string.
   sqft: ReactNode;
   beds: ReactNode;
@@ -3041,11 +3041,14 @@ export function CardViewAiStates() {
   const columns: GridColumn<PlanProgramRow>[] = [
     {
       header: "Plan Code",
-      data: ({ code, isNewPlan }) => ({ content: code, cardSlot: cardLeftEyebrowSlot(code, isNewPlan) }),
+      data: ({ code }) => ({
+        content: code,
+        cardSlot: cardLeftEyebrowSlot(code),
+      }),
     },
     {
       header: "Offering Name",
-      data: ({ name, isNewPlan }) => ({ content: name, cardSlot: cardTitleSlot(name, isNewPlan) }),
+      data: ({ name, proposedName }) => ({ content: name, cardSlot: cardTitleSlot(name, proposedName) }),
     },
     { header: "Version", data: ({ version }) => ({ content: version, cardSlot: cardBadgeSlot(version) }) },
     {
@@ -3106,7 +3109,8 @@ export function CardViewAiStates() {
       aiMode: true,
       data: {
         code: "002",
-        name: "E1 - C - Craftsman",
+        name: "E1 - C - Spanish",
+        proposedName: { original: "E1 - C - Craftsman" },
         version: "v5",
         status: "In Progress",
         sqft: aiProposal("2,650", "2,400"),
@@ -3147,7 +3151,6 @@ export function CardViewAiStates() {
       data: {
         code: "002",
         name: "I1 - B - Spanish",
-        isNewPlan: true,
         version: "v1",
         status: "Draft",
         sqft: aiProposal("3,100"),
