@@ -54,6 +54,15 @@ describe("useSnackbar", () => {
     expect(r.query.snackbar).not.toBeInTheDocument();
   });
 
+  it("renders notices in a portal at the body", async () => {
+    // Given an app that can trigger snackbar notices
+    const r = await render(<TestComponent />);
+    // When triggering the notice
+    click(r.triggerNotice);
+    // Then the wrapper is a direct child of the body, so app stacking contexts can't trap it
+    expect(r.snackbarWrapper.parentElement).toBe(document.body);
+  });
+
   it("can use an offset", async () => {
     // Given a component with a 200 offset
     const r = await render(<TestComponentWithOffset bottom={200} />);

@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
@@ -10,7 +11,9 @@ type SnackbarProps = {
 
 export function Snackbar({ notices, offset }: SnackbarProps) {
   const tid = useTestIds({});
-  return (
+  // Portal to the body, like Modal and SuperDrawer, so an app root that establishes a stacking
+  // context can't trap notices below the overlay scrims.
+  return createPortal(
     <div
       {...tid.snackbarWrapper}
       css={
@@ -23,7 +26,8 @@ export function Snackbar({ notices, offset }: SnackbarProps) {
       {notices.map((data) => (
         <SnackbarNotice key={data.id} {...data} />
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }
 

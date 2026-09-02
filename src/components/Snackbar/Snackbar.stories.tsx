@@ -1,18 +1,19 @@
 import { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useState } from "react";
-import { Button, ButtonVariant, useSnackbar } from "src/components";
+import { Button, ButtonVariant, useModal, useSnackbar } from "src/components";
+import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { Offset, Snackbar } from "src/components/Snackbar/Snackbar";
 import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
-import { withBeamDecorator } from "src/utils/sb";
+import { newStory, withBeamDecorator, withDimensions } from "src/utils/sb";
 import { action } from "storybook/actions";
 
-interface SnackBarStoryProps extends Omit<SnackbarNoticeProps, "action"> {
+type SnackBarStoryProps = {
   actionLabel?: string;
   actionVariant?: ButtonVariant;
   offset?: Offset;
   notices: SnackbarNoticeProps[];
-}
+} & Omit<SnackbarNoticeProps, "action">;
 
 export default {
   component: Snackbar,
@@ -145,3 +146,22 @@ export function SystematicClose(args: SnackBarStoryProps) {
   );
 }
 SystematicClose.parameters = { controls: { exclude: ["notices", "persistent", "hideCloseButton"] } };
+
+/** Notices layer above the modal underlay, i.e. they are not dimmed by the scrim. */
+export const AboveModalUnderlay = newStory(() => <ModalWithNotice />, { decorators: [withDimensions()] });
+
+function ModalWithNotice() {
+  const { openModal } = useModal();
+  const { triggerNotice } = useSnackbar();
+
+  const open = () => {
+    openModal({ content: <TestModalContent /> });
+    triggerNotice({ message: "This notice should stay above the modal underlay.", persistent: true });
+  };
+
+  // Immediately open the modal for Chromatic snapshots
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(open, [openModal, triggerNotice]);
+
+  return <Button label="Open" onClick={open} />;
+}

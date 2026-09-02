@@ -3,6 +3,9 @@
  *
  * Keep values sparse so new layers can slot between existing ones without ripple
  * edits. Lower numbers sit behind higher numbers in the same stacking context.
+ *
+ * Global overlays (Modal, SuperDrawer, Snackbar) must portal to `document.body`, otherwise an app
+ * root that establishes a stacking context traps them below the layers listed here.
  */
 export const zIndices = {
   // Local table stacking (single GridTable's internal stack only).
