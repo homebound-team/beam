@@ -3,7 +3,7 @@ import { Icon } from "src/components";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
-import { CenteredLayout, EnvironmentBannerLayout, useSideNavLayoutContext } from "src/layouts";
+import { CenteredLayout, EnvironmentBannerLayout } from "src/layouts";
 import { NavbarLayout } from "src/layouts/NavbarLayout";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
@@ -124,8 +124,6 @@ export const ComposedConstrainedWidthTable = () => (
 );
 
 function Brand() {
-  const { navState } = useSideNavLayoutContext();
-  if (navState === "collapse") return <></>;
   return (
     <div css={Css.df.fdc.gap1.$}>
       <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>

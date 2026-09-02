@@ -7,7 +7,7 @@ import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll
 import { SideNav } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
-import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
+import { SideNavLayoutProvider, useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 
 export default {
@@ -142,6 +142,19 @@ export function ContrastNav() {
   );
 }
 
+/** Collapsed rail keeps icon-only items, top, and footer instead of hiding them. */
+export function ShowContentWhenCollapsed() {
+  return (
+    <Shell>
+      <SideNavLayoutProvider defaultNavState="collapse">
+        <SideNavLayout sideNav={{ top: <Brand />, items, footer: <CollapsedFooter />, showContentWhenCollapsed: true }}>
+          <PageContent />
+        </SideNavLayout>
+      </SideNavLayoutProvider>
+    </Shell>
+  );
+}
+
 function Shell({ children }: { children: ReactNode }) {
   return (
     <PreventBrowserScroll>
@@ -151,8 +164,6 @@ function Shell({ children }: { children: ReactNode }) {
 }
 
 function Brand() {
-  const { navState } = useSideNavLayoutContext();
-  if (navState === "collapse") return <></>;
   return (
     <div css={Css.df.fdc.gap1.$}>
       <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
@@ -168,6 +179,18 @@ function Brand() {
 }
 
 function Footer() {
+  return (
+    <div css={Css.df.aic.gap2.$}>
+      <Avatar src={undefined} name="Jane Smith" size="sm" />
+      <div>
+        <div css={Css.smSb.color(Tokens.OnSurface).$}>Jane Smith</div>
+        <div css={Css.xs.color(Tokens.OnSurfaceMuted).$}>Admin</div>
+      </div>
+    </div>
+  );
+}
+
+function CollapsedFooter() {
   const { navState } = useSideNavLayoutContext();
   return (
     <div css={Css.df.aic.gap2.$}>
