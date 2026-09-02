@@ -104,8 +104,8 @@ describe("TableCardView", () => {
     const r = await render(
       <TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} status={{ text: "Active", type: "success" }} />,
     );
-    // Then the status Tag shows the text
-    expect(r.tableCardView_status).toHaveTextContent("Active");
+    // Then the status Tag shows the text, under BaseCard's `tag` slot
+    expect(r.tableCardView_tag).toHaveTextContent("Active");
   });
 
   it("renders data blocks as 'header: value' pairs", async () => {

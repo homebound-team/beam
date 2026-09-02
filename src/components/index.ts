@@ -19,6 +19,7 @@ export * from "./AutoSaveIndicator";
 export * from "./Avatar";
 export * from "./Banner";
 export type { BannerProps } from "./Banner";
+export * from "./BaseCard";
 export { BeamProvider } from "./BeamContext";
 export * from "./Breadcrumbs";
 export * from "./Button";

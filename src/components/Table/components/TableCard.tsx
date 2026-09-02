@@ -1,8 +1,8 @@
 import { observer } from "mobx-react";
 import { ReactNode, useMemo } from "react";
-import { useFocusRing } from "react-aria";
 import { Link } from "react-router-dom";
 import { Tag, Tooltip } from "src/components";
+import { BaseCard } from "src/components/BaseCard";
 import { CardTag, ImageFitType } from "src/components/Card";
 import { Carousel } from "src/components/Carousel";
 import { ProposedValue, ProposedValueProps } from "src/components/ProposedValue";
@@ -21,7 +21,6 @@ import { Css, Palette, Tokens } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 export type CardData = {
   label: string;
@@ -163,141 +162,104 @@ export function TableCardView(props: TableCardViewProps) {
   const tid = useTestIds(props, "tableCardView");
   // `alt` / `aria-label` need plain text even when `title` is a proposal.
   const titleText = typeof title === "string" ? title : title.proposed;
-  // `getButtonOrLink` renders a link when passed a string, and a button otherwise.
-  const action = to || onClick;
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
   const shownFooter = shownInteractiveFooter(interactiveFooter);
-  // The footer is a sibling of the action, so only the data/progress stack rides along inside of it.
+  // The footer sits outside the card's action, so only the data/progress stack rides along inside of it.
   const hasDetails = data.length > 0 || progress !== undefined;
 
   const col1 = data.slice(0, Math.ceil(data.length / 2));
   const col2 = data.slice(Math.ceil(data.length / 2));
 
-  const { isFocusVisible, focusProps } = useFocusRing();
-
-  const actionAttrs = {
-    ...tid.action,
-    "aria-label": titleText,
-    // `getButtonOrLink` renders its `<button>` without a type, which would default to submit inside a form.
-    type: typeof action === "string" ? undefined : "button",
-    ...Css.props(contentStyles),
-    ...focusProps,
-  };
-
-  const content = (
-    <>
-      <div
-        css={
-          Css.relative
-            .hPx(184)
-            .w100.bb.bc(aiMode ? Tokens.AiFieldBg : Tokens.FieldBorderDefault)
-            .oh.borderRadius("12px 12px 0 0").$
-        }
-        {...tid.hero}
-      >
-        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={titleText} loading="lazy" {...tid.image} />
-        {status && (
-          <div css={Css.absolute.top1.left1.df.$} {...tid.status}>
-            <Tag {...status} />
+  return (
+    <BaseCard
+      {...tid}
+      imgSrc={imgSrc}
+      imgAlt={titleText}
+      imageFit={imageFit}
+      tag={status}
+      to={to}
+      onClick={onClick}
+      height={height}
+      aiMode={aiMode}
+      footer={
+        shownFooter && (
+          <div css={Css.df.fdc.gap2.px3.pb3.pt2.$} {...tid.interactiveFooter}>
+            <InteractiveFooter footer={shownFooter} tid={tid} />
           </div>
-        )}
-      </div>
-      {/* The hero is full-bleed, so each section pads itself and only the last one gets `pb3`. */}
-      <div css={Css.df.fdc.gap1.px3.if(!hasDetails && !shownFooter).pb3.$}>
-        {(leftEyebrow || rightEyebrow) && (
-          <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
-            <span css={Css.truncate.$} {...tid.leftEyebrow}>
-              {renderMaybeProposed(leftEyebrow, tid.leftEyebrowProposal)}
-            </span>
-            {rightEyebrow && (
-              <span css={Css.fs0.$} {...tid.rightEyebrow}>
-                {renderMaybeProposed(rightEyebrow, tid.rightEyebrowProposal)}
+        )
+      }
+    >
+      <div css={Css.df.fdc.gap2.fg1.mw0.pt2.$}>
+        {/* The hero is full-bleed, so each section pads itself and only the last one gets `pb3`. */}
+        <div css={Css.df.fdc.gap1.px3.if(!hasDetails && !shownFooter).pb3.$}>
+          {(leftEyebrow || rightEyebrow) && (
+            <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
+              <span css={Css.truncate.$} {...tid.leftEyebrow}>
+                {renderMaybeProposed(leftEyebrow, tid.leftEyebrowProposal)}
               </span>
+              {rightEyebrow && (
+                <span css={Css.fs0.$} {...tid.rightEyebrow}>
+                  {renderMaybeProposed(rightEyebrow, tid.rightEyebrowProposal)}
+                </span>
+              )}
+            </div>
+          )}
+          <div css={Css.dif.w100.jcsb.aic.$}>
+            <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
+              {renderMaybeProposed(title, tid.titleProposal)}
+            </h4>
+            {(badge || badgeTags?.length) && (
+              <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
+                {badge && <span css={Css.sm.wsnw.$}>{badge}</span>}
+                {badgeTags?.map((tag) => (
+                  <Tag key={tag.text} {...tag} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        {hasDetails && (
+          <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownFooter).pb3.$}>
+            {data.length > 0 && (
+              <dl css={Css.df.gap2.sm.$}>
+                <div css={Css.df.fdc.fg1.fb2.mw0.$}>
+                  {col1.map((d) => (
+                    <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
+                      <dt css={Css.fs0.$}>{d.label}:</dt>
+                      {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
+                        instead of widening the column. */}
+                      <dd css={Css.mw0.$}>{d.value}</dd>
+                    </div>
+                  ))}
+                </div>
+                <div css={Css.df.fdc.fg1.fb2.mw0.$}>
+                  {col2.map((d) => (
+                    <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
+                      <dt css={Css.fs0.$}>{d.label}:</dt>
+                      {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
+                        instead of widening the column. */}
+                      <dd css={Css.mw0.$}>{d.value}</dd>
+                    </div>
+                  ))}
+                </div>
+              </dl>
+            )}
+            {progress !== undefined && (
+              <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
+                {/* `SurfaceSubtle` is Gray200, which all but vanishes on the AI fill. */}
+                <div
+                  css={Css.w25.hPx(8).br4.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$}
+                  {...tid.progressTrack}
+                >
+                  <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} {...tid.progressFill} />
+                </div>
+                <span {...tid.progressValue}>{progressValue}%</span>
+              </div>
             )}
           </div>
         )}
-        <div css={Css.dif.w100.jcsb.aic.$}>
-          <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
-            {renderMaybeProposed(title, tid.titleProposal)}
-          </h4>
-          {(badge || badgeTags?.length) && (
-            <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
-              {badge && <span css={Css.sm.wsnw.$}>{badge}</span>}
-              {badgeTags?.map((tag) => (
-                <Tag key={tag.text} {...tag} />
-              ))}
-            </div>
-          )}
-        </div>
       </div>
-      {hasDetails && (
-        <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownFooter).pb3.$}>
-          {data.length > 0 && (
-            <dl css={Css.df.gap2.sm.$}>
-              <div css={Css.df.fdc.fg1.fb2.mw0.$}>
-                {col1.map((d) => (
-                  <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                    <dt css={Css.fs0.$}>{d.label}:</dt>
-                    {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
-                        instead of widening the column. */}
-                    <dd css={Css.mw0.$}>{d.value}</dd>
-                  </div>
-                ))}
-              </div>
-              <div css={Css.df.fdc.fg1.fb2.mw0.$}>
-                {col2.map((d) => (
-                  <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                    <dt css={Css.fs0.$}>{d.label}:</dt>
-                    {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
-                        instead of widening the column. */}
-                    <dd css={Css.mw0.$}>{d.value}</dd>
-                  </div>
-                ))}
-              </div>
-            </dl>
-          )}
-          {progress !== undefined && (
-            <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-              {/* `SurfaceSubtle` is Gray200, which all but vanishes on the AI fill. */}
-              <div
-                css={Css.w25.hPx(8).br4.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$}
-                {...tid.progressTrack}
-              >
-                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} {...tid.progressFill} />
-              </div>
-              <span {...tid.progressValue}>{progressValue}%</span>
-            </div>
-          )}
-        </div>
-      )}
-    </>
-  );
-
-  return (
-    <div
-      css={{
-        ...Css.w100.df.fdc.relative.ba.br12
-          .bc(Tokens.FieldBorderDefault)
-          .bgColor(aiMode ? Tokens.AiFieldBg : Tokens.SurfaceRaised)
-          .hPx(height).cursorPointer.onHover.bshHover.$,
-        ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
-        // Must follow the focus ring, whose `ba` would reset the AI border back to 1px.
-        ...(aiMode ? Css.bw2.bc(Tokens.AiFieldFg).$ : {}),
-      }}
-      {...tid}
-    >
-      {action ? (
-        getButtonOrLink(content, action, actionAttrs)
-      ) : (
-        // Keep the same box as the action, so the card's layout doesn't depend on it being interactive.
-        <div css={contentStyles}>{content}</div>
-      )}
-      {shownFooter && (
-        <div css={Css.df.fdc.gap2.px3.pb3.pt2.$} {...tid.interactiveFooter}>
-          <InteractiveFooter footer={shownFooter} tid={tid} />
-        </div>
-      )}
-    </div>
+    </BaseCard>
   );
 }
 
@@ -384,9 +346,3 @@ function clampProgress(value: number): number {
   }
   return Math.min(100, Math.max(0, value));
 }
-
-/**
- * The box holding everything above the interactive footer, i.e. the card's link/button, or a plain
- * div for a static card.
- */
-const contentStyles = Css.df.fdc.gap2.fg1.mw0.w100.tal.bn.p0.bgTransparent.color("unset").tdn.outline(0).$;

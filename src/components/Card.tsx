@@ -31,6 +31,7 @@ export type CardProps = {
   tag?: CardTag;
 };
 
+/** To be deprecated. Look to {@link BaseCard} if a card is needed */
 export function Card(props: CardProps) {
   const {
     title,
