@@ -31,7 +31,37 @@ describe("SideNav", () => {
     expect(r.getByText("Dashboard").closest("a")).toHaveAttribute("aria-current", "page");
   });
 
-  it("hides labels and section headings when collapsed", async () => {
+  it("renders top, items, and footer when expanded even if showContentWhenCollapsed is false", async () => {
+    const items: AppNavItem[] = [{ label: "Dashboard", icon: "columns", onClick: "/", active: true }];
+    const r = await render(
+      withState(
+        "expanded",
+        <SideNav top={<div>Brand</div>} items={items} footer={<div>User Menu</div>} showContentWhenCollapsed={false} />,
+      ),
+      withRouter(),
+    );
+
+    expect(r.sideNav_top).toHaveTextContent("Brand");
+    expect(r.sideNav_items).toHaveTextContent("Dashboard");
+    expect(r.sideNav_footer).toHaveTextContent("User Menu");
+  });
+
+  it("hides top, items, and footer when collapsed by default", async () => {
+    const items: AppNavItem[] = [
+      { label: "Dashboard", icon: "columns", onClick: "/", active: true },
+      { label: "Reports", icon: "search", onClick: "/reports" },
+    ];
+    const r = await render(
+      withState("collapse", <SideNav top={<div>Brand</div>} items={items} footer={<div>User Menu</div>} />),
+      withRouter(),
+    );
+
+    expect(r.query.sideNav_top).toBeNull();
+    expect(r.query.sideNav_items).toBeNull();
+    expect(r.query.sideNav_footer).toBeNull();
+  });
+
+  it("hides labels and section headings when collapsed with showContentWhenCollapsed", async () => {
     const items: AppNavItem[] = [
       { label: "Dashboard", icon: "columns", onClick: "/", active: true },
       { label: "Reports", icon: "search", onClick: "/reports" },
@@ -44,8 +74,16 @@ describe("SideNav", () => {
         ],
       },
     ];
-    const r = await render(withState("collapse", <SideNav items={items} />), withRouter());
+    const r = await render(
+      withState(
+        "collapse",
+        <SideNav top={<div>Brand</div>} items={items} footer={<div>User Menu</div>} showContentWhenCollapsed />,
+      ),
+      withRouter(),
+    );
 
+    expect(r.sideNav_top).toHaveTextContent("Brand");
+    expect(r.sideNav_footer).toHaveTextContent("User Menu");
     expect(r.query.sideNav_section_label).toBeNull();
     expect(r.appNav_link_dashboard).toHaveTextContent("Dashboard");
     expect(r.appNav_link_reports).toHaveTextContent("Reports");
@@ -142,12 +180,12 @@ describe("SideNav", () => {
     expect(r.appNav_linkGroup_trigger).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("hides the items list when collapsed and not every item has an icon", async () => {
+  it("hides the items list when collapsed with showContentWhenCollapsed and not every item has an icon", async () => {
     const items: AppNavItem[] = [
       { label: "Dashboard", onClick: "/" },
       { label: "Reports", icon: "search", onClick: "/reports" },
     ];
-    const r = await render(withState("collapse", <SideNav items={items} />), withRouter());
+    const r = await render(withState("collapse", <SideNav items={items} showContentWhenCollapsed />), withRouter());
 
     expect(r.sideNav_items).toBeEmptyDOMElement();
   });
@@ -162,7 +200,7 @@ describe("SideNav", () => {
         ],
       },
     ];
-    const r = await render(withState("collapse", <SideNav items={items} />), withRouter());
+    const r = await render(withState("collapse", <SideNav items={items} showContentWhenCollapsed />), withRouter());
 
     expect(r.query.appNav_linkGroup_trigger).toBeNull();
   });
