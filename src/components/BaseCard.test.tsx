@@ -20,6 +20,22 @@ describe("BaseCard", () => {
     expect(r.baseCard_image).toHaveAttribute("alt", "123 Main St");
   });
 
+  it("fills the frame by default and shows the full image when contain is requested", async () => {
+    // Given a card with no imageFit
+    // When rendered
+    const r = await render(<BaseCard imgSrc="home.jpg">body</BaseCard>);
+    // Then the hero fills the frame
+    expect(r.baseCard_image).toHaveStyle({ objectFit: "cover" });
+    // When contain is requested
+    r.rerender(
+      <BaseCard imgSrc="home.jpg" imageFit="contain">
+        body
+      </BaseCard>,
+    );
+    // Then the full image is shown
+    expect(r.baseCard_image).toHaveStyle({ objectFit: "contain" });
+  });
+
   it("renders a plain div when neither to nor onClick is set", async () => {
     // Given a static card
     // When rendered
@@ -28,6 +44,16 @@ describe("BaseCard", () => {
     expect(r.query.baseCard_action).toBeNull();
     expect(r.baseCard.querySelector("a")).toBeNull();
     expect(r.baseCard.querySelector("button")).toBeNull();
+    // And it doesn't invite a click it can't act on
+    expect(r.baseCard).not.toHaveStyle({ cursor: "pointer" });
+  });
+
+  it("only invites a click when the card is actually interactive", async () => {
+    // Given a card that navigates
+    // When rendered
+    const r = await render(<BaseCard imgSrc="home.jpg" to="/homes/1" children="body" />, withRouter());
+    // Then it shows a pointer cursor
+    expect(r.baseCard).toHaveStyle({ cursor: "pointer" });
   });
 
   it("renders a link for to", async () => {

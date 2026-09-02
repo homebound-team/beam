@@ -14,9 +14,9 @@ export default {
 } as Meta;
 
 /**
- * The shell's variations side by side:a status tag, a hero action (button or menu), the card
- * acting as a link or a button — including the hover/focus states each takes on — and an
- * interactive footer. Each is a one-prop difference from `BaseCard`'s defaults, so they share a
+ * The shell's variations side by side: a status tag, a hero action (button or menu), the card
+ * acting as a link or a button, focus state, and an interactive footer.
+ * Each is a one-prop difference from `BaseCard`'s defaults, so they share a
  * story rather than each claiming a full-page one.
  */
 export const Default = newStory(

@@ -19,7 +19,7 @@ export type BaseCardProps = {
   tag?: CardTag;
   /** Button or menu overlaying the hero's trailing edge. */
   action?: IconButtonProps | ButtonMenuProps;
-  /** Card body. Unpadded to allow callers to full-bleed sections; the standard inset is usally `p3`. */
+  /** Card body. Unpadded to allow callers to full-bleed sections; the standard inset is usually `p3`. */
   children: ReactNode;
   /** Content with its own interactive controls, rendered outside the card's link/button area. */
   footer?: ReactNode;
