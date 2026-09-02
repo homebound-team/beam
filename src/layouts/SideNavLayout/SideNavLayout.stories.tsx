@@ -85,8 +85,6 @@ function NavStateControls() {
 }
 
 function Brand() {
-  const { navState } = useSideNavLayoutContext();
-  if (navState === "collapse") return <></>;
   return (
     <div css={Css.df.fdc.gap1.$}>
       <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
@@ -102,8 +100,6 @@ function Brand() {
 }
 
 function UserFooter() {
-  const { navState } = useSideNavLayoutContext();
-  if (navState === "collapse") return <Icon icon="userCircle" inc={3} />;
   return (
     <div css={Css.df.aic.gap2.$}>
       <Icon icon="userCircle" inc={3} />
