@@ -37,18 +37,18 @@ function StepperLayoutForm({ formState, aiMode }: { formState: FormValue; aiMode
         const steps: StepperLayoutStep[] = [
           {
             label: "Author Details",
-            isValid: step1Valid,
+            primaryDisabled: step1Valid ? false : "Fill all required fields to continue.",
             content: <AuthorDetails formState={formState} aiMode={aiMode} />,
           },
           {
             label: "Books",
-            isValid: step2Valid,
+            primaryDisabled: step2Valid ? false : "Fill all required fields to continue.",
             disabled: !step1Valid,
             content: <BookList formState={formState} aiMode={aiMode} />,
           },
           {
             label: "Miscellaneous Author Information",
-            isValid: formState.birthday.valid,
+            primaryDisabled: formState.birthday.valid ? false : "Fill all required fields to continue.",
             disabled: !step2Valid,
             content: <MiscAuthorDetails formState={formState} showFormData={showFormData} aiMode={aiMode} />,
           },
