@@ -162,7 +162,7 @@ const variantStyles = {
   },
   circle: {
     // Blue100/200 hover fills have no semantic tokens — keep palette for those.
-    base: Css.br100.wPx(48).hPx(48).bc(Tokens.FieldBorderDefault).ba.bw1.df.jcc.aic.$,
+    base: Css.br100.wPx(48).hPx(48).bc(Tokens.FieldBorderDefault).bgColor(Tokens.SurfaceRaised).ba.bw1.df.jcc.aic.$,
     hover: Css.bgBlue100.bcBlue200.$,
     focus: Css.bgBlue100.bc(Tokens.FieldBorderFocus).$,
     pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,

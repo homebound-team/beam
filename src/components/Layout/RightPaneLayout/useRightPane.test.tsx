@@ -1,7 +1,8 @@
 import { waitFor } from "@homebound/rtl-utils";
 import { Button } from "src/components/Button";
 import { click, clickAndWait, render } from "src/utils/rtl";
-import { RightPaneLayout, RightPaneProvider, useRightPane } from "./index";
+import { RightPaneLayout } from "./RightPaneLayout";
+import { useRightPane } from "./useRightPane";
 
 describe("useRightPane", () => {
   it("should show right pane when calling openRightPane hook", async () => {
@@ -42,10 +43,8 @@ function TestDetailPane() {
 
 function TestRightPaneLayoutContent() {
   return (
-    <RightPaneProvider>
-      <RightPaneLayout>
-        <TestPageContent />
-      </RightPaneLayout>
-    </RightPaneProvider>
+    <RightPaneLayout>
+      <TestPageContent />
+    </RightPaneLayout>
   );
 }

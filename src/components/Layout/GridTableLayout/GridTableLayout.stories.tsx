@@ -4,7 +4,7 @@ import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import { IconButton } from "src/components/IconButton";
-import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { GridColumn, GridDataRow, SimpleHeaderAndData } from "src/components/Table";
 import {
   cardBadgeSlot,
@@ -1178,7 +1178,7 @@ function DocumentScrollRightPaneTable<F extends Record<string, unknown>>({
   columns: GridColumn<Row>[];
   rows: GridDataRow<Row>[];
 }) {
-  const { openRightPane } = useRightPane();
+  const { openRightPane } = useRightPaneActions();
 
   const tableProps = useMemo(
     () => ({
@@ -1215,7 +1215,7 @@ function rowDetailName(row: GridDataRow<Row>): string {
 }
 
 function RightPaneDetail({ name }: { name: string }) {
-  const { closeRightPane } = useRightPane();
+  const { closeRightPane } = useRightPaneActions();
   return (
     <div css={Css.df.fdc.h100.$}>
       <div css={Css.df.aic.jcsb.gap1.p2.bb.bc(Tokens.SurfaceSeparator).$}>

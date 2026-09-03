@@ -22,10 +22,9 @@ import {
 import { noop, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
-import {
-  defaultDocumentScrollRightPaneWidth,
-  DocumentScrollRightPaneLayout,
-} from "../RightPaneLayout/DocumentScrollRightPaneLayout";
+import { DocumentScrollOverlayRightPaneLayout } from "../RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
+import { resolveWithRightPaneOptions } from "../RightPaneLayout/documentScrollRightPaneMode";
+import { WithRightPane } from "../RightPaneLayout/types";
 import { GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
 import { QueryTable, QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
@@ -58,10 +57,10 @@ export type GridTableLayoutProps<
   withCardView?: boolean;
   defaultView?: TableView;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`). `true` uses the default width;
-   * a number sets the pane width in px. Only applies inside a document-scroll layout.
+   * Opt into the document-scroll detail pane (`useRightPane`). Default mode `overlay` (spacer).
+   * Only applies inside a document-scroll layout; hosts the pane around the table body only.
    */
-  withRightPane?: boolean | number;
+  withRightPane?: WithRightPane;
 };
 
 /**
@@ -106,12 +105,7 @@ function GridTableLayoutComponent<
     emptyFallback: layoutEmptyFallback,
     withRightPane,
   } = props;
-  const rightPaneWidth =
-    withRightPane === true
-      ? defaultDocumentScrollRightPaneWidth
-      : typeof withRightPane === "number"
-        ? withRightPane
-        : undefined;
+  const rightPane = resolveWithRightPaneOptions(withRightPane, "overlay");
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
@@ -246,8 +240,10 @@ function GridTableLayoutComponent<
       )}
       {inDocumentScrollLayout ? (
         // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
-        rightPaneWidth !== undefined ? (
-          <DocumentScrollRightPaneLayout paneWidth={rightPaneWidth}>{tableBody}</DocumentScrollRightPaneLayout>
+        rightPane ? (
+          <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>
+            {tableBody}
+          </DocumentScrollOverlayRightPaneLayout>
         ) : (
           tableBody
         )

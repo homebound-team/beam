@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useEffect } from "react";
 import { BeamColor } from "src/colors";
 import { Css, Tokens } from "src/Css";
-import { useRightPaneContext } from "./RightPaneContext";
+import { useRightPaneContentContext, useRightPaneOpenContext } from "./RightPaneContext";
 
 export function RightPaneLayout(props: {
   children: ReactElement;
@@ -11,7 +11,8 @@ export function RightPaneLayout(props: {
   defaultPaneContent?: ReactElement;
 }) {
   const { children, paneBgColor = Tokens.Surface, paneWidth = 450, defaultPaneContent } = props;
-  const { isRightPaneOpen, rightPaneContent, clearPane, closePane } = useRightPaneContext();
+  const { isRightPaneOpen, clearPane, closePane } = useRightPaneOpenContext();
+  const rightPaneContent = useRightPaneContentContext();
 
   // Close pane on page unmount because otherwise the next page that has a right pane will show our stale content
   useEffect(() => closePane, [closePane]);

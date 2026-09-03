@@ -1,6 +1,13 @@
+import { Button } from "src/components/Button";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
+import {
+  beamFloatingRightOffsetVar,
+  documentScrollChromeWidth,
+  documentScrollRightPaneWidth,
+} from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { click, render, withRouter } from "src/utils/rtl";
+import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
 import { FocusedFormLayout, FocusedFormLayoutProps } from "./FocusedFormLayout";
 
 describe("FocusedFormLayout", () => {
@@ -131,6 +138,40 @@ describe("FocusedFormLayout", () => {
     // Then Create is in the footer
     expect(r.focusedFormLayout_footer).toContainElement(r.create);
   });
+
+  it("pins the header to the viewport when the body's right pane is open", async () => {
+    // Given a FocusedFormLayout whose form body hosts a right pane (auto → push on typical chrome)
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          children: (
+            <FormSectionLayout
+              withJumpLinks
+              withRightPane={280}
+              title="Link Design Package"
+              sections={[
+                { title: "Setup", fields: <OpenPaneButton /> },
+                { title: "Package Options", fields: <div /> },
+              ]}
+            />
+          ),
+        })}
+      />,
+      withRouter(),
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then the header is viewport-fixed at chrome width
+    expect(r.focusedFormLayout_header).toHaveStyle({
+      position: "fixed",
+      width: documentScrollChromeWidth(),
+    });
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(280),
+    );
+  });
 });
 
 function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedFormLayoutProps {
@@ -151,4 +192,9 @@ function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedForm
     ),
     ...rest,
   };
+}
+
+function OpenPaneButton() {
+  const { openRightPane } = useRightPaneActions();
+  return <Button label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />;
 }
