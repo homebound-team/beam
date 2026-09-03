@@ -50,7 +50,6 @@ export function WithContentHeaderAndTable() {
         steps={[
           {
             label: "Trade Partners",
-            isValid: true,
             content: (
               <div>
                 <ContentHeader
@@ -81,7 +80,6 @@ export function WithJumpLinks() {
         steps={[
           {
             label: "Details",
-            isValid: true,
             content: (
               <FormSectionLayout
                 withJumpLinks
@@ -105,7 +103,6 @@ export function WithJumpLinks() {
           },
           {
             label: "Review",
-            isValid: true,
             content: (
               <FormSectionLayout
                 title="Review"

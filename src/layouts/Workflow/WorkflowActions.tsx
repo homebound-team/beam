@@ -1,4 +1,5 @@
 import type { PressEvent } from "@react-types/shared";
+import { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css } from "src/Css";
@@ -13,8 +14,8 @@ export type WorkflowActionsProps = {
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. */
   onComplete: (e: PressEvent) => void | Promise<void>;
-  /** Disables whichever of Continue/Complete is currently shown, e.g. while the active step is invalid. */
-  primaryDisabled?: boolean;
+  /** Continue/Complete is disabled. A ReactNode is shown in Beam's tooltip. */
+  primaryDisabled?: boolean | ReactNode;
   /** When true, Continue/Complete use the `ai` button variant instead of `primary`. */
   aiMode?: boolean;
   isFirstStep?: boolean;

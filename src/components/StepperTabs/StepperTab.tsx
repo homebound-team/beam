@@ -13,6 +13,7 @@ export type StepperTabProps = {
   /** Whether this step's content has been completed. */
   completed: boolean;
   onClick: (value: string) => void;
+  /** Tab isn't clickable. */
   disabled?: boolean;
   /** Collapses the tab down to its colored bottom border only, hiding the label — for the mobile view */
   collapsed?: boolean;

@@ -7,15 +7,15 @@ import { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
 /**
- * A `StepperLayout` step: a `StepperTabsStep` (minus `value`, which is derived from `label`) plus
- * page content. Stepper chrome marks prior steps complete via current-step index; `isValid` only
- * gates the Continue/Complete CTA for the active step.
+ * A `StepperLayout` step: `StepperTabsStep` (minus `value`) plus page content.
  */
-export type StepperLayoutStep = Omit<StepperTabsStep, "value"> & {
+export type StepperLayoutStep = Omit<StepperTabsStep, "value" | "disabled"> & {
   /** Rendered as the page body while this is the active step. */
   content: ReactNode;
-  /** Gates Continue/Complete for the active step (form validity) */
-  isValid: boolean;
+  /** Tab isn't clickable. */
+  disabled?: boolean;
+  /** Continue/Complete is disabled. A ReactNode is shown in Beam's tooltip. */
+  primaryDisabled?: boolean | ReactNode;
 };
 
 export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
@@ -64,7 +64,7 @@ export function StepperLayout(props: StepperLayoutProps) {
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
-      primaryDisabled={!activeStep?.isValid}
+      primaryDisabled={activeStep?.primaryDisabled}
       onContinue={async () => {
         const onContinue = activeStep?.onContinue;
         if (onContinue) {

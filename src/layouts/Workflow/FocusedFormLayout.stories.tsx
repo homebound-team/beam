@@ -24,7 +24,6 @@ export function Default() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        isValid
       >
         <FormSectionLayout
           withJumpLinks
@@ -45,7 +44,6 @@ export function WithoutJumpLinks() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        isValid
       >
         <FormSectionLayout
           title="Link Design Package"
@@ -65,7 +63,6 @@ export function AiMode() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        isValid
         aiMode
       >
         <FormSectionLayout
