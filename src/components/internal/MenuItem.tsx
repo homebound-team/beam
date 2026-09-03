@@ -7,7 +7,7 @@ import { Avatar } from "src/components/Avatar";
 import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Tokens } from "src/Css";
+import { Css, Palette, Tokens } from "src/Css";
 import { isAbsoluteUrl, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 
@@ -110,7 +110,9 @@ function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boo
       <div css={Css.df.aic.$}>
         {maybeWrapInLink(
           menuItem.onClick,
-          isIconMenuItem(menuItem) ? (
+          menuItem.ai ? (
+            <AiMenuItem label={menuItem.label} isDisabled={isDisabled} />
+          ) : isIconMenuItem(menuItem) ? (
             <IconMenuItem {...menuItem} />
           ) : isImageMenuItem(menuItem) ? (
             <ImageMenuItem {...menuItem} />
@@ -137,6 +139,19 @@ function ImageMenuItem(item: ImageMenuItemType) {
         )}
       </span>
       {label}
+    </>
+  );
+}
+
+function AiMenuItem({ label, isDisabled }: { label: string; isDisabled: boolean }) {
+  return (
+    <>
+      {/* The aiStar artwork fills its full viewBox, but Design draws it inset within a 24px slot, so
+          scale it down and center it in a same-size box to match other menu items' icon alignment. */}
+      <span css={Css.df.aic.jcc.fs0.sqPx(24).mr2.$}>
+        <Icon icon="aiStar" inc={2.125} />
+      </span>
+      <span css={Css.if(!isDisabled).color(Palette.Purple600).$}>{label}</span>
     </>
   );
 }
