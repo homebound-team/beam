@@ -15,18 +15,46 @@ describe("FocusedFormLayout", () => {
     expect(r.focusedFormLayout_body).toBeInTheDocument();
   });
 
-  it("disables Create when isValid is false, and enables it once valid", async () => {
-    // Given an invalid focused form
-    const r = await render(<FocusedFormLayout {...baseProps({ isValid: false })} />, withRouter());
+  it("disables Create when primaryDisabled is true, and enables it once omitted", async () => {
+    // Given a focused form with primaryDisabled
+    const r = await render(<FocusedFormLayout {...baseProps({ primaryDisabled: true })} />, withRouter());
 
     // Then Create is disabled
     expect(r.create).toBeDisabled();
 
-    // When it becomes valid
-    r.rerender(<FocusedFormLayout {...baseProps({ isValid: true })} />);
+    // When primaryDisabled is omitted
+    r.rerender(<FocusedFormLayout {...baseProps()} />);
 
     // Then Create is enabled
     expect(r.create).not.toBeDisabled();
+  });
+
+  it("disables Create without a tooltip when primaryDisabled is true", async () => {
+    // Given a focused form with primaryDisabled true
+    const r = await render(<FocusedFormLayout {...baseProps({ primaryDisabled: true })} />, withRouter());
+
+    // Then Create is disabled and there is no tooltip
+    expect(r.create).toBeDisabled();
+    expect(r.query.tooltip).toBeNull();
+  });
+
+  it("shows a Beam tooltip on disabled Create when primaryDisabled is a reason", async () => {
+    // Given a focused form with a primaryDisabled reason
+    const r = await render(
+      <FocusedFormLayout {...baseProps({ primaryDisabled: "Fill all required fields to continue." })} />,
+      withRouter(),
+    );
+
+    // Then Create is disabled and wrapped in Beam's tooltip
+    expect(r.create).toBeDisabled();
+    expect(r.tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
+
+    // When primaryDisabled is omitted
+    r.rerender(<FocusedFormLayout {...baseProps()} />);
+
+    // Then Create is enabled and the tooltip is gone
+    expect(r.create).not.toBeDisabled();
+    expect(r.query.tooltip).toBeNull();
   });
 
   it("renders Cancel and Create without Continue", async () => {
@@ -112,7 +140,6 @@ function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedForm
     onCancel: () => {},
     completeLabel: "Create",
     onComplete: () => {},
-    isValid: true,
     children: children ?? (
       <FormSectionLayout
         title="Link Design Package"

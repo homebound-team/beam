@@ -44,18 +44,18 @@ export function StepperLayoutMultiFormApp() {
         const steps: StepperLayoutStep[] = [
           {
             label: "Basics",
-            isValid: basicsForm.valid,
+            primaryDisabled: basicsForm.valid ? false : "Fill all required fields to continue.",
             content: <BasicsStep form={basicsForm} onLoad={loadBasics} loaded={!!basicsInput} />,
           },
           {
             label: "Contact",
-            isValid: contactForm.valid,
+            primaryDisabled: contactForm.valid ? false : "Fill all required fields to continue.",
             disabled: !basicsForm.valid,
             content: <ContactStep form={contactForm} onLoad={loadContact} loaded={!!contactInput} />,
           },
           {
             label: "Notes",
-            isValid: notesForm.valid,
+            primaryDisabled: notesForm.valid ? false : "Fill all required fields to continue.",
             disabled: !contactForm.valid,
             content: <NotesStep form={notesForm} onLoad={loadNotes} loaded={!!notesInput} />,
           },

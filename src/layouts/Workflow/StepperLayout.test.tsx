@@ -146,24 +146,27 @@ describe("StepperLayout", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it("disables Continue when the active step is invalid, and enables it once valid", async () => {
-    // Given a StepperLayout whose first (active) step is invalid
-    const r = await render(<StepperLayout {...baseProps({ steps: makeSteps({ oneIsValid: false }) })} />, withRouter());
+  it("disables Continue when the active step is primaryDisabled, and enables it once omitted", async () => {
+    // Given a StepperLayout whose first (active) step has primaryDisabled
+    const r = await render(
+      <StepperLayout {...baseProps({ steps: makeSteps({ onePrimaryDisabled: true }) })} />,
+      withRouter(),
+    );
 
     // Then Continue is disabled
     expect(r.continue).toBeDisabled();
 
-    // When the same step becomes valid
-    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps({ oneIsValid: true }) })} />);
+    // When primaryDisabled is omitted
+    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps() })} />);
 
     // Then Continue is enabled
     expect(r.continue).not.toBeDisabled();
   });
 
-  it("disables Save when the active (last) step is invalid, and enables it once valid", async () => {
-    // Given a StepperLayout on its last step, which is invalid
+  it("disables Save when the active (last) step is primaryDisabled, and enables it once omitted", async () => {
+    // Given a StepperLayout on its last step, which is primaryDisabled
     const r = await render(
-      <StepperLayout {...baseProps({ steps: makeSteps({ twoIsValid: false }), defaultStep: "stepTwo" })} />,
+      <StepperLayout {...baseProps({ steps: makeSteps({ twoPrimaryDisabled: true }), defaultStep: "stepTwo" })} />,
       withRouter(),
     );
 
@@ -171,7 +174,7 @@ describe("StepperLayout", () => {
     expect(r.save).toBeDisabled();
 
     // When the same step becomes valid
-    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps({ twoIsValid: true }), defaultStep: "stepTwo" })} />);
+    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps(), defaultStep: "stepTwo" })} />);
 
     // Then Save is enabled
     expect(r.save).not.toBeDisabled();
@@ -247,15 +250,70 @@ describe("StepperLayout", () => {
     expect(r.body).toBeInTheDocument();
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
   });
+
+  it("disables Continue without a tooltip when primaryDisabled is true", async () => {
+    // Given a first step with primaryDisabled true
+    const r = await render(
+      <StepperLayout {...baseProps({ steps: makeSteps({ onePrimaryDisabled: true }) })} />,
+      withRouter(),
+    );
+
+    // Then Continue is disabled and there is no tooltip
+    expect(r.continue).toBeDisabled();
+    expect(r.query.tooltip).toBeNull();
+  });
+
+  it("shows a Beam tooltip on disabled Continue when primaryDisabled is a reason", async () => {
+    // Given a first step with a primaryDisabled reason
+    const r = await render(
+      <StepperLayout
+        {...baseProps({ steps: makeSteps({ onePrimaryDisabled: "Fill all required fields to continue." }) })}
+      />,
+      withRouter(),
+    );
+
+    // Then Continue is disabled and wrapped in Beam's tooltip
+    expect(r.continue).toBeDisabled();
+    expect(r.tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
+
+    // When primaryDisabled is omitted
+    r.rerender(<StepperLayout {...baseProps({ steps: makeSteps() })} />);
+
+    // Then Continue is enabled and the tooltip is gone
+    expect(r.continue).not.toBeDisabled();
+    expect(r.query.tooltip).toBeNull();
+  });
+
+  it("shows a Beam tooltip on disabled Complete when primaryDisabled is a reason", async () => {
+    // Given a last step with a primaryDisabled reason
+    const r = await render(
+      <StepperLayout
+        {...baseProps({
+          steps: makeSteps({ twoPrimaryDisabled: "Fill all required fields to continue." }),
+          defaultStep: "stepTwo",
+        })}
+      />,
+      withRouter(),
+    );
+
+    // Then Save is disabled and wrapped in Beam's tooltip
+    expect(r.save).toBeDisabled();
+    expect(r.tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
+  });
 });
 
-function makeSteps(overrides: { oneIsValid?: boolean; twoIsValid?: boolean } = {}): StepperLayoutStep[] {
-  const { oneIsValid = true, twoIsValid = true } = overrides;
+function makeSteps(
+  overrides: {
+    onePrimaryDisabled?: StepperLayoutStep["primaryDisabled"];
+    twoPrimaryDisabled?: StepperLayoutStep["primaryDisabled"];
+  } = {},
+): StepperLayoutStep[] {
+  const { onePrimaryDisabled, twoPrimaryDisabled } = overrides;
   return [
-    { label: "Step One", isValid: oneIsValid, content: <div data-testid="body">Body content</div> },
+    { label: "Step One", primaryDisabled: onePrimaryDisabled, content: <div data-testid="body">Body content</div> },
     {
       label: "Step Two",
-      isValid: twoIsValid,
+      primaryDisabled: twoPrimaryDisabled,
       content: <div data-testid="stepTwoBody">Step two content</div>,
     },
   ];
