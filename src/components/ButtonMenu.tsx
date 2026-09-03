@@ -80,7 +80,7 @@ type MenuItemBase = {
   disabled?: boolean | ReactNode;
   destructive?: boolean;
   hasDivider?: boolean;
-  /** Shows AiStar and styling on label. */
+  /** Shows AiStar and styling on label. This ai icon and styling trumps all other subtypes. */
   ai?: boolean;
 };
 
