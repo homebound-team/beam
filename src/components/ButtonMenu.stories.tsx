@@ -238,6 +238,17 @@ export function NavLinkButtonMenu() {
   );
 }
 
+export function AiMenuItems() {
+  const menuItems: MenuItem[] = [
+    { label: "Accept Changes", onClick: action("Accept Changes"), ai: true },
+    { label: "Ignore Change", onClick: action("Ignore Change"), ai: true },
+    { label: "View Import Source", onClick: action("View Import Source"), ai: true },
+    { label: "Remove Room", onClick: action("Remove Room"), icon: "trash" },
+  ];
+
+  return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} defaultOpen />;
+}
+
 export function SelectableMenuItems() {
   const [selectedItem, setSelectedItem] = useState("Design doc");
   const menuItems: MenuItem[] = [

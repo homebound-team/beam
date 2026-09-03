@@ -109,6 +109,20 @@ describe("ButtonMenu", () => {
     expect(r.tooltip).toHaveAttribute("title", "Tooltip");
   });
 
+  it("renders the AI sparkle icon on an ai menu item", async () => {
+    // Given a menu item flagged as `ai`
+    const r = await render(
+      <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Accept Changes", onClick: noop, ai: true }]} />,
+      withRouter(),
+    );
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then it shows the aiStar icon rather than requiring an explicit `icon` prop
+    expect(r.trigger_acceptChanges.querySelector("[data-icon='aiStar']")).toBeTruthy();
+  });
+
   // OverlayTrigger forwards `preventTooltip` from an avatar trigger through to AvatarButton.
   it("shows the avatar name as a tooltip by default", async () => {
     const r = await render(

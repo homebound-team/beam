@@ -80,6 +80,8 @@ type MenuItemBase = {
   disabled?: boolean | ReactNode;
   destructive?: boolean;
   hasDivider?: boolean;
+  /** Shows AiStar and styling on label. */
+  ai?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {
