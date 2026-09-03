@@ -28,6 +28,7 @@ export * from "./ButtonGroup";
 export * from "./ButtonMenu";
 export * from "./ButtonModal";
 export * from "./Card";
+export * from "./CardBody";
 export * from "./Carousel";
 export * from "./ContrastScope";
 export * from "./Copy";

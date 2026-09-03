@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
 import { BaseCard } from "src/components/BaseCard";
+import { CardBody } from "src/components/CardBody";
 import { Carousel } from "src/components/Carousel";
 import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
@@ -25,25 +26,25 @@ export const Default = newStory(
       {samples(
         [
           "Static",
-          <BaseCard key="static" imgSrc={imgSrc()}>
+          <BaseCard key="static" imgSrc={imgSrc()} imgAlt="">
             <CardTitle />
           </BaseCard>,
         ],
         [
           "As link",
-          <BaseCard key="link" imgSrc={imgSrc()} to="/plan/1" imgAlt="The Emerson Houston">
+          <BaseCard key="link" imgSrc={imgSrc()} imgAlt="" onClick="/plan/1">
             <CardTitle />
           </BaseCard>,
         ],
         [
           "As button (focused)",
-          <BaseCard key="focus" imgSrc={imgSrc()} onClick={() => {}} imgAlt="The Emerson Houston">
+          <BaseCard key="focus" imgSrc={imgSrc()} imgAlt="" onClick={() => {}}>
             <CardTitle />
           </BaseCard>,
         ],
         [
           "With tag",
-          <BaseCard key="tag" imgSrc={imgSrc()} imageFit="contain" tag={{ text: "Active", type: "success" }}>
+          <BaseCard key="tag" imgSrc={imgSrc()} imgAlt="" imageFit="contain" tag={{ text: "Active", type: "success" }}>
             <div css={Css.p3.df.fdc.gap1.$}>
               <div css={Css.sm.color(Tokens.OnSurface).$}>Kohler</div>
               <div css={Css.xl.color(Tokens.OnSurface).$}>Forté Showerhead</div>
@@ -55,6 +56,7 @@ export const Default = newStory(
           <BaseCard
             key="menu"
             imgSrc={imgSrc()}
+            imgAlt=""
             action={{
               trigger: { icon: "verticalDots" },
               items: [
@@ -68,19 +70,13 @@ export const Default = newStory(
         ],
         [
           "With footer (tags, wrapping)",
-          <BaseCard key="footerTags" imgSrc={imgSrc()} to="/plan/1" imgAlt="Forté Showerhead" footer={<TagsFooter />}>
+          <BaseCard key="footerTags" imgSrc={imgSrc()} imgAlt="" onClick="/plan/1" footer={<TagsFooter />}>
             <CardTitle text="Forté Showerhead" />
           </BaseCard>,
         ],
         [
           "With footer (carousel)",
-          <BaseCard
-            key="footerCarousel"
-            imgSrc={imgSrc()}
-            to="/plan/1"
-            imgAlt="Forté Showerhead"
-            footer={<CarouselFooter />}
-          >
+          <BaseCard key="footerCarousel" imgSrc={imgSrc()} imgAlt="" onClick="/plan/1" footer={<CarouselFooter />}>
             <CardTitle text="Forté Showerhead" />
           </BaseCard>,
         ],
@@ -91,17 +87,21 @@ export const Default = newStory(
 );
 
 /**
- * The Change Event configuration card. The body lives here rather than in `BaseCard` because the
- * label|value table is specific to this type — copy it as-is when building the real card.
+ * The Change Event configuration card. `CardBody` owns the eyebrow/title; the label|value table
+ * with per-row Tags is Configuration-specific, so it comes in as `CardBody`'s `children`.
  */
 export function Configuration() {
   return (
     <CardContainer>
       <BaseCard
         imgSrc={imgSrc()}
+        imgAlt=""
         action={{ icon: "trash", variant: "outline", onClick: () => {}, label: "Remove configuration" }}
       >
-        <ConfigurationBody eyebrow="12345" title="Configuration C" rows={createConfigurationRows()} />
+        {/* 24, not the 16 default — Figma gives this type a full 24px inset on every side, not just a hero-to-body gap. */}
+        <CardBody title="Configuration C" leftEyebrow="12345" topGap={24}>
+          <ConfigurationRows rows={createConfigurationRows()} />
+        </CardBody>
       </BaseCard>
     </CardContainer>
   );
@@ -113,17 +113,22 @@ export function ConfigurationComparison() {
     <div css={Css.df.gap3.$}>
       <CardContainer>
         <div css={Css.smSb.color(Tokens.OnSurface).mb1.$}>Original</div>
-        <BaseCard imgSrc={imgSrc()}>
-          <ConfigurationBody eyebrow="12345" title="Configuration D" rows={createConfigurationRows({ plain: true })} />
+        <BaseCard imgSrc={imgSrc()} imgAlt="">
+          <CardBody title="Configuration D" leftEyebrow="12345" topGap={24}>
+            <ConfigurationRows rows={createConfigurationRows({ plain: true })} />
+          </CardBody>
         </BaseCard>
       </CardContainer>
       <CardContainer>
         <div css={Css.smSb.color(Tokens.OnSurface).mb1.$}>Replacement</div>
         <BaseCard
           imgSrc={imgSrc()}
+          imgAlt=""
           action={{ icon: "trash", variant: "outline", onClick: () => {}, label: "Remove configuration" }}
         >
-          <ConfigurationBody eyebrow="12345" title="Configuration C" rows={createConfigurationRows()} />
+          <CardBody title="Configuration C" leftEyebrow="12345" topGap={24}>
+            <ConfigurationRows rows={createConfigurationRows()} />
+          </CardBody>
         </BaseCard>
       </CardContainer>
     </div>
@@ -135,13 +140,15 @@ export function FixedHeight() {
   return (
     <div css={Css.df.gap3.$}>
       <CardContainer>
-        <BaseCard imgSrc={imgSrc()} height={380}>
+        <BaseCard imgSrc={imgSrc()} imgAlt="" height={380}>
           <CardTitle text="Short body" />
         </BaseCard>
       </CardContainer>
       <CardContainer>
-        <BaseCard imgSrc={imgSrc()} height={380}>
-          <ConfigurationBody eyebrow="12345" title="Taller body" rows={createConfigurationRows({ plain: true })} />
+        <BaseCard imgSrc={imgSrc()} imgAlt="" height={380}>
+          <CardBody title="Taller body" leftEyebrow="12345" topGap={24}>
+            <ConfigurationRows rows={createConfigurationRows({ plain: true })} />
+          </CardBody>
         </BaseCard>
       </CardContainer>
     </div>
@@ -151,8 +158,10 @@ export function FixedHeight() {
 export function AiMode() {
   return (
     <CardContainer>
-      <BaseCard imgSrc={imgSrc()} aiMode>
-        <ConfigurationBody eyebrow="12345" title="Configuration C" rows={createConfigurationRows()} />
+      <BaseCard imgSrc={imgSrc()} imgAlt="" aiMode>
+        <CardBody title="Configuration C" leftEyebrow="12345" topGap={24}>
+          <ConfigurationRows rows={createConfigurationRows()} />
+        </CardBody>
       </BaseCard>
     </CardContainer>
   );
@@ -176,35 +185,30 @@ function defaultPlayFn(): PlayFunction {
 type ConfigurationRow = { label: string; value: string; tag?: { text: string; type: "success" | "warning" } };
 
 /**
- * The Configuration body: a label|value table, each row optionally flagged with an icon-only `Tag`.
- * Figma sets both columns to 14px on a 26px line, with the labels semibold.
+ * The Configuration-specific label|value table, each row optionally flagged with an icon-only
+ * `Tag`. Figma sets both columns to 14px on a 26px line, with the labels semibold. Passed as
+ * `CardBody`'s `children`, so it owns its own side/bottom padding.
  */
-function ConfigurationBody(props: { eyebrow: string; title: string; rows: ConfigurationRow[] }) {
-  const { eyebrow, title, rows } = props;
+function ConfigurationRows(props: { rows: ConfigurationRow[] }) {
+  const { rows } = props;
   return (
-    <div css={Css.p3.df.fdc.gap2.$}>
-      <div>
-        <div css={Css.sm.color(Tokens.OnSurface).$}>{eyebrow}</div>
-        <div css={Css.xl.color(Tokens.OnSurface).$}>{title}</div>
+    <dl css={Css.df.gapPx(12).m0.color(Tokens.OnSurface).px3.pb3.$}>
+      <div css={Css.df.fdc.wPx(135).fs0.$}>
+        {rows.map((r) => (
+          <dt key={r.label} css={Css.smSb.lh("26px").$}>
+            {r.label}
+          </dt>
+        ))}
       </div>
-      <dl css={Css.df.gapPx(12).m0.color(Tokens.OnSurface).$}>
-        <div css={Css.df.fdc.wPx(135).fs0.$}>
-          {rows.map((r) => (
-            <dt key={r.label} css={Css.smSb.lh("26px").$}>
-              {r.label}
-            </dt>
-          ))}
-        </div>
-        <div css={Css.df.fdc.fg1.mw0.$}>
-          {rows.map((r) => (
-            <dd key={r.label} css={Css.sm.lh("26px").m0.df.aic.jcsb.gap1.$}>
-              <span css={Css.truncate.$}>{r.value}</span>
-              {r.tag && <Tag iconOnly icon={r.tag.type === "success" ? "check" : "error"} {...r.tag} />}
-            </dd>
-          ))}
-        </div>
-      </dl>
-    </div>
+      <div css={Css.df.fdc.fg1.mw0.$}>
+        {rows.map((r) => (
+          <dd key={r.label} css={Css.sm.lh("26px").m0.df.aic.jcsb.gap1.$}>
+            <span css={Css.truncate.$}>{r.value}</span>
+            {r.tag && <Tag iconOnly icon={r.tag.type === "success" ? "check" : "error"} {...r.tag} />}
+          </dd>
+        ))}
+      </div>
+    </dl>
   );
 }
 

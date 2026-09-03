@@ -8,26 +8,24 @@ import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
+// TODO: every card has a hero today, but if a heroless card shows up, consider folding these three
+// into a single `heroImg?: { src: string; alt: string; fit?: ImageFitType }`.
 export type BaseCardProps = {
-  /** Hero image url.  */
   imgSrc: string;
-  /** Doubles as the link/button's accessible name when set.*/
-  imgAlt?: string;
+  imgAlt: string;
   /** Defaults to `"cover"`. */
   imageFit?: ImageFitType;
   /** Status tag overlaying the hero's leading edge. */
   tag?: CardTag;
   /** Button or menu overlaying the hero's trailing edge. */
   action?: IconButtonProps | ButtonMenuProps;
-  /** Card body. Unpadded to allow callers to full-bleed sections; the standard inset is usually `p3`. */
+  /** Unpadded, so callers can full-bleed sections; the standard inset is usually `p3`. */
   children: ReactNode;
   /** Content with its own interactive controls, rendered outside the card's link/button area. */
   footer?: ReactNode;
-  /** Makes the body a link. Takes precedence over `onClick`. */
-  to?: string;
-  /** Makes the body a button, for cards that act on click instead of navigating. */
-  onClick?: () => void;
-  /** Fixed card height in px. Defaults to sizing to content. */
+  /** A URL makes the body a link; a function makes it a button that acts in place. */
+  onClick?: (() => void) | string;
+  /** Defaults to sizing to content. */
   height?: number;
   /** Adds ai styling. */
   aiMode?: boolean;
@@ -35,30 +33,14 @@ export type BaseCardProps = {
 
 /** The shared card shell: border, radius, hero image, and interaction states. Callers own the body. */
 export function BaseCard(props: BaseCardProps) {
-  const {
-    imgSrc,
-    imgAlt = "",
-    imageFit = "cover",
-    tag,
-    action,
-    children,
-    footer,
-    to,
-    onClick,
-    height,
-    aiMode = false,
-  } = props;
+  const { imgSrc, imgAlt, imageFit = "cover", tag, action, children, footer, onClick, height, aiMode = false } = props;
   const tid = useTestIds(props, "baseCard");
   const { isFocusVisible, focusProps } = useFocusRing();
-  const cardAction = to || onClick;
 
   const actionAttrs = {
     ...tid.action,
-    // Without this, an interactive card with a decorative hero (`imgAlt` unset) still gets a correct
-    // accessible name — the browser computes it from the link/button's own text content.
-    ...(imgAlt ? { "aria-label": imgAlt } : {}),
     // `getButtonOrLink` renders its `<button>` without a type, which would default to submit inside a form.
-    type: typeof cardAction === "string" ? undefined : "button",
+    type: typeof onClick === "string" ? undefined : "button",
     ...Css.props(contentStyles),
     ...focusProps,
   };
@@ -76,8 +58,14 @@ export function BaseCard(props: BaseCardProps) {
         }
         {...tid.hero}
       >
-        <img css={Css.h100.w100.objectFit(imageFit).$} src={imgSrc} alt={imgAlt} loading="lazy" {...tid.image} />
-        {/* `Tag` isn't focusable, so it can nest inside the card's own link. */}
+        <img
+          css={Css.h100.w100.objectFit(imageFit).$}
+          src={imgSrc}
+          alt={imgAlt}
+          aria-hidden={imgAlt === "" || undefined}
+          loading="lazy"
+          {...tid.image}
+        />
         {tag && (
           <div css={Css.absolute.top1.left1.df.$} {...tid.tag}>
             <Tag {...tag} />
@@ -97,19 +85,14 @@ export function BaseCard(props: BaseCardProps) {
           .bgColor(Tokens.AiFieldBg)
           .else.bgColor(Tokens.SurfaceRaised).$,
         ...(height !== undefined ? Css.hPx(height).$ : {}),
-        ...(cardAction ? Css.cursorPointer.onHover.bshHover.$ : {}),
+        ...(onClick ? Css.cursorPointer.onHover.bshHover.$ : {}),
         ...(isFocusVisible ? Css.bshFocus.ba.$ : {}),
         // Must follow the focus ring, whose `ba` would reset the AI border back to 1px.
         ...(aiMode ? Css.bw2.bc(Tokens.AiFieldFg).$ : {}),
       }}
       {...tid}
     >
-      {cardAction ? (
-        getButtonOrLink(content, cardAction, actionAttrs)
-      ) : (
-        // Keep the same box as the action, so the card's layout doesn't depend on it being interactive.
-        <div css={contentStyles}>{content}</div>
-      )}
+      {onClick ? getButtonOrLink(content, onClick, actionAttrs) : <div css={contentStyles}>{content}</div>}
       {/* Siblings of the card's link — a button can't nest inside an anchor. They still land over the
           hero because this box is `relative` and the hero is a fixed height at the top. */}
       {action && (

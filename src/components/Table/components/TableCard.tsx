@@ -1,11 +1,11 @@
 import { observer } from "mobx-react";
-import { ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Tag, Tooltip } from "src/components";
+import { Tooltip } from "src/components";
 import { BaseCard } from "src/components/BaseCard";
 import { CardTag, ImageFitType } from "src/components/Card";
+import { CardBody, CardData } from "src/components/CardBody";
 import { Carousel } from "src/components/Carousel";
-import { ProposedValue, ProposedValueProps } from "src/components/ProposedValue";
+import { ProposedValueProps } from "src/components/ProposedValue";
 import type {
   CardBadgeTag,
   CardCarouselFooter,
@@ -17,24 +17,18 @@ import { RowStyle } from "src/components/Table/TableStyles";
 import { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
-import { Css, Palette, Tokens } from "src/Css";
+import { Css } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useTestIds } from "src/utils";
-import { defaultTestId } from "src/utils/defaultTestId";
-
-export type CardData = {
-  label: string;
-  value: ReactNode | string | number;
-};
 
 export type TableCardProps<R extends Kinded> = {
   rs: RowState<R>;
   columns: GridColumnWithId<R>[];
   rowStyle: RowStyle<any> | undefined;
   api: GridTableApi<R>;
-  /** Fixed card height in px. Defaults to 430. */
+  /** Defaults to 430. */
   height?: number;
-  /** How the hero image fills its frame. Defaults to `"cover"`. */
+  /** Defaults to `"cover"`. */
   imageFit?: ImageFitType;
 };
 
@@ -119,7 +113,6 @@ export type TableCardViewProps = {
   imgSrc: string;
   leftEyebrow?: string | ProposedValueProps;
   rightEyebrow?: string | ProposedValueProps;
-  /** Plain text, or a `ProposedValueProps` the card renders via `ProposedValue`. */
   title: string | ProposedValueProps;
   badge?: string;
   badgeTags?: CardBadgeTag[];
@@ -133,11 +126,10 @@ export type TableCardViewProps = {
   to?: string;
   /** Makes the card's content a button, for rows that act on click instead of navigating. */
   onClick?: () => void;
-  /** Fixed card height in px. */
   height?: number;
-  /** How the hero image fills its frame. Defaults to `"cover"`. */
+  /** Defaults to `"cover"`. */
   imageFit?: ImageFitType;
-  /** Paints the card with `Tokens.AiFieldBg`. */
+  /** Adds ai styling. */
   aiMode?: boolean;
 };
 
@@ -160,15 +152,11 @@ export function TableCardView(props: TableCardViewProps) {
     aiMode = false,
   } = props;
   const tid = useTestIds(props, "tableCardView");
-  // `alt` / `aria-label` need plain text even when `title` is a proposal.
+  // `alt` needs plain text even when `title` is a proposal.
   const titleText = typeof title === "string" ? title : title.proposed;
-  const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
   const shownFooter = shownInteractiveFooter(interactiveFooter);
-  // The footer sits outside the card's action, so only the data/progress stack rides along inside of it.
-  const hasDetails = data.length > 0 || progress !== undefined;
-
-  const col1 = data.slice(0, Math.ceil(data.length / 2));
-  const col2 = data.slice(Math.ceil(data.length / 2));
+  // `BaseCard` takes a single `onClick`; a row is either a link or an in-page action, never both.
+  const action = to || onClick;
 
   return (
     <BaseCard
@@ -177,8 +165,7 @@ export function TableCardView(props: TableCardViewProps) {
       imgAlt={titleText}
       imageFit={imageFit}
       tag={status}
-      to={to}
-      onClick={onClick}
+      onClick={action}
       height={height}
       aiMode={aiMode}
       footer={
@@ -189,76 +176,18 @@ export function TableCardView(props: TableCardViewProps) {
         )
       }
     >
-      <div css={Css.df.fdc.gap2.fg1.mw0.pt2.$}>
-        {/* The hero is full-bleed, so each section pads itself and only the last one gets `pb3`. */}
-        <div css={Css.df.fdc.gap1.px3.if(!hasDetails && !shownFooter).pb3.$}>
-          {(leftEyebrow || rightEyebrow) && (
-            <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
-              <span css={Css.truncate.$} {...tid.leftEyebrow}>
-                {renderMaybeProposed(leftEyebrow, tid.leftEyebrowProposal)}
-              </span>
-              {rightEyebrow && (
-                <span css={Css.fs0.$} {...tid.rightEyebrow}>
-                  {renderMaybeProposed(rightEyebrow, tid.rightEyebrowProposal)}
-                </span>
-              )}
-            </div>
-          )}
-          <div css={Css.dif.w100.jcsb.aic.$}>
-            <h4 css={Css.xl.lineClamp2.color(Tokens.OnSurface).$} {...tid.title}>
-              {renderMaybeProposed(title, tid.titleProposal)}
-            </h4>
-            {(badge || badgeTags?.length) && (
-              <div css={Css.dif.aic.gap1.fs0.$} {...tid.badge}>
-                {badge && <span css={Css.sm.wsnw.$}>{badge}</span>}
-                {badgeTags?.map((tag) => (
-                  <Tag key={tag.text} {...tag} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        {hasDetails && (
-          <div css={Css.df.fdc.gap2.mt("auto").px3.if(!shownFooter).pb3.$}>
-            {data.length > 0 && (
-              <dl css={Css.df.gap2.sm.$}>
-                <div css={Css.df.fdc.fg1.fb2.mw0.$}>
-                  {col1.map((d) => (
-                    <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                      <dt css={Css.fs0.$}>{d.label}:</dt>
-                      {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
-                        instead of widening the column. */}
-                      <dd css={Css.mw0.$}>{d.value}</dd>
-                    </div>
-                  ))}
-                </div>
-                <div css={Css.df.fdc.fg1.fb2.mw0.$}>
-                  {col2.map((d) => (
-                    <div key={d.label} css={Css.df.gapPx(4).$} {...tid[defaultTestId(d.label)]}>
-                      <dt css={Css.fs0.$}>{d.label}:</dt>
-                      {/* `mw0` lets a long value — e.g. a `ProposedValue` carrying both halves — wrap
-                        instead of widening the column. */}
-                      <dd css={Css.mw0.$}>{d.value}</dd>
-                    </div>
-                  ))}
-                </div>
-              </dl>
-            )}
-            {progress !== undefined && (
-              <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-                {/* `SurfaceSubtle` is Gray200, which all but vanishes on the AI fill. */}
-                <div
-                  css={Css.w25.hPx(8).br4.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$}
-                  {...tid.progressTrack}
-                >
-                  <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} {...tid.progressFill} />
-                </div>
-                <span {...tid.progressValue}>{progressValue}%</span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <CardBody
+        {...tid}
+        title={title}
+        leftEyebrow={leftEyebrow}
+        rightEyebrow={rightEyebrow}
+        badge={badge}
+        badgeTags={badgeTags}
+        data={data}
+        progress={progress}
+        aiMode={aiMode}
+        hasFooter={!!shownFooter}
+      />
     </BaseCard>
   );
 }
@@ -333,16 +262,4 @@ function Thumbnail(props: ThumbnailProps) {
       </Link>
     </Tooltip>
   );
-}
-
-/** Renders the title/eyebrow union: plain text, or a proposal via `ProposedValue`. */
-function renderMaybeProposed(value: string | ProposedValueProps | undefined, tid?: object): ReactNode {
-  return typeof value === "string" || value === undefined ? value : <ProposedValue {...value} {...tid} />;
-}
-
-function clampProgress(value: number): number {
-  if (process.env.NODE_ENV !== "production" && (value < 0 || value > 100)) {
-    console.warn(`[TableCard] progress value ${value} is outside the expected range [0, 100] and will be clamped.`);
-  }
-  return Math.min(100, Math.max(0, value));
 }
