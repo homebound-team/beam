@@ -1,7 +1,10 @@
+import { Button } from "src/components/Button";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { jumpLinksRailReservation } from "src/layouts/FormSectionLayout/JumpLinksRail";
+import { beamFloatingRightOffsetVar, documentScrollRightPaneWidth } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { click, render } from "src/utils/rtl";
+import { click, clickAndWait, render } from "src/utils/rtl";
 
 describe("FormSectionLayout", () => {
   it("renders the form title, description, and delegates sections to FormSection", async () => {
@@ -225,4 +228,56 @@ describe("FormSectionLayout", () => {
     // Then the matching section scrolls into view
     expect(document.getElementById("setup")!.scrollIntoView).toHaveBeenCalledTimes(1);
   });
+
+  it("default auto mode pushes on a typical desktop chrome", async () => {
+    // Given default withRightPane (auto) where the sm shell collides but can push
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        withRightPane={280}
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <OpenPaneButton /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then push constrains the column; the row is not widened
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.query.rightPaneMain_overlay).toBeNull();
+    expect(r.rightPaneMain_push).toBeInTheDocument();
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(280),
+    );
+  });
+
+  it("does not wrap in DocumentScrollRightPaneLayout without withRightPane", async () => {
+    // Given a form that did not opt into the right pane
+    const r = await render(
+      <FormSectionLayout
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <OpenPaneButton /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // When the pane context is opened
+    await clickAndWait(r.openPane);
+
+    // Then FormSectionLayout does not host the document-scroll pane wrapper
+    expect(r.query.documentScrollRightPaneLayout).toBeNull();
+    expect(r.query.rightPaneContent).toBeNull();
+    expect(r.query.rightPaneMain_overlay).toBeNull();
+  });
 });
+
+function OpenPaneButton() {
+  const { openRightPane } = useRightPaneActions();
+  return <Button label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />;
+}

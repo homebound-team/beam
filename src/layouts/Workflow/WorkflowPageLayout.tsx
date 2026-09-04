@@ -31,7 +31,7 @@ export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentT
 
 const mobileFooterHeightPx = 80;
 
-/** Internal sticky header + mobile footer + optional AI wash. Not part of the public API. */
+/** Internal always-on header + mobile footer + optional AI wash. Not part of the public API. */
 export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
   const { stepperTabs, aiMode, isDirty, children, title, documentTitleSuffix, breadcrumbs, onCancel, ...actionProps } =
     props;
@@ -67,18 +67,21 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
   return (
     <DocumentScrollLayoutProvider>
       <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
-        <div
-          ref={headerMetricsRef}
-          css={Css.sticky.left0.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
-          {...tid.header}
-        >
-          <WorkflowHeader
-            title={title}
-            documentTitleSuffix={documentTitleSuffix}
-            breadcrumbs={breadcrumbs}
-            rightSlot={isMobile ? undefined : actions}
-            stepperTabs={stepperTabs}
-          />
+        {/* In-flow spacer: the header is `fixed` (viewport-pinned) so horizontal document scroll cannot move it. */}
+        <div css={Css.fs0.w100.$} style={{ height: headerHeight }}>
+          <div
+            ref={headerMetricsRef}
+            css={Css.fixed.left0.w(headerWidth).z(zIndices.pageStickyHeader).top(outerTop).$}
+            {...tid.header}
+          >
+            <WorkflowHeader
+              title={title}
+              documentTitleSuffix={documentTitleSuffix}
+              breadcrumbs={breadcrumbs}
+              rightSlot={isMobile ? undefined : actions}
+              stepperTabs={stepperTabs}
+            />
+          </div>
         </div>
 
         <div

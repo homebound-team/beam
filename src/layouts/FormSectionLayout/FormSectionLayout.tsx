@@ -2,13 +2,19 @@ import { ReactNode } from "react";
 import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { HeaderAction } from "src/components/Headers/HeaderActions";
+import { DocumentScrollInlineRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollInlineRightPaneLayout";
+import {
+  resolveWithRightPaneOptions,
+  toInlineRightPaneMode,
+} from "src/components/Layout/RightPaneLayout/documentScrollRightPaneMode";
+import { WithRightPane } from "src/components/Layout/RightPaneLayout/types";
 import { Css } from "src/Css";
 import { FormSection, FormSectionProps } from "src/forms/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { CenteredLayout } from "src/layouts/CenteredLayout";
+import { CenteredLayout, centeredShellMaxPx } from "src/layouts/CenteredLayout";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { JumpLinksRail, jumpLinksRailReservation } from "./JumpLinksRail";
+import { JumpLinksRail, jumpLinksRailReservation, jumpLinksRailWidthPx } from "./JumpLinksRail";
 import { useActiveJumpLink } from "./useActiveJumpLink";
 
 export type FormSectionLayoutSection = FormSectionProps & {
@@ -34,6 +40,11 @@ export type FormSectionLayoutProps = {
    * Default false — opt in for FocusedForm / Stepper form steps that want the rail.
    */
   withJumpLinks?: boolean;
+  /**
+   * Opt into the document-scroll detail pane (`useRightPane`); default mode `auto`.
+   * Hosts JumpLinks + form, so do not nest another right-pane layout around this form.
+   */
+  withRightPane?: WithRightPane;
 };
 
 /**
@@ -50,9 +61,11 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     sections,
     aiMode = false,
     withJumpLinks = false,
+    withRightPane,
   } = props;
   const tid = useTestIds(props, "formSectionLayout");
   const { sm: isMobile } = useBreakpoint();
+  const rightPane = resolveWithRightPaneOptions(withRightPane, "auto");
 
   const jumpLinks = (sections ?? [])
     .filter((section) => !section.excludeJumpLink)
@@ -99,11 +112,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     </CenteredLayout>
   );
 
-  if (!showRail) {
-    return <div css={Css.mb4.$}>{form}</div>;
-  }
-
-  return (
+  const body = showRail ? (
     <div css={Css.df.w100.mb4.$}>
       <JumpLinksRail links={jumpLinks} activeId={activeId} {...tid.jumpLinks} />
       {/* Mirror the rail's width so the form stays centered on the page, as it is without the rail. */}
@@ -111,5 +120,20 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
         {form}
       </div>
     </div>
+  ) : (
+    <div css={Css.mb4.$}>{form}</div>
+  );
+
+  if (!rightPane) return body;
+
+  return (
+    <DocumentScrollInlineRightPaneLayout
+      paneWidth={rightPane.width}
+      mode={toInlineRightPaneMode(rightPane.mode)}
+      shellMaxPx={centeredShellMaxPx.sm}
+      jumpLinksWidthPx={showRail ? jumpLinksRailWidthPx : 0}
+    >
+      {body}
+    </DocumentScrollInlineRightPaneLayout>
   );
 }
