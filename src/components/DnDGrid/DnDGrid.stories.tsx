@@ -88,3 +88,27 @@ export function WithViewportOffset() {
     </div>
   );
 }
+
+/** Single-column list with vertical-only dragging — the same lock FormSection uses for reorderable children. */
+export function LockAxisY() {
+  const items = createVerticalItems();
+  return (
+    <DnDGrid
+      lockAxis="y"
+      onReorder={(items) => console.log("onReorder:", { items })}
+      gridStyles={Css.gtc("minmax(0, 1fr)").add("gridAutoRows", "80px").gap2.$}
+    >
+      {items.map((item) => (
+        <DraggableItem key={item.id} item={item} />
+      ))}
+    </DnDGrid>
+  );
+}
+
+function createVerticalItems(): GridItem[] {
+  return [
+    { id: "1", name: "Electrical", colSpan: 1, rowSpan: 1 },
+    { id: "2", name: "Plumbing", colSpan: 1, rowSpan: 1 },
+    { id: "3", name: "HVAC", colSpan: 1, rowSpan: 1 },
+  ];
+}

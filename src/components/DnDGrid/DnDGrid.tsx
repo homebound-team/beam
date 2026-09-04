@@ -1,5 +1,5 @@
 import equal from "fast-deep-equal";
-import React, { KeyboardEvent, ReactNode, useCallback, useRef } from "react";
+import React, { KeyboardEvent, ReactNode, useCallback, useEffect, useRef } from "react";
 import { Css, Palette, Properties, useTestIds } from "src";
 import { ElementStyleSnapshot, isDefined, restoreElementStyle, setInlineStyles, snapshotElementStyle } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
@@ -11,12 +11,14 @@ export type DnDGridProps = {
   gridStyles?: GridStyles;
   /** Defines the styling for the GridItem that is actively being moved */
   activeItemStyles?: Properties;
+  /** Restrict drag movement to one axis. Omit to allow free 2D movement. */
+  lockAxis?: "x" | "y";
   /** Returns the new order of the GridItems. */
   onReorder: (items: string[]) => void;
 };
 
 export function DnDGrid(props: DnDGridProps) {
-  const { children, gridStyles, onReorder, activeItemStyles } = props;
+  const { children, gridStyles, onReorder, activeItemStyles, lockAxis } = props;
   const gridEl = useRef<HTMLDivElement>(null);
   const dragEl = useRef<HTMLElement>();
   const cloneEl = useRef<HTMLElement>();
@@ -97,44 +99,73 @@ export function DnDGrid(props: DnDGridProps) {
   }, [getGridItemIdOrder, getGridItems]);
 
   /** Handles moving the GridItem based on cursor position */
-  const onMove = useCallback((e: MouseOrTouchEvent) => {
-    if (!reorderViaKeyboard.current && dragEl.current && cloneEl.current && gridEl.current) {
-      // Get the current position of the pointer.
-      const clientX = "clientX" in e ? e.clientX : e.touches[0].clientX;
-      const clientY = "clientY" in e ? e.clientY : e.touches[0].clientY;
+  const onMove = useCallback(
+    (e: MouseOrTouchEvent) => {
+      if (!reorderViaKeyboard.current && dragEl.current && cloneEl.current && gridEl.current) {
+        // Get the current position of the pointer.
+        const clientX = "clientX" in e ? e.clientX : e.touches[0].clientX;
+        const clientY = "clientY" in e ? e.clientY : e.touches[0].clientY;
 
-      // Update the transform property to move the element along with the pointer's position.
-      const left = dragEl.current.style.left ? parseInt(dragEl.current.style.left) : 0;
-      const top = dragEl.current.style.top ? parseInt(dragEl.current.style.top) : 0;
-      const x = clientX - transformFrom.current.x - left;
-      const y = clientY - transformFrom.current.y - top;
-      dragEl.current.style.transform = `translate(${x}px, ${y}px)`;
+        // Update the transform property to move the element along with the pointer's position.
+        const left = dragEl.current.style.left ? parseInt(dragEl.current.style.left) : 0;
+        const top = dragEl.current.style.top ? parseInt(dragEl.current.style.top) : 0;
+        const x = lockAxis === "y" ? 0 : clientX - transformFrom.current.x - left;
+        const y = lockAxis === "x" ? 0 : clientY - transformFrom.current.y - top;
+        dragEl.current.style.transform = `translate(${x}px, ${y}px)`;
 
-      // For touch devices we need to use `document.elementFromPoint` to determine which element is under the cursor/dragged element. For non-touch screens, setting `pointer-events: none` does this for us.
-      const maybeTarget = "touches" in e ? document.elementFromPoint(clientX, clientY) : e.target;
-      const target = maybeTarget instanceof HTMLElement ? maybeTarget?.closest(`[${gridItemIdKey}]`) : undefined;
+        // For touch devices we need to use `document.elementFromPoint` to determine which element is under the cursor/dragged element. For non-touch screens, setting `pointer-events: none` does this for us.
+        const maybeTarget = "touches" in e ? document.elementFromPoint(clientX, clientY) : e.target;
+        const target = maybeTarget instanceof HTMLElement ? maybeTarget?.closest(`[${gridItemIdKey}]`) : undefined;
 
-      // Figure out if we need to move the placeholder element based on the `dragEl`'s new position.
-      if (target instanceof HTMLElement && target !== cloneEl.current && target !== dragEl.current) {
-        const targetPos = target.getBoundingClientRect();
-        const clonePos = cloneEl.current.getBoundingClientRect();
-        // Pick the axis along which the placeholder and target are most separated, that's the layout's flow direction.
-        const useYAxis = Math.abs(targetPos.top - clonePos.top) >= Math.abs(targetPos.left - clonePos.left);
-        const isHalfwayPassedTarget = useYAxis
-          ? (clientY - targetPos.top) / (targetPos.bottom - targetPos.top) > 0.5
-          : (clientX - targetPos.left) / (targetPos.right - targetPos.left) > 0.5;
+        // Figure out if we need to move the placeholder element based on the `dragEl`'s new position.
+        if (target instanceof HTMLElement && target !== cloneEl.current && target !== dragEl.current) {
+          const targetPos = target.getBoundingClientRect();
+          const clonePos = cloneEl.current.getBoundingClientRect();
+          // Use the locked axis when set; otherwise pick the axis along which the placeholder and target are most separated.
+          const useYAxis =
+            lockAxis === "y"
+              ? true
+              : lockAxis === "x"
+                ? false
+                : Math.abs(targetPos.top - clonePos.top) >= Math.abs(targetPos.left - clonePos.left);
+          const isHalfwayPassedTarget = useYAxis
+            ? (clientY - targetPos.top) / (targetPos.bottom - targetPos.top) > 0.5
+            : (clientX - targetPos.left) / (targetPos.right - targetPos.left) > 0.5;
 
-        // Only insert the placeholder if it's not already in the correct position.
-        const shouldInsert =
-          (isHalfwayPassedTarget && target.nextSibling !== cloneEl.current) ||
-          (!isHalfwayPassedTarget && target.previousSibling !== cloneEl.current);
+          // Only insert the placeholder if it's not already in the correct position.
+          const shouldInsert =
+            (isHalfwayPassedTarget && target.nextSibling !== cloneEl.current) ||
+            (!isHalfwayPassedTarget && target.previousSibling !== cloneEl.current);
 
-        if (shouldInsert) {
-          gridEl.current.insertBefore(cloneEl.current, isHalfwayPassedTarget ? target.nextSibling : target);
+          if (shouldInsert) {
+            gridEl.current.insertBefore(cloneEl.current, isHalfwayPassedTarget ? target.nextSibling : target);
+          }
         }
       }
-    }
-  }, []);
+    },
+    [lockAxis],
+  );
+
+  /** Handles the end of the dragging process */
+  const onDragEnd = useCallback(
+    (e: DragEndEvent) => {
+      if (!reorderViaKeyboard.current && dragEl.current && cloneEl.current && gridEl.current) {
+        e.preventDefault();
+        cloneEl.current.replaceWith(dragEl.current);
+
+        // Remove any placeholder elements.
+        gridEl.current.querySelectorAll(`[${gridCloneKey}]`).forEach((el) => el.remove());
+        gridEl.current.style.cursor = "auto";
+        // And unset the `cloneEl`
+        cloneEl.current = undefined;
+
+        // Commit the changes to the GridItem order
+        commitReorder();
+        removePointerDragListeners(onMove, onDragEnd);
+      }
+    },
+    [commitReorder, onMove],
+  );
 
   /** Handles the initiation of the dragging process */
   const onDragStart = useCallback(
@@ -180,36 +211,16 @@ export function DnDGrid(props: DnDGridProps) {
         // Applies cursor styling to the Grid element.
         gridEl.current.style.cursor = "grabbing";
 
-        // Add event listeners to move the element as the user drags it around.
-        gridEl.current.addEventListener("mousemove", onMove);
-        gridEl.current.addEventListener("touchmove", onMove);
+        // Listen on document so the drag keeps tracking (and can commit) after the pointer leaves the grid.
+        addPointerDragListeners(onMove, onDragEnd);
       }
     },
-    [initReorder, onMove],
+    [initReorder, onMove, onDragEnd],
   );
 
-  /** Handles the end of the dragging process */
-  const onDragEnd = useCallback(
-    (e: MouseOrTouchEvent) => {
-      if (!reorderViaKeyboard.current && dragEl.current && cloneEl.current && gridEl.current) {
-        e.preventDefault();
-        cloneEl.current.replaceWith(dragEl.current);
-
-        // Remove any placeholder elements.
-        gridEl.current.querySelectorAll(`[${gridCloneKey}]`).forEach((el) => el.remove());
-        gridEl.current.style.cursor = "auto";
-        // And unset the `cloneEl`
-        cloneEl.current = undefined;
-
-        // Commit the changes to the GridItem order
-        commitReorder();
-        // Remove event listeners.
-        gridEl.current.removeEventListener("mousemove", onMove);
-        gridEl.current.removeEventListener("touchmove", onMove);
-      }
-    },
-    [commitReorder, onMove],
-  );
+  useEffect(() => {
+    return () => removePointerDragListeners(onMove, onDragEnd);
+  }, [onMove, onDragEnd]);
 
   /** Handles keyboard interaction when the active element is one of the "drag handles" */
   const onDragHandleKeyDown = useCallback(
@@ -254,9 +265,9 @@ export function DnDGrid(props: DnDGridProps) {
           return;
         }
 
-        // Check to see if we should move the element
-        const movingLeft = ["ArrowLeft", "ArrowUp"].includes(e.key);
-        const movingRight = ["ArrowRight", "ArrowDown"].includes(e.key);
+        // Check to see if we should move the element. When lockAxis is set, only arrows along that axis move.
+        const movingLeft = (lockAxis !== "x" && e.key === "ArrowUp") || (lockAxis !== "y" && e.key === "ArrowLeft");
+        const movingRight = (lockAxis !== "x" && e.key === "ArrowDown") || (lockAxis !== "y" && e.key === "ArrowRight");
 
         if (movingLeft || movingRight) {
           e.preventDefault();
@@ -279,7 +290,7 @@ export function DnDGrid(props: DnDGridProps) {
         }
       }
     },
-    [cancelReorder, commitReorder, initReorder, getGridItems],
+    [cancelReorder, commitReorder, initReorder, getGridItems, lockAxis],
   );
 
   return (
@@ -318,6 +329,26 @@ type GridStyles = Pick<
 
 export const gridItemIdKey = "dndgrid-itemid";
 const gridCloneKey = "dndgrid-clone";
+
+type DragEndEvent = MouseOrTouchEvent | PointerEvent;
+
+function addPointerDragListeners(onMove: (e: MouseOrTouchEvent) => void, onEnd: (e: DragEndEvent) => void) {
+  document.addEventListener("mousemove", onMove as EventListener);
+  document.addEventListener("touchmove", onMove as EventListener);
+  document.addEventListener("mouseup", onEnd as EventListener);
+  document.addEventListener("touchend", onEnd as EventListener);
+  document.addEventListener("pointercancel", onEnd as EventListener);
+  document.addEventListener("touchcancel", onEnd as EventListener);
+}
+
+function removePointerDragListeners(onMove: (e: MouseOrTouchEvent) => void, onEnd: (e: DragEndEvent) => void) {
+  document.removeEventListener("mousemove", onMove as EventListener);
+  document.removeEventListener("touchmove", onMove as EventListener);
+  document.removeEventListener("mouseup", onEnd as EventListener);
+  document.removeEventListener("touchend", onEnd as EventListener);
+  document.removeEventListener("pointercancel", onEnd as EventListener);
+  document.removeEventListener("touchcancel", onEnd as EventListener);
+}
 
 /**
  * Applies a Truss `activeItemStyles` expression to `el`, outside of a `css={...}` attribute.

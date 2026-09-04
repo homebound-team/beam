@@ -77,7 +77,7 @@ function DraggableChildren(props: DraggableChildrenProps) {
   };
 
   return (
-    <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
+    <DnDGrid onReorder={handleReorder} lockAxis="y" gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
       {sorted.map((child) => (
         <FormSectionChild key={child.id} {...child} {...tid} />
       ))}
