@@ -75,9 +75,83 @@ describe("DnDGrid", () => {
     expect(onReorder).toHaveBeenCalledWith(["b", "a"]);
     expect(r.item_a.className).toBe("");
   });
+
+  it("constrains the dragged item to the Y axis when lockAxis is y", async () => {
+    // Given a DnDGrid locked to vertical movement
+    const r = await render(<Harness onReorder={() => {}} lockAxis="y" />);
+
+    // When the user starts a drag and moves the pointer on both axes
+    fireEvent.mouseDown(r.dragHandle_0, { clientX: 10, clientY: 10 });
+    fireEvent.mouseMove(r.dndGrid, { clientX: 50, clientY: 80 });
+    const draggedItem = r.getAllByTestId("item_a").find((el) => !el.hasAttribute("dndgrid-clone"))!;
+
+    // Then the item only translates vertically
+    expect(draggedItem.style.transform).toBe("translate(0px, 70px)");
+
+    fireEvent.mouseUp(r.dragHandle_0);
+  });
+
+  it("constrains the dragged item to the X axis when lockAxis is x", async () => {
+    // Given a DnDGrid locked to horizontal movement
+    const r = await render(<Harness onReorder={() => {}} lockAxis="x" />);
+
+    // When the user starts a drag and moves the pointer on both axes
+    fireEvent.mouseDown(r.dragHandle_0, { clientX: 10, clientY: 10 });
+    fireEvent.mouseMove(r.dndGrid, { clientX: 50, clientY: 80 });
+    const draggedItem = r.getAllByTestId("item_a").find((el) => !el.hasAttribute("dndgrid-clone"))!;
+
+    // Then the item only translates horizontally
+    expect(draggedItem.style.transform).toBe("translate(40px, 0px)");
+
+    fireEvent.mouseUp(r.dragHandle_0);
+  });
+
+  it("does not reorder on ArrowLeft when lockAxis is y", async () => {
+    // Given a vertically locked DnDGrid
+    const onReorder = vi.fn();
+    const r = await render(<Harness onReorder={onReorder} lockAxis="y" />);
+
+    // When the user grabs the first item and presses ArrowLeft, then commits
+    const handle = r.dragHandle_0;
+    fireEvent.keyDown(handle, { key: " " });
+    fireEvent.keyDown(handle, { key: "ArrowLeft" });
+    fireEvent.keyDown(handle, { key: "Enter" });
+
+    // Then the order is unchanged
+    expect(onReorder).not.toHaveBeenCalled();
+  });
+
+  it("tracks the dragged item when the pointer moves on the document", async () => {
+    // Given a DnDGrid with a drag in progress
+    const r = await render(<Harness onReorder={() => {}} />);
+    fireEvent.mouseDown(r.dragHandle_0, { clientX: 10, clientY: 10 });
+
+    // When the pointer moves on the document (outside the grid)
+    fireEvent.mouseMove(document, { clientX: 50, clientY: 80 });
+    const draggedItem = r.getAllByTestId("item_a").find((el) => !el.hasAttribute("dndgrid-clone"))!;
+
+    // Then the item still follows the pointer
+    expect(draggedItem.style.transform).toBe("translate(40px, 70px)");
+
+    fireEvent.mouseUp(document);
+  });
+
+  it("commits and restores the item when the pointer is released on the document", async () => {
+    // Given a DnDGrid with a drag that has moved outside the grid
+    const r = await render(<Harness onReorder={() => {}} />);
+    fireEvent.mouseDown(r.dragHandle_0, { clientX: 10, clientY: 10 });
+    fireEvent.mouseMove(document, { clientX: 50, clientY: 80 });
+
+    // When the user releases the pointer on the document
+    fireEvent.mouseUp(document);
+
+    // Then the item is put back with no leftover overlay styles or active class
+    expect(r.item_a.hasAttribute("style")).toBe(false);
+    expect(r.item_a.className).toBe("");
+  });
 });
 
-function Harness(props: Pick<DnDGridProps, "onReorder" | "activeItemStyles">) {
+function Harness(props: Pick<DnDGridProps, "onReorder" | "activeItemStyles" | "lockAxis">) {
   return (
     <DnDGrid {...props}>
       <Item id="a" />
