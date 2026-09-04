@@ -1,8 +1,10 @@
 import { Meta } from "@storybook/react-vite";
 import { ReactNode } from "react";
+import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css, Tokens } from "src/Css";
 import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
+import { CenteredLayout } from "src/layouts/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
@@ -34,6 +36,44 @@ export function AiMode() {
   return (
     <WithEnvironmentBanner>
       <StepperLayoutFormApp aiMode />
+    </WithEnvironmentBanner>
+  );
+}
+
+/** Loading step: {@link AiLoadingPanel} with `omitBg` on an `aiMode` {@link StepperLayout}. */
+export function WithAiLoadingPanel() {
+  return (
+    <WithEnvironmentBanner>
+      <StepperLayout
+        title="Import Materials"
+        aiMode
+        defaultStep="importing"
+        onCancel={action("cancel clicked")}
+        completeLabel="Save"
+        onComplete={action("complete clicked")}
+        steps={[
+          {
+            label: "Details",
+            content: (
+              <FormSectionLayout
+                aiMode
+                title="Import Details"
+                description="Connect a source and we'll pull in the details."
+                sections={[{ title: "Source", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+          {
+            label: "Importing",
+            primaryDisabled: "Import is still running.",
+            content: (
+              <CenteredLayout size="sm">
+                <AiLoadingPanel omitBg />
+              </CenteredLayout>
+            ),
+          },
+        ]}
+      />
     </WithEnvironmentBanner>
   );
 }

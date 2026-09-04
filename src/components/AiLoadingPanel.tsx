@@ -7,6 +7,7 @@ import { useTestIds } from "src/utils";
 export type AiLoadingPanelProps = {
   title?: string;
   message?: ReactNode;
+  omitBg?: boolean;
 };
 
 /**
@@ -15,23 +16,29 @@ export type AiLoadingPanelProps = {
  * Indeterminate — these steps don't report progress, so this never shows a percentage or ETA.
  */
 export function AiLoadingPanel(props: AiLoadingPanelProps) {
-  const { title = "Importing Details...", message = defaultMessage } = props;
+  const { title = "Importing Details...", message = defaultMessage, omitBg = false } = props;
   const tid = useTestIds(props, "aiLoadingPanel");
-  return (
+  const card = (
     // `status` rather than `alert` so assistive tech waits for a pause instead of interrupting, and
     // `aria-busy` so it knows the surrounding content is still settling.
-    <AiPanel role="status" aria-busy={true} padding="lg" {...tid}>
-      <AiCard size="lg" {...tid}>
-        <div css={Css.df.fdc.aic.gap1.w100.py2.px3.$}>
-          <AiLoader />
-          <span css={Css.lg.aiBoldText.$} {...tid.title}>
-            {title}
-          </span>
-          <span css={Css.sm.color(Tokens.OnSurface).tac.$} {...tid.message}>
-            {message}
-          </span>
-        </div>
-      </AiCard>
+    <AiCard role="status" aria-busy={true} size="lg" {...tid}>
+      <div css={Css.df.fdc.aic.gap1.w100.py2.px3.$}>
+        <AiLoader />
+        <span css={Css.lg.aiBoldText.$} {...tid.title}>
+          {title}
+        </span>
+        <span css={Css.sm.color(Tokens.OnSurface).tac.$} {...tid.message}>
+          {message}
+        </span>
+      </div>
+    </AiCard>
+  );
+
+  return omitBg ? (
+    card
+  ) : (
+    <AiPanel padding="lg" {...tid}>
+      {card}
     </AiPanel>
   );
 }

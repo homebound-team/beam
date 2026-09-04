@@ -9,7 +9,7 @@ export type AiPanelProps = {
   /** Background padding. `lg` = 24 all around; `sm` = 24 horizontal, 16 vertical. */
   padding?: AiPanelPadding;
   children?: ReactNode;
-} & AriaAttributes & { role?: AriaRole };
+};
 
 /**
  * Escape hatch for one-off AI chrome — prefer a pre-composed component. See {@link AiBanner}, {@link AiLoadingPanel}, {@link AiSlimBanner}, or `aiMode` on {@link FormSectionLayout} / {@link StepperLayout} / {@link FocusedFormLayout} / {@link Modal}.
@@ -31,7 +31,7 @@ export type AiCardProps = {
   /** Logo height and logo-to-card gap. */
   size?: AiCardSize;
   children?: ReactNode;
-};
+} & AriaAttributes & { role?: AriaRole };
 
 /**
  * Escape hatch for one-off AI chrome — prefer a pre-composed component. See {@link AiBanner}, {@link AiLoadingPanel}, {@link AiSlimBanner}, or `aiMode` on {@link FormSectionLayout} / {@link StepperLayout} / {@link FocusedFormLayout} / {@link Modal}.
@@ -44,7 +44,7 @@ export function AiCard(props: AiCardProps) {
   return (
     <div css={{ ...Css.df.fdc.aifs.w100.if(!fullWidth).wfc.maxw100.mxa.$, ...gapCss }} {...tid.column}>
       <BlueprintAiLogo height={logoHeight} />
-      <div css={Css.df.fdc.w100.mw0.br12.bgColor(Tokens.Surface).bshBasic.$} {...tid.card}>
+      <div css={Css.df.fdc.w100.mw0.br12.bgColor(Tokens.Surface).bshBasic.$} {...others} {...tid.card}>
         {children}
       </div>
     </div>
