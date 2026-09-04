@@ -1,87 +1,33 @@
-import { CSSProperties, ReactNode, useLayoutEffect } from "react";
-import { Css } from "src/Css";
-import { useBreakpoint } from "src/hooks/useBreakpoint";
-import {
-  beamFloatingRightOffsetVar,
-  beamRightPaneWidthVar,
-  documentScrollChromeWidth,
-  documentScrollRightPaneWidth,
-} from "src/layouts/layoutVars";
-import { useTestIds } from "src/utils";
-import { DocumentScrollRightPane } from "./DocumentScrollRightPane";
-import { useRightPaneContext } from "./RightPaneContext";
-
-export const defaultDocumentScrollRightPaneWidth = 450;
+import { ReactNode, useContext, useRef } from "react";
+import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
+import { NestedRightPaneLayoutContext } from "./documentScrollRightPaneLayoutShared";
 
 export type DocumentScrollRightPaneLayoutProps = {
   children: ReactNode;
-  /** Width (px) of the fixed detail pane opened via `useRightPane`. */
+  /** Width (px) of the detail pane opened via `useRightPane`. */
   paneWidth?: number;
 };
 
-/**
- * Document-scroll right pane: `children` are main content; pane body comes from `openRightPane`.
- * Desktop: pins below sticky chrome; publishes scoped `--beam-right-pane-width` and root
- * `--beam-floating-right-offset`. On `sm`, the open pane is a full-bleed overlay (no spacer / width vars).
- * `GridTableLayout` scopes this around the table body (not table actions).
- */
+/** Document-scroll overlay right pane host. Prefer {@link DocumentScrollOverlayRightPaneLayout} when composing. */
 export function DocumentScrollRightPaneLayout(props: DocumentScrollRightPaneLayoutProps) {
-  const { children, paneWidth = defaultDocumentScrollRightPaneWidth } = props;
-  const tid = useTestIds(props, "documentScrollRightPaneLayout");
-  const { isRightPaneOpen } = useRightPaneContext();
-  const { sm } = useBreakpoint();
-  // Split layout only on larger viewports; on `sm` the pane overlays full-bleed so no spacer/offsets.
-  const isSplitPaneOpen = isRightPaneOpen && !sm;
-  const effectivePaneWidth = isSplitPaneOpen ? documentScrollRightPaneWidth(paneWidth) : "0px";
+  const nestedInLayout = useContext(NestedRightPaneLayoutContext);
+  const nestedWarnedRef = useRef(false);
 
-  useLayoutEffect(() => {
-    // Apply styles to the root element so elements such as the "ScrollToTop" button can position correctly.
-    const root = document.documentElement;
-    const previous = root.style.getPropertyValue(beamFloatingRightOffsetVar);
-    root.style.setProperty(beamFloatingRightOffsetVar, effectivePaneWidth);
-    return () => {
-      if (previous) {
-        root.style.setProperty(beamFloatingRightOffsetVar, previous);
-      } else {
-        root.style.removeProperty(beamFloatingRightOffsetVar);
-      }
-    };
-  }, [effectivePaneWidth]);
+  if (nestedInLayout && process.env.NODE_ENV !== "production" && !nestedWarnedRef.current) {
+    nestedWarnedRef.current = true;
+    console.warn(
+      "DocumentScrollRightPaneLayout is nested inside another document-scroll right-pane layout. Use a single layout (compose at the body; do not set withRightPane on both a parent and a nested layout).",
+    );
+  }
+
+  if (nestedInLayout) return <>{props.children}</>;
 
   return (
-    <div css={Css.w100.$} style={{ [beamRightPaneWidthVar]: effectivePaneWidth } as CSSProperties} {...tid}>
-      <DocumentScrollRightPaneSpacer paneWidth={paneWidth} isOpen={isSplitPaneOpen}>
-        {children}
-      </DocumentScrollRightPaneSpacer>
-      <DocumentScrollRightPane paneWidth={paneWidth} />
-    </div>
+    <DocumentScrollOverlayRightPaneLayout paneWidth={props.paneWidth}>
+      {props.children}
+    </DocumentScrollOverlayRightPaneLayout>
   );
 }
 
-/** Grows horizontal document scroll by the pane width when open so content is not trapped under it. */
-function DocumentScrollRightPaneSpacer({
-  paneWidth,
-  isOpen,
-  children,
-}: {
-  paneWidth: number;
-  isOpen: boolean;
-  children: ReactNode;
-}) {
-  const tid = useTestIds({}, "rightPaneSpacer");
-  const effectivePaneWidth = documentScrollRightPaneWidth(paneWidth);
-
-  return (
-    <div css={Css.df.mw100.$} style={{ width: isOpen ? "fit-content" : "100%" }}>
-      <div css={Css.fs0.mw("fit-content").$} style={{ width: `min(100%, ${documentScrollChromeWidth()})` }}>
-        {children}
-      </div>
-      <div
-        aria-hidden
-        css={Css.fs0.fg0.$}
-        style={{ width: isOpen ? effectivePaneWidth : 0 }}
-        {...(isOpen ? tid : {})}
-      />
-    </div>
-  );
-}
+export { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
+export type { DocumentScrollOverlayRightPaneLayoutProps } from "./DocumentScrollOverlayRightPaneLayout";
