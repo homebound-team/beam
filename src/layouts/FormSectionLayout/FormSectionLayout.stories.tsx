@@ -1,4 +1,7 @@
 import { Meta } from "@storybook/react-vite";
+import { Button } from "src/components/Button";
+import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { Css, Tokens } from "src/Css";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { newStory, withAiBackground, withBeamDecorator } from "src/utils/sb";
@@ -130,12 +133,52 @@ export function WithJumpLinks() {
   );
 }
 
+/** Document-scroll detail pane around JumpLinks + form (default mode `auto`). */
+export function WithRightPane() {
+  return (
+    <FormSectionLayout
+      withJumpLinks
+      withRightPane
+      title="Link Design Package"
+      description="Connect this package to a market and give it a name."
+      sections={[
+        { title: "Setup", description: "Basic package details.", fields: <OpenRightPaneFields /> },
+        { title: "Package Options", fields: <PlaceholderFields count={3} /> },
+        { title: "Internal", excludeJumpLink: true, fields: <PlaceholderFields count={1} /> },
+      ]}
+    />
+  );
+}
+
 function PlaceholderFields({ count }: { count: number }) {
   return (
     <div css={Css.df.fdc.gap1.$}>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
       ))}
+    </div>
+  );
+}
+
+function OpenRightPaneFields() {
+  const { openRightPane } = useRightPaneActions();
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      <PlaceholderFields count={2} />
+      <Button
+        label="Open detail pane"
+        onClick={() =>
+          openRightPane({
+            content: (
+              <RightPanePanel title="Package detail">
+                <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
+                  Desktop uses `auto` (push or no spacer when the form clears the pane).
+                </p>
+              </RightPanePanel>
+            ),
+          })
+        }
+      />
     </div>
   );
 }

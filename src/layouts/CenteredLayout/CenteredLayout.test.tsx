@@ -43,4 +43,17 @@ describe("CenteredLayout", () => {
     expect(r.centeredLayout).toHaveTextContent("Form body");
     expect(r.centeredLayout).toHaveStyle({ width: "100%", maxWidth: "768px" });
   });
+
+  it("wraps in DocumentScrollRightPaneLayout when withRightPane is set", async () => {
+    // Given a centered layout that opts into the right pane
+    const r = await render(
+      <CenteredLayout size="sm" withRightPane>
+        <span>Form body</span>
+      </CenteredLayout>,
+    );
+
+    // Then the document-scroll host wraps the shell
+    expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
+    expect(r.centeredLayout).toHaveTextContent("Form body");
+  });
 });

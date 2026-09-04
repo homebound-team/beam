@@ -127,13 +127,90 @@ describe("DocumentScrollRightPaneLayout", () => {
     expect(r.query.rightPaneContent).toBeNull();
   });
 
+  it("push mode shrinks the main column instead of widening the flex container", async () => {
+    // Given a push-mode document-scroll right pane
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollRightPaneLayout paneWidth={320} mode="push">
+          <div>Main content</div>
+        </DocumentScrollRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then the main column is the push variant; floating offset is still published
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.query.rightPaneMain_overlay).toBeNull();
+    expect(r.rightPaneMain_push).toBeInTheDocument();
+    expect(r.rightPaneContent.style.marginLeft).toBe("");
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(320),
+    );
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
+  });
+
+  it("auto mode with a clearing shell floats the pane over the gutter", async () => {
+    // Given auto mode and a shell small enough to clear the pane on typical test chrome
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollRightPaneLayout paneWidth={320} mode="auto" shellMaxPx={280}>
+          <div>Main content</div>
+        </DocumentScrollRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then the main column keeps its width and the pane is pulled back out of the flex container
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.query.rightPaneMain_overlay).toBeNull();
+    expect(r.query.rightPaneMain_push).toBeNull();
+    expect(r.rightPaneContent).toHaveStyle({
+      marginLeft: `calc(-1 * ${documentScrollRightPaneWidth(320)})`,
+    });
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(320),
+    );
+  });
+
+  it("push mode stays split on md+ when chrome is tight (narrow push)", async () => {
+    // Given md+ viewport and chrome − pane < 460 (1024 − 600 on typical jsdom)
+    setViewport("md");
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollRightPaneLayout paneWidth={600} mode="push">
+          <div>Main content</div>
+        </DocumentScrollRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then the pane stays in-flow beside a narrowed main column — never portaled full-screen
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.rightPaneMain_push).toBeInTheDocument();
+    expect(r.query.rightPaneMain_overlay).toBeNull();
+    expect(r.rightPaneContent.style.top).toBe("");
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
+      documentScrollRightPaneWidth(600),
+    );
+  });
+
   it("ignores a nested host so only the outer pane mounts", async () => {
     // Given withRightPane composed twice (inner should pass through)
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const r = await render(
       <DocumentScrollLayoutProvider>
         <DocumentScrollRightPaneLayout paneWidth={320}>
-          <DocumentScrollRightPaneLayout paneWidth={200}>
+          <DocumentScrollRightPaneLayout paneWidth={200} mode="push">
             <div>Main content</div>
           </DocumentScrollRightPaneLayout>
         </DocumentScrollRightPaneLayout>
@@ -150,9 +227,10 @@ describe("DocumentScrollRightPaneLayout", () => {
     // When the pane is opened
     await clickAndWait(r.openPaneBtn);
 
-    // Then a single overlay pane uses the outer width
+    // Then a single overlay pane uses the outer width, not the inner push host
     expect(r.queryAllByTestId("rightPaneContent")).toHaveLength(1);
     expect(r.rightPaneMain_overlay).toBeInTheDocument();
+    expect(r.query.rightPaneMain_push).toBeNull();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
       documentScrollRightPaneWidth(320),
     );
