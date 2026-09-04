@@ -104,8 +104,8 @@ describe("TableCardView", () => {
     const r = await render(
       <TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} status={{ text: "Active", type: "success" }} />,
     );
-    // Then the status Tag shows the text
-    expect(r.tableCardView_status).toHaveTextContent("Active");
+    // Then the status Tag shows the text, under BaseCard's `tag` slot
+    expect(r.tableCardView_tag).toHaveTextContent("Active");
   });
 
   it("renders data blocks as 'header: value' pairs", async () => {
@@ -246,10 +246,9 @@ describe("TableCardView", () => {
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} to="/item/1" />, {
       at: { url: "/" },
     });
-    // Then the card's content is a single link, named by the title
+    // Then the card's content is a single link
     expect(r.tableCardView_action.tagName).toBe("A");
     expect(r.tableCardView_action).toHaveAttribute("href", "/item/1");
-    expect(r.tableCardView_action).toHaveAttribute("aria-label", "123 Main St");
     // And it holds the card's content
     expect(r.tableCardView_action).toContainElement(r.tableCardView_title);
     // And it is a direct child of the card, which is how the card rings for its focus

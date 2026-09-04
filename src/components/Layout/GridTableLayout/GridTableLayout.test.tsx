@@ -418,7 +418,7 @@ describe("GridTableLayout", () => {
 
       // Then the card shows the title and status
       expect(r.tableCard_title).toHaveTextContent("The Conroy");
-      expect(r.tableCard_status).toHaveTextContent("Active");
+      expect(r.tableCard_tag).toHaveTextContent("Active");
     });
   });
 

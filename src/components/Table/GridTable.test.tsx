@@ -5326,7 +5326,7 @@ describe("card view", () => {
     // When rendered as card
     const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
     // Then the status Tag shows the text
-    expect(r.tableCard_status).toHaveTextContent("Active");
+    expect(r.tableCard_tag).toHaveTextContent("Active");
   });
 
   it("skips rows that produce no title", async () => {
