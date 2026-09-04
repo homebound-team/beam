@@ -105,6 +105,18 @@ export function stickyNavAndHeaderOffsetPx(el: Element): number {
   );
 }
 
+/** Pixel equivalent of {@link stickyTableHeaderOffset}, read from `el`'s computed (inherited) CSS vars. */
+export function stickyTableHeaderOffsetPx(el: Element): number {
+  const styles = getComputedStyle(el);
+  const read = (name: string) => parseFloat(styles.getPropertyValue(name)) || 0;
+  return (
+    read(beamEnvironmentBannerLayoutHeightVar) +
+    read(beamNavbarLayoutHeightVar) +
+    read(beamPageHeaderLayoutHeightVar) +
+    read(beamTableActionsHeightVar)
+  );
+}
+
 /** `top` offset for sticky table column headers (environment banner + navbar + page header + table actions). */
 export function stickyTableHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;

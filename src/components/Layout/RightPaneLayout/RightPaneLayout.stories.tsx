@@ -14,7 +14,7 @@ import { PreventBrowserScroll } from "../PreventBrowserScroll";
 import { ScrollableContent } from "../ScrollableContent";
 import { ScrollableParent } from "../ScrollableParent";
 import { RightPaneLayout } from "./RightPaneLayout";
-import { useRightPane } from "./useRightPane";
+import { useRightPaneActions } from "./useRightPane";
 
 export default {
   component: RightPaneLayout,
@@ -22,7 +22,7 @@ export default {
 } as Meta;
 
 function SampleContent() {
-  const { openRightPane } = useRightPane();
+  const { openRightPane } = useRightPaneActions();
   return (
     <div css={Css.bgWhite.h100.$}>
       <Button label={"Open Pane"} onClick={() => openRightPane({ content: <DetailPane /> })} />
@@ -31,7 +31,7 @@ function SampleContent() {
 }
 
 function DetailPane() {
-  const { closeRightPane } = useRightPane();
+  const { closeRightPane } = useRightPaneActions();
   return (
     <div css={Css.bgWhite.h100.$}>
       <Button label={"Close Pane"} onClick={() => closeRightPane()} />
@@ -119,7 +119,7 @@ function ScrollableTableExample({ numCols, numRows }: { numCols?: number; numRow
 
 type Row = SimpleHeaderAndData<{ name: string; value: number }>;
 function TableExample({ numCols = 10, numRows = 100 }: { numCols?: number; numRows?: number }) {
-  const { openRightPane } = useRightPane();
+  const { openRightPane } = useRightPaneActions();
 
   const rows: GridDataRow<Row>[] = useMemo(
     () => [
@@ -159,7 +159,7 @@ function TableExample({ numCols = 10, numRows = 100 }: { numCols?: number; numRo
 }
 
 function TestDetailPane({ value }: { value: number }) {
-  const { closeRightPane } = useRightPane();
+  const { closeRightPane } = useRightPaneActions();
 
   return (
     <div css={Css.df.fdc.h100.$}>

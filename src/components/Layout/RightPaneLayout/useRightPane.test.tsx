@@ -1,6 +1,5 @@
 import { waitFor } from "@homebound/rtl-utils";
 import { Button } from "src/components/Button";
-import { RightPaneProvider } from "src/components/Layout/RightPaneLayout/RightPaneContext";
 import { RightPaneLayout } from "src/components/Layout/RightPaneLayout/RightPaneLayout";
 import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { click, clickAndWait, render } from "src/utils/rtl";
@@ -44,10 +43,8 @@ function TestDetailPane() {
 
 function TestRightPaneLayoutContent() {
   return (
-    <RightPaneProvider>
-      <RightPaneLayout>
-        <TestPageContent />
-      </RightPaneLayout>
-    </RightPaneProvider>
+    <RightPaneLayout>
+      <TestPageContent />
+    </RightPaneLayout>
   );
 }
