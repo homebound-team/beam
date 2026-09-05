@@ -1,5 +1,5 @@
 export * from "./DocumentScrollRightPaneLayout";
-export * from "./RightPaneContext";
 export * from "./RightPaneLayout";
+export * from "./rightPaneStore";
 export * from "./types";
 export * from "./useRightPane";

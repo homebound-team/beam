@@ -14,8 +14,8 @@ import {
   DocumentScrollRightPaneMainChildren,
   useDocumentScrollRightPaneAnchorRef,
 } from "./documentScrollRightPaneLayoutShared";
-import { useRightPaneOpenContext } from "./RightPaneContext";
 import { defaultDocumentScrollRightPaneWidth } from "./types";
+import { useRightPaneOpenContext } from "./useRightPane";
 
 export type DocumentScrollOverlayRightPaneLayoutProps = {
   children: ReactNode;

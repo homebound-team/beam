@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useEffect } from "react";
 import { BeamColor } from "src/colors";
 import { Css, Tokens } from "src/Css";
-import { useRightPaneContentContext, useRightPaneOpenContext } from "./RightPaneContext";
+import { useRightPaneContentContext, useRightPaneOpenContext } from "./useRightPane";
 
 export function RightPaneLayout(props: {
   children: ReactElement;

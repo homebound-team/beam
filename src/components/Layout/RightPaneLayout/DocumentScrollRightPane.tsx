@@ -12,8 +12,8 @@ import {
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { ResolvedDocumentScrollRightPaneBehavior } from "./documentScrollRightPaneMode";
-import { useRightPaneContentContext, useRightPaneOpenContext } from "./RightPaneContext";
 import { useDocumentScrollRightPaneViewportGeometry } from "./useDocumentScrollRightPaneViewportGeometry";
+import { useRightPaneContentContext, useRightPaneOpenContext } from "./useRightPane";
 
 export type DocumentScrollRightPaneProps = {
   paneWidth: number;

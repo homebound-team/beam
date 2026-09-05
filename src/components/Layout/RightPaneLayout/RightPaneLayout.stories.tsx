@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react-vite";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ChildrenOnly } from "src/types";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { Css } from "../../../Css";
@@ -11,7 +11,7 @@ import { PreventBrowserScroll } from "../PreventBrowserScroll";
 import { ScrollableContent } from "../ScrollableContent";
 import { ScrollableParent } from "../ScrollableParent";
 import { RightPaneLayout } from "./RightPaneLayout";
-import { useRightPaneActions } from "./useRightPane";
+import { useRightPane, useRightPaneActions } from "./useRightPane";
 
 export default {
   component: RightPaneLayout,
@@ -59,6 +59,23 @@ export function RightPaneWithDefaultPaneContent() {
     <TestProjectLayout>
       <DashboardExample />
     </TestProjectLayout>
+  );
+}
+
+/**
+ * Toggle the pane and watch the console: `useRightPane()` re-renders even when the component
+ * only uses `openRightPane`; `useRightPaneActions()` does not.
+ */
+export function HookRenderCountDemo() {
+  return (
+    <div css={Css.df.fdc.gap2.p3.$}>
+      <HookRenderCountDemoControls />
+      <div css={Css.df.fdc.gap1.$}>
+        <HookRenderCountDemoSubscriber label="useRightPane()" hook="open" />
+        <HookRenderCountDemoSubscriber label="useRightPaneActions()" hook="actions" />
+      </div>
+      <p css={Css.sm.$}>Open the browser console, then open/close the pane.</p>
+    </div>
   );
 }
 
@@ -178,6 +195,68 @@ function TestDetailPane({ value }: { value: number }) {
           </nav>
         </ScrollableContent>
       </ScrollableParent>
+    </div>
+  );
+}
+
+function HookRenderCountDemoControls() {
+  const { openRightPane, closeRightPane, isRightPaneOpen } = useRightPane();
+
+  return (
+    <div css={Css.df.aic.gap2.$}>
+      <Button label="Open pane" onClick={() => openRightPane({ content: <div css={Css.p2.$}>Demo pane body</div> })} />
+      <Button label="Close pane" onClick={() => closeRightPane()} />
+      <span css={Css.sm.$}>Pane open: {String(isRightPaneOpen)}</span>
+    </div>
+  );
+}
+
+type HookRenderCountDemoSubscriberProps = {
+  label: string;
+  hook: "open" | "actions";
+};
+
+function HookRenderCountDemoSubscriber({ label, hook }: HookRenderCountDemoSubscriberProps) {
+  if (hook === "open") {
+    return <HookRenderCountOpenHookSubscriber label={label} />;
+  }
+  return <HookRenderCountActionsHookSubscriber label={label} />;
+}
+
+/** Only `openRightPane` is used, but the hook still subscribes to open state. */
+function HookRenderCountOpenHookSubscriber({ label }: { label: string }) {
+  const { openRightPane } = useRightPane();
+  const renderCount = useRef(0);
+
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log(`${label} render ${renderCount.current}`);
+  });
+
+  return (
+    <div css={Css.p2.ba.bcGray200.br4.$}>
+      <div css={Css.smSb.$}>{label}</div>
+      <div css={Css.sm.$}>Uses only `openRightPane` (fn ref: {String(!!openRightPane)})</div>
+      <div css={Css.sm.$}>Console render count: {renderCount.current}</div>
+    </div>
+  );
+}
+
+/** Same surface API for open, but no subscription to open state. */
+function HookRenderCountActionsHookSubscriber({ label }: { label: string }) {
+  const { openRightPane } = useRightPaneActions();
+  const renderCount = useRef(0);
+
+  useEffect(() => {
+    renderCount.current += 1;
+    console.log(`${label} render ${renderCount.current}`);
+  });
+
+  return (
+    <div css={Css.p2.ba.bcGray200.br4.$}>
+      <div css={Css.smSb.$}>{label}</div>
+      <div css={Css.sm.$}>Uses only `openRightPane` (fn ref: {String(!!openRightPane)})</div>
+      <div css={Css.sm.$}>Console render count: {renderCount.current}</div>
     </div>
   );
 }

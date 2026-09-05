@@ -1,7 +1,7 @@
 import { createContext, CSSProperties, memo, ReactNode, useCallback, useRef } from "react";
 import { Css } from "src/Css";
 import { beamRightPaneWidthVar } from "src/layouts/layoutVars";
-import { useRightPaneOpenActions } from "./RightPaneContext";
+import { useRightPaneOpenActions } from "./useRightPane";
 
 /** True when a document-scroll right-pane layout is already mounted above. */
 export const NestedRightPaneLayoutContext = createContext(false);
