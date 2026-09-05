@@ -9,7 +9,6 @@ import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import { CanCloseCheck, CheckFn } from "src/types";
 import { EmptyRef } from "src/utils/index";
-import { RightPaneProvider } from "./Layout";
 import { ToastProvider } from "./Toast/ToastContext";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
@@ -95,20 +94,18 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
 
   const beamTree = (
     <PresentationProvider {...presentationProps}>
-      <RightPaneProvider>
-        <AutoSaveStatusProvider>
-          <SnackbarProvider>
-            {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <ToastProvider>
-              <OverlayProvider>
-                {children}
-                {modalRef.current && <Modal {...modalRef.current} />}
-              </OverlayProvider>
-              <SuperDrawer />
-            </ToastProvider>
-          </SnackbarProvider>
-        </AutoSaveStatusProvider>
-      </RightPaneProvider>
+      <AutoSaveStatusProvider>
+        <SnackbarProvider>
+          {/* OverlayProvider is required for Modals generated via React-Aria */}
+          <ToastProvider>
+            <OverlayProvider>
+              {children}
+              {modalRef.current && <Modal {...modalRef.current} />}
+            </OverlayProvider>
+            <SuperDrawer />
+          </ToastProvider>
+        </SnackbarProvider>
+      </AutoSaveStatusProvider>
     </PresentationProvider>
   );
 
