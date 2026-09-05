@@ -6,15 +6,15 @@ import { EnvironmentBannerLayoutHeightProvider } from "src/layouts/EnvironmentBa
 import {
   beamFloatingRightOffsetVar,
   beamRightPaneWidthVar,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
 import { click, clickAndWait, render } from "src/utils/rtl";
 import { vi } from "vitest";
-import { DocumentScrollRightPaneLayout } from "./DocumentScrollRightPaneLayout";
+import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
 import { useRightPaneActions } from "./useRightPane";
 
-describe("DocumentScrollRightPaneLayout", () => {
+describe("DocumentScrollOverlayRightPaneLayout", () => {
   beforeEach(() => {
     document.documentElement.style.setProperty(beamFloatingRightOffsetVar, "0px");
   });
@@ -25,20 +25,20 @@ describe("DocumentScrollRightPaneLayout", () => {
 
   it("publishes scoped pane width and a root floating right offset when open", async () => {
     // Given a document-scroll right pane layout on desktop
-    const expectedWidth = documentScrollRightPaneWidth(320);
+    const expectedWidth = documentScrollRightPaneWidthCss(320);
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout paneWidth={320}>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
           <div>Main content</div>
-        </DocumentScrollRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
 
     // Then overlay layout is ready while closed; spacer has zero width until open
-    expect(r.rightPaneMain_overlay).toBeInTheDocument();
-    expect(r.rightPaneSpacer).toBeInTheDocument();
-    expect(r.rightPaneSpacer).toHaveStyle({ width: "0px" });
+    expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
     expect(r.query.rightPaneContent).toBeNull();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
@@ -48,8 +48,7 @@ describe("DocumentScrollRightPaneLayout", () => {
 
     // Then the fixed overlay pane renders; scoped width and root floating offset match it
     expect(r.rightPaneContent).toBeInTheDocument();
-    expect(r.rightPaneMain_overlay).toBeInTheDocument();
-    expect(r.rightPaneSpacer).toHaveStyle({ width: expectedWidth });
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: expectedWidth });
     expect(r.rightPaneContent.style.marginLeft).toBe("");
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
@@ -62,10 +61,9 @@ describe("DocumentScrollRightPaneLayout", () => {
       expect(r.query.rightPaneContent).toBeNull();
     });
     await waitFor(() => {
-      expect(r.rightPaneSpacer).toHaveStyle({ width: "0px" });
+      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
     });
-    expect(r.rightPaneMain_overlay).toBeInTheDocument();
-    expect(r.rightPaneSpacer).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
   });
@@ -76,9 +74,9 @@ describe("DocumentScrollRightPaneLayout", () => {
     const r = await render(
       <EnvironmentBannerLayoutHeightProvider value={environmentBannerSizePx}>
         <DocumentScrollLayoutProvider>
-          <DocumentScrollRightPaneLayout paneWidth={320}>
+          <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
             <div>Main content</div>
-          </DocumentScrollRightPaneLayout>
+          </DocumentScrollOverlayRightPaneLayout>
           <OpenCloseButtons />
         </DocumentScrollLayoutProvider>
       </EnvironmentBannerLayoutHeightProvider>,
@@ -90,7 +88,7 @@ describe("DocumentScrollRightPaneLayout", () => {
     // Then the overlay renders pinned below the banner; no split column / width vars
     expect(r.rightPaneContent).toBeInTheDocument();
     expect(r.rightPaneContent).toHaveStyle({ top: `${environmentBannerSizePx}px` });
-    expect(r.query.rightPaneMain_overlay).toBeNull();
+    expect(r.query.documentScrollRightPaneLayout_spacer).toBeNull();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
   });
@@ -99,9 +97,9 @@ describe("DocumentScrollRightPaneLayout", () => {
     // Given an open document-scroll right pane layout
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
-        </DocumentScrollRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
@@ -118,9 +116,9 @@ describe("DocumentScrollRightPaneLayout", () => {
     // Then remounting a closed layout does not show stale pane content
     r.rerender(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
-        </DocumentScrollRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
@@ -132,11 +130,11 @@ describe("DocumentScrollRightPaneLayout", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout paneWidth={320}>
-          <DocumentScrollRightPaneLayout paneWidth={200}>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+          <DocumentScrollOverlayRightPaneLayout paneWidth={200}>
             <div>Main content</div>
-          </DocumentScrollRightPaneLayout>
-        </DocumentScrollRightPaneLayout>
+          </DocumentScrollOverlayRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
@@ -152,9 +150,9 @@ describe("DocumentScrollRightPaneLayout", () => {
 
     // Then a single overlay pane uses the outer width
     expect(r.queryAllByTestId("rightPaneContent")).toHaveLength(1);
-    expect(r.rightPaneMain_overlay).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
-      documentScrollRightPaneWidth(320),
+      documentScrollRightPaneWidthCss(320),
     );
   });
 });

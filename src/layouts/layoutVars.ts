@@ -27,7 +27,7 @@ export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
 /**
  * Open document-scroll right pane width; `0px` when closed. Published on
- * `DocumentScrollRightPaneLayout` so sticky right columns (descendants) inherit it.
+ * `DocumentScrollOverlayRightPaneLayout` so sticky right columns (descendants) inherit it.
  * Not subtracted from `documentScrollChromeWidth` — the pane pins below page header /
  * table actions.
  */
@@ -82,7 +82,7 @@ export function documentScrollBodyMinHeight(): string {
  * `width` for the document-scroll right pane: the configured max px, capped by available chrome
  * width so the pane fits the viewport on mobile (side nav collapses to `0px` there).
  */
-export function documentScrollRightPaneWidth(maxPx: number): string {
+export function documentScrollRightPaneWidthCss(maxPx: number): string {
   return `min(${maxPx}px, ${documentScrollChromeWidth()})`;
 }
 

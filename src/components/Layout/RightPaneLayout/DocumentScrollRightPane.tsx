@@ -6,14 +6,17 @@ import { Css, Tokens } from "src/Css";
 import { useEnvironmentBannerLayoutHeight } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import {
   documentScrollRightPaneHeight,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
   stickyTableHeaderOffset,
+  stickyTableHeaderOffsetPx,
 } from "src/layouts/layoutVars";
+import { useScrollPinnedViewportBounds } from "src/layouts/useScrollPinnedViewportBounds";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import type { ResolvedDocumentScrollRightPaneBehavior } from "./documentScrollRightPaneMode";
-import { useRightPaneContentContext, useRightPaneOpenContext } from "./RightPaneContext";
-import { useDocumentScrollRightPaneViewportGeometry } from "./useDocumentScrollRightPaneViewportGeometry";
+import { rightPaneContentDataAttribute } from "./types";
+import { useRightPaneContent, useRightPaneOpenState } from "./useRightPane";
+import { waitForRightPaneExit } from "./waitForRightPaneExit";
 
 export type DocumentScrollRightPaneProps = {
   paneWidth: number;
@@ -27,8 +30,8 @@ export type DocumentScrollRightPaneProps = {
 
 /** Detail pane UI: mobile takeover, desktop fixed overlay, or desktop sticky in-flow (push/clear). */
 export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef }: DocumentScrollRightPaneProps) {
-  const { isRightPaneOpen, clearPane } = useRightPaneOpenContext();
-  const rightPaneContent = useRightPaneContentContext();
+  const { isRightPaneOpen, clearPane } = useRightPaneOpenState();
+  const rightPaneContent = useRightPaneContent();
   const tid = useTestIds({}, "rightPaneContent");
   const paneRef = useRef<HTMLDivElement>(null);
   const [keepPaneLayout, setKeepPaneLayout] = useState(false);
@@ -57,36 +60,27 @@ export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef
   // Fallback when exit animations do not run (e.g. jsdom); `onAnimationComplete` handles the normal path.
   useLayoutEffect(() => {
     if (isRightPaneOpen || !keepPaneLayout) return;
-
-    let frame = 0;
-    const waitForPaneExit = () => {
-      if (document.querySelector("[data-right-pane-content]")) {
-        frame = requestAnimationFrame(waitForPaneExit);
-        return;
-      }
-      releaseAfterExit();
-    };
-    frame = requestAnimationFrame(waitForPaneExit);
-    return () => cancelAnimationFrame(frame);
+    return waitForRightPaneExit(releaseAfterExit);
   }, [isRightPaneOpen, keepPaneLayout, releaseAfterExit]);
 
   usePreventScroll({ isDisabled: !mobile || !isRightPaneOpen });
 
   const slideX = mobile ? "100%" : paneWidth;
-  const effectivePaneWidth = documentScrollRightPaneWidth(paneWidth);
+  const paneWidthCss = documentScrollRightPaneWidthCss(paneWidth);
 
   const anchor = anchorRef ?? { current: null };
-  const paneGeometry = useDocumentScrollRightPaneViewportGeometry(
+  const paneBounds = useScrollPinnedViewportBounds(
     isFixedOverlay ? anchor : paneRef,
     paneLayoutActive && (isFixedOverlay || isInFlowDesktop),
+    stickyTableHeaderOffsetPx,
   );
 
   const paneStyle: CSSProperties | undefined = mobile
     ? { top: bannerHeightPx }
-    : isFixedOverlay && paneGeometry
-      ? { top: paneGeometry.topPx, height: paneGeometry.heightPx, maxHeight: paneGeometry.heightPx }
-      : paneGeometry
-        ? { height: paneGeometry.heightPx, maxHeight: paneGeometry.heightPx }
+    : isFixedOverlay && paneBounds
+      ? { top: paneBounds.topPx, height: paneBounds.heightPx, maxHeight: paneBounds.heightPx }
+      : paneBounds
+        ? { height: paneBounds.heightPx, maxHeight: paneBounds.heightPx }
         : undefined;
 
   const pane = (
@@ -95,27 +89,27 @@ export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef
         <motion.div
           ref={paneRef}
           key="documentScrollRightPane"
-          data-right-pane-content
+          {...{ [rightPaneContentDataAttribute]: true }}
           {...tid}
           css={
             mobile
               ? Css.fixed.right0.bottom0.left0.oya.bgColor(Tokens.Surface).z(zIndices.rightPaneMobile).$
               : isFixedOverlay
                 ? Css.fixed.right0.oya
-                    .w(effectivePaneWidth)
+                    .w(paneWidthCss)
                     .bgColor(Tokens.Surface)
                     .z(zIndices.rightPane)
                     .bl.bc(Tokens.SurfaceSeparator).$
                 : Css.sticky.transitionTop
                     .top(stickyTableHeaderOffset())
                     .right(0)
-                    .asfs.fs0.fg0.oya.w(effectivePaneWidth)
+                    .asfs.fs0.fg0.oya.w(paneWidthCss)
                     .bgColor(Tokens.Surface)
                     .z(zIndices.rightPane)
                     .bl.bc(Tokens.SurfaceSeparator)
                     .maxh(documentScrollRightPaneHeight())
                     .if(behavior === "clear")
-                    .ml(`calc(-1 * ${effectivePaneWidth})`).$
+                    .ml(`calc(-1 * ${paneWidthCss})`).$
           }
           style={paneStyle}
           initial={{ x: slideX }}

@@ -78,7 +78,7 @@ export function WithAiLoadingPanel() {
   );
 }
 
-/** A table step: {@link ContentHeader} above `GridTableLayout`. */
+/** A table step: {@link ContentHeader} above `GridTableLayout`; row click opens a document-scroll right pane. */
 export function WithContentHeaderAndTable() {
   return (
     <WithEnvironmentBanner>
@@ -98,7 +98,7 @@ export function WithContentHeaderAndTable() {
                   actions={[{ label: "Add", onClick: action("add clicked") }]}
                   xss={pageContentPaddingX}
                 />
-                <GridTableLayoutExample storageKey="stepper-layout-grid-table" />
+                <GridTableLayoutExample storageKey="stepper-layout-grid-table" withRightPane />
               </div>
             ),
           },

@@ -17,8 +17,11 @@ export type DocumentScrollInlineRightPaneMode = "auto" | "push";
 /** Default document-scroll detail pane width (px). */
 export const defaultDocumentScrollRightPaneWidth = 450;
 
+/** DOM marker on open pane content; polled by {@link waitForRightPaneExit} after close. */
+export const rightPaneContentDataAttribute = "data-right-pane-content";
+
 /**
- * Opt into `DocumentScrollRightPaneLayout`.
+ * Opt into `DocumentScrollOverlayRightPaneLayout`.
  * `true` / a px width use the caller's default mode; an object sets width and/or mode.
  */
 export type WithRightPane =

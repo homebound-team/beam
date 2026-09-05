@@ -1,21 +1,22 @@
-import { forwardRef, type ReactNode, type RefObject, useLayoutEffect, useRef, useState } from "react";
+import { type ReactNode, type RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import {
   beamFloatingRightOffsetVar,
   beamRightPaneWidthVar,
   documentScrollChromeWidth,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
 import { DocumentScrollRightPane } from "./DocumentScrollRightPane";
 import {
   DocumentScrollRightPaneLayoutRoot,
-  DocumentScrollRightPaneMainChildren,
+  NestedRightPaneLayoutContext,
   useDocumentScrollRightPaneAnchorRef,
 } from "./documentScrollRightPaneLayoutShared";
-import { useRightPaneOpenContext } from "./RightPaneContext";
 import { defaultDocumentScrollRightPaneWidth } from "./types";
+import { useRightPaneOpenState } from "./useRightPane";
+import { waitForRightPaneExit } from "./waitForRightPaneExit";
 
 export type DocumentScrollOverlayRightPaneLayoutProps = {
   children: ReactNode;
@@ -28,74 +29,72 @@ export function DocumentScrollOverlayRightPaneLayout({
   children,
   paneWidth = defaultDocumentScrollRightPaneWidth,
 }: DocumentScrollOverlayRightPaneLayoutProps) {
+  const nestedInLayout = useContext(NestedRightPaneLayoutContext);
+  const nestedWarnedRef = useRef(false);
   const { sm } = useBreakpoint();
   const tid = useTestIds({}, "documentScrollRightPaneLayout");
-  const mainTid = useTestIds({}, "rightPaneMain");
-  const spacerTid = useTestIds({}, "rightPaneSpacer");
   const anchorRef = useDocumentScrollRightPaneAnchorRef();
   const spacerRef = useRef<HTMLDivElement | null>(null);
+
+  if (nestedInLayout && process.env.NODE_ENV !== "production" && !nestedWarnedRef.current) {
+    nestedWarnedRef.current = true;
+    console.warn(
+      "DocumentScrollOverlayRightPaneLayout is nested inside another document-scroll right-pane layout. Use a single layout (compose at the body; do not set withRightPane on both a parent and a nested layout).",
+    );
+  }
+
+  if (nestedInLayout) return <>{children}</>;
 
   return (
     <DocumentScrollRightPaneLayoutRoot anchorRef={anchorRef} tid={tid}>
       {sm ? (
         <>
-          <DocumentScrollRightPaneMainChildren>{children}</DocumentScrollRightPaneMainChildren>
+          {children}
           <DocumentScrollRightPane paneWidth={paneWidth} mobile={true} />
         </>
       ) : (
         <>
-          <div css={Css.df.aifs.mw100.w("fit-content").$}>
-            <DocumentScrollOverlayRightPaneMain mainPart={mainTid.overlay}>
-              <DocumentScrollRightPaneMainChildren>{children}</DocumentScrollRightPaneMainChildren>
-            </DocumentScrollOverlayRightPaneMain>
-            <DocumentScrollOverlayRightPaneSpacer ref={spacerRef} {...spacerTid} />
+          <div css={Css.df.aifs.mw100.wfc.$}>
+            <div css={Css.fs0.mwfc.w(`min(100%, ${documentScrollChromeWidth()})`).$}>{children}</div>
+            <div ref={spacerRef} aria-hidden css={Css.fs0.fg0.h1.$} style={{ width: 0 }} {...tid.spacer} />
           </div>
-          <DocumentScrollOverlayRightPaneOpen anchorRef={anchorRef.ref} spacerRef={spacerRef} paneWidth={paneWidth} />
+          <DocumentScrollOverlayRightPaneHost anchorRef={anchorRef.ref} spacerRef={spacerRef} paneWidth={paneWidth} />
         </>
       )}
     </DocumentScrollRightPaneLayoutRoot>
   );
 }
 
-/** Publishes pane width CSS vars and mounts the fixed overlay — isolated from the main subtree. */
-function DocumentScrollOverlayRightPaneOpen({
-  anchorRef,
-  spacerRef,
-  paneWidth,
-}: {
+type DocumentScrollOverlayRightPaneHostProps = {
   anchorRef: RefObject<HTMLDivElement | null>;
   spacerRef: RefObject<HTMLDivElement | null>;
   paneWidth: number;
-}) {
-  const { isRightPaneOpen } = useRightPaneOpenContext();
-  const effectivePaneWidth = documentScrollRightPaneWidth(paneWidth);
+};
+/** Subscribes to pane open/close here so the layout shell and `{children}` stay stable; syncs width vars/spacer and mounts the overlay pane. */
+function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPaneHostProps) {
+  const { anchorRef, spacerRef, paneWidth } = props;
+  const { isRightPaneOpen } = useRightPaneOpenState();
+  const paneWidthCss = documentScrollRightPaneWidthCss(paneWidth);
   const [reserveOverlayChrome, setReserveOverlayChrome] = useState(isRightPaneOpen);
 
+  // Keep spacer / width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
   useLayoutEffect(() => {
     if (isRightPaneOpen) {
       setReserveOverlayChrome(true);
       return;
     }
-
-    let frame = 0;
-    const waitForPaneExit = () => {
-      if (document.querySelector("[data-right-pane-content]")) {
-        frame = requestAnimationFrame(waitForPaneExit);
-        return;
-      }
-      setReserveOverlayChrome(false);
-    };
-    frame = requestAnimationFrame(waitForPaneExit);
-    return () => cancelAnimationFrame(frame);
+    return waitForRightPaneExit(() => setReserveOverlayChrome(false));
   }, [isRightPaneOpen]);
 
+  // Imperatively sync scoped pane width, root floating offset, and spacer width while overlay chrome is reserved.
   useLayoutEffect(() => {
     const layoutRoot = anchorRef.current;
     const spacer = spacerRef.current;
     if (!layoutRoot) return;
 
-    const width = reserveOverlayChrome ? effectivePaneWidth : "0px";
+    const width = reserveOverlayChrome ? paneWidthCss : "0px";
     layoutRoot.style.setProperty(beamRightPaneWidthVar, width);
+    // Floating right offset helps position elements such as the "scroll to top" button properly when the pane is open.
     document.documentElement.style.setProperty(beamFloatingRightOffsetVar, width);
     if (spacer) {
       spacer.style.width = width;
@@ -108,27 +107,7 @@ function DocumentScrollOverlayRightPaneOpen({
         spacer.style.width = "0px";
       }
     };
-  }, [anchorRef, effectivePaneWidth, reserveOverlayChrome, spacerRef]);
+  }, [anchorRef, paneWidthCss, reserveOverlayChrome, spacerRef]);
 
   return <DocumentScrollRightPane paneWidth={paneWidth} mobile={false} behavior="overlay" anchorRef={anchorRef} />;
 }
-
-/** Overlay main column — full chrome width; spacer adds horizontal scroll when open. */
-function DocumentScrollOverlayRightPaneMain({ mainPart, children }: { mainPart: object; children: ReactNode }) {
-  return (
-    <div
-      css={Css.fs0.mw("fit-content").w(`min(100%, ${documentScrollChromeWidth()})`).$}
-      data-right-pane-main
-      {...mainPart}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** Zero-width slot; width toggled imperatively when the overlay pane opens. */
-const DocumentScrollOverlayRightPaneSpacer = forwardRef<HTMLDivElement, Record<string, unknown>>(
-  function DocumentScrollOverlayRightPaneSpacer(tid, ref) {
-    return <div ref={ref} aria-hidden css={Css.fs0.fg0.h1.$} style={{ width: 0 }} {...tid} />;
-  },
-);
