@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import { isValidElement, ReactNode } from "react";
 import { maybeApply } from "src/components/Table/GridTableApi";
 import type { GridStyle } from "src/components/Table/TableStyles";
@@ -24,7 +25,7 @@ type CompanionRowProps = {
 };
 
 /** Full-width row rendered beside a data row when `GridDataRow.companion` is set. */
-export function CompanionRow(props: CompanionRowProps) {
+function CompanionRowImpl(props: CompanionRowProps) {
   const {
     as,
     columnSizes,
@@ -93,6 +94,8 @@ export function CompanionRow(props: CompanionRowProps) {
   );
 }
 
+export const CompanionRow = observer(CompanionRowImpl);
+
 export type CompanionPosition = "leading" | "trailing";
 
 export type CompanionContent = MaybeFn<ReactNode>;
@@ -119,10 +122,14 @@ export function isCompanionConfig(companion: GridRowCompanion): companion is Com
 type ResolvedCompanion = { position: CompanionPosition; content: CompanionContent };
 
 /** Resolves companion placement and content; `undefined` when there is no companion. */
-export function resolveCompanion(companion: GridRowCompanion | null | undefined): ResolvedCompanion | undefined {
+export function resolveCompanion(
+  companion: MaybeFn<GridRowCompanion | null | undefined> | null | undefined,
+): ResolvedCompanion | undefined {
   if (companion == null) return undefined;
-  if (isCompanionConfig(companion)) {
-    return { position: companion.position ?? "trailing", content: companion.content };
+  const value = maybeApply(companion);
+  if (value == null) return undefined;
+  if (isCompanionConfig(value)) {
+    return { position: value.position ?? "trailing", content: value.content };
   }
-  return { position: "trailing", content: companion };
+  return { position: "trailing", content: value };
 }

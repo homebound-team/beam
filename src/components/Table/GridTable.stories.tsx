@@ -1526,6 +1526,46 @@ export function ActiveRow() {
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
 }
 
+/** Companions that add/remove/update via MobX without rebuilding `rows`. */
+export function CompanionRowsReactive() {
+  const pending = useMemo(() => observable({ show: true, message: "Review matches." }), []);
+  const rows = useMemo<GridDataRow<Row>[]>(
+    () => [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "Suggested option", value: 1 },
+        companion: () =>
+          pending.show
+            ? {
+                content: () => (
+                  <CompanionBanner
+                    tone="warning"
+                    message={pending.message}
+                    actions={<Button label="Dismiss" variant="text" onClick={() => (pending.show = false)} />}
+                  />
+                ),
+              }
+            : undefined,
+      },
+      { kind: "data", id: "2", data: { name: "Normal", value: 2 } },
+    ],
+    [pending],
+  );
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <div css={Css.df.gap1.$}>
+        <Button label="Show companion" onClick={() => (pending.show = true)} />
+        <Button label="Change message" onClick={() => (pending.message = "Updated note.")} />
+      </div>
+      <GridTable columns={[nameColumn, valueColumn]} rows={rows} />
+    </div>
+  );
+}
+
 /** Mixed `aiMode` rows; Accept flips MobX so the functions re-evaluate without rebuilding `rows`. */
 export function AiModeRows() {
   const pending = useMemo(() => observable({ first: true, third: true }), []);

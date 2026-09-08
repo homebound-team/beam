@@ -1467,6 +1467,74 @@ describe("GridTable", () => {
       expect(row(r, 3).closest("tbody")).not.toBe(r.companion_1.closest("tbody"));
       expect(row(r, 1).closest("table")!.querySelectorAll("tbody")).toHaveLength(2);
     });
+
+    it("removes a companion when rerendered with the same data and companion undefined", async () => {
+      // Given a stable data object on a row with a trailing companion
+      const data = { name: "foo", value: 1 };
+      function Harness({ companion }: { companion?: GridDataRow<Row>["companion"] }) {
+        return (
+          <GridTable<Row>
+            columns={[nameColumn, valueColumn]}
+            rows={[
+              simpleHeader,
+              { kind: "data", id: "1", data, companion },
+              { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+            ]}
+          />
+        );
+      }
+      const r = await render(<Harness companion={() => <span>Note</span>} />);
+      expect(r.companion_1).toBeInTheDocument();
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: "none" });
+      // When the same data is passed with no companion
+      await r.rerender(<Harness />);
+      // Then the companion is gone and the parent separator is restored
+      expect(r.query.companion_1).toBeNull();
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: insetSeparator });
+    });
+
+    it("reevaluates a function companion when its observables change", async () => {
+      // Given a companion that reads a MobX box
+      const pending = observable.box(true);
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        {
+          kind: "data",
+          id: "1",
+          data: { name: "foo", value: 1 },
+          companion: () => (pending.get() ? <span>Note</span> : undefined),
+        },
+        { kind: "data", id: "2", data: { name: "bar", value: 2 } },
+      ];
+      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={rows} />);
+      expect(r.companion_1).toBeInTheDocument();
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: "none" });
+      // When the observable flips without rebuilding rows
+      act(() => pending.set(false));
+      // Then the companion is gone and the parent separator is restored
+      expect(r.query.companion_1).toBeNull();
+      expect(cell(r, 1, 0)).toHaveStyle({ boxShadow: insetSeparator });
+    });
+
+    it("updates function companion content when its observables change", async () => {
+      // Given companion content that reads a MobX box
+      const message = observable.box("Hello");
+      const rows: GridDataRow<Row>[] = [
+        simpleHeader,
+        {
+          kind: "data",
+          id: "1",
+          data: { name: "foo", value: 1 },
+          companion: { content: () => <span>{message.get()}</span> },
+        },
+      ];
+      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={rows} />);
+      expect(r.companion_1).toHaveTextContent("Hello");
+      // When the observable flips without rebuilding rows
+      act(() => message.set("Goodbye"));
+      // Then the companion text updates
+      expect(r.companion_1).toHaveTextContent("Goodbye");
+    });
   });
 
   describe("column sizes", () => {

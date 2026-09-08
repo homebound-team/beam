@@ -47,7 +47,7 @@ import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext
 import { stickyTableHeaderOffset } from "src/layouts/layoutVars";
 import { isPromise, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
-import { CompanionRow, resolveCompanion } from "./components/CompanionRow";
+import { CompanionRow } from "./components/CompanionRow";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
 import { RowGroup } from "./components/RowGroup";
@@ -563,7 +563,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
     const makeCompanionRow = (
       rs: RowState<R>,
-      resolved: NonNullable<ReturnType<typeof resolveCompanion>>,
+      resolved: NonNullable<RowState<R>["companion"]>,
       isFirstBodyRow: boolean,
       isLastBodyRow: boolean,
     ): ReactElement => {
@@ -593,7 +593,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       isLastBodyRow: boolean,
       inHead: boolean,
     ): ReactElement => {
-      const resolved = resolveCompanion(rs.row.companion);
+      const resolved = rs.companion;
       const position = resolved?.position;
       const row = makeRow(
         rs,
