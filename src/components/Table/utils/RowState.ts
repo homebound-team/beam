@@ -1,5 +1,6 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
 import { Kinded } from "src";
+import { resolveCompanion, type GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridRowApi, maybeApply } from "src/components/Table/GridTableApi";
 import type { MaybeFn } from "src/components/Table/types";
@@ -37,6 +38,7 @@ export class RowState<R extends Kinded> {
    */
   pinned = false;
   private _aiMode: MaybeFn<boolean> | undefined;
+  private _companion: MaybeFn<GridRowCompanion | null | undefined> | undefined;
   /** Whether we are dragged over. */
   isDraggedOver: DraggedOver = DraggedOver.None;
   /**
@@ -76,6 +78,7 @@ export class RowState<R extends Kinded> {
         _row: false,
         _data: observable.ref,
         _aiMode: observable.ref,
+        _companion: observable.ref,
         isCalculatingDirectMatch: false,
       } as any,
       { name: `RowState@${row.id}` },
@@ -108,11 +111,17 @@ export class RowState<R extends Kinded> {
     this._data = row.data;
     // Same boolean/fn identity across new row literals must not notify every row.
     if (this._aiMode !== row.aiMode) this._aiMode = row.aiMode;
+    if (this._companion !== row.companion) this._companion = row.companion;
   }
 
   /** True when `row.aiMode` is true or its function returns true. */
   get aiMode(): boolean {
     return !!maybeApply(this._aiMode);
+  }
+
+  /** Resolved companion for this row; `undefined` when hidden or unset. */
+  get companion() {
+    return resolveCompanion(this._companion);
   }
 
   /**

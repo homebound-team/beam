@@ -582,10 +582,9 @@ export type GridDataRow<R extends Kinded> = {
   /** Paints the row with `Tokens.AiFieldBg`. Use `() => boolean` to read MobX without rebuilding `rows`. */
   aiMode?: MaybeFn<boolean>;
   /**
-   * Full-width content rendered with this row (no separator between them).
-   * Plain content / render fn defaults to `"trailing"`; use `{ position, content }` for `"leading"`.
+   * Full-width content with this row. Use `() => …` to read MobX without rebuilding `rows`; return `undefined` to hide.
    */
-  companion?: GridRowCompanion;
+  companion?: MaybeFn<GridRowCompanion | null | undefined>;
 } & IfAny<R, AnyObject, DiscriminateUnion<R, "kind", R["kind"]>>;
 
 // Used by TextFieldBase to set a border when the row is being hovered over
