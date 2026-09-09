@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { BeamColor } from "src/colors";
 import { Button } from "src/components/Button";
+import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
 import { IconKey } from "src/components/Icon";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { Tag, TagProps, TagType } from "src/components/Tag";
@@ -9,12 +10,17 @@ import { useTestIds } from "src/utils";
 
 export type InlineFeedbackBannerType = "error" | "warning";
 
+/** A banner action: a text `Button`, or a `menu` that opens a `ButtonMenu` from a text trigger. */
+export type InlineFeedbackBannerAction =
+  | ActionButtonProps
+  | ({ kind: "menu"; label: string } & Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">);
+
 export type InlineFeedbackBannerProps = {
   type: InlineFeedbackBannerType;
   tagText?: TagProps<any>["text"];
   description: ReactNode;
-  /** Rendered in order, always as text buttons. */
-  actions?: ActionButtonProps[];
+  /** Rendered in order, always as text buttons (menu triggers included). */
+  actions?: InlineFeedbackBannerAction[];
 };
 
 /**
@@ -42,9 +48,19 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
       </span>
       {actions.length > 0 && (
         <div css={Css.df.aic.gap(1.5).fs0.$}>
-          {actions.map((action) => (
-            <Button key={`${action.label}`} {...action} variant="text" />
-          ))}
+          {actions.map((action) =>
+            "kind" in action ? (
+              <ButtonMenu
+                key={action.label}
+                trigger={{ label: action.label, variant: "text" }}
+                items={action.items}
+                disabled={action.disabled}
+                tooltip={action.tooltip}
+              />
+            ) : (
+              <Button key={`${action.label}`} {...action} variant="text" />
+            ),
+          )}
         </div>
       )}
     </div>
