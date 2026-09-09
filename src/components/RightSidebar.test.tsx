@@ -1,6 +1,6 @@
 import { waitFor } from "@homebound/rtl-utils";
 import { click, render } from "src/utils/rtl";
-import { RightSidebar, SidebarContentProps } from "./RightSidebar";
+import { RightSidebar, type SidebarContentProps } from "./RightSidebar";
 
 describe("RightSidebar", () => {
   it("can render and hide content", async () => {

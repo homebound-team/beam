@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { Step, Stepper } from "src/components/Stepper";
+import { type Step, Stepper } from "src/components/Stepper";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 

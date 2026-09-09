@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ContrastScope, Css, IconButton, IconButtonProps, Icons, Palette, Tokens } from "src";
+import type { Meta } from "@storybook/react-vite";
+import { ContrastScope, Css, IconButton, type IconButtonProps, Icons, Palette, Tokens } from "src";
 import { noop } from "src/utils";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";

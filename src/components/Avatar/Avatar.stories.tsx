@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { Avatar, AvatarSize } from "src/components/Avatar/Avatar";
+import type { Meta } from "@storybook/react-vite";
+import { Avatar, type AvatarSize } from "src/components/Avatar/Avatar";
 import { Css } from "src/Css";
 
 export default {

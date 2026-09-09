@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { createContext, type PropsWithChildren, useContext, useMemo } from "react";
 import type { AppEnvironment } from "src/components/EnvironmentBanner/EnvironmentBanner";
 
 export type DocumentTitleConfig = {

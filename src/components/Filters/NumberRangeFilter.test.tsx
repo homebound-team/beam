@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { FilterDefs, Filters } from "src/components/Filters";
-import { ProjectFilter } from "src/components/Filters/testDomain";
+import { type FilterDefs, Filters } from "src/components/Filters";
+import type { ProjectFilter } from "src/components/Filters/testDomain";
 import { render, type } from "src/utils/rtl";
-import { numberRangeFilter, NumberRangeFilterValue } from "./NumberRangeFilter";
+import { numberRangeFilter, type NumberRangeFilterValue } from "./NumberRangeFilter";
 
 describe("NumberRangeFilter", () => {
   it("renders the Number Range Filter in horizontal filters", async () => {

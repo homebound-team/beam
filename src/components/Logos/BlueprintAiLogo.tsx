@@ -1,5 +1,5 @@
 import { useId } from "@react-aria/utils";
-import { LogoSizeProps } from "src/components/Logos/logoTypes";
+import type { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css, Palette } from "src/Css";
 
 /**

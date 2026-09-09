@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { JumpLink, JumpLinkProps } from "src/components/JumpLink";
+import type { Meta } from "@storybook/react-vite";
+import { JumpLink, type JumpLinkProps } from "src/components/JumpLink";
 import { Css } from "src/Css";
 
 export default {

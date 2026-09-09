@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { EnvironmentBanner, ImpersonatedUser } from "src/components/EnvironmentBanner/EnvironmentBanner";
+import type { Meta } from "@storybook/react-vite";
+import { EnvironmentBanner, type ImpersonatedUser } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { newStory, type StoryOptions, viewportModes } from "src/utils/sb";
 
 export default {

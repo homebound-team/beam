@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MultiSelectCardGroup } from "src/inputs/SelectCard/MultiSelectCardGroup";
-import { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
+import type { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

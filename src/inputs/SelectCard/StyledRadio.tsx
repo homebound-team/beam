@@ -1,4 +1,4 @@
-import { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes } from "react";
 import { useHover } from "react-aria";
 import { Css } from "src/Css";
 import { getRadioStateStyles, radioDefault, radioHover, radioReset } from "src/inputs/internal/radioStyles";

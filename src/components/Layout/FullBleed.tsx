@@ -1,5 +1,5 @@
-import { mergeProps, TrussStyleHash } from "@homebound/truss/runtime";
-import { cloneElement, ReactElement } from "react";
+import { mergeProps, type TrussStyleHash } from "@homebound/truss/runtime";
+import { cloneElement, type ReactElement } from "react";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { Css } from "src/Css";
 

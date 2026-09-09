@@ -1,5 +1,5 @@
 import { Button } from "src/components/Button";
-import { IconKey } from "src/components/Icon";
+import type { IconKey } from "src/components/Icon";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";

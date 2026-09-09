@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode, useLayoutEffect } from "react";
+import { type CSSProperties, type ReactNode, useLayoutEffect } from "react";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import {

@@ -1,13 +1,13 @@
-import { ReactNode } from "react";
-import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import type { ReactNode } from "react";
+import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { useTestIds } from "src/utils";
-import { WorkflowActionsProps } from "./WorkflowActions";
+import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
 export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
   Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
-    /** Gates the Create/Save CTA. */
-    isValid: boolean;
+    /** Create/Save is disabled. A ReactNode is shown in Beam's tooltip. */
+    primaryDisabled?: WorkflowActionsProps["primaryDisabled"];
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
     /** Full-bleed AI wash on the body and the `ai` Create/Save variant. Pair with body `aiMode` (e.g. FormSectionLayout). */
@@ -22,8 +22,17 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
  * Contract: `docs/layouts.md`.
  */
 export function FocusedFormLayout(props: FocusedFormLayoutProps) {
-  const { onCancel, completeLabel, onComplete, onSaveAndExit, isValid, isDirty, aiMode, children, ...headerProps } =
-    props;
+  const {
+    onCancel,
+    completeLabel,
+    onComplete,
+    onSaveAndExit,
+    primaryDisabled,
+    isDirty,
+    aiMode,
+    children,
+    ...headerProps
+  } = props;
   const tid = useTestIds(props, "focusedFormLayout");
 
   return (
@@ -36,7 +45,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
-      primaryDisabled={!isValid}
+      primaryDisabled={primaryDisabled}
     >
       {children}
     </WorkflowPageLayout>

@@ -1,13 +1,13 @@
-import { Node } from "@react-types/shared";
+import type { Node } from "@react-types/shared";
 import { useRef } from "react";
 import { useHover, useOption } from "react-aria";
-import { ListState } from "react-stately";
+import type { ListState } from "react-stately";
 import { Icon, maybeTooltip } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
-import { LeveledOption, NestedOption } from "src/inputs/TreeSelectField/utils";
-import { Value, valueToKey } from "src/inputs/Value";
+import type { LeveledOption, NestedOption } from "src/inputs/TreeSelectField/utils";
+import { type Value, valueToKey } from "src/inputs/Value";
 import { useTestIds } from "src/utils";
 
 type TreeOptionProps<O> = {

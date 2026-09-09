@@ -2,20 +2,20 @@ import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import { Tooltip } from "src/components";
 import { BaseCard } from "src/components/BaseCard";
-import { CardTag, ImageFitType } from "src/components/Card";
-import { CardBody, CardData } from "src/components/CardBody";
+import type { CardTag, ImageFitType } from "src/components/Card";
+import { CardBody, type CardData } from "src/components/CardBody";
 import { Carousel } from "src/components/Carousel";
-import { ProposedValueProps } from "src/components/ProposedValue";
+import type { ProposedValueProps } from "src/components/ProposedValue";
 import type {
   CardBadgeTag,
   CardCarouselFooter,
   CardCarouselThumbnail,
   CardInteractiveFooter,
 } from "src/components/Table/cardSlots";
-import { GridTableApi } from "src/components/Table/GridTableApi";
-import { RowStyle } from "src/components/Table/TableStyles";
-import { GridColumnWithId, Kinded } from "src/components/Table/types";
-import { RowState } from "src/components/Table/utils/RowState";
+import type { GridTableApi } from "src/components/Table/GridTableApi";
+import type { RowStyle } from "src/components/Table/TableStyles";
+import type { GridColumnWithId, Kinded } from "src/components/Table/types";
+import type { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { navLink } from "src/css/CssReset";

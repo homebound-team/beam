@@ -1,6 +1,6 @@
-import { ReactNode, useMemo } from "react";
-import { ProposedValue, ProposedValueProps } from "src/components/ProposedValue";
-import { CardBadgeTag } from "src/components/Table/cardSlots";
+import { type ReactNode, useMemo } from "react";
+import { ProposedValue, type ProposedValueProps } from "src/components/ProposedValue";
+import type { CardBadgeTag } from "src/components/Table/cardSlots";
 import { Tag } from "src/components/Tag";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

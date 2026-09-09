@@ -1,13 +1,13 @@
 import { wait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { booleanFilter, FilterDefs, Filters, multiFilter, singleFilter } from "src/components/Filters";
-import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
-import { HasIdAndName } from "src/types";
+import { booleanFilter, type FilterDefs, Filters, multiFilter, singleFilter } from "src/components/Filters";
+import { type ProjectFilter, Stage } from "src/components/Filters/testDomain";
+import type { HasIdAndName } from "src/types";
 import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 import { vi } from "vitest";
-import { MultiFilterProps } from "./MultiFilter";
+import type { MultiFilterProps } from "./MultiFilter";
 
 describe("Filters", () => {
   it("can match GQL types of enum arrays", () => {

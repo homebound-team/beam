@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Avatar } from "src/components/Avatar";
 import { Icon } from "src/components/Icon";

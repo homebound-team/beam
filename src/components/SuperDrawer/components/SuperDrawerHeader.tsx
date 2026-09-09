@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useBeamContext } from "src/components/BeamContext";
 import { ButtonGroup } from "src/components/ButtonGroup";
-import { OpenInDrawerOpts } from "src/components/SuperDrawer/useSuperDrawer";
+import type { OpenInDrawerOpts } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";
 

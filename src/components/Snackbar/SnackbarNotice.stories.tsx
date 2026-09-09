@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { capitalCase } from "change-case";
-import { SnackbarNotice, SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import { SnackbarNotice, type SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
 import { newStory, withBeamDecorator } from "src/utils/sb";
 import { action } from "storybook/actions";

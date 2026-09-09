@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { AiCard, AiPanel } from "src/components/AiPanel";
 import { Css, Tokens } from "src/Css";
 

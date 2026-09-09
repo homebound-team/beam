@@ -1,5 +1,5 @@
-import { BaseHeader, BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import { StepperTabs, StepperTabsProps } from "src/components/StepperTabs";
+import { BaseHeader, type BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import { StepperTabs, type StepperTabsProps } from "src/components/StepperTabs";
 import { useTestIds } from "src/utils";
 
 export type WorkflowHeaderProps = Omit<BaseHeaderProps, "bottomSlot"> & {

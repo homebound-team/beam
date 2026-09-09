@@ -1,7 +1,7 @@
 import { clickAndWait } from "@homebound/rtl-utils";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { useSnackbar } from "src/components/Snackbar/useSnackbar";
 import { Css } from "src/Css";
 import { click, render, wait } from "src/utils/rtl";
@@ -52,6 +52,15 @@ describe("useSnackbar", () => {
     await clickAndWait(r.snackbar_close);
     // Then expect it to have closed
     expect(r.query.snackbar).not.toBeInTheDocument();
+  });
+
+  it("renders notices in a portal at the body", async () => {
+    // Given an app that can trigger snackbar notices
+    const r = await render(<TestComponent />);
+    // When triggering the notice
+    click(r.triggerNotice);
+    // Then the wrapper is a direct child of the body, so app stacking contexts can't trap it
+    expect(r.snackbarWrapper.parentElement).toBe(document.body);
   });
 
   it("can use an offset", async () => {

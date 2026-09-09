@@ -1,6 +1,6 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
+import { NumberField, type NumberFieldProps } from "src/inputs/NumberField";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

@@ -1,17 +1,23 @@
 import { useResizeObserver } from "@react-aria/utils";
-import React, { RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { type RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { getActiveFilterCount } from "src/components/Filters/utils";
-import { HeaderAction } from "src/components/Headers/HeaderActions";
-import { TableView } from "src/components/Table/components/ViewToggleButton";
+import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
-import { GridStyle, GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
-import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only, Tokens } from "src/Css";
-import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
+import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
+import { type GridStyle, type GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
+import type { GridTableXss, Kinded } from "src/components/Table/types";
+import { Css, type Only, Tokens } from "src/Css";
+import {
+  useComputed,
+  useGroupBy,
+  usePersistedFilter,
+  type UsePersistedFilterProps,
+  useSessionStorage,
+} from "src/hooks";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamTableActionsHeightVar,
@@ -21,13 +27,13 @@ import {
 } from "src/layouts/layoutVars";
 import { noop, useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
-import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
+import { type BaseQueryTableProps, type GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import {
   defaultDocumentScrollRightPaneWidth,
   DocumentScrollRightPaneLayout,
 } from "../RightPaneLayout/DocumentScrollRightPaneLayout";
-import { GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
-import { QueryTable, QueryTableProps } from "./QueryTable";
+import { GridTableLayoutActions, type SearchBoxApi } from "./GridTableLayoutActions";
+import { QueryTable, type QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
 
 // GridTableLayout-specific query props extend the shared base with display extras.

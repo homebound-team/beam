@@ -1,4 +1,4 @@
-import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
+import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { useBreakpoint } from "src/hooks";
 import { useTestIds } from "src/utils";
 

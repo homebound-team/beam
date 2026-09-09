@@ -1,8 +1,8 @@
 import { camelCase } from "change-case";
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
-import { AriaMenuOptions, FocusScope, useFilter, useMenu } from "react-aria";
+import { type PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
+import { type AriaMenuOptions, FocusScope, useFilter, useMenu } from "react-aria";
 import { Item, Section, useTreeData, useTreeState } from "react-stately";
-import { MenuItem, MenuSection } from "src/components";
+import type { MenuItem, MenuSection } from "src/components";
 import { MenuSectionImpl } from "src/components/internal/MenuSection";
 import { Css, Tokens } from "src/Css";
 import { MenuSearchField } from "src/inputs/internal/MenuSearchField";

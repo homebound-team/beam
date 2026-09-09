@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { BaseCard } from "src/components/BaseCard";
 import { CardBody } from "src/components/CardBody";
 import { Carousel } from "src/components/Carousel";

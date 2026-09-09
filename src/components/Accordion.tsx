@@ -1,8 +1,8 @@
 import { useId, useResizeObserver } from "@react-aria/utils";
-import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
-import { Css, Only, Padding, Tokens, Xss } from "src/Css";
+import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 type AccordionXss = Xss<Padding>;

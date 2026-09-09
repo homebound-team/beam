@@ -1,9 +1,9 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Value } from "src/inputs";
+import type { Value } from "src/inputs";
 import { MultiSelectCardGroup } from "src/inputs/SelectCard/MultiSelectCardGroup";
-import { MultiSelectCardGroupProps } from "src/inputs/SelectCard/types";
-import { DistributiveOmit } from "src/types";
+import type { MultiSelectCardGroupProps } from "src/inputs/SelectCard/types";
+import type { DistributiveOmit } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

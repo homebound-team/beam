@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { Button } from "src/components/Button";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";

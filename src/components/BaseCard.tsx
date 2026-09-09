@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useFocusRing } from "react-aria";
-import { ButtonMenu, ButtonMenuProps } from "src/components/ButtonMenu";
-import { CardTag, ImageFitType } from "src/components/Card";
-import { IconButton, IconButtonProps } from "src/components/IconButton";
+import { ButtonMenu, type ButtonMenuProps } from "src/components/ButtonMenu";
+import type { CardTag, ImageFitType } from "src/components/Card";
+import { IconButton, type IconButtonProps } from "src/components/IconButton";
 import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

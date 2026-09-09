@@ -1,10 +1,10 @@
 import { useRef } from "react";
 import { useCheckboxGroupItem } from "react-aria";
-import { CheckboxGroupState } from "react-stately";
+import type { CheckboxGroupState } from "react-stately";
 import { GridSelectCard } from "src/inputs/SelectCard/GridSelectCard";
 import { ListSelectCard } from "src/inputs/SelectCard/ListSelectCard";
-import { SelectCardGridGroupItemOption, SelectCardGroupItemProps } from "src/inputs/SelectCard/types";
-import { Value, valueToKey } from "src/inputs/Value";
+import type { SelectCardGridGroupItemOption, SelectCardGroupItemProps } from "src/inputs/SelectCard/types";
+import { type Value, valueToKey } from "src/inputs/Value";
 
 type SelectCardCheckboxGroupItemProps<V extends Value> = SelectCardGroupItemProps<V> & {
   groupState: CheckboxGroupState;

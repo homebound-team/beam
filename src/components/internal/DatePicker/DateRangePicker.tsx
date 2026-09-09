@@ -9,7 +9,7 @@ import { Day } from "src/components/internal/DatePicker/Day";
 import { Header, YearSkipHeader } from "src/components/internal/DatePicker/Header";
 import { WeekHeader } from "src/components/internal/DatePicker/WeekHeader";
 import { Css, Tokens } from "src/Css";
-import { type DateMatcher, type DateRange } from "src/types";
+import type { DateMatcher, DateRange } from "src/types";
 import { useTestIds } from "src/utils";
 import { todayPlainDate } from "src/utils/plainDate";
 import "./DatePicker.css";

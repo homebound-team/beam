@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Carousel } from "src/components/Carousel";
 import { Chip } from "src/components/Chip";
 import { Css, Tokens } from "src/Css";

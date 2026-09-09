@@ -1,4 +1,4 @@
-import { StepperTabs, StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
+import { StepperTabs, type StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

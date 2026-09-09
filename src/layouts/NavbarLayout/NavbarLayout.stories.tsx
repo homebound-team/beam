@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Icon } from "src/components";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useMemo } from "react";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
 import { emptyCell, type GridDataRow } from "src/components/Table";

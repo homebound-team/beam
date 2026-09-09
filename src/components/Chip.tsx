@@ -1,8 +1,8 @@
-import { ReactNode, useMemo } from "react";
-import { Icon, IconKey } from "src/components/Icon";
+import { type ReactNode, useMemo } from "react";
+import { Icon, type IconKey } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, Margin, Only, Properties, Xss } from "src/Css";
+import { Css, type Margin, type Only, type Properties, type Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type ChipType = "caution" | "warning" | "success" | "light" | "dark" | "neutral" | "darkMode" | "info";

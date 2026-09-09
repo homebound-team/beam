@@ -1,9 +1,11 @@
 import { trussPlugin } from "@homebound/truss/plugin";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [trussPlugin({ mapping: "./src/Css.json" })],
-  resolve: { tsconfigPaths: true },
+  // Vite 8.2 stopped resolving `paths` from a tsconfig that `extends` a package, so alias `src/*` directly
+  resolve: { alias: { src: fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
     globals: true,
     environment: "jsdom",
@@ -12,6 +14,9 @@ export default defineConfig({
     css: true,
     // TreeFilter tests take ~800ms locally and ~2.5s in CI; the default 5s wasn't enough
     testTimeout: 15_000,
+    // Node 26 defines its own `localStorage`, which is undefined without `--localstorage-file`, and
+    // vitest keeps globals Node already defines. Turn Node's off so jsdom's Web Storage is used.
+    execArgv: ["--no-experimental-webstorage"],
     server: {
       deps: {
         // use-query-params v2 ships CJS without an `exports` map, so Node's ESM

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactElement, useEffect } from "react";
-import { BeamColor } from "src/colors";
+import { type ReactElement, useEffect } from "react";
+import type { BeamColor } from "src/colors";
 import { Css, Tokens } from "src/Css";
 import { useRightPaneContext } from "./RightPaneContext";
 

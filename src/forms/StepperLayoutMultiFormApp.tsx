@@ -1,9 +1,9 @@
-import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
+import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useCallback, useEffect, useState } from "react";
 import { Css, Tokens } from "src/Css";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { FormSectionLayout, StepperLayout, StepperLayoutStep } from "src/layouts";
+import { FormSectionLayout, StepperLayout, type StepperLayoutStep } from "src/layouts";
 
 type ProjectBasics = { name?: string | null; code?: string | null };
 type ProjectContact = { email?: string | null; phone?: string | null };
@@ -44,18 +44,18 @@ export function StepperLayoutMultiFormApp() {
         const steps: StepperLayoutStep[] = [
           {
             label: "Basics",
-            isValid: basicsForm.valid,
+            primaryDisabled: basicsForm.valid ? false : "Fill all required fields to continue.",
             content: <BasicsStep form={basicsForm} onLoad={loadBasics} loaded={!!basicsInput} />,
           },
           {
             label: "Contact",
-            isValid: contactForm.valid,
+            primaryDisabled: contactForm.valid ? false : "Fill all required fields to continue.",
             disabled: !basicsForm.valid,
             content: <ContactStep form={contactForm} onLoad={loadContact} loaded={!!contactInput} />,
           },
           {
             label: "Notes",
-            isValid: notesForm.valid,
+            primaryDisabled: notesForm.valid ? false : "Fill all required fields to continue.",
             disabled: !contactForm.valid,
             content: <NotesStep form={notesForm} onLoad={loadNotes} loaded={!!notesInput} />,
           },

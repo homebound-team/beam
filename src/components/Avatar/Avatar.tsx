@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, Tokens, Typography } from "src/Css";
+import { Css, Tokens, type Typography } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export type AvatarProps = {

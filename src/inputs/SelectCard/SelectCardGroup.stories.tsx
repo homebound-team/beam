@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { Button, ModalBody, ModalHeader, useModal } from "src/components";
 import { Css } from "src/Css";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
-import {
+import type {
   SelectCardGridGroupItemOption,
   SelectCardGroupProps,
   SelectCardListGroupItemOption,

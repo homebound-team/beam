@@ -18,8 +18,8 @@ This document is the **canonical contract** for structural page layouts in Beam.
 | `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                                                                                                                                                                                                                                                                                                                                                |
 | `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `StepperLayout`           | `WorkflowHeader` + steps       | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?` flattened onto `StepperLayoutProps`, `steps: StepperLayoutStep[]` (label/isValid/disabled/content — no `value`, it's derived from `label`) — active step's `content` is the body and need not be `FormSectionLayout`; `defaultStep?` picks the initial step; standalone, only ever under `EnvironmentBannerLayout` (see rule 3). `aiMode?` paints the body AI background and uses the `ai` Continue/Complete variant — pair with `FormSectionLayout` `aiMode` for the card + gradient title. |
-| `FocusedFormLayout`       | `WorkflowHeader` (no steps)    | Same flattened chrome as `StepperLayout`, plus `isValid`, `aiMode?` (page wash + `ai` CTA), and body → **`children`** (typically `FormSectionLayout`). Does **not** own JumpLinks — pass `withJumpLinks` on the body `FormSectionLayout`. Standalone, only ever under `EnvironmentBannerLayout` (see rule 3). |
+| `StepperLayout`           | `WorkflowHeader` + steps       | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?` flattened onto `StepperLayoutProps`, `steps: StepperLayoutStep[]` (label/`primaryDisabled?`/`disabled?`/content — no `value`, it's derived from `label`) — `primaryDisabled` gates Continue/Complete (`boolean \| ReactNode`, same as `Button.disabled`); `disabled` only locks the tab. Active step's `content` is the body and need not be `FormSectionLayout`; `defaultStep?` picks the initial step; standalone, only ever under `EnvironmentBannerLayout` (see rule 3). `aiMode?` paints the body AI background and uses the `ai` Continue/Complete variant — pair with `FormSectionLayout` `aiMode` for the card + gradient title. |
+| `FocusedFormLayout`       | `WorkflowHeader` (no steps)    | Same flattened chrome as `StepperLayout`, plus `primaryDisabled?` (gates Create/Save; a ReactNode is the tooltip), `aiMode?` (page wash + `ai` CTA), and body → **`children`** (typically `FormSectionLayout`). Does **not** own JumpLinks — pass `withJumpLinks` on the body `FormSectionLayout`. Standalone, only ever under `EnvironmentBannerLayout` (see rule 3). |
 | `CenteredLayout`          | centered body-width shell      | `size: "sm" \| "lg"`; body → **`children`**. **Not** a chrome peer (see rule 2). Horizontal padding 12px / 24px from `md`, publishes `--beam-layout-content-padding-x` for `layoutContainer` / sticky in-column chrome. `sm` = 720px content (768px shell max); `lg` = 1392px content (1440px shell max). `FormSectionLayout` wraps `CenteredLayout size="sm"` — do not wrap it again. |
 | `FormSectionLayout`       | form + optional JumpLinks      | `title`, `sections?`, `withJumpLinks?` (default false; rail needs 2+ includable sections, hidden on `sm`), `excludeJumpLink` on a section to omit it from the rail, `aiMode?` (`AiCard` + gradient title). Use as a `StepperLayout` step body or as `FocusedFormLayout` children. The rail does **not** shift the form: the content column mirrors the rail's 192px on its right, so the shell stays centered on the page exactly as it is without the rail (CSS-only `clamp`, no measuring). Below ~1152px there is no room for both, so the mirror shrinks and the form keeps its full width instead of narrowing. |
 
@@ -72,12 +72,13 @@ When the rail is collapsed, `SideNav` hides `top`, `items`, and `footer` (toggle
 
 Workflow pages skip `NavbarLayout`/`SideNavLayout` entirely. **`StepperLayout`** is the sequential
 experience: `steps` drives the header's tab strip, the active step's `content` is the body, and
-Continue/Complete is gated on that step's `isValid`. The layout owns step navigation (`defaultStep`
-only picks the start). **`FocusedFormLayout`** is the stepless workflow chrome: pass the body as
-**`children`** (typically `FormSectionLayout`). JumpLinks are owned by **`FormSectionLayout`**
-(`withJumpLinks`, section `excludeJumpLink`) — use the same body in a Stepper step or under
-FocusedForm. `aiMode` on the workflow paints a full-bleed wash; pair with `FormSectionLayout`
-`aiMode` for the card + gradient title.
+Continue/Complete is gated on that step's `primaryDisabled` (`boolean | ReactNode`, same as
+`Button.disabled`). Step `disabled` only locks the tab — it does not affect the CTA. The layout owns
+step navigation (`defaultStep` only picks the start). **`FocusedFormLayout`** is the stepless
+workflow chrome: pass the body as **`children`** (typically `FormSectionLayout`). JumpLinks are owned
+by **`FormSectionLayout`** (`withJumpLinks`, section `excludeJumpLink`) — use the same body in a
+Stepper step or under FocusedForm. `aiMode` on the workflow paints a full-bleed wash; pair with
+`FormSectionLayout` `aiMode` for the card + gradient title.
 
 ```tsx
 import {
@@ -111,7 +112,7 @@ import {
   onCancel={onCancel}
   completeLabel="Create"
   onComplete={onComplete}
-  isValid={formState.valid}
+  primaryDisabled={formState.valid ? false : "Fill all required fields to continue."}
   isDirty={() => formState.dirty}
 >
   <FormSectionLayout withJumpLinks title={formTitle} sections={sections} />
@@ -149,12 +150,12 @@ function CreateThingWorkflow() {
       steps={[
         {
           label: "Basics",
-          isValid: basicsForm.valid,
+          primaryDisabled: basicsForm.valid ? false : "Fill all required fields to continue.",
           content: <BasicsStep form={basicsForm} onLoad={setBasicsInput} />,
         },
         {
           label: "Details",
-          isValid: detailsForm.valid,
+          primaryDisabled: detailsForm.valid ? false : "Fill all required fields to continue.",
           disabled: !basicsForm.valid,
           content: <DetailsStep form={detailsForm} onLoad={setDetailsInput} />,
         },

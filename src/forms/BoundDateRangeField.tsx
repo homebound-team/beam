@@ -1,7 +1,7 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { DateRangeField, DateRangeFieldProps } from "src/inputs";
-import { type DateRange } from "src/types";
+import { DateRangeField, type DateRangeFieldProps } from "src/inputs";
+import type { DateRange } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

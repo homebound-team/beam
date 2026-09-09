@@ -1,5 +1,5 @@
 import { act } from "@testing-library/react";
-import { CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { Css } from "src/Css";
 import { beamPageHeaderLayoutHeightVar } from "src/layouts/layoutVars";
 import { render } from "src/utils/rtl";

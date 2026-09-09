@@ -1,11 +1,11 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useMemo } from "react";
-import { ChildrenOnly } from "src/types";
+import type { ChildrenOnly } from "src/types";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { Css } from "../../../Css";
 import { Button } from "../../Button";
 import { IconButton } from "../../IconButton";
-import { GridColumn, GridDataRow, GridTable, SimpleHeaderAndData } from "../../Table";
+import { type GridColumn, type GridDataRow, GridTable, type SimpleHeaderAndData } from "../../Table";
 import { FullBleed } from "../FullBleed";
 import { PreventBrowserScroll } from "../PreventBrowserScroll";
 import { ScrollableContent } from "../ScrollableContent";

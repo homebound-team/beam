@@ -1,4 +1,4 @@
-import { HTMLAttributes, PropsWithChildren } from "react";
+import type { HTMLAttributes, PropsWithChildren } from "react";
 import { Css } from "src/Css";
 
 type DatePickerOverlayProps = {

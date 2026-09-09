@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { ReactElement, useEffect } from "react";
+import { type ReactElement, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { render, withBeamRTL } from "src/utils/rtl";
 import { vi } from "vitest";

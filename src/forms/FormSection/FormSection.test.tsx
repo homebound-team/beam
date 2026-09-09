@@ -1,4 +1,4 @@
-import { createObjectState, ObjectConfig } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig } from "@homebound/form-state";
 import { fireEvent } from "@testing-library/react";
 import { FormSection } from "src/forms/FormSection/FormSection";
 import { render } from "src/utils/rtl";

@@ -1,9 +1,9 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, required } from "@homebound/form-state";
 import { act } from "@testing-library/react";
 import { click, render, withRouter } from "src/utils/rtl";
 import { boundCheckboxField, BoundForm, boundTextField } from "./BoundForm";
-import { ListFieldConfig } from "./BoundListField";
-import { AuthorInput } from "./formStateDomain";
+import type { ListFieldConfig } from "./BoundListField";
+import type { AuthorInput } from "./formStateDomain";
 
 const formConfig: ObjectConfig<AuthorInput> = {
   isAvailable: { type: "value", rules: [required] },

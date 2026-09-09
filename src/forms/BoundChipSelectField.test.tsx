@@ -1,7 +1,7 @@
-import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
 import { fireEvent } from "@testing-library/react";
 import { BoundChipSelectField } from "src";
-import { AuthorInput } from "src/forms/formStateDomain";
+import type { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus, render, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 

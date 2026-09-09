@@ -1,11 +1,11 @@
 import React, {
-  ChangeEvent,
-  FocusEvent,
-  InputHTMLAttributes,
-  LabelHTMLAttributes,
-  MutableRefObject,
-  ReactNode,
-  TextareaHTMLAttributes,
+  type ChangeEvent,
+  type FocusEvent,
+  type InputHTMLAttributes,
+  type LabelHTMLAttributes,
+  type MutableRefObject,
+  type ReactNode,
+  type TextareaHTMLAttributes,
   useState,
 } from "react";
 import type { NumberFieldAria } from "react-aria";
@@ -13,17 +13,17 @@ import { chain, mergeProps, useFocusWithin, useHover } from "react-aria";
 import { Icon, IconButton, maybeTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { InlineLabel, Label } from "src/components/Label";
-import { InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
+import { type InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
 import { ProposedValue } from "src/components/ProposedValue";
 import { BorderHoverChild } from "src/components/Table/components/Row";
 // Side-effect import: injects CSS for the border-hover-on-row pattern
 import "src/components/Table/components/Row.css.ts";
-import { Css, increment, Only, Palette, Tokens } from "src/Css";
+import { Css, increment, type Only, Palette, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getFieldWidth } from "src/inputs/utils";
-import { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
+import type { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
 import { maybeCall } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";

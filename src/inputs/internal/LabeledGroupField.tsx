@@ -1,10 +1,10 @@
-import { HTMLAttributes, LabelHTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, LabelHTMLAttributes, ReactNode } from "react";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
-import { PresentationFieldProps } from "src/components/PresentationContext";
+import type { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { useTestIds } from "src/utils";
+import type { useTestIds } from "src/utils";
 
 type LabeledGroupFieldProps = {
   label: string;
