@@ -95,7 +95,7 @@ export function SingleColumn() {
   );
 }
 
-export function withCollapsibleBreadcrumbs() {
+export function WithCollapsibleBreadcrumbs() {
   const formState = useFormState({
     config: formConfig,
     init: { input: { firstName: "John", middleInitial: "C", lastName: "Doe" } },

@@ -6,7 +6,7 @@ import { Toast } from "./Toast";
 import type { ToastNoticeProps } from "./ToastContext";
 import { useToast } from "./useToast";
 
-interface ToastStoryProps extends Omit<ToastNoticeProps, "action"> {}
+type ToastStoryProps = Omit<ToastNoticeProps, "action">;
 
 export default {
   component: Toast,
