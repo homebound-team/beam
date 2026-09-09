@@ -14,6 +14,9 @@ export default defineConfig({
     css: true,
     // TreeFilter tests take ~800ms locally and ~2.5s in CI; the default 5s wasn't enough
     testTimeout: 15_000,
+    // Node 26 defines its own `localStorage`, which is undefined without `--localstorage-file`, and
+    // vitest keeps globals Node already defines. Turn Node's off so jsdom's Web Storage is used.
+    execArgv: ["--no-experimental-webstorage"],
     server: {
       deps: {
         // use-query-params v2 ships CJS without an `exports` map, so Node's ESM
