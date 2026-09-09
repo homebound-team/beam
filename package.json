@@ -15,7 +15,7 @@
     "docs/layout-shells.md"
   ],
   "engines": {
-    "node": "~22.14.0"
+    "node": "~26.8.0"
   },
   "exports": {
     ".": {
