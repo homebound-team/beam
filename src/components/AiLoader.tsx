@@ -21,8 +21,8 @@ export function AiLoader<X extends Only<Xss<Margin>, X>>(props: AiLoaderProps<X>
   return (
     <div role="img" aria-label={label} css={{ ...Css.df.aic.jcc.fs0.gapPx(gap).pxPx(gap).$, ...xss }} {...tid}>
       {[0, 1, 2].map((i) => (
-        <span key={i} css={starStyles(i)} {...tid[`star${i + 1}`]}>
-          <Icon icon="aiStar" inc={inc * 1.4} />
+        <span key={i} css={starStyles(i, inc)} {...tid[`star${i + 1}`]}>
+          <Icon icon="aiStar" inc={inc * 1.4} xss={Css.fs0.$} />
         </span>
       ))}
     </div>
@@ -31,9 +31,11 @@ export function AiLoader<X extends Only<Xss<Margin>, X>>(props: AiLoaderProps<X>
 
 const cycleMs = 1500;
 
-function starStyles(index: number) {
+function starStyles(index: number, inc: number) {
   return (
-    Css.df
+    // The sparkle's slot runs larger than the star it draws, so the slot here stays `inc` sized.
+    Css.df.aic.jcc
+      .sqPx(increment(inc))
       // Also the keyframes' 0%, so stars waiting out their delay (and reduced-motion users) rest small.
       .add("transform", "scale(0.5)")
       .add("animationName", "aiStarLoader")
