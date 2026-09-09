@@ -1,6 +1,6 @@
-import { ReactNode, useContext, useState } from "react";
+import { type ReactNode, useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
-import { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
+import type { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Tokens } from "src/Css";
 import { useComputed, useHover } from "src/hooks";

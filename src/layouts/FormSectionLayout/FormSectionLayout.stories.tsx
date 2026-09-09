@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css, Tokens } from "src/Css";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { newStory, withAiBackground, withBeamDecorator } from "src/utils/sb";

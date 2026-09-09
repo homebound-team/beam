@@ -1,12 +1,12 @@
-import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
+import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { AuthorInput } from "src/forms/formStateDomain";
-import { FormSectionLayout, StepperLayout, StepperLayoutStep } from "src/layouts";
+import type { AuthorInput } from "src/forms/formStateDomain";
+import { FormSectionLayout, StepperLayout, type StepperLayoutStep } from "src/layouts";
 
 /**
  * Demos `StepperLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab

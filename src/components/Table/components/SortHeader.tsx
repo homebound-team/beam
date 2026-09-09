@@ -1,7 +1,7 @@
-import { ReactNode, useCallback, useContext } from "react";
+import { type ReactNode, useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Css, Properties, Tokens } from "src/Css";
+import { Css, type Properties, Tokens } from "src/Css";
 import { useComputed, useHover } from "src/hooks";
 import { useTestIds } from "src/utils/useTestIds";
 

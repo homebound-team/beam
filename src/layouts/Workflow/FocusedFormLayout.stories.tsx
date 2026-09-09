@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";

@@ -1,5 +1,5 @@
-import { createObjectState, ObjectConfig } from "@homebound/form-state";
-import { Meta } from "@storybook/react-vite";
+import { createObjectState, type ObjectConfig } from "@homebound/form-state";
+import type { Meta } from "@storybook/react-vite";
 import { Css, Tokens } from "src/Css";
 import { FormSection } from "src/forms/FormSection/FormSection";
 import { withBeamDecorator, withRouter } from "src/utils/sb";

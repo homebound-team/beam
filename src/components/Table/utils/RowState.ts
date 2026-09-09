@@ -1,11 +1,11 @@
 import { makeAutoObservable, observable, reaction } from "mobx";
-import { Kinded } from "src";
+import type { Kinded } from "src";
 import { resolveCompanion, type GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { GridRowApi, maybeApply } from "src/components/Table/GridTableApi";
+import { maybeApply, type GridRowApi } from "src/components/Table/GridTableApi";
 import type { MaybeFn } from "src/components/Table/types";
-import { RowStates } from "src/components/Table/utils/RowStates";
-import { SelectedState } from "src/components/Table/utils/TableState";
+import type { RowStates } from "src/components/Table/utils/RowStates";
+import type { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
 
 export enum DraggedOver {

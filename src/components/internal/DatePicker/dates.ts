@@ -1,5 +1,5 @@
-import { type DateRange as DayPickerDateRange, type Matcher } from "react-day-picker";
-import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
+import type { DateRange as DayPickerDateRange, Matcher } from "react-day-picker";
+import type { DateMatcher, DateRange, PlainDate } from "src/types";
 import { isPlainDate, jsDateToPlainDate } from "src/utils/plainDate";
 
 // These conversions exist solely for Beam/react-day-picker interop and shouldn't

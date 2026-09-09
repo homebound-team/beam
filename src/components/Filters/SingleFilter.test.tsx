@@ -1,10 +1,10 @@
 import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { FilterDefs, Filters } from "src/components/Filters";
+import { type FilterDefs, Filters } from "src/components/Filters";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import {
-  ProjectFilter,
+  type ProjectFilter,
   stageFilterWithNothingSelectedText,
   stageSingleFilter,
 } from "src/components/Filters/testDomain";

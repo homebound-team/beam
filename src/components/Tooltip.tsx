@@ -1,10 +1,10 @@
-import React, { ReactNode, useRef, useState } from "react";
+import React, { type ReactNode, useRef, useState } from "react";
 import { mergeProps, useTooltip, useTooltipTrigger } from "react-aria";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
-import { BeamColor } from "src/colors";
-import { Css, Padding, Tokens, Xss } from "src/Css";
+import type { BeamColor } from "src/colors";
+import { Css, type Padding, Tokens, type Xss } from "src/Css";
 import { useTestIds } from "src/utils";
 
 // We combine react-popper and aria-tooltip to make up the tooltip component for the following reasons:

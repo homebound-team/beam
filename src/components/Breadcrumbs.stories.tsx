@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { Breadcrumb, Breadcrumbs } from "src/components/Breadcrumbs";
+import type { Meta } from "@storybook/react-vite";
+import { type Breadcrumb, Breadcrumbs } from "src/components/Breadcrumbs";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 

@@ -1,9 +1,9 @@
-import { createObjectState, ObjectState } from "@homebound/form-state";
+import { createObjectState, type ObjectState } from "@homebound/form-state";
 import { BoundTreeSelectField } from "src/forms/BoundTreeSelectField";
 import { formConfig } from "src/forms/FormStateApp";
-import { AuthorInput } from "src/forms/formStateDomain";
-import { NestedOption } from "src/inputs";
-import { HasIdAndName } from "src/types";
+import type { AuthorInput } from "src/forms/formStateDomain";
+import type { NestedOption } from "src/inputs";
+import type { HasIdAndName } from "src/types";
 import { blur, click, focus, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

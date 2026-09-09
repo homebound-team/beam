@@ -1,5 +1,5 @@
-import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
-import { BannerProps } from "src/components";
+import React, { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import type { BannerProps } from "src/components";
 
 export interface ToastNoticeProps extends Omit<BannerProps, "onClose"> {}
 

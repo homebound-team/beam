@@ -1,6 +1,6 @@
-import { ReactNode, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Button } from "src/components/Button";
-import { Filter, FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
+import { type Filter, type FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
 import { ModalBody, ModalFooter, ModalHeader, useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { omitKey, safeEntries, safeKeys, useTestIds } from "src/utils";

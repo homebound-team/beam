@@ -1,8 +1,8 @@
 import { makeAutoObservable, observable } from "mobx";
-import { GridColumnWithId, Kinded } from "src/components/Table/types";
+import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
-import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
+import type { ColumnStates } from "src/components/Table/utils/ColumnStates";
+import type { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
 import { isFunction } from "src/utils/index";
 
 /**

@@ -1,6 +1,6 @@
 import { Chip } from "src/components/Chip";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, Margin, Only, Xss } from "src/Css";
+import { Css, type Margin, type Only, type Xss } from "src/Css";
 
 type ChipsXss = Xss<Margin>;
 

@@ -1,6 +1,6 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { CheckboxGroup, CheckboxGroupProps } from "src/inputs";
+import { CheckboxGroup, type CheckboxGroupProps } from "src/inputs";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

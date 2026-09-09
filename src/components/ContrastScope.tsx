@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, type PropsWithChildren, useContext } from "react";
 import { Css } from "src/Css";
 
 /** Must match the `contrast` theme axis in tokens and `[data-theme="contrast"]` in `src/css/generated/theme-scopes.css`. */

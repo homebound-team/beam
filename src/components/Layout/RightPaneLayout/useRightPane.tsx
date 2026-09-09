@@ -1,4 +1,4 @@
-import { OpenRightPaneOpts, useRightPaneContext } from "./RightPaneContext";
+import { type OpenRightPaneOpts, useRightPaneContext } from "./RightPaneContext";
 
 export interface UseRightPaneHook {
   /** Opens a right pane */

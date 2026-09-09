@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTestIds } from "..";
-import { Accordion, AccordionProps, AccordionSize } from "./Accordion";
+import { Accordion, type AccordionProps, type AccordionSize } from "./Accordion";
 
 interface AccordionListProps {
   accordions: AccordionProps[];

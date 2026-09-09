@@ -1,6 +1,6 @@
-import { Node } from "@react-types/shared";
+import type { Node } from "@react-types/shared";
 import { useListBoxSection, useSeparator } from "react-aria";
-import { ListState } from "react-stately";
+import type { ListState } from "react-stately";
 import { Css, Tokens } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { Option } from "src/inputs/internal/Option";

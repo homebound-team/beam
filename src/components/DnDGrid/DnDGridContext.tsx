@@ -1,4 +1,5 @@
-import React, { createContext, KeyboardEvent, useContext } from "react";
+import type React from "react";
+import { createContext, useContext, type KeyboardEvent } from "react";
 
 interface DnDGridContextProps {
   dragEl: React.MutableRefObject<HTMLElement | undefined>;

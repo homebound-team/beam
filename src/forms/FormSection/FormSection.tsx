@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import { Css } from "src/Css";
 import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils";

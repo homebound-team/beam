@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useFocus } from "react-aria";
 import { chipBaseStyles } from "src/components";
 import { usePresentationContext } from "src/components/PresentationContext";

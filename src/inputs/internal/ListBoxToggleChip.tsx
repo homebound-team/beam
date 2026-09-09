@@ -1,5 +1,5 @@
-import { Key as AriaKey } from "@react-types/shared";
-import { ListState } from "react-stately";
+import type { Key as AriaKey } from "@react-types/shared";
+import type { ListState } from "react-stately";
 import { ToggleChip } from "src/components";
 import { Css } from "src/Css";
 

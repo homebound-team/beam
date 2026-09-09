@@ -2,8 +2,8 @@ import { clickAndWait, typeAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { AuthorHeight } from "src/forms/formStateDomain";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { SelectField, type SelectFieldProps, type Value } from "src/inputs";
+import type { HasIdAndName, Optional } from "src/types";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 

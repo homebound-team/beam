@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
-import { MultiLineSelectField, Value } from "src/inputs";
+import { MultiLineSelectField, type Value } from "src/inputs";
 import { FormLines } from "..";
 
 export default {

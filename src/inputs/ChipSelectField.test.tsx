@@ -1,8 +1,8 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { ChipSelectField, ChipSelectFieldProps } from "src";
-import { Value } from "src/inputs/Value";
-import { Optional } from "src/types";
+import { ChipSelectField, type ChipSelectFieldProps } from "src";
+import type { Value } from "src/inputs/Value";
+import type { Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { click, focus, render, wait } from "src/utils/rtl";
 import { vi } from "vitest";

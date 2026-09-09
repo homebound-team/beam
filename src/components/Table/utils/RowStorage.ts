@@ -1,6 +1,6 @@
 import { reaction } from "mobx";
-import { Kinded } from "src";
-import { RowStates } from "src/components/Table/utils/RowStates";
+import type { Kinded } from "src";
+import type { RowStates } from "src/components/Table/utils/RowStates";
 import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
 /**

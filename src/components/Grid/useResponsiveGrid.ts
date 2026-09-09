@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Css, Properties } from "src";
+import { Css, type Properties } from "src";
 
 export interface useResponsiveGridProps {
   minColumnWidth: number;

@@ -1,6 +1,6 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Switch, SwitchProps } from "src/inputs";
+import { Switch, type SwitchProps } from "src/inputs";
 import { useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

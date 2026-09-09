@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { treeFilter } from "src/components/Filters/TreeFilter";
 import { Filters } from "src/components/index";
-import { NestedOption } from "src/inputs";
-import { HasIdAndName } from "src/types";
+import type { NestedOption } from "src/inputs";
+import type { HasIdAndName } from "src/types";
 import { zeroTo } from "src/utils/sb";
 
 export default {

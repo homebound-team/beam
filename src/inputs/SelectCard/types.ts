@@ -1,8 +1,8 @@
-import { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 import type { CardTag } from "src/components/Card";
-import { IconProps } from "src/components/Icon";
-import { PresentationFieldProps } from "src/components/PresentationContext";
-import { Value } from "src/inputs";
+import type { IconProps } from "src/components/Icon";
+import type { PresentationFieldProps } from "src/components/PresentationContext";
+import type { Value } from "src/inputs";
 
 export type SelectCardView = "grid" | "list";
 

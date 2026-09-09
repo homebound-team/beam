@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { AvatarButton, AvatarButtonProps } from "src/components/Avatar/AvatarButton";
+import type { Meta } from "@storybook/react-vite";
+import { AvatarButton, type AvatarButtonProps } from "src/components/Avatar/AvatarButton";
 import { Css } from "src/Css";
 import { action } from "storybook/actions";
 

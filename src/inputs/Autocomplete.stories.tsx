@@ -1,8 +1,8 @@
-import { Meta, StoryFn } from "@storybook/react-vite";
+import type { Meta, StoryFn } from "@storybook/react-vite";
 import { useState } from "react";
 import { useFilter } from "react-aria";
 import { Css } from "src/Css";
-import { Autocomplete, AutocompleteProps } from "src/inputs/Autocomplete";
+import { Autocomplete, type AutocompleteProps } from "src/inputs/Autocomplete";
 import { action } from "storybook/actions";
 import { within } from "storybook/test";
 

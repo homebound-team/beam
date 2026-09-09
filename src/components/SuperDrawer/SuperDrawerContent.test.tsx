@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
 import { render } from "src/utils/rtl";
 import { SuperDrawerContent, useSuperDrawer } from "./index";

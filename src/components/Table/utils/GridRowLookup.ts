@@ -1,8 +1,13 @@
-import { MutableRefObject } from "react";
-import { ListRange, VirtuosoHandle } from "react-virtuoso";
+import type { MutableRefObject } from "react";
+import type { ListRange, VirtuosoHandle } from "react-virtuoso";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { DiscriminateUnion, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import type { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import {
+  type DiscriminateUnion,
+  type GridColumnWithId,
+  type Kinded,
+  nonKindGridColumnKeys,
+} from "src/components/Table/types";
 import { isContentColumn } from "src/components/Table/utils/columns";
 
 /**

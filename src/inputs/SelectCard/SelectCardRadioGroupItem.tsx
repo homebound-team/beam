@@ -1,10 +1,10 @@
 import { useRef } from "react";
 import { useRadio } from "react-aria";
-import { RadioGroupState } from "react-stately";
+import type { RadioGroupState } from "react-stately";
 import { GridSelectCard } from "src/inputs/SelectCard/GridSelectCard";
 import { ListSelectCard } from "src/inputs/SelectCard/ListSelectCard";
-import { SelectCardGridGroupItemOption, SelectCardGroupItemProps } from "src/inputs/SelectCard/types";
-import { Value, valueToKey } from "src/inputs/Value";
+import type { SelectCardGridGroupItemOption, SelectCardGroupItemProps } from "src/inputs/SelectCard/types";
+import { type Value, valueToKey } from "src/inputs/Value";
 
 type SelectCardRadioGroupItemProps<V extends Value> = SelectCardGroupItemProps<V> & {
   groupState: RadioGroupState;

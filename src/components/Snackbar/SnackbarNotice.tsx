@@ -1,8 +1,8 @@
 import { useLayoutEffect, useResizeObserver } from "@react-aria/utils";
-import { ReactNode, useCallback, useRef, useState } from "react";
-import { Button, ButtonProps } from "src/components/Button";
+import { type ReactNode, useCallback, useRef, useState } from "react";
+import { Button, type ButtonProps } from "src/components/Button";
 import { contrastDataTheme } from "src/components/ContrastScope";
-import { Icon, IconProps } from "src/components/Icon";
+import { Icon, type IconProps } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

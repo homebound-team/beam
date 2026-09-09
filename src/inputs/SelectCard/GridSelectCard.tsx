@@ -1,8 +1,8 @@
 import { VisuallyHidden } from "react-aria";
-import { Icon, IconProps, Tag } from "src/components";
+import { Icon, type IconProps, Tag } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
-import { SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
+import type { SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 

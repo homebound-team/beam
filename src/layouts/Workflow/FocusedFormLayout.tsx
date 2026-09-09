@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
-import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import type { ReactNode } from "react";
+import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { useTestIds } from "src/utils";
-import { WorkflowActionsProps } from "./WorkflowActions";
+import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
 export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &

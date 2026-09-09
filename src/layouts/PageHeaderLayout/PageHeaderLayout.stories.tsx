@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";

@@ -1,4 +1,4 @@
-import { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 let useMock = process.env.NODE_ENV === "test";
 

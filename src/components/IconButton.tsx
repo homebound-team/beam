@@ -1,11 +1,11 @@
-import { AriaButtonProps } from "@react-types/button";
-import { RefObject, useMemo } from "react";
+import type { AriaButtonProps } from "@react-types/button";
+import { type RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { BeamColor } from "src/colors";
-import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
+import type { BeamColor } from "src/colors";
+import { Icon, type IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { useGetRef } from "src/hooks/useGetRef";
-import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
+import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 import { useTestIds } from "src/utils/useTestIds";
