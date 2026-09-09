@@ -146,7 +146,7 @@ function ImageMenuItem(item: ImageMenuItemType) {
 function AiMenuItem({ label, isDisabled }: { label: string; isDisabled: boolean }) {
   return (
     <>
-      <span css={Css.fs0.mr2.$}>
+      <span css={Css.df.aic.jcc.fs0.sqPx(24).mr2.$}>
         <Icon icon="aiStar" />
       </span>
       <span css={Css.if(!isDisabled).color(Palette.Purple600).$}>{label}</span>

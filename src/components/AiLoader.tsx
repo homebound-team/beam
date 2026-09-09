@@ -22,7 +22,7 @@ export function AiLoader<X extends Only<Xss<Margin>, X>>(props: AiLoaderProps<X>
     <div role="img" aria-label={label} css={{ ...Css.df.aic.jcc.fs0.gapPx(gap).pxPx(gap).$, ...xss }} {...tid}>
       {[0, 1, 2].map((i) => (
         <span key={i} css={starStyles(i)} {...tid[`star${i + 1}`]}>
-          <Icon icon="aiStar" inc={inc} />
+          <Icon icon="aiStar" inc={inc * 1.4} />
         </span>
       ))}
     </div>

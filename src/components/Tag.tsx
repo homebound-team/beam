@@ -62,7 +62,8 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
         {/* Using `lineClamp1` instead of `truncate` as `truncate` requires a width set to properly truncate and `lineClamp` can smartly do it based on the parent's width */}
         {icon && (
           <span css={Css.fs0.$}>
-            <Icon icon={icon} inc={1.75} color={iconColor} />
+            {/* aiStar draws inset within its box, so it needs a larger slot to match the other icons. */}
+            <Icon icon={icon} inc={icon === "aiStar" ? 2.5 : 1.75} color={iconColor} />
           </span>
         )}
         {isIconOnly ? (
