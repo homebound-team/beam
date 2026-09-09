@@ -1,4 +1,4 @@
-import { comparer } from "mobx";
+import { compareShallow } from "mobx";
 import { computedFn } from "mobx-utils";
 import { type MutableRefObject, useMemo } from "react";
 import type { ListRange, VirtuosoHandle } from "react-virtuoso";
@@ -119,11 +119,11 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     bindMethods(this);
     // Memoize these so that if the user is creating new `data` instances on every render, they
     // can use `getSelectedRowIds` to observer a stable list of `[pi:1, pi:2]`, etc.
-    this.getVisibleRowsImpl = computedFn(this.getVisibleRowsImpl, { equals: comparer.shallow });
-    this.getVisibleRowIdsImpl = computedFn(this.getVisibleRowIdsImpl, { equals: comparer.shallow });
-    this.getSelectedRowsImpl = computedFn(this.getSelectedRowsImpl, { equals: comparer.shallow });
-    this.getSelectedRowIdsImpl = computedFn(this.getSelectedRowIdsImpl, { equals: comparer.shallow });
-    this.getPinnedRowIdsImpl = computedFn(this.getPinnedRowIdsImpl, { equals: comparer.shallow });
+    this.getVisibleRowsImpl = computedFn(this.getVisibleRowsImpl, { equals: compareShallow });
+    this.getVisibleRowIdsImpl = computedFn(this.getVisibleRowIdsImpl, { equals: compareShallow });
+    this.getSelectedRowsImpl = computedFn(this.getSelectedRowsImpl, { equals: compareShallow });
+    this.getSelectedRowIdsImpl = computedFn(this.getSelectedRowIdsImpl, { equals: compareShallow });
+    this.getPinnedRowIdsImpl = computedFn(this.getPinnedRowIdsImpl, { equals: compareShallow });
   }
 
   /** Called once by the GridTable when it takes ownership of this api instance. */

@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable, reaction } from "mobx";
+import { makeAutoObservable, observableRef, reaction } from "mobx";
 import type { Kinded } from "src";
 import { resolveCompanion, type GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import type { GridDataRow } from "src/components/Table/components/Row";
@@ -76,9 +76,9 @@ export class RowState<R extends Kinded> {
       // 'as any' because the fields are private so don't show up in the type
       {
         _row: false,
-        _data: observable.ref,
-        _aiMode: observable.ref,
-        _companion: observable.ref,
+        _data: observableRef,
+        _aiMode: observableRef,
+        _companion: observableRef,
         isCalculatingDirectMatch: false,
       } as any,
       { name: `RowState@${row.id}` },
