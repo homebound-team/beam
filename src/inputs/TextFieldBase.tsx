@@ -17,7 +17,7 @@ import { type InputStylePalette, usePresentationContext } from "src/components/P
 import { ProposedValue } from "src/components/ProposedValue";
 import { BorderHoverChild } from "src/components/Table/components/Row";
 // Side-effect import: injects CSS for the border-hover-on-row pattern
-import "src/components/Table/components/Row.css.ts";
+import "src/components/Table/components/Row.css";
 import { Css, increment, type Only, Palette, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
