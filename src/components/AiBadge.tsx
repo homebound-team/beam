@@ -15,8 +15,8 @@ export function AiBadge(props: AiBadgeProps) {
   const tid = useTestIds(props, "aiBadge");
   return (
     <span {...tid} css={Css.dif.aic.jcc.fs0.br100.sqPx(increment(inc)).bgColor(Tokens.AiFieldBg).$}>
-      {/* Design insets the sparkle by a quarter of the badge on each side, so it always draws at half that size. */}
-      <Icon icon="aiStar" inc={inc / 2} />
+      {/* Design insets the sparkle a quarter of the badge on each side; adjusted for aiStar's own inset. */}
+      <Icon icon="aiStar" inc={inc * 0.706} />
     </span>
   );
 }
