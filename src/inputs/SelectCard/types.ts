@@ -34,8 +34,7 @@ export type SelectCardListGroupItemOption<V extends Value> = SelectCardGroupItem
 };
 
 export type SelectCardGroupItemOption<V extends Value> =
-  | SelectCardGridGroupItemOption<V>
-  | SelectCardListGroupItemOption<V>;
+  SelectCardGridGroupItemOption<V> | SelectCardListGroupItemOption<V>;
 
 type SelectCardGroupFieldPropsBase = {
   label: string;

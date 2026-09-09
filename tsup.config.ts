@@ -1,5 +1,5 @@
 import { trussEsbuildPlugin } from "@homebound/truss/plugin";
-import { type Plugin } from "esbuild";
+import type { Plugin } from "esbuild";
 import { defineConfig } from "tsup";
 
 export default defineConfig({

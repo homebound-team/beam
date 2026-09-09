@@ -69,16 +69,13 @@ export function EditColumnButtonManyColumns() {
   // so the option list scrolls internally and the "Reset Column Widths" footer stays pinned.
   const manyColumns: GridColumn<Row>[] = [
     nameColumn,
-    ...Array.from(
-      { length: 50 },
-      (_, i): GridColumn<Row> => ({
-        id: `col${i}`,
-        name: `Column ${i + 1}`,
-        header: `Column ${i + 1}`,
-        canHide: true,
-        data: ({ value }) => value,
-      }),
-    ),
+    ...Array.from({ length: 50 }, (_, i): GridColumn<Row> => ({
+      id: `col${i}`,
+      name: `Column ${i + 1}`,
+      header: `Column ${i + 1}`,
+      canHide: true,
+      data: ({ value }) => value,
+    })),
   ];
   const api = useGridTableApi<Row>();
   return (

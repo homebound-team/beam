@@ -9,14 +9,7 @@ import { Css, type Properties, type Typography } from "src/Css";
 import type { Temporal } from "temporal-polyfill";
 
 export type GridCellValue =
-  | number
-  | string
-  | Date
-  | boolean
-  | Temporal.PlainDate
-  | Temporal.ZonedDateTime
-  | null
-  | undefined;
+  number | string | Date | boolean | Temporal.PlainDate | Temporal.ZonedDateTime | null | undefined;
 
 /**
  * Allows a cell to be more than just a RectNode, i.e. declare its alignment or

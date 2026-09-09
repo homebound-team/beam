@@ -1,7 +1,0 @@
-dist
-coverage
-node_modules/
-.eslintrc.js
-jest.config.js
-release.config.js
-truss/

@@ -7,7 +7,7 @@ import type { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { TextFieldBase } from "../TextFieldBase";
 
-interface TextFieldProps<X> extends BeamTextFieldProps<X> {}
+type TextFieldProps<X> = BeamTextFieldProps<X>;
 
 export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const { value, proposedValue } = props;

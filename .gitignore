@@ -6,7 +6,6 @@ dist
 
 .vscode/
 .idea/
-.eslintcache
 
 dist
 storybook-static
