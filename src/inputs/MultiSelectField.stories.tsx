@@ -199,6 +199,25 @@ export function MultiSelectFields() {
   );
 }
 
+export function WithPillList() {
+  return (
+    <div css={Css.df.fdc.gap2.maxwPx(480).$}>
+      <TestMultiSelectField
+        label="Favorite Icons"
+        values={[options[1].id, options[2].id, options[3].id]}
+        options={options}
+        withPillList
+        getOptionMenuLabel={(o) => (
+          <span css={Css.df.aic.gap1.$}>
+            {o.icon && <Icon icon={o.icon} />}
+            {o.name}
+          </span>
+        )}
+      />
+    </div>
+  );
+}
+
 export function Loading() {
   const loadTestOptions: TestOption[] = zeroTo(1000).map((i) => ({ id: String(i), name: `Project ${i}` }));
   const [loaded, setLoaded] = useState<TestOption[]>([]);

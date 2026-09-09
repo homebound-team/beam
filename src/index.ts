@@ -280,6 +280,8 @@ export * from "./forms/BoundToggleChipGroupField";
 export * from "./forms/BoundTreeSelectField";
 export * from "./forms/FormHeading";
 export * from "./forms/FormLines";
+export * from "./forms/SelectedOptionPill";
+export * from "./forms/SelectedOptionPillList";
 export * from "./forms/StaticField";
 export * from "./forms/SubmitButton";
 export { FormSection } from "./forms/FormSection/FormSection";
