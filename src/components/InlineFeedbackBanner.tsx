@@ -12,8 +12,7 @@ export type InlineFeedbackBannerType = "error" | "warning";
 
 /** A banner action: a text `Button`, or a `menu` that opens a `ButtonMenu` from a text trigger. */
 export type InlineFeedbackBannerAction =
-  | ActionButtonProps
-  | ({ kind: "menu"; label: string } & Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">);
+  ActionButtonProps | ({ kind: "menu"; label: string } & Pick<ButtonMenuProps, "items" | "disabled" | "tooltip">);
 
 export type InlineFeedbackBannerProps = {
   type: InlineFeedbackBannerType;

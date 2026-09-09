@@ -16,10 +16,11 @@ import {
 } from "src/components/InlineFeedbackBanner";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { viewportModes } from "src/utils/sb";
+import { viewportModes, withRouter } from "src/utils/sb";
 
 export default {
   component: InlineFeedbackBanner,
+  decorators: [withRouter()],
   parameters: {
     chromatic: { modes: viewportModes("desktop", "mobile1") },
     design: {
