@@ -18,9 +18,10 @@ export function AiSlimBanner(props: AiSlimBannerProps) {
   return (
     <div css={Css.df.ais.gap2.w100.px2.xs.aiBackground.$} {...tid}>
       {/* Matches the title's first line box (16px line height plus its 8px above and below) so the star
-          stays on that line rather than drifting to the middle of wrapped copy. */}
-      <span css={Css.df.aic.fs0.py1.hPx(32).$}>
-        <Icon icon="aiStar" inc={1.5} />
+          stays on that line rather than drifting to the middle of wrapped copy, and holds the 12px
+          width the star used to take up on its own. */}
+      <span css={Css.df.aic.jcc.fs0.py1.wPx(12).hPx(32).$}>
+        <Icon icon="aiStar" inc={2.125} xss={Css.fs0.$} />
       </span>
       <div css={Css.df.aic.jcsb.gap2.fg1.mw0.$}>
         {/* The vertical padding lives on the title so an action's taller line box can't grow the bar. */}
