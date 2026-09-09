@@ -8,7 +8,7 @@ import { maybeCall, noop } from "src/utils";
 import { withTestMock } from "src/utils/withTestMock";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
-import "trix/dist/trix";
+import "trix";
 import "trix/dist/trix.css";
 import "./trix.css";
 
@@ -63,6 +63,10 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
   // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,
   // otherwise we'll constantly call loadHTML and reset the user's cursor location.
   const currentHtml = useRef<string | undefined>(undefined);
+  // Every html we've emitted via onChange since the last external load. trix can fire several
+  // `trix-change` events before React commits, so a render may still carry an older one of these.
+  // Those are echoes of the user's own edits, not new values, and must not trigger a reload.
+  const emittedHtml = useRef(new Set<string | undefined>());
 
   // Use a ref for onChange b/c so trixChange always has the latest
   const onChangeRef = useRef<RichTextFieldProps["onChange"]>(onChange);
@@ -90,6 +94,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
         }
 
         currentHtml.current = value;
+        emittedHtml.current.clear();
         editor.loadHTML(value || "");
         // Remove listener once we've initialized
         window.removeEventListener("trix-initialize", onEditorInit);
@@ -100,9 +105,11 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
           // If the user only types whitespace, treat that as undefined
           if ((textContent || "").trim() === "") {
             currentHtml.current = undefined;
+            emittedHtml.current.add(undefined);
             onChange && onChange(undefined, undefined, []);
           } else {
             currentHtml.current = innerHTML;
+            emittedHtml.current.add(innerHTML);
             const mentions = extractIdsFromMentions(mergeTags || [], textContent || "");
             onChange && onChange(innerHTML, textContent || undefined, mentions);
           }
@@ -130,8 +137,14 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
   }, [readOnly]);
 
   useEffect(() => {
-    // If our value prop changes (without the change coming from us), reload it
-    if (!readOnly && editor && value !== currentHtml.current) {
+    if (readOnly || !editor) return;
+    if (value === currentHtml.current) {
+      // The parent has caught up with our latest edit, so older echoes can no longer arrive
+      emittedHtml.current.clear();
+    } else if (!emittedHtml.current.has(value)) {
+      // The value changed without the change coming from us, so reload it
+      currentHtml.current = value;
+      emittedHtml.current.clear();
       editor.loadHTML(value || "");
     }
   }, [value, readOnly, editor]);
