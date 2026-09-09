@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { useFocusRing, useHover, useSwitch, VisuallyHidden } from "react-aria";
 import { resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";

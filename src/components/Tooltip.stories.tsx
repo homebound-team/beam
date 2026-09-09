@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
-import { Css, Properties } from "src/Css";
+import type { Meta } from "@storybook/react-vite";
+import { Css, type Properties } from "src/Css";
 import { userEvent, waitFor, within } from "storybook/test";
-import { Placement, Tooltip } from "./Tooltip";
+import { type Placement, Tooltip } from "./Tooltip";
 
 export default {
   component: Tooltip,

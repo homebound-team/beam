@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { noop } from "src/utils";
 import { withDimensions } from "src/utils/sb";
 import { ContextualModal } from "./ContextualModal";

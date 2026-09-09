@@ -1,7 +1,7 @@
-import { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { ContrastScope } from "src/components/ContrastScope";
 import { IconButton } from "src/components/IconButton";
-import { SideNav, SideNavProps } from "src/components/SideNav/SideNav";
+import { SideNav, type SideNavProps } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks";
 import {

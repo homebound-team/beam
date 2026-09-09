@@ -1,11 +1,18 @@
 import { memo, useMemo } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import { Filter, FilterDefs, FilterImpls, FilterModal, filterTestIdPrefix, updateFilter } from "src/components/Filters";
+import {
+  type Filter,
+  type FilterDefs,
+  type FilterImpls,
+  FilterModal,
+  filterTestIdPrefix,
+  updateFilter,
+} from "src/components/Filters";
 import { useModal } from "src/components/Modal";
 import { Css } from "src/Css";
 import { SelectField } from "src/inputs/SelectField";
-import { Value } from "src/inputs/Value";
+import type { Value } from "src/inputs/Value";
 import { safeEntries, safeKeys, useTestIds } from "src/utils";
 
 interface FilterProps<F extends Record<string, unknown>, G extends Value = string> {

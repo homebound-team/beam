@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { SuperDrawerContent, useSuperDrawer } from "src/components";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";

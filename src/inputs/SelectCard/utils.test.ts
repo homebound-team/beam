@@ -1,4 +1,4 @@
-import { SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
+import type { SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
 import { findToggledSelectCardGroupValue, getNextSelectCardGroupValues } from "src/inputs/SelectCard/utils";
 
 enum TestCategory {

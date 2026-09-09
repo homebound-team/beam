@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export enum AutoSaveStatus {
   IDLE = "idle",

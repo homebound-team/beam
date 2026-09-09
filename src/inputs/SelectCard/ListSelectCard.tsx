@@ -4,7 +4,7 @@ import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
 import { StyledRadio } from "src/inputs/SelectCard/StyledRadio";
-import { SelectCardItemProps } from "src/inputs/SelectCard/types";
+import type { SelectCardItemProps } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 

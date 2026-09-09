@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
-import { DatePicker, DatePickerProps } from "src/components/internal/DatePicker/DatePicker";
+import { DatePicker, type DatePickerProps } from "src/components/internal/DatePicker/DatePicker";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
 import {
   isIconButton,
@@ -9,7 +9,7 @@ import {
   isTextButton,
   labelOr,
   OverlayTrigger,
-  OverlayTriggerProps,
+  type OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";

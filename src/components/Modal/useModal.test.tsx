@@ -1,8 +1,8 @@
 import { act } from "@testing-library/react";
 import { useEffect } from "react";
-import { BeamContextState, useBeamContext } from "src/components/BeamContext";
-import { ModalProps } from "src/components/Modal/Modal";
-import { useModal, UseModalHook } from "src/components/Modal/useModal";
+import { type BeamContextState, useBeamContext } from "src/components/BeamContext";
+import type { ModalProps } from "src/components/Modal/Modal";
+import { useModal, type UseModalHook } from "src/components/Modal/useModal";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

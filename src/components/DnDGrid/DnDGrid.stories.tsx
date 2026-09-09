@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useRef } from "react";
-import { Css, DnDGridProps } from "src";
+import { Css, type DnDGridProps } from "src";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";

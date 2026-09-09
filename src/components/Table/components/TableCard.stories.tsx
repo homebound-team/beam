@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode, useState } from "react";
+import type { Meta } from "@storybook/react-vite";
+import { type ReactNode, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ProposedValue } from "src/components/ProposedValue";
 import { TableCardView } from "src/components/Table/components/TableCard";

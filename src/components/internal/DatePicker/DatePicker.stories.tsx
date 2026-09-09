@@ -1,4 +1,4 @@
-import { type Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src";
 import { DatePicker } from "src/components/internal/DatePicker";

@@ -1,12 +1,12 @@
 import { camelCase } from "change-case";
-import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type HTMLAttributes, type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath } from "react-router";
 import { Link, useLocation } from "react-router-dom";
-import { FullBleed, IconKey, maybeTooltip, resolveTooltip, Tag } from "src/components";
-import { Css, Margin, Only, Padding, Palette, Tokens, Xss } from "src/Css";
-import { BeamFocusableProps } from "src/interfaces";
-import { AnyObject } from "src/types";
+import { FullBleed, type IconKey, maybeTooltip, resolveTooltip, Tag } from "src/components";
+import { Css, type Margin, type Only, type Padding, Palette, Tokens, type Xss } from "src/Css";
+import type { BeamFocusableProps } from "src/interfaces";
+import type { AnyObject } from "src/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { Icon } from "./Icon";

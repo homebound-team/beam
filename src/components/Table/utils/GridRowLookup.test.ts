@@ -1,4 +1,4 @@
-import { GridColumn } from "src/components/Table/types";
+import type { GridColumn } from "src/components/Table/types";
 import { assignDefaultColumnIds, collapseColumn, selectColumn } from "src/components/Table/utils/columns";
 import { getKinds } from "src/components/Table/utils/GridRowLookup";
 

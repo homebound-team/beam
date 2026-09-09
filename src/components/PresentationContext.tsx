@@ -1,6 +1,6 @@
-import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { createContext, type PropsWithChildren, useContext, useMemo } from "react";
 import type { GridStyle } from "src/components/Table/TableStyles";
-import { Typography } from "src/Css";
+import type { Typography } from "src/Css";
 
 export type InputStylePalette = "success" | "warning" | "caution" | "info";
 

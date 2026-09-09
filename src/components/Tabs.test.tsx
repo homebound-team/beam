@@ -4,8 +4,8 @@ import { useParams } from "react-router";
 import { ScrollableContent, ScrollableParent } from "src";
 import { Css, Palette } from "src/Css";
 import { click, render, withRouter } from "src/utils/rtl";
-import { getNextTabValue, RouteTabWithContent, TabContent, TabsWithContent, TabWithContent } from "./Tabs";
-import { TabValue, TestTabContent, testTabs } from "./testData";
+import { getNextTabValue, type RouteTabWithContent, TabContent, TabsWithContent, type TabWithContent } from "./Tabs";
+import { type TabValue, TestTabContent, testTabs } from "./testData";
 
 describe("TabsWithContent", () => {
   it("should display content of selected tab", async () => {

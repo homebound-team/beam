@@ -1,4 +1,4 @@
-import { MutableRefObject } from "react";
+import type { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
 export function fail(message?: string): never {

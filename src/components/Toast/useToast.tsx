@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { ToastNoticeProps, useToastContext } from "./ToastContext";
+import { type ToastNoticeProps, useToastContext } from "./ToastContext";
 
 export interface UseToastProps {
   showToast: (props: ToastNoticeProps) => void;

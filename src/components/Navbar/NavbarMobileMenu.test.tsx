@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { environmentBannerSizePx } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { NavbarMobileMenu } from "src/components/Navbar/NavbarMobileMenu";

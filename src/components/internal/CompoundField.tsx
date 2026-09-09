@@ -1,6 +1,6 @@
-import { FocusEvent, cloneElement, useState } from "react";
+import { type FocusEvent, cloneElement, useState } from "react";
 import { Css, Tokens } from "src/Css";
-import { TextFieldInternalProps } from "src/interfaces";
+import type { TextFieldInternalProps } from "src/interfaces";
 
 /** Internal component to help create compound fields */
 export function CompoundField({ children }: { children: JSX.Element[] }) {

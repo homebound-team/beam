@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode, useState } from "react";
+import type { Meta } from "@storybook/react-vite";
+import { type ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
-import { TabsWithContent, TabWithContent } from "src/components/Tabs";
+import { TabsWithContent, type TabWithContent } from "src/components/Tabs";
 import { Css, Palette, Tokens } from "src/Css";
 import { FormLines } from "src/forms";
 import {
@@ -13,7 +13,7 @@ import {
   ScrollableParent,
 } from "src/index";
 import { NumberField } from "src/inputs/NumberField";
-import { ChildrenOnly } from "src/types";
+import type { ChildrenOnly } from "src/types";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
 import { TableExample } from "src/utils/sbComponents";
 

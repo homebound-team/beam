@@ -1,4 +1,4 @@
-import { type PlainDate } from "src/types";
+import type { PlainDate } from "src/types";
 import { Temporal } from "temporal-polyfill";
 
 export type SupportedDateFormat =

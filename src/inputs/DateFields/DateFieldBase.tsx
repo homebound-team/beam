@@ -4,7 +4,7 @@ import { useOverlayTriggerState } from "react-stately";
 import { Icon, IconButton, resolveTooltip } from "src/components";
 import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
-import { Css, Properties, Tokens } from "src/Css";
+import { Css, type Properties, Tokens } from "src/Css";
 import {
   dateFormats,
   formatDate,
@@ -16,7 +16,7 @@ import {
 } from "src/inputs/DateFields/utils";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
-import { type DateMatcher, type DateRange, type PlainDate } from "src/types";
+import type { DateMatcher, DateRange, PlainDate } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 

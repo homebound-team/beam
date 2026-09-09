@@ -1,9 +1,9 @@
 import { blur, focus, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useRef, useState } from "react";
-import { Only } from "src/Css";
-import { TextField, TextFieldApi, TextFieldProps } from "src/inputs";
-import { TextFieldXss } from "src/interfaces";
+import type { Only } from "src/Css";
+import { TextField, type TextFieldApi, type TextFieldProps } from "src/inputs";
+import type { TextFieldXss } from "src/interfaces";
 import { click } from "src/utils/rtl";
 import { vi } from "vitest";
 

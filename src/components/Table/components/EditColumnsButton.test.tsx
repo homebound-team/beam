@@ -1,10 +1,10 @@
-import { MutableRefObject } from "react";
+import type { MutableRefObject } from "react";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
-import { GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
-import { GridColumn } from "src/components/Table/types";
+import { type GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
+import type { GridColumn } from "src/components/Table/types";
 import { actionColumn, column } from "src/components/Table/utils/columns";
-import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
-import { GridCellContent } from "src/components/Table/components/cell";
+import type { ReactNode } from "react";
+import type { GridCellContent } from "src/components/Table/components/cell";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { FixedSort, GridColumnWithId, Kinded } from "src/components/Table/types";
-import { SortOn, SortState } from "src/components/Table/utils/TableState";
+import type { FixedSort, GridColumnWithId, Kinded } from "src/components/Table/types";
+import type { SortOn, SortState } from "src/components/Table/utils/TableState";
 import { applyRowFn } from "src/components/Table/utils/utils";
 import { Temporal } from "temporal-polyfill";
 

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { allItemsHaveIcons } from "src/components/AppNav/appNavUtils";

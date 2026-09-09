@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AiCard, AiPanel } from "src/components/AiPanel";
 import { Button } from "src/components/Button";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";

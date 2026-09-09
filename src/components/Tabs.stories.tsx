@@ -1,14 +1,14 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Fragment, useState } from "react";
 import { Route, Routes, useLocation, useParams } from "react-router";
 import { Link, useNavigate } from "react-router-dom";
-import { RouteTabWithContent, TabContent, Tabs, TabsWithContent, TabWithContent } from "src/components";
+import { type RouteTabWithContent, TabContent, Tabs, TabsWithContent, type TabWithContent } from "src/components";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { Icon } from "./Icon";
 import { getTabStyles } from "./Tabs";
-import { TabValue, TestTabContent, testTabs } from "./testData";
+import { type TabValue, TestTabContent, testTabs } from "./testData";
 
 export default {
   component: TabsWithContent,

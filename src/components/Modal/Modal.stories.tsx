@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Chip } from "src/components/Chip";
@@ -8,14 +8,14 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  ModalProps,
+  type ModalProps,
   OpenModal,
   useModal,
 } from "src/components/index";
 import { Modal } from "src/components/Modal/Modal";
 import {
   TestModalContent,
-  TestModalContentProps,
+  type TestModalContentProps,
   TestModalFilterTable,
   VirtualizedTable,
 } from "src/components/Modal/TestModalContent";

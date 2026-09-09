@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import React, { type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
 export interface OpenRightPaneOpts {
   content: ReactNode;

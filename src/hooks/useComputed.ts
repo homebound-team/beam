@@ -1,4 +1,4 @@
-import { autorun, IReactionDisposer } from "mobx";
+import { autorun, type IReactionDisposer } from "mobx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { shallowEqual } from "src/utils/shallowEqual";
 

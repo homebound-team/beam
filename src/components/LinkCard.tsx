@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
-import { BeamButtonProps } from "src/interfaces";
+import type { BeamButtonProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 
 export type LinkCardProps = {

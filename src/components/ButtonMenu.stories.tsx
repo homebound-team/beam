@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
+import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";
 import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";

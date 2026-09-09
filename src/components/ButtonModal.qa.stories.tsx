@@ -1,4 +1,4 @@
-import { ButtonModal, ButtonModalProps } from "./ButtonModal";
+import { ButtonModal, type ButtonModalProps } from "./ButtonModal";
 
 export default {
   component: ButtonModal,

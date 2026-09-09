@@ -1,8 +1,8 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Value } from "src/inputs";
-import { ChipSelectField, ChipSelectFieldProps } from "src/inputs/ChipSelectField";
-import { HasIdAndName, Optional } from "src/types";
+import type { Value } from "src/inputs";
+import { ChipSelectField, type ChipSelectFieldProps } from "src/inputs/ChipSelectField";
+import type { HasIdAndName, Optional } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

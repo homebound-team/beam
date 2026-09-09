@@ -1,5 +1,5 @@
 import type { PressEvent } from "@react-types/shared";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { Css } from "src/Css";

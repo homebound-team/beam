@@ -1,4 +1,4 @@
-import { MutableRefObject, RefObject, useRef } from "react";
+import { type MutableRefObject, type RefObject, useRef } from "react";
 
 /**
  * Replaces code like `const ref = passedRef || useRef(null)` which was triggering rules-of-hooks violations. Used

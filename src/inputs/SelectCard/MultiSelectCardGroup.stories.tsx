@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { MultiSelectCardGroup } from "src/inputs/SelectCard/MultiSelectCardGroup";
-import {
+import type {
   MultiSelectCardGroupProps,
   SelectCardGridGroupItemOption,
   SelectCardListGroupItemOption,

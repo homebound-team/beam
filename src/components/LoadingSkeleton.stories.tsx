@@ -1,4 +1,4 @@
-import { ContrastScope, LoadingSkeleton, LoadingSkeletonProps } from "src/components";
+import { ContrastScope, LoadingSkeleton, type LoadingSkeletonProps } from "src/components";
 import { Css } from "src/Css";
 
 export default {

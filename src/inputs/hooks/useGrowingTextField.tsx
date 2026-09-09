@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "@react-aria/utils";
-import { MutableRefObject, useCallback } from "react";
+import { type MutableRefObject, useCallback } from "react";
 import { textFieldBaseMultilineTopPadding, textFieldBasePadding } from "../TextFieldBase";
 
 interface GrowingTextFieldProps {

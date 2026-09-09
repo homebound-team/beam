@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import { Key, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type Key, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
 import {
@@ -17,8 +17,8 @@ import { Css, Palette } from "src/Css";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { ListBoxChip } from "src/inputs/internal/ListBoxChip";
-import { Value, valueToKey } from "src/inputs/Value";
-import { HasIdAndName, Optional } from "src/types";
+import { type Value, valueToKey } from "src/inputs/Value";
+import type { HasIdAndName, Optional } from "src/types";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 

@@ -1,8 +1,8 @@
-import { click, render, RenderResult } from "@homebound/rtl-utils";
+import { click, render, type RenderResult } from "@homebound/rtl-utils";
 import { act, fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs";
+import type { HasIdAndName, Optional } from "src/types";
 import { focus } from "src/utils/rtl";
 import { vi } from "vitest";
 

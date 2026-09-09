@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
-import { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -14,10 +14,10 @@ import {
   defaultStyle,
   dragHandleColumn,
   emptyCell,
-  GridCellAlignment,
-  GridColumn,
-  GridDataRow,
-  GridRowLookup,
+  type GridCellAlignment,
+  type GridColumn,
+  type GridDataRow,
+  type GridRowLookup,
   GridTable,
   GridTableLayout,
   Icon,
@@ -27,10 +27,10 @@ import {
   pinColumn,
   ProposedValue,
   recursivelyGetContainingRow,
-  RowStyles,
+  type RowStyles,
   selectColumn,
   simpleHeader,
-  SimpleHeaderAndData,
+  type SimpleHeaderAndData,
   useGridTableApi,
   useGridTableLayoutState,
 } from "src/components/index";
@@ -50,7 +50,7 @@ import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
-import { type PlainDate } from "src/types";
+import type { PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
@@ -1524,6 +1524,46 @@ export function ActiveRow() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
+}
+
+/** Companions that add/remove/update via MobX without rebuilding `rows`. */
+export function CompanionRowsReactive() {
+  const pending = useMemo(() => observable({ show: true, message: "Review matches." }), []);
+  const rows = useMemo<GridDataRow<Row>[]>(
+    () => [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "Suggested option", value: 1 },
+        companion: () =>
+          pending.show
+            ? {
+                content: () => (
+                  <CompanionBanner
+                    tone="warning"
+                    message={pending.message}
+                    actions={<Button label="Dismiss" variant="text" onClick={() => (pending.show = false)} />}
+                  />
+                ),
+              }
+            : undefined,
+      },
+      { kind: "data", id: "2", data: { name: "Normal", value: 2 } },
+    ],
+    [pending],
+  );
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <div css={Css.df.gap1.$}>
+        <Button label="Show companion" onClick={() => (pending.show = true)} />
+        <Button label="Change message" onClick={() => (pending.message = "Updated note.")} />
+      </div>
+      <GridTable columns={[nameColumn, valueColumn]} rows={rows} />
+    </div>
+  );
 }
 
 /** Mixed `aiMode` rows; Accept flips MobX so the functions re-evaluate without rebuilding `rows`. */

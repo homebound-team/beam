@@ -2,7 +2,7 @@ import { clickAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { DateFieldBase } from "src/inputs/DateFields/DateFieldBase";
-import { type PlainDate } from "src/types";
+import type { PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, render } from "src/utils/rtl";
 import { jan10, jan2 } from "src/utils/testDates";

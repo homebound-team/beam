@@ -1,7 +1,7 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, required } from "@homebound/form-state";
 import { FormPageLayout } from "src/components/Layout";
 import { boundCheckboxField, boundTextField } from "src/forms";
-import { AuthorInput } from "src/forms/formStateDomain";
+import type { AuthorInput } from "src/forms/formStateDomain";
 import { noop } from "src/utils";
 import { render, type, withRouter } from "src/utils/rtl";
 

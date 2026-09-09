@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { APP_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY } from "src/components/AppNav/useAppNavGroupExpanded";
 import { SideNav } from "src/components/SideNav/SideNav";
-import { SideNavLayoutProvider, SideNavLayoutState } from "src/layouts/SideNavLayout/SideNavLayoutContext";
+import { SideNavLayoutProvider, type SideNavLayoutState } from "src/layouts/SideNavLayout/SideNavLayoutContext";
 import { click, render, withRouter } from "src/utils/rtl";
 
 describe("SideNav", () => {

@@ -1,10 +1,10 @@
-import { Node } from "@react-types/shared";
+import type { Node } from "@react-types/shared";
 import { type KeyboardEvent, type MouseEvent, useRef } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { Link, useNavigate } from "react-router-dom";
-import { TreeState } from "react-stately";
+import type { TreeState } from "react-stately";
 import { Avatar } from "src/components/Avatar";
-import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
+import type { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, Tokens } from "src/Css";

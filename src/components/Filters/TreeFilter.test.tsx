@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Filters } from "src/components/Filters/Filters";
-import { treeFilter, TreeFilterProps } from "src/components/Filters/TreeFilter";
-import { FilterDefs } from "src/components/Filters/types";
-import { NestedOption } from "src/inputs";
-import { HasIdAndName } from "src/types";
+import { treeFilter, type TreeFilterProps } from "src/components/Filters/TreeFilter";
+import type { FilterDefs } from "src/components/Filters/types";
+import type { NestedOption } from "src/inputs";
+import type { HasIdAndName } from "src/types";
 import { render, select } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 

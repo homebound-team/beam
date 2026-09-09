@@ -1,5 +1,5 @@
-import { GridDataRow } from "src/components/Table/components/Row";
-import { GridColumnWithId } from "src/components/Table/types";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import type { GridColumnWithId } from "src/components/Table/types";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { ensureClientSideSortValueIsSortable, sortRows } from "src/components/Table/utils/sortRows";
 import { Temporal } from "temporal-polyfill";

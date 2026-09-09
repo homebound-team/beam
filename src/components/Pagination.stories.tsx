@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { FormLines, StaticField } from "..";
 import { Pagination } from "./Pagination";

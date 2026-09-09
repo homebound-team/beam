@@ -1,9 +1,9 @@
-import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
+import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useCallback, useEffect, useState } from "react";
 import { Css, Tokens } from "src/Css";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { FormSectionLayout, StepperLayout, StepperLayoutStep } from "src/layouts";
+import { FormSectionLayout, StepperLayout, type StepperLayoutStep } from "src/layouts";
 
 type ProjectBasics = { name?: string | null; code?: string | null };
 type ProjectContact = { email?: string | null; phone?: string | null };

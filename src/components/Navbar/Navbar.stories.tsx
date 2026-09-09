@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavGroup, AppNavItem } from "src/components/AppNav/appNavTypes";

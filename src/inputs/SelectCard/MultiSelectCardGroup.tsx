@@ -4,13 +4,13 @@ import { useCheckboxGroupState } from "react-stately";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { LabeledGroupField } from "src/inputs/internal/LabeledGroupField";
 import { SelectCardCheckboxGroupItem } from "src/inputs/SelectCard/SelectCardCheckboxGroupItem";
-import { MultiSelectCardGroupProps } from "src/inputs/SelectCard/types";
+import type { MultiSelectCardGroupProps } from "src/inputs/SelectCard/types";
 import {
   findToggledSelectCardGroupValue,
   getNextSelectCardGroupValues,
   getSelectCardOptionsCss,
 } from "src/inputs/SelectCard/utils";
-import { Value, keyToValue, valueToKey } from "src/inputs/Value";
+import { type Value, keyToValue, valueToKey } from "src/inputs/Value";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 

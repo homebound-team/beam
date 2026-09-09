@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { StepperTab, StepperTabProps } from "./StepperTab";
+import { StepperTab, type StepperTabProps } from "./StepperTab";
 
 export default {
   component: StepperTab,

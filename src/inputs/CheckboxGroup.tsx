@@ -1,7 +1,7 @@
-import { ReactNode, useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { useCheckboxGroup, useCheckboxGroupItem } from "react-aria";
-import { CheckboxGroupState, useCheckboxGroupState } from "react-stately";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { type CheckboxGroupState, useCheckboxGroupState } from "react-stately";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
