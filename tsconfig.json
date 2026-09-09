@@ -7,6 +7,8 @@
     "module": "Preserve",
     // Let tsup rewrite path-less imports
     "moduleResolution": "bundler",
+    // Vite's `resolve.tsconfigPaths` and TS 7 both need explicit `paths` for the `src/*` alias
+    "paths": { "src/*": ["./src/*"] },
     "noEmit": true,
     "skipLibCheck": true
   }
