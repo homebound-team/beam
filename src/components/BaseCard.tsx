@@ -19,7 +19,7 @@ export type BaseCardProps = {
   tag?: CardTag;
   /** Button or menu overlaying the hero's trailing edge. */
   action?: IconButtonProps | ButtonMenuProps;
-  /** Unpadded, so callers can full-bleed sections; the standard inset is usually `p3`. */
+  /** Inset by the card — pass bare content, not a padded wrapper. */
   children: ReactNode;
   /** Content with its own interactive controls, rendered outside the card's link/button area. */
   footer?: ReactNode;
@@ -72,7 +72,9 @@ export function BaseCard(props: BaseCardProps) {
           </div>
         )}
       </div>
-      {children}
+      {/* `fg1` has to carry through to the body so a fixed-height card can still bottom-anchor its
+          last section. The footer supplies its own top space, so skip `pb3` when one follows. */}
+      <div css={Css.df.fdc.fg1.mw0.px3.pt2.if(!footer).pb3.$}>{children}</div>
     </>
   );
 
@@ -106,8 +108,5 @@ export function BaseCard(props: BaseCardProps) {
 }
 
 const heroHeight = 184;
-/**
- * The box holding the hero and body, i.e. the card's link/button, or a plain div for a static card.
- * Deliberately carries no padding or gap — those differ per card type, so callers own them.
- */
+/** The box holding the hero and body, i.e. the card's link/button, or a plain div for a static card. */
 const contentStyles = Css.df.fdc.fg1.mw0.w100.tal.bn.p0.bgTransparent.color("unset").tdn.outline(0).$;

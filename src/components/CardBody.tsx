@@ -24,11 +24,7 @@ export type CardBodyProps = {
   progress?: number;
   /** Paints the progress track for the AI surface. */
   aiMode?: boolean;
-  /** Set when trailing content (e.g. `BaseCard`'s `footer`) follows, so this skips its own bottom padding. */
-  hasFooter?: boolean;
-  /** Space above the header, before the hero. Defaults to 16px. */
-  topGap?: number;
-  /** Anything below the predefined slots, e.g. a card-type-specific table — owns its own bottom padding. */
+  /** Anything below the predefined slots, e.g. a card-type-specific table. */
   children?: ReactNode;
 };
 
@@ -37,31 +33,17 @@ export type CardBodyProps = {
  * every card should share.
  */
 export function CardBody(props: CardBodyProps) {
-  const {
-    title,
-    leftEyebrow,
-    rightEyebrow,
-    badge,
-    badgeTags,
-    data = [],
-    progress,
-    aiMode = false,
-    hasFooter = false,
-    topGap = 16,
-    children,
-  } = props;
+  const { title, leftEyebrow, rightEyebrow, badge, badgeTags, data = [], progress, aiMode = false, children } = props;
   const tid = useTestIds(props, "cardBody");
   const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
   const hasDetails = data.length > 0 || progress !== undefined;
-  const isLastSection = !hasFooter && !children;
 
   const col1 = data.slice(0, Math.ceil(data.length / 2));
   const col2 = data.slice(Math.ceil(data.length / 2));
 
   return (
-    <div css={Css.df.fdc.gap2.fg1.mw0.ptPx(topGap).$}>
-      {/* The hero is full-bleed, so this section pads its own sides; only the last section gets `pb3`. */}
-      <div css={Css.df.fdc.gap1.px3.if(!hasDetails && isLastSection).pb3.$}>
+    <div css={Css.df.fdc.gap2.fg1.mw0.$}>
+      <div css={Css.df.fdc.gap1.$}>
         {(leftEyebrow || rightEyebrow) && (
           <div css={Css.df.jcsb.gap1.sm.color(Tokens.OnSurface).$} {...tid.eyebrow}>
             <span css={Css.truncate.$} {...tid.leftEyebrow}>
@@ -89,7 +71,7 @@ export function CardBody(props: CardBodyProps) {
         </div>
       </div>
       {hasDetails && (
-        <div css={Css.df.fdc.gap2.mt("auto").px3.if(isLastSection).pb3.$}>
+        <div css={Css.df.fdc.gap2.mt("auto").$}>
           {data.length > 0 && (
             <dl css={Css.df.gap2.sm.$}>
               <div css={Css.df.fdc.fg1.fb2.mw0.$}>

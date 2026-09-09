@@ -45,7 +45,7 @@ export const Default = newStory(
         [
           "With tag",
           <BaseCard key="tag" imgSrc={imgSrc()} imgAlt="" imageFit="contain" tag={{ text: "Active", type: "success" }}>
-            <div css={Css.p3.df.fdc.gap1.$}>
+            <div css={Css.df.fdc.gap1.$}>
               <div css={Css.sm.color(Tokens.OnSurface).$}>Kohler</div>
               <div css={Css.xl.color(Tokens.OnSurface).$}>Forté Showerhead</div>
             </div>
@@ -98,8 +98,7 @@ export function Configuration() {
         imgAlt=""
         action={{ icon: "trash", variant: "outline", onClick: () => {}, label: "Remove configuration" }}
       >
-        {/* 24, not the 16 default — Figma gives this type a full 24px inset on every side, not just a hero-to-body gap. */}
-        <CardBody title="Configuration C" leftEyebrow="12345" topGap={24}>
+        <CardBody title="Configuration C" leftEyebrow="12345">
           <ConfigurationRows rows={createConfigurationRows()} />
         </CardBody>
       </BaseCard>
@@ -114,7 +113,7 @@ export function ConfigurationComparison() {
       <CardContainer>
         <div css={Css.smSb.color(Tokens.OnSurface).mb1.$}>Original</div>
         <BaseCard imgSrc={imgSrc()} imgAlt="">
-          <CardBody title="Configuration D" leftEyebrow="12345" topGap={24}>
+          <CardBody title="Configuration D" leftEyebrow="12345">
             <ConfigurationRows rows={createConfigurationRows({ plain: true })} />
           </CardBody>
         </BaseCard>
@@ -126,7 +125,7 @@ export function ConfigurationComparison() {
           imgAlt=""
           action={{ icon: "trash", variant: "outline", onClick: () => {}, label: "Remove configuration" }}
         >
-          <CardBody title="Configuration C" leftEyebrow="12345" topGap={24}>
+          <CardBody title="Configuration C" leftEyebrow="12345">
             <ConfigurationRows rows={createConfigurationRows()} />
           </CardBody>
         </BaseCard>
@@ -146,7 +145,7 @@ export function FixedHeight() {
       </CardContainer>
       <CardContainer>
         <BaseCard imgSrc={imgSrc()} imgAlt="" height={380}>
-          <CardBody title="Taller body" leftEyebrow="12345" topGap={24}>
+          <CardBody title="Taller body" leftEyebrow="12345">
             <ConfigurationRows rows={createConfigurationRows({ plain: true })} />
           </CardBody>
         </BaseCard>
@@ -159,7 +158,7 @@ export function AiMode() {
   return (
     <CardContainer>
       <BaseCard imgSrc={imgSrc()} imgAlt="" aiMode>
-        <CardBody title="Configuration C" leftEyebrow="12345" topGap={24}>
+        <CardBody title="Configuration C" leftEyebrow="12345">
           <ConfigurationRows rows={createConfigurationRows()} />
         </CardBody>
       </BaseCard>
@@ -187,12 +186,12 @@ type ConfigurationRow = { label: string; value: string; tag?: { text: string; ty
 /**
  * The Configuration-specific label|value table, each row optionally flagged with an icon-only
  * `Tag`. Figma sets both columns to 14px on a 26px line, with the labels semibold. Passed as
- * `CardBody`'s `children`, so it owns its own side/bottom padding.
+ * `CardBody`'s `children`.
  */
 function ConfigurationRows(props: { rows: ConfigurationRow[] }) {
   const { rows } = props;
   return (
-    <dl css={Css.df.gapPx(12).m0.color(Tokens.OnSurface).px3.pb3.$}>
+    <dl css={Css.df.gapPx(12).m0.color(Tokens.OnSurface).$}>
       <div css={Css.df.fdc.wPx(135).fs0.$}>
         {rows.map((r) => (
           <dt key={r.label} css={Css.smSb.lh("26px").$}>
@@ -272,11 +271,7 @@ function materialSwatches(): { label: string; src: string }[] {
 
 function CardTitle(props: { text?: string }) {
   const { text = "The Emerson Houston" } = props;
-  return (
-    <div css={Css.p3.$}>
-      <div css={Css.xl.color(Tokens.OnSurface).$}>{text}</div>
-    </div>
-  );
+  return <div css={Css.xl.color(Tokens.OnSurface).$}>{text}</div>;
 }
 
 function CardContainer({ children }: { children: ReactNode }) {

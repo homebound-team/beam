@@ -186,7 +186,6 @@ export function TableCardView(props: TableCardViewProps) {
         data={data}
         progress={progress}
         aiMode={aiMode}
-        hasFooter={!!shownFooter}
       />
     </BaseCard>
   );
