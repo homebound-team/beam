@@ -1,4 +1,4 @@
-import { type ReactNode, useSyncExternalStore } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import {
   rightPaneContentStore,
   rightPaneOpenActions,
