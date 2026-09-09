@@ -15,7 +15,7 @@
     "docs/layout-shells.md"
   ],
   "engines": {
-    "node": "~22.14.0"
+    "node": "~26.8.0"
   },
   "exports": {
     ".": {
@@ -42,10 +42,10 @@
     "build-storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint --ext js,ts,tsx src",
-    "lint:ci": "eslint --ext js,ts,tsx src --cache --cache-location .eslintcache --quiet",
-    "lint:fix": "eslint --ext js,ts,tsx --fix --cache --cache-location .eslintcache src",
-    "lint:fix:files": "eslint --ext js,ts,tsx --fix --cache --cache-location .eslintcache",
+    "lint": "oxlint --type-aware",
+    "lint:ci": "oxlint --type-aware --quiet && prettier --check \"src/**/*.{ts,tsx}\"",
+    "lint:fix": "oxlint --type-aware --fix && prettier --log-level warn --write \"src/**/*.{ts,tsx}\"",
+    "lint:fix:files": "sh -c 'oxlint --type-aware --fix \"$@\" && prettier --log-level warn --write \"$@\"' --",
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider storybook dev -p 9000",
     "chromatic": "chromatic --project-token=074248da7284 --exit-once-uploaded --only-changed",
     "copy": "npx copyfiles -u 1 \"./src/**/*.css\" \"./dist/\"",
@@ -97,16 +97,16 @@
     }
   },
   "devDependencies": {
-    "@homebound/eslint-config": "^1.10.2",
+    "@homebound/eslint-config": "^5.0.0",
     "@homebound/rtl-react-router-utils": "2.1.0",
     "@homebound/rtl-utils": "^2.71.0",
     "@homebound/truss": "2.29.5",
-    "@homebound/tsconfig": "^1.1.1",
+    "@homebound/tsconfig": "^1.2.0",
     "@semantic-release/exec": "^7.1.0",
-    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/git": "^11.0.1",
     "@storybook/react-vite": "^10.6.0",
     "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.10.0",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@tsconfig/recommended": "^1.0.13",
     "@types/dompurify": "^2.4.0",
@@ -115,34 +115,32 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18.3.7",
     "array-move": "^4.0.0",
-    "chromatic": "^15.3.1",
-    "conventional-changelog-conventionalcommits": "^9.3.1",
-    "eslint": "^8.57.1",
-    "eslint-plugin-storybook": "^10.6.0",
-    "husky": "^5.2.0",
+    "chromatic": "^18.7.2",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
+    "husky": "^9.1.7",
     "jsdom": "29.0.0",
     "mobx": "^6.16.1",
     "mobx-react": "^9.2.2",
+    "oxlint": "^1.82.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "prettier": "^3.9.6",
     "prettier-plugin-organize-imports": "^4.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "semantic-release": "^24.2.9",
+    "semantic-release": "^25.0.9",
     "storybook": "^10.6.0",
     "tsup": "^8.5.1",
     "tsx": "^4.23.13",
     "typescript": "5.9.3",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11",
+    "vitest": "^5.0.0",
     "watch": "^1.0.2"
   },
   "resolutions": {
     "@types/react": "18.0.28",
     "react-router": "6.30.6",
     "react-router-dom": "6.30.6",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "@vitest/expect": "^4.1.0"
+    "@vitest/expect": "^5.0.0"
   },
   "imports": {
     "src/*": "./src/*"

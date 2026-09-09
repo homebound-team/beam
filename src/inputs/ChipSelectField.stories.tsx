@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useCallback, useState } from "react";
 import { ChipSelectField } from "src";
 import { PresentationProvider } from "src/components";
-import { InternalUser, TaskStatus } from "src/components/Filters/testDomain";
+import { type InternalUser, TaskStatus } from "src/components/Filters/testDomain";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { zeroTo } from "src/utils/sb";

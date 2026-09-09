@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { HomeboundLogo } from "src/components/Logos";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";

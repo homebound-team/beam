@@ -142,9 +142,9 @@ Authoring, structure, nomenclature, and commands: [`tokens/README.md`](tokens/RE
 
 ## Linting
 
-CI **`validate-code`** runs **`yarn lint:ci`** on `src/` (ESLint with cache + quiet, same as local). **Before opening a PR**, run **`yarn lint:ci`** and fix all reported issues so the lint job does not fail downstream.
+Linting is [oxlint](https://oxc.rs/docs/guide/usage/linter) with type-aware rules, configured in `oxlint.config.ts` via `@homebound/eslint-config`. CI **`validate-code`** runs **`yarn lint:ci`** (oxlint with `--quiet`, so only errors fail the job). **Before opening a PR**, run **`yarn lint:ci`** and fix all reported issues so the lint job does not fail downstream.
 
-Whenever you edit **`.ts` / `.tsx` / `.js` under `src/`**, run ESLint with **`--fix`** on those paths (then address anything left manually):
+Whenever you edit **`.ts` / `.tsx` / `.js` under `src/`**, run oxlint with **`--fix`** on those paths (then address anything left manually):
 
 ```
 yarn lint:fix:files src/components/Example.tsx

@@ -1,5 +1,5 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
-import { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
+import { createObjectState, type ObjectConfig, required } from "@homebound/form-state";
+import type { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
 import { click, render } from "src/utils/rtl";
 import { BoundSelectCardGroupField } from "./BoundSelectCardGroupField";
 

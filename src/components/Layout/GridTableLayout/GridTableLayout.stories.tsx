@@ -1,11 +1,11 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import { IconButton } from "src/components/IconButton";
 import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
-import { GridColumn, GridDataRow, SimpleHeaderAndData } from "src/components/Table";
+import type { GridColumn, GridDataRow, SimpleHeaderAndData } from "src/components/Table";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,

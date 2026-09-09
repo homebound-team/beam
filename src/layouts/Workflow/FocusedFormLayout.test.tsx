@@ -1,7 +1,7 @@
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { setViewport } from "src/tests/viewport";
 import { click, render, withRouter } from "src/utils/rtl";
-import { FocusedFormLayout, FocusedFormLayoutProps } from "./FocusedFormLayout";
+import { FocusedFormLayout, type FocusedFormLayoutProps } from "./FocusedFormLayout";
 
 describe("FocusedFormLayout", () => {
   it("renders the header without stepper tabs and the body", async () => {

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { noop } from "src/utils";

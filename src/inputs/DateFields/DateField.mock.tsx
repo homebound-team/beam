@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type DateFieldProps } from "src/inputs";
+import type { DateFieldProps } from "src/inputs";
 import { dateFormats, formatDate, parseDate } from "src/inputs/DateFields/utils";
 import { maybeCall, useTestIds } from "src/utils";
 

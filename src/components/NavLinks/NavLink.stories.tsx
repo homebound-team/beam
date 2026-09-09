@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { ContrastScope } from "src/components";
 import { Icons } from "src/components/Icon";
-import { NavLink, NavLinkProps } from "src/components/NavLinks/NavLink";
+import { NavLink, type NavLinkProps } from "src/components/NavLinks/NavLink";
 import { Css, Tokens } from "src/Css";
 import { withRouter } from "src/utils/sb";
 

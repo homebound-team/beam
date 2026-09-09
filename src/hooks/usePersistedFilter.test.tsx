@@ -1,7 +1,7 @@
 import { withRouter } from "@homebound/rtl-react-router-utils";
 import { useMemo, useRef, useState } from "react";
-import { booleanFilter, FilterDefs, Filters, singleFilter } from "src/components/Filters";
-import { ProjectFilter, Stage, taskCompleteFilter, taskDueFilter } from "src/components/Filters/testDomain";
+import { booleanFilter, type FilterDefs, Filters, singleFilter } from "src/components/Filters";
+import { type ProjectFilter, Stage, taskCompleteFilter, taskDueFilter } from "src/components/Filters/testDomain";
 import { usePersistedFilter } from "src/hooks/usePersistedFilter";
 import { objectId } from "src/utils/objectId";
 import { click, render, wait } from "src/utils/rtl";

@@ -1,7 +1,7 @@
 import type { PressEvent } from "@react-types/shared";
-import { ReactNode } from "react";
-import { PresentationFieldProps } from "src/components/PresentationContext";
-import { Xss } from "src/Css";
+import type { ReactNode } from "react";
+import type { PresentationFieldProps } from "src/components/PresentationContext";
+import type { Xss } from "src/Css";
 
 /** Base Interfaced */
 export interface BeamFocusableProps {

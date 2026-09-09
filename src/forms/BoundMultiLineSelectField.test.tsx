@@ -1,6 +1,6 @@
-import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { AuthorInput } from "src/forms/formStateDomain";
+import type { AuthorInput } from "src/forms/formStateDomain";
 import { click } from "src/utils/rtl";
 import { vi } from "vitest";
 import { BoundMultiLineSelectField } from "./BoundMultiLineSelectField";

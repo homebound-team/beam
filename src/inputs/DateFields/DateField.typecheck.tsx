@@ -1,5 +1,12 @@
-import { type ComponentProps } from "react";
-import { BoundDateField, BoundDateRangeField, DateField, DateRangeField, type DateRange, type PlainDate } from "src";
+import type { ComponentProps } from "react";
+import {
+  DateField,
+  DateRangeField,
+  type BoundDateField,
+  type BoundDateRangeField,
+  type DateRange,
+  type PlainDate,
+} from "src";
 
 type Assert<T extends true> = T;
 type IsAny<T> = 0 extends 1 & T ? true : false;

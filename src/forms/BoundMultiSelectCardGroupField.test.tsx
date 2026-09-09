@@ -1,9 +1,9 @@
-import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
-import { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
+import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
+import type { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 import { BoundMultiSelectCardGroupField } from "./BoundMultiSelectCardGroupField";
-import { AuthorInput } from "./formStateDomain";
+import type { AuthorInput } from "./formStateDomain";
 
 enum Category {
   Math,

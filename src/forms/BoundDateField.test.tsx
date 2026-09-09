@@ -1,7 +1,7 @@
-import { createObjectState, ObjectConfig, ObjectState } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, type ObjectState } from "@homebound/form-state";
 import { act, fireEvent } from "@testing-library/react";
 import { BoundDateField } from "src/forms/BoundDateField";
-import { AuthorInput } from "src/forms/formStateDomain";
+import type { AuthorInput } from "src/forms/formStateDomain";
 import { blur, click, focus, render } from "src/utils/rtl";
 import { jan1, jan2 } from "src/utils/testDates";
 import { setUseMockComponents } from "src/utils/withTestMock";

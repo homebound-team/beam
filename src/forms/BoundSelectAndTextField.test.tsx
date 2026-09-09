@@ -1,4 +1,4 @@
-import { createObjectState, ObjectConfig, required, useFormState } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, required, useFormState } from "@homebound/form-state";
 import { fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundSelectAndTextField } from "src";

@@ -1,4 +1,4 @@
-import { TestIds } from "src/utils/useTestIds";
+import type { TestIds } from "src/utils/useTestIds";
 
 /**
  * Defines the filters for a given filter type `F`.

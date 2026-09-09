@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms";
@@ -10,7 +10,7 @@ import { NumberField } from "src/inputs/NumberField";
 import { SelectField } from "src/inputs/SelectField";
 import { TextAreaField } from "src/inputs/TextAreaField";
 import { TextField } from "src/inputs/TextField";
-import { DateRange, HasIdAndName, PlainDate } from "src/types";
+import type { DateRange, HasIdAndName, PlainDate } from "src/types";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/utils/testDates";
 
 export default {

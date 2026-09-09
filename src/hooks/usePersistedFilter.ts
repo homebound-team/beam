@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
-import { type FilterDefs, type FilterImpls } from "src/components";
+import type { FilterDefs, FilterImpls } from "src/components";
 import { useSessionStorage } from "src/hooks";
-import { type AnyObject } from "src/types";
+import type { AnyObject } from "src/types";
 import { safeEntries, safeKeys } from "src/utils";
 import { JsonParam, useQueryParams } from "use-query-params";
 

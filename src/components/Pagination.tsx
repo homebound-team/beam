@@ -1,4 +1,4 @@
-import { Dispatch } from "react";
+import type { Dispatch } from "react";
 import { IconButton } from "src/components";
 import { Css, Tokens } from "src/Css";
 import { SelectField } from "src/inputs";

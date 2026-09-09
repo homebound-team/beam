@@ -1,5 +1,5 @@
-import { BeamColor } from "src/colors";
-import { LogoSizeProps } from "src/components/Logos/logoTypes";
+import type { BeamColor } from "src/colors";
+import type { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css } from "src/Css";
 
 type BeamLogoProps = { fill?: BeamColor } & LogoSizeProps;

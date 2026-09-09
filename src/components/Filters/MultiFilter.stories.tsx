@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { stageFilter, stageFilterDisabledOptions } from "src/components/Filters/testDomain";
 import { Filters, multiFilter } from "src/components/index";
-import { HasIdAndName } from "src/types";
+import type { HasIdAndName } from "src/types";
 import { zeroTo } from "src/utils/sb";
 
 export default {

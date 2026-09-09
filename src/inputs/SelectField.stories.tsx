@@ -1,11 +1,19 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { ContrastScope, GridColumn, GridTable, Icon, IconKey, simpleHeader, SimpleHeaderAndData } from "src/components";
-import { InputStylePalette } from "src/components/PresentationContext";
+import {
+  ContrastScope,
+  type GridColumn,
+  GridTable,
+  Icon,
+  type IconKey,
+  simpleHeader,
+  type SimpleHeaderAndData,
+} from "src/components";
+import type { InputStylePalette } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
-import { Value } from "src/inputs/Value";
-import { HasIdAndName, Optional } from "src/types";
+import { SelectField, type SelectFieldProps } from "src/inputs/SelectField";
+import type { Value } from "src/inputs/Value";
+import type { HasIdAndName, Optional } from "src/types";
 import { noop } from "src/utils";
 import { withDimensions, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";

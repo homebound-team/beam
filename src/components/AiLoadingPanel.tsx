@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AiLoader } from "src/components/AiLoader";
 import { AiCard, AiPanel } from "src/components/AiPanel";
 import { Css, Tokens } from "src/Css";

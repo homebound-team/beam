@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
-import { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
+import type { SelectCardGridGroupItemOption, SelectCardListGroupItemOption } from "src/inputs/SelectCard/types";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

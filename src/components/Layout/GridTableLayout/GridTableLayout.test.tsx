@@ -15,7 +15,7 @@ import {
   numericColumn,
   selectColumn,
 } from "src/components/Table/utils/columns";
-import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { type SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamFloatingRightOffsetVar,
@@ -28,7 +28,7 @@ import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } f
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
-  GridTableLayoutProps,
+  type GridTableLayoutProps,
   resolveGridTableLayoutStyle,
   useGridTableLayoutState,
 } from "./GridTableLayout";
@@ -418,7 +418,7 @@ describe("GridTableLayout", () => {
 
       // Then the card shows the title and status
       expect(r.tableCard_title).toHaveTextContent("The Conroy");
-      expect(r.tableCard_status).toHaveTextContent("Active");
+      expect(r.tableCard_tag).toHaveTextContent("Active");
     });
   });
 

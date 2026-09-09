@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useMemo, useState } from "react";
+import { Fragment, type ReactNode, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

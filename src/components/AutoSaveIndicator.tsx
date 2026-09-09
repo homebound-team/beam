@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Css, Tokens } from "src/Css";
 import { assertNever } from "src/types";
-import { AutoSaveStatus, IconProps, Tooltip, useAutoSaveStatus } from ".";
+import { AutoSaveStatus, type IconProps, Tooltip, useAutoSaveStatus } from ".";
 import { Icon } from "./Icon";
 
 type AutoSaveIndicatorProps = {

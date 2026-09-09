@@ -1,6 +1,6 @@
 import { useId } from "@react-aria/utils";
-import { ReactNode } from "react";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import type { ReactNode } from "react";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";

@@ -1,5 +1,5 @@
-import React from "react";
-import { Temporal } from "temporal-polyfill";
+import type React from "react";
+import type { Temporal } from "temporal-polyfill";
 
 export type PlainDate = Temporal.PlainDate;
 

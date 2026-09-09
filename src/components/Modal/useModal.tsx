@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { CheckFn } from "src/types";
+import type { CheckFn } from "src/types";
 import { maybeCall } from "src/utils";
-import { ModalApi, ModalProps } from "./Modal";
+import type { ModalApi, ModalProps } from "./Modal";
 import { useModalContext } from "./ModalContext";
 
 export interface UseModalHook {

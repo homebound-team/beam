@@ -1,6 +1,6 @@
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
-import { Tab } from "src/components/Tabs";
+import type { Tab } from "src/components/Tabs";
 import { setViewport } from "src/tests/viewport";
 import { noop } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";

@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { action } from "storybook/actions";
-import { Switch as SwitchComponent, SwitchProps } from "./Switch";
-import { SwitchGroup, SwitchGroupProps } from "./SwitchGroup";
+import { Switch as SwitchComponent, type SwitchProps } from "./Switch";
+import { SwitchGroup, type SwitchGroupProps } from "./SwitchGroup";
 
 export default {
   component: SwitchComponent,

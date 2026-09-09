@@ -1,9 +1,9 @@
-import { ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { useHover } from "react-aria";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
-import { ButtonMenu, MenuItem } from "./ButtonMenu";
-import { Tag, TagType } from "./Tag";
+import { ButtonMenu, type MenuItem } from "./ButtonMenu";
+import { Tag, type TagType } from "./Tag";
 
 export type CardType = "card" | "list";
 export type ImageFitType = "contain" | "cover";
@@ -31,6 +31,7 @@ export type CardProps = {
   tag?: CardTag;
 };
 
+/** @deprecated Prefer {@link BaseCard} if a card is needed. */
 export function Card(props: CardProps) {
   const {
     title,

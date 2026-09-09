@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { LoadingSkeleton, LoadingSkeletonProps } from "src/components/LoadingSkeleton";
+import { LoadingSkeleton, type LoadingSkeletonProps } from "src/components/LoadingSkeleton";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { GridTable, GridTableProps } from "src/components/Table/GridTable";
-import { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
-import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Only } from "src/Css";
+import { GridTable, type GridTableProps } from "src/components/Table/GridTable";
+import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
+import type { GridTableXss, Kinded } from "src/components/Table/types";
+import type { Only } from "src/Css";
 
 export type QueryResult<QData> = {
   loading: boolean;

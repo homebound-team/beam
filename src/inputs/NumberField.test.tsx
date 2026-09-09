@@ -1,7 +1,7 @@
 import { blur, change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
+import { formatValue, NumberField, type NumberFieldProps } from "src/inputs/NumberField";
 import { focus } from "src/utils/rtl";
 import { vi } from "vitest";
 

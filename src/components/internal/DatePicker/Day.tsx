@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { DayProps, useDayRender } from "react-day-picker";
+import { type DayProps, useDayRender } from "react-day-picker";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import "./day.css";

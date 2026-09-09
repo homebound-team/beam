@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
-import { Icon, IconKey } from "src/components/Icon";
+import type { ReactNode } from "react";
+import { Icon, type IconKey } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
-import { Css, Palette, Properties } from "src/Css";
+import { Css, Palette, type Properties } from "src/Css";
 import { useTestIds } from "src/utils";
 
 export interface BannerProps {

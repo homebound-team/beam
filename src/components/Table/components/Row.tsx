@@ -1,19 +1,19 @@
 import { observer } from "mobx-react";
-import React, { ReactElement, useCallback, useContext, useRef } from "react";
+import React, { type ReactElement, useCallback, useContext, useRef } from "react";
 import { mergeProps } from "react-aria";
 import {
   defaultRenderFn,
   headerRenderFn,
-  RenderCellFn,
+  type RenderCellFn,
   rowClickRenderFn,
   rowLinkRenderFn,
 } from "src/components/Table/components/cell";
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
-import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { GridStyle, RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
-import {
+import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
+import { type GridStyle, type RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
+import type {
   DiscriminateUnion,
   FixedSort,
   GridColumnWithId,
@@ -23,12 +23,12 @@ import {
   RenderAs,
 } from "src/components/Table/types";
 import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
-import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
+import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
-  DragData,
+  type DragData,
   EXPANDABLE_HEADER,
   getAlignment,
   getColumnBorderCss,
@@ -41,9 +41,9 @@ import {
   toContent,
   TOTALS,
 } from "src/components/Table/utils/utils";
-import { Css, maybeCssVar, Palette, Properties, Tokens } from "src/Css";
+import { Css, maybeCssVar, Palette, type Properties, Tokens } from "src/Css";
 import { beamRightPaneWidthVar, beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
-import { AnyObject } from "src/types";
+import type { AnyObject } from "src/types";
 import { isFunction } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { useDebouncedCallback } from "use-debounce";

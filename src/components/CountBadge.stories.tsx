@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css, Palette } from "src/Css";
 import { CountBadge } from "./CountBadge";
 

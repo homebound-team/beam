@@ -1,4 +1,4 @@
-import { Css, Properties, Tokens } from "src/Css";
+import { Css, type Properties, Tokens } from "src/Css";
 
 const whiteCircle =
   "data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='4'/%3e%3c/svg%3e";

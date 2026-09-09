@@ -1,7 +1,7 @@
 import { act } from "@testing-library/react";
 import { setViewport } from "src/tests/viewport";
 import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
-import { StepperLayout, StepperLayoutProps, StepperLayoutStep } from "./StepperLayout";
+import { StepperLayout, type StepperLayoutProps, type StepperLayoutStep } from "./StepperLayout";
 
 describe("StepperLayout", () => {
   it("renders the header and the active step's content", async () => {

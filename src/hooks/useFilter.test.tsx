@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { FilterDefs, Filters, singleFilter } from "src/components";
-import { ProjectFilter, Stage } from "src/components/Filters/testDomain";
+import { type FilterDefs, Filters, singleFilter } from "src/components";
+import { type ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import { useFilter } from "src/hooks/useFilter";
 import { render, wait, withRouter } from "src/utils/rtl";
 

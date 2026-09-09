@@ -1,7 +1,7 @@
 import DOMPurify from "dompurify";
-import { ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { RichTextFieldMock } from "src/inputs/RichTextField.mock";
 import { maybeCall, noop } from "src/utils";

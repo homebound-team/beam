@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { Label } from "src/components/Label";
-import { SelectField, Value } from "src/inputs";
-import { ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
-import { Optional } from "src/types";
+import { SelectField, type Value } from "src/inputs";
+import type { ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
+import type { Optional } from "src/types";
 import { Css, useTestIds } from "..";
 
 export interface MultiLineSelectFieldProps<O, V extends Value> extends Exclude<ComboBoxBaseProps<O, V>, "unsetLabel"> {

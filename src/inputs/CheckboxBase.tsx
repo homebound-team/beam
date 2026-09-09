@@ -1,9 +1,9 @@
-import { InputHTMLAttributes, ReactNode, useRef } from "react";
+import { type InputHTMLAttributes, type ReactNode, useRef } from "react";
 import { mergeProps, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { HelperText, maybeTooltip } from "src/components";
 import { Css, px, Tokens } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { BeamFocusableProps } from "src/interfaces";
+import type { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 

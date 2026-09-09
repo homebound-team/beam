@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter, multiFilter } from "src/components/Filters";
@@ -9,14 +9,14 @@ import { collapseColumn, column, numericColumn, selectColumn } from "src/compone
 import { Css } from "src/Css";
 import {
   type AppNavItem,
-  GridColumn,
-  GridDataRow,
+  type GridColumn,
+  type GridDataRow,
   GridTable,
   HomeboundLogo,
   type NavbarProps,
   type NavbarUser,
   simpleHeader,
-  SimpleHeaderAndData,
+  type SimpleHeaderAndData,
   Tokens,
 } from "src/index";
 import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";

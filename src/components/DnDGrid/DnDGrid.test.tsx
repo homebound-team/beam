@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { useRef } from "react";
-import { DnDGrid, DnDGridProps } from "src/components/DnDGrid/DnDGrid";
+import { DnDGrid, type DnDGridProps } from "src/components/DnDGrid/DnDGrid";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { Css, Palette } from "src/Css";

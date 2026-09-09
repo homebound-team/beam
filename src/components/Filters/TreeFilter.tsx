@@ -1,9 +1,9 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveTreeSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { TreeSelectField, TreeSelectFieldProps, Value } from "src/inputs";
-import { TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
-import { TestIds } from "src/utils";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import { TreeSelectField, type TreeSelectFieldProps, type Value } from "src/inputs";
+import type { TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
+import type { TestIds } from "src/utils";
 
 export type TreeFilterProps<O, V extends Value> = Omit<TreeSelectFieldProps<O, V>, "values" | "onSelect" | "label"> & {
   defaultValue?: V[];

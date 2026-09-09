@@ -1,7 +1,7 @@
 import { noop } from "src/utils";
 import { click, getOptions, render } from "src/utils/rtl";
 import { vi } from "vitest";
-import { PageSettings, Pagination, toLimitAndOffset } from "./Pagination";
+import { type PageSettings, Pagination, toLimitAndOffset } from "./Pagination";
 
 const init: PageSettings = { pageNumber: 1, pageSize: 100 };
 

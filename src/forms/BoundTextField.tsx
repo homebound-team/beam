@@ -1,8 +1,8 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Only } from "src/Css";
-import { TextField, TextFieldProps } from "src/inputs";
-import { TextFieldXss } from "src/interfaces";
+import type { Only } from "src/Css";
+import { TextField, type TextFieldProps } from "src/inputs";
+import type { TextFieldXss } from "src/interfaces";
 import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 

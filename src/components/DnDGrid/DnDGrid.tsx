@@ -1,7 +1,13 @@
 import equal from "fast-deep-equal";
-import React, { KeyboardEvent, ReactNode, useCallback, useEffect, useRef } from "react";
-import { Css, Palette, Properties, useTestIds } from "src";
-import { ElementStyleSnapshot, isDefined, restoreElementStyle, setInlineStyles, snapshotElementStyle } from "src/utils";
+import React, { type KeyboardEvent, type ReactNode, useCallback, useEffect, useRef } from "react";
+import { Css, Palette, type Properties, useTestIds } from "src";
+import {
+  type ElementStyleSnapshot,
+  isDefined,
+  restoreElementStyle,
+  setInlineStyles,
+  snapshotElementStyle,
+} from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { DnDGridContext } from "./DnDGridContext";
 

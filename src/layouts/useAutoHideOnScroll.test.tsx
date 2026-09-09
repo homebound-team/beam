@@ -1,4 +1,4 @@
-import { RefObject, useRef } from "react";
+import { type RefObject, useRef } from "react";
 import { THRESHOLD, useAutoHideOnScroll } from "src/layouts/useAutoHideOnScroll";
 import { render, scrollWindowWithAnchor } from "src/utils/rtl";
 

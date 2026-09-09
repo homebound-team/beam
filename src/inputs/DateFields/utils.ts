@@ -1,4 +1,4 @@
-import { type DateRange, type PlainDate } from "src/types";
+import type { DateRange, PlainDate } from "src/types";
 import { type SupportedDateFormat, formatPlainDate, isPlainDate, todayPlainDate } from "src/utils/plainDate";
 import { Temporal } from "temporal-polyfill";
 

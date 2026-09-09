@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css, Tokens } from "src/Css";

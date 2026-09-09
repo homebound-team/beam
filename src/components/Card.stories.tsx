@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { newStory, withRouter } from "src/utils/sb";
 import type { PlayFunction } from "storybook/internal/types";
 import { userEvent, waitFor, within } from "storybook/test";
-import { Card as CardComponent, CardProps } from "./Card";
+import { Card as CardComponent, type CardProps } from "./Card";
 
 export default {
   component: CardComponent,

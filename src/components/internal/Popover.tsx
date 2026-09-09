@@ -1,4 +1,4 @@
-import React, { MutableRefObject } from "react";
+import React, { type MutableRefObject } from "react";
 import { DismissButton, OverlayContainer, useOverlay } from "react-aria";
 import { contrastDataTheme, useContrastScope } from "src/components/ContrastScope";
 

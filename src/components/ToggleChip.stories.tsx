@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css, PresentationProvider, ToggleChip } from "src/index";
 import { newStory } from "src/utils/sb";
 import { action } from "storybook/actions";

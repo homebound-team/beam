@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { AiLoader } from "src/components/AiLoader";
 import { Css } from "src/Css";
 

@@ -1,7 +1,7 @@
-import { BaseHeader, BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import { HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
-import { RouteTabsProps, Tabs, TabsContentXss, TabsProps } from "src/components/Tabs";
-import { Only } from "src/Css";
+import { BaseHeader, type BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
+import { type RouteTabsProps, Tabs, type TabsContentXss, type TabsProps } from "src/components/Tabs";
+import type { Only } from "src/Css";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils";
 
