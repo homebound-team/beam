@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { type MouseEvent, useEffect, useState } from "react";
 import { FocusScope, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
@@ -122,7 +122,7 @@ function NavbarMobileDrawer({
           animate={{ x: 0 }}
           exit={{ x: "-100%" }}
           transition={{ ease: "linear", duration: 0.2 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: MouseEvent) => e.stopPropagation()}
           {...tid.mobileMenuDrawer}
         >
           <div
@@ -166,7 +166,7 @@ function NavbarMobileDrawer({
                 transition={{ ease: "linear", duration: 0.2 }}
                 // String-route items render as `<a>` (react-router Link) and external URLs as `<a href>`;
                 // closing on any anchor click covers same-route taps that don't change the location.
-                onClickCapture={(e) => {
+                onClickCapture={(e: MouseEvent) => {
                   if ((e.target as Element).closest("a")) {
                     onClose();
                   }
