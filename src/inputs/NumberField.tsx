@@ -19,6 +19,8 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   value: number | undefined;
   /** Value proposed by an AI model; puts the field in AI mode. */
   proposedValue?: number;
+  /** Whether to render the on-record value struck through beside the AI proposal. */
+  showOriginalValue?: boolean;
   onChange: (value: number | undefined) => void;
   compact?: boolean;
   clearable?: boolean;
@@ -73,6 +75,7 @@ export function NumberField(props: NumberFieldProps) {
     helperText,
     value,
     proposedValue,
+    showOriginalValue,
     onChange,
     xss,
     displayDirection = false,
@@ -246,6 +249,7 @@ export function NumberField(props: NumberFieldProps) {
       errorMsg={errorMsg}
       helperText={helperText}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      showOriginalValue={showOriginalValue}
       {...proposalProps}
       {...otherProps}
     />

@@ -23,6 +23,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
   const {
     value,
     proposedValue,
+    showOriginalValue,
     disabled = false,
     readOnly = false,
     onBlur,
@@ -76,6 +77,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       inputWrapRef={inputWrapRef}
       textAreaMinHeight={preventNewLines ? 0 : undefined}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      showOriginalValue={showOriginalValue}
       {...proposalProps}
     />
   );

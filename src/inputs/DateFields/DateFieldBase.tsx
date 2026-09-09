@@ -53,8 +53,12 @@ type DateFieldCommonProps = Pick<
   useYearPicker?: boolean;
 };
 
-/** Value proposed by an AI model; puts the field in AI mode. */
-type ProposedValue<V> = { proposedValue?: V };
+type ProposedValue<V> = {
+  /** Value proposed by an AI model; puts the field in AI mode. */
+  proposedValue?: V;
+  /** Whether to render the on-record value struck through beside the AI proposal. */
+  showOriginalValue?: boolean;
+};
 
 export type DateFieldProps = DateFieldCommonProps &
   ProposedValue<PlainDate> & {
@@ -83,6 +87,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
     required,
     value,
     proposedValue,
+    showOriginalValue,
     onFocus,
     onBlur,
     // Pull `onChange` out of the props, but we're not directly using it. Do not want to keep it in `...others`
@@ -311,6 +316,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         inputProps={{ ...inputProps, size: inputSize, onClick: state.open }}
         inputRef={inputRef}
         inputWrapRef={inputWrapRef}
+        showOriginalValue={showOriginalValue}
         {...proposalProps}
         onChange={(v) => {
           // hide the calendar if the user is manually entering the date

@@ -129,6 +129,17 @@ describe("AI mode", () => {
     expect(r.query.name_originalValue).not.toBeInTheDocument();
   });
 
+  it("can omit the original while keeping the proposal styling", async () => {
+    // Given an AI proposal whose original value should not be shown
+    const r = await render(
+      <TestTextField value="Old Cottage" proposedValue="Janes Cottage" showOriginalValue={false} />,
+    );
+    // Then only the proposed value is shown in AI mode
+    expect(r.name).toHaveValue("Janes Cottage");
+    expect(r.name).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.name_originalValue).not.toBeInTheDocument();
+  });
+
   it("commits on edit and drops the AI treatment", async () => {
     const r = await render(<TestTextField value="Old Cottage" proposedValue="Janes Cottage" />);
     // When the user edits the field, which starts from the proposal

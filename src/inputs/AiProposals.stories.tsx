@@ -64,6 +64,17 @@ export function AllFields() {
         <AiTextField />
         <PlainTextField />
       </Section>
+
+      <Section title="All fields without showing the original value, i.e. optimistic entity creation">
+        <AiTextField showOriginalValue={false} />
+        <AiNumberField showOriginalValue={false} />
+        <AiSelectField showOriginalValue={false} />
+        <AiMultiSelectField showOriginalValue={false} />
+        <AiDateField showOriginalValue={false} />
+        <AiDateRangeField showOriginalValue={false} />
+        <AiAutocomplete showOriginalValue={false} />
+        <AiTextAreaField showOriginalValue={false} />
+      </Section>
     </div>
   );
 }
@@ -77,7 +88,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function AiTextField({ original = "Old Cottage", readOnly }: { original?: string; readOnly?: boolean }) {
+function AiTextField({
+  original = "Old Cottage",
+  readOnly,
+  showOriginalValue,
+}: {
+  original?: string;
+  readOnly?: boolean;
+  showOriginalValue?: boolean;
+}) {
   const [value, setValue] = useState<string | undefined>(original);
   return (
     <TextField
@@ -85,6 +104,7 @@ function AiTextField({ original = "Old Cottage", readOnly }: { original?: string
       required
       value={value}
       proposedValue="Janes Cottage"
+      showOriginalValue={showOriginalValue}
       onChange={setValue}
       readOnly={readOnly}
     />
@@ -96,18 +116,35 @@ function PlainTextField() {
   return <TextField label="Lot" value={value} onChange={setValue} />;
 }
 
-function AiNumberField({ original = 20 }: { original?: number }) {
+function AiNumberField({ original = 20, showOriginalValue }: { original?: number; showOriginalValue?: boolean }) {
   const [value, setValue] = useState<number | undefined>(original);
-  return <NumberField label="Ceiling Height" value={value} proposedValue={25} onChange={setValue} />;
+  return (
+    <NumberField
+      label="Ceiling Height"
+      value={value}
+      proposedValue={25}
+      showOriginalValue={showOriginalValue}
+      onChange={setValue}
+    />
+  );
 }
 
-function AiSelectField({ original = "up", readOnly }: { original?: string; readOnly?: boolean }) {
+function AiSelectField({
+  original = "up",
+  readOnly,
+  showOriginalValue,
+}: {
+  original?: string;
+  readOnly?: boolean;
+  showOriginalValue?: boolean;
+}) {
   const [value, setValue] = useState<string | undefined>(original);
   return (
     <SelectField
       label="Primary Bedroom Location"
       value={value}
       proposedValue="down"
+      showOriginalValue={showOriginalValue}
       options={locations}
       onSelect={setValue}
       readOnly={readOnly}
@@ -115,38 +152,54 @@ function AiSelectField({ original = "up", readOnly }: { original?: string; readO
   );
 }
 
-function AiMultiSelectField() {
+function AiMultiSelectField({ showOriginalValue }: { showOriginalValue?: boolean }) {
   const [values, setValues] = useState<string[]>(["up"]);
   return (
     <MultiSelectField
       label="Bedroom Locations"
       values={values}
       proposedValues={["down", "sideways"]}
+      showOriginalValue={showOriginalValue}
       options={locations}
       onSelect={setValues}
     />
   );
 }
 
-function AiDateField() {
+function AiDateField({ showOriginalValue }: { showOriginalValue?: boolean }) {
   const [value, setValue] = useState<PlainDate | undefined>(jan2);
-  return <DateField label="Start Date" value={value} proposedValue={jan29} onChange={setValue} />;
-}
-
-function AiDateRangeField() {
-  const [value, setValue] = useState<DateRange | undefined>({ from: jan2, to: jan10 });
   return (
-    <DateRangeField label="Build Window" value={value} proposedValue={{ from: jan1, to: jan19 }} onChange={setValue} />
+    <DateField
+      label="Start Date"
+      value={value}
+      proposedValue={jan29}
+      showOriginalValue={showOriginalValue}
+      onChange={setValue}
+    />
   );
 }
 
-function AiAutocomplete() {
+function AiDateRangeField({ showOriginalValue }: { showOriginalValue?: boolean }) {
+  const [value, setValue] = useState<DateRange | undefined>({ from: jan2, to: jan10 });
+  return (
+    <DateRangeField
+      label="Build Window"
+      value={value}
+      proposedValue={{ from: jan1, to: jan19 }}
+      showOriginalValue={showOriginalValue}
+      onChange={setValue}
+    />
+  );
+}
+
+function AiAutocomplete({ showOriginalValue }: { showOriginalValue?: boolean }) {
   const [value, setValue] = useState<string | undefined>("Old Supplier");
   return (
     <Autocomplete<HasIdAndName>
       label="Supplier"
       value={value}
       proposedValue="Acme Lumber"
+      showOriginalValue={showOriginalValue}
       options={[{ id: "1", name: "Acme Lumber" }]}
       getOptionLabel={(o) => o.name}
       getOptionValue={(o) => o.id}
@@ -156,9 +209,15 @@ function AiAutocomplete() {
   );
 }
 
-function AiTextAreaField() {
+function AiTextAreaField({ showOriginalValue }: { showOriginalValue?: boolean }) {
   const [value, setValue] = useState<string | undefined>("Old note about the framing.");
   return (
-    <TextAreaField label="Notes" value={value} proposedValue="Framing inspection passed on 1/19." onChange={setValue} />
+    <TextAreaField
+      label="Notes"
+      value={value}
+      proposedValue="Framing inspection passed on 1/19."
+      showOriginalValue={showOriginalValue}
+      onChange={setValue}
+    />
   );
 }

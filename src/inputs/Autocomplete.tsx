@@ -31,7 +31,10 @@ export type AutocompleteProps<T> = {
   /** A list of options that are disabled. Can be either the option itself or an object with the option and a reason why it is disabled */
   disabledOptions?: (Value | { value: Value; reason: string })[];
 } & Pick<PresentationFieldProps, "labelStyle"> &
-  Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth" | "proposedValue">;
+  Pick<
+    TextFieldBaseProps<any>,
+    "label" | "clearable" | "startAdornment" | "fullWidth" | "proposedValue" | "showOriginalValue"
+  >;
 
 export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
   const {
@@ -42,6 +45,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
     onInputChange,
     value,
     proposedValue,
+    showOriginalValue,
     options,
     disabled,
     disabledOptions,
@@ -128,6 +132,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
         inputProps={inputProps}
         labelProps={labelProps}
         onChange={onInputChange}
+        showOriginalValue={showOriginalValue}
         {...proposalProps}
         clearable
         // Respect if caller to passes in `startAdornment={undefined}`

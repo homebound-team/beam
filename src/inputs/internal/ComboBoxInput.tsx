@@ -48,7 +48,7 @@ type ComboBoxInputProps<O, V extends Value> = {
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
 } & PresentationFieldProps &
-  Pick<TextFieldBaseProps<any>, "proposedValue" | "originalValue" | "onUserEdit" | "onUserBlur">;
+  Pick<TextFieldBaseProps<any>, "proposedValue" | "originalValue" | "showOriginalValue" | "onUserEdit" | "onUserBlur">;
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
   const {

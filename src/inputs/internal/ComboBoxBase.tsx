@@ -25,6 +25,8 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   values: V[] | undefined;
   /** Values proposed by an AI model; puts the field in AI mode. */
   proposedValues?: V[];
+  /** Whether to render the on-record value struck through beside the AI proposal. */
+  showOriginalValue?: boolean;
   onSelect: (values: V[], opts: O[]) => void;
   multiselect?: boolean;
   disabledOptions?: (V | { value: V; reason: string })[];
@@ -110,6 +112,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     multiselect = false,
     values: propValues,
     proposedValues,
+    showOriginalValue,
     nothingSelectedText = "",
     disabledOptions,
     borderless,
@@ -433,6 +436,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
+        showOriginalValue={showOriginalValue}
         {...proposalProps}
       />
       {state.isOpen && (

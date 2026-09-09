@@ -10,7 +10,7 @@ import { TextFieldBase } from "../TextFieldBase";
 type TextFieldProps<X> = BeamTextFieldProps<X>;
 
 export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
-  const { value, proposedValue } = props;
+  const { value, proposedValue, showOriginalValue } = props;
   const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
   const tid = useTestIds(props);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -22,6 +22,7 @@ export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFiel
       labelProps={labelProps}
       inputProps={inputProps}
       startAdornment={<Icon icon="search" />}
+      showOriginalValue={showOriginalValue}
       {...proposalProps}
       {...tid.search}
     />

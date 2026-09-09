@@ -51,6 +51,8 @@ export type TextFieldBaseProps<X> = {
   proposedValue?: string;
   /** The formatted value on record, rendered struck through beside the input. Independent of `proposedValue`. */
   originalValue?: string;
+  /** Whether to render `originalValue` beside the proposal. */
+  showOriginalValue?: boolean;
   /** Called on any edit the user makes, so the owning field can end AI mode. */
   onUserEdit?: VoidFunction;
   /** Called when the user leaves the field, so the owning field can retire the struck-through original. */
@@ -116,6 +118,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     inputStylePalette,
     proposedValue,
     originalValue,
+    showOriginalValue = true,
     onUserEdit,
     onUserBlur,
   } = props;
@@ -137,7 +140,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   // Takes precedence over the `inputStylePalette` / `borderless` / `borderOnHover` backgrounds below.
   const showProposal = proposedValue !== undefined;
   // Rendered as a sibling of the input rather than an overlay, so it survives focus.
-  const showOriginal = originalValue !== undefined && originalValue !== "";
+  const showOriginal = showOriginalValue && originalValue !== undefined && originalValue !== "";
 
   const [bgColor, hoverBgColor, disabledBgColor] = showProposal
     ? [Tokens.AiFieldBg, Palette.Purple100, Tokens.FieldBgDisabled]

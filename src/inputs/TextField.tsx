@@ -38,6 +38,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     errorMsg,
     value,
     proposedValue,
+    showOriginalValue,
     onBlur,
     onFocus,
     api,
@@ -93,6 +94,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       inputRef={inputRef}
       tooltip={resolveTooltip(disabled, undefined, readOnly)}
       hideErrorMessage={hideErrorMessage}
+      showOriginalValue={showOriginalValue}
       {...proposalProps}
     />
   );

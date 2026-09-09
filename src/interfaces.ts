@@ -39,6 +39,8 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   value: string | undefined;
   /** Value proposed by an AI model; puts the field in AI mode. */
   proposedValue?: string;
+  /** Whether to render the on-record value struck through beside the AI proposal. */
+  showOriginalValue?: boolean;
   /** Handler called when the interactive element state changes. */
   onChange: (value: string | undefined) => void;
   /** Called when the component loses focus, mostly for BoundTextField to use. */
