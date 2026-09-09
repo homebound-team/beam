@@ -9,13 +9,18 @@ import {
   simpleHeader,
   type SimpleHeaderAndData,
 } from "src/components/index";
-import { InlineFeedbackBanner, type InlineFeedbackBannerProps } from "src/components/InlineFeedbackBanner";
+import {
+  InlineFeedbackBanner,
+  type InlineFeedbackBannerAction,
+  type InlineFeedbackBannerProps,
+} from "src/components/InlineFeedbackBanner";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
-import { viewportModes } from "src/utils/sb";
+import { viewportModes, withRouter } from "src/utils/sb";
 
 export default {
   component: InlineFeedbackBanner,
+  decorators: [withRouter()],
   parameters: {
     chromatic: { modes: viewportModes("desktop", "mobile1") },
     design: {
@@ -61,6 +66,12 @@ export function Default() {
           tagText="Cost missing scope"
           description="Two costs have been awarded but do not have any associated takeoff line items. Remove the bid line or contact the estimation team to update takeoffs."
           actions={[view]}
+        />
+        <InlineFeedbackBanner
+          type="error"
+          tagText="Unmatched"
+          description="Add Stained Wood Ceiling was not found in the option library."
+          actions={[view, resolve()]}
         />
       </Sample>
 
@@ -261,6 +272,18 @@ const nestedColumns: GridColumn<NestedRow>[] = [
   { header: () => "Option", parent: ({ name }) => name, child: ({ name }) => name },
   { header: () => "Status", parent: ({ status }) => status, child: ({ status }) => status },
 ];
+
+/** A menu action, for when one action has several choices behind it. */
+function resolve(): InlineFeedbackBannerAction {
+  return {
+    kind: "menu",
+    label: "Resolve",
+    items: [
+      { label: "Keep", onClick: noop },
+      { label: "Remove", onClick: noop },
+    ],
+  };
+}
 
 function Sample({ title, children }: { title: string; children: ReactNode }) {
   return (

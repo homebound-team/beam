@@ -1,5 +1,6 @@
 import { InlineFeedbackBanner } from "src";
-import { click, render } from "src/utils/rtl";
+import { noop } from "src/utils";
+import { click, render, withRouter } from "src/utils/rtl";
 
 describe("InlineFeedbackBanner", () => {
   it("renders its description", async () => {
@@ -46,6 +47,35 @@ describe("InlineFeedbackBanner", () => {
     click(r.remove);
     expect(onKeep).toHaveBeenCalledTimes(1);
     expect(onRemove).toHaveBeenCalledTimes(1);
+  });
+
+  it("fires a menu action's item", async () => {
+    // Given a banner whose action is a menu
+    const onKeep = vi.fn();
+    const r = await render(
+      <InlineFeedbackBanner
+        type="warning"
+        tagText="In use"
+        description="Used as a requirement for Extend Backsplash Kitchen 109."
+        actions={[
+          {
+            kind: "menu",
+            label: "Resolve",
+            items: [
+              { label: "Keep", onClick: onKeep },
+              { label: "Remove", onClick: noop },
+            ],
+          },
+        ]}
+      />,
+      // `MenuItem` navigates for string `onClick`s, so it always wants a router
+      withRouter(),
+    );
+    // When we open it and pick an item
+    click(r.resolve);
+    click(r.resolve_keep);
+    // Then that item fired
+    expect(onKeep).toHaveBeenCalledTimes(1);
   });
 
   it("omits the actions when it has none", async () => {
