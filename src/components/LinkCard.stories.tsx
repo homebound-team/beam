@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { LinkCard } from "src/components/LinkCard";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";

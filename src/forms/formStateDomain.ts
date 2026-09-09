@@ -2,7 +2,7 @@
 // by a GraphQL schema for a `saveAuthor` mutation that takes an author
 // plus the author's books.
 
-import { type DateRange, type PlainDate } from "src/types";
+import type { DateRange, PlainDate } from "src/types";
 import { Temporal } from "temporal-polyfill";
 
 export const jan1 = Temporal.PlainDate.from("2020-01-01");

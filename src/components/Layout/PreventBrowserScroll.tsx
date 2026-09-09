@@ -1,5 +1,5 @@
 import { Css } from "src/Css";
-import { ChildrenOnly } from "src/types";
+import type { ChildrenOnly } from "src/types";
 
 /** Intended to wrap the whole application to prevent the browser's native scrolling behavior while also taking the full height of the viewport */
 export function PreventBrowserScroll({ children }: ChildrenOnly) {

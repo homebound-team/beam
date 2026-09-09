@@ -2,7 +2,7 @@ import {
   resolveOptionSelectedFilterLabel,
   resolveTreeSelectedFilterLabel,
 } from "src/components/Filters/selectedFilterLabelUtils";
-import { NestedOption } from "src/inputs/TreeSelectField/utils";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
 
 describe("resolveOptionSelectedFilterLabel", () => {
   it("returns the option label for a static options list", () => {

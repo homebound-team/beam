@@ -1,7 +1,7 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Checkbox } from "src/inputs";
-import { TestIds } from "src/utils/useTestIds";
+import type { TestIds } from "src/utils/useTestIds";
 
 export type CheckboxFilterProps<V> = {
   label?: string;

@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactPortal, useEffect, useRef } from "react";
+import { type ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { AutoSaveStatusProvider, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { AutoSaveStatusProvider, IconButton, type OpenInDrawerOpts, useSuperDrawer } from "src/components";
 import { useBeamContext } from "src/components/BeamContext";
 import { Css, px, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

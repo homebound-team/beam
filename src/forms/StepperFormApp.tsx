@@ -1,22 +1,22 @@
-import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
+import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { reaction } from "mobx";
 import { Observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Button,
-  GridColumn,
-  GridDataRow,
+  type GridColumn,
+  type GridDataRow,
   GridTable,
   IconButton,
   simpleHeader,
-  SimpleHeaderAndData,
+  type SimpleHeaderAndData,
 } from "src/components";
-import { Step, Stepper } from "src/components/Stepper";
+import { type Step, Stepper } from "src/components/Stepper";
 import { Css, Tokens } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { AuthorInput } from "src/forms/formStateDomain";
+import type { AuthorInput } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 
 export function StepperFormApp() {

@@ -1,5 +1,5 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useCallback, useRef, useState } from "react";
 import {
   Button,
@@ -10,7 +10,7 @@ import {
   NumberField,
   PresentationProvider,
   ResponsiveGrid,
-  ResponsiveGridProps,
+  type ResponsiveGridProps,
   Switch,
   TextAreaField,
   useDnDGridItem,

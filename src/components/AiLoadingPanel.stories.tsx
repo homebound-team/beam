@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { Css } from "src/Css";
 

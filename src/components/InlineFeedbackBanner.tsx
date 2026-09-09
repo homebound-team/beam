@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
-import { BeamColor } from "src/colors";
+import type { ReactNode } from "react";
+import type { BeamColor } from "src/colors";
 import { Button } from "src/components/Button";
-import { IconKey } from "src/components/Icon";
+import type { IconKey } from "src/components/Icon";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
-import { Tag, TagProps, TagType } from "src/components/Tag";
+import { Tag, type TagProps, type TagType } from "src/components/Tag";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 

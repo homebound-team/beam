@@ -1,7 +1,7 @@
 import { clickAndWait } from "@homebound/rtl-utils";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { useSnackbar } from "src/components/Snackbar/useSnackbar";
 import { Css } from "src/Css";
 import { click, render, wait } from "src/utils/rtl";

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import { Css } from "..";

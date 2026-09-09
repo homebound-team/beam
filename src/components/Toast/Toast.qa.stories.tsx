@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { withBeamDecorator } from "src/utils/sb";
 import { Button } from "../Button";

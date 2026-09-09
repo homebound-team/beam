@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toggleFilter } from "src/components/Filters";
-import { ToggleFilterProps } from "src/components/Filters/ToggleFilter";
+import type { ToggleFilterProps } from "src/components/Filters/ToggleFilter";
 import { click, render } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 

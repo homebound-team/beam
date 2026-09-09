@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { GridColumnWithId, Kinded } from "src/components/Table/types";
+import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
+import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 
 type ColumnWidthInfo = {

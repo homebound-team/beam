@@ -15,7 +15,7 @@ import {
   numericColumn,
   selectColumn,
 } from "src/components/Table/utils/columns";
-import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { type SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamFloatingRightOffsetVar,
@@ -28,7 +28,7 @@ import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } f
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
-  GridTableLayoutProps,
+  type GridTableLayoutProps,
   resolveGridTableLayoutStyle,
   useGridTableLayoutState,
 } from "./GridTableLayout";

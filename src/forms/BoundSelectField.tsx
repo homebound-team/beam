@@ -1,7 +1,7 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdIsh, HasNameIsh, Optional } from "src/types";
+import { SelectField, type SelectFieldProps, type Value } from "src/inputs";
+import type { HasIdIsh, HasNameIsh, Optional } from "src/types";
 import { maybeCall } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";

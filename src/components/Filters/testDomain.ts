@@ -1,9 +1,9 @@
-import { dateFilter, DateFilterValue } from "src/components/Filters/DateFilter";
-import { dateRangeFilter, DateRangeFilterValue } from "src/components/Filters/DateRangeFilter";
+import { dateFilter, type DateFilterValue } from "src/components/Filters/DateFilter";
+import { dateRangeFilter, type DateRangeFilterValue } from "src/components/Filters/DateRangeFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { singleFilter } from "src/components/Filters/SingleFilter";
-import { FilterDefs } from "src/components/Filters/types";
-import { NumberRangeFilterValue } from "./NumberRangeFilter";
+import type { FilterDefs } from "src/components/Filters/types";
+import type { NumberRangeFilterValue } from "./NumberRangeFilter";
 
 export enum Stage {
   StageOne = "ONE",

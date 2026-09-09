@@ -1,7 +1,7 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Switch } from "src/inputs/Switch";
-import { TestIds } from "src/utils/useTestIds";
+import type { TestIds } from "src/utils/useTestIds";
 
 export type ToggleFilterProps<V> = {
   label?: string;

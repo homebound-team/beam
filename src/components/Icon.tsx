@@ -1,8 +1,8 @@
-import { DOMProps } from "@react-types/shared";
-import React, { AriaAttributes, ReactNode } from "react";
-import { BeamColor } from "src/colors";
+import type { DOMProps } from "@react-types/shared";
+import React, { type AriaAttributes, type ReactNode } from "react";
+import type { BeamColor } from "src/colors";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, increment, Margin, Palette, Tokens, Xss } from "src/Css";
+import { Css, increment, type Margin, Palette, Tokens, type Xss } from "src/Css";
 
 export type IconProps = {
   /** The name of an icon */

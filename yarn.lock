@@ -2482,7 +2482,7 @@ __metadata:
     "@homebound/rtl-react-router-utils": "npm:2.1.0"
     "@homebound/rtl-utils": "npm:^2.71.0"
     "@homebound/truss": "npm:2.29.5"
-    "@homebound/tsconfig": "npm:^1.1.1"
+    "@homebound/tsconfig": "npm:^1.2.0"
     "@internationalized/number": "npm:^3.6.8"
     "@popperjs/core": "npm:^2.11.8"
     "@react-aria/interactions": "npm:^3.28.1"
@@ -2647,12 +2647,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@homebound/tsconfig@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@homebound/tsconfig@npm:1.1.1"
+"@homebound/tsconfig@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@homebound/tsconfig@npm:1.2.0"
   dependencies:
-    "@tsconfig/recommended": "npm:^1.0.1"
-  checksum: 10/585c0436ef649c6cc1b9b407816764879d21187de0bfb8cc99de41296df741e1ecd8b9f5ae61ede7926cdfb0856ba004d10f5e619010cd96bb4e284f08d1b919
+    "@tsconfig/recommended": "npm:^1.0.13"
+  checksum: 10/a995704cf13f0f49670cc9bac638b78de16f6359daf375f80913fa2733042bd0e8ddf05dc297d5e1961b889d264e82675e13f1f40adca07a8f16430a8229eea8
   languageName: node
   linkType: hard
 
@@ -4470,7 +4470,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/recommended@npm:^1.0.1, @tsconfig/recommended@npm:^1.0.13":
+"@tsconfig/recommended@npm:^1.0.13":
   version: 1.0.13
   resolution: "@tsconfig/recommended@npm:1.0.13"
   checksum: 10/03af3ce6b4a493ed9daea50dc7c334a9b3d04bf5f3fdbd6b5d0550efffaabb12e0ad7b249d93bd9f5102b8dccd3266af48949ec2ac2e9990580c692e1158db95

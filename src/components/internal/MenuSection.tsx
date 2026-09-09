@@ -1,7 +1,7 @@
-import { Node } from "@react-types/shared";
+import type { Node } from "@react-types/shared";
 import { useMenuSection, useSeparator } from "react-aria";
-import { TreeState } from "react-stately";
-import { MenuItem } from "src/components/ButtonMenu";
+import type { TreeState } from "react-stately";
+import type { MenuItem } from "src/components/ButtonMenu";
 import { MenuItemImpl } from "src/components/internal";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

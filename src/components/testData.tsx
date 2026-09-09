@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { TabWithContent } from "./Tabs";
+import type { ReactNode } from "react";
+import type { TabWithContent } from "./Tabs";
 
 export type TabValue = "tab1" | "tab2" | "tab3" | "tab4";
 

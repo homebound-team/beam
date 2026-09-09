@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { newStory, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
-import { TagGroup, TagGroupProps } from "./TagGroup";
+import { TagGroup, type TagGroupProps } from "./TagGroup";
 
 export default {
   component: TagGroup,

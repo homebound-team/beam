@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FilterDefs } from "src";
+import type { FilterDefs } from "src";
 import { safeEntries } from "src/utils";
 
 interface UsePersistedFilterProps<F> {

@@ -1,17 +1,17 @@
-import { Key as AriaKey } from "@react-types/shared";
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Key as AriaKey } from "@react-types/shared";
+import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
 import { resolveTooltip } from "src/components";
 import { Popover } from "src/components/internal";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { getFieldWidth } from "src/inputs/utils";
-import { keyToValue, Value, valueToKey } from "src/inputs/Value";
-import { BeamFocusableProps } from "src/interfaces";
+import { keyToValue, type Value, valueToKey } from "src/inputs/Value";
+import type { BeamFocusableProps } from "src/interfaces";
 import { useDebounce } from "use-debounce";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */

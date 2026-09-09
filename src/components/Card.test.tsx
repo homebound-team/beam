@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { noop } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
-import { Card, CardProps } from "./Card";
+import { Card, type CardProps } from "./Card";
 
 describe("Card Component", () => {
   const defaultProps: CardProps = {

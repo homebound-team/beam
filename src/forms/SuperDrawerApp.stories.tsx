@@ -1,5 +1,5 @@
 import { useFormState } from "@homebound/form-state";
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { Button, SuperDrawerContent, useSuperDrawer } from "src/components";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
@@ -10,7 +10,7 @@ import { BoundDateField } from "./BoundDateField";
 import { BoundNumberField } from "./BoundNumberField";
 import { BoundTextField } from "./BoundTextField";
 import { formConfig } from "./FormStateApp";
-import { AuthorInput } from "./formStateDomain";
+import type { AuthorInput } from "./formStateDomain";
 
 /**
  * Example app using Superdrawer and FormState.

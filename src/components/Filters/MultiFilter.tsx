@@ -1,12 +1,12 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
-import { MultiSelectField, MultiSelectFieldProps } from "src/inputs/MultiSelectField";
+import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
-import { Value } from "src/inputs/Value";
+import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { TestIds } from "src/utils/useTestIds";
+import type { TestIds } from "src/utils/useTestIds";
 
 export type MultiFilterProps<O, V extends Value> = Omit<
   MultiSelectFieldProps<O, V>,

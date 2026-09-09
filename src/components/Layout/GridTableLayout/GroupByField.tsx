@@ -1,5 +1,5 @@
 import { SelectField } from "src/inputs/SelectField";
-import { Value } from "src/inputs/Value";
+import type { Value } from "src/inputs/Value";
 
 export type GroupByFieldProps<G extends Value = string> = {
   value: G;

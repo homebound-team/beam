@@ -1,6 +1,6 @@
-import { Fragment, ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { BorderHoverParent, rowHoverBgVar, RowHoverClass } from "src/components/Table/components/Row";
-import { GridStyle, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
+import { type GridStyle, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
 import type { RenderAs } from "src/components/Table/types";
 import { Css, maybeCssVar, Tokens } from "src/Css";
 

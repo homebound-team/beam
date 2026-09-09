@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { isValidElement, ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
 import { maybeApply } from "src/components/Table/GridTableApi";
 import type { GridStyle } from "src/components/Table/TableStyles";
 import type { MaybeFn, RenderAs } from "src/components/Table/types";

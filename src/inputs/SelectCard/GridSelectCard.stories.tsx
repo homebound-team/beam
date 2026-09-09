@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
-import { GridSelectCard, GridSelectCardProps } from "src/inputs/SelectCard/GridSelectCard";
+import { GridSelectCard, type GridSelectCardProps } from "src/inputs/SelectCard/GridSelectCard";
 import { getSelectCardOptionsCss } from "./utils";
 
 export default {

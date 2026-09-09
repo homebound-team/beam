@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
-import { GridColumn } from "src/components/Table/types";
-import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import type { GridColumn } from "src/components/Table/types";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 
 export default {

@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { StepperLayoutMultiFormApp as StepperLayoutMultiFormAppComponent } from "src/forms/StepperLayoutMultiFormApp";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 

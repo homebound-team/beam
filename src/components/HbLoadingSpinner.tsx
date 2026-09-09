@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useMemo } from "react";
+import React, { type ReactNode, useContext, useMemo } from "react";
 import { Css } from "src/Css";
 import { useTestIds } from "../utils";
 import SpinnerGifBase64 from "./HbLoadingSpinner.base64";

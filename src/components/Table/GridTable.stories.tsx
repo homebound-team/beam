@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
-import { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -14,10 +14,10 @@ import {
   defaultStyle,
   dragHandleColumn,
   emptyCell,
-  GridCellAlignment,
-  GridColumn,
-  GridDataRow,
-  GridRowLookup,
+  type GridCellAlignment,
+  type GridColumn,
+  type GridDataRow,
+  type GridRowLookup,
   GridTable,
   GridTableLayout,
   Icon,
@@ -27,10 +27,10 @@ import {
   pinColumn,
   ProposedValue,
   recursivelyGetContainingRow,
-  RowStyles,
+  type RowStyles,
   selectColumn,
   simpleHeader,
-  SimpleHeaderAndData,
+  type SimpleHeaderAndData,
   useGridTableApi,
   useGridTableLayoutState,
 } from "src/components/index";
@@ -50,7 +50,7 @@ import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
 import { DateField, SelectField } from "src/inputs";
 import { NumberField } from "src/inputs/NumberField";
-import { type PlainDate } from "src/types";
+import type { PlainDate } from "src/types";
 import { noop } from "src/utils";
 import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";

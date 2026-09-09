@@ -1,14 +1,14 @@
-import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
+import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useMemo, useState } from "react";
 import {
   Button,
-  GridColumn,
-  GridDataRow,
+  type GridColumn,
+  type GridDataRow,
   GridTable,
   IconButton,
   simpleHeader,
-  SimpleHeaderAndData,
+  type SimpleHeaderAndData,
 } from "src/components";
 import { Css } from "src/Css";
 import {
@@ -27,10 +27,10 @@ import {
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import { BoundTreeSelectField } from "src/forms/BoundTreeSelectField";
 import { FormLines } from "src/forms/FormLines";
-import { AuthorInput, jan1 } from "src/forms/formStateDomain";
+import { type AuthorInput, jan1 } from "src/forms/formStateDomain";
 import { useComputed } from "src/hooks";
-import { CheckboxGroupItemOption, NestedOption } from "src/inputs";
-import { HasIdAndName } from "src/types";
+import type { CheckboxGroupItemOption, NestedOption } from "src/inputs";
+import type { HasIdAndName } from "src/types";
 
 export function FormStateApp() {
   const [readOnly, setReadOnly] = useState(false);

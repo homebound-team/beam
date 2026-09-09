@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { AiBanner } from "src/components/AiBanner";
 import { Css } from "src/Css";
 import { noop } from "src/utils";

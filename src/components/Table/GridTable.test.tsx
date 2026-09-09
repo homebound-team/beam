@@ -1,6 +1,6 @@
 import { act, fireEvent } from "@testing-library/react";
 import { observable } from "mobx";
-import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
+import { type MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import {
   cardDataBlockSlot,
   cardEyebrowSlot,
@@ -11,11 +11,11 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
-import { GridDataRow } from "src/components/Table/components/Row";
-import { GridTable, OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
-import { GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
-import { defaultStyle, RowStyles } from "src/components/Table/TableStyles";
-import { GridColumn, GridColumnWithId } from "src/components/Table/types";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable, type OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
+import { type GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
+import { defaultStyle, type RowStyles } from "src/components/Table/TableStyles";
+import type { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
   assignDefaultColumnIds,
@@ -31,8 +31,8 @@ import {
   sumColumnSizesPx,
   withColumnGutters,
 } from "src/components/Table/utils/columns";
-import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { simpleDataRows, simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { simpleDataRows, simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
@@ -56,7 +56,7 @@ import {
 } from "src/utils/rtl";
 import { Temporal } from "temporal-polyfill";
 import { vi } from "vitest";
-import { GridCellContent } from "./components/cell";
+import type { GridCellContent } from "./components/cell";
 
 // Most of our tests use this simple Row and 2 columns
 type Data = { name: string; value: number | undefined | null };

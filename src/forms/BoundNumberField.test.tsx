@@ -1,9 +1,9 @@
-import { createObjectState, ObjectConfig, ObjectState, required } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
 import { act, fireEvent } from "@testing-library/react";
 import { Observer } from "mobx-react";
 import { BoundNumberField } from "src/forms/BoundNumberField";
-import { AuthorInput } from "src/forms/formStateDomain";
+import type { AuthorInput } from "src/forms/formStateDomain";
 import { blur, focus, type } from "src/utils/rtl";
 import { vi } from "vitest";
 

@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
 import { resolveTooltip } from "src/components";
-import { Only } from "src/Css";
+import type { Only } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
-import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
+import type { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
 import { maybeCall } from "src/utils";
 
 // Exported for test purposes

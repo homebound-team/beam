@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { FocusScope } from "react-aria";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";

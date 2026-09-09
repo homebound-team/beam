@@ -1,10 +1,10 @@
-import { ListFieldState, ObjectState } from "@homebound/form-state";
+import type { ListFieldState, ObjectState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { Button, ButtonMenu } from "src/components";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks";
 import { fail, useTestIds } from "src/utils";
-import { BoundFormInputConfig, BoundFormRowInputs, FormRow, listFieldPrefix } from "./BoundForm";
+import { type BoundFormInputConfig, type BoundFormRowInputs, FormRow, listFieldPrefix } from "./BoundForm";
 
 // Helper type to identify array type fields in the input type that contain objects
 // Where books: Books[] would be a valid listField, but bookIds: string[] would not

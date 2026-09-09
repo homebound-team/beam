@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { InternalUser } from "src/components/Filters/testDomain";
+import type { InternalUser } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { DateField, MultiSelectField, NumberField, SelectField, TextAreaField, TextField } from "src/inputs";
-import { type PlainDate } from "src/types";
+import type { PlainDate } from "src/types";
 import { Temporal } from "temporal-polyfill";
 
 export default {

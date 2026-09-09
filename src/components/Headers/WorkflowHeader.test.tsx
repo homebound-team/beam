@@ -1,6 +1,6 @@
 import { Button } from "src/components/Button";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
-import { StepperTabsStep } from "src/components/StepperTabs";
+import type { StepperTabsStep } from "src/components/StepperTabs";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

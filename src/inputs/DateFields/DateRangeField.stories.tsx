@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { jan19, jan2 } from "src/forms/formStateDomain";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
-import { DateRange } from "src/types";
+import type { DateRange } from "src/types";
 import { withDimensions } from "src/utils/sb";
 import { action } from "storybook/actions";
 

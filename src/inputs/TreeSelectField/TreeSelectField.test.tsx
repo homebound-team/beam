@@ -1,9 +1,9 @@
-import { RenderResult } from "@homebound/rtl-utils";
+import type { RenderResult } from "@homebound/rtl-utils";
 import { fireEvent, within } from "@testing-library/react";
 import { useState } from "react";
 import { TreeSelectField } from "src/inputs";
-import { NestedOption } from "src/inputs/TreeSelectField/utils";
-import { HasIdAndName } from "src/types";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
+import type { HasIdAndName } from "src/types";
 import { noop } from "src/utils";
 import { blur, click, focus, getSelected, render, wait } from "src/utils/rtl";
 import { vi } from "vitest";

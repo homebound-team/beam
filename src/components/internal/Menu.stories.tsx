@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { ButtonMenu } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";

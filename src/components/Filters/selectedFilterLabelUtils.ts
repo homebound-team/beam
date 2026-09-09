@@ -1,6 +1,6 @@
-import { initializeOptions, OptionsOrLoad } from "src/inputs/internal/ComboBoxBase";
-import { flattenOptions, NestedOption, NestedOptionsOrLoad } from "src/inputs/TreeSelectField/utils";
-import { Value } from "src/inputs/Value";
+import { initializeOptions, type OptionsOrLoad } from "src/inputs/internal/ComboBoxBase";
+import { flattenOptions, type NestedOption, type NestedOptionsOrLoad } from "src/inputs/TreeSelectField/utils";
+import type { Value } from "src/inputs/Value";
 
 /** Resolves a display label for a selected option value (static or lazy-loaded options). */
 export function resolveOptionSelectedFilterLabel<O, V extends Value>(

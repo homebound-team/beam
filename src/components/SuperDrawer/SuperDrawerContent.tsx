@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { Button, ButtonProps } from "src/components/Button";
-import { OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
+import { Button, type ButtonProps } from "src/components/Button";
+import { type OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css, Tokens } from "src/Css";
 import { SuperDrawerWidth } from "./utils";
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Autocomplete } from "src/inputs/Autocomplete";
-import { HasIdAndName } from "src/types";
+import type { HasIdAndName } from "src/types";
 import { click, focus, render, type } from "src/utils/rtl";
 import { vi } from "vitest";
 

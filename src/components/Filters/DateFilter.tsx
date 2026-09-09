@@ -1,11 +1,11 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
-import { DateField, SelectField, Value } from "src/inputs";
+import { DateField, SelectField, type Value } from "src/inputs";
 import { formatDate } from "src/inputs/DateFields/utils";
-import { type PlainDate } from "src/types";
-import { TestIds } from "src/utils";
+import type { PlainDate } from "src/types";
+import type { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { dehydratePlainDate, parsePersistedPlainDate, todayPlainDate } from "src/utils/plainDate";
 

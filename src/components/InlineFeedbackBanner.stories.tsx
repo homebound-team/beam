@@ -1,15 +1,15 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import {
   condensedStyle,
-  GridColumn,
-  GridDataRow,
+  type GridColumn,
+  type GridDataRow,
   GridTable,
   simpleHeader,
-  SimpleHeaderAndData,
+  type SimpleHeaderAndData,
 } from "src/components/index";
-import { InlineFeedbackBanner, InlineFeedbackBannerProps } from "src/components/InlineFeedbackBanner";
+import { InlineFeedbackBanner, type InlineFeedbackBannerProps } from "src/components/InlineFeedbackBanner";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { viewportModes } from "src/utils/sb";

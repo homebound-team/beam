@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { createElement, PropsWithChildren } from "react";
+import { createElement, type PropsWithChildren } from "react";
 import { useResponsiveGridItem } from "src/components/Grid/useResponsiveGridItem";
 import { ResponsiveGridContext } from "src/components/Grid/utils";
 

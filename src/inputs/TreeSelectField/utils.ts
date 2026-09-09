@@ -1,5 +1,5 @@
-import { Key as AriaKey, Node } from "@react-types/shared";
-import { Value } from "src/inputs/Value";
+import type { Key as AriaKey, Node } from "@react-types/shared";
+import type { Value } from "src/inputs/Value";
 
 type FoundOption<O> = { option: NestedOption<O>; parents: NestedOption<O>[] };
 export type NestedOption<O> = O & { children?: NestedOption<O>[]; defaultCollapsed?: boolean };

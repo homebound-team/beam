@@ -1,4 +1,4 @@
-import { AriaAttributes, AriaRole, ReactNode } from "react";
+import type { AriaAttributes, AriaRole, ReactNode } from "react";
 import { BlueprintAiLogo } from "src/components/Logos";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";

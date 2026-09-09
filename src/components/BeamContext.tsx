@@ -1,13 +1,21 @@
-import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
+import {
+  createContext,
+  type MutableRefObject,
+  type PropsWithChildren,
+  useContext,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
 import { OverlayProvider } from "react-aria";
 import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
-import { DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
-import { Modal, ModalProps } from "src/components/Modal/Modal";
-import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
+import { type DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
+import { Modal, type ModalProps } from "src/components/Modal/Modal";
+import { type PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
-import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
-import { CanCloseCheck, CheckFn } from "src/types";
+import type { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
+import type { CanCloseCheck, CheckFn } from "src/types";
 import { EmptyRef } from "src/utils/index";
 import { RightPaneProvider } from "./Layout";
 import { ToastProvider } from "./Toast/ToastContext";

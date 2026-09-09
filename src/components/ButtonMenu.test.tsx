@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "src/components/Button";
-import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
+import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
 import { noop } from "src/utils";
 import { click, render, type, withRouter } from "src/utils/rtl";

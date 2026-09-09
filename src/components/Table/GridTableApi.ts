@@ -1,7 +1,7 @@
 import { comparer } from "mobx";
 import { computedFn } from "mobx-utils";
-import { MutableRefObject, useMemo } from "react";
-import { ListRange, VirtuosoHandle } from "react-virtuoso";
+import { type MutableRefObject, useMemo } from "react";
+import type { ListRange, VirtuosoHandle } from "react-virtuoso";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { DiscriminateUnion, GridTableScrollOptions, Kinded, MaybeFn } from "src/components/Table/types";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";

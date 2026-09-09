@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
-import { Checkbox, CheckboxGroup, CheckboxGroupProps } from "src/index";
+import { Checkbox, CheckboxGroup, type CheckboxGroupProps } from "src/index";
 import { action } from "storybook/actions";
 
 export default {

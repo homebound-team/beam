@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
 import {
   DateField,

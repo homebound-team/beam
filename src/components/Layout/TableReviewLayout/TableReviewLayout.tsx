@@ -1,16 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import { GridTable } from "src/components/Table/GridTable";
-import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only, Tokens } from "src/Css";
+import type { GridTableXss, Kinded } from "src/components/Table/types";
+import { Css, type Only, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import { zIndices } from "src/utils/zIndices";
 import { Toast } from "../../Toast/Toast";
-import { QueryTable, QueryTableProps } from "../GridTableLayout/QueryTable";
-import { ActionButtonProps, BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
-import { HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
+import { QueryTable, type QueryTableProps } from "../GridTableLayout/QueryTable";
+import {
+  type ActionButtonProps,
+  type BaseQueryTableProps,
+  type GridTablePropsWithRows,
+  isGridTableProps,
+} from "../layoutTypes";
+import { type HeaderBreadcrumb, PageHeaderBreadcrumbs } from "../PageHeaderBreadcrumbs";
 import { SidePanel } from "./SidePanel";
 
 const defaultRightPaneWidth = 450;

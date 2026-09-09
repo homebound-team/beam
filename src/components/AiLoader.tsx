@@ -1,5 +1,5 @@
 import { Icon } from "src/components/Icon";
-import { Css, increment, Margin, Only, Xss } from "src/Css";
+import { Css, increment, type Margin, type Only, type Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type AiLoaderProps<X> = {

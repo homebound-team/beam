@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { BeamLogo, BlueprintAiLogo, HomeboundLogo } from "src/components/Logos";
 import { Css, Palette } from "src/Css";
 

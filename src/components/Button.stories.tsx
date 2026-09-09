@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { capitalCase } from "change-case";
-import { Button, ButtonSize, ButtonVariant, ContrastScope, Icon } from "src";
+import { Button, type ButtonSize, type ButtonVariant, ContrastScope, Icon } from "src";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";

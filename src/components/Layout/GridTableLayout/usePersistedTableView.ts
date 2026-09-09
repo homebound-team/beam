@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { TableView } from "src/components/Table/components/ViewToggleButton";
+import type { TableView } from "src/components/Table/components/ViewToggleButton";
 
 export function usePersistedTableView(
   defaultView: TableView,

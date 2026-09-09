@@ -1,5 +1,5 @@
 import { AiPanel } from "src/components/AiPanel";
-import { LinkCard, LinkCardProps } from "src/components/LinkCard";
+import { LinkCard, type LinkCardProps } from "src/components/LinkCard";
 import { BlueprintAiLogo } from "src/components/Logos";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils";

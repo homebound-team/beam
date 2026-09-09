@@ -1,26 +1,34 @@
 import memoizeOne from "memoize-one";
 import { runInAction } from "mobx";
-import React, { MutableRefObject, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Components, ListRange, Virtuoso, VirtuosoGrid, VirtuosoHandle } from "react-virtuoso";
+import React, {
+  type MutableRefObject,
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { type Components, type ListRange, Virtuoso, VirtuosoGrid, type VirtuosoHandle } from "react-virtuoso";
 import type { ImageFitType } from "src/components/Card";
 import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
-import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
-import { GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
+import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
+import { type GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { useColumnResizeHandlers } from "src/components/Table/hooks/useColumnResizeHandlers";
 import { useScrollStorage } from "src/components/Table/hooks/useScrollStorage";
 import { useSetupColumnSizes } from "src/components/Table/hooks/useSetupColumnSizes";
 import {
   defaultStyle,
-  GridStyle,
-  GridStyleDef,
+  type GridStyle,
+  type GridStyleDef,
   resolveStyles,
-  RowStyles,
+  type RowStyles,
   tableRowPrintBreakCss,
 } from "src/components/Table/TableStyles";
-import type { DiscriminateUnion } from "src/components/Table/types";
-import {
+import type {
   Direction,
+  DiscriminateUnion,
   GridColumn,
   GridColumnWithId,
   GridTableXss,
@@ -29,7 +37,7 @@ import {
   RenderAs,
 } from "src/components/Table/types";
 import { assignDefaultColumnIds, withColumnGutters } from "src/components/Table/utils/columns";
-import { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
@@ -40,7 +48,7 @@ import {
   reservedRowKinds,
   TOTALS,
 } from "src/components/Table/utils/utils";
-import { Css, Only } from "src/Css";
+import { Css, type Only } from "src/Css";
 import { useComputed } from "src/hooks";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
@@ -52,8 +60,8 @@ import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
 import { RowGroup } from "./components/RowGroup";
 import { TableCard } from "./components/TableCard";
-import { GridTableEmptyState, GridTableEmptyStateProps } from "./GridTableEmptyState";
-import { DraggedOver, RowState } from "./utils/RowState";
+import { GridTableEmptyState, type GridTableEmptyStateProps } from "./GridTableEmptyState";
+import { DraggedOver, type RowState } from "./utils/RowState";
 
 let runningInJest = false;
 

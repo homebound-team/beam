@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { mergeProps } from "react-aria";
 import { Css, useResponsiveGridItem } from "src";
 

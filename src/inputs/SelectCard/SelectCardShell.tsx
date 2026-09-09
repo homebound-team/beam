@@ -1,8 +1,8 @@
-import { ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { mergeProps, useFocusRing, useHover, usePress } from "react-aria";
 import { maybeTooltip, resolveTooltip } from "src/components";
 import { Css, maybeCssVar, Tokens } from "src/Css";
-import { SelectCardLayout, SelectCardStoryState, SelectCardView } from "src/inputs/SelectCard/types";
+import type { SelectCardLayout, SelectCardStoryState, SelectCardView } from "src/inputs/SelectCard/types";
 import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 

@@ -101,7 +101,7 @@
     "@homebound/rtl-react-router-utils": "2.1.0",
     "@homebound/rtl-utils": "^2.71.0",
     "@homebound/truss": "2.29.5",
-    "@homebound/tsconfig": "^1.1.1",
+    "@homebound/tsconfig": "^1.2.0",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^11.0.1",
     "@storybook/react-vite": "^10.6.0",

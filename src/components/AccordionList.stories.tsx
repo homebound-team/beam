@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Chip } from "src";
 import { Css } from "src/Css";
-import { AccordionProps } from "./Accordion";
+import type { AccordionProps } from "./Accordion";
 import { AccordionList } from "./AccordionList";
 
 export default {
