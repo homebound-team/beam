@@ -252,7 +252,7 @@ const Books: Book[] = [
 
 export function TableWithPrevNextAndCloseCheck() {
   const { openInDrawer, addCanCloseDrawerCheck } = useSuperDrawer();
-  const rowLookup = useRef<GridRowLookup<Row>>();
+  const rowLookup = useRef<GridRowLookup<Row> | undefined>(undefined);
   // Always prompts a confirmation message
   addCanCloseDrawerCheck(() => false);
   // Creates a setContent with prev/next handles to move up or down the table
@@ -298,7 +298,7 @@ export function TableWithPrevNextAndCloseCheck() {
  */
 export function TableWithPrevNext() {
   const { openInDrawer } = useSuperDrawer();
-  const rowLookup = useRef<GridRowLookup<Row>>();
+  const rowLookup = useRef<GridRowLookup<Row> | undefined>(undefined);
 
   // Creates a setContent with prev/next handles to move up or down the table
   function openRow(row: GridDataRow<Row>) {

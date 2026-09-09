@@ -149,7 +149,7 @@ function PageHeader<F>(props: FormPageLayoutProps<F>) {
 }
 
 type SectionWithRefs<F> = {
-  ref: RefObject<HTMLElement>;
+  ref: RefObject<HTMLElement | null>;
   section: FormSection<F>;
   sectionKey: string;
 };

@@ -16,8 +16,8 @@ export interface UseModalHook {
 export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
   const { inModal } = useModalContext();
-  const lastCanClose = useRef<CheckFn | undefined>();
-  const api = useRef<ModalApi>();
+  const lastCanClose = useRef<CheckFn | undefined>(undefined);
+  const api = useRef<ModalApi | undefined>(undefined);
   useEffect(() => {
     return () => {
       modalCanCloseChecks.current = modalCanCloseChecks.current.filter((c) => c !== lastCanClose.current);

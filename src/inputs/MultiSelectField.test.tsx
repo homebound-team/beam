@@ -1,6 +1,6 @@
 import { click, render, type RenderResult } from "@homebound/rtl-utils";
 import { act, fireEvent } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs";
 import type { HasIdAndName, Optional } from "src/types";
 import { focus } from "src/utils/rtl";

@@ -1,6 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
-import { Fragment, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   actionColumn,
   Button,
@@ -192,7 +192,7 @@ export function VirtualFiltering() {
     ],
     [],
   );
-  const rowLookup = useRef<GridRowLookup<Row> | undefined>();
+  const rowLookup = useRef<GridRowLookup<Row> | undefined>(undefined);
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div css={Css.df.fdc.vh100.$}>

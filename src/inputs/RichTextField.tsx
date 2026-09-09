@@ -57,7 +57,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
 
   // We get a reference to the Editor instance after trix-init fires
   const [editor, setEditor] = useState<Editor>();
-  const editorElement = useRef<HTMLElement>();
+  const editorElement = useRef<HTMLElement | undefined>(undefined);
 
   // Keep track of what we pass to onChange, so that we can make ourselves keep looking
   // like a controlled input, i.e. by only calling loadHTML if a new incoming `value` !== `currentHtml`,

@@ -1,6 +1,6 @@
 import { clickAndWait, typeAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { AuthorHeight } from "src/forms/formStateDomain";
 import { SelectField, type SelectFieldProps, type Value } from "src/inputs";
 import type { HasIdAndName, Optional } from "src/types";

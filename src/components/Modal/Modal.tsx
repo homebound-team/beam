@@ -1,5 +1,6 @@
 import { useResizeObserver } from "@react-aria/utils";
 import {
+  type JSX,
   type MutableRefObject,
   type PropsWithChildren,
   type ReactNode,

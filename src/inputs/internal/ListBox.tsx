@@ -1,5 +1,5 @@
 import type { Key as AriaKey } from "@react-types/shared";
-import React, { type MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, type JSX, type MutableRefObject } from "react";
 import { useListBox } from "react-aria";
 import type { ListState } from "react-stately";
 import { Css, Tokens } from "src/Css";

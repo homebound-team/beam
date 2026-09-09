@@ -1,6 +1,6 @@
 import { getInteractionModality } from "@react-aria/interactions";
 import type { Node } from "@react-types/shared";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type JSX } from "react";
 import type { ListState } from "react-stately";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";

@@ -5,7 +5,7 @@ import { useDnDGridContext } from "src/components/DnDGrid/DnDGridContext";
 
 export type useDnDGridItemProps = {
   id: React.Key;
-  itemRef: React.RefObject<HTMLElement>;
+  itemRef: React.RefObject<HTMLElement | null>;
 };
 
 /** Provides props for a GridItem to be draggable */

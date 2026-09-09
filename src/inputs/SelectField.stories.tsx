@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { type JSX, useState } from "react";
 import {
   ContrastScope,
   type GridColumn,

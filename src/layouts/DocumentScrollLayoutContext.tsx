@@ -1,13 +1,14 @@
 import { useResizeObserver } from "@react-aria/utils";
 import {
   createContext,
-  type CSSProperties,
-  type ReactNode,
   useCallback,
   useContext,
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
+  type JSX,
+  type ReactNode,
 } from "react";
 import type { BeamColor } from "src/colors";
 import { Css, Tokens } from "src/Css";

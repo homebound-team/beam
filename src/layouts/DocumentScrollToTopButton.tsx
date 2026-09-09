@@ -35,7 +35,7 @@ export function DocumentScrollToTopButton({ viewportHeight }: DocumentScrollToTo
     <div
       {...tid.wrapper}
       aria-hidden={!visible}
-      {...(!visible ? { inert: "" } : {})}
+      {...(!visible ? { inert: true } : {})}
       css={{
         ...Css.fixed
           .bottom(getFloatingBottomOffset(scrollToTopOffsetPx))

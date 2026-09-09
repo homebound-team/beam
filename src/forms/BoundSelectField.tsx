@@ -1,5 +1,6 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
+import type { JSX } from "react";
 import { SelectField, type SelectFieldProps, type Value } from "src/inputs";
 import type { HasIdIsh, HasNameIsh, Optional } from "src/types";
 import { maybeCall } from "src/utils";

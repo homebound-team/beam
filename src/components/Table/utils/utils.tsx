@@ -145,7 +145,7 @@ function isContentEmpty(content: ReactNode): boolean {
 }
 
 export type DragData<R extends Kinded> = {
-  rowRenderRef: React.RefObject<HTMLTableRowElement>;
+  rowRenderRef: React.RefObject<HTMLTableRowElement | null>;
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;

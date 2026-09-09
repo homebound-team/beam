@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { Button, ContrastScope } from "src/components";
 import { Css } from "src/Css";
 import type { Value } from "src/inputs/index";

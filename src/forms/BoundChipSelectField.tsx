@@ -1,5 +1,6 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
+import type { JSX } from "react";
 import type { Value } from "src/inputs";
 import { ChipSelectField, type ChipSelectFieldProps } from "src/inputs/ChipSelectField";
 import type { HasIdAndName, Optional } from "src/types";

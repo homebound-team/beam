@@ -1,5 +1,5 @@
 import type { Decorator, StoryObj } from "@storybook/react-vite";
-import type { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 import { BeamProvider } from "src/components";
 import { Css, type Properties } from "src/Css";
 import { documentScrollBodyMinHeight } from "src/layouts/layoutVars";

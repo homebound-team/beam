@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type JSX } from "react";
 import { Modal, type ModalProps } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 

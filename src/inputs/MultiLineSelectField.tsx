@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { Button } from "src/components/Button";
 import { Label } from "src/components/Label";
 import { SelectField, type Value } from "src/inputs";
