@@ -1,8 +1,9 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Checkbox, type CheckboxProps } from "src/inputs";
-import { maybeCall, useTestIds } from "src/utils";
+import { Checkbox, type CheckboxProps } from "src/inputs/Checkbox";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundCheckboxFieldProps = Omit<CheckboxProps, "selected" | "onChange" | "label"> & {
   field: FieldState<boolean | null | undefined>;

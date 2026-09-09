@@ -1,11 +1,11 @@
 import { type MutableRefObject, type ReactNode, useRef } from "react";
 import { mergeProps, useTextField } from "react-aria";
-import { resolveTooltip } from "src/components";
+import { resolveTooltip } from "src/components/Tooltip";
 import type { Only } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { TextFieldBase } from "src/inputs/TextFieldBase";
 import type { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
-import { maybeCall } from "src/utils";
+import { maybeCall } from "src/utils/helpers";
 
 // exported for testing purposes
 export interface TextFieldProps<X> extends BeamTextFieldProps<X> {

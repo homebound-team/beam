@@ -1,6 +1,6 @@
 import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
 import { click, render } from "@homebound/rtl-utils";
-import { BoundCheckboxField } from "src/forms";
+import { BoundCheckboxField } from "src/forms/BoundCheckboxField";
 import type { AuthorInput } from "src/forms/formStateDomain";
 import { blur, focus } from "src/utils/rtl";
 import { vi } from "vitest";

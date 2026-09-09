@@ -2,9 +2,9 @@ import { fireEvent } from "@testing-library/react";
 import { useEffect } from "react";
 import { vi } from "vitest";
 
-import { ModalBanner, ModalBody, ModalFooter, type ModalProps, useModal } from "src/components/Modal";
-import { ModalHeader } from "src/components/Modal/Modal";
+import { ModalBanner, ModalBody, ModalFooter, ModalHeader, type ModalProps } from "src/components/Modal/Modal";
 import { OpenModal } from "src/components/Modal/OpenModal";
+import { useModal } from "src/components/Modal/useModal";
 import { Tooltip } from "src/components/Tooltip";
 import { click, render, wait } from "src/utils/rtl";
 

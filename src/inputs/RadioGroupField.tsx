@@ -1,10 +1,10 @@
 import { Fragment, type ReactNode, useMemo, useRef } from "react";
 import { useFocusRing, useHover, useRadio, useRadioGroup } from "react-aria";
 import { type RadioGroupState, useRadioGroupState } from "react-stately";
-import { maybeTooltip, resolveTooltip } from "src/components";
 import { HelperText } from "src/components/HelperText";
 import { Label } from "src/components/Label";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";

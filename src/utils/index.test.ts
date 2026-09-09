@@ -1,4 +1,4 @@
-import { areArraysEqual, isAbsoluteUrl, pluralize } from "src/utils/index";
+import { areArraysEqual, isAbsoluteUrl, pluralize } from "src/utils/helpers";
 
 describe("utils index", () => {
   describe("areArraysEqual", () => {

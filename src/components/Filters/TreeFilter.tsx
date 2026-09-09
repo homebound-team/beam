@@ -2,9 +2,10 @@ import type { JSX } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveTreeSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { TreeSelectField, type TreeSelectFieldProps, type Value } from "src/inputs";
+import { TreeSelectField, type TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
 import type { TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
-import type { TestIds } from "src/utils";
+import type { Value } from "src/inputs/Value";
+import type { TestIds } from "src/utils/useTestIds";
 
 export type TreeFilterProps<O, V extends Value> = Omit<TreeSelectFieldProps<O, V>, "values" | "onSelect" | "label"> & {
   defaultValue?: V[];

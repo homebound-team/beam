@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
 import { Css } from "src/Css";
-import { FormLines } from "src/forms";
+import { FormLines } from "src/forms/FormLines";
 import {
   radioChecked,
   radioDefault,

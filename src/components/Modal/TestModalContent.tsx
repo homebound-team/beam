@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import type { InternalUser } from "src/components/Filters/testDomain";
-import { ScrollableContent, ScrollableParent } from "src/components/Layout";
+import { ScrollableContent } from "src/components/Layout/ScrollableContent";
+import { ScrollableParent } from "src/components/Layout/ScrollableParent";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
-import { useSnackbar } from "src/components/Snackbar";
-import {
-  type GridColumn,
-  type GridDataRow,
-  GridTable,
-  simpleHeader,
-  type SimpleHeaderAndData,
-} from "src/components/Table";
+import { useSnackbar } from "src/components/Snackbar/useSnackbar";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import type { GridColumn } from "src/components/Table/types";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
 import { jan1 } from "src/forms/formStateDomain";
-import { DateField, TextAreaField, TextField } from "src/inputs";
+import { DateField } from "src/inputs/DateFields/DateField";
+import { TextAreaField } from "src/inputs/TextAreaField";
+import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { action } from "storybook/actions";
 

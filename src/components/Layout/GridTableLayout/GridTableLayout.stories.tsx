@@ -1,11 +1,11 @@
 import type { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import { IconButton } from "src/components/IconButton";
 import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
-import type { GridColumn, GridDataRow, SimpleHeaderAndData } from "src/components/Table";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -14,11 +14,16 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import type { GridColumn } from "src/components/Table/types";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css, Tokens } from "src/Css";
-import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
-import { noop } from "src/utils";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
+import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
+import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { createNavbar, sideNavItems, TestProjectLayout } from "src/utils/sbComponents";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";

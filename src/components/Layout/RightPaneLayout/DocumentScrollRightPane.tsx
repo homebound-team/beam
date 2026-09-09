@@ -10,7 +10,7 @@ import {
   documentScrollRightPaneWidth,
   stickyTableHeaderOffset,
 } from "src/layouts/layoutVars";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { useRightPaneContext } from "./RightPaneContext";
 

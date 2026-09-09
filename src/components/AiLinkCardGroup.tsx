@@ -1,8 +1,8 @@
 import { AiPanel } from "src/components/AiPanel";
 import { LinkCard, type LinkCardProps } from "src/components/LinkCard";
-import { BlueprintAiLogo } from "src/components/Logos";
+import { BlueprintAiLogo } from "src/components/Logos/BlueprintAiLogo";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AiLinkCardGroupProps = {
   cards: LinkCardProps[];

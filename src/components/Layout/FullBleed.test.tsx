@@ -1,4 +1,5 @@
-import { FullBleed, ScrollableParent } from "src/components/Layout";
+import { FullBleed } from "src/components/Layout/FullBleed";
+import { ScrollableParent } from "src/components/Layout/ScrollableParent";
 import { render } from "src/utils/rtl";
 
 describe("FullBleed", () => {

@@ -10,7 +10,7 @@ import {
   boundSelectField,
   boundTextAreaField,
   boundTextField,
-} from "src/forms";
+} from "src/forms/BoundForm";
 import type { AuthorInput } from "src/forms/formStateDomain";
 import {
   Css,
@@ -21,7 +21,7 @@ import {
   Tooltip,
   useSnackbar,
 } from "src/index";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
 
 export default {

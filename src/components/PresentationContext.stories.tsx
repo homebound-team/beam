@@ -2,7 +2,12 @@ import { useState } from "react";
 import type { InternalUser } from "src/components/Filters/testDomain";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { DateField, MultiSelectField, NumberField, SelectField, TextAreaField, TextField } from "src/inputs";
+import { DateField } from "src/inputs/DateFields/DateField";
+import { MultiSelectField } from "src/inputs/MultiSelectField";
+import { NumberField } from "src/inputs/NumberField";
+import { SelectField } from "src/inputs/SelectField";
+import { TextAreaField } from "src/inputs/TextAreaField";
+import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { Temporal } from "temporal-polyfill";
 

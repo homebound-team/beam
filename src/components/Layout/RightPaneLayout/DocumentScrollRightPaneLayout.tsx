@@ -7,7 +7,7 @@ import {
   documentScrollChromeWidth,
   documentScrollRightPaneWidth,
 } from "src/layouts/layoutVars";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { DocumentScrollRightPane } from "./DocumentScrollRightPane";
 import { useRightPaneContext } from "./RightPaneContext";
 

@@ -4,7 +4,7 @@ import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css, Tokens } from "src/Css";
 import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
-import { CenteredLayout } from "src/layouts/CenteredLayout";
+import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";

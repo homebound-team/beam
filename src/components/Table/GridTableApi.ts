@@ -8,7 +8,7 @@ import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 import { TableState } from "src/components/Table/utils/TableState";
 import { applyRowFn, isGridCellContent, isJSX } from "src/components/Table/utils/utils";
-import { isDefined } from "src/utils";
+import { isDefined } from "src/utils/helpers";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.

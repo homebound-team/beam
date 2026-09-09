@@ -2,9 +2,9 @@ import type { Node } from "@react-types/shared";
 import { useMenuSection, useSeparator } from "react-aria";
 import type { TreeState } from "react-stately";
 import type { MenuItem } from "src/components/ButtonMenu";
-import { MenuItemImpl } from "src/components/internal";
+import { MenuItemImpl } from "src/components/internal/MenuItem";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 type MenuSectionProps = {
   section: Node<MenuItem>;

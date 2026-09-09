@@ -2,7 +2,7 @@ import type { InputHTMLAttributes, ReactNode } from "react";
 import type { CardTag } from "src/components/Card";
 import type { IconProps } from "src/components/Icon";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
-import type { Value } from "src/inputs";
+import type { Value } from "src/inputs/Value";
 
 export type SelectCardView = "grid" | "list";
 

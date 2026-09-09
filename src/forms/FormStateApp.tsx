@@ -1,35 +1,29 @@
 import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import { useMemo, useState } from "react";
-import {
-  Button,
-  type GridColumn,
-  type GridDataRow,
-  GridTable,
-  IconButton,
-  simpleHeader,
-  type SimpleHeaderAndData,
-} from "src/components";
+import { Button } from "src/components/Button";
+import { IconButton } from "src/components/IconButton";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import type { GridColumn } from "src/components/Table/types";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
-import {
-  BoundDateField,
-  BoundMultiSelectField,
-  BoundNumberField,
-  BoundSelectField,
-  BoundSwitchField,
-  BoundTextField,
-  BoundToggleChipGroupField,
-  FieldGroup,
-  FormDivider,
-  StaticField,
-  SubmitButton,
-} from "src/forms";
 import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
+import { BoundDateField } from "src/forms/BoundDateField";
+import { BoundMultiSelectField } from "src/forms/BoundMultiSelectField";
+import { BoundNumberField } from "src/forms/BoundNumberField";
+import { BoundSelectField } from "src/forms/BoundSelectField";
+import { BoundSwitchField } from "src/forms/BoundSwitchField";
+import { BoundTextField } from "src/forms/BoundTextField";
+import { BoundToggleChipGroupField } from "src/forms/BoundToggleChipGroupField";
 import { BoundTreeSelectField } from "src/forms/BoundTreeSelectField";
-import { FormLines } from "src/forms/FormLines";
+import { FieldGroup, FormDivider, FormLines } from "src/forms/FormLines";
 import { type AuthorInput, jan1 } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
-import type { CheckboxGroupItemOption, NestedOption } from "src/inputs";
+import { StaticField } from "src/forms/StaticField";
+import { SubmitButton } from "src/forms/SubmitButton";
+import { useComputed } from "src/hooks/useComputed";
+import type { CheckboxGroupItemOption } from "src/inputs/CheckboxGroup";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
 import type { HasIdAndName } from "src/types";
 
 export function FormStateApp() {

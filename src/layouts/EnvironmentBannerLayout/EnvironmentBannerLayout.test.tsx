@@ -1,7 +1,7 @@
 import { environmentBannerSizePx } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { beamEnvironmentBannerLayoutHeightVar } from "src/layouts/layoutVars";
-import { NavbarLayout } from "src/layouts/NavbarLayout";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
 import { render } from "src/utils/rtl";
 
 describe("EnvironmentBannerLayout", () => {

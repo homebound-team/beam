@@ -2,7 +2,8 @@ import { type ReactNode, useCallback, useContext } from "react";
 import { Icon } from "src/components/Icon";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, type Properties, Tokens } from "src/Css";
-import { useComputed, useHover } from "src/hooks";
+import { useComputed } from "src/hooks/useComputed";
+import { useHover } from "src/hooks/useHover";
 import { useTestIds } from "src/utils/useTestIds";
 
 type SortHeaderProps = {

@@ -1,7 +1,7 @@
 import { type ReactNode, useRef } from "react";
 import { useCheckbox } from "react-aria";
 import { useToggleState } from "react-stately";
-import { resolveTooltip } from "src/components";
+import { resolveTooltip } from "src/components/Tooltip";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 
 export interface CheckboxProps {

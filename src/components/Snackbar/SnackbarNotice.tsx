@@ -5,7 +5,7 @@ import { contrastDataTheme } from "src/components/ContrastScope";
 import { Icon, type IconProps } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { Css, Palette, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type SnackbarNoticeTypes = "error" | "warning" | "success" | "info" | "alert";
 export type SnackbarNoticeProps = {

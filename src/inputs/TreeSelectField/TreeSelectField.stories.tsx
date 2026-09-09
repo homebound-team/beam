@@ -1,10 +1,11 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState, type JSX } from "react";
-import { Button, ContrastScope } from "src/components";
+import { Button } from "src/components/Button";
+import { ContrastScope } from "src/components/ContrastScope";
 import { Css } from "src/Css";
-import type { Value } from "src/inputs/index";
 import { TreeSelectField, type TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
 import type { NestedOption } from "src/inputs/TreeSelectField/utils";
+import type { Value } from "src/inputs/Value";
 import type { HasIdAndName } from "src/types";
 import { newStory, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";

@@ -1,8 +1,8 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Switch, type SwitchProps } from "src/inputs";
-import { useTestIds } from "src/utils";
+import { Switch, type SwitchProps } from "src/inputs/Switch";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundSwitchFieldProps = Omit<SwitchProps, "selected" | "onChange" | "label"> & {
   field: FieldState<boolean | null | undefined>;

@@ -1,7 +1,8 @@
 import { type ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
 import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
 import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
@@ -19,7 +20,9 @@ import {
   type SimpleHeaderAndData,
   Tokens,
 } from "src/index";
-import { NavbarLayout, PageHeaderLayout, SideNavLayout } from "src/layouts";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
+import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
 

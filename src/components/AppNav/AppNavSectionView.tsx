@@ -1,8 +1,8 @@
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavSection } from "src/components/AppNav/appNavTypes";
-import type { NavLinkVariant } from "src/components/NavLinks";
+import type { NavLinkVariant } from "src/components/NavLinks/NavLink";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AppNavSectionViewProps = {
   section: AppNavSection;

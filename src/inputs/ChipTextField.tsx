@@ -1,9 +1,10 @@
 import { type FormEvent, type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useFocus } from "react-aria";
-import { chipBaseStyles } from "src/components";
+import { chipBaseStyles } from "src/components/Chip";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
-import { maybeCall, useTestIds } from "src/utils";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 interface ChipTextFieldProps {
   // Label is not visible in the component, but required for accessibility purposes

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 /** Structured empty state shown in place of a GridTable when there are no data rows. */
 export type GridTableEmptyStateProps = {

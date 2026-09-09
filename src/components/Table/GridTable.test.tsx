@@ -36,11 +36,12 @@ import { simpleDataRows, simpleHeader, type SimpleHeaderAndData } from "src/comp
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell, matchesFilter } from "src/components/Table/utils/utils";
 import { Css, maybeCssVar, Palette, Tokens } from "src/Css";
-import { useComputed } from "src/hooks";
-import { SelectField, TextField } from "src/inputs";
+import { useComputed } from "src/hooks/useComputed";
+import { SelectField } from "src/inputs/SelectField";
+import { TextField } from "src/inputs/TextField";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { documentScrollChromeWidth } from "src/layouts/layoutVars";
-import { isDefined, noop } from "src/utils";
+import { isDefined, noop } from "src/utils/helpers";
 import {
   cell,
   cellAnd,

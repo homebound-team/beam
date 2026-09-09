@@ -4,7 +4,7 @@ import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import type { FormSectionProps } from "./FormSection";
 
 type FormSectionChildBase = Omit<FormSectionProps, "childSections">;

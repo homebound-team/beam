@@ -4,7 +4,7 @@ import { Label } from "src/components/Label";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { RichTextFieldMock } from "src/inputs/RichTextField.mock";
-import { maybeCall, noop } from "src/utils";
+import { maybeCall, noop } from "src/utils/helpers";
 import { withTestMock } from "src/utils/withTestMock";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useSnackbarContext } from "src/components/Snackbar/SnackbarContext";
 import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
-import { maybeCall } from "src/utils";
+import { maybeCall } from "src/utils/helpers";
 import type { Offset } from "./Snackbar";
 
 export interface UseSnackbarHook {

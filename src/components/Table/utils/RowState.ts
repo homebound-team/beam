@@ -1,9 +1,8 @@
 import { makeAutoObservable, observableRef, reaction } from "mobx";
-import type { Kinded } from "src";
 import { resolveCompanion, type GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { maybeApply, type GridRowApi } from "src/components/Table/GridTableApi";
-import type { MaybeFn } from "src/components/Table/types";
+import type { Kinded, MaybeFn } from "src/components/Table/types";
 import type { RowStates } from "src/components/Table/utils/RowStates";
 import type { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";

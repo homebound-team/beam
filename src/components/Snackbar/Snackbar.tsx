@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { SnackbarNotice, type SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 
 type SnackbarProps = {

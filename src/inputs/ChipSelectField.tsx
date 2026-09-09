@@ -2,25 +2,22 @@ import { camelCase } from "change-case";
 import { type JSX, type Key, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useButton, useFocus, useOverlayPosition, useSelect } from "react-aria";
 import { Item, Section, useListData, useSelectState } from "react-stately";
-import {
-  chipBaseStyles,
-  chipDisabledStyles,
-  chipHoverOnlyStyles,
-  Icon,
-  maybeTooltip,
-  resolveTooltip,
-} from "src/components";
-import { Popover } from "src/components/internal";
+import { chipBaseStyles } from "src/components/Chip";
+import { Icon } from "src/components/Icon";
+import { Popover } from "src/components/internal/Popover";
 import { Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
+import { chipDisabledStyles, chipHoverOnlyStyles } from "src/components/ToggleChip";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette } from "src/Css";
 import { ChipTextField } from "src/inputs/ChipTextField";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { ListBoxChip } from "src/inputs/internal/ListBoxChip";
 import { type Value, valueToKey } from "src/inputs/Value";
 import type { HasIdAndName, Optional } from "src/types";
-import { maybeCall, useTestIds } from "src/utils";
+import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface ChipSelectFieldProps<O, V extends Value> {
   label: string;

@@ -1,4 +1,4 @@
-import { NavbarLayout } from "src/layouts/NavbarLayout";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
 import { render } from "src/utils/rtl";
 
 describe("NavbarLayout", () => {

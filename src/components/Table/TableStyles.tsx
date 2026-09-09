@@ -6,7 +6,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { DiscriminateUnion, Kinded } from "src/components/Table/types";
 import { Css, maybeCssVar, Palette, type Properties, Tokens, type Typography } from "src/Css";
-import { safeKeys } from "src/utils";
+import { safeKeys } from "src/utils/helpers";
 
 const insetSeparator = `inset 0 -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`;
 const insetSeparatorCorner = `inset -1px -1px 0 ${maybeCssVar(Tokens.SurfaceSeparator)}`;

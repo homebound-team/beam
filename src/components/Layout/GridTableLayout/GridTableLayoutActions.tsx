@@ -1,8 +1,8 @@
 import { memo, type MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
-import { type FilterDefs, type FilterImpls, filterTestIdPrefix } from "src/components/Filters";
-import { getActiveFilterCount } from "src/components/Filters/utils";
+import type { FilterDefs, FilterImpls } from "src/components/Filters/types";
+import { filterTestIdPrefix, getActiveFilterCount } from "src/components/Filters/utils";
 import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
@@ -11,12 +11,12 @@ import { type TableView, ViewToggleButton } from "src/components/Table/component
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn, Kinded } from "src/components/Table/types";
 import { Css, Tokens } from "src/Css";
-import { useBreakpoint } from "src/hooks";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { TextField } from "src/inputs/TextField";
 import type { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 import { buildFilterControls, buildFilterImpls, FilterPanel } from "./FilterPanel";

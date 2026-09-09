@@ -1,8 +1,8 @@
 import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
 import { render } from "@homebound/rtl-utils";
-import { BoundCheckboxGroupField } from "src/forms";
+import { BoundCheckboxGroupField } from "src/forms/BoundCheckboxGroupField";
 import type { AuthorInput } from "src/forms/formStateDomain";
-import type { CheckboxGroupItemOption } from "src/inputs";
+import type { CheckboxGroupItemOption } from "src/inputs/CheckboxGroup";
 import { blur, click, focus } from "src/utils/rtl";
 import { vi } from "vitest";
 

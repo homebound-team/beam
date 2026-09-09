@@ -2,7 +2,7 @@ import { Button } from "src/components/Button";
 import type { IconKey } from "src/components/Icon";
 import { Tag } from "src/components/Tag";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type TagGroupItem = {
   text: string;

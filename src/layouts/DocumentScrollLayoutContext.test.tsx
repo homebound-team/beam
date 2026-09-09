@@ -1,6 +1,6 @@
 import { Tokens } from "src/Css";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "src/layouts/layoutVars";
 import { mockDocumentViewport, render } from "src/utils/rtl";
 

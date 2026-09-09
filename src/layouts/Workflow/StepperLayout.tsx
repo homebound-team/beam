@@ -1,8 +1,8 @@
 import { type ReactNode, useState } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import type { StepperTabsStep } from "src/components/StepperTabs";
-import { useTestIds } from "src/utils";
+import type { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 

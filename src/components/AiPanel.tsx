@@ -1,7 +1,7 @@
 import type { AriaAttributes, AriaRole, ReactNode } from "react";
-import { BlueprintAiLogo } from "src/components/Logos";
+import { BlueprintAiLogo } from "src/components/Logos/BlueprintAiLogo";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AiPanelProps = {
   /** Rounds the corners, for a panel sitting within page content rather than spanning it. */

@@ -1,8 +1,12 @@
 import { wait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { booleanFilter, type FilterDefs, Filters, multiFilter, singleFilter } from "src/components/Filters";
+import { booleanFilter } from "src/components/Filters/BooleanFilter";
+import { Filters } from "src/components/Filters/Filters";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import { singleFilter } from "src/components/Filters/SingleFilter";
 import { type ProjectFilter, Stage } from "src/components/Filters/testDomain";
+import type { FilterDefs } from "src/components/Filters/types";
 import type { HasIdAndName } from "src/types";
 import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";

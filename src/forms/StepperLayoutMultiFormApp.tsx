@@ -3,7 +3,8 @@ import { Observer } from "mobx-react";
 import { useCallback, useEffect, useState } from "react";
 import { Css, Tokens } from "src/Css";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { FormSectionLayout, StepperLayout, type StepperLayoutStep } from "src/layouts";
+import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
+import { StepperLayout, type StepperLayoutStep } from "src/layouts/Workflow/StepperLayout";
 
 type ProjectBasics = { name?: string | null; code?: string | null };
 type ProjectContact = { email?: string | null; phone?: string | null };

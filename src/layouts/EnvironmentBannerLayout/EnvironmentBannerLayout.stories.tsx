@@ -1,9 +1,9 @@
 import type { Meta } from "@storybook/react-vite";
-import { HomeboundLogo } from "src/components/Logos";
+import { HomeboundLogo } from "src/components/Logos/HomeboundLogo";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
-import { NavbarLayout } from "src/layouts/NavbarLayout";
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";

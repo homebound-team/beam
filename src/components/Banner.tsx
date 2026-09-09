@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Icon, type IconKey } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { Css, Palette, type Properties } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface BannerProps {
   type: BannerTypes;

@@ -1,13 +1,14 @@
 import type { AriaButtonProps } from "@react-types/button";
 import { type RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { maybeTooltip, navLink, resolveTooltip } from "src/components";
 import { Avatar, type AvatarProps } from "src/components/Avatar/Avatar";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
 import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type AvatarButtonProps = {

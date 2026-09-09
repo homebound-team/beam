@@ -4,7 +4,7 @@ import { IconButton } from "src/components/IconButton";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { HEADER, KEPT_GROUP } from "src/components/Table/utils/utils";
-import { useComputed } from "src/hooks";
+import { useComputed } from "src/hooks/useComputed";
 
 export interface GridTableCollapseToggleProps extends Pick<IconButtonProps, "compact"> {
   row: GridDataRow<any>;

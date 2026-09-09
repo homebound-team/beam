@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { DateFieldImpl as DateField } from "src/inputs/DateFields/DateField";
 import type { PlainDate } from "src/types";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { blur, click, focus, render, type } from "src/utils/rtl";
 import { jan1, jan2, jan29 } from "src/utils/testDates";
 import { vi } from "vitest";

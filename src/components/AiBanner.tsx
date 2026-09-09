@@ -3,7 +3,7 @@ import { AiCard, AiPanel } from "src/components/AiPanel";
 import { Button } from "src/components/Button";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AiBannerProps = {
   title: string;

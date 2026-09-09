@@ -11,8 +11,8 @@ import {
   getSelectCardOptionsCss,
 } from "src/inputs/SelectCard/utils";
 import { type Value, keyToValue, valueToKey } from "src/inputs/Value";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();

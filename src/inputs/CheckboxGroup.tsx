@@ -6,8 +6,8 @@ import { Css } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { CheckboxBase } from "src/inputs/CheckboxBase";
 import { LabeledGroupField } from "src/inputs/internal/LabeledGroupField";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type CheckboxGroupItemOption = {
   /** Additional text displayed below label */

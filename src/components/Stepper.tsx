@@ -2,8 +2,8 @@ import { useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type Step = {
   label: string;

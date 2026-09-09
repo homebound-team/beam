@@ -56,9 +56,6 @@ export function maybeCall(callback: Function | undefined, ...args: any[]) {
   return callback && callback(...args);
 }
 
-export * from "./inlineStyles";
-export * from "./useTestIds";
-
 /** Casts `Object.keys` to "what it should be", as long as your instance doesn't have keys it shouldn't. */
 export function safeKeys<T>(instance: T): (keyof T)[] {
   return Object.getOwnPropertyNames(instance) as any;

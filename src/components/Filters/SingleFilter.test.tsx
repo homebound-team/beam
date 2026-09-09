@@ -1,13 +1,14 @@
 import { click } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { type FilterDefs, Filters } from "src/components/Filters";
+import { Filters } from "src/components/Filters/Filters";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import {
   type ProjectFilter,
   stageFilterWithNothingSelectedText,
   stageSingleFilter,
 } from "src/components/Filters/testDomain";
+import type { FilterDefs } from "src/components/Filters/types";
 import { render } from "src/utils/rtl";
 
 describe("SingleSelectFilter", () => {

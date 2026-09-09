@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { ContrastScope, IconButton } from "src/components";
+import { ContrastScope } from "src/components/ContrastScope";
+import { IconButton } from "src/components/IconButton";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";

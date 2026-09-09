@@ -1,6 +1,6 @@
 import { ObservableMap } from "mobx";
-import type { Kinded } from "src";
 import type { GridDataRow } from "src/components/Table/components/Row";
+import type { Kinded } from "src/components/Table/types";
 import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStorage } from "src/components/Table/utils/RowStorage";
 import type { TableState } from "src/components/Table/utils/TableState";

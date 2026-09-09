@@ -1,8 +1,8 @@
 import type { Dispatch } from "react";
-import { IconButton } from "src/components";
+import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
-import { SelectField } from "src/inputs";
-import { useTestIds } from "src/utils";
+import { SelectField } from "src/inputs/SelectField";
+import { useTestIds } from "src/utils/useTestIds";
 
 /**
  * Page settings, either a pageNumber+pageSize or offset+limit.

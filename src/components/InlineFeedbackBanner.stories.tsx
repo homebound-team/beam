@@ -2,20 +2,17 @@ import type { Meta } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { Button } from "src/components/Button";
 import {
-  condensedStyle,
-  type GridColumn,
-  type GridDataRow,
-  GridTable,
-  simpleHeader,
-  type SimpleHeaderAndData,
-} from "src/components/index";
-import {
   InlineFeedbackBanner,
   type InlineFeedbackBannerAction,
   type InlineFeedbackBannerProps,
 } from "src/components/InlineFeedbackBanner";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import { condensedStyle } from "src/components/Table/TableStyles";
+import type { GridColumn } from "src/components/Table/types";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { viewportModes, withRouter } from "src/utils/sb";
 
 export default {

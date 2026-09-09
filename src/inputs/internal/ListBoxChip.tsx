@@ -1,4 +1,4 @@
-import { chipBaseStyles } from "src/components";
+import { chipBaseStyles } from "src/components/Chip";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 

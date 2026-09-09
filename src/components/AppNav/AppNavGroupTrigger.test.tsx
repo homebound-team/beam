@@ -1,6 +1,6 @@
 import { AppNavGroupTrigger } from "src/components/AppNav/AppNavGroupTrigger";
-import { useTestIds } from "src/utils";
 import { click, render, withRouter } from "src/utils/rtl";
+import { useTestIds } from "src/utils/useTestIds";
 
 describe("AppNavGroupTrigger", () => {
   it("exposes disclosure semantics and label", async () => {

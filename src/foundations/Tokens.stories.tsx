@@ -1,12 +1,13 @@
 import type { Meta } from "@storybook/react-vite";
 import { useMemo } from "react";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
-import { emptyCell, type GridDataRow } from "src/components/Table";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { emptyCell } from "src/components/Table/utils/utils";
 import { Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import colorTokens from "../../tokens/color.json";
 

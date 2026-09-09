@@ -1,6 +1,7 @@
 import { act } from "@testing-library/react";
 import { Button } from "src/components/Button";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -23,7 +24,7 @@ import {
   beamTableActionsHeightVar,
   documentScrollRightPaneWidth,
 } from "src/layouts/layoutVars";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import {

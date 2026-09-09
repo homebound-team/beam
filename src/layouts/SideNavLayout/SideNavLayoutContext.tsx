@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { Breakpoints } from "src/Css";
-import { useBreakpoint } from "src/hooks";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 
 export type SideNavLayoutState = "hidden" | "collapse" | "expanded";
 

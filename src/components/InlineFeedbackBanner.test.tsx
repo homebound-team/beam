@@ -1,5 +1,5 @@
 import { InlineFeedbackBanner } from "src";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 
 describe("InlineFeedbackBanner", () => {

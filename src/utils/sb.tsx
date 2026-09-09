@@ -1,6 +1,6 @@
 import type { Decorator, StoryObj } from "@storybook/react-vite";
 import type { JSX, ReactNode } from "react";
-import { BeamProvider } from "src/components";
+import { BeamProvider } from "src/components/BeamContext";
 import { Css, type Properties } from "src/Css";
 import { documentScrollBodyMinHeight } from "src/layouts/layoutVars";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";

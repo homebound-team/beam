@@ -4,7 +4,7 @@ import { useBeamContext } from "src/components/BeamContext";
 import { ButtonGroup } from "src/components/ButtonGroup";
 import type { OpenInDrawerOpts } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 interface SuperDrawerHeaderProps {
   children: ReactNode;

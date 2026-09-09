@@ -2,14 +2,13 @@ import type { AriaButtonProps } from "@react-types/button";
 import type { PressEvent } from "@react-types/shared";
 import { type ReactNode, type RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
-import type { IconKey } from "src/components";
-import { navLink } from "src/components";
-import { Icon } from "src/components/Icon";
+import { Icon, type IconKey } from "src/components/Icon";
 import { Css, type Properties, Tokens } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
 import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { noop } from "src/utils/helpers";
 
 export type NavLinkVariant = "side" | "global";
 

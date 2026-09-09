@@ -6,7 +6,7 @@ This file is the **source of truth** for agent-oriented conventions in this repo
 
 Use the `src/` path alias (e.g. `import { Css } from "src/Css"`), not relative paths like `../../utils/...`. This applies repo-wide — components, hooks, tests, and stories.
 
-**Do not re-export types through component files.** Put shared types in a dedicated module (e.g. `types.ts`) and expose the public API from the folder barrel (`index.ts`); do not `export type { … } from "…/types"` from a component file just to create a second import path. Prop types for the component (e.g. `FooProps`) stay **above** the component; other file-local types may live **below** it — see [`docs/components.md`](docs/components.md).
+**Do not re-export types through component files.** Put shared types in a dedicated module (e.g. `types.ts`) and import them from there; do not `export type { … } from "…/types"` from a component file just to create a second import path. `src/index.ts` is the only barrel and defines the public API; there are no folder `index.ts` files, and product code always imports the module that declares a symbol (oxlint enforces this for `src`). Prop types for the component (e.g. `FooProps`) stay **above** the component; other file-local types may live **below** it — see [`docs/components.md`](docs/components.md).
 
 ## File naming
 
@@ -64,14 +64,14 @@ After editing a test file, run `yarn lint:fix:files` on that path (see **Linting
 
 **Do not use `getByRole(role, { name })`** (or `getAllByRole` / `findByRole` / `queryByRole` with a `name`). It is the single most expensive thing a Beam test can do, and it has repeatedly caused CI timeouts.
 
-Passing `name` makes Testing Library compute each candidate’s **accessible name** via `dom-accessibility-api`, which calls `getComputedStyle` on every candidate *and its subtree*. jsdom has no cascade cache, so each of those calls re-matches **every CSS rule in the document** — and Truss injects ~2.5k atomic utility rules (`.br4 { … }`), for ~2.7k rules total. Measured on a 14-option `TreeSelectField` listbox:
+Passing `name` makes Testing Library compute each candidate’s **accessible name** via `dom-accessibility-api`, which calls `getComputedStyle` on every candidate _and its subtree_. jsdom has no cascade cache, so each of those calls re-matches **every CSS rule in the document** — and Truss injects ~2.5k atomic utility rules (`.br4 { … }`), for ~2.7k rules total. Measured on a 14-option `TreeSelectField` listbox:
 
-| Query | Cost |
-| --- | --- |
+| Query                                            | Cost      |
+| ------------------------------------------------ | --------- |
 | `getByRole("option", { name: "Grandparent 0" })` | **270ms** |
-| `getAllByRole("option")` (no `name`) | 10ms |
-| `getByText("Grandparent 0")` | ~0ms |
-| the `click` itself | 10ms |
+| `getAllByRole("option")` (no `name`)             | 10ms      |
+| `getByText("Grandparent 0")`                     | ~0ms      |
+| the `click` itself                               | 10ms      |
 
 That is ~96% of the interaction spent in jsdom’s CSS matcher, and it scales with both option count and stylesheet size. Three such lookups per test made `TreeFilter.test.tsx` take 1.1s locally and **16.4s in CI** (CI runs ~13x slower), blowing the 15s `testTimeout` on `main` and on unrelated branches until the queries were replaced.
 

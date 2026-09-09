@@ -1,5 +1,5 @@
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export function LoadingDots() {
   const dotCss = Css.hPx(8)

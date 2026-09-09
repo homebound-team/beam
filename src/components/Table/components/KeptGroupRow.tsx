@@ -6,8 +6,8 @@ import type { GridStyle } from "src/components/Table/TableStyles";
 import type { RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css } from "src/Css";
-import { useComputed } from "src/hooks";
-import { pluralize } from "src/utils";
+import { useComputed } from "src/hooks/useComputed";
+import { pluralize } from "src/utils/helpers";
 
 interface KeptGroupRowProps {
   as: RenderAs;

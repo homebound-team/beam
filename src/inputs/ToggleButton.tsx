@@ -1,9 +1,11 @@
 import { type ReactNode, useRef, useState } from "react";
 import { useFocusRing, useHover, usePress, useSwitch, VisuallyHidden } from "react-aria";
 import { useToggleState } from "react-stately";
-import { Icon, type IconKey, maybeTooltip, resolveTooltip } from "src/components";
+import { Icon, type IconKey } from "src/components/Icon";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
-import { isPromise, useTestIds } from "src/utils";
+import { isPromise } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type ToggleButtonProps = {
   /** Input label */

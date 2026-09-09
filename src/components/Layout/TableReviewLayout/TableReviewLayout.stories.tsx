@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
-import type { GridDataRow } from "src/components/Table";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { useToast } from "src/components/Toast/useToast";

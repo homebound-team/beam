@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { Button } from "src/components/Button";
 import { Css, Tokens } from "src/Css";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 
 export default {

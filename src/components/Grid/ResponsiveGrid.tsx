@@ -1,5 +1,5 @@
 import { type PropsWithChildren, useMemo } from "react";
-import { useResponsiveGrid, type useResponsiveGridProps } from "src/components";
+import { useResponsiveGrid, type useResponsiveGridProps } from "src/components/Grid/useResponsiveGrid";
 import { ResponsiveGridContext } from "src/components/Grid/utils";
 
 export type ResponsiveGridProps = PropsWithChildren<useResponsiveGridProps>;

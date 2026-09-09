@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
+import { Button } from "src/components/Button";
 import { withBeamDecorator } from "src/utils/sb";
-import { Button } from "../index";
 import { Toast } from "./Toast";
 import type { ToastNoticeProps } from "./ToastContext";
 import { useToast } from "./useToast";

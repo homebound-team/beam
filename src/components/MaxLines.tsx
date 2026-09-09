@@ -1,6 +1,6 @@
 import { useLayoutEffect, useResizeObserver } from "@react-aria/utils";
 import { type PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
-import { Css } from "src";
+import { Css } from "src/Css";
 
 export type MaxLinesProps = PropsWithChildren<{
   maxLines: number;

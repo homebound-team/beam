@@ -1,5 +1,5 @@
 import { Children, cloneElement, type JSX, type ReactElement, type ReactNode } from "react";
-import { useModal } from "src/components";
+import { useModal } from "src/components/Modal/useModal";
 import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 

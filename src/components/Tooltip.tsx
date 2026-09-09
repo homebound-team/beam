@@ -5,7 +5,7 @@ import { usePopper } from "react-popper";
 import { useTooltipTriggerState } from "react-stately";
 import type { BeamColor } from "src/colors";
 import { Css, type Padding, Tokens, type Xss } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 // We combine react-popper and aria-tooltip to make up the tooltip component for the following reasons:
 // Aria can handle all aspects of the tooltip accessibility and rendering it except handling the dynamic positioning aspect

@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavGroup, AppNavItem } from "src/components/AppNav/appNavTypes";
-import { HomeboundLogo } from "src/components/Logos";
+import { HomeboundLogo } from "src/components/Logos/HomeboundLogo";
 import type { NavbarUser } from "src/components/Navbar/Navbar";
 import { Navbar } from "src/components/Navbar/Navbar";
 import { Tokens } from "src/Css";

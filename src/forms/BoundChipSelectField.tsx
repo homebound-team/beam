@@ -1,11 +1,12 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import type { JSX } from "react";
-import type { Value } from "src/inputs";
 import { ChipSelectField, type ChipSelectFieldProps } from "src/inputs/ChipSelectField";
+import type { Value } from "src/inputs/Value";
 import type { HasIdAndName, Optional } from "src/types";
-import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 type BoundChipSelectFieldProps<O, V extends Value> = {
   // Allow `onSelect` to be overridden to do more than just `field.set`.

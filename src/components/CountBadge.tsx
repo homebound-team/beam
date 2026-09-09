@@ -1,6 +1,6 @@
 import type { BeamColor } from "src/colors";
 import { Css, type Only, Palette, type Xss } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 type CountBadgeXss = "color";
 

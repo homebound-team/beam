@@ -1,6 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
+import { Filters } from "src/components/Filters/Filters";
 import { stageSingleFilter } from "src/components/Filters/testDomain";
-import { Filters } from "src/components/index";
 
 export default {
   component: Filters,

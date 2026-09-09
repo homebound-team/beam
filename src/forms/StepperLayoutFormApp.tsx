@@ -6,7 +6,8 @@ import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
 import type { AuthorInput } from "src/forms/formStateDomain";
-import { FormSectionLayout, StepperLayout, type StepperLayoutStep } from "src/layouts";
+import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
+import { StepperLayout, type StepperLayoutStep } from "src/layouts/Workflow/StepperLayout";
 
 /**
  * Demos `StepperLayout` over the same form-state domain as `StepperFormApp` — the header (title, tab

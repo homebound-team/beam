@@ -2,7 +2,7 @@ import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import type { Tab } from "src/components/Tabs";
 import { setViewport } from "src/tests/viewport";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 
 describe("PageHeader", () => {

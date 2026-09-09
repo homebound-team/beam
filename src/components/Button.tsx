@@ -1,12 +1,15 @@
 import type { AriaButtonProps } from "@react-types/button";
 import { type ButtonHTMLAttributes, type ReactNode, type RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Icon, type IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
+import { Icon, type IconProps } from "src/components/Icon";
+import { Loader } from "src/components/Loader";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, type Properties, Tokens } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
 import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { isAbsoluteUrl, isPromise, noop } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { isAbsoluteUrl, isPromise, noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { labelOr } from "./internal/OverlayTrigger";
 
