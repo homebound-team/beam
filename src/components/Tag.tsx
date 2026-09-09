@@ -28,6 +28,7 @@ export type TagProps<X> = TagPropsBase<X> & ({ iconOnly?: false; icon?: IconKey 
 export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
   const { text, type, variant = "primary", xss, preventTooltip = false, iconOnly, icon, ...otherProps } = props;
   const isIconOnly = !!iconOnly && !!icon;
+  const isAiStar = icon === "aiStar";
   const isStrikethrough = type === "strikethrough";
   const { background, iconColor, typography, padding } = getVariantStyles(variant, type);
   const tid = useTestIds(otherProps);
@@ -62,7 +63,8 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
         {/* Using `lineClamp1` instead of `truncate` as `truncate` requires a width set to properly truncate and `lineClamp` can smartly do it based on the parent's width */}
         {icon && (
           <span css={Css.fs0.$}>
-            <Icon icon={icon} inc={1.75} color={iconColor} />
+            {/* Trim aiStar's wider viewbox back off, so the chip sizes like it does for every other icon. */}
+            <Icon icon={icon} inc={isAiStar ? 2.5 : 1.75} xss={isAiStar ? Css.mPx(-3).$ : {}} color={iconColor} />
           </span>
         )}
         {isIconOnly ? (

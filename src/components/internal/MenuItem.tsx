@@ -146,10 +146,8 @@ function ImageMenuItem(item: ImageMenuItemType) {
 function AiMenuItem({ label, isDisabled }: { label: string; isDisabled: boolean }) {
   return (
     <>
-      {/* The aiStar artwork fills its full viewBox, but Design draws it inset within a 24px slot, so
-          scale it down and center it in a same-size box to match other menu items' icon alignment. */}
       <span css={Css.df.aic.jcc.fs0.sqPx(24).mr2.$}>
-        <Icon icon="aiStar" inc={2.125} />
+        <Icon icon="aiStar" />
       </span>
       <span css={Css.if(!isDisabled).color(Palette.Purple600).$}>{label}</span>
     </>

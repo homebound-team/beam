@@ -21,7 +21,7 @@ export function ProposedValue(props: ProposedValueProps) {
     <span {...tid}>
       {original && (
         <>
-          <span css={Css.tdlt.color(Tokens.OnSurfaceMuted).$} {...tid.original}>
+          <span css={Css.tdlt.color(Tokens.OnSurface).$} {...tid.original}>
             {original}
           </span>{" "}
         </>
