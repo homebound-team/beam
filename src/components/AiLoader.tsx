@@ -33,7 +33,6 @@ const cycleMs = 1500;
 
 function starStyles(index: number, inc: number) {
   return (
-    // The sparkle's slot runs larger than the star it draws, so the slot here stays `inc` sized.
     Css.df.aic.jcc
       .sqPx(increment(inc))
       // Also the keyframes' 0%, so stars waiting out their delay (and reduced-motion users) rest small.

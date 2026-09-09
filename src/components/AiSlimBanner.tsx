@@ -18,8 +18,8 @@ export function AiSlimBanner(props: AiSlimBannerProps) {
   return (
     <div css={Css.df.ais.gap2.w100.px2.xs.aiBackground.$} {...tid}>
       {/* Matches the title's first line box (16px line height plus its 8px above and below) so the star
-          stays on that line rather than drifting to the middle of wrapped copy. */}
-      {/* The sparkle's 17px slot draws the 12px star, so the box stays 12px to keep the title in place. */}
+          stays on that line rather than drifting to the middle of wrapped copy, and holds the 12px
+          width the star used to take up on its own. */}
       <span css={Css.df.aic.jcc.fs0.py1.wPx(12).hPx(32).$}>
         <Icon icon="aiStar" inc={2.125} xss={Css.fs0.$} />
       </span>
