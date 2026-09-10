@@ -7,10 +7,10 @@ import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { pageContentPaddingX } from "../layoutSpacing";
 import { StepperLayout } from "./StepperLayout";
 
 export default {

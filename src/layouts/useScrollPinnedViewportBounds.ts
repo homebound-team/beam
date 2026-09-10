@@ -13,7 +13,6 @@ export function useScrollPinnedViewportBounds(
 ): ScrollPinnedViewportBounds | undefined {
   const [bounds, setBounds] = useState<ScrollPinnedViewportBounds | undefined>();
   const getPinTopPxRef = useRef(getPinTopPx);
-  getPinTopPxRef.current = getPinTopPx;
 
   const syncBounds = useCallback(() => {
     const el = anchorRef.current;
@@ -26,6 +25,10 @@ export function useScrollPinnedViewportBounds(
     const heightPx = Math.max(0, Math.round(window.innerHeight - topPx));
     setBounds((prev) => (prev?.topPx === topPx && prev?.heightPx === heightPx ? prev : { topPx, heightPx }));
   }, [anchorRef]);
+
+  useLayoutEffect(() => {
+    getPinTopPxRef.current = getPinTopPx;
+  }, [getPinTopPx]);
 
   useLayoutEffect(() => {
     if (!enabled) {

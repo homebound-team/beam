@@ -1,14 +1,6 @@
 import type { ReactNode } from "react";
 
-/**
- * Desktop right-pane layout strategy. Default varies by layout (`overlay` for GridTable, `auto` for forms).
- * On `sm`, all layouts use {@link DocumentScrollRightPane} `mobile` instead — not a mode here.
- * See `docs/layouts.md` and `ResolvedDocumentScrollRightPaneBehavior` for resolved outcomes.
- *
- * - `overlay` — fixed pane over full-width main (tables).
- * - `push` — main column shrinks beside the pane.
- * - `auto` — pick `clear` or `push` from shell / pane math; when tight → narrow push (forms).
- */
+/** Desktop right-pane strategy. See `docs/layouts.md` for overlay / push / auto outcomes. */
 export type DocumentScrollRightPaneMode = "auto" | "overlay" | "push";
 
 /** Desktop strategies for {@link DocumentScrollInlineRightPaneLayout} only. */

@@ -1,18 +1,18 @@
 import type { Meta } from "@storybook/react-vite";
 import { useMemo } from "react";
+import { Button } from "src/components/Button";
+import { IconButton } from "src/components/IconButton";
+import { FullBleed } from "src/components/Layout/FullBleed";
+import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
+import { ScrollableContent } from "src/components/Layout/ScrollableContent";
+import { ScrollableParent } from "src/components/Layout/ScrollableParent";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable } from "src/components/Table/GridTable";
 import type { GridColumn } from "src/components/Table/types";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { Css } from "src/Css";
 import type { ChildrenOnly } from "src/types";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
-import { Css } from "../../../Css";
-import { Button } from "../../Button";
-import { IconButton } from "../../IconButton";
-import { FullBleed } from "../FullBleed";
-import { PreventBrowserScroll } from "../PreventBrowserScroll";
-import { ScrollableContent } from "../ScrollableContent";
-import { ScrollableParent } from "../ScrollableParent";
 import { RightPaneLayout } from "./RightPaneLayout";
 import { useRightPaneActions } from "./useRightPane";
 

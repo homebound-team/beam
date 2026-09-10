@@ -1,8 +1,3 @@
-/**
- * Module store backing `useRightPane`. Open state and pane content are split so
- * {@link rightPaneOpenActions} stay subscription-free (layout shell, row handlers); only pane
- * UI subscribes via {@link useRightPaneOpenState} / {@link useRightPaneContent}.
- */
 import type { ReactNode } from "react";
 import type { OpenRightPaneOpts } from "./types";
 
