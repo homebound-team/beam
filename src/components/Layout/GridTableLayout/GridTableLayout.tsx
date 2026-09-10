@@ -60,7 +60,7 @@ export type GridTableLayoutProps<
   withCardView?: boolean;
   defaultView?: TableView;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`). Default mode `overlay` (spacer).
+   * Opt into the document-scroll detail pane (`useRightPane`). Always reserves horizontal scroll.
    * Only applies inside a document-scroll layout; hosts the pane around the table body only.
    */
   withRightPane?: WithRightPane;
@@ -108,7 +108,7 @@ function GridTableLayoutComponent<
     emptyFallback: layoutEmptyFallback,
     withRightPane,
   } = props;
-  const rightPane = resolveWithRightPaneOptions(withRightPane, "overlay");
+  const rightPane = resolveWithRightPaneOptions(withRightPane, true);
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
@@ -244,7 +244,7 @@ function GridTableLayoutComponent<
       {inDocumentScrollLayout ? (
         // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
         rightPane ? (
-          <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>
+          <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width} reserveScroll={rightPane.reserveScroll}>
             {tableBody}
           </DocumentScrollOverlayRightPaneLayout>
         ) : (
