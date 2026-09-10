@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { CompoundField } from "src/components/internal/CompoundField";
 import type { Only } from "src/Css";
 import {

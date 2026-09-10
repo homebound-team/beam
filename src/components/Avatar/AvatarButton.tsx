@@ -12,7 +12,7 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type AvatarButtonProps = {
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLButtonElement>;
+  buttonRef?: RefObject<HTMLButtonElement | null>;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
   __storyState?: {
     hovered?: boolean;

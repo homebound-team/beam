@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import type { IconKey } from "src/components";
 import { Icon } from "src/components";
 import { Css } from "src/Css";

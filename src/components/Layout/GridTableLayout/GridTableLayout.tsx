@@ -167,7 +167,7 @@ function GridTableLayoutComponent<
 
   // Imperative handle into GridTableLayoutActions' search box, so `clearFilters` can reset the search
   // input directly even when triggered from outside GridTableLayoutActions (e.g. the empty state below).
-  const searchApiRef = useRef<SearchBoxApi>();
+  const searchApiRef = useRef<SearchBoxApi | undefined>(undefined);
   const clearFilters = useCallback(() => {
     layoutState?.clearFilters();
     searchApiRef.current?.clear();

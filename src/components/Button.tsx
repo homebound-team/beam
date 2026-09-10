@@ -19,7 +19,7 @@ export type ButtonProps = {
   endAdornment?: ReactNode;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLElement>;
+  buttonRef?: RefObject<HTMLElement | null>;
   /** Allow for setting "submit" | "button" | "reset" on button element */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */

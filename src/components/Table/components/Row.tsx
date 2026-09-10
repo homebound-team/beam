@@ -471,12 +471,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             const cellElementWithHandle = React.cloneElement(
               cellElement as React.ReactElement,
               mergeProps(
-                (cellElement as React.ReactElement).props,
+                (cellElement as React.ReactElement<{ children?: React.ReactNode }>).props,
                 Css.props({ ...(!maybeSticky && Css.relative.$) }),
                 {
                   children: (
                     <>
-                      {(cellElement as React.ReactElement).props.children}
+                      {(cellElement as React.ReactElement<{ children?: React.ReactNode }>).props.children}
                       <ColumnResizeHandle
                         columnId={column.id}
                         columnIndex={columnIndex}

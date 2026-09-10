@@ -23,7 +23,7 @@ export type NavLinkProps = {
   openInNew?: boolean;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLElement>;
+  buttonRef?: RefObject<HTMLElement | null>;
   /**
    * When true with an `icon`, shows icon only but keeps `label` for accessibility
    * (visually hidden text). Used by SideNav when the rail is collapsed.

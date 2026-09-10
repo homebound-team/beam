@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Switch } from "src/inputs/Switch";

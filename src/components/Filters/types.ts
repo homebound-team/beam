@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import type { TestIds } from "src/utils/useTestIds";
 
 /**

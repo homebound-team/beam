@@ -1,5 +1,5 @@
 import type { Key as AriaKey } from "@react-types/shared";
-import React, { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
 import { resolveTooltip } from "src/components";

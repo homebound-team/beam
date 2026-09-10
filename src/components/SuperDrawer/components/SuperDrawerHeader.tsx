@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useBeamContext } from "src/components/BeamContext";
 import { ButtonGroup } from "src/components/ButtonGroup";

@@ -1,6 +1,7 @@
 import type { Key as AriaKey } from "@react-types/shared";
 import React, {
   type Dispatch,
+  type JSX,
   type ReactNode,
   type SetStateAction,
   useCallback,

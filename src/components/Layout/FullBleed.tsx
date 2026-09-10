@@ -6,7 +6,11 @@ import { Css } from "src/Css";
 /** Provides a way to extend the full width of the ScrollableParent */
 export function FullBleed({ children, omitPadding = false }: { children: ReactElement; omitPadding?: boolean }) {
   const { paddingRight, paddingLeft } = useScrollableParent();
-  const { className, style, ...others } = children.props;
+  const { className, style, ...others } = children.props as {
+    className?: string;
+    style?: Record<string, unknown>;
+    [key: string]: unknown;
+  };
 
   return paddingRight === "0px" && paddingLeft === "0px"
     ? children

@@ -21,7 +21,7 @@ export type IconButtonProps = {
   inc?: number;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLButtonElement>;
+  buttonRef?: RefObject<HTMLButtonElement | null>;
   /** Whether to show a 16x16px version of the IconButton */
   compact?: boolean;
   /** Visual variant of the button. Defaults to "default". */

@@ -77,7 +77,7 @@ function AppNavGroupDisclosure(props: AppNavGroupViewProps) {
         aria-hidden={!expanded}
         css={Css.oh.transitionHeight.h(contentHeight).$}
         {...tid.panel}
-        {...(!expanded ? { inert: "true" } : {})}
+        {...(!expanded ? { inert: true } : {})}
       >
         <div ref={setContentEl} css={Css.df.fdc.$}>
           <AppNavItems items={linkGroup.items} panelCollapsed={false} nested {...tid} />

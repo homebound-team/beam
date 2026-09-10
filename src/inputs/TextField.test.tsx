@@ -158,7 +158,7 @@ describe("AI mode", () => {
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange" | "label">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);
-  const textFieldApi = useRef<TextFieldApi | undefined>();
+  const textFieldApi = useRef<TextFieldApi | undefined>(undefined);
   return (
     <>
       <TextField

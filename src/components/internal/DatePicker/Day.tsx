@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { type DayProps, useDayRender } from "react-day-picker";
+import { useRef, type RefObject } from "react";
+import { useDayRender, type DayProps } from "react-day-picker";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils";
 import "./day.css";
@@ -12,7 +12,7 @@ export function Day(props: DayProps) {
   const { isHidden, isButton, activeModifiers, buttonProps, divProps } = useDayRender(
     props.date,
     props.displayMonth,
-    buttonRef,
+    buttonRef as RefObject<HTMLButtonElement>,
   );
 
   if (isHidden) {

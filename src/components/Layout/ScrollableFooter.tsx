@@ -1,4 +1,4 @@
-import type { ReactNode, ReactPortal } from "react";
+import type { JSX, ReactNode, ReactPortal } from "react";
 import { createPortal } from "react-dom";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 

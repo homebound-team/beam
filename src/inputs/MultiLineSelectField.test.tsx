@@ -1,5 +1,5 @@
 import { click, render } from "@homebound/rtl-utils";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { MultiLineSelectField, type MultiLineSelectFieldProps } from "src/inputs";
 import type { HasIdAndName, Optional } from "src/types";
 import { vi } from "vitest";

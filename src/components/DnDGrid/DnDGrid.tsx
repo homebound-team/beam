@@ -26,10 +26,10 @@ export type DnDGridProps = {
 export function DnDGrid(props: DnDGridProps) {
   const { children, gridStyles, onReorder, activeItemStyles, lockAxis } = props;
   const gridEl = useRef<HTMLDivElement>(null);
-  const dragEl = useRef<HTMLElement>();
-  const cloneEl = useRef<HTMLElement>();
-  const initialOrder = useRef<string[]>();
-  const styleSnapshot = useRef<ElementStyleSnapshot>();
+  const dragEl = useRef<HTMLElement | undefined>(undefined);
+  const cloneEl = useRef<HTMLElement | undefined>(undefined);
+  const initialOrder = useRef<string[] | undefined>(undefined);
+  const styleSnapshot = useRef<ElementStyleSnapshot | undefined>(undefined);
   const reorderViaKeyboard = useRef(false);
   const transformFrom = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const tid = useTestIds(props, "dndGrid");

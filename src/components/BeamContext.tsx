@@ -66,7 +66,7 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
   // dependencies as well, i.e. things like GridTable rowStyles will memoize on openInDrawer.
   // So we use refs + a tick.
   const [, tick] = useReducer((prev) => prev + 1, 0);
-  const modalRef = useRef<ModalProps | undefined>();
+  const modalRef = useRef<ModalProps | undefined>(undefined);
   const modalHeaderDiv = useMemo(() => document.createElement("div"), []);
   const modalBannerDiv = useMemo(() => document.createElement("div"), []);
   const modalBodyDiv = useMemo(() => {
