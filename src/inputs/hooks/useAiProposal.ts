@@ -26,7 +26,7 @@ export type UseAiProposalResult<V> = {
  * re-entering the on-record value produces no change to `value` at all — there is nothing to observe.
  *
  * A proposal that matches what is already on record has no original worth striking through, so we
- * skip it. That is how creation flows arrive: the entity is created from the model's own values, so
+ * skip it. That is how creation flows arrive: the entity is created from the agent's own values, so
  * `value` already equals the proposal by the time the user reviews it.
  */
 export function useAiProposal<V>(
