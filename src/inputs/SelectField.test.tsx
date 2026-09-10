@@ -835,6 +835,24 @@ describe("SelectFieldTest", () => {
       expect(r.age).toHaveAttribute("data-ai-mode", "true");
       expect(r.query.age_originalValue).not.toBeInTheDocument();
     });
+
+    it("omits the original when the proposal matches it", async () => {
+      // i.e. an optimistically-created entity, already saved with the value the model proposed
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"3"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      // Then the field still reads as AI-proposed, just without striking through the same label twice
+      expect(r.age).toHaveValue("Three");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
+    });
   });
 
   // Used to validate the `unset` option can be applied to non-`HasIdAndName` options

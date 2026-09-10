@@ -347,6 +347,15 @@ describe("MultiSelectFieldTest", () => {
       expect(r.query.age_originalValue).not.toBeInTheDocument();
     });
 
+    it("omits the original when the proposal is the same selection", async () => {
+      // Two equal arrays are never `===`, so only the formatted comparison can spot this
+      const r = await render(
+        <TestMultiSelectField values={["2", "3"]} proposedValues={["2", "3"]} options={options} />,
+      );
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
+    });
+
     it("commits and drops the AI treatment when the selection changes", async () => {
       const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
       // When the user adds an option on top of the proposal
