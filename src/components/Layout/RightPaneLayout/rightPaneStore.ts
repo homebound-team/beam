@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import type { OpenRightPaneOpts } from "./types";
+
+/** Body passed to `openRightPane`. */
+export type OpenRightPaneOpts = {
+  content: ReactNode;
+};
 
 export type RightPaneOpenActions = {
   openInPane: (opts: OpenRightPaneOpts) => void;

@@ -3,9 +3,9 @@ import {
   rightPaneContentStore,
   rightPaneOpenActions,
   rightPaneOpenStore,
+  type OpenRightPaneOpts,
   type RightPaneOpenActions,
 } from "./rightPaneStore";
-import type { OpenRightPaneOpts } from "./types";
 
 export type RightPaneOpenState = RightPaneOpenActions & {
   isRightPaneOpen: boolean;

@@ -1,4 +1,3 @@
-import { waitFor } from "@homebound/rtl-utils";
 import { Button } from "src/components/Button";
 import { environmentBannerSizePx } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
@@ -9,7 +8,7 @@ import {
   documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render } from "src/utils/rtl";
+import { clickAndWait, render } from "src/utils/rtl";
 import { vi } from "vitest";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
 import { useRightPaneActions } from "./useRightPane";
@@ -50,17 +49,12 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
 
-    // When the pane is closed
-    click(r.closePaneBtn);
+    // When the pane is closed (`clickAndWait` covers the exit animation / jsdom poll)
+    await clickAndWait(r.closePaneBtn);
 
-    // Then the pane clears; spacer width and width vars return to 0 after the exit animation
-    // Separate waitFor calls — eslint disallows multiple assertions per waitFor callback.
-    await waitFor(() => {
-      expect(r.query.rightPaneContent).toBeNull();
-    });
-    await waitFor(() => {
-      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
-    });
+    // Then the pane clears; spacer width and width vars return to 0
+    expect(r.query.rightPaneContent).toBeNull();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
     // Desktop overlay keeps the spacer node mounted; only its width resets while closed.
     expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");

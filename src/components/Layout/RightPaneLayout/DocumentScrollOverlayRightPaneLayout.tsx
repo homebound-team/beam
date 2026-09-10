@@ -9,14 +9,11 @@ import {
 } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
 import { DocumentScrollRightPane } from "./DocumentScrollRightPane";
-import {
-  DocumentScrollRightPaneLayoutRoot,
-  NestedRightPaneLayoutContext,
-  useDocumentScrollRightPaneAnchorRef,
-} from "./documentScrollRightPaneLayoutShared";
-import { defaultDocumentScrollRightPaneWidth } from "./types";
+import { DocumentScrollRightPaneLayoutRoot, NestedRightPaneLayoutContext } from "./DocumentScrollRightPaneLayoutRoot";
+import { useDocumentScrollRightPaneAnchorRef } from "./useDocumentScrollRightPaneAnchorRef";
 import { useRightPaneOpenState } from "./useRightPane";
 import { waitForRightPaneExit } from "./waitForRightPaneExit";
+import { defaultDocumentScrollRightPaneWidth } from "./withRightPane";
 
 export type DocumentScrollOverlayRightPaneLayoutProps = {
   children: ReactNode;

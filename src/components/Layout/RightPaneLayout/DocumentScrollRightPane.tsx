@@ -13,10 +13,9 @@ import {
 import { useScrollPinnedViewportBounds } from "src/layouts/useScrollPinnedViewportBounds";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
-import type { ResolvedDocumentScrollRightPaneBehavior } from "./documentScrollRightPaneMode";
-import { rightPaneContentDataAttribute } from "./types";
 import { useRightPaneContent, useRightPaneOpenState } from "./useRightPane";
-import { waitForRightPaneExit } from "./waitForRightPaneExit";
+import { rightPaneContentDataAttribute, waitForRightPaneExit } from "./waitForRightPaneExit";
+import type { ResolvedDocumentScrollRightPaneBehavior } from "./withRightPane";
 
 export type DocumentScrollRightPaneProps = {
   paneWidth: number;

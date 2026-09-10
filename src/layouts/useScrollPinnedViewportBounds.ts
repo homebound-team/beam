@@ -5,7 +5,19 @@ export type ScrollPinnedViewportBounds = {
   heightPx: number;
 };
 
-/** Viewport top/height for fixed overlays that follow an in-flow anchor, then pin below sticky chrome on scroll. */
+/**
+ * Viewport top/height for a fixed overlay that follows an in-flow anchor, then pins below sticky chrome.
+ *
+ * i.e. the overlay pane tracks the layout root (`anchorRef`) as the page scrolls; once that box hits
+ * `getPinTopPx` (navbar + page header + table actions), `top` stays there and height is the rest of the viewport.
+ *
+ * ```
+ * [banner / nav / header]  ← pin top
+ * [ layout root         ]  ← in-flow anchor (table / form body)
+ * [  ...scroll...       ]
+ *                    [pane]  ← fixed; top = max(anchor.top, pin)
+ * ```
+ */
 export function useScrollPinnedViewportBounds(
   anchorRef: RefObject<HTMLElement | null>,
   enabled: boolean,
