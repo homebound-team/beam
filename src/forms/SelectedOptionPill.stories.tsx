@@ -38,6 +38,14 @@ export function AiMode() {
   );
 }
 
+export function Disabled() {
+  return (
+    <div css={Css.df.fdc.gap3.maxwPx(592).$}>
+      <SelectedOptionPill value={optionValue()} onRemove={action("onRemove")} disabled />
+    </div>
+  );
+}
+
 function optionValue(): ReactNode {
   return (
     <span css={Css.sm.$}>

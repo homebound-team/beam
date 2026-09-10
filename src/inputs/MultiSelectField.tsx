@@ -39,9 +39,11 @@ export function MultiSelectField<O, V extends Value>(
     onSelect,
     options,
     autoSort = true,
+    disabled,
     ...otherProps
   } = props;
 
+  const isDisabled = !!disabled;
   const pillOptions = useMemo(() => {
     if (!withPillList) return [];
     const resolved = initializeOptions(options, getOptionValue, getOptionLabel, undefined, autoSort);
@@ -52,6 +54,7 @@ export function MultiSelectField<O, V extends Value>(
         return {
           id: String(value),
           value: getOptionMenuLabel?.(o) ?? getOptionLabel(o),
+          disabled: isDisabled,
           onRemove: () => {
             const nextValues = values.filter((v) => v !== value);
             const nextOpts = resolved.filter((opt) => nextValues.includes(getOptionValue(opt)));
@@ -61,7 +64,7 @@ export function MultiSelectField<O, V extends Value>(
       });
     // getOptionLabel / getOptionValue / getOptionMenuLabel / onSelect are typically lambdas
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withPillList, options, values, autoSort]);
+  }, [withPillList, options, values, autoSort, isDisabled]);
 
   const field = (
     <ComboBoxBase
@@ -74,6 +77,7 @@ export function MultiSelectField<O, V extends Value>(
       onSelect={onSelect}
       options={options}
       autoSort={autoSort}
+      disabled={disabled}
       {...otherProps}
     />
   );

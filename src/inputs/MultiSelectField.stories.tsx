@@ -214,6 +214,13 @@ export function WithPillList() {
           </span>
         )}
       />
+      <TestMultiSelectField
+        label="Disabled"
+        values={[options[1].id, options[2].id]}
+        options={options}
+        withPillList
+        disabled
+      />
     </div>
   );
 }

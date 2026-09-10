@@ -33,6 +33,14 @@ describe("SelectedOptionPill", () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
+  it("omits the remove button when disabled", async () => {
+    // Given a disabled pill
+    // When rendered
+    const r = await render(<SelectedOptionPill value="Option" onRemove={() => {}} disabled />);
+    // Then the remove control is not in the document
+    expect(r.query.selectedOptionPill_remove).toBeNull();
+  });
+
   it("applies the AI background and purple capsule text when aiMode is true", async () => {
     // Given a pill in aiMode
     // When rendered

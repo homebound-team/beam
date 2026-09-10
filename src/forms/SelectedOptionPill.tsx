@@ -8,11 +8,13 @@ export type SelectedOptionPillProps = {
   helperText?: ReactNode;
   onRemove: () => void;
   aiMode?: boolean;
+  /** Hides the remove control so the selection cannot be cleared. */
+  disabled?: boolean;
 };
 
 /** A selected-option capsule with a remove control. `aiMode` paints the capsule purple. */
 export function SelectedOptionPill(props: SelectedOptionPillProps) {
-  const { value, helperText, onRemove, aiMode = false } = props;
+  const { value, helperText, onRemove, aiMode = false, disabled = false } = props;
   const tid = useTestIds(props, "selectedOptionPill");
   return (
     <div css={Css.df.fdc.gap1.w100.$} {...tid}>
@@ -26,7 +28,7 @@ export function SelectedOptionPill(props: SelectedOptionPillProps) {
         <div css={Css.fg1.wbba.sm.$} {...tid.value}>
           {value}
         </div>
-        <IconButton icon="x" compact label="Remove" onClick={onRemove} {...tid.remove} />
+        {!disabled && <IconButton icon="x" compact label="Remove" onClick={onRemove} {...tid.remove} />}
       </div>
       {helperText && (
         <div css={Css.plPx(20).xs.$} {...tid.helperText}>
