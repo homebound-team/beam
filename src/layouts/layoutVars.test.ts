@@ -6,7 +6,7 @@ import {
   documentScrollChromeWidth,
   documentScrollContentWidth,
   documentScrollRightPaneHeight,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
   stickyNavAndHeaderOffset,
@@ -65,11 +65,11 @@ describe("layoutVars", () => {
     });
   });
 
-  describe("documentScrollRightPaneWidth", () => {
+  describe("documentScrollRightPaneWidthCss", () => {
     it("caps the configured max width by available document-scroll chrome width", () => {
       // Given a 400px preferred pane width
       // When computing the width expression
-      const result = documentScrollRightPaneWidth(400);
+      const result = documentScrollRightPaneWidthCss(400);
 
       // Then it uses min(maxPx, chrome width) so the pane fits the viewport on mobile
       expect(result).toBe(

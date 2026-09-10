@@ -10,7 +10,6 @@ import {
 import { OverlayProvider } from "react-aria";
 import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { type DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle/DocumentTitleContext";
-import { RightPaneProvider } from "src/components/Layout/RightPaneLayout/RightPaneContext";
 import { Modal, type ModalProps } from "src/components/Modal/Modal";
 import { type PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
@@ -103,20 +102,18 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
 
   const beamTree = (
     <PresentationProvider {...presentationProps}>
-      <RightPaneProvider>
-        <AutoSaveStatusProvider>
-          <SnackbarProvider>
-            {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <ToastProvider>
-              <OverlayProvider>
-                {children}
-                {modalRef.current && <Modal {...modalRef.current} />}
-              </OverlayProvider>
-              <SuperDrawer />
-            </ToastProvider>
-          </SnackbarProvider>
-        </AutoSaveStatusProvider>
-      </RightPaneProvider>
+      <AutoSaveStatusProvider>
+        <SnackbarProvider>
+          {/* OverlayProvider is required for Modals generated via React-Aria */}
+          <ToastProvider>
+            <OverlayProvider>
+              {children}
+              {modalRef.current && <Modal {...modalRef.current} />}
+            </OverlayProvider>
+            <SuperDrawer />
+          </ToastProvider>
+        </SnackbarProvider>
+      </AutoSaveStatusProvider>
     </PresentationProvider>
   );
 
