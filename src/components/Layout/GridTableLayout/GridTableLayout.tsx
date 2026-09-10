@@ -1,9 +1,9 @@
 import { useResizeObserver } from "@react-aria/utils";
 import React, { type RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ScrollableContent } from "src/components";
 import { Button } from "src/components/Button";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import { ScrollableContent } from "src/components/Layout/ScrollableContent";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -11,13 +11,10 @@ import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmp
 import { type GridStyle, type GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
 import type { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, type Only, Tokens } from "src/Css";
-import {
-  useComputed,
-  useGroupBy,
-  usePersistedFilter,
-  type UsePersistedFilterProps,
-  useSessionStorage,
-} from "src/hooks";
+import { useComputed } from "src/hooks/useComputed";
+import { useGroupBy } from "src/hooks/useGroupBy";
+import { usePersistedFilter, type UsePersistedFilterProps } from "src/hooks/usePersistedFilter";
+import { useSessionStorage } from "src/hooks/useSessionStorage";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamTableActionsHeightVar,
@@ -25,7 +22,8 @@ import {
   documentScrollChromeWidth,
   stickyNavAndHeaderOffset,
 } from "src/layouts/layoutVars";
-import { noop, useTestIds } from "src/utils";
+import { noop } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { type BaseQueryTableProps, type GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
 import {

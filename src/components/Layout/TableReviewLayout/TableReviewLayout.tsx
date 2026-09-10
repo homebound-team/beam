@@ -5,7 +5,7 @@ import { IconButton } from "src/components/IconButton";
 import { GridTable } from "src/components/Table/GridTable";
 import type { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, type Only, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { Toast } from "../../Toast/Toast";
 import { QueryTable, type QueryTableProps } from "../GridTableLayout/QueryTable";

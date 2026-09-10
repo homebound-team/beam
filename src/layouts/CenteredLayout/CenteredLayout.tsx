@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Css } from "src/Css";
-import { useBreakpoint } from "src/hooks";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { beamLayoutContentPaddingXVar, pageContentPaddingXValue } from "src/layouts/layoutVars";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type CenteredLayoutSize = "sm" | "lg";
 

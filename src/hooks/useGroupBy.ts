@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useQueryState } from "src/hooks/useQueryState";
-import { safeEntries } from "src/utils/index";
+import { safeEntries } from "src/utils/helpers";
 
 export interface GroupByHook<G extends string> {
   /** The current group by value. */

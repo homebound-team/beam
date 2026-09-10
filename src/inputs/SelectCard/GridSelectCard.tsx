@@ -1,10 +1,11 @@
 import { VisuallyHidden } from "react-aria";
-import { Icon, type IconProps, Tag } from "src/components";
+import { Icon, type IconProps } from "src/components/Icon";
+import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
 import type { SelectCardItemProps, SelectCardLayout } from "src/inputs/SelectCard/types";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type GridSelectCardProps = SelectCardItemProps & {
   icon?: IconProps["icon"];

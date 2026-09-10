@@ -3,7 +3,7 @@ import { type ReactNode, useState } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TabsWithContent, type TabWithContent } from "src/components/Tabs";
 import { Css, Palette, Tokens } from "src/Css";
-import { FormLines } from "src/forms";
+import { FormLines } from "src/forms/FormLines";
 import {
   Button,
   FullBleed,

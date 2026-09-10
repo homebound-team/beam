@@ -1,7 +1,7 @@
 import { withRouter as _withRouter } from "@homebound/rtl-react-router-utils";
 import { type RenderResult, render as rtlRender, type Wrapper } from "@homebound/rtl-utils";
 import type { ReactElement } from "react";
-import { BeamProvider } from "src";
+import { BeamProvider } from "src/components/BeamContext";
 
 export * from "./rtlUtils";
 export { _withRouter as withRouter };

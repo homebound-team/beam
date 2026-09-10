@@ -1,7 +1,7 @@
 import { type ReactNode, useMemo } from "react";
 import { useHover } from "react-aria";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { ButtonMenu, type MenuItem } from "./ButtonMenu";
 import { Tag, type TagType } from "./Tag";
 

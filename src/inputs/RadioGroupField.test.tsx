@@ -1,4 +1,4 @@
-import { RadioGroupField } from "src/inputs";
+import { RadioGroupField } from "src/inputs/RadioGroupField";
 import { click, render } from "src/utils/rtl";
 
 describe("RadioGroupField", () => {

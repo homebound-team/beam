@@ -1,5 +1,5 @@
-import type { FilterDefs } from "src/components/Filters";
-import { checkboxFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import type { FilterDefs } from "src/components/Filters/types";
 import { click, render, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import { buildFilterImpls, FilterPanel } from "./FilterPanel";

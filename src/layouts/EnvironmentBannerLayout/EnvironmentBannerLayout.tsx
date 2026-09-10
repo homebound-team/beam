@@ -9,7 +9,7 @@ import { Css } from "src/Css";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { EnvironmentBannerLayoutHeightProvider } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import { beamEnvironmentBannerLayoutHeightVar, beamLayoutViewportWidthVar } from "src/layouts/layoutVars";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 
 export type EnvironmentBannerLayoutProps = {

@@ -2,8 +2,8 @@ import { useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, type Properties, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type StepperTabProps = {
   label: string;

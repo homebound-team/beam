@@ -44,7 +44,7 @@ import {
 import { Css, maybeCssVar, Palette, type Properties, Tokens } from "src/Css";
 import { beamRightPaneWidthVar, beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import type { AnyObject } from "src/types";
-import { isFunction } from "src/utils";
+import { isFunction } from "src/utils/helpers";
 import { zIndices } from "src/utils/zIndices";
 import { useDebouncedCallback } from "use-debounce";
 

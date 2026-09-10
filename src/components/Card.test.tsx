@@ -1,5 +1,5 @@
 import { fireEvent } from "@testing-library/react";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 import { Card, type CardProps } from "./Card";
 

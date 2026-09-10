@@ -2,7 +2,7 @@ import type { PressEvent } from "@react-types/shared";
 import type { HTMLAttributes, JSX, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Properties } from "src/Css";
-import { isAbsoluteUrl } from "src/utils/index";
+import { isAbsoluteUrl } from "src/utils/helpers";
 
 export function getButtonOrLink(
   content: ReactNode,

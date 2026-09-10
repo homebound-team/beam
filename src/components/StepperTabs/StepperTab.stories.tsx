@@ -1,6 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { StepperTab, type StepperTabProps } from "./StepperTab";
 
 export default {

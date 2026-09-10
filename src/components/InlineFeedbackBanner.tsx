@@ -6,7 +6,7 @@ import type { IconKey } from "src/components/Icon";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { Tag, type TagProps, type TagType } from "src/components/Tag";
 import { Css, Palette, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type InlineFeedbackBannerType = "error" | "warning";
 

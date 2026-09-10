@@ -1,4 +1,5 @@
-import { ContrastScope, Loader } from "src/components";
+import { ContrastScope } from "src/components/ContrastScope";
+import { Loader } from "src/components/Loader";
 import { Css } from "src/Css";
 
 export default {

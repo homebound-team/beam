@@ -1,9 +1,9 @@
 import { type ReactNode, useRef } from "react";
 import { useCheckboxGroup, useCheckboxGroupItem, useFocusRing, VisuallyHidden } from "react-aria";
 import { type CheckboxGroupState, useCheckboxGroupState } from "react-stately";
-import { maybeTooltip, resolveTooltip } from "src/components";
 import { Label } from "src/components/Label";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, type Xss } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useTestIds } from "src/utils/useTestIds";

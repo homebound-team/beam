@@ -1,10 +1,11 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
 import type { Only } from "src/Css";
-import { TextAreaField, type TextAreaFieldProps } from "src/inputs";
+import { TextAreaField, type TextAreaFieldProps } from "src/inputs/TextAreaField";
 import type { TextFieldXss } from "src/interfaces";
-import { maybeCall, useTestIds } from "src/utils";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundTextAreaFieldProps<X> = Omit<TextAreaFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present

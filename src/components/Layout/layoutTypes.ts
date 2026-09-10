@@ -1,5 +1,5 @@
 import type { ButtonProps } from "src/components/Button";
-import type { GridDataRow } from "src/components/Table";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridTableProps } from "src/components/Table/GridTable";
 import type { GridTableXss, Kinded } from "src/components/Table/types";
 import type { Only } from "src/Css";

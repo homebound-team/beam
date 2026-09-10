@@ -4,9 +4,8 @@ import { AppNavGroupMenu } from "src/components/AppNav/AppNavGroupMenu";
 import { AppNavSectionView } from "src/components/AppNav/AppNavSectionView";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { appNavItemKey, isAppNavGroup, isAppNavLink, isAppNavSection } from "src/components/AppNav/appNavUtils";
-import type { NavLinkVariant } from "src/components/NavLinks";
-import { NavLink } from "src/components/NavLinks";
-import { useTestIds } from "src/utils";
+import { NavLink, type NavLinkVariant } from "src/components/NavLinks/NavLink";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AppNavItemsProps = {
   items: AppNavItem[];

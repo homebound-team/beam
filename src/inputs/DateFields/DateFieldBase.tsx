@@ -1,9 +1,13 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { FocusScope, useButton, useOverlayPosition, useOverlayTrigger, useTextField } from "react-aria";
 import { useOverlayTriggerState } from "react-stately";
-import { Icon, IconButton, resolveTooltip } from "src/components";
-import { DatePicker, DateRangePicker, Popover } from "src/components/internal";
+import { Icon } from "src/components/Icon";
+import { IconButton } from "src/components/IconButton";
+import { DatePicker } from "src/components/internal/DatePicker/DatePicker";
 import { DatePickerOverlay } from "src/components/internal/DatePicker/DatePickerOverlay";
+import { DateRangePicker } from "src/components/internal/DatePicker/DateRangePicker";
+import { Popover } from "src/components/internal/Popover";
+import { resolveTooltip } from "src/components/Tooltip";
 import { Css, type Properties, Tokens } from "src/Css";
 import {
   dateFormats,
@@ -17,8 +21,9 @@ import {
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import type { DateMatcher, DateRange, PlainDate } from "src/types";
-import { maybeCall, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 type DateFieldCommonProps = Pick<
   TextFieldBaseProps<Properties>,

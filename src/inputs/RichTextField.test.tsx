@@ -1,6 +1,6 @@
 import { render } from "@homebound/rtl-utils";
 import { act } from "@testing-library/react";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { RichTextFieldImpl as RichTextField } from "./RichTextField";
 
 describe("RichTextField", () => {

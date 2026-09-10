@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { FocusScope } from "react-aria";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export interface ContextualModalProps {
   content: ReactNode | ((close: () => void) => ReactNode);

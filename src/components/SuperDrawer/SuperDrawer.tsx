@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { type MouseEvent, type ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { AutoSaveStatusProvider, IconButton, type OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { useBeamContext } from "src/components/BeamContext";
+import { IconButton } from "src/components/IconButton";
+import { type OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css, px, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { SuperDrawerWidth } from "./utils";
 

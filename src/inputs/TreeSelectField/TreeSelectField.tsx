@@ -13,11 +13,10 @@ import React, {
 } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
-import { resolveTooltip } from "src/components";
-import { Popover } from "src/components/internal";
+import { Popover } from "src/components/internal/Popover";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { resolveTooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
-import type { Value } from "src/inputs/index";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
@@ -32,6 +31,7 @@ import {
   type TreeSelectResponse,
 } from "src/inputs/TreeSelectField/utils";
 import { getFieldWidth } from "src/inputs/utils";
+import type { Value } from "src/inputs/Value";
 import { keyToValue, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";
 import type { HasIdAndName, Optional } from "src/types";

@@ -1,12 +1,12 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { Label } from "src/components/Label";
-import { DateRangeField } from "src/inputs";
+import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
 import { formatDateRange } from "src/inputs/DateFields/utils";
 import type { DateMatcher, DateRange } from "src/types";
-import type { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { dehydratePlainDate, parsePersistedPlainDate } from "src/utils/plainDate";
+import type { TestIds } from "src/utils/useTestIds";
 
 export type DateRangeFilterProps<O extends string> = {
   label: string;

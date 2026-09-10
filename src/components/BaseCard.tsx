@@ -5,8 +5,8 @@ import type { CardTag, ImageFitType } from "src/components/Card";
 import { IconButton, type IconButtonProps } from "src/components/IconButton";
 import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { useTestIds } from "src/utils/useTestIds";
 
 // TODO: every card has a hero today, but if a heroless card shows up, consider folding these three
 // into a single `heroImg?: { src: string; alt: string; fit?: ImageFitType }`.

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { type FilterDefs, Filters } from "src/components/Filters";
+import { Filters } from "src/components/Filters/Filters";
 import type { ProjectFilter } from "src/components/Filters/testDomain";
+import type { FilterDefs } from "src/components/Filters/types";
 import { render, type } from "src/utils/rtl";
 import { numberRangeFilter, type NumberRangeFilterValue } from "./NumberRangeFilter";
 

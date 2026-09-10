@@ -1,7 +1,7 @@
 import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, focus } from "src/utils/rtl";
 import { jan1, jan10, jan19, jan2 } from "src/utils/testDates";
 import { vi } from "vitest";

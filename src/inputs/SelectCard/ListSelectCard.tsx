@@ -1,12 +1,12 @@
 import { VisuallyHidden } from "react-aria";
-import { Tag } from "src/components";
+import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
 import { StyledRadio } from "src/inputs/SelectCard/StyledRadio";
 import type { SelectCardItemProps } from "src/inputs/SelectCard/types";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 /** Internal list-view card with checkbox or radio leading control. */
 export function ListSelectCard(props: SelectCardItemProps) {

@@ -1,10 +1,10 @@
 import { useMemo, useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
-import { navLink } from "src/components";
 import { Icon } from "src/components/Icon";
 import { getNavLinkStyles } from "src/components/NavLinks/NavLink";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { navLink } from "src/css/CssReset";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AppNavGroupTriggerProps = {
   label: string;

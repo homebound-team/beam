@@ -1,6 +1,6 @@
 import type { Key as AriaKey } from "@react-types/shared";
 import type { ListState } from "react-stately";
-import { ToggleChip } from "src/components";
+import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 
 type ListBoxToggleChipProps<O, V extends AriaKey> = {

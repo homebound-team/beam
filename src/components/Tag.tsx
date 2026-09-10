@@ -1,8 +1,9 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { type ReactNode, useRef, useState } from "react";
-import { Icon, type IconKey, maybeTooltip } from "src/components";
+import { Icon, type IconKey } from "src/components/Icon";
+import { maybeTooltip } from "src/components/Tooltip";
 import { Css, type Margin, type Only, Palette, type Properties, type Xss } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral" | "ai" | "strikethrough";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Filters } from "src/components/Filters/Filters";
 import { treeFilter, type TreeFilterProps } from "src/components/Filters/TreeFilter";
 import type { FilterDefs } from "src/components/Filters/types";
-import type { NestedOption } from "src/inputs";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
 import type { HasIdAndName } from "src/types";
 import { render, select } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";

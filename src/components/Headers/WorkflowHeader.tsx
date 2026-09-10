@@ -1,6 +1,6 @@
 import { BaseHeader, type BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import { StepperTabs, type StepperTabsProps } from "src/components/StepperTabs";
-import { useTestIds } from "src/utils";
+import { StepperTabs, type StepperTabsProps } from "src/components/StepperTabs/StepperTabs";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type WorkflowHeaderProps = Omit<BaseHeaderProps, "bottomSlot"> & {
   /** Omit on focused-form pages — the header then has no step strip. */

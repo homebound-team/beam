@@ -1,6 +1,6 @@
 import { Css } from "src/Css";
-import type { Value } from "src/inputs";
 import type { SelectCardLayout, SelectCardView } from "src/inputs/SelectCard/types";
+import type { Value } from "src/inputs/Value";
 
 type SelectCardGroupOptionLike<V extends Value> = {
   value: V;

@@ -1,10 +1,10 @@
 import { useRef } from "react";
 import { useTextField } from "react-aria";
-import { Icon } from "src/components";
+import { Icon } from "src/components/Icon";
 import type { Only } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import type { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { TextFieldBase } from "../TextFieldBase";
 
 type TextFieldProps<X> = BeamTextFieldProps<X>;

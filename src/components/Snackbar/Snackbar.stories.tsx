@@ -1,9 +1,11 @@
 import type { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useState } from "react";
-import { Button, type ButtonVariant, useModal, useSnackbar } from "src/components";
+import { Button, type ButtonVariant } from "src/components/Button";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
+import { useModal } from "src/components/Modal/useModal";
 import { type Offset, Snackbar } from "src/components/Snackbar/Snackbar";
 import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import { useSnackbar } from "src/components/Snackbar/useSnackbar";
 import { Css } from "src/Css";
 import { newStory, withBeamDecorator, withDimensions } from "src/utils/sb";
 import { action } from "storybook/actions";

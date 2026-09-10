@@ -83,11 +83,12 @@ describe("useComputed", () => {
       obs.name = "food";
     });
     // Then we don't even re-render
-    expect(objectIds).toEqual([1]);
+    expect(objectIds).toHaveLength(1);
     // And when the component re-renders organically
     r.rerender(<TestComponent />);
     // We've kept the same object id
-    expect(objectIds).toEqual([1, 1]);
+    // The ids come from a process-wide counter, so assert the two renders saw the same object
+    expect(objectIds).toEqual([objectIds[0], objectIds[0]]);
   });
 
   it("re-renders on other hook change", async () => {

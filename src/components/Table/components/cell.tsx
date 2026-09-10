@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { navLink } from "src/components";
 import type { CardSlot } from "src/components/Table/cardSlots";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { RowStyle } from "src/components/Table/TableStyles";
 import type { GridCellAlignment, GridColumnWithId, Kinded, MaybeFn, RenderAs } from "src/components/Table/types";
 import { Css, type Properties, type Typography } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import type { Temporal } from "temporal-polyfill";
 
 export type GridCellValue =

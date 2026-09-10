@@ -4,7 +4,7 @@ import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { allItemsHaveIcons } from "src/components/AppNav/appNavUtils";
 import { Css, Tokens } from "src/Css";
 import { useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type SideNavProps = {
   /** Optional area above the item list (logo, workspace switcher, etc.). */

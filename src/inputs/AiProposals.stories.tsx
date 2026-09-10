@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
-import { FormLines } from "src/forms";
+import { FormLines } from "src/forms/FormLines";
 import { Autocomplete } from "src/inputs/Autocomplete";
 import { DateField } from "src/inputs/DateFields/DateField";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";

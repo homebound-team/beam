@@ -3,8 +3,8 @@ import { ProposedValue, type ProposedValueProps } from "src/components/ProposedV
 import type { CardBadgeTag } from "src/components/Table/cardSlots";
 import { Tag } from "src/components/Tag";
 import { Css, Palette, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type CardData = {
   label: string;

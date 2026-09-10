@@ -1,6 +1,6 @@
 import equal from "fast-deep-equal";
 import { useEffect, useState } from "react";
-import { safeEntries } from "src/utils/index";
+import { safeEntries } from "src/utils/helpers";
 import { useDebouncedCallback } from "use-debounce";
 import { type Breakpoint, Breakpoints } from "../Css";
 

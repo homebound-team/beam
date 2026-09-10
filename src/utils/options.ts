@@ -1,4 +1,4 @@
-import { fail } from "src/utils";
+import { fail } from "src/utils/helpers";
 
 // This `any` is currently on purpose to ignore type errors in ChipSelectField
 export function defaultOptionValue<O>(opt: O): any {

@@ -9,15 +9,18 @@ import React, {
 } from "react";
 import { mergeProps } from "react-aria";
 import type { ComboBoxState } from "react-stately";
-import { Chips, CountBadge, Icon, Tooltip } from "src/components";
+import { Chips } from "src/components/Chips";
+import { CountBadge } from "src/components/CountBadge";
+import { Icon } from "src/components/Icon";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
-import { maybeCall } from "src/utils";
+import { maybeCall } from "src/utils/helpers";
 
 type ComboBoxInputProps<O, V extends Value> = {
   buttonProps: any;

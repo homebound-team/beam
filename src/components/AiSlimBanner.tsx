@@ -2,7 +2,7 @@ import { Button } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AiSlimBannerProps = {
   title: string;

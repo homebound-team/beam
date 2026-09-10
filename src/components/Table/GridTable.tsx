@@ -49,11 +49,12 @@ import {
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, type Only } from "src/Css";
-import { useComputed } from "src/hooks";
+import { useComputed } from "src/hooks/useComputed";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { stickyTableHeaderOffset } from "src/layouts/layoutVars";
-import { isPromise, useTestIds } from "src/utils";
+import { isPromise } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { CompanionRow } from "./components/CompanionRow";
 import type { GridDataRow, GridRowKind } from "./components/Row";

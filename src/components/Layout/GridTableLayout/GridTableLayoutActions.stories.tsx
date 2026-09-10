@@ -1,7 +1,8 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import type { FilterDefs } from "src/components/Filters";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import type { FilterDefs } from "src/components/Filters/types";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import type { GridColumn } from "src/components/Table/types";

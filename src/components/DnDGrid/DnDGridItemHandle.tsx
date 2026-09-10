@@ -3,7 +3,7 @@ import type { BeamColor } from "src/colors";
 import type { DnDGridItemProps } from "src/components/DnDGrid/useDnDGridItem";
 import { Icon, type IconKey } from "src/components/Icon";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type DnDGridItemHandleProps = {
   dragHandleProps: DnDGridItemProps["dragHandleProps"];

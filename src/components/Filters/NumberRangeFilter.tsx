@@ -2,8 +2,8 @@ import { BaseFilter } from "src/components/Filters/BaseFilter";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
-import type { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import type { TestIds } from "src/utils/useTestIds";
 import { Css } from "../../Css";
 import { NumberField, type NumberFieldType } from "../../inputs/NumberField";
 

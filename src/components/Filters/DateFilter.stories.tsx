@@ -1,6 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
+import { Filters } from "src/components/Filters/Filters";
 import { taskDueFilter } from "src/components/Filters/testDomain";
-import { Filters } from "src/components/index";
 import { Css } from "src/Css";
 import { jan2 } from "src/forms/formStateDomain";
 

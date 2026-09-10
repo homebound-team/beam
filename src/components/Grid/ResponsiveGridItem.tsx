@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { mergeProps } from "react-aria";
-import { Css, useResponsiveGridItem } from "src";
+import { Css } from "src/Css";
+import { useResponsiveGridItem } from "src/components/Grid/useResponsiveGridItem";
 
 export type ResponsiveGridItemProps = PropsWithChildren<{
   colSpan: number;

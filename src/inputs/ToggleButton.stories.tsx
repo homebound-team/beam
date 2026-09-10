@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
-import { isPromise } from "src/utils";
+import { isPromise } from "src/utils/helpers";
 import { action } from "storybook/actions";
 import { ToggleButton as ToggleButtonComponent, type ToggleButtonProps } from "./ToggleButton";
 

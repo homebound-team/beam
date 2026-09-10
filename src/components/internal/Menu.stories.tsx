@@ -4,7 +4,7 @@ import { ButtonMenu } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";
 import { Menu } from "src/components/internal/Menu";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { withDimensions, withRouter } from "src/utils/sb";
 
 export default {

@@ -22,8 +22,8 @@ import {
   boundToggleChipGroupField,
   boundTreeSelectField,
 } from "src/forms/BoundForm";
-import type { NestedOption } from "src/inputs";
 import type { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
 import type { HasIdAndName } from "src/types";
 import { withBeamDecorator } from "src/utils/sb";
 import { BoundTextAreaField } from "./BoundTextAreaField";

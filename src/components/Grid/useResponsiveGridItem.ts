@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo } from "react";
-import type { Properties } from "src";
+import type { Properties } from "src/Css";
 import { gridItemDataAttribute, type ResponsiveGridConfig, ResponsiveGridContext } from "src/components/Grid/utils";
 
 /**

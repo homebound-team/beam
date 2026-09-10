@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { AiLoader } from "src/components/AiLoader";
 import { AiCard, AiPanel } from "src/components/AiPanel";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AiLoadingPanelProps = {
   title?: string;

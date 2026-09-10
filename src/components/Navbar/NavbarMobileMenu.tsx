@@ -11,7 +11,7 @@ import { Css, Tokens } from "src/Css";
 import { useEnvironmentBannerLayoutHeight } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { type MobileSubNavContent, useMobileSubNav } from "src/layouts/NavbarLayout/MobileSubNavContext";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 
 type MobileNavLevel = "sub" | "global";

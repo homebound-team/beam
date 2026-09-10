@@ -1,5 +1,5 @@
 import { VisuallyHidden } from "react-aria";
-import { Icon } from "src/components";
+import { Icon } from "src/components/Icon";
 import { Css, Tokens } from "src/Css";
 
 type ErrorMessageProps = {

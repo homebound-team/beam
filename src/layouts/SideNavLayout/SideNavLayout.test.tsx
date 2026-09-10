@@ -1,5 +1,5 @@
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
-import { NavbarLayout } from "src/layouts/NavbarLayout";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import {
   SIDE_NAV_LAYOUT_STATE_STORAGE_KEY,

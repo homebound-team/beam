@@ -12,7 +12,7 @@ import {
   type RenderResult,
 } from "@homebound/rtl-utils";
 import { act, fireEvent, prettyDOM } from "@testing-library/react";
-import { fail } from "src/utils/index";
+import { fail } from "src/utils/helpers";
 
 export {
   _blur as blur,

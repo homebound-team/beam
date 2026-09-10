@@ -4,7 +4,7 @@ import { Label } from "src/components/Label";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import type { useTestIds } from "src/utils";
+import type { useTestIds } from "src/utils/useTestIds";
 
 type LabeledGroupFieldProps = {
   label: string;

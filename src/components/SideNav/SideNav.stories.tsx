@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
-import { Avatar } from "src/components/Avatar";
+import { Avatar } from "src/components/Avatar/Avatar";
 import { Icon } from "src/components/Icon";
 import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
 import { SideNav } from "src/components/SideNav/SideNav";

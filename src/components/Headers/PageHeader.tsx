@@ -3,7 +3,7 @@ import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderA
 import { type RouteTabsProps, Tabs, type TabsContentXss, type TabsProps } from "src/components/Tabs";
 import type { Only } from "src/Css";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type PageHeaderProps<V extends string, X> = Omit<BaseHeaderProps, "bottomSlot"> & {
   /** Rendered as buttons on desktop; two or more collapse into a `ButtonMenu` at `sm`. */

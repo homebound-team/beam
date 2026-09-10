@@ -1,7 +1,7 @@
 import { useRef, type RefObject } from "react";
 import { useDayRender, type DayProps } from "react-day-picker";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import "./day.css";
 
 /** Follows the same pattern as defined by the React-Day-Picker 'Day' component, plus sprinkling our own styling */

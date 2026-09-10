@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 

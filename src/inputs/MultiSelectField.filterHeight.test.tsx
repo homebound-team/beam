@@ -1,7 +1,7 @@
 import { click, render } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState, type JSX } from "react";
-import { MultiSelectField } from "src/inputs";
+import { MultiSelectField } from "src/inputs/MultiSelectField";
 import type { HasIdAndName } from "src/types";
 import { describe, expect, it, vi } from "vitest";
 

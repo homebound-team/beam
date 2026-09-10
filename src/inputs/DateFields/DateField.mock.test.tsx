@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { DateFieldMock as MockDateField } from "src/inputs/DateFields/DateField.mock";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { render, type } from "src/utils/rtl";
 import { feb11, jan1 } from "src/utils/testDates";
 import { Temporal } from "temporal-polyfill";

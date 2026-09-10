@@ -3,8 +3,8 @@ import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, type IconProps } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, type Properties, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type ButtonGroupProps = {
   buttons: ButtonGroupButton[];

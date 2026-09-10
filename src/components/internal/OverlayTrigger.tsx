@@ -8,11 +8,12 @@ import { AvatarButton, type AvatarButtonProps } from "src/components/Avatar/Avat
 import { Button, type ButtonProps, type ButtonVariant } from "src/components/Button";
 import { Icon } from "src/components/Icon";
 import { IconButton, type IconButtonProps } from "src/components/IconButton";
-import { Popover } from "src/components/internal";
-import { NavLink, type NavLinkProps } from "src/components/NavLinks";
+import { Popover } from "src/components/internal/Popover";
+import { NavLink, type NavLinkProps } from "src/components/NavLinks/NavLink";
 import { Css } from "src/Css";
-import { noop, useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { noop } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 type TextButtonTriggerProps = Pick<ButtonProps, "label" | "variant" | "size" | "icon">;
 type IconButtonTriggerProps = Pick<IconButtonProps, "icon" | "color" | "compact" | "inc" | "variant">;

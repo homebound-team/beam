@@ -3,9 +3,10 @@ import { Icon } from "src/components/Icon";
 import type { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Tokens } from "src/Css";
-import { useComputed, useHover } from "src/hooks";
+import { useComputed } from "src/hooks/useComputed";
+import { useHover } from "src/hooks/useHover";
 import { beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
-import { isFunction } from "src/utils";
+import { isFunction } from "src/utils/helpers";
 import { zIndices } from "src/utils/zIndices";
 import { Loader } from "../../Loader";
 

@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { viewportModes } from "src/utils/sb";
 import { StepperTabs, type StepperTabsStep } from "./StepperTabs";
 

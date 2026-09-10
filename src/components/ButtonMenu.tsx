@@ -11,8 +11,8 @@ import {
   OverlayTrigger,
   type OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 type ButtonMenuBaseProps = {
   items: MenuItem[];

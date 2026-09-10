@@ -3,7 +3,7 @@ import { ContrastScope } from "src/components/ContrastScope";
 import { IconButton } from "src/components/IconButton";
 import { SideNav, type SideNavProps } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
-import { useBreakpoint } from "src/hooks";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import {
   bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
@@ -12,7 +12,7 @@ import {
   beamSideNavLayoutWidthVar,
 } from "src/layouts/layoutVars";
 import { useRegisterMobileSubNav } from "src/layouts/NavbarLayout/MobileSubNavContext";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import { SideNavLayoutProvider, useHasSideNavLayoutProvider, useSideNavLayoutContext } from "./SideNavLayoutContext";

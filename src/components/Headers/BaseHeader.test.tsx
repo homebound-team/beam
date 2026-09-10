@@ -1,7 +1,7 @@
 import { BeamProvider } from "src/components/BeamContext";
 import { Button } from "src/components/Button";
 import { BaseHeader } from "src/components/Headers/BaseHeader";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { render } from "src/utils/rtl";
 
 describe("BaseHeader", () => {

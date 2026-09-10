@@ -1,6 +1,7 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
-import { Css, Palette, type Properties, useTestIds } from "src";
+import { Css, Palette, type Properties } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 
 type ScrollShadowsProps = {

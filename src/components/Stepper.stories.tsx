@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "src/components/Button";
 import { type Step, Stepper } from "src/components/Stepper";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 
 export default {
   component: Stepper,

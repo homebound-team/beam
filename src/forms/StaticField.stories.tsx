@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { Chips } from "src/components/Chips";
 import { FieldGroup, FormLines } from "src/forms/FormLines";
 import { StaticField as StaticFieldComponent } from "src/forms/StaticField";
-import { TextField } from "src/inputs";
+import { TextField } from "src/inputs/TextField";
 import { ButtonModal, Css } from "..";
 
 export default {

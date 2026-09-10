@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { ContrastScope } from "src/components";
+import { ContrastScope } from "src/components/ContrastScope";
 import { Icons } from "src/components/Icon";
 import { NavLink, type NavLinkProps } from "src/components/NavLinks/NavLink";
 import { Css, Tokens } from "src/Css";

@@ -8,16 +8,16 @@ import {
   useRef,
 } from "react";
 import { OverlayProvider } from "react-aria";
-import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
-import { type DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
+import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
+import { type DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle/DocumentTitleContext";
+import { RightPaneProvider } from "src/components/Layout/RightPaneLayout/RightPaneContext";
 import { Modal, type ModalProps } from "src/components/Modal/Modal";
 import { type PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
 import type { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
 import type { CanCloseCheck, CheckFn } from "src/types";
-import { EmptyRef } from "src/utils/index";
-import { RightPaneProvider } from "./Layout";
+import { EmptyRef } from "src/utils/helpers";
 import { ToastProvider } from "./Toast/ToastContext";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */

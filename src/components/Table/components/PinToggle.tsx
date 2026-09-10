@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Tokens } from "src/Css";
-import { useComputed } from "src/hooks";
-import { useTestIds } from "src/utils";
+import { useComputed } from "src/hooks/useComputed";
+import { useTestIds } from "src/utils/useTestIds";
 
 type PinToggleProps = {
   rowId: string;

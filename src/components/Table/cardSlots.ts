@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import type { IconKey } from "src/components";
 import type { CardTag } from "src/components/Card";
+import type { IconKey } from "src/components/Icon";
 import type { ProposedValueProps } from "src/components/ProposedValue";
 import type { TagType } from "src/components/Tag";
 

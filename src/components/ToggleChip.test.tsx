@@ -1,4 +1,4 @@
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 import { ToggleChip } from "./ToggleChip";

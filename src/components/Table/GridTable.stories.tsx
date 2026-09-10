@@ -1,39 +1,12 @@
 import type { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
 import { Fragment, type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  actionColumn,
-  Button,
-  cardStyle,
-  Chips,
-  collapseColumn,
-  CollapseToggle,
-  column,
-  condensedStyle,
-  dateColumn,
-  defaultStyle,
-  dragHandleColumn,
-  emptyCell,
-  type GridCellAlignment,
-  type GridColumn,
-  type GridDataRow,
-  type GridRowLookup,
-  GridTable,
-  GridTableLayout,
-  Icon,
-  IconButton,
-  insertAtIndex,
-  numericColumn,
-  pinColumn,
-  ProposedValue,
-  recursivelyGetContainingRow,
-  type RowStyles,
-  selectColumn,
-  simpleHeader,
-  type SimpleHeaderAndData,
-  useGridTableApi,
-  useGridTableLayoutState,
-} from "src/components/index";
+import { Button } from "src/components/Button";
+import { Chips } from "src/components/Chips";
+import { Icon } from "src/components/Icon";
+import { IconButton } from "src/components/IconButton";
+import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
+import { ProposedValue } from "src/components/ProposedValue";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -43,15 +16,35 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
+import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { PinToggle } from "src/components/Table/components/PinToggle";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
+import { cardStyle, condensedStyle, defaultStyle, type RowStyles } from "src/components/Table/TableStyles";
+import type { GridCellAlignment, GridColumn } from "src/components/Table/types";
+import {
+  actionColumn,
+  collapseColumn,
+  column,
+  dateColumn,
+  dragHandleColumn,
+  numericColumn,
+  pinColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
+import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { emptyCell, insertAtIndex, recursivelyGetContainingRow } from "src/components/Table/utils/utils";
 import { Css, Palette, Tokens } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
-import { DateField, SelectField } from "src/inputs";
+import { useComputed } from "src/hooks/useComputed";
+import { DateField } from "src/inputs/DateFields/DateField";
 import { NumberField } from "src/inputs/NumberField";
+import { SelectField } from "src/inputs/SelectField";
 import type { PlainDate } from "src/types";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";

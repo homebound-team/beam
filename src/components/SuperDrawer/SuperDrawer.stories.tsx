@@ -1,27 +1,23 @@
 import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useEffect, useRef } from "react";
-import {
-  Button,
-  type GridColumn,
-  GridTable,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  type RowStyles,
-  simpleDataRows,
-  simpleHeader,
-  type SimpleHeaderAndData,
-  Tag,
-} from "src/components";
 import { AiLoadingPanel } from "src/components/AiLoadingPanel";
+import { Button } from "src/components/Button";
+import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { TestModalContent } from "src/components/Modal/TestModalContent";
 import { useModal } from "src/components/Modal/useModal";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
-import type { GridDataRow, GridRowLookup } from "src/components/Table";
+import { SuperDrawerContent } from "src/components/SuperDrawer/SuperDrawerContent";
+import { useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import type { RowStyles } from "src/components/Table/TableStyles";
+import type { GridColumn } from "src/components/Table/types";
+import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { simpleDataRows, simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withDimensions, zeroTo } from "src/utils/sb";
-import { SuperDrawerContent, useSuperDrawer } from "./index";
 import { SuperDrawer as SuperDrawerComponent } from "./SuperDrawer";
 import { SuperDrawerWidth } from "./utils";
 

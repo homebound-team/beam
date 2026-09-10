@@ -3,7 +3,7 @@ import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
 import type { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import type { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
-import { isFunction } from "src/utils/index";
+import { isFunction } from "src/utils/helpers";
 
 /**
  * A reactive/observable wrapper around each GridColumn.

@@ -4,7 +4,7 @@ import { ButtonMenu, type ButtonMenuProps, type MenuItem } from "src/components/
 import { IconButton, type IconButtonProps } from "src/components/IconButton";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 /**
  * A single action rendered by `HeaderActions` — a `Button`, an icon-only `IconButton`, or a

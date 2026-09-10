@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { IconButton } from "src/components/IconButton";
 import { Css, Tokens } from "src/Css";
 import type { BeamButtonProps } from "src/interfaces";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type LinkCardProps = {
   title: string;

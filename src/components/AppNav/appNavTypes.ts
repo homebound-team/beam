@@ -1,4 +1,4 @@
-import type { NavLinkProps } from "src/components/NavLinks";
+import type { NavLinkProps } from "src/components/NavLinks/NavLink";
 
 /** A single nav link. String `label` only; see `NavLinkProps.label` (ReactNode) for the wider API. */
 export type AppNavLink = Pick<NavLinkProps, "icon" | "onClick" | "active" | "disabled" | "openInNew" | "iconOnly"> & {

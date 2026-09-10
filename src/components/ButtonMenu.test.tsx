@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, type, withRouter } from "src/utils/rtl";
 
 describe("ButtonMenu", () => {

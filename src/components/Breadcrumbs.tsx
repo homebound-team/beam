@@ -1,8 +1,8 @@
 import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { Css } from "src/Css";
-import { useBreakpoint } from "src/hooks";
-import { useTestIds } from "src/utils";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type Breadcrumb = {
   label: string;

@@ -1,9 +1,12 @@
 import { type ReactNode, useState } from "react";
 import { Button } from "src/components/Button";
-import { type Filter, type FilterImpls, filterTestIdPrefix, updateFilter } from "src/components/Filters";
-import { ModalBody, ModalFooter, ModalHeader, useModal } from "src/components/Modal";
+import type { Filter, FilterImpls } from "src/components/Filters/types";
+import { filterTestIdPrefix, updateFilter } from "src/components/Filters/utils";
+import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
+import { useModal } from "src/components/Modal/useModal";
 import { Css } from "src/Css";
-import { omitKey, safeEntries, safeKeys, useTestIds } from "src/utils";
+import { omitKey, safeEntries, safeKeys } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 interface FilterModalProps<F> {
   filter: F;

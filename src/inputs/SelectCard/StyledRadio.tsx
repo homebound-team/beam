@@ -2,8 +2,8 @@ import type { InputHTMLAttributes } from "react";
 import { useHover } from "react-aria";
 import { Css } from "src/Css";
 import { getRadioStateStyles, radioDefault, radioHover, radioReset } from "src/inputs/internal/radioStyles";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type StyledRadioProps = {
   label?: string;

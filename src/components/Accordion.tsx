@@ -3,7 +3,7 @@ import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEff
 import { useFocusRing } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 type AccordionXss = Xss<Padding>;
 

@@ -1,8 +1,8 @@
 import React from "react";
-import { noop } from "src/utils";
+import { AutoSaveStatus, AutoSaveStatusContext } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
+import { noop } from "src/utils/helpers";
 import { render } from "src/utils/rtl";
 import { vi } from "vitest";
-import { AutoSaveStatus, AutoSaveStatusContext } from ".";
 import { AutoSaveIndicator } from "./AutoSaveIndicator";
 
 describe(AutoSaveIndicator, () => {

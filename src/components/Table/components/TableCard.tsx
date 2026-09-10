@@ -1,6 +1,5 @@
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
-import { Tooltip } from "src/components";
 import { BaseCard } from "src/components/BaseCard";
 import type { CardTag, ImageFitType } from "src/components/Card";
 import { CardBody, type CardData } from "src/components/CardBody";
@@ -17,9 +16,10 @@ import type { RowStyle } from "src/components/Table/TableStyles";
 import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import type { RowState } from "src/components/Table/utils/RowState";
 import { applyRowFn, isGridCellContent } from "src/components/Table/utils/utils";
+import { Tooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
 import { navLink } from "src/css/CssReset";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type TableCardProps<R extends Kinded> = {
   rs: RowState<R>;

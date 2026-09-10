@@ -1,8 +1,8 @@
 import { type ReactNode, useMemo } from "react";
 import { useBeamContext } from "src/components/BeamContext";
 import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
+import { useModal } from "src/components/Modal/useModal";
 import type { CanCloseCheck } from "src/types";
-import { useModal } from "../Modal";
 import type { SuperDrawerWidth } from "./utils";
 
 export type OpenInDrawerOpts = {
