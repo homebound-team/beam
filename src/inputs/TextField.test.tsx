@@ -129,6 +129,25 @@ describe("AI mode", () => {
     expect(r.query.name_originalValue).not.toBeInTheDocument();
   });
 
+  it("omits the original when the proposal matches it", async () => {
+    // i.e. an optimistically-created entity, already saved with the value the model proposed
+    const r = await render(<TestTextField value="Janes Cottage" proposedValue="Janes Cottage" />);
+    // Then the field still reads as AI-proposed, just without striking through the same text twice
+    expect(r.name).toHaveValue("Janes Cottage");
+    expect(r.name).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.name_originalValue).not.toBeInTheDocument();
+  });
+
+  it("keeps the matching original hidden once the user edits", async () => {
+    // The proposal is gated on AI mode, so it goes undefined on the first keystroke while the
+    // original deliberately lingers until blur — the original must not pop in at that moment.
+    const r = await render(<TestTextField value="Janes Cottage" proposedValue="Janes Cottage" />);
+    // Mid-edit, i.e. still focused — `type` would blur and retire the original on its own
+    focus(r.name);
+    fireEvent.input(r.name, { target: { value: "Janes Cottages" } });
+    expect(r.query.name_originalValue).not.toBeInTheDocument();
+  });
+
   it("commits on edit and drops the AI treatment", async () => {
     const r = await render(<TestTextField value="Old Cottage" proposedValue="Janes Cottage" />);
     // When the user edits the field, which starts from the proposal
