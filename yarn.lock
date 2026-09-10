@@ -920,8 +920,8 @@ __metadata:
     husky: "npm:^9.1.7"
     jsdom: "npm:29.0.0"
     memoize-one: "npm:^6.0.0"
-    mobx: "npm:^6.16.1"
-    mobx-react: "npm:^9.2.2"
+    mobx: "npm:^7.0.3"
+    mobx-react: "npm:^10.0.2"
     mobx-utils: "npm:^6.1.1"
     oxlint: "npm:^1.82.0"
     oxlint-tsgolint: "npm:^7.0.2001"
@@ -950,10 +950,13 @@ __metadata:
     vitest: "npm:^5.0.0"
     watch: "npm:^1.0.2"
   peerDependencies:
-    mobx-react: ">=7"
+    mobx: ">=7"
+    mobx-react: ">=10"
     react: ">=16"
     react-router-dom: ">=6"
   peerDependenciesMeta:
+    mobx:
+      optional: true
     mobx-react:
       optional: true
     react-router-dom:
@@ -6079,37 +6082,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx-react-lite@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "mobx-react-lite@npm:4.1.1"
-  dependencies:
-    use-sync-external-store: "npm:^1.4.0"
+"mobx-react-lite@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "mobx-react-lite@npm:5.0.3"
   peerDependencies:
-    mobx: ^6.9.0
-    react: ^16.8.0 || ^17 || ^18 || ^19
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 10/ce2c848129c052e1901f530329ec440e4b7f7264073e0f91bda240b2c37826f964d1fcab8cf43c4a1fa0d596074364e9ce52094e3db0bd5ca1d59147b92200f7
+    mobx: ^7.0.0
+    react: ^18 || ^19
+  checksum: 10/0f55d1c29ae3379ace135c7085a1e8c6d9c875f48aa2c53ea2182a6a0a5bbbfc3519765c0e9536d08834862f1e281eb3f52f16d851e95b83aae23d68411bc9d0
   languageName: node
   linkType: hard
 
-"mobx-react@npm:^9.2.2":
-  version: 9.2.2
-  resolution: "mobx-react@npm:9.2.2"
+"mobx-react@npm:^10.0.2":
+  version: 10.0.2
+  resolution: "mobx-react@npm:10.0.2"
   dependencies:
-    mobx-react-lite: "npm:^4.1.1"
+    mobx-react-lite: "npm:^5.0.3"
   peerDependencies:
-    mobx: ^6.9.0
-    react: ^16.8.0 || ^17 || ^18 || ^19
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 10/fb50f2bc6246ee74cd28a0294abe65699f62cc7aae47ccca139a98a3ca3facadda5d014d07d30e8fc1a65bc05667719216a37b5bfe8fb622a40de4ff0b3292a2
+    mobx: ^7.0.0
+    react: ^18 || ^19
+  checksum: 10/a4189a17d1265753a4081450a466ae8b43bde60062e64c2fb81031c1cdbe375c18a09ad571cdf82884c711b659ccd34b23d387095c7dcfda3735b88205609f09
   languageName: node
   linkType: hard
 
@@ -6122,10 +6113,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx@npm:^6.16.1":
-  version: 6.16.1
-  resolution: "mobx@npm:6.16.1"
-  checksum: 10/01753230a35d2f8a376d4f0e5b0096848141a6c1567f09f4a5e6f7a983814e971141eccb58288e737a7b259618312e4c963523100ccc13f5505881ead7066c80
+"mobx@npm:^7.0.3":
+  version: 7.0.3
+  resolution: "mobx@npm:7.0.3"
+  checksum: 10/17909a64107694fc1c18df11714dda168f86b81dac5e011c49c2e6a75450411cc5e84fe5960b195fee1340d559a47c82a2f2844d01b24cc78256d4a8b3f1286d
   languageName: node
   linkType: hard
 
@@ -8985,7 +8976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.4.0, use-sync-external-store@npm:^1.5.0, use-sync-external-store@npm:^1.6.0":
+"use-sync-external-store@npm:^1.5.0, use-sync-external-store@npm:^1.6.0":
   version: 1.6.0
   resolution: "use-sync-external-store@npm:1.6.0"
   peerDependencies:
