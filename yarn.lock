@@ -940,7 +940,7 @@ __metadata:
     storybook: "npm:^10.6.0"
     temporal-polyfill: "npm:^0.3.2"
     tributejs: "npm:^5.1.3"
-    trix: "npm:^1.3.5"
+    trix: "npm:^2.1.19"
     tsup: "npm:^8.5.1"
     tsx: "npm:^4.23.13"
     typescript: "npm:5.9.3"
@@ -4137,7 +4137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.4.15":
+"dompurify@npm:^3.2.5, dompurify@npm:^3.4.15":
   version: 3.4.15
   resolution: "dompurify@npm:3.4.15"
   dependencies:
@@ -8667,10 +8667,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"trix@npm:^1.3.5":
-  version: 1.3.5
-  resolution: "trix@npm:1.3.5"
-  checksum: 10/d430d8da751fa4afeb8775a5051f5e8df6f3845dd93b545f66ab3c1ca8fd1fb7312e77b88ebf8570285b29aea83b9bd1910cb2fc9ace87828e4f371e32cc64b8
+"trix@npm:^2.1.19":
+  version: 2.1.19
+  resolution: "trix@npm:2.1.19"
+  dependencies:
+    dompurify: "npm:^3.2.5"
+  checksum: 10/a7f4b6e50b1d1714eb4d27ce520f958a6225a3bcd6b4a566320efc163e24701599bd0091a9e0b5b0e9302b8400fbf54d027a988f4419639a69f7ae530cd07f06
   languageName: node
   linkType: hard
 

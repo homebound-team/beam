@@ -1,5 +1,6 @@
 import { configure } from "mobx";
 import { resetWindowScroll } from "src/tests/documentScroll";
+import "src/tests/elementInternals";
 import "src/tests/framerMotion";
 import "src/tests/matchers";
 import { resetViewport } from "src/tests/viewport";
