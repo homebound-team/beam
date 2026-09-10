@@ -34,7 +34,6 @@ export const jumpLinksRailWidthPx = 192;
 const railAndShellPx = centeredShellMaxPx.sm + jumpLinksRailWidthPx;
 
 /**
- * `margin-right` mirroring the rail so the sibling content column stays page-centered (`100%` resolves
- * against the flex row). The clamp drops the mirror instead of narrowing content on shorter rows.
+ * `margin-right` mirroring the rail so the form stays page-centered (`0` until rail + shell fit).
  */
 export const jumpLinksRailReservation = `clamp(0px, 100% - ${railAndShellPx}px, ${jumpLinksRailWidthPx}px)`;

@@ -4,7 +4,9 @@ import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutCo
 import { EnvironmentBannerLayoutHeightProvider } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import {
   beamFloatingRightOffsetVar,
+  beamLayoutViewportWidthVar,
   beamRightPaneWidthVar,
+  beamSideNavLayoutWidthVar,
   documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
@@ -44,8 +46,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     // Then the fixed overlay pane renders; scoped width and root floating offset match it
     expect(r.rightPaneContent).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: expectedWidth });
-    // Fixed overlay — not inline clear mode, which applies a negative marginLeft.
-    expect(r.rightPaneContent.style.marginLeft).toBe("");
+    expect(r.rightPaneContent).toHaveStyle({ position: "fixed" });
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
 
@@ -137,6 +138,73 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
     expect(r.queryAllByTestId("documentScrollRightPaneLayout")).toHaveLength(1);
     warn.mockRestore();
+  });
+
+  it("publishes width tokens without a spacer when reserveScroll is false", async () => {
+    // Given an overlay that opts out of the horizontal-scroll spacer
+    const expectedWidth = documentScrollRightPaneWidthCss(320);
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320} reserveScroll={false}>
+          <div>Main content</div>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then the pane is open and tokens match it, but the spacer stays 0
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
+  });
+
+  it("auto skips the spacer when leftover chrome is unusable", async () => {
+    // Given auto reserve on a tight chrome (viewport − side nav leaves < 480px beside the pane)
+    const expectedWidth = documentScrollRightPaneWidthCss(450);
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={450} reserveScroll="auto">
+          <div>Main content</div>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+    r.documentScrollRightPaneLayout.style.setProperty(beamLayoutViewportWidthVar, "768px");
+    r.documentScrollRightPaneLayout.style.setProperty(beamSideNavLayoutWidthVar, "260px");
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then tokens still publish; leftover is unusable so there is no dummy scrollbar
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
+  });
+
+  it("auto inserts a pane-width spacer when leftover chrome is usable", async () => {
+    // Given auto reserve on typical jsdom chrome (viewport leaves ≥ 480px beside the pane)
+    const expectedWidth = documentScrollRightPaneWidthCss(320);
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320} reserveScroll="auto">
+          <div>Main content</div>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then the form column is the leftover (spacer is the resolved pane width in px)
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "320px" });
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
   });
 });
 

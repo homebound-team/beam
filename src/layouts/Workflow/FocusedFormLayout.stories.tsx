@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
-import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { createRightPaneFormSections } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 import { FocusedFormLayout } from "./FocusedFormLayout";
 
@@ -54,6 +55,33 @@ export function WithoutJumpLinks() {
     </WithEnvironmentBanner>
   );
 }
+
+/** `FormSectionLayout withRightPane` under FocusedForm chrome. Toggle JumpLinks. */
+export const WithRightPane = newStory(
+  ({ withJumpLinks = true }: { withJumpLinks: boolean }) => (
+    <WithEnvironmentBanner>
+      <FocusedFormLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+      >
+        <FormSectionLayout
+          withJumpLinks={withJumpLinks}
+          withRightPane
+          title="Link Design Package"
+          description="Connect this package to a market and give it a name."
+          sections={createRightPaneFormSections()}
+        />
+      </FocusedFormLayout>
+    </WithEnvironmentBanner>
+  ),
+  {
+    args: { withJumpLinks: true },
+    argTypes: { withJumpLinks: { control: "boolean" } },
+    parameters: { controls: { include: ["withJumpLinks"] } },
+  },
+);
 
 export function AiMode() {
   return (

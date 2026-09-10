@@ -54,6 +54,7 @@ export * from "./components/Layout/layoutTypes";
 export * from "./components/Layout/PreventBrowserScroll";
 export * from "./components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 export * from "./components/Layout/RightPaneLayout/RightPaneLayout";
+export * from "./components/Layout/RightPaneLayout/RightPanePanel";
 export * from "./components/Layout/RightPaneLayout/rightPaneStore";
 export * from "./components/Layout/RightPaneLayout/useRightPane";
 export * from "./components/Layout/RightPaneLayout/withRightPane";
@@ -216,7 +217,7 @@ export type { UseToastProps } from "./components/Toast/useToast";
 // ./layouts
 export * from "./layouts/SideNavLayout/SideNavLayout";
 export * from "./layouts/SideNavLayout/SideNavLayoutContext";
-export { CenteredLayout } from "./layouts/CenteredLayout/CenteredLayout";
+export { CenteredLayout, centeredShellMaxPx } from "./layouts/CenteredLayout/CenteredLayout";
 export type { CenteredLayoutProps, CenteredLayoutSize } from "./layouts/CenteredLayout/CenteredLayout";
 export { EnvironmentBannerLayout } from "./layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 export type { EnvironmentBannerLayoutProps } from "./layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";

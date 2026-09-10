@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
+import { resolveWithRightPaneOptions, type WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { Css } from "src/Css";
 import { FormSection, type FormSectionProps } from "src/forms/FormSection/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
@@ -34,6 +36,11 @@ export type FormSectionLayoutProps = {
    * Default false — opt in for FocusedForm / Stepper form steps that want the rail.
    */
   withJumpLinks?: boolean;
+  /**
+   * Opt into the document-scroll detail pane (`useRightPane`); default `reserveScroll: "auto"`.
+   * Hosts JumpLinks + form — do not also set `withRightPane` on the inner `CenteredLayout`.
+   */
+  withRightPane?: WithRightPane;
 };
 
 /**
@@ -50,9 +57,11 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     sections,
     aiMode = false,
     withJumpLinks = false,
+    withRightPane,
   } = props;
   const tid = useTestIds(props, "formSectionLayout");
   const { sm: isMobile } = useBreakpoint();
+  const rightPane = resolveWithRightPaneOptions(withRightPane, "auto");
 
   const jumpLinks = (sections ?? [])
     .filter((section) => !section.excludeJumpLink)
@@ -99,11 +108,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     </CenteredLayout>
   );
 
-  if (!showRail) {
-    return <div css={Css.mb4.$}>{form}</div>;
-  }
-
-  return (
+  const body = showRail ? (
     <div css={Css.df.w100.mb4.$}>
       <JumpLinksRail links={jumpLinks} activeId={activeId} {...tid.jumpLinks} />
       {/* Mirror the rail's width so the form stays centered on the page, as it is without the rail. */}
@@ -111,5 +116,15 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
         {form}
       </div>
     </div>
+  ) : (
+    <div css={Css.mb4.$}>{form}</div>
+  );
+
+  if (!rightPane) return body;
+
+  return (
+    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width} reserveScroll={rightPane.reserveScroll}>
+      {body}
+    </DocumentScrollOverlayRightPaneLayout>
   );
 }

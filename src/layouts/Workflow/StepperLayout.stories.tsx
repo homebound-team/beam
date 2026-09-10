@@ -8,8 +8,8 @@ import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
-import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
-import { GridTableLayoutExample } from "src/utils/sbComponents";
+import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { createRightPaneFormSections, GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 import { StepperLayout } from "./StepperLayout";
 
@@ -107,6 +107,49 @@ export function WithContentHeaderAndTable() {
     </WithEnvironmentBanner>
   );
 }
+
+/** Form step with `FormSectionLayout withRightPane`. Toggle JumpLinks — Stepper does not own the pane. */
+export const WithRightPane = newStory(
+  ({ withJumpLinks = true }: { withJumpLinks: boolean }) => (
+    <WithEnvironmentBanner>
+      <StepperLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        steps={[
+          {
+            label: "Details",
+            content: (
+              <FormSectionLayout
+                withJumpLinks={withJumpLinks}
+                withRightPane
+                title="Link Design Package"
+                description="Connect this package to a market and give it a name."
+                sections={createRightPaneFormSections()}
+              />
+            ),
+          },
+          {
+            label: "Review",
+            content: (
+              <FormSectionLayout
+                title="Review"
+                description="Confirm before creating."
+                sections={[{ title: "Summary", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+        ]}
+      />
+    </WithEnvironmentBanner>
+  ),
+  {
+    args: { withJumpLinks: true },
+    argTypes: { withJumpLinks: { control: "boolean" } },
+    parameters: { controls: { include: ["withJumpLinks"] } },
+  },
+);
 
 /** Form step with JumpLinks on {@link FormSectionLayout} — Stepper itself does not own the rail. */
 export function WithJumpLinks() {
