@@ -28,21 +28,6 @@ export function FourStatuses() {
   return <TableSummaryReport {...createProps({ metrics: createFourMetrics() })} />;
 }
 
-export function Interactive() {
-  const [activeMetricValues, setActiveMetricValues] = useState<string[]>([]);
-  return (
-    <TableSummaryReport
-      {...createProps({
-        activeMetricValues,
-        onMetricClick: (value) =>
-          setActiveMetricValues((values) =>
-            values.includes(value) ? values.filter((current) => current !== value) : [...values, value],
-          ),
-      })}
-    />
-  );
-}
-
 /** Demonstrates applying a report status filter and scrolling to the filtered table. */
 export function FiltersTableAndScrolls() {
   const [activeMetricValues, setActiveMetricValues] = useState<string[]>([]);
