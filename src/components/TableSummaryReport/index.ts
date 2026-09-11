@@ -1,7 +1,8 @@
-export { TableSummaryReport } from "./TableSummaryReport";
+export { StackBarGraph, TableSummaryReport } from "./TableSummaryReport";
 export type {
+  StackBarGraphProps,
+  StackBarGraphSegment,
   TableSummaryReportMetric,
   TableSummaryReportProps,
-  TableSummaryReportSegment,
   TableSummaryReportStatus,
-} from "./types";
+} from "./TableSummaryReport";

@@ -1,34 +1,75 @@
-import { useMemo, useRef, type RefObject } from "react";
+import { useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import { Button } from "src/components/Button";
 import { Icon, type IconKey } from "src/components/Icon";
 import { Css, Palette, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils/useTestIds";
-import type { TableSummaryReportMetric, TableSummaryReportProps, TableSummaryReportStatus } from "./types";
+
+export type TableSummaryReportStatus = "success" | "neutral" | "warning" | "error";
+
+export type TableSummaryReportMetric<V extends string | number> = {
+  value: V;
+  label: string;
+  count: number;
+  status: Exclude<TableSummaryReportStatus, "neutral" | "success">;
+  disabled?: boolean;
+};
+
+export type TableSummaryReportProps<V extends string | number> = {
+  title: ReactNode;
+  metrics?: readonly TableSummaryReportMetric<V>[];
+  activeMetricValues?: readonly V[];
+  onMetricClick?: (value: V) => void;
+  issueLabel?: ReactNode;
+  issueMobileLabel?: ReactNode;
+  onIssueClick?: VoidFunction;
+  issueDisabled?: boolean;
+  footer?: ReactNode;
+  "data-testid"?: string;
+};
+
+export type StackBarGraphSegment = {
+  label: string;
+  count: number;
+  status: TableSummaryReportStatus;
+};
+
+export type StackBarGraphProps = {
+  title: ReactNode;
+  totalLabel: ReactNode;
+  segments: readonly StackBarGraphSegment[];
+  "data-testid"?: string;
+};
 
 export function TableSummaryReport<V extends string | number>(props: TableSummaryReportProps<V>) {
-  const { title, totalLabel, segments, metrics = [], activeMetricValues = [], onMetricClick, issueAction } = props;
+  const {
+    title,
+    metrics = [],
+    activeMetricValues = [],
+    onMetricClick,
+    issueLabel,
+    issueMobileLabel = "Issues",
+    onIssueClick,
+    issueDisabled,
+    footer,
+  } = props;
   const { sm: isMobile } = useBreakpoint();
   const tid = useTestIds(props, "tableSummaryReport");
   const visibleMetrics = metrics.slice(0, 4);
-  const totalCount = useMemo(
-    () => segments.reduce((total, segment) => total + Math.max(0, segment.count), 0),
-    [segments],
-  );
 
   return (
-    <section css={Css.df.fdc.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).ba.br12.oh.bshBasic.$} {...tid}>
-      <header css={Css.df.aic.jcsb.gap2.p2.bb.bc(Tokens.FieldBorderDefault).$}>
-        <div css={Css.mdSb.mw0.$}>{title}</div>
-        {visibleMetrics.length > 0 && issueAction && (
+    <section css={Css.df.fdc.bgColor(Tokens.Surface).br12.oh.bshBasic.$} {...tid}>
+      <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.FieldBorderDefault).$}>
+        <div css={Css.mdSb.mw0.py1.$}>{title}</div>
+        {visibleMetrics.length > 0 && issueLabel != null && onIssueClick && (
           <Button
-            label={isMobile ? "Issues" : issueAction.label}
+            label={isMobile ? issueMobileLabel : issueLabel}
             variant="tertiary"
             icon={null}
             endAdornment={<Icon icon="arrowRight" />}
-            onClick={issueAction.onClick}
-            disabled={issueAction.disabled}
+            onClick={onIssueClick}
+            disabled={issueDisabled}
             {...tid.issueAction}
           />
         )}
@@ -48,38 +89,51 @@ export function TableSummaryReport<V extends string | number>(props: TableSummar
           ))}
         </div>
       )}
-      <footer
-        css={Css.df.fdc.gap2.p2.if(visibleMetrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}
-        {...tid.coverage}
-      >
-        <div css={Css.df.aic.jcsb.gap2.$}>
-          <span css={Css.xs2Sb.ttu.add("letterSpacing", "0.5px").$}>Coverage by status</span>
-          <span css={Css.xs.wsnw.$}>{totalLabel}</span>
-        </div>
-        <div css={Css.df.hPx(20).borderRadius("6px").oh.$} {...tid.coverageBar}>
-          {segments.map((segment) => (
-            <div
-              key={segment.label}
-              css={
-                Css.flexGrow(Math.max(0, segment.count))
-                  .add("minWidth", segment.count > 0 ? "1px" : 0)
-                  .bgColor(statusColors[segment.status]).$
-              }
-            />
-          ))}
-        </div>
-        <div css={Css.df.fww.aic.gap2.$} {...tid.legend}>
-          {segments.map((segment) => (
-            <div key={segment.label} css={Css.dif.aic.gapPx(4).$}>
-              <span css={Css.br100.wPx(8).hPx(8).bgColor(statusColors[segment.status]).$} />
-              <span css={Css.xs.$}>
-                {percentage(segment.count, totalCount)}% {segment.label} ({segment.count})
-              </span>
-            </div>
-          ))}
-        </div>
-      </footer>
+      {footer !== undefined && (
+        <div css={Css.if(visibleMetrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>
+      )}
     </section>
+  );
+}
+
+/** Horizontal stacked bar + legend for use as a `TableSummaryReport` footer (or elsewhere). */
+export function StackBarGraph(props: StackBarGraphProps) {
+  const { title, totalLabel, segments } = props;
+  const tid = useTestIds(props, "stackBarGraph");
+  const totalCount = useMemo(
+    () => segments.reduce((total, segment) => total + Math.max(0, segment.count), 0),
+    [segments],
+  );
+
+  return (
+    <div css={Css.df.fdc.gap2.p2.$} {...tid}>
+      <div css={Css.df.aic.jcsb.gap2.$}>
+        <span css={Css.xs2Sb.ttu.add("letterSpacing", "0.5px").$}>{title}</span>
+        <span css={Css.xs.wsnw.$}>{totalLabel}</span>
+      </div>
+      <div css={Css.df.hPx(20).borderRadius("6px").oh.$} {...tid.bar}>
+        {segments.map((segment) => (
+          <div
+            key={segment.label}
+            css={
+              Css.flexGrow(Math.max(0, segment.count))
+                .add("minWidth", segment.count > 0 ? "1px" : 0)
+                .bgColor(statusColors[segment.status]).$
+            }
+          />
+        ))}
+      </div>
+      <div css={Css.df.fww.aic.gap2.$} {...tid.legend}>
+        {segments.map((segment) => (
+          <div key={segment.label} css={Css.dif.aic.gapPx(4).$}>
+            <span css={Css.br100.wPx(8).hPx(8).bgColor(statusColors[segment.status]).$} />
+            <span css={Css.xs.$}>
+              {percentage(segment.count, totalCount)}% {segment.label} ({segment.count})
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
