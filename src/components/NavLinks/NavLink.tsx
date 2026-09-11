@@ -1,15 +1,14 @@
-import { AriaButtonProps } from "@react-types/button";
+import type { AriaButtonProps } from "@react-types/button";
 import type { PressEvent } from "@react-types/shared";
-import { ReactNode, RefObject, useMemo } from "react";
+import { type ReactNode, type RefObject, useMemo } from "react";
 import { mergeProps, useButton, useFocusRing, useHover, VisuallyHidden } from "react-aria";
-import type { IconKey } from "src/components";
-import { navLink } from "src/components";
-import { Icon } from "src/components/Icon";
-import { Css, Properties, Tokens } from "src/Css";
+import { Icon, type IconKey } from "src/components/Icon";
+import { Css, type Properties, Tokens } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
-import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { noop } from "src/utils";
+import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { noop } from "src/utils/helpers";
 
 export type NavLinkVariant = "side" | "global";
 
@@ -23,7 +22,7 @@ export type NavLinkProps = {
   openInNew?: boolean;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLElement>;
+  buttonRef?: RefObject<HTMLElement | null>;
   /**
    * When true with an `icon`, shows icon only but keeps `label` for accessibility
    * (visually hidden text). Used by SideNav when the rail is collapsed.

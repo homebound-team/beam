@@ -1,15 +1,16 @@
 import { useResizeObserver } from "@react-aria/utils";
 import {
   createContext,
-  type CSSProperties,
-  ReactNode,
   useCallback,
   useContext,
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
+  type JSX,
+  type ReactNode,
 } from "react";
-import { BeamColor } from "src/colors";
+import type { BeamColor } from "src/colors";
 import { Css, Tokens } from "src/Css";
 import { useBodyBackgroundColor } from "src/hooks/useBodyBackgroundColor";
 import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";

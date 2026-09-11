@@ -1,7 +1,7 @@
 import { JumpLink } from "src/components/JumpLink";
 import { Css } from "src/Css";
 import { centeredShellMaxPx } from "src/layouts/CenteredLayout/CenteredLayout";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { stickyNavAndHeaderOffset } from "../layoutVars";
 
 export type JumpLinksRailLink = {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { checkboxFilter, CheckboxFilterProps } from "src/components/Filters/CheckboxFilter";
+import { checkboxFilter, type CheckboxFilterProps } from "src/components/Filters/CheckboxFilter";
 import { click, render } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 

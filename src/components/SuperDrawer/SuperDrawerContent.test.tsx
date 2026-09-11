@@ -1,7 +1,8 @@
-import { ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
+import { SuperDrawerContent } from "src/components/SuperDrawer/SuperDrawerContent";
+import { useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { render } from "src/utils/rtl";
-import { SuperDrawerContent, useSuperDrawer } from "./index";
 
 describe("SuperDrawerContent", () => {
   it("renders a banner above the content", async () => {

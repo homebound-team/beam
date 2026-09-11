@@ -1,7 +1,7 @@
-import { useRef } from "react";
-import { DayProps, useDayRender } from "react-day-picker";
+import { useRef, type RefObject } from "react";
+import { useDayRender, type DayProps } from "react-day-picker";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import "./day.css";
 
 /** Follows the same pattern as defined by the React-Day-Picker 'Day' component, plus sprinkling our own styling */
@@ -12,7 +12,7 @@ export function Day(props: DayProps) {
   const { isHidden, isButton, activeModifiers, buttonProps, divProps } = useDayRender(
     props.date,
     props.displayMonth,
-    buttonRef,
+    buttonRef as RefObject<HTMLButtonElement>,
   );
 
   if (isHidden) {

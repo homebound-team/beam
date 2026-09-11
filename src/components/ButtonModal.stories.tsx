@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
 import { ButtonModal } from "./ButtonModal";

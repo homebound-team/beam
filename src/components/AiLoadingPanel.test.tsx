@@ -19,7 +19,15 @@ describe("AiLoadingPanel", () => {
     // Given AI work in flight
     const r = await render(<AiLoadingPanel />);
     // Then assistive tech waits for a pause rather than interrupting, and knows content is settling
-    expect(r.aiLoadingPanel).toHaveAttribute("role", "status");
-    expect(r.aiLoadingPanel).toHaveAttribute("aria-busy", "true");
+    expect(r.aiLoadingPanel_card).toHaveAttribute("role", "status");
+    expect(r.aiLoadingPanel_card).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("omits the wash when omitBg is true", async () => {
+    // Given a loading panel sitting on a parent wash
+    const r = await render(<AiLoadingPanel omitBg />);
+    // Then only the card is rendered, not the panel wash
+    expect(r.query.aiLoadingPanel).toBeNull();
+    expect(r.aiLoadingPanel_card).toBeInTheDocument();
   });
 });

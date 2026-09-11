@@ -1,6 +1,6 @@
-import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
-import { useBreakpoint } from "src/hooks";
-import { useTestIds } from "src/utils";
+import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type TableView = "list" | "card";
 

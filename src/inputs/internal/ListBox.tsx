@@ -1,7 +1,7 @@
-import { Key as AriaKey } from "@react-types/shared";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import type { Key as AriaKey } from "@react-types/shared";
+import React, { useEffect, useRef, useState, type JSX, type MutableRefObject } from "react";
 import { useListBox } from "react-aria";
-import { ListState } from "react-stately";
+import type { ListState } from "react-stately";
 import { Css, Tokens } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { ListBoxSection } from "src/inputs/internal/ListBoxSection";

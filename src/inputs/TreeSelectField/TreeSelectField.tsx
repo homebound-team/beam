@@ -1,8 +1,9 @@
-import { Key as AriaKey } from "@react-types/shared";
+import type { Key as AriaKey } from "@react-types/shared";
 import React, {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
+  type Dispatch,
+  type JSX,
+  type ReactNode,
+  type SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -12,11 +13,10 @@ import React, {
 } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
-import { resolveTooltip } from "src/components";
-import { Popover } from "src/components/internal";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { Popover } from "src/components/internal/Popover";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { resolveTooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
-import { Value } from "src/inputs/index";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
@@ -24,16 +24,17 @@ import {
   findOption,
   findOptions,
   flattenOptions,
-  LeveledOption,
-  NestedOption,
-  NestedOptionsOrLoad,
-  TreeFieldState,
-  TreeSelectResponse,
+  type LeveledOption,
+  type NestedOption,
+  type NestedOptionsOrLoad,
+  type TreeFieldState,
+  type TreeSelectResponse,
 } from "src/inputs/TreeSelectField/utils";
 import { getFieldWidth } from "src/inputs/utils";
+import type { Value } from "src/inputs/Value";
 import { keyToValue, valueToKey } from "src/inputs/Value";
-import { BeamFocusableProps } from "src/interfaces";
-import { HasIdAndName, Optional } from "src/types";
+import type { BeamFocusableProps } from "src/interfaces";
+import type { HasIdAndName, Optional } from "src/types";
 
 export type TreeSelectFieldProps<O, V extends Value> = {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */

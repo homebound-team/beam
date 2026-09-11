@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { Value } from "src/inputs";
-import { ComboBoxBase, ComboBoxBaseProps, unsetOption } from "src/inputs/internal/ComboBoxBase";
-import { HasIdIsh, HasNameIsh, Optional } from "src/types";
+import { useMemo, type JSX } from "react";
+import type { Value } from "src/inputs/Value";
+import { ComboBoxBase, unsetOption, type ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
+import type { HasIdIsh, HasNameIsh, Optional } from "src/types";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
 export type SelectFieldProps<O, V extends Value> = {

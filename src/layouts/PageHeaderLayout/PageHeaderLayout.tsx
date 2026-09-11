@@ -1,8 +1,8 @@
-import { CSSProperties, ReactNode, useCallback, useMemo, useRef } from "react";
-import { PageHeader, PageHeaderProps } from "src/components/Headers/PageHeader";
-import { TabsContentXss } from "src/components/Tabs";
-import { Css, Only } from "src/Css";
-import { useTestIds } from "src/utils";
+import { type CSSProperties, type ReactNode, useCallback, useMemo, useRef } from "react";
+import { PageHeader, type PageHeaderProps } from "src/components/Headers/PageHeader";
+import type { TabsContentXss } from "src/components/Tabs";
+import { Css, type Only } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import {

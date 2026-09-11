@@ -1,5 +1,5 @@
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type ProposedValueProps = {
   /** The value on record, struck-through. */
@@ -21,7 +21,7 @@ export function ProposedValue(props: ProposedValueProps) {
     <span {...tid}>
       {original && (
         <>
-          <span css={Css.tdlt.color(Tokens.OnSurfaceMuted).$} {...tid.original}>
+          <span css={Css.tdlt.color(Tokens.OnSurface).$} {...tid.original}>
             {original}
           </span>{" "}
         </>

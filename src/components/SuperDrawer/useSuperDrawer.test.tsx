@@ -1,10 +1,10 @@
 import { act, renderHook } from "@testing-library/react";
-import { ReactElement, useEffect } from "react";
+import { type ReactElement, useEffect } from "react";
 import { SuperDrawerHeader } from "src/components/SuperDrawer/components/SuperDrawerHeader";
+import { useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { render, withBeamRTL } from "src/utils/rtl";
 import { vi } from "vitest";
 import { useBeamContext } from "../BeamContext";
-import { useSuperDrawer } from "./index";
 
 describe("useSuperDrawer", () => {
   it("should allow `new` element to be added", async () => {

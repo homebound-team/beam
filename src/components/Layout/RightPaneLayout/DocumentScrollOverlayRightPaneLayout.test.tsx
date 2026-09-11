@@ -1,4 +1,3 @@
-import { waitFor } from "@homebound/rtl-utils";
 import { Button } from "src/components/Button";
 import { environmentBannerSizePx } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
@@ -6,54 +5,58 @@ import { EnvironmentBannerLayoutHeightProvider } from "src/layouts/EnvironmentBa
 import {
   beamFloatingRightOffsetVar,
   beamRightPaneWidthVar,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render } from "src/utils/rtl";
-import { DocumentScrollRightPaneLayout } from "./DocumentScrollRightPaneLayout";
-import { useRightPane } from "./useRightPane";
+import { clickAndWait, render } from "src/utils/rtl";
+import { vi } from "vitest";
+import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
+import { useRightPaneActions } from "./useRightPane";
 
-describe("DocumentScrollRightPaneLayout", () => {
+describe("DocumentScrollOverlayRightPaneLayout", () => {
   afterEach(() => {
-    document.documentElement.style.removeProperty(beamFloatingRightOffsetVar);
+    // Host sets this on documentElement while open; reset so other tests/files do not inherit it.
+    document.documentElement.style.setProperty(beamFloatingRightOffsetVar, "0px");
   });
 
   it("publishes scoped pane width and a root floating right offset when open", async () => {
     // Given a document-scroll right pane layout on desktop
-    const expectedWidth = documentScrollRightPaneWidth(320);
+    const expectedWidth = documentScrollRightPaneWidthCss(320);
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout paneWidth={320}>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
           <div>Main content</div>
-        </DocumentScrollRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
 
-    // Then there is no spacer while closed; width vars are 0
-    expect(r.query.rightPaneSpacer).toBeNull();
+    // Then overlay layout is ready while closed; spacer has zero width until open
+    expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
     expect(r.query.rightPaneContent).toBeNull();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
-    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
 
     // When the pane is opened
     await clickAndWait(r.openPaneBtn);
 
-    // Then the pane/spacer render; scoped width and root floating offset match the effective pane width
+    // Then the fixed overlay pane renders; scoped width and root floating offset match it
     expect(r.rightPaneContent).toBeInTheDocument();
-    expect(r.rightPaneSpacer).toBeInTheDocument();
-    expect(r.rightPaneSpacer).toHaveStyle({ width: expectedWidth });
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: expectedWidth });
+    // Fixed overlay — not inline clear mode, which applies a negative marginLeft.
+    expect(r.rightPaneContent.style.marginLeft).toBe("");
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
 
-    // When the pane is closed
-    click(r.closePaneBtn);
+    // When the pane is closed (`clickAndWait` covers the exit animation / jsdom poll)
+    await clickAndWait(r.closePaneBtn);
 
-    // Then the spacer and pane clear; width vars return to 0
-    await waitFor(() => {
-      expect(r.query.rightPaneContent).toBeNull();
-    });
-    expect(r.query.rightPaneSpacer).toBeNull();
+    // Then the pane clears; spacer width and width vars return to 0
+    expect(r.query.rightPaneContent).toBeNull();
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
+    // Desktop overlay keeps the spacer node mounted; only its width resets while closed.
+    expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
   });
@@ -64,9 +67,9 @@ describe("DocumentScrollRightPaneLayout", () => {
     const r = await render(
       <EnvironmentBannerLayoutHeightProvider value={environmentBannerSizePx}>
         <DocumentScrollLayoutProvider>
-          <DocumentScrollRightPaneLayout paneWidth={320}>
+          <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
             <div>Main content</div>
-          </DocumentScrollRightPaneLayout>
+          </DocumentScrollOverlayRightPaneLayout>
           <OpenCloseButtons />
         </DocumentScrollLayoutProvider>
       </EnvironmentBannerLayoutHeightProvider>,
@@ -75,10 +78,10 @@ describe("DocumentScrollRightPaneLayout", () => {
     // When the pane is opened
     await clickAndWait(r.openPaneBtn);
 
-    // Then the overlay renders pinned below the banner; no split spacer / width vars
+    // Then the overlay renders pinned below the banner; no split column / width vars
     expect(r.rightPaneContent).toBeInTheDocument();
     expect(r.rightPaneContent).toHaveStyle({ top: `${environmentBannerSizePx}px` });
-    expect(r.query.rightPaneSpacer).toBeNull();
+    expect(r.query.documentScrollRightPaneLayout_spacer).toBeNull();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
   });
@@ -87,9 +90,9 @@ describe("DocumentScrollRightPaneLayout", () => {
     // Given an open document-scroll right pane layout
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
-        </DocumentScrollRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
@@ -106,18 +109,39 @@ describe("DocumentScrollRightPaneLayout", () => {
     // Then remounting a closed layout does not show stale pane content
     r.rerender(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollRightPaneLayout>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
-        </DocumentScrollRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
       </DocumentScrollLayoutProvider>,
     );
     expect(r.query.rightPaneContent).toBeNull();
   });
+
+  it("ignores a nested host so only the outer pane mounts", async () => {
+    // Given withRightPane composed twice (inner should pass through)
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+          <DocumentScrollOverlayRightPaneLayout paneWidth={200}>
+            <div>Main content</div>
+          </DocumentScrollOverlayRightPaneLayout>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // Then we warn once; only the outer host is in the tree
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
+    expect(r.queryAllByTestId("documentScrollRightPaneLayout")).toHaveLength(1);
+    warn.mockRestore();
+  });
 });
 
 function OpenCloseButtons() {
-  const { openRightPane, closeRightPane } = useRightPane();
+  const { openRightPane, closeRightPane } = useRightPaneActions();
   return (
     <Button
       data-testid="openPaneBtn"

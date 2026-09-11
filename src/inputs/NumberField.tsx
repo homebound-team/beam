@@ -1,12 +1,12 @@
 import { NumberParser } from "@internationalized/number";
-import { ReactNode, useMemo, useRef, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 import { mergeProps, useLocale, useNumberField } from "react-aria";
-import { NumberFieldStateOptions, useNumberFieldState } from "react-stately";
-import { resolveTooltip } from "src/components";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
-import { Css, Xss } from "src/Css";
+import { type NumberFieldStateOptions, useNumberFieldState } from "react-stately";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { resolveTooltip } from "src/components/Tooltip";
+import { Css, type Xss } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
-import { maybeCall } from "src/utils";
+import { maybeCall } from "src/utils/helpers";
 import { TextFieldBase } from "./TextFieldBase";
 
 export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | "days" | "mills";

@@ -1,4 +1,4 @@
-import { MutableRefObject } from "react";
+import type { MutableRefObject } from "react";
 import type { CheckboxGroupState, ToggleState } from "react-stately";
 
 export function fail(message?: string): never {
@@ -55,9 +55,6 @@ export function toGroupState<T extends string>(values: T[], onChange: (value: T[
 export function maybeCall(callback: Function | undefined, ...args: any[]) {
   return callback && callback(...args);
 }
-
-export * from "./inlineStyles";
-export * from "./useTestIds";
 
 /** Casts `Object.keys` to "what it should be", as long as your instance doesn't have keys it shouldn't. */
 export function safeKeys<T>(instance: T): (keyof T)[] {

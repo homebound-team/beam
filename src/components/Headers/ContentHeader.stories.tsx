@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
 import { newStory, withBeamDecorator, withRouter } from "src/utils/sb";

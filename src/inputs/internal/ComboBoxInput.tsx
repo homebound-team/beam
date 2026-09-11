@@ -1,23 +1,26 @@
-import { Key as AriaKey } from "@react-types/shared";
+import type { Key as AriaKey } from "@react-types/shared";
 import React, {
-  ChangeEvent,
-  InputHTMLAttributes,
-  LabelHTMLAttributes,
-  MutableRefObject,
-  ReactNode,
+  type ChangeEvent,
+  type InputHTMLAttributes,
+  type LabelHTMLAttributes,
+  type MutableRefObject,
+  type ReactNode,
   useState,
 } from "react";
 import { mergeProps } from "react-aria";
-import { ComboBoxState } from "react-stately";
-import { Chips, CountBadge, Icon, Tooltip } from "src/components";
-import { PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import type { ComboBoxState } from "react-stately";
+import { Chips } from "src/components/Chips";
+import { CountBadge } from "src/components/CountBadge";
+import { Icon } from "src/components/Icon";
+import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import { Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
-import { Value } from "src/inputs/Value";
-import { maybeCall } from "src/utils";
+import type { Value } from "src/inputs/Value";
+import { maybeCall } from "src/utils/helpers";
 
 type ComboBoxInputProps<O, V extends Value> = {
   buttonProps: any;

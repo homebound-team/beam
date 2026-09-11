@@ -1,13 +1,15 @@
-import { AriaButtonProps } from "@react-types/button";
-import { RefObject, useMemo } from "react";
+import type { AriaButtonProps } from "@react-types/button";
+import { type RefObject, useMemo } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { BeamColor } from "src/colors";
-import { Icon, IconProps, maybeTooltip, navLink, resolveTooltip } from "src/components";
+import type { BeamColor } from "src/colors";
+import { Icon, type IconProps } from "src/components/Icon";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
-import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { noop } from "src/utils";
+import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type IconButtonVariant = "default" | "circle" | "outline";
@@ -21,7 +23,7 @@ export type IconButtonProps = {
   inc?: number;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLButtonElement>;
+  buttonRef?: RefObject<HTMLButtonElement | null>;
   /** Whether to show a 16x16px version of the IconButton */
   compact?: boolean;
   /** Visual variant of the button. Defaults to "default". */

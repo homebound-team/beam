@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { FilterDefs, Filters } from "src/components/Filters";
 import { dateRangeFilter } from "src/components/Filters/DateRangeFilter";
-import { ProjectFilter, taskCompleteFilter } from "src/components/Filters/testDomain";
+import { Filters } from "src/components/Filters/Filters";
+import { type ProjectFilter, taskCompleteFilter } from "src/components/Filters/testDomain";
+import type { FilterDefs } from "src/components/Filters/types";
 import { click, render, type } from "src/utils/rtl";
 import { jan19, jan2 } from "src/utils/testDates";
 

@@ -2,9 +2,9 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "src/components/Button";
-import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
+import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, type, withRouter } from "src/utils/rtl";
 
 describe("ButtonMenu", () => {
@@ -107,6 +107,20 @@ describe("ButtonMenu", () => {
     // Then the menu item should be disabled and have a tooltip
     expect(r.trigger_disabled).toHaveAttribute("aria-disabled", "true");
     expect(r.tooltip).toHaveAttribute("title", "Tooltip");
+  });
+
+  it("renders the AI sparkle icon on an ai menu item", async () => {
+    // Given a menu item flagged as `ai`
+    const r = await render(
+      <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Accept Changes", onClick: noop, ai: true }]} />,
+      withRouter(),
+    );
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then it shows the aiStar icon rather than requiring an explicit `icon` prop
+    expect(r.trigger_acceptChanges.querySelector("[data-icon='aiStar']")).toBeTruthy();
   });
 
   // OverlayTrigger forwards `preventTooltip` from an avatar trigger through to AvatarButton.

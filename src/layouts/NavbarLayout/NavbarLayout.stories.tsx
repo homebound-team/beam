@@ -1,11 +1,12 @@
-import { Meta } from "@storybook/react-vite";
-import { Icon } from "src/components";
+import type { Meta } from "@storybook/react-vite";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Button } from "src/components/Button";
+import { Icon } from "src/components/Icon";
 import { Css, Tokens } from "src/Css";
-import { CenteredLayout, EnvironmentBannerLayout, useSideNavLayoutContext } from "src/layouts";
-import { NavbarLayout } from "src/layouts/NavbarLayout";
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
+import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { createNavbar, GridTableLayoutExample } from "src/utils/sbComponents";
@@ -124,8 +125,6 @@ export const ComposedConstrainedWidthTable = () => (
 );
 
 function Brand() {
-  const { navState } = useSideNavLayoutContext();
-  if (navState === "collapse") return <></>;
   return (
     <div css={Css.df.fdc.gap1.$}>
       <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>

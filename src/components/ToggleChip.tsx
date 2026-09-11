@@ -1,7 +1,7 @@
-import { Icon, IconKey } from "src/components/Icon";
+import { Icon, type IconKey } from "src/components/Icon";
 import { usePresentationContext } from "src/components/PresentationContext";
-import { Css, Margin, Only, Palette, Xss } from "src/Css";
-import { useHover } from "src/hooks";
+import { Css, type Margin, type Only, Palette, type Xss } from "src/Css";
+import { useHover } from "src/hooks/useHover";
 import { useTestIds } from "src/utils/useTestIds";
 import { chipBaseStyles } from "./Chip";
 

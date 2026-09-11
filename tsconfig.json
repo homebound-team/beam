@@ -7,6 +7,11 @@
     "module": "Preserve",
     // Let tsup rewrite path-less imports
     "moduleResolution": "bundler",
+    // TS 7 removed `baseUrl`, so the `src/*` alias needs explicit `paths`. The bare `src` entry
+    // points at the file, not the directory, because tsup's dts build cannot resolve the directory.
+    "paths": { "src/*": ["./src/*"], "src": ["./src/index.ts"] },
+    // @homebound/tsconfig pins rootDir to src/, but src/ tests import from scripts/
+    "rootDir": ".",
     "noEmit": true,
     "skipLibCheck": true
   }

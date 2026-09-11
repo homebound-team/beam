@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Modal, ModalProps } from "src/components/Modal/Modal";
+import { useEffect, type JSX } from "react";
+import { Modal, type ModalProps } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 
 export interface OpenModalProps {

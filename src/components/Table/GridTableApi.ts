@@ -1,14 +1,14 @@
-import { comparer } from "mobx";
+import { compareShallow } from "mobx";
 import { computedFn } from "mobx-utils";
-import { MutableRefObject, useMemo } from "react";
-import { ListRange, VirtuosoHandle } from "react-virtuoso";
+import { type MutableRefObject, useMemo } from "react";
+import type { ListRange, VirtuosoHandle } from "react-virtuoso";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { DiscriminateUnion, GridTableScrollOptions, Kinded, MaybeFn } from "src/components/Table/types";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 import { TableState } from "src/components/Table/utils/TableState";
 import { applyRowFn, isGridCellContent, isJSX } from "src/components/Table/utils/utils";
-import { isDefined } from "src/utils";
+import { isDefined } from "src/utils/helpers";
 
 /**
  * Creates an `api` handle to drive a `GridTable`.
@@ -119,11 +119,11 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     bindMethods(this);
     // Memoize these so that if the user is creating new `data` instances on every render, they
     // can use `getSelectedRowIds` to observer a stable list of `[pi:1, pi:2]`, etc.
-    this.getVisibleRowsImpl = computedFn(this.getVisibleRowsImpl, { equals: comparer.shallow });
-    this.getVisibleRowIdsImpl = computedFn(this.getVisibleRowIdsImpl, { equals: comparer.shallow });
-    this.getSelectedRowsImpl = computedFn(this.getSelectedRowsImpl, { equals: comparer.shallow });
-    this.getSelectedRowIdsImpl = computedFn(this.getSelectedRowIdsImpl, { equals: comparer.shallow });
-    this.getPinnedRowIdsImpl = computedFn(this.getPinnedRowIdsImpl, { equals: comparer.shallow });
+    this.getVisibleRowsImpl = computedFn(this.getVisibleRowsImpl, { equals: compareShallow });
+    this.getVisibleRowIdsImpl = computedFn(this.getVisibleRowIdsImpl, { equals: compareShallow });
+    this.getSelectedRowsImpl = computedFn(this.getSelectedRowsImpl, { equals: compareShallow });
+    this.getSelectedRowIdsImpl = computedFn(this.getSelectedRowIdsImpl, { equals: compareShallow });
+    this.getPinnedRowIdsImpl = computedFn(this.getPinnedRowIdsImpl, { equals: compareShallow });
   }
 
   /** Called once by the GridTable when it takes ownership of this api instance. */

@@ -1,11 +1,13 @@
+import type { JSX } from "react";
 import { CompoundField } from "src/components/internal/CompoundField";
-import { Only } from "src/Css";
-import { BoundSelectField, BoundSelectFieldProps, BoundTextField, BoundTextFieldProps } from "src/forms/index";
-import { Value } from "src/inputs/Value";
-import { TextFieldXss } from "src/interfaces";
-import { HasIdAndName, Optional } from "src/types";
-import { useTestIds } from "src/utils";
+import type { Only } from "src/Css";
+import { BoundSelectField, type BoundSelectFieldProps } from "src/forms/BoundSelectField";
+import { BoundTextField, type BoundTextFieldProps } from "src/forms/BoundTextField";
+import type { Value } from "src/inputs/Value";
+import type { TextFieldXss } from "src/interfaces";
+import type { HasIdAndName, Optional } from "src/types";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 interface BoundSelectAndTextFieldProps<O, V extends Value, X> {
   selectFieldProps: CompoundSelectFieldProps<O, V>;

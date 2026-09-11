@@ -1,4 +1,4 @@
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { render, type } from "src/utils/rtl";
 import { vi } from "vitest";
 import { RichTextFieldMock } from "./RichTextField.mock";

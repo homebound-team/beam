@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Css } from "src/Css";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { viewportModes } from "src/utils/sb";
 
 export default {

@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import {
@@ -7,11 +7,11 @@ import {
   isTextButton,
   labelOr,
   OverlayTrigger,
-  OverlayTriggerProps,
+  type OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { ButtonVariant } from "./Button";
+import { useTestIds } from "src/utils/useTestIds";
+import type { ButtonVariant } from "./Button";
 import { ContextualModal } from "./internal/ContextualModal";
 
 export type ButtonModalProps = {

@@ -1,6 +1,6 @@
-import { click } from "@homebound/rtl-utils/build/lib";
+import { click } from "@homebound/rtl-utils";
 import { render } from "src/utils/rtl";
-import { AccordionProps } from "./Accordion";
+import type { AccordionProps } from "./Accordion";
 import { AccordionList } from "./AccordionList";
 
 describe("AccordionList", () => {

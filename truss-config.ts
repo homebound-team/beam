@@ -95,7 +95,7 @@ const sections: Sections = {
       position: "sticky" as const,
     }),
   ],
-  animation: () => [
+  transition: () => [
     newMethod("transition", { transition }),
     newMethod("transitionWidth", {
       transition: `width ${motion.duration.normal} ${motion.easing.standard}`,

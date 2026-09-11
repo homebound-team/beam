@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { BeamColor } from "src/colors";
+import type { BeamColor } from "src/colors";
 import { Icon } from "src/components/Icon";
 import { Css, maybeCssVar, Tokens } from "src/Css";
 import { headerContentPaddingX } from "src/layouts/layoutSpacing";
-import { isDefined, useTestIds } from "src/utils";
+import { isDefined } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { Tag } from "../Tag";
 

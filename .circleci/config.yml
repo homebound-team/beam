@@ -4,7 +4,7 @@ orbs:
   node: circleci/node@5.1.0
 
 node-image: &node-image
-  image: cimg/node:22.14.0
+  image: cimg/node:26.8.1
   auth:
     username: $DOCKERHUB_USERNAME
     password: $DOCKERHUB_ACCESS_TOKEN
@@ -76,20 +76,9 @@ jobs:
       - <<: *node-image
     steps:
       - bootstrap
-      - restore_cache:
-          name: Restore ESLint Cache
-          keys:
-            - eslint-cache-{{ .Branch }}
-            # If this branch doesn't have a warm cache yet, fall back to main to try to speed up the initial build
-            - eslint-cache-main
       - run:
-          name: Run ESLint
+          name: Run oxlint
           command: yarn lint:ci
-      - save_cache:
-          name: Save ESLint Cache
-          key: eslint-cache-{{ .Branch }}
-          paths:
-            - .eslintcache
 
   publish:
     resource_class: "xlarge"

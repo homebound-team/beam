@@ -1,8 +1,9 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { FilterDefs, Filters } from "src/components/Filters";
 import { dateFilter } from "src/components/Filters/DateFilter";
-import { ProjectFilter, taskDueFilter } from "src/components/Filters/testDomain";
+import { Filters } from "src/components/Filters/Filters";
+import { type ProjectFilter, taskDueFilter } from "src/components/Filters/testDomain";
+import type { FilterDefs } from "src/components/Filters/types";
 import { click, render, type } from "src/utils/rtl";
 import { jan29 } from "src/utils/testDates";
 

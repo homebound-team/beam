@@ -1,10 +1,10 @@
-import { ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { mergeProps, useFocusRing, useHover, usePress } from "react-aria";
-import { maybeTooltip, resolveTooltip } from "src/components";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, maybeCssVar, Tokens } from "src/Css";
-import { SelectCardLayout, SelectCardStoryState, SelectCardView } from "src/inputs/SelectCard/types";
-import { useTestIds } from "src/utils";
+import type { SelectCardLayout, SelectCardStoryState, SelectCardView } from "src/inputs/SelectCard/types";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type SelectCardShellProps = {
   label: string;

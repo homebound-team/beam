@@ -21,6 +21,21 @@ describe("useAiProposal", () => {
     expect(result.current.proposalProps.originalValue).toBeUndefined();
   });
 
+  it("omits the original when the proposal matches it", async () => {
+    // i.e. an optimistically-created entity, already saved with the value the model proposed
+    const { result } = renderHook(() => useAiProposal("up", "up"));
+    expect(result.current.effectiveValue).toBe("up");
+    expect(result.current.proposalProps.proposedValue).toBe("up");
+    expect(result.current.proposalProps.originalValue).toBeUndefined();
+  });
+
+  it("omits the original when the proposal only matches once formatted", async () => {
+    // Values can differ while reading identically, and it's the display text the user compares
+    const { result } = renderHook(() => useAiProposal(1.004, 1.001, (v) => v.toFixed(2)));
+    expect(result.current.proposalProps.proposedValue).toBe("1.00");
+    expect(result.current.proposalProps.originalValue).toBeUndefined();
+  });
+
   it("formats both halves with the caller's formatter", async () => {
     const { result } = renderHook(() => useAiProposal(20, 25, (v) => `$${v}`));
     expect(result.current.proposalProps).toMatchObject({ proposedValue: "$25", originalValue: "$20" });

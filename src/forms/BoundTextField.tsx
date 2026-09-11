@@ -1,10 +1,11 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { Only } from "src/Css";
-import { TextField, TextFieldProps } from "src/inputs";
-import { TextFieldXss } from "src/interfaces";
-import { maybeCall, useTestIds } from "src/utils";
+import type { Only } from "src/Css";
+import { TextField, type TextFieldProps } from "src/inputs/TextField";
+import type { TextFieldXss } from "src/interfaces";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundTextFieldProps<X> = Omit<TextFieldProps<X>, "value" | "onChange" | "label"> & {
   // Make optional as it'll create a label from the field's key if not present

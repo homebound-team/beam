@@ -1,14 +1,16 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
+import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css, Tokens } from "src/Css";
 import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
+import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { pageContentPaddingX } from "../layoutSpacing";
 import { StepperLayout } from "./StepperLayout";
 
 export default {
@@ -38,7 +40,45 @@ export function AiMode() {
   );
 }
 
-/** A table step: {@link ContentHeader} above `GridTableLayout`. */
+/** Loading step: {@link AiLoadingPanel} with `omitBg` on an `aiMode` {@link StepperLayout}. */
+export function WithAiLoadingPanel() {
+  return (
+    <WithEnvironmentBanner>
+      <StepperLayout
+        title="Import Materials"
+        aiMode
+        defaultStep="importing"
+        onCancel={action("cancel clicked")}
+        completeLabel="Save"
+        onComplete={action("complete clicked")}
+        steps={[
+          {
+            label: "Details",
+            content: (
+              <FormSectionLayout
+                aiMode
+                title="Import Details"
+                description="Connect a source and we'll pull in the details."
+                sections={[{ title: "Source", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+          {
+            label: "Importing",
+            primaryDisabled: "Import is still running.",
+            content: (
+              <CenteredLayout size="sm">
+                <AiLoadingPanel omitBg />
+              </CenteredLayout>
+            ),
+          },
+        ]}
+      />
+    </WithEnvironmentBanner>
+  );
+}
+
+/** A table step: {@link ContentHeader} above `GridTableLayout`; row click opens a document-scroll right pane. */
 export function WithContentHeaderAndTable() {
   return (
     <WithEnvironmentBanner>
@@ -50,7 +90,6 @@ export function WithContentHeaderAndTable() {
         steps={[
           {
             label: "Trade Partners",
-            isValid: true,
             content: (
               <div>
                 <ContentHeader
@@ -59,7 +98,7 @@ export function WithContentHeaderAndTable() {
                   actions={[{ label: "Add", onClick: action("add clicked") }]}
                   xss={pageContentPaddingX}
                 />
-                <GridTableLayoutExample storageKey="stepper-layout-grid-table" />
+                <GridTableLayoutExample storageKey="stepper-layout-grid-table" withRightPane />
               </div>
             ),
           },
@@ -81,7 +120,6 @@ export function WithJumpLinks() {
         steps={[
           {
             label: "Details",
-            isValid: true,
             content: (
               <FormSectionLayout
                 withJumpLinks
@@ -105,7 +143,6 @@ export function WithJumpLinks() {
           },
           {
             label: "Review",
-            isValid: true,
             content: (
               <FormSectionLayout
                 title="Review"

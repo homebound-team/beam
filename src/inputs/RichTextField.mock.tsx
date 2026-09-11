@@ -1,7 +1,7 @@
 import { camelCase } from "change-case";
 import { useState } from "react";
-import { useTestIds } from "src/utils";
-import { RichTextFieldProps } from "./RichTextField";
+import { useTestIds } from "src/utils/useTestIds";
+import type { RichTextFieldProps } from "./RichTextField";
 
 /** Mocks out `RichTextField` as a text `<input>` field. */
 export function RichTextFieldMock(props: RichTextFieldProps) {

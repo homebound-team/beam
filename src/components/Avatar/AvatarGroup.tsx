@@ -1,4 +1,4 @@
-import { Avatar, AvatarSize } from "src/components/Avatar/Avatar";
+import { Avatar, type AvatarSize } from "src/components/Avatar/Avatar";
 import { ButtonModal } from "src/components/ButtonModal";
 import { Css } from "src/Css";
 

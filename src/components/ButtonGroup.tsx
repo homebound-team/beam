@@ -1,10 +1,10 @@
-import { ReactNode, useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Icon, IconProps } from "src/components/Icon";
+import { Icon, type IconProps } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Properties, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { Css, type Properties, Tokens } from "src/Css";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type ButtonGroupProps = {
   buttons: ButtonGroupButton[];

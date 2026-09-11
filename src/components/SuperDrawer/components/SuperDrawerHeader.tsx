@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useBeamContext } from "src/components/BeamContext";
 import { ButtonGroup } from "src/components/ButtonGroup";
-import { OpenInDrawerOpts } from "src/components/SuperDrawer/useSuperDrawer";
+import type { OpenInDrawerOpts } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 interface SuperDrawerHeaderProps {
   children: ReactNode;

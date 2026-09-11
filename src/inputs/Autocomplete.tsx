@@ -1,14 +1,14 @@
-import { Key, ReactNode, useCallback, useRef } from "react";
+import { type Key, type ReactNode, useCallback, useRef } from "react";
 import { useComboBox, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
-import { Icon } from "src/components";
-import { Popover } from "src/components/internal";
-import { PresentationFieldProps } from "src/components/PresentationContext";
+import { Icon } from "src/components/Icon";
+import { Popover } from "src/components/internal/Popover";
+import type { PresentationFieldProps } from "src/components/PresentationContext";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ListBox } from "src/inputs/internal/ListBox";
-import { TextFieldBase, TextFieldBaseProps } from "src/inputs/TextFieldBase";
-import { Value, valueToKey } from "src/inputs/Value";
+import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { type Value, valueToKey } from "src/inputs/Value";
 
 export type AutocompleteProps<T> = {
   onSelect: (item: T) => void;

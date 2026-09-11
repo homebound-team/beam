@@ -1,6 +1,6 @@
 import { camelCase } from "change-case";
 import { makeAutoObservable } from "mobx";
-import { GridColumnWithId, Kinded } from "src";
+import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { isContentColumn } from "src/components/Table/utils/columns";
 import { ColumnState } from "src/components/Table/utils/ColumnState";
 import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";

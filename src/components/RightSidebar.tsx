@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
-import { IconKey } from "./Icon";
+import { useTestIds } from "src/utils/useTestIds";
+import type { IconKey } from "./Icon";
 import { IconButton } from "./IconButton";
 
 export type SidebarContentProps = {

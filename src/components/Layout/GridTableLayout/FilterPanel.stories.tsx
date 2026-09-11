@@ -1,8 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import type { FilterDefs } from "src/components/Filters";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
-import { Value } from "src/inputs/Value";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import type { FilterDefs } from "src/components/Filters/types";
+import type { Value } from "src/inputs/Value";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { buildFilterImpls, FilterPanel } from "./FilterPanel";
 

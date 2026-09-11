@@ -1,28 +1,21 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect } from "react";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
+import { Button } from "src/components/Button";
 import { Chip } from "src/components/Chip";
-import {
-  Button,
-  ModalBanner,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  ModalProps,
-  OpenModal,
-  useModal,
-} from "src/components/index";
-import { Modal } from "src/components/Modal/Modal";
+import { Modal, ModalBanner, ModalBody, ModalFooter, ModalHeader, type ModalProps } from "src/components/Modal/Modal";
+import { OpenModal } from "src/components/Modal/OpenModal";
 import {
   TestModalContent,
-  TestModalContentProps,
+  type TestModalContentProps,
   TestModalFilterTable,
   VirtualizedTable,
 } from "src/components/Modal/TestModalContent";
+import { useModal } from "src/components/Modal/useModal";
 import { Tooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
 import { FormStateApp } from "src/forms/FormStateApp";
-import { noop } from "src/utils/index";
+import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withDimensions } from "src/utils/sb";
 
 export default {

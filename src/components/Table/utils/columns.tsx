@@ -1,14 +1,15 @@
-import { Icon } from "src";
+import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
-import { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { GridColumn, GridColumnWithId, Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
-import { DragData, emptyCell } from "src/components/Table/utils/utils";
+import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
+import { type GridColumn, type GridColumnWithId, type Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import { type DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
-import { isFunction, newMethodMissingProxy } from "src/utils";
+import { isFunction } from "src/utils/helpers";
+import { newMethodMissingProxy } from "src/utils/useTestIds";
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {

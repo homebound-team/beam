@@ -55,12 +55,6 @@ describe("AiPanel", () => {
     expect(r.aiPanel).not.toHaveAttribute("role");
     expect(r.aiPanel).not.toHaveAttribute("aria-busy");
   });
-
-  it("forwards ARIA from its caller", async () => {
-    const r = await render(<AiPanel role="status" aria-busy={true} />);
-    expect(r.aiPanel).toHaveAttribute("role", "status");
-    expect(r.aiPanel).toHaveAttribute("aria-busy", "true");
-  });
 });
 
 describe("AiCard", () => {
@@ -107,5 +101,11 @@ describe("AiCard", () => {
     // Then the logo is 16px with a 4px gap
     expect(r.aiCard_column).toHaveStyle({ gap: "4px" });
     expect(r.aiCard_column.querySelector("svg")).toHaveStyle({ height: "calc(var(--t-spacing) * 2)" });
+  });
+
+  it("forwards ARIA from its caller", async () => {
+    const r = await render(<AiCard role="status" aria-busy={true} />);
+    expect(r.aiCard_card).toHaveAttribute("role", "status");
+    expect(r.aiCard_card).toHaveAttribute("aria-busy", "true");
   });
 });

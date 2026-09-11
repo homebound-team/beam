@@ -1,5 +1,5 @@
 import { ToggleChip } from "src/components/ToggleChip";
-import { Css, Margin, Only, Xss } from "src/Css";
+import { Css, type Margin, type Only, type Xss } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 type ToggleChipXss = Xss<Margin>;

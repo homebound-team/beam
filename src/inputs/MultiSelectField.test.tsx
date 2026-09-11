@@ -1,8 +1,8 @@
-import { click, render, RenderResult } from "@homebound/rtl-utils";
+import { click, render, type RenderResult } from "@homebound/rtl-utils";
 import { act, fireEvent } from "@testing-library/react";
-import { useState } from "react";
-import { MultiSelectField, MultiSelectFieldProps } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { useState, type JSX } from "react";
+import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
+import type { HasIdAndName, Optional } from "src/types";
 import { focus } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -343,6 +343,15 @@ describe("MultiSelectFieldTest", () => {
     it("omits the original when nothing was on record", async () => {
       const r = await render(<TestMultiSelectField values={[]} proposedValues={["2"]} options={options} />);
       expect(r.age).toHaveValue("Two");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
+    });
+
+    it("omits the original when the proposal is the same selection", async () => {
+      // Two equal arrays are never `===`, so only the formatted comparison can spot this
+      const r = await render(
+        <TestMultiSelectField values={["2", "3"]} proposedValues={["2", "3"]} options={options} />,
+      );
       expect(r.age).toHaveAttribute("data-ai-mode", "true");
       expect(r.query.age_originalValue).not.toBeInTheDocument();
     });

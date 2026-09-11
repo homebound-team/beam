@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { ListSelectCard } from "src/inputs/SelectCard/ListSelectCard";
-import { SelectCardItemProps } from "./types";
+import type { SelectCardItemProps } from "./types";
 
 export default {
   component: ListSelectCard,

@@ -1,9 +1,10 @@
 import { clickAndWait, typeAndWait } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { AuthorHeight } from "src/forms/formStateDomain";
-import { SelectField, SelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { SelectField, type SelectFieldProps } from "src/inputs/SelectField";
+import type { Value } from "src/inputs/Value";
+import type { HasIdAndName, Optional } from "src/types";
 import { blur, click, focus, getOptions, render, select, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -830,6 +831,24 @@ describe("SelectFieldTest", () => {
           getOptionValue={(o) => o.id}
         />,
       );
+      expect(r.age).toHaveValue("Three");
+      expect(r.age).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.age_originalValue).not.toBeInTheDocument();
+    });
+
+    it("omits the original when the proposal matches it", async () => {
+      // i.e. an optimistically-created entity, already saved with the value the model proposed
+      const r = await render(
+        <TestSelectField
+          label="Age"
+          value={"3"}
+          proposedValue={"3"}
+          options={options}
+          getOptionLabel={(o) => o.name}
+          getOptionValue={(o) => o.id}
+        />,
+      );
+      // Then the field still reads as AI-proposed, just without striking through the same label twice
       expect(r.age).toHaveValue("Three");
       expect(r.age).toHaveAttribute("data-ai-mode", "true");
       expect(r.query.age_originalValue).not.toBeInTheDocument();

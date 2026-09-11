@@ -1,9 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
-import { GridColumn } from "src/components/Table/types";
-import { simpleHeader, SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import type { GridColumn } from "src/components/Table/types";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 
 export default {
@@ -69,16 +69,13 @@ export function EditColumnButtonManyColumns() {
   // so the option list scrolls internally and the "Reset Column Widths" footer stays pinned.
   const manyColumns: GridColumn<Row>[] = [
     nameColumn,
-    ...Array.from(
-      { length: 50 },
-      (_, i): GridColumn<Row> => ({
-        id: `col${i}`,
-        name: `Column ${i + 1}`,
-        header: `Column ${i + 1}`,
-        canHide: true,
-        data: ({ value }) => value,
-      }),
-    ),
+    ...Array.from({ length: 50 }, (_, i): GridColumn<Row> => ({
+      id: `col${i}`,
+      name: `Column ${i + 1}`,
+      header: `Column ${i + 1}`,
+      canHide: true,
+      data: ({ value }) => value,
+    })),
   ];
   const api = useGridTableApi<Row>();
   return (

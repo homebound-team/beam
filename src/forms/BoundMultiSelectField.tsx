@@ -1,9 +1,11 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
-import { maybeCall } from "src/utils";
+import type { JSX } from "react";
+import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
+import type { Value } from "src/inputs/Value";
+import type { HasIdAndName, Optional } from "src/types";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { maybeCall } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<

@@ -1,7 +1,7 @@
 import { blur, change, render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { formatValue, NumberField, NumberFieldProps } from "src/inputs/NumberField";
+import { formatValue, NumberField, type NumberFieldProps } from "src/inputs/NumberField";
 import { focus } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -416,6 +416,14 @@ describe("AI mode", () => {
     expect(r.age).toHaveValue("25");
     expect(r.age).toHaveAttribute("data-ai-mode", "true");
     expect(r.query.age_originalValue).not.toBeInTheDocument();
+  });
+
+  it("omits the original when the field's formatting renders both the same", async () => {
+    // The cents are distinct values that both round to $10.00, and it's the display text the user compares
+    const r = await render(<TestNumberField label="Price" type="cents" value={1000.4} proposedValue={1000.1} />);
+    expect(r.price).toHaveValue("$10.00");
+    expect(r.price).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.price_originalValue).not.toBeInTheDocument();
   });
 
   it("commits on edit and drops the AI treatment", async () => {

@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { BeamColor } from "src/colors";
+import type { BeamColor } from "src/colors";
 import { Palette, Tokens } from "src/Css";
 import { useBodyBackgroundColor } from "src/hooks/useBodyBackgroundColor";
 

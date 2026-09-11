@@ -1,12 +1,13 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import type { FilterDefs } from "src/components/Filters";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import type { FilterDefs } from "src/components/Filters/types";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
-import { GridColumn } from "src/components/Table/types";
+import type { GridColumn } from "src/components/Table/types";
 import { column } from "src/components/Table/utils/columns";
-import { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutActions } from "./GridTableLayoutActions";
 

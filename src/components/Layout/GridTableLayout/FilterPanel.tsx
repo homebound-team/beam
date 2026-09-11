@@ -1,21 +1,20 @@
 import { Button } from "src/components/Button";
-import {
+import type {
   DefinedFilterValue,
   Filter,
   FilterDefs,
   FilterImpls,
-  filterTestIdPrefix,
-  getActiveFilterCount,
   SelectedFilterLabelValue,
-  updateFilter,
-} from "src/components/Filters";
+} from "src/components/Filters/types";
+import { filterTestIdPrefix, getActiveFilterCount, updateFilter } from "src/components/Filters/utils";
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
-import { Value } from "src/inputs/Value";
+import type { Value } from "src/inputs/Value";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
-import { isDefined, maybeCall, safeEntries, useTestIds } from "src/utils";
-import { GroupByField, GroupByFieldProps } from "./GroupByField";
+import { isDefined, maybeCall, safeEntries } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
+import { GroupByField, type GroupByFieldProps } from "./GroupByField";
 
 type FilterPanelProps<F extends Record<string, unknown>, G extends Value = string> = {
   isOpen: boolean;

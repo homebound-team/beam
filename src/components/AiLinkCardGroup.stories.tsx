@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { AiLinkCardGroup } from "src/components/AiLinkCardGroup";
-import { LinkCardProps } from "src/components/LinkCard";
+import type { LinkCardProps } from "src/components/LinkCard";
 import { Css } from "src/Css";
 import { withRouter } from "src/utils/sb";
 

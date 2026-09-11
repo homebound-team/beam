@@ -1,12 +1,15 @@
-import { AriaButtonProps } from "@react-types/button";
-import { ButtonHTMLAttributes, ReactNode, RefObject, useMemo, useState } from "react";
+import type { AriaButtonProps } from "@react-types/button";
+import { type ButtonHTMLAttributes, type ReactNode, type RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
-import { Icon, IconProps, Loader, maybeTooltip, navLink, resolveTooltip } from "src/components";
-import { Css, Palette, Properties, Tokens } from "src/Css";
+import { Icon, type IconProps } from "src/components/Icon";
+import { Loader } from "src/components/Loader";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
+import { Css, Palette, type Properties, Tokens } from "src/Css";
+import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
-import { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
-import { isAbsoluteUrl, isPromise, noop } from "src/utils";
+import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
+import { isAbsoluteUrl, isPromise, noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { labelOr } from "./internal/OverlayTrigger";
 
@@ -19,7 +22,7 @@ export type ButtonProps = {
   endAdornment?: ReactNode;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
-  buttonRef?: RefObject<HTMLElement>;
+  buttonRef?: RefObject<HTMLElement | null>;
   /** Allow for setting "submit" | "button" | "reset" on button element */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */

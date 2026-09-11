@@ -1,4 +1,4 @@
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { render } from "src/utils/rtl";
 
 describe("PageHeaderLayout", () => {

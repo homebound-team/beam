@@ -1,11 +1,12 @@
-import { InputHTMLAttributes, ReactNode, useRef } from "react";
+import { type InputHTMLAttributes, type ReactNode, useRef } from "react";
 import { mergeProps, useFocusRing, useHover, VisuallyHidden } from "react-aria";
-import { HelperText, maybeTooltip } from "src/components";
+import { HelperText } from "src/components/HelperText";
+import { maybeTooltip } from "src/components/Tooltip";
 import { Css, px, Tokens } from "src/Css";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { BeamFocusableProps } from "src/interfaces";
-import { useTestIds } from "src/utils";
+import type { BeamFocusableProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 type CheckboxAriaProps = {
   description?: string | undefined;

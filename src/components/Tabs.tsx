@@ -1,14 +1,17 @@
 import { camelCase } from "change-case";
-import { HTMLAttributes, KeyboardEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type HTMLAttributes, type KeyboardEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { matchPath } from "react-router";
 import { Link, useLocation } from "react-router-dom";
-import { FullBleed, IconKey, maybeTooltip, resolveTooltip, Tag } from "src/components";
-import { Css, Margin, Only, Padding, Palette, Tokens, Xss } from "src/Css";
-import { BeamFocusableProps } from "src/interfaces";
-import { AnyObject } from "src/types";
-import { useTestIds } from "src/utils";
+import type { IconKey } from "src/components/Icon";
+import { FullBleed } from "src/components/Layout/FullBleed";
+import { Tag } from "src/components/Tag";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
+import { Css, type Margin, type Only, type Padding, Palette, Tokens, type Xss } from "src/Css";
+import type { BeamFocusableProps } from "src/interfaces";
+import type { AnyObject } from "src/types";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 import { Icon } from "./Icon";
 
 export type Tab<V extends string = string> = {

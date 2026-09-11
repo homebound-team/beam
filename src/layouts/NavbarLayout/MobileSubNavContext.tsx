@@ -1,6 +1,6 @@
-import { createContext, ReactNode, useContext, useLayoutEffect, useMemo, useState } from "react";
+import { createContext, type ReactNode, useContext, useLayoutEffect, useMemo, useState } from "react";
 import type { SideNavProps } from "src/components/SideNav/SideNav";
-import { useBreakpoint } from "src/hooks";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 
 /** Nested pane of the mobile nav menu. Drawer-owned fields from {@link SideNavProps}. */
 export type MobileSubNavContent = Pick<SideNavProps, "top" | "items" | "footer">;

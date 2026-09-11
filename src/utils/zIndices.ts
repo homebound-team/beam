@@ -3,6 +3,9 @@
  *
  * Keep values sparse so new layers can slot between existing ones without ripple
  * edits. Lower numbers sit behind higher numbers in the same stacking context.
+ *
+ * Global overlays (Modal, SuperDrawer, Snackbar) must portal to `document.body`, otherwise an app
+ * root that establishes a stacking context traps them below the layers listed here.
  */
 export const zIndices = {
   // Local table stacking (single GridTable's internal stack only).
@@ -17,7 +20,7 @@ export const zIndices = {
 
   // Page chrome - ensure these items sit above the table
   scrollShadow: 50,
-  // Document-scroll detail pane (DocumentScrollRightPaneLayout) — above table sticky chrome, below page sticky headers.
+  // Document-scroll detail pane (DocumentScrollOverlayRightPaneLayout) — above table sticky chrome, below page sticky headers.
   rightPane: 60,
   pageStickyHeader: 70,
   // Sticky mobile action footer (workflow layouts) — same tier as pageStickyHeader; header and footer never overlap on screen.

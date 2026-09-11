@@ -1,15 +1,24 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { MutableRefObject, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type JSX,
+  type MutableRefObject,
+  type PropsWithChildren,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FocusScope, OverlayContainer, useDialog, useModal, useOverlay, usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
-import { AutoSaveStatusProvider } from "src/components";
+import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
-import { BlueprintAiLogo } from "src/components/Logos";
+import { BlueprintAiLogo } from "src/components/Logos/BlueprintAiLogo";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
-import { Css, Only, Tokens, Xss } from "src/Css";
-import { useBreakpoint } from "src/hooks";
-import { useTestIds } from "src/utils";
+import { Css, type Only, Tokens, type Xss } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { ModalProvider } from "./ModalContext";
 

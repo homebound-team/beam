@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { ReactNode } from "react";
+import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
@@ -24,7 +24,6 @@ export function Default() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        isValid
       >
         <FormSectionLayout
           withJumpLinks
@@ -45,7 +44,6 @@ export function WithoutJumpLinks() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        isValid
       >
         <FormSectionLayout
           title="Link Design Package"
@@ -65,7 +63,6 @@ export function AiMode() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        isValid
         aiMode
       >
         <FormSectionLayout

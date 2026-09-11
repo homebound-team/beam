@@ -1,14 +1,8 @@
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, tableSnapshot, withRouter } from "src/utils/rtl";
-import { SidePanelProps, TableReviewLayout, TableReviewLayoutProps } from "./TableReviewLayout";
-
-// Replace AnimatePresence with a passthrough so exit animations don't block element removal
-vi.mock("framer-motion", async () => {
-  const actual = await vi.importActual("framer-motion");
-  return { ...actual, AnimatePresence: ({ children }: any) => <>{children}</> };
-});
+import { type SidePanelProps, TableReviewLayout, type TableReviewLayoutProps } from "./TableReviewLayout";
 
 type Data = { id: string; name: string };
 type HeaderRow = { kind: "header"; id: string; data: undefined };

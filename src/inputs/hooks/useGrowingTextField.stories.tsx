@@ -1,6 +1,11 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useCallback, useMemo, useState } from "react";
-import { Button, collapseColumn, column, GridColumn, GridDataRow, GridTable, simpleHeader } from "src/components";
+import { Button } from "src/components/Button";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import type { GridColumn } from "src/components/Table/types";
+import { collapseColumn, column } from "src/components/Table/utils/columns";
+import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { withRouter, zeroTo } from "src/utils/sb";
 import { SelectField } from "../SelectField";

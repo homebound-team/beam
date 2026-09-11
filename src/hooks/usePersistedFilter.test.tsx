@@ -1,7 +1,10 @@
 import { withRouter } from "@homebound/rtl-react-router-utils";
 import { useMemo, useRef, useState } from "react";
-import { booleanFilter, FilterDefs, Filters, singleFilter } from "src/components/Filters";
-import { ProjectFilter, Stage, taskCompleteFilter, taskDueFilter } from "src/components/Filters/testDomain";
+import { booleanFilter } from "src/components/Filters/BooleanFilter";
+import { Filters } from "src/components/Filters/Filters";
+import { singleFilter } from "src/components/Filters/SingleFilter";
+import { type ProjectFilter, Stage, taskCompleteFilter, taskDueFilter } from "src/components/Filters/testDomain";
+import type { FilterDefs } from "src/components/Filters/types";
 import { usePersistedFilter } from "src/hooks/usePersistedFilter";
 import { objectId } from "src/utils/objectId";
 import { click, render, wait } from "src/utils/rtl";
@@ -56,9 +59,11 @@ describe("usePersistedFilter", () => {
       defaultValue: Stage.StageOne,
     });
     const r = await render(<StableFilterTestPage filterDefs={{ stageSingle: stage }} />, withRouter());
-    expect(r.filterIds.textContent).toEqual("[1,1]");
+    // The ids come from a process-wide counter, so compare them to each other rather than to absolute values
+    const [firstId, ...rest] = JSON.parse(r.filterIds.textContent!) as number[];
+    expect(rest).toEqual([firstId]);
     click(r.rerenderButton);
-    expect(r.filterIds.textContent).toEqual("[1,1,1]");
+    expect(JSON.parse(r.filterIds.textContent!)).toEqual([firstId, firstId, firstId]);
   });
 
   it("rehydrates plain date strings for persisted date filters", async () => {

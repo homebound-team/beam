@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
-import { Value } from "src/inputs";
-import { ComboBoxBase, ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
-import { HasIdAndName, Optional } from "src/types";
+import type { JSX, ReactNode } from "react";
+import type { Value } from "src/inputs/Value";
+import { ComboBoxBase, type ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
+import type { HasIdAndName, Optional } from "src/types";
 
 export type MultiSelectFieldProps<O, V extends Value> = {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. */

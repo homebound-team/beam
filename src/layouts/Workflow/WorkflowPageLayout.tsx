@@ -1,10 +1,10 @@
-import { ReactNode, useLayoutEffect, useRef } from "react";
-import { BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import { type ReactNode, useLayoutEffect, useRef } from "react";
+import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
-import { StepperTabsProps } from "src/components/StepperTabs";
+import type { StepperTabsProps } from "src/components/StepperTabs/StepperTabs";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "../layoutSpacing";
@@ -17,7 +17,7 @@ import {
 } from "../layoutVars";
 import { useMeasuredHeight } from "../useMeasuredHeight";
 import { UnsavedChangesNavigationModal, useUnsavedChangesGuard } from "./useUnsavedChangesGuard";
-import { WorkflowActions, WorkflowActionsProps } from "./WorkflowActions";
+import { WorkflowActions, type WorkflowActionsProps } from "./WorkflowActions";
 
 export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
   Omit<WorkflowActionsProps, "aiMode"> & {

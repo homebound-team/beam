@@ -1,8 +1,8 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { Children, ReactNode, useCallback, useLayoutEffect, useRef, useState } from "react";
+import { Children, type ReactNode, useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Icon } from "src/components/Icon";
 import { Css, increment, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type CarouselProps = {
   /** The items to scroll through; each one snaps into place as the strip scrolls. */

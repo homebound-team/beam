@@ -1,13 +1,13 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
-import { GridDataRow } from "src/components/Table";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { column } from "src/components/Table/utils/columns";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { useToast } from "src/components/Toast/useToast";
 import { Css } from "src/Css";
 import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
-import { SidePanelProps, TableReviewLayout as TableReviewLayoutComponent } from "./TableReviewLayout";
+import { type SidePanelProps, TableReviewLayout as TableReviewLayoutComponent } from "./TableReviewLayout";
 
 export default {
   component: TableReviewLayoutComponent,

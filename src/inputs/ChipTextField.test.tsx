@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { ChipTextField } from "src/inputs/ChipTextField";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { focus, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

@@ -1,7 +1,7 @@
-import { ReactNode, useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
-import { IconProps } from "src/components/Icon";
+import type { IconProps } from "src/components/Icon";
 import { Menu } from "src/components/internal/Menu";
 import {
   isIconButton,
@@ -9,10 +9,10 @@ import {
   isTextButton,
   labelOr,
   OverlayTrigger,
-  OverlayTriggerProps,
+  type OverlayTriggerProps,
 } from "src/components/internal/OverlayTrigger";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 type ButtonMenuBaseProps = {
   items: MenuItem[];
@@ -80,6 +80,8 @@ type MenuItemBase = {
   disabled?: boolean | ReactNode;
   destructive?: boolean;
   hasDivider?: boolean;
+  /** Shows AiStar and styling on label. This ai icon and styling trumps all other subtypes. */
+  ai?: boolean;
 };
 
 export type IconMenuItemType = MenuItemBase & {

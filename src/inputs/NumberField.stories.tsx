@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useEffect, useMemo, useState } from "react";
 import { Css } from "src/Css";
-import { TextField } from "src/inputs";
-import { NumberField, NumberFieldProps } from "src/inputs/NumberField";
+import { NumberField, type NumberFieldProps } from "src/inputs/NumberField";
+import { TextField } from "src/inputs/TextField";
 import { action } from "storybook/actions";
 
 export default {

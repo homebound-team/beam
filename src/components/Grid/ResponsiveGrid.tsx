@@ -1,8 +1,8 @@
-import { PropsWithChildren, useMemo } from "react";
-import { useResponsiveGrid, useResponsiveGridProps } from "src/components";
+import { type PropsWithChildren, useMemo } from "react";
+import { useResponsiveGrid, type useResponsiveGridProps } from "src/components/Grid/useResponsiveGrid";
 import { ResponsiveGridContext } from "src/components/Grid/utils";
 
-export interface ResponsiveGridProps extends PropsWithChildren<useResponsiveGridProps> {}
+export type ResponsiveGridProps = PropsWithChildren<useResponsiveGridProps>;
 
 /** Helper component for generating a responsive grid */
 export function ResponsiveGrid(props: ResponsiveGridProps) {

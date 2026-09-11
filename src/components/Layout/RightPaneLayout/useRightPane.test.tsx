@@ -1,23 +1,31 @@
 import { waitFor } from "@homebound/rtl-utils";
 import { Button } from "src/components/Button";
+import { RightPaneLayout } from "src/components/Layout/RightPaneLayout/RightPaneLayout";
+import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { click, clickAndWait, render } from "src/utils/rtl";
-import { RightPaneLayout, RightPaneProvider, useRightPane } from "./index";
 
 describe("useRightPane", () => {
   it("should show right pane when calling openRightPane hook", async () => {
+    // Given a page that can open the right pane
     const r = await render(<TestRightPaneLayoutContent />);
+
+    // When the pane is opened
     await clickAndWait(r.openPaneBtn);
+
+    // Then the pane content is visible
     expect(r.rightPaneContent).toBeInTheDocument();
   });
 
   it("should close right pane when calling closeRightPane hook", async () => {
+    // Given an open right pane
     const r = await render(<TestRightPaneLayoutContent />);
     await clickAndWait(r.openPaneBtn);
     expect(r.closePaneBtn).toBeTruthy();
 
-    // click and wait for right pane content to be removed from DOM
+    // When the pane is closed
     click(r.closePaneBtn);
 
+    // Then the pane content is removed from the DOM
     await waitFor(() => {
       expect(r.query.rightPaneContent).not.toBeInTheDocument();
     });
@@ -42,10 +50,8 @@ function TestDetailPane() {
 
 function TestRightPaneLayoutContent() {
   return (
-    <RightPaneProvider>
-      <RightPaneLayout>
-        <TestPageContent />
-      </RightPaneLayout>
-    </RightPaneProvider>
+    <RightPaneLayout>
+      <TestPageContent />
+    </RightPaneLayout>
   );
 }

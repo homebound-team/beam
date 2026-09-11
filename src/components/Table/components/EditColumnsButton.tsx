@@ -2,13 +2,14 @@ import { Fragment, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { Button } from "src/components/Button";
-import { OverlayTrigger, OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
-import { GridTableApi } from "src/components/Table/GridTableApi";
-import { GridColumn, Kinded } from "src/components/Table/types";
+import { OverlayTrigger, type OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
+import type { GridTableApi } from "src/components/Table/GridTableApi";
+import type { GridColumn, Kinded } from "src/components/Table/types";
 import { Css, Tokens } from "src/Css";
-import { useBreakpoint, useComputed } from "src/hooks";
-import { Switch } from "src/inputs";
-import { useTestIds } from "src/utils";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useComputed } from "src/hooks/useComputed";
+import { Switch } from "src/inputs/Switch";
+import { useTestIds } from "src/utils/useTestIds";
 
 type EditColumnsButtonProps<R extends Kinded> = {
   columns: GridColumn<R>[];

@@ -1,16 +1,14 @@
 import { useState } from "react";
-import {
-  CheckboxGroup,
-  MultiSelectField,
-  NestedOption,
-  RadioGroupField,
-  SelectField,
-  TreeSelectField,
-} from "src/inputs";
+import { CheckboxGroup } from "src/inputs/CheckboxGroup";
+import { MultiSelectField } from "src/inputs/MultiSelectField";
+import { RadioGroupField } from "src/inputs/RadioGroupField";
 import { MultiSelectCardGroup } from "src/inputs/SelectCard/MultiSelectCardGroup";
 import { SelectCardGroup } from "src/inputs/SelectCard/SelectCardGroup";
-import { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
-import { HasIdAndName } from "src/types";
+import type { SelectCardGridGroupItemOption } from "src/inputs/SelectCard/types";
+import { SelectField } from "src/inputs/SelectField";
+import { TreeSelectField } from "src/inputs/TreeSelectField/TreeSelectField";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
+import type { HasIdAndName } from "src/types";
 import { getOptions, getSelected, render, select, selectAndWait } from "src/utils/rtl";
 import { vi } from "vitest";
 

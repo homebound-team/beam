@@ -1,5 +1,5 @@
-import { Banner } from "src/components";
-import { useTestIds } from "src/utils";
+import { Banner } from "src/components/Banner";
+import { useTestIds } from "src/utils/useTestIds";
 import { useToastContext } from "./ToastContext";
 
 export function Toast() {

@@ -1,5 +1,5 @@
-import { FocusableElement } from "@react-types/shared";
-import { MouseEvent, ReactNode, useRef } from "react";
+import type { FocusableElement } from "@react-types/shared";
+import { type MouseEvent, type ReactNode, useRef } from "react";
 import { mergeProps, useFocusRing, useHover, useLink } from "react-aria";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";

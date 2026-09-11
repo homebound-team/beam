@@ -1,8 +1,8 @@
 import {
   createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { Breakpoints } from "src/Css";
-import { useBreakpoint } from "src/hooks";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 
 export type SideNavLayoutState = "hidden" | "collapse" | "expanded";
 

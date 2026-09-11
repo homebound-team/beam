@@ -1,8 +1,8 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
-import { GridStyle } from "src/components/Table/TableStyles";
-import { ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
-import { GridColumnWithId, Kinded } from "src/components/Table/types";
+import { type MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
+import type { GridStyle } from "src/components/Table/TableStyles";
+import { type ResizedWidths, useColumnResizing } from "src/components/Table/hooks/useColumnResizing";
+import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnLayout } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 

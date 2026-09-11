@@ -1,5 +1,5 @@
-import { Meta } from "@storybook/react-vite";
-import { AvatarGroup, AvatarGroupProps } from "src/components/Avatar/AvatarGroup";
+import type { Meta } from "@storybook/react-vite";
+import { AvatarGroup, type AvatarGroupProps } from "src/components/Avatar/AvatarGroup";
 import { Css } from "src/Css";
 
 export default {

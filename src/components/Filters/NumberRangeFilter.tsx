@@ -1,11 +1,11 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
-import { TestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import type { TestIds } from "src/utils/useTestIds";
 import { Css } from "../../Css";
-import { NumberField, NumberFieldType } from "../../inputs/NumberField";
+import { NumberField, type NumberFieldType } from "../../inputs/NumberField";
 
 export type NumberRangeFilterProps<DV extends NumberRangeFilterValue> = {
   label: string;

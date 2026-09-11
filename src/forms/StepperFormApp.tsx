@@ -1,23 +1,20 @@
-import { ObjectConfig, ObjectState, required, useFormState } from "@homebound/form-state";
+import { type ObjectConfig, type ObjectState, required, useFormState } from "@homebound/form-state";
 import { reaction } from "mobx";
 import { Observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Button,
-  GridColumn,
-  GridDataRow,
-  GridTable,
-  IconButton,
-  simpleHeader,
-  SimpleHeaderAndData,
-} from "src/components";
-import { Step, Stepper } from "src/components/Stepper";
+import { Button } from "src/components/Button";
+import { IconButton } from "src/components/IconButton";
+import { type Step, Stepper } from "src/components/Stepper";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import type { GridColumn } from "src/components/Table/types";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css, Tokens } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundTextField } from "src/forms/BoundTextField";
-import { AuthorInput } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
+import type { AuthorInput } from "src/forms/formStateDomain";
+import { useComputed } from "src/hooks/useComputed";
 
 export function StepperFormApp() {
   const formState = useFormState({

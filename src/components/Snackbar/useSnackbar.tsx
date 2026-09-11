@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from "react";
 import { useSnackbarContext } from "src/components/Snackbar/SnackbarContext";
-import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
-import { maybeCall } from "src/utils";
-import { Offset } from "./Snackbar";
+import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import { maybeCall } from "src/utils/helpers";
+import type { Offset } from "./Snackbar";
 
 export interface UseSnackbarHook {
   triggerNotice: (props: TriggerNoticeProps) => { close: () => void };

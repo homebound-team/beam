@@ -1,10 +1,11 @@
-import { Meta } from "@storybook/react-vite";
-import { useState } from "react";
-import type { IconKey } from "src/components";
-import { Icon } from "src/components";
+import type { Meta } from "@storybook/react-vite";
+import { useState, type JSX } from "react";
+import type { IconKey } from "src/components/Icon";
+import { Icon } from "src/components/Icon";
 import { Css } from "src/Css";
-import { MultiSelectField, MultiSelectFieldProps, Value } from "src/inputs";
-import { HasIdAndName, Optional } from "src/types";
+import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
+import type { Value } from "src/inputs/Value";
+import type { HasIdAndName, Optional } from "src/types";
 import { zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
 

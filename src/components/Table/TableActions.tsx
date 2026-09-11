@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Css, Margin, Only, Padding, Xss } from "src/Css";
+import type { ReactNode } from "react";
+import { Css, type Margin, type Only, type Padding, type Xss } from "src/Css";
 
 type TableActionsXss = Xss<Margin | Padding>;
 

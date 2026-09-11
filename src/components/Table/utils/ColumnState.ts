@@ -1,9 +1,9 @@
-import { makeAutoObservable, observable } from "mobx";
-import { GridColumnWithId, Kinded } from "src/components/Table/types";
+import { makeAutoObservable, observableRef } from "mobx";
+import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { assignDefaultColumnIds } from "src/components/Table/utils/columns";
-import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
-import { isFunction } from "src/utils/index";
+import type { ColumnStates } from "src/components/Table/utils/ColumnStates";
+import type { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
+import { isFunction } from "src/utils/helpers";
 
 /**
  * A reactive/observable wrapper around each GridColumn.
@@ -31,7 +31,7 @@ export class ColumnState<R extends Kinded> {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       this.doExpand();
     }
-    makeAutoObservable(this, { column: observable.ref }, { name: `ColumnState@${column.id}` });
+    makeAutoObservable(this, { column: observableRef }, { name: `ColumnState@${column.id}` });
   }
 
   setVisible(visible: boolean): void {

@@ -1,8 +1,9 @@
-import { FieldState } from "@homebound/form-state";
+import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { RichTextField, RichTextFieldProps } from "src/inputs/RichTextField";
-import { maybeCall, useTestIds } from "src/utils";
+import { RichTextField, type RichTextFieldProps } from "src/inputs/RichTextField";
 import { defaultLabel } from "src/utils/defaultLabel";
+import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type BoundRichTextFieldProps = Omit<RichTextFieldProps, "value" | "onChange"> & {
   field: FieldState<string | null | undefined>;

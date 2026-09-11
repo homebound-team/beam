@@ -1,8 +1,8 @@
-import { createObjectState, ObjectConfig, required } from "@homebound/form-state";
-import { FormPageLayout } from "src/components/Layout";
-import { boundCheckboxField, boundTextField } from "src/forms";
-import { AuthorInput } from "src/forms/formStateDomain";
-import { noop } from "src/utils";
+import { createObjectState, type ObjectConfig, required } from "@homebound/form-state";
+import { FormPageLayout } from "src/components/Layout/FormPageLayout";
+import { boundCheckboxField, boundTextField } from "src/forms/BoundForm";
+import type { AuthorInput } from "src/forms/formStateDomain";
+import { noop } from "src/utils/helpers";
 import { render, type, withRouter } from "src/utils/rtl";
 
 const formConfig: ObjectConfig<AuthorInput> = {

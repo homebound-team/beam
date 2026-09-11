@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import type { MenuItem } from "src/components/ButtonMenu";
@@ -9,7 +9,7 @@ import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useContentOverflow } from "src/hooks/useContentOverflow";
 import { headerContentPaddingX } from "src/layouts/layoutSpacing";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type NavbarUser = {
   name: string;

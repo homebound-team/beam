@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from "rea
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 
 type ColumnResizeHandleProps = {

@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import { Css } from "src/Css";
 import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
-import { useTestIds } from "src/utils";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 import { FormSectionChild, type PlainFormSectionChild, type ReorderableFormSectionChild } from "./FormSectionChild";
 
 /** @see {@link HeaderAction} */
@@ -77,7 +77,7 @@ function DraggableChildren(props: DraggableChildrenProps) {
   };
 
   return (
-    <DnDGrid onReorder={handleReorder} gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
+    <DnDGrid onReorder={handleReorder} lockAxis="y" gridStyles={Css.gtc("minmax(0, 1fr)").gap3.$}>
       {sorted.map((child) => (
         <FormSectionChild key={child.id} {...child} {...tid} />
       ))}

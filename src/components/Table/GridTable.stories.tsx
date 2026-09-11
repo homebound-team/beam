@@ -1,39 +1,12 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
-import { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  actionColumn,
-  Button,
-  cardStyle,
-  Chips,
-  collapseColumn,
-  CollapseToggle,
-  column,
-  condensedStyle,
-  dateColumn,
-  defaultStyle,
-  dragHandleColumn,
-  emptyCell,
-  GridCellAlignment,
-  GridColumn,
-  GridDataRow,
-  GridRowLookup,
-  GridTable,
-  GridTableLayout,
-  Icon,
-  IconButton,
-  insertAtIndex,
-  numericColumn,
-  pinColumn,
-  ProposedValue,
-  recursivelyGetContainingRow,
-  RowStyles,
-  selectColumn,
-  simpleHeader,
-  SimpleHeaderAndData,
-  useGridTableApi,
-  useGridTableLayoutState,
-} from "src/components/index";
+import { Fragment, type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "src/components/Button";
+import { Chips } from "src/components/Chips";
+import { Icon } from "src/components/Icon";
+import { IconButton } from "src/components/IconButton";
+import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
+import { ProposedValue } from "src/components/ProposedValue";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -43,15 +16,35 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
+import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { PinToggle } from "src/components/Table/components/PinToggle";
+import type { GridDataRow } from "src/components/Table/components/Row";
+import { GridTable } from "src/components/Table/GridTable";
+import { useGridTableApi } from "src/components/Table/GridTableApi";
+import { cardStyle, condensedStyle, defaultStyle, type RowStyles } from "src/components/Table/TableStyles";
+import type { GridCellAlignment, GridColumn } from "src/components/Table/types";
+import {
+  actionColumn,
+  collapseColumn,
+  column,
+  dateColumn,
+  dragHandleColumn,
+  numericColumn,
+  pinColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
+import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { emptyCell, insertAtIndex, recursivelyGetContainingRow } from "src/components/Table/utils/utils";
 import { Css, Palette, Tokens } from "src/Css";
 import { jan1, jan2, jan29 } from "src/forms/formStateDomain";
-import { useComputed } from "src/hooks";
-import { DateField, SelectField } from "src/inputs";
+import { useComputed } from "src/hooks/useComputed";
+import { DateField } from "src/inputs/DateFields/DateField";
 import { NumberField } from "src/inputs/NumberField";
-import { type PlainDate } from "src/types";
-import { noop } from "src/utils";
+import { SelectField } from "src/inputs/SelectField";
+import type { PlainDate } from "src/types";
+import { noop } from "src/utils/helpers";
 import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -192,7 +185,7 @@ export function VirtualFiltering() {
     ],
     [],
   );
-  const rowLookup = useRef<GridRowLookup<Row> | undefined>();
+  const rowLookup = useRef<GridRowLookup<Row> | undefined>(undefined);
   const [filter, setFilter] = useState<string | undefined>();
   return (
     <div css={Css.df.fdc.vh100.$}>
@@ -1524,6 +1517,46 @@ export function ActiveRow() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const columns = useMemo(() => [nameColumn, valueColumn, actionColumn], []);
   return <GridTable columns={columns} activeRowId="data_2" rowStyles={rowStyles} rows={rows} />;
+}
+
+/** Companions that add/remove/update via MobX without rebuilding `rows`. */
+export function CompanionRowsReactive() {
+  const pending = useMemo(() => observable({ show: true, message: "Review matches." }), []);
+  const rows = useMemo<GridDataRow<Row>[]>(
+    () => [
+      simpleHeader,
+      {
+        kind: "data",
+        id: "1",
+        data: { name: "Suggested option", value: 1 },
+        companion: () =>
+          pending.show
+            ? {
+                content: () => (
+                  <CompanionBanner
+                    tone="warning"
+                    message={pending.message}
+                    actions={<Button label="Dismiss" variant="text" onClick={() => (pending.show = false)} />}
+                  />
+                ),
+              }
+            : undefined,
+      },
+      { kind: "data", id: "2", data: { name: "Normal", value: 2 } },
+    ],
+    [pending],
+  );
+  const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
+  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <div css={Css.df.gap1.$}>
+        <Button label="Show companion" onClick={() => (pending.show = true)} />
+        <Button label="Change message" onClick={() => (pending.message = "Updated note.")} />
+      </div>
+      <GridTable columns={[nameColumn, valueColumn]} rows={rows} />
+    </div>
+  );
 }
 
 /** Mixed `aiMode` rows; Accept flips MobX so the functions re-evaluate without rebuilding `rows`. */

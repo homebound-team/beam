@@ -1,6 +1,6 @@
 import { defaultLabel } from "src/utils/defaultLabel";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { TestIds } from "src/utils/useTestIds";
+import type { TestIds } from "src/utils/useTestIds";
 
 /**
  * Provides behavior common to most filters.

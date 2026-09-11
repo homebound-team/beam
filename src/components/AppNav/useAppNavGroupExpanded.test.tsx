@@ -3,8 +3,8 @@ import {
   APP_NAV_EXPANDED_LINK_GROUPS_STORAGE_KEY,
   useAppNavGroupExpanded,
 } from "src/components/AppNav/useAppNavGroupExpanded";
-import { useTestIds } from "src/utils";
 import { click, render } from "src/utils/rtl";
+import { useTestIds } from "src/utils/useTestIds";
 
 describe("useAppNavGroupExpanded", () => {
   it("starts collapsed when no stored value, no active link, and no defaultExpanded", async () => {

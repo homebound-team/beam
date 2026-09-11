@@ -1,6 +1,6 @@
-import { Children, cloneElement, ReactNode } from "react";
-import { useModal } from "src/components";
-import { PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
+import { Children, cloneElement, type JSX, type ReactElement, type ReactNode } from "react";
+import { useModal } from "src/components/Modal/useModal";
+import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 
 export type FormWidth =
@@ -55,7 +55,7 @@ export function FormLines(props: FormLinesProps) {
       <div css={Css.df.fdc.gap(gap).pb(gap).w(sizes[width]).$}>
         {Children.map(children, (child) => {
           if (child && typeof child === "object" && "type" in child && (child.type as any).isFormHeading) {
-            const clone = cloneElement(child, { isFirst: firstFormHeading });
+            const clone = cloneElement(child as ReactElement<{ isFirst?: boolean }>, { isFirst: firstFormHeading });
             firstFormHeading = false;
             return clone;
           }

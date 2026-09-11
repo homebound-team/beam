@@ -1,6 +1,6 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { Breadcrumb } from "src/components/Breadcrumbs";
+import type { Breadcrumb } from "src/components/Breadcrumbs";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import { TabContent } from "src/components/Tabs";

@@ -1,8 +1,9 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useMemo, useState } from "react";
-import { Css, Only } from "src/Css";
-import { TextAreaField, TextAreaFieldProps, TextField } from "src/inputs";
-import { TextFieldXss } from "src/interfaces";
+import { Css, type Only } from "src/Css";
+import { TextAreaField, type TextAreaFieldProps } from "src/inputs/TextAreaField";
+import { TextField } from "src/inputs/TextField";
+import type { TextFieldXss } from "src/interfaces";
 import { action } from "storybook/actions";
 import { FormLines } from "..";
 

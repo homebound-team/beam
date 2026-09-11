@@ -1,6 +1,6 @@
 import { autorun, reaction } from "mobx";
-import { Kinded } from "src/components/Table/types";
-import { ColumnStates } from "src/components/Table/utils/ColumnStates";
+import type { Kinded } from "src/components/Table/types";
+import type { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import { loadArrayOrUndefined } from "src/components/Table/utils/utils";
 
 /** Loads/saves the column state from sessionStorage. */

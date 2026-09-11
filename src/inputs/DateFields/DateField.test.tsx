@@ -1,8 +1,8 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { DateFieldImpl as DateField } from "src/inputs/DateFields/DateField";
-import { PlainDate } from "src/types";
-import { noop } from "src/utils";
+import type { PlainDate } from "src/types";
+import { noop } from "src/utils/helpers";
 import { blur, click, focus, render, type } from "src/utils/rtl";
 import { jan1, jan2, jan29 } from "src/utils/testDates";
 import { vi } from "vitest";
@@ -98,6 +98,16 @@ describe("DateField", () => {
     it("omits the original when the field was empty", async () => {
       const r = await render(<DateField value={undefined} proposedValue={jan29} label="Date" onChange={noop} />);
       expect(r.date).toHaveValue("01/29/20");
+      expect(r.date).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.date_originalValue).not.toBeInTheDocument();
+    });
+
+    it("omits the original when the proposal is the same date", async () => {
+      // A separate instance, because a `PlainDate` equal to the original is never `===` to it — the
+      // formatted comparison is the only thing that can see they are the same day
+      const alsoJan2 = new Temporal.PlainDate(2020, 1, 2);
+      const r = await render(<DateField value={jan2} proposedValue={alsoJan2} label="Date" onChange={noop} />);
+      expect(r.date).toHaveValue("01/02/20");
       expect(r.date).toHaveAttribute("data-ai-mode", "true");
       expect(r.query.date_originalValue).not.toBeInTheDocument();
     });

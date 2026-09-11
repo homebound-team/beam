@@ -1,4 +1,5 @@
-import { TestIds } from "src/utils/useTestIds";
+import type { JSX } from "react";
+import type { TestIds } from "src/utils/useTestIds";
 
 /**
  * Defines the filters for a given filter type `F`.

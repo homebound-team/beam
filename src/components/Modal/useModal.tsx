@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { CheckFn } from "src/types";
-import { maybeCall } from "src/utils";
-import { ModalApi, ModalProps } from "./Modal";
+import type { CheckFn } from "src/types";
+import { maybeCall } from "src/utils/helpers";
+import type { ModalApi, ModalProps } from "./Modal";
 import { useModalContext } from "./ModalContext";
 
 export interface UseModalHook {
@@ -16,8 +16,8 @@ export interface UseModalHook {
 export function useModal(): UseModalHook {
   const { modalState, modalCanCloseChecks } = useBeamContext();
   const { inModal } = useModalContext();
-  const lastCanClose = useRef<CheckFn | undefined>();
-  const api = useRef<ModalApi>();
+  const lastCanClose = useRef<CheckFn | undefined>(undefined);
+  const api = useRef<ModalApi | undefined>(undefined);
   useEffect(() => {
     return () => {
       modalCanCloseChecks.current = modalCanCloseChecks.current.filter((c) => c !== lastCanClose.current);

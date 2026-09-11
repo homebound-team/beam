@@ -1,13 +1,19 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Icon } from "src/components/Icon";
-import { GridCellContent } from "src/components/Table/components/cell";
+import type { GridCellContent } from "src/components/Table/components/cell";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
-import { GridRowApi } from "src/components/Table/GridTableApi";
-import { GridStyle } from "src/components/Table/TableStyles";
-import { GridCellAlignment, GridColumnBorder, GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
-import { Css, Properties, Tokens } from "src/Css";
+import type { GridRowApi } from "src/components/Table/GridTableApi";
+import type { GridStyle } from "src/components/Table/TableStyles";
+import type {
+  GridCellAlignment,
+  GridColumnBorder,
+  GridColumnWithId,
+  Kinded,
+  RenderAs,
+} from "src/components/Table/types";
+import { Css, type Properties, Tokens } from "src/Css";
 import { documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
@@ -139,7 +145,7 @@ function isContentEmpty(content: ReactNode): boolean {
 }
 
 export type DragData<R extends Kinded> = {
-  rowRenderRef: React.RefObject<HTMLTableRowElement>;
+  rowRenderRef: React.RefObject<HTMLTableRowElement | null>;
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDrop?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;

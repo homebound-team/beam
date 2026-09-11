@@ -1,9 +1,9 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
-import { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { SelectField, SelectFieldProps } from "src/inputs/SelectField";
-import { Value } from "src/inputs/Value";
-import { TestIds } from "src/utils/useTestIds";
+import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import { SelectField, type SelectFieldProps } from "src/inputs/SelectField";
+import type { Value } from "src/inputs/Value";
+import type { TestIds } from "src/utils/useTestIds";
 
 export type SingleFilterProps<O, V extends Value> = Omit<SelectFieldProps<O, V>, "value" | "onSelect" | "label"> & {
   defaultValue?: V;

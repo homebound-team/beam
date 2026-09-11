@@ -1,4 +1,4 @@
-import { Css, Margin, Xss } from "src/Css";
+import { Css, type Margin, type Xss } from "src/Css";
 
 export interface FormHeadingProps {
   title: string;

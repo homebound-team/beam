@@ -1,15 +1,22 @@
-import { createContext, MutableRefObject, PropsWithChildren, useContext, useMemo, useReducer, useRef } from "react";
+import {
+  createContext,
+  type MutableRefObject,
+  type PropsWithChildren,
+  useContext,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
 import { OverlayProvider } from "react-aria";
-import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/index";
-import { DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle";
-import { Modal, ModalProps } from "src/components/Modal/Modal";
-import { PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
+import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
+import { type DocumentTitleConfig, DocumentTitleProvider } from "src/components/DocumentTitle/DocumentTitleContext";
+import { Modal, type ModalProps } from "src/components/Modal/Modal";
+import { type PresentationContextProps, PresentationProvider } from "src/components/PresentationContext";
 import { SnackbarProvider } from "src/components/Snackbar/SnackbarContext";
 import { SuperDrawer } from "src/components/SuperDrawer/SuperDrawer";
-import { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
-import { CanCloseCheck, CheckFn } from "src/types";
-import { EmptyRef } from "src/utils/index";
-import { RightPaneProvider } from "./Layout";
+import type { ContentStack } from "src/components/SuperDrawer/useSuperDrawer";
+import type { CanCloseCheck, CheckFn } from "src/types";
+import { EmptyRef } from "src/utils/helpers";
 import { ToastProvider } from "./Toast/ToastContext";
 
 /** The internal state of our Beam context; see useModal and useSuperDrawer for the public APIs. */
@@ -58,7 +65,7 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
   // dependencies as well, i.e. things like GridTable rowStyles will memoize on openInDrawer.
   // So we use refs + a tick.
   const [, tick] = useReducer((prev) => prev + 1, 0);
-  const modalRef = useRef<ModalProps | undefined>();
+  const modalRef = useRef<ModalProps | undefined>(undefined);
   const modalHeaderDiv = useMemo(() => document.createElement("div"), []);
   const modalBannerDiv = useMemo(() => document.createElement("div"), []);
   const modalBodyDiv = useMemo(() => {
@@ -95,20 +102,18 @@ export function BeamProvider({ children, documentTitleConfig, ...presentationPro
 
   const beamTree = (
     <PresentationProvider {...presentationProps}>
-      <RightPaneProvider>
-        <AutoSaveStatusProvider>
-          <SnackbarProvider>
-            {/* OverlayProvider is required for Modals generated via React-Aria */}
-            <ToastProvider>
-              <OverlayProvider>
-                {children}
-                {modalRef.current && <Modal {...modalRef.current} />}
-              </OverlayProvider>
-              <SuperDrawer />
-            </ToastProvider>
-          </SnackbarProvider>
-        </AutoSaveStatusProvider>
-      </RightPaneProvider>
+      <AutoSaveStatusProvider>
+        <SnackbarProvider>
+          {/* OverlayProvider is required for Modals generated via React-Aria */}
+          <ToastProvider>
+            <OverlayProvider>
+              {children}
+              {modalRef.current && <Modal {...modalRef.current} />}
+            </OverlayProvider>
+            <SuperDrawer />
+          </ToastProvider>
+        </SnackbarProvider>
+      </AutoSaveStatusProvider>
     </PresentationProvider>
   );
 

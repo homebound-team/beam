@@ -4,11 +4,11 @@ import { useRadioGroupState } from "react-stately";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { LabeledGroupField } from "src/inputs/internal/LabeledGroupField";
 import { SelectCardRadioGroupItem } from "src/inputs/SelectCard/SelectCardRadioGroupItem";
-import { SelectCardGroupProps } from "src/inputs/SelectCard/types";
+import type { SelectCardGroupProps } from "src/inputs/SelectCard/types";
 import { getSelectCardOptionsCss } from "src/inputs/SelectCard/utils";
-import { Value, keyToValue, valueToKey } from "src/inputs/Value";
-import { useTestIds } from "src/utils";
+import { type Value, keyToValue, valueToKey } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 
 export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();

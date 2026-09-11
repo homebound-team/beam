@@ -1,6 +1,6 @@
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import type { SidePanelProps } from "./TableReviewLayout";
 
 export function SidePanel(props: SidePanelProps) {

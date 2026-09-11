@@ -1,11 +1,11 @@
-import { makeAutoObservable, observable, reaction } from "mobx";
+import { makeAutoObservable, observableRef, reaction } from "mobx";
 import React from "react";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
-import { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
+import type { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { DraggedOver, RowState } from "src/components/Table/utils/RowState";
+import type { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { sortFn } from "src/components/Table/utils/sortRows";
 import { ASC, DESC, HEADER, KEPT_GROUP, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -66,9 +66,9 @@ export class TableState<R extends Kinded> {
     // that it'll be a stable identity for GridTable to useMemo against.
     makeAutoObservable(this, {
       // We use `ref`s so that observables can watch the immutable data change w/o deeply proxy-ifying Apollo fragments
-      rows: observable.ref,
-      columns: observable.ref,
-      search: observable.ref,
+      rows: observableRef,
+      columns: observableRef,
+      search: observableRef,
     } as any);
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
     reaction(

@@ -1,7 +1,7 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { ButtonMenu, MenuItem } from "src/components/ButtonMenu";
+import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";
 import { Css } from "src/Css";
 import { withDimensions, withRouter } from "src/utils/sb";
@@ -236,6 +236,17 @@ export function NavLinkButtonMenu() {
       </div>
     </ContrastScope>
   );
+}
+
+export function AiMenuItems() {
+  const menuItems: MenuItem[] = [
+    { label: "Accept Changes", onClick: action("Accept Changes"), ai: true },
+    { label: "Ignore Change", onClick: action("Ignore Change"), ai: true },
+    { label: "View Import Source", onClick: action("View Import Source"), ai: true },
+    { label: "Remove Room", onClick: action("Remove Room"), icon: "trash" },
+  ];
+
+  return <ButtonMenu trigger={{ label: "Menu trigger" }} items={menuItems} defaultOpen />;
 }
 
 export function SelectableMenuItems() {

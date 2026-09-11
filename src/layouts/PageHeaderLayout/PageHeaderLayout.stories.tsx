@@ -1,8 +1,8 @@
-import { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
-import { PageHeaderLayout } from "src/layouts/PageHeaderLayout";
+import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 
 export default {

@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactPortal, useEffect, useRef } from "react";
+import { type MouseEvent, type ReactPortal, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { AutoSaveStatusProvider, IconButton, OpenInDrawerOpts, useSuperDrawer } from "src/components";
+import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { useBeamContext } from "src/components/BeamContext";
+import { IconButton } from "src/components/IconButton";
+import { type OpenInDrawerOpts, useSuperDrawer } from "src/components/SuperDrawer/useSuperDrawer";
 import { Css, px, Tokens } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { SuperDrawerWidth } from "./utils";
 
@@ -96,7 +98,7 @@ export function SuperDrawer(): ReactPortal | null {
               transition={{ ease: "linear", duration: 0.2, delay: 0.2 }}
               exit={{ transition: { ease: "linear", duration: 0.2 }, x: width }}
               // Preventing clicks from triggering parent onClick
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: MouseEvent) => e.stopPropagation()}
             >
               <AutoSaveStatusProvider>
                 <header css={Css.p3.bb.bc(Tokens.SurfaceSeparator).df.aic.jcsb.gap3.$}>

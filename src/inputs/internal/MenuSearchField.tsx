@@ -1,13 +1,13 @@
 import { useRef } from "react";
 import { useTextField } from "react-aria";
-import { Icon } from "src/components";
-import { Only } from "src/Css";
+import { Icon } from "src/components/Icon";
+import type { Only } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
-import { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
-import { useTestIds } from "src/utils";
+import type { BeamTextFieldProps, TextFieldXss } from "src/interfaces";
+import { useTestIds } from "src/utils/useTestIds";
 import { TextFieldBase } from "../TextFieldBase";
 
-interface TextFieldProps<X> extends BeamTextFieldProps<X> {}
+type TextFieldProps<X> = BeamTextFieldProps<X>;
 
 export function MenuSearchField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const { value, proposedValue } = props;

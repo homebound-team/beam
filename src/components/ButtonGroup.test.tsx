@@ -1,4 +1,4 @@
-import { ButtonGroup, ButtonGroupButton } from "src/components/ButtonGroup";
+import { ButtonGroup, type ButtonGroupButton } from "src/components/ButtonGroup";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 import { Css, Palette } from "..";

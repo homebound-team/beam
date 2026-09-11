@@ -1,15 +1,16 @@
 import {
   createContext,
-  Dispatch,
-  PropsWithChildren,
-  SetStateAction,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type Dispatch,
+  type JSX,
+  type PropsWithChildren,
+  type SetStateAction,
 } from "react";
-import { Css, maybeInc, Properties } from "src/Css";
+import { Css, maybeInc, type Properties } from "src/Css";
 
 interface ScrollableParentContextProps {
   scrollableEl: HTMLElement | null;

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo } from "react";
-import { Properties } from "src";
-import { gridItemDataAttribute, ResponsiveGridConfig, ResponsiveGridContext } from "src/components/Grid/utils";
+import type { Properties } from "src/Css";
+import { gridItemDataAttribute, type ResponsiveGridConfig, ResponsiveGridContext } from "src/components/Grid/utils";
 
 /**
  * The responsive grid logic we use is heavily dependent on @container queries

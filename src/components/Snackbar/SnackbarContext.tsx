@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
-import { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
-import { ChildrenOnly } from "src/types";
-import { Offset, Snackbar } from "./Snackbar";
+import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
+import type { ChildrenOnly } from "src/types";
+import { type Offset, Snackbar } from "./Snackbar";
 
 export type SnackbarContextProps = {
   setNotices: React.Dispatch<React.SetStateAction<SnackbarNoticeProps[]>>;

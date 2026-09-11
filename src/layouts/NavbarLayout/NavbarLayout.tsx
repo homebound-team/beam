@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo, useRef } from "react";
-import { Navbar, NavbarProps } from "src/components/Navbar/Navbar";
+import { Navbar, type NavbarProps } from "src/components/Navbar/Navbar";
 import { Css } from "src/Css";
-import { useTestIds } from "src/utils";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import {

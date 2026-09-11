@@ -1,17 +1,20 @@
 import { useResizeObserver } from "@react-aria/utils";
-import React, { RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ScrollableContent } from "src/components";
+import React, { type RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Button } from "src/components/Button";
 import { getActiveFilterCount } from "src/components/Filters/utils";
-import { HeaderAction } from "src/components/Headers/HeaderActions";
-import { TableView } from "src/components/Table/components/ViewToggleButton";
+import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import { ScrollableContent } from "src/components/Layout/ScrollableContent";
+import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
-import { GridStyle, GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
-import { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, Only, Tokens } from "src/Css";
-import { useComputed, useGroupBy, usePersistedFilter, UsePersistedFilterProps, useSessionStorage } from "src/hooks";
+import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
+import { type GridStyle, type GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
+import type { GridTableXss, Kinded } from "src/components/Table/types";
+import { Css, type Only, Tokens } from "src/Css";
+import { useComputed } from "src/hooks/useComputed";
+import { useGroupBy } from "src/hooks/useGroupBy";
+import { usePersistedFilter, type UsePersistedFilterProps } from "src/hooks/usePersistedFilter";
+import { useSessionStorage } from "src/hooks/useSessionStorage";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamTableActionsHeightVar,
@@ -19,15 +22,14 @@ import {
   documentScrollChromeWidth,
   stickyNavAndHeaderOffset,
 } from "src/layouts/layoutVars";
-import { noop, useTestIds } from "src/utils";
+import { noop } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
-import { BaseQueryTableProps, GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
-import {
-  defaultDocumentScrollRightPaneWidth,
-  DocumentScrollRightPaneLayout,
-} from "../RightPaneLayout/DocumentScrollRightPaneLayout";
-import { GridTableLayoutActions, SearchBoxApi } from "./GridTableLayoutActions";
-import { QueryTable, QueryTableProps } from "./QueryTable";
+import { type BaseQueryTableProps, type GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
+import { DocumentScrollOverlayRightPaneLayout } from "../RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
+import { resolveWithRightPaneOptions, type WithRightPane } from "../RightPaneLayout/withRightPane";
+import { GridTableLayoutActions, type SearchBoxApi } from "./GridTableLayoutActions";
+import { QueryTable, type QueryTableProps } from "./QueryTable";
 import { usePersistedTableView } from "./usePersistedTableView";
 
 // GridTableLayout-specific query props extend the shared base with display extras.
@@ -58,10 +60,10 @@ export type GridTableLayoutProps<
   withCardView?: boolean;
   defaultView?: TableView;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`). `true` uses the default width;
-   * a number sets the pane width in px. Only applies inside a document-scroll layout.
+   * Opt into the document-scroll detail pane (`useRightPane`). Default mode `overlay` (spacer).
+   * Only applies inside a document-scroll layout; hosts the pane around the table body only.
    */
-  withRightPane?: boolean | number;
+  withRightPane?: WithRightPane;
 };
 
 /**
@@ -106,12 +108,7 @@ function GridTableLayoutComponent<
     emptyFallback: layoutEmptyFallback,
     withRightPane,
   } = props;
-  const rightPaneWidth =
-    withRightPane === true
-      ? defaultDocumentScrollRightPaneWidth
-      : typeof withRightPane === "number"
-        ? withRightPane
-        : undefined;
+  const rightPane = resolveWithRightPaneOptions(withRightPane, "overlay");
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
@@ -161,7 +158,7 @@ function GridTableLayoutComponent<
 
   // Imperative handle into GridTableLayoutActions' search box, so `clearFilters` can reset the search
   // input directly even when triggered from outside GridTableLayoutActions (e.g. the empty state below).
-  const searchApiRef = useRef<SearchBoxApi>();
+  const searchApiRef = useRef<SearchBoxApi | undefined>(undefined);
   const clearFilters = useCallback(() => {
     layoutState?.clearFilters();
     searchApiRef.current?.clear();
@@ -246,8 +243,10 @@ function GridTableLayoutComponent<
       )}
       {inDocumentScrollLayout ? (
         // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
-        rightPaneWidth !== undefined ? (
-          <DocumentScrollRightPaneLayout paneWidth={rightPaneWidth}>{tableBody}</DocumentScrollRightPaneLayout>
+        rightPane ? (
+          <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>
+            {tableBody}
+          </DocumentScrollOverlayRightPaneLayout>
         ) : (
           tableBody
         )

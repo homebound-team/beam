@@ -1,15 +1,16 @@
-import { Node } from "@react-types/shared";
-import { type KeyboardEvent, type MouseEvent, useRef } from "react";
+import type { Node } from "@react-types/shared";
+import { useRef, type JSX, type KeyboardEvent, type MouseEvent } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { Link, useNavigate } from "react-router-dom";
-import { TreeState } from "react-stately";
-import { Avatar } from "src/components/Avatar";
-import { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
+import type { TreeState } from "react-stately";
+import { Avatar } from "src/components/Avatar/Avatar";
+import type { IconMenuItemType, ImageMenuItemType, MenuItem } from "src/components/ButtonMenu";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Tokens } from "src/Css";
-import { isAbsoluteUrl, useTestIds } from "src/utils";
+import { Css, Palette, Tokens } from "src/Css";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { isAbsoluteUrl } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 type MenuItemProps = {
   item: Node<MenuItem>;
@@ -110,7 +111,9 @@ function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boo
       <div css={Css.df.aic.$}>
         {maybeWrapInLink(
           menuItem.onClick,
-          isIconMenuItem(menuItem) ? (
+          menuItem.ai ? (
+            <AiMenuItem label={menuItem.label} isDisabled={isDisabled} />
+          ) : isIconMenuItem(menuItem) ? (
             <IconMenuItem {...menuItem} />
           ) : isImageMenuItem(menuItem) ? (
             <ImageMenuItem {...menuItem} />
@@ -137,6 +140,17 @@ function ImageMenuItem(item: ImageMenuItemType) {
         )}
       </span>
       {label}
+    </>
+  );
+}
+
+function AiMenuItem({ label, isDisabled }: { label: string; isDisabled: boolean }) {
+  return (
+    <>
+      <span css={Css.df.aic.jcc.fs0.sqPx(24).mr2.$}>
+        <Icon icon="aiStar" />
+      </span>
+      <span css={Css.if(!isDisabled).color(Palette.Purple600).$}>{label}</span>
     </>
   );
 }

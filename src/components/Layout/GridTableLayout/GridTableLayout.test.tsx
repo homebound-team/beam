@@ -1,7 +1,8 @@
 import { act } from "@testing-library/react";
 import { Button } from "src/components/Button";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
-import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import { cardStyle } from "src/components/Table/TableStyles";
@@ -15,20 +16,20 @@ import {
   numericColumn,
   selectColumn,
 } from "src/components/Table/utils/columns";
-import { SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { type SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamFloatingRightOffsetVar,
   beamRightPaneWidthVar,
   beamTableActionsHeightVar,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
-  GridTableLayoutProps,
+  type GridTableLayoutProps,
   resolveGridTableLayoutStyle,
   useGridTableLayoutState,
 } from "./GridTableLayout";
@@ -418,7 +419,7 @@ describe("GridTableLayout", () => {
 
       // Then the card shows the title and status
       expect(r.tableCard_title).toHaveTextContent("The Conroy");
-      expect(r.tableCard_status).toHaveTextContent("Active");
+      expect(r.tableCard_tag).toHaveTextContent("Active");
     });
   });
 
@@ -552,7 +553,7 @@ describe("GridTableLayout", () => {
       expect(api.getVisibleColumnIds()[0]).toBe("name");
     });
 
-    it("renders a right pane spacer when useRightPane opens the pane", async () => {
+    it("renders the right pane beside the table when useRightPane opens it", async () => {
       // Given a GridTableLayout inside a document-scroll layout
       const r = await render(
         <DocumentScrollLayoutProvider>
@@ -570,26 +571,27 @@ describe("GridTableLayout", () => {
         withRouter(),
       );
 
-      // Then there is no spacer while the pane is closed
-      expect(r.query.rightPaneSpacer).toBeNull();
+      // Then overlay layout is ready while the pane is closed (spacer width is 0)
+      expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
+      expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
+      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
       expect(r.query.rightPaneContent).toBeNull();
 
       // When the pane is opened
       await clickAndWait(r.openPaneBtn);
 
-      // Then the pane renders and a spacer matching the pane width is rendered after the table
+      // Then the pane renders in flow after the table column
       expect(r.rightPaneContent).toBeInTheDocument();
-      expect(r.rightPaneSpacer).toBeInTheDocument();
-      expect(r.rightPaneSpacer).toHaveStyle({ width: documentScrollRightPaneWidth(280) });
+      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: documentScrollRightPaneWidthCss(280) });
       expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
-        documentScrollRightPaneWidth(280),
+        documentScrollRightPaneWidthCss(280),
       );
       expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
-        documentScrollRightPaneWidth(280),
+        documentScrollRightPaneWidthCss(280),
       );
     });
 
-    it("does not wrap in DocumentScrollRightPaneLayout without withRightPane", async () => {
+    it("does not wrap in DocumentScrollOverlayRightPaneLayout without withRightPane", async () => {
       // Given a document-scroll GridTableLayout that did not opt into the right pane
       const r = await render(
         <DocumentScrollLayoutProvider>
@@ -612,7 +614,6 @@ describe("GridTableLayout", () => {
       // Then GridTableLayout does not host the document-scroll pane wrapper
       expect(r.query.documentScrollRightPaneLayout).toBeNull();
       expect(r.query.rightPaneContent).toBeNull();
-      expect(r.query.rightPaneSpacer).toBeNull();
     });
 
     it("does not render the document-scroll right pane outside DocumentScrollLayoutProvider", async () => {
@@ -636,9 +637,8 @@ describe("GridTableLayout", () => {
       // When opening the right pane context
       await clickAndWait(r.openPaneBtn);
 
-      // Then GridTableLayout does not host the document-scroll pane or spacer
+      // Then GridTableLayout does not host the document-scroll pane or its column
       expect(r.query.rightPaneContent).toBeNull();
-      expect(r.query.rightPaneSpacer).toBeNull();
     });
 
     function getFilterLayoutStateProps(storageKey: string) {
@@ -911,7 +911,7 @@ function TestWrapper(props: TestWrapperProps) {
 }
 
 function OpenPaneButton() {
-  const { openRightPane } = useRightPane();
+  const { openRightPane } = useRightPaneActions();
   return (
     <Button data-testid="openPaneBtn" label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />
   );

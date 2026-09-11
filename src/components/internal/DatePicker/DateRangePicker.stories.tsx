@@ -1,9 +1,9 @@
-import { type Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { DateRangePicker } from "src/components/internal/DatePicker";
+import { DateRangePicker } from "src/components/internal/DatePicker/DateRangePicker";
 import { Css } from "src/Css";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/forms/formStateDomain";
-import { type DateRange } from "src/types";
+import type { DateRange } from "src/types";
 import { formatPlainDate } from "src/utils/plainDate";
 
 export default {

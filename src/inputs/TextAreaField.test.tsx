@@ -1,9 +1,9 @@
 import { render, type } from "@homebound/rtl-utils";
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
-import { Only } from "src/Css";
-import { TextAreaField, TextAreaFieldProps } from "src/inputs";
-import { TextFieldXss } from "src/interfaces";
+import type { Only } from "src/Css";
+import { TextAreaField, type TextAreaFieldProps } from "src/inputs/TextAreaField";
+import type { TextFieldXss } from "src/interfaces";
 import { focus } from "src/utils/rtl";
 import { vi } from "vitest";
 

@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
-import { HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
-import { Css, Only, Padding, Tokens, Xss } from "src/Css";
-import { useTestIds } from "src/utils";
+import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
+import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
 type ContentHeaderXss = Xss<Padding>;
 

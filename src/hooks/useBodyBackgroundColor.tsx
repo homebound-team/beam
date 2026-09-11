@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import { BeamColor } from "src/colors";
+import type { BeamColor } from "src/colors";
 import { maybeCssVar } from "src/Css";
 
 /** Sets `document.body` background color and restores the prior inline value on unmount. */

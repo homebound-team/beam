@@ -1,13 +1,13 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import { Css } from "src/Css";
-import { FormSection, FormSectionProps } from "src/forms/FormSection";
+import { FormSection, type FormSectionProps } from "src/forms/FormSection/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { CenteredLayout } from "src/layouts/CenteredLayout";
-import { useTestIds } from "src/utils";
+import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { useTestIds } from "src/utils/useTestIds";
 import { JumpLinksRail, jumpLinksRailReservation } from "./JumpLinksRail";
 import { useActiveJumpLink } from "./useActiveJumpLink";
 

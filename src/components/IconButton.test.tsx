@@ -1,5 +1,5 @@
 import { IconButton } from "src/components/IconButton";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
 import { vi } from "vitest";

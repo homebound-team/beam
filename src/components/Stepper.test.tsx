@@ -1,4 +1,4 @@
-import { Step, Stepper } from "src/components/Stepper";
+import { type Step, Stepper } from "src/components/Stepper";
 import { click, render } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
 import { vi } from "vitest";

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import type { FilterDefs } from "src/components/Filters";
-import { checkboxFilter, multiFilter } from "src/components/Filters";
+import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
+import { multiFilter } from "src/components/Filters/MultiFilter";
+import type { FilterDefs } from "src/components/Filters/types";
 import { setViewport } from "src/tests/viewport";
-import { noop } from "src/utils";
+import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 import { typeAndWait } from "src/utils/rtlUtils";
 import { vi } from "vitest";

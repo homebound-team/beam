@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
-import { GridCellContent } from "src/components/Table/components/cell";
+import type { ReactNode } from "react";
+import type { GridCellContent } from "src/components/Table/components/cell";
 import type { GridRowKind } from "src/components/Table/components/Row";
-import { GridRowApi } from "src/components/Table/GridTableApi";
-import { Margin, Xss } from "src/Css";
+import type { GridRowApi } from "src/components/Table/GridTableApi";
+import type { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
 export type GridTableXss = Xss<Margin>;

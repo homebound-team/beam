@@ -1,4 +1,4 @@
-import { Breadcrumb, Breadcrumbs } from "src/components/Breadcrumbs";
+import { type Breadcrumb, Breadcrumbs } from "src/components/Breadcrumbs";
 import { click, render } from "src/utils/rtl";
 
 describe("Breadcrumbs", () => {
