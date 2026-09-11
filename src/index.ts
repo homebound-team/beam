@@ -93,6 +93,7 @@ export * from "./components/Table/utils/utils";
 export * from "./components/Table/utils/visitor";
 export * from "./components/Tag";
 export * from "./components/TagGroup";
+export * from "./components/StackBarGraph";
 export * from "./components/TableSummaryReport";
 export * from "./components/Toast/Toast";
 export * from "./components/Tooltip";

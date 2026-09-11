@@ -1,14 +1,10 @@
 import type { Meta } from "@storybook/react-vite";
 import { useCallback, useMemo, useState } from "react";
+import { StackBarGraph, type StackBarGraphSegment } from "src/components/StackBarGraph";
 import { GridTable } from "src/components/Table/GridTable";
 import type { GridColumn } from "src/components/Table/types";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import {
-  StackBarGraph,
-  TableSummaryReport,
-  type StackBarGraphSegment,
-  type TableSummaryReportProps,
-} from "src/components/TableSummaryReport";
+import { TableSummaryReport, type TableSummaryReportProps } from "src/components/TableSummaryReport";
 import { Css } from "src/Css";
 import { newStory, viewportModes } from "src/utils/sb";
 
@@ -96,9 +92,7 @@ function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): 
     ],
     issueLabel: "View Issues",
     onIssueClick: () => {},
-    footer: footer ?? (
-      <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />
-    ),
+    footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,
   };
 }

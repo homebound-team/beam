@@ -1,4 +1,4 @@
-import { useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { useRef, type ReactNode, type RefObject } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import { Button } from "src/components/Button";
 import { Icon, type IconKey } from "src/components/Icon";
@@ -26,19 +26,6 @@ export type TableSummaryReportProps<V extends string | number> = {
   onIssueClick?: VoidFunction;
   issueDisabled?: boolean;
   footer?: ReactNode;
-  "data-testid"?: string;
-};
-
-export type StackBarGraphSegment = {
-  label: string;
-  count: number;
-  status: TableSummaryReportStatus;
-};
-
-export type StackBarGraphProps = {
-  title: ReactNode;
-  totalLabel: ReactNode;
-  segments: readonly StackBarGraphSegment[];
   "data-testid"?: string;
 };
 
@@ -96,47 +83,6 @@ export function TableSummaryReport<V extends string | number>(props: TableSummar
   );
 }
 
-/** Horizontal stacked bar + legend for use as a `TableSummaryReport` footer (or elsewhere). */
-export function StackBarGraph(props: StackBarGraphProps) {
-  const { title, totalLabel, segments } = props;
-  const tid = useTestIds(props, "stackBarGraph");
-  const totalCount = useMemo(
-    () => segments.reduce((total, segment) => total + Math.max(0, segment.count), 0),
-    [segments],
-  );
-
-  return (
-    <div css={Css.df.fdc.gap2.p2.$} {...tid}>
-      <div css={Css.df.aic.jcsb.gap2.$}>
-        <span css={Css.xs2Sb.ttu.add("letterSpacing", "0.5px").$}>{title}</span>
-        <span css={Css.xs.wsnw.$}>{totalLabel}</span>
-      </div>
-      <div css={Css.df.hPx(20).borderRadius("6px").oh.$} {...tid.bar}>
-        {segments.map((segment) => (
-          <div
-            key={segment.label}
-            css={
-              Css.flexGrow(Math.max(0, segment.count))
-                .add("minWidth", segment.count > 0 ? "1px" : 0)
-                .bgColor(statusColors[segment.status]).$
-            }
-          />
-        ))}
-      </div>
-      <div css={Css.df.fww.aic.gap2.$} {...tid.legend}>
-        {segments.map((segment) => (
-          <div key={segment.label} css={Css.dif.aic.gapPx(4).$}>
-            <span css={Css.br100.wPx(8).hPx(8).bgColor(statusColors[segment.status]).$} />
-            <span css={Css.xs.$}>
-              {percentage(segment.count, totalCount)}% {segment.label} ({segment.count})
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 type MetricButtonProps<V extends string | number> = {
   metric: TableSummaryReportMetric<V>;
   active: boolean;
@@ -178,10 +124,6 @@ function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
       </span>
     </button>
   );
-}
-
-function percentage(count: number, total: number): number {
-  return total === 0 ? 0 : Math.round((Math.max(0, count) / total) * 100);
 }
 
 const statusColors: Record<TableSummaryReportStatus, Palette> = {
