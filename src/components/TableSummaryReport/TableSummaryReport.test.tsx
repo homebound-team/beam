@@ -5,16 +5,16 @@ import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("TableSummaryReport", () => {
-  it("renders the stack bar graph without issue controls", async () => {
-    // Given a report without issues
+  it("renders the stack bar graph without status controls", async () => {
+    // Given a report without metrics
     const r = await render(<TableSummaryReport {...createProps({ metrics: [] })} />);
-    // Then it retains the stack bar graph but hides issue controls
+    // Then it retains the stack bar graph but hides status controls
     expect(r.stackBarGraph).toBeInTheDocument();
     expect(r.query.tableSummaryReport_metrics).toBeNull();
-    expect(r.query.tableSummaryReport_issueAction).toBeNull();
+    expect(r.query.tableSummaryReport_statusAction).toBeNull();
   });
 
-  it("shows no more than four issue metrics", async () => {
+  it("shows no more than four status metrics", async () => {
     // Given a report with five metrics
     const r = await render(
       <TableSummaryReport
@@ -35,19 +35,19 @@ describe("TableSummaryReport", () => {
     expect(r.query.tableSummaryReport_metric_five).toBeNull();
   });
 
-  it("reports metric and issue action clicks to its parent", async () => {
+  it("reports metric and status action clicks to its parent", async () => {
     const onMetricClick = vi.fn();
-    const onIssueClick = vi.fn();
+    const onStatusClick = vi.fn();
     // Given an actionable report
     const r = await render(
-      <TableSummaryReport {...createProps({ onMetricClick, issueLabel: "View Issues", onIssueClick })} />,
+      <TableSummaryReport {...createProps({ onMetricClick, statusLabel: "View Items", onStatusClick })} />,
     );
-    // When the user activates a metric and the issues action
+    // When the user activates a metric and the status action
     click(r.tableSummaryReport_metric_missing);
-    click(r.tableSummaryReport_issueAction);
+    click(r.tableSummaryReport_statusAction);
     // Then the parent receives each action
     expect(onMetricClick).toHaveBeenCalledWith("missing");
-    expect(onIssueClick).toHaveBeenCalledTimes(1);
+    expect(onStatusClick).toHaveBeenCalledTimes(1);
   });
 
   it("does not activate disabled metrics", async () => {
@@ -101,8 +101,8 @@ function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): 
   return {
     title: "Bid Package Coverage",
     metrics: [{ value: "missing", label: "Missing", count: 4, status: "error" }],
-    issueLabel: "View Issues",
-    onIssueClick: () => {},
+    statusLabel: "View Items",
+    onStatusClick: () => {},
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,
   };

@@ -21,10 +21,10 @@ export type TableSummaryReportProps<V extends string | number> = {
   metrics?: readonly TableSummaryReportMetric<V>[];
   activeMetricValues?: readonly V[];
   onMetricClick?: (value: V) => void;
-  issueLabel?: ReactNode;
-  issueMobileLabel?: ReactNode;
-  onIssueClick?: VoidFunction;
-  issueDisabled?: boolean;
+  statusLabel?: ReactNode;
+  statusMobileLabel?: ReactNode;
+  onStatusClick?: VoidFunction;
+  statusDisabled?: boolean;
   footer?: ReactNode;
   "data-testid"?: string;
 };
@@ -35,10 +35,10 @@ export function TableSummaryReport<V extends string | number>(props: TableSummar
     metrics = [],
     activeMetricValues = [],
     onMetricClick,
-    issueLabel,
-    issueMobileLabel = "Issues",
-    onIssueClick,
-    issueDisabled,
+    statusLabel,
+    statusMobileLabel = "Items",
+    onStatusClick,
+    statusDisabled,
     footer,
   } = props;
   const { sm: isMobile } = useBreakpoint();
@@ -49,15 +49,15 @@ export function TableSummaryReport<V extends string | number>(props: TableSummar
     <section css={Css.df.fdc.bgColor(Tokens.Surface).br12.oh.bshBasic.$} {...tid}>
       <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.FieldBorderDefault).$}>
         <div css={Css.mdSb.mw0.py1.$}>{title}</div>
-        {visibleMetrics.length > 0 && issueLabel != null && onIssueClick && (
+        {visibleMetrics.length > 0 && statusLabel != null && onStatusClick && (
           <Button
-            label={isMobile ? issueMobileLabel : issueLabel}
+            label={isMobile ? statusMobileLabel : statusLabel}
             variant="tertiary"
             icon={null}
             endAdornment={<Icon icon="arrowRight" />}
-            onClick={onIssueClick}
-            disabled={issueDisabled}
-            {...tid.issueAction}
+            onClick={onStatusClick}
+            disabled={statusDisabled}
+            {...tid.statusAction}
           />
         )}
       </header>
@@ -107,7 +107,7 @@ function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
     <button
       ref={ref}
       css={{
-        ...Css.buttonBase.df.flexGrow(1).aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
+        ...Css.bn.outline0.df.flexGrow(1).aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
         ...Css.if(divider && mobile).bb.bc(Tokens.FieldBorderDefault).$,
         ...Css.if(divider && !mobile).br.bc(Tokens.FieldBorderDefault).$,
         ...(isHovered && !metric.disabled ? Css.bgColor(Tokens.NeutralFillHoverSubtle).$ : {}),

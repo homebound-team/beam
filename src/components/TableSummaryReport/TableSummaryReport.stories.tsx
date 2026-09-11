@@ -20,7 +20,7 @@ export const Mobile = newStory(() => <TableSummaryReport {...createProps()} />, 
   parameters: { chromatic: { modes: viewportModes("iphone12") } },
 });
 
-export function NoIssues() {
+export function NoMetrics() {
   return <TableSummaryReport {...createProps({ metrics: [] })} />;
 }
 
@@ -55,8 +55,8 @@ export function FiltersTableAndScrolls() {
                 ? activeMetricValues.filter((current) => current !== value)
                 : [...activeMetricValues, value],
             ),
-          issueLabel: "View Issues",
-          onIssueClick: () => applyFilter(["missing", "incomplete", "warnings"]),
+          statusLabel: "View Items",
+          onStatusClick: () => applyFilter(["missing", "incomplete", "warnings"]),
         })}
       />
       <div id="tableSummaryReportStoryTable">
@@ -75,8 +75,8 @@ function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): 
       { value: "incomplete", label: "Incomplete", count: 9, status: "warning" },
       { value: "warnings", label: "Warnings", count: 3, status: "warning" },
     ],
-    issueLabel: "View Issues",
-    onIssueClick: () => {},
+    statusLabel: "View Items",
+    onStatusClick: () => {},
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,
   };
