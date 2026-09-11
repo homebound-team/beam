@@ -24,6 +24,7 @@ export type StoryParameters = {
     modes?: Partial<ChromaticViewportModes>;
   };
   mockData?: unknown;
+  controls?: { include?: string[]; exclude?: string | string[] };
 };
 type PlayFunction = NonNullable<StoryObj["play"]>;
 
@@ -38,6 +39,7 @@ export type StoryOptions<TArgs = Record<string, unknown>> = {
     };
   };
   args?: Partial<TArgs>;
+  argTypes?: Record<string, object>;
 };
 
 /**

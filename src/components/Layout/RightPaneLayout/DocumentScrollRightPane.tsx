@@ -4,31 +4,23 @@ import { usePreventScroll } from "react-aria";
 import { createPortal } from "react-dom";
 import { Css, Tokens } from "src/Css";
 import { useEnvironmentBannerLayoutHeight } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
-import {
-  documentScrollRightPaneHeight,
-  documentScrollRightPaneWidthCss,
-  stickyTableHeaderOffset,
-  stickyTableHeaderOffsetPx,
-} from "src/layouts/layoutVars";
+import { documentScrollRightPaneWidthCss, stickyTableHeaderOffsetPx } from "src/layouts/layoutVars";
 import { useScrollPinnedViewportBounds } from "src/layouts/useScrollPinnedViewportBounds";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { useRightPaneContent, useRightPaneOpenState } from "./useRightPane";
 import { rightPaneContentDataAttribute, waitForRightPaneExit } from "./waitForRightPaneExit";
-import type { ResolvedDocumentScrollRightPaneBehavior } from "./withRightPane";
 
 export type DocumentScrollRightPaneProps = {
   paneWidth: number;
   /** When true, full-bleed portal below the env banner (`sm` takeover — not a desktop mode). */
   mobile: boolean;
-  /** Desktop only: fixed overlay, or in-flow push/clear. Ignored when `mobile` is true. */
-  behavior?: ResolvedDocumentScrollRightPaneBehavior;
-  /** Desktop overlay only: layout root for fixed pane top/height. */
+  /** Desktop only: layout root for fixed pane top/height. */
   anchorRef?: RefObject<HTMLElement | null>;
 };
 
-/** Detail pane UI: mobile takeover, desktop fixed overlay, or desktop sticky in-flow (push/clear). */
-export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef }: DocumentScrollRightPaneProps) {
+/** Detail pane UI: mobile takeover or desktop fixed overlay. */
+export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: DocumentScrollRightPaneProps) {
   const { isRightPaneOpen, clearPane } = useRightPaneOpenState();
   const rightPaneContent = useRightPaneContent();
   const tid = useTestIds({}, "rightPaneContent");
@@ -37,8 +29,7 @@ export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef
   const exitReleasedRef = useRef(false);
 
   const bannerHeightPx = useEnvironmentBannerLayoutHeight();
-  const isFixedOverlay = !mobile && behavior === "overlay";
-  const isInFlowDesktop = !mobile && behavior !== undefined && behavior !== "overlay";
+  const isFixedOverlay = !mobile;
 
   useLayoutEffect(() => {
     if (isRightPaneOpen) {
@@ -70,17 +61,15 @@ export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef
   const anchor = anchorRef ?? { current: null };
   const paneBounds = useScrollPinnedViewportBounds(
     isFixedOverlay ? anchor : paneRef,
-    paneLayoutActive && (isFixedOverlay || isInFlowDesktop),
+    paneLayoutActive && isFixedOverlay,
     stickyTableHeaderOffsetPx,
   );
 
   const paneStyle: CSSProperties | undefined = mobile
     ? { top: bannerHeightPx }
-    : isFixedOverlay && paneBounds
+    : paneBounds
       ? { top: paneBounds.topPx, height: paneBounds.heightPx, maxHeight: paneBounds.heightPx }
-      : paneBounds
-        ? { height: paneBounds.heightPx, maxHeight: paneBounds.heightPx }
-        : undefined;
+      : undefined;
 
   const pane = (
     <AnimatePresence>
@@ -93,30 +82,19 @@ export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef
           css={
             mobile
               ? Css.fixed.right0.bottom0.left0.oya.bgColor(Tokens.Surface).z(zIndices.rightPaneMobile).$
-              : isFixedOverlay
-                ? Css.fixed.right0.oya
-                    .w(paneWidthCss)
-                    .bgColor(Tokens.Surface)
-                    .z(zIndices.rightPane)
-                    .bl.bc(Tokens.SurfaceSeparator).$
-                : Css.sticky.transitionTop
-                    .top(stickyTableHeaderOffset())
-                    .right(0)
-                    .asfs.fs0.fg0.oya.w(paneWidthCss)
-                    .bgColor(Tokens.Surface)
-                    .z(zIndices.rightPane)
-                    .bl.bc(Tokens.SurfaceSeparator)
-                    .maxh(documentScrollRightPaneHeight())
-                    .if(behavior === "clear")
-                    .ml(`calc(-1 * ${paneWidthCss})`).$
+              : Css.fixed.right0.oya
+                  .w(paneWidthCss)
+                  .bgColor(Tokens.Surface)
+                  .z(zIndices.rightPane)
+                  .bl.bc(Tokens.SurfaceSeparator).$
           }
           style={paneStyle}
           initial={{ x: slideX }}
           animate={{ x: 0 }}
           exit={{ x: slideX }}
           transition={{ ease: "linear", duration: 0.2 }}
-          onAnimationComplete={(definition: { x: number | string }) => {
-            if (definition.x !== 0) releaseAfterExit();
+          onAnimationComplete={(definition: { x?: number | string }) => {
+            if (definition.x !== 0 && definition.x !== undefined) releaseAfterExit();
           }}
         >
           {rightPaneContent}
@@ -125,9 +103,5 @@ export function DocumentScrollRightPane({ paneWidth, mobile, behavior, anchorRef
     </AnimatePresence>
   );
 
-  if (mobile || isFixedOverlay) {
-    return createPortal(pane, document.body);
-  }
-
-  return pane;
+  return createPortal(pane, document.body);
 }

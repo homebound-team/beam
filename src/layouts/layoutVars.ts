@@ -26,7 +26,7 @@ export const beamLayoutContentPaddingXVar = "--beam-layout-content-padding-x";
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
 /**
- * Open document-scroll right pane width; `0px` when closed. Published on
+ * Open overlay pane width; `0px` when closed. Published on
  * `DocumentScrollOverlayRightPaneLayout` so sticky right columns (descendants) inherit it.
  * Not subtracted from `documentScrollChromeWidth` — the pane pins below page header /
  * table actions.

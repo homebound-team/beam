@@ -1,9 +1,20 @@
+import { Button } from "src/components/Button";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { jumpLinksRailReservation } from "src/layouts/FormSectionLayout/JumpLinksRail";
+import {
+  beamFloatingRightOffsetVar,
+  beamRightPaneWidthVar,
+  documentScrollRightPaneWidthCss,
+} from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { click, render } from "src/utils/rtl";
+import { click, clickAndWait, render } from "src/utils/rtl";
 
 describe("FormSectionLayout", () => {
+  afterEach(() => {
+    document.documentElement.style.setProperty(beamFloatingRightOffsetVar, "0px");
+  });
+
   it("renders the form title, description, and delegates sections to FormSection", async () => {
     // Given a FormSectionLayout with a title, description, and two sections
     // When rendered
@@ -225,4 +236,55 @@ describe("FormSectionLayout", () => {
     // Then the matching section scrolls into view
     expect(document.getElementById("setup")!.scrollIntoView).toHaveBeenCalledTimes(1);
   });
+
+  it("default auto reserveScroll inserts a pane-width spacer when leftover is usable", async () => {
+    // Given default withRightPane (auto) on typical jsdom chrome
+    const expectedWidth = documentScrollRightPaneWidthCss(280);
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        withRightPane={280}
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <OpenPaneButton /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then tokens publish and the spacer is the pane width so the form sits in the leftover
+    expect(r.rightPaneContent).toBeInTheDocument();
+    expect(r.rightPaneContent).toHaveStyle({ position: "fixed" });
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "280px" });
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
+    expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(expectedWidth);
+  });
+
+  it("does not wrap in DocumentScrollOverlayRightPaneLayout without withRightPane", async () => {
+    // Given a form that did not opt into the right pane
+    const r = await render(
+      <FormSectionLayout
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <OpenPaneButton /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // When the pane context is opened
+    await clickAndWait(r.openPane);
+
+    // Then FormSectionLayout does not host the document-scroll pane wrapper
+    expect(r.query.documentScrollRightPaneLayout).toBeNull();
+    expect(r.query.rightPaneContent).toBeNull();
+  });
 });
+
+function OpenPaneButton() {
+  const { openRightPane } = useRightPaneActions();
+  return <Button label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />;
+}

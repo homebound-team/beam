@@ -1,46 +1,90 @@
-/** Desktop right-pane strategy. See `docs/layouts.md` for overlay / push / auto outcomes. */
-export type DocumentScrollRightPaneMode = "auto" | "overlay" | "push";
+import { beamLayoutViewportWidthVar, beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 
-/** Desktop strategies for the upcoming inline (push/clear) pane only. */
-export type DocumentScrollInlineRightPaneMode = "auto" | "push";
+/** Whether the overlay host inserts a horizontal-scroll spacer while the pane is open. */
+export type ReserveScroll = boolean | "auto";
 
 /** Default document-scroll detail pane width (px). */
 export const defaultDocumentScrollRightPaneWidth = 450;
 
 /**
- * Opt into a document-scroll right pane. `true` / a px width use the caller's default mode;
- * an object sets width and/or mode.
+ * Minimum leftover chrome (px) for `reserveScroll: "auto"` to consider a spacer.
+ * Below this the leftover column is unusable, so the pane overlays with no spacer.
+ */
+export const minDocumentScrollMainWidthPx = 480;
+
+/**
+ * Opt into a document-scroll right pane. `true` / a px width use the caller's default
+ * `reserveScroll` (`true` for tables, `"auto"` for forms).
  */
 export type WithRightPane =
   | boolean
   | number
   | {
       width?: number;
-      mode?: DocumentScrollRightPaneMode;
+      reserveScroll?: ReserveScroll;
     };
 
 export type ResolvedWithRightPane = {
   width: number;
-  mode: DocumentScrollRightPaneMode;
+  reserveScroll: ReserveScroll;
 };
 
-/** Desktop split-pane outcome (`md+` only). */
-export type ResolvedDocumentScrollRightPaneBehavior = "overlay" | "push" | "clear";
+export type ResolveReserveScrollArgs = {
+  reserveScroll: ReserveScroll;
+  chromeWidthPx: number;
+  paneWidthPx: number;
+};
 
-/** Normalize `withRightPane` into width + mode, or `undefined` when opted out. */
+/** Normalize `withRightPane` into width + reserveScroll, or `undefined` when opted out. */
 export function resolveWithRightPaneOptions(
   withRightPane: WithRightPane | undefined,
-  defaultMode: DocumentScrollRightPaneMode,
+  defaultReserveScroll: ReserveScroll,
 ): ResolvedWithRightPane | undefined {
   if (withRightPane === undefined || withRightPane === false) return undefined;
   if (withRightPane === true) {
-    return { width: defaultDocumentScrollRightPaneWidth, mode: defaultMode };
+    return { width: defaultDocumentScrollRightPaneWidth, reserveScroll: defaultReserveScroll };
   }
   if (typeof withRightPane === "number") {
-    return { width: withRightPane, mode: defaultMode };
+    return { width: withRightPane, reserveScroll: defaultReserveScroll };
   }
   return {
     width: withRightPane.width ?? defaultDocumentScrollRightPaneWidth,
-    mode: withRightPane.mode ?? defaultMode,
+    reserveScroll: withRightPane.reserveScroll ?? defaultReserveScroll,
   };
+}
+
+/** Resolve whether to insert the overlay spacer (tables always; forms when leftover chrome is usable). */
+export function resolveReserveScroll(args: ResolveReserveScrollArgs): boolean {
+  const { reserveScroll, chromeWidthPx, paneWidthPx } = args;
+  if (reserveScroll === true) return true;
+  if (reserveScroll === false) return false;
+  if (chromeWidthPx <= 0) return false;
+  const leftoverPx = chromeWidthPx - Math.min(paneWidthPx, chromeWidthPx);
+  return leftoverPx >= minDocumentScrollMainWidthPx;
+}
+
+/**
+ * Overlay spacer width (px). Tables always use the pane width. `auto` uses the pane width when
+ * leftover chrome is usable so the form column is the leftover (fully visible); otherwise 0.
+ */
+export function resolveOverlaySpacerWidthPx(args: {
+  reserveScroll: ReserveScroll;
+  chromeWidthPx: number;
+  paneWidthPx: number;
+}): number {
+  const { reserveScroll, chromeWidthPx, paneWidthPx } = args;
+  if (reserveScroll === true) return chromeWidthPx > 0 ? Math.min(paneWidthPx, chromeWidthPx) : paneWidthPx;
+  if (reserveScroll === false) return 0;
+  if (!resolveReserveScroll({ reserveScroll, chromeWidthPx, paneWidthPx })) return 0;
+  return chromeWidthPx > 0 ? Math.min(paneWidthPx, chromeWidthPx) : paneWidthPx;
+}
+
+/** Reads inherited chrome width (viewport − side nav) from CSS vars on `el`, falling back to `window`. */
+export function readDocumentScrollChromeWidthPx(el: Element | null): number {
+  if (typeof window === "undefined") return 0;
+  if (!el) return window.innerWidth;
+  const styles = getComputedStyle(el);
+  const viewport = parseFloat(styles.getPropertyValue(beamLayoutViewportWidthVar)) || window.innerWidth;
+  const sideNav = parseFloat(styles.getPropertyValue(beamSideNavLayoutWidthVar)) || 0;
+  return Math.max(0, viewport - sideNav);
 }

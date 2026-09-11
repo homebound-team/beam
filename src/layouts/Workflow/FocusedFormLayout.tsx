@@ -12,14 +12,14 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
     isDirty?: () => boolean;
     /** Full-bleed AI wash on the body and the `ai` Create/Save variant. Pair with body `aiMode` (e.g. FormSectionLayout). */
     aiMode?: boolean;
-    /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks`). */
+    /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks` / `withRightPane`). */
     children: ReactNode;
   };
 
 /**
  * Standalone workflow page without steps: workflow header + body.
- * Nest under `EnvironmentBannerLayout` only. JumpLinks live on the body (e.g. `FormSectionLayout withJumpLinks`).
- * Contract: `docs/layouts.md`.
+ * Nest under `EnvironmentBannerLayout` only. JumpLinks and the right pane live on the body
+ * (e.g. `FormSectionLayout withJumpLinks withRightPane`). Contract: `docs/layouts.md`.
  */
 export function FocusedFormLayout(props: FocusedFormLayoutProps) {
   const {

@@ -1,10 +1,12 @@
 import { type ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
+import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
+import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { Css } from "src/Css";
@@ -154,7 +156,7 @@ export function GridTableLayoutExample({
   numNestedRows = 20,
 }: {
   storageKey: string;
-  /** When true, row clicks open a document-scroll right pane (desktop split / mobile full-bleed). */
+  /** When true, row clicks open a document-scroll right pane (desktop overlay / mobile full-bleed). */
   withRightPane?: boolean;
   numNestedRows?: number;
 }) {
@@ -356,6 +358,62 @@ function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+/** Placeholder fields plus a control that opens a document-scroll right pane (`RightPanePanel`). */
+export function RightPaneStoryOpenFields({ count = 2 }: { count?: number }) {
+  const { openRightPane } = useRightPaneActions();
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      {count > 0 && <RightPaneStoryPlaceholderFields count={count} />}
+      <Button
+        label="Open detail pane"
+        onClick={() =>
+          openRightPane({
+            content: (
+              <RightPanePanel title="Package detail">
+                <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
+                  Desktop overlay. Forms use `reserveScroll: "auto"` — when leftover chrome is usable, the form column
+                  is the leftover so the full shell stays visible.
+                </p>
+              </RightPanePanel>
+            ),
+          })
+        }
+      />
+    </div>
+  );
+}
+
+/** Form sections for composed `FormSectionLayout withRightPane` stories — open from Setup. */
+export function createRightPaneFormSections() {
+  return [
+    { title: "Setup", description: "Basic package details.", fields: <RightPaneStoryOpenFields /> },
+    { title: "Package Options", fields: <RightPaneStoryPlaceholderFields count={3} /> },
+    { title: "Internal", excludeJumpLink: true, fields: <RightPaneStoryPlaceholderFields count={1} /> },
+  ];
+}
+
+/** Tall centered body for `CenteredLayout withRightPane` stories. */
+export function RightPaneCenteredPlaceholderBody() {
+  return (
+    <div css={Css.df.fdc.gap2.py3.$}>
+      {Array.from({ length: 8 }, (_, i) => (
+        <div key={i} css={Css.hPx(48).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
+      <RightPaneStoryOpenFields count={0} />
+    </div>
+  );
+}
+
+function RightPaneStoryPlaceholderFields({ count }: { count: number }) {
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
     </div>
   );
 }
