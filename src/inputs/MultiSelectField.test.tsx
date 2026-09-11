@@ -220,6 +220,81 @@ describe("MultiSelectFieldTest", () => {
     expect(onSelect).toHaveBeenCalledWith([]);
   });
 
+  it("renders a pill list below the field when withPillList is true", async () => {
+    // Given a MultiSelectField with selected values and withPillList
+    const r = await render(<TestMultiSelectField values={["1", "3"]} options={options} withPillList />);
+    // Then selected options render as pills, not chips
+    expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("One");
+    expect(r.selectedOptionPillList_pill_value_1).toHaveTextContent("Three");
+    expect(r.queryAllByTestId("chip")).toHaveLength(0);
+    expect(r.query.selectedOptionsCount).toBeNull();
+    expect(r.age).toHaveValue("");
+  });
+
+  it("uses getOptionMenuLabel for pill content when provided", async () => {
+    // Given a MultiSelectField with withPillList and a custom menu label
+    const r = await render(
+      <TestMultiSelectField
+        values={["1"]}
+        options={options}
+        withPillList
+        getOptionMenuLabel={(o) => `Menu ${o.name}`}
+      />,
+    );
+    // Then the pill shows the menu label, not getOptionLabel
+    expect(r.selectedOptionPillList_pill_value).toHaveTextContent("Menu One");
+  });
+
+  it("does not put a single selection in the input when withPillList is true", async () => {
+    // Given a MultiSelectField with withPillList and one selected value
+    const r = await render(<TestMultiSelectField values={["1"]} options={options} withPillList />);
+    // Then the value is only in the pill, not the combobox
+    expect(r.selectedOptionPillList_pill_value).toHaveTextContent("One");
+    expect(r.age).toHaveValue("");
+  });
+
+  it("hides listbox chips when withPillList is true", async () => {
+    // Given a MultiSelectField with withPillList and a selected value
+    const r = await render(<TestMultiSelectField values={["1"]} options={options} withPillList />);
+    // When opening the menu
+    click(r.age);
+    // Then the listbox does not show ToggleChips
+    expect(r.getByRole("listbox")).toBeInTheDocument();
+    expect(r.queryAllByTestId("chip")).toHaveLength(0);
+  });
+
+  it("removes a value when a pill is removed", async () => {
+    // Given a MultiSelectField with withPillList and two selected values
+    const r = await render(<TestMultiSelectField values={["1", "2"]} options={options} withPillList />);
+    // When removing the first pill
+    click(r.selectedOptionPillList_pill_remove_0);
+    // Then onSelect is called without that value
+    expect(onSelect).toHaveBeenCalledWith(["2"]);
+  });
+
+  it("hides pill remove buttons when the field is disabled", async () => {
+    // Given a disabled MultiSelectField with withPillList
+    const r = await render(<TestMultiSelectField values={["1", "2"]} options={options} withPillList disabled />);
+    // Then selections still render as pills, but cannot be removed
+    expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("One");
+    expect(r.selectedOptionPillList_pill_value_1).toHaveTextContent("Two");
+    expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+    expect(r.query.selectedOptionPillList_pill_remove_1).toBeNull();
+  });
+
+  it("hides field and listbox chips when hideChips is true", async () => {
+    // Given a MultiSelectField that only hides chips
+    const r = await render(<TestMultiSelectField values={["1", "2"]} options={options} hideChips />);
+    // Then no field chips or count badge are shown
+    expect(r.queryAllByTestId("chip")).toHaveLength(0);
+    expect(r.query.selectedOptionPillList).toBeNull();
+    // When opening the menu
+    click(r.age);
+    // Then the listbox also has no chips
+    expect(r.getByRole("listbox")).toBeInTheDocument();
+    expect(r.queryAllByTestId("chip")).toHaveLength(0);
+  });
+
   it("preserves selections after tab-blur", async () => {
     const selectedRef: React.MutableRefObject<string[] | undefined> = { current: undefined };
     // Given a MultiSelectField with no selected values

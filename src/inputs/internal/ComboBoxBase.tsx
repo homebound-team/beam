@@ -88,6 +88,8 @@ export type ComboBoxBaseProps<O, V extends Value> = {
    * Set to false to maintain the original order of options.
    */
   autoSort?: boolean;
+  /** Hides selected-value chips in the closed field and in the open listbox. */
+  hideChips?: boolean;
 } & BeamFocusableProps &
   PresentationFieldProps;
 
@@ -122,6 +124,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     onSearch,
     onAddNew,
     autoSort = true,
+    hideChips = false,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -197,7 +200,14 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   // Do a one-time initialize of fieldState
   const [fieldState, setFieldState] = useState<FieldState>(() => {
     return {
-      inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
+      inputValue: getInputValue(
+        selectedOptions,
+        getOptionLabel,
+        multiselect,
+        nothingSelectedText,
+        isReadOnly,
+        hideChips,
+      ),
       searchValue: undefined,
       optionsLoading: false,
     };
@@ -359,10 +369,26 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
       setFieldState((prevState) => ({
         ...prevState,
         searchValue: "",
-        inputValue: getInputValue(selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly),
+        inputValue: getInputValue(
+          selectedOptions,
+          getOptionLabel,
+          multiselect,
+          nothingSelectedText,
+          isReadOnly,
+          hideChips,
+        ),
       }));
     }
-  }, [state.isOpen, selectedOptions, getOptionLabel, multiselect, nothingSelectedText, isReadOnly, debouncedSearch]);
+  }, [
+    state.isOpen,
+    selectedOptions,
+    getOptionLabel,
+    multiselect,
+    nothingSelectedText,
+    isReadOnly,
+    hideChips,
+    debouncedSearch,
+  ]);
 
   // Call on search callback when the user types in the input field
   useEffect(() => {
@@ -433,6 +459,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         borderless={borderless}
         tooltip={resolveTooltip(disabled, undefined, readOnly)}
         resetField={resetField}
+        hideChips={hideChips}
         {...proposalProps}
       />
       {state.isOpen && (
@@ -456,6 +483,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
             horizontalLayout={labelStyle === "left"}
             loading={fieldState.optionsLoading}
             disabledOptionsWithReasons={disabledOptionsWithReasons}
+            hideChips={hideChips}
           />
         </Popover>
       )}
@@ -489,7 +517,12 @@ function getInputValue<O>(
   multiselect: boolean,
   nothingSelectedText: string,
   readOnly?: boolean,
+  hideChips?: boolean,
 ) {
+  // Pill list (or hideChips) owns the selection UI — keep the input empty except placeholder-when-empty.
+  if (hideChips && multiselect) {
+    return selectedOptions.length === 0 ? nothingSelectedText : "";
+  }
   return selectedOptions.length === 1
     ? getOptionLabel(selectedOptions[0])
     : readOnly && selectedOptions.length > 0
