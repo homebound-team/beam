@@ -3,8 +3,12 @@ import { useCallback, useMemo, useState } from "react";
 import { GridTable } from "src/components/Table/GridTable";
 import type { GridColumn } from "src/components/Table/types";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { TableSummaryReport } from "src/components/TableSummaryReport";
-import type { TableSummaryReportProps } from "src/components/TableSummaryReport/types";
+import {
+  StackBarGraph,
+  TableSummaryReport,
+  type StackBarGraphSegment,
+  type TableSummaryReportProps,
+} from "src/components/TableSummaryReport";
 import { Css } from "src/Css";
 import { newStory, viewportModes } from "src/utils/sb";
 
@@ -70,10 +74,8 @@ export function FiltersTableAndScrolls() {
                 ? activeMetricValues.filter((current) => current !== value)
                 : [...activeMetricValues, value],
             ),
-          issueAction: {
-            label: "View 16 Issues",
-            onClick: () => applyFilter(["missing", "incomplete", "warnings"]),
-          },
+          issueLabel: "View Issues",
+          onIssueClick: () => applyFilter(["missing", "incomplete", "warnings"]),
         })}
       />
       <div id="tableSummaryReportStoryTable">
@@ -83,23 +85,21 @@ export function FiltersTableAndScrolls() {
   );
 }
 
-function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}) {
+function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): TableSummaryReportProps<string> {
+  const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",
-    totalLabel: "85 Cost Codes",
-    segments: [
-      { label: "Complete", count: 40, status: "success" as const },
-      { label: "In Progress", count: 32, status: "neutral" as const },
-      { label: "Incomplete", count: 9, status: "warning" as const },
-      { label: "Missing", count: 4, status: "error" as const },
-    ],
     metrics: [
-      { value: "missing", label: "Missing", count: 4, status: "error" as const },
-      { value: "incomplete", label: "Incomplete", count: 9, status: "warning" as const },
-      { value: "warnings", label: "Warnings", count: 3, status: "warning" as const },
+      { value: "missing", label: "Missing", count: 4, status: "error" },
+      { value: "incomplete", label: "Incomplete", count: 9, status: "warning" },
+      { value: "warnings", label: "Warnings", count: 3, status: "warning" },
     ],
-    issueAction: { label: "View 15 Issues", onClick: () => {} },
-    ...overrides,
+    issueLabel: "View Issues",
+    onIssueClick: () => {},
+    footer: footer ?? (
+      <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />
+    ),
+    ...rest,
   };
 }
 
@@ -109,6 +109,15 @@ function createFourMetrics() {
     { value: "missing", label: "Missing", count: 4, status: "error" as const },
     { value: "incomplete", label: "Incomplete", count: 9, status: "warning" as const },
     { value: "warnings", label: "Warnings", count: 3, status: "warning" as const },
+  ];
+}
+
+function defaultSegments(): StackBarGraphSegment[] {
+  return [
+    { label: "Complete", count: 40, status: "success" },
+    { label: "In Progress", count: 32, status: "neutral" },
+    { label: "Incomplete", count: 9, status: "warning" },
+    { label: "Missing", count: 4, status: "error" },
   ];
 }
 

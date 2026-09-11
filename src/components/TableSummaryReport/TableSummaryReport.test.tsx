@@ -1,15 +1,15 @@
 import { fireEvent } from "@testing-library/react";
-import { TableSummaryReport } from "src/components/TableSummaryReport";
-import type { TableSummaryReportProps } from "src/components/TableSummaryReport/types";
+import type { StackBarGraphSegment, TableSummaryReportProps } from "src/components/TableSummaryReport";
+import { StackBarGraph, TableSummaryReport } from "src/components/TableSummaryReport";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("TableSummaryReport", () => {
-  it("renders the coverage section without issue controls", async () => {
+  it("renders the stack bar graph without issue controls", async () => {
     // Given a report without issues
     const r = await render(<TableSummaryReport {...createProps({ metrics: [] })} />);
-    // Then it retains coverage but hides issue controls
-    expect(r.tableSummaryReport_coverage).toBeInTheDocument();
+    // Then it retains the stack bar graph but hides issue controls
+    expect(r.stackBarGraph).toBeInTheDocument();
     expect(r.query.tableSummaryReport_metrics).toBeNull();
     expect(r.query.tableSummaryReport_issueAction).toBeNull();
   });
@@ -40,9 +40,7 @@ describe("TableSummaryReport", () => {
     const onIssueClick = vi.fn();
     // Given an actionable report
     const r = await render(
-      <TableSummaryReport
-        {...createProps({ onMetricClick, issueAction: { label: "View 15 Issues", onClick: onIssueClick } })}
-      />,
+      <TableSummaryReport {...createProps({ onMetricClick, issueLabel: "View Issues", onIssueClick })} />,
     );
     // When the user activates a metric and the issues action
     click(r.tableSummaryReport_metric_missing);
@@ -85,52 +83,84 @@ describe("TableSummaryReport", () => {
   });
 
   it("shows zero percent for segments with a zero total", async () => {
-    // Given coverage segments with no items
+    // Given stack bar segments with no items
     const r = await render(
       <TableSummaryReport
         {...createProps({
-          segments: [
-            { label: "Complete", count: 0, status: "success" },
-            { label: "Missing", count: 0, status: "error" },
-          ],
+          footer: (
+            <StackBarGraph
+              title="Coverage by status"
+              totalLabel="Cost Codes"
+              segments={[
+                { label: "Complete", count: 0, status: "success" },
+                { label: "Missing", count: 0, status: "error" },
+              ]}
+            />
+          ),
         })}
       />,
     );
     // Then the legend does not render invalid percentages
-    expect(r.tableSummaryReport_legend).toHaveTextContent("0% Complete (0)");
-    expect(r.tableSummaryReport_legend).toHaveTextContent("0% Missing (0)");
+    expect(r.stackBarGraph_legend).toHaveTextContent("0% Complete (0)");
+    expect(r.stackBarGraph_legend).toHaveTextContent("0% Missing (0)");
   });
 
-  it("sizes coverage segments according to their counts", async () => {
-    // Given coverage with unequal segment counts
+  it("sizes stack bar segments according to their counts", async () => {
+    // Given a stack bar with unequal segment counts
     const r = await render(
       <TableSummaryReport
         {...createProps({
-          segments: [
-            { label: "Complete", count: 3, status: "success" },
-            { label: "Missing", count: 1, status: "error" },
-          ],
+          footer: (
+            <StackBarGraph
+              title="Coverage by status"
+              totalLabel="Cost Codes"
+              segments={[
+                { label: "Complete", count: 3, status: "success" },
+                { label: "Missing", count: 1, status: "error" },
+              ]}
+            />
+          ),
         })}
       />,
     );
     // Then the bar uses counts as flex proportions
-    expect(r.tableSummaryReport_coverageBar.children[0]).toHaveStyle({ flexGrow: "3" });
-    expect(r.tableSummaryReport_coverageBar.children[1]).toHaveStyle({ flexGrow: "1" });
+    expect(r.stackBarGraph_bar.children[0]).toHaveStyle({ flexGrow: "3" });
+    expect(r.stackBarGraph_bar.children[1]).toHaveStyle({ flexGrow: "1" });
+  });
+
+  it("renders a caller-provided stack bar title", async () => {
+    // Given a custom stack bar title
+    const r = await render(
+      <TableSummaryReport
+        {...createProps({
+          footer: <StackBarGraph title="Bid package status" totalLabel="Cost Codes" segments={defaultSegments()} />,
+        })}
+      />,
+    );
+    // Then the custom title is shown
+    expect(r.stackBarGraph).toHaveTextContent("Bid package status");
   });
 });
 
-function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}) {
+function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): TableSummaryReportProps<string> {
+  const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",
-    totalLabel: "85 Cost Codes",
-    segments: [
-      { label: "Complete", count: 40, status: "success" as const },
-      { label: "In Progress", count: 32, status: "neutral" as const },
-      { label: "Incomplete", count: 9, status: "warning" as const },
-      { label: "Missing", count: 4, status: "error" as const },
-    ],
-    metrics: [{ value: "missing", label: "Missing", count: 4, status: "error" as const }],
-    issueAction: { label: "View 15 Issues", onClick: () => {} },
-    ...overrides,
+    metrics: [{ value: "missing", label: "Missing", count: 4, status: "error" }],
+    issueLabel: "View Issues",
+    onIssueClick: () => {},
+    footer: footer ?? (
+      <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />
+    ),
+    ...rest,
   };
+}
+
+function defaultSegments(): StackBarGraphSegment[] {
+  return [
+    { label: "Complete", count: 40, status: "success" },
+    { label: "In Progress", count: 32, status: "neutral" },
+    { label: "Incomplete", count: 9, status: "warning" },
+    { label: "Missing", count: 4, status: "error" },
+  ];
 }
