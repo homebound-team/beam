@@ -467,7 +467,7 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
             onDragOver={(evt) => onDragOver?.(row, evt)}
             css={Css.ma.cursorPointer.$}
           >
-            <Icon icon="drag" />
+            <Icon icon="drag" inc={2.25} />
           </div>
         ) : undefined,
       };
