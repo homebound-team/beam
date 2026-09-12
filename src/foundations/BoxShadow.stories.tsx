@@ -11,11 +11,11 @@ export const BoxShadow = () => (
     <div css={Css.df.gap4.$}>
       <div>
         <h2 css={Css.xl.mb4.$}>Basic</h2>
-        <div css={Css.hPx(250).wPx(250).bshBasic.$}></div>
+        <div css={Css.sqPx(250).bshBasic.$}></div>
       </div>
       <div>
         <h2 css={Css.xl.mb4.$}>Hover</h2>
-        <div css={Css.hPx(250).wPx(250).bshHover.$}></div>
+        <div css={Css.sqPx(250).bshHover.$}></div>
       </div>
     </div>
   </div>

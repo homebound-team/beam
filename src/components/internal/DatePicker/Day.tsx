@@ -63,8 +63,7 @@ export function Day(props: DayProps) {
             css={
               Css.absolute
                 .bottomPx(4)
-                .wPx(4)
-                .hPx(4)
+                .sqPx(4)
                 .bgColor(Tokens.Primary)
                 .br4.if(selected && !range_middle)
                 .bgColor(Tokens.OnPrimary).$
