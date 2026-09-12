@@ -243,7 +243,7 @@ function CarouselFooter() {
     <div css={Css.px3.pb3.pt2.$}>
       <Carousel>
         {materialSwatches().map((s) => (
-          <img key={s.label} src={s.src} alt={s.label} css={Css.hPx(32).wPx(32).br8.ba.bcGray300.oh.objectCover.$} />
+          <img key={s.label} src={s.src} alt={s.label} css={Css.sqPx(32).br8.ba.bcGray300.oh.objectCover.$} />
         ))}
       </Carousel>
     </div>

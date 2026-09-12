@@ -163,8 +163,7 @@ function ColorSwatch({ cssVar, name }: { cssVar: string; name: string }) {
   return (
     <div
       css={
-        Css.hPx(32)
-          .wPx(32)
+        Css.sqPx(32)
           .br4.ba.bc(Tokens.FieldBorderDefault)
           .bgColor(tokenValue ?? `var(${cssVar})`).$
       }
@@ -199,7 +198,7 @@ function ColorSourceLabel({ prefix, source }: { prefix: string; source: ColorSou
       bgColor={Tokens.SurfaceRaised}
       title={
         <div css={Css.df.fdc.aic.gap1.color(Tokens.OnSurface).p1.$}>
-          <div css={Css.hPx(40).wPx(40).br4.ba.bc(Tokens.FieldBorderDefault).bgColor(literal).$} />
+          <div css={Css.sqPx(40).br4.ba.bc(Tokens.FieldBorderDefault).bgColor(literal).$} />
           <div css={Css.xs.tal.$}>{literal}</div>
         </div>
       }

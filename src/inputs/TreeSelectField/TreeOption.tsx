@@ -95,7 +95,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
                 toggleCollapsed();
                 return false;
               }}
-              css={Css.br4.hPx(16).wPx(16).bgTransparent.onHover.bgGray300.$}
+              css={Css.br4.sqPx(16).bgTransparent.onHover.bgGray300.$}
               {...tid[`collapseToggle_${item.key}`]}
             >
               <Icon icon={collapsedKeys.includes(item.key) ? "triangleRight" : "triangleDown"} inc={2} />
