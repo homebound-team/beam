@@ -1,3 +1,5 @@
+// The atomic css that the truss vite plugin compiles out of our `Css.*.$` chains.
+import "virtual:truss.css";
 import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
 import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from "storybook/viewport";

@@ -37,10 +37,7 @@ function starStyles(index: number, inc: number) {
       .sqPx(increment(inc))
       // Also the keyframes' 0%, so stars waiting out their delay (and reduced-motion users) rest small.
       .add("transform", "scale(0.5)")
-      .add("animationName", "aiStarLoader")
-      .add("animationDuration", `${cycleMs}ms`)
-      .add("animationIterationCount", "infinite")
-      .add("animationTimingFunction", "ease-in-out")
-      .add("animationDelay", `${(index * cycleMs) / 3}ms`).$
+      // The 2nd time in the shorthand is the delay, which staggers each star a third of a cycle.
+      .aiStarLoader(`${cycleMs}ms ease-in-out ${(index * cycleMs) / 3}ms infinite`).$
   );
 }

@@ -136,6 +136,13 @@ export type CssSetVarValue = CssSetVarScalar | {
   container?: Array<{ name?: string; gt?: number; lt?: number; value: CssSetVarScalar }>;
 };
 
+export enum Keyframes {
+  LoadingDots = "loadingDots",
+  Spin = "spin",
+  Pulse = "pulse",
+  AiStarLoader = "aiStarLoader",
+}
+
 // Augment React types so all JSX elements accept the `css` prop:
 // - HTMLAttributes/SVGAttributes cover intrinsic elements (div, svg, etc.)
 // - JSX.IntrinsicAttributes covers custom components (Card, Page, etc.)
@@ -4152,6 +4159,24 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   }
 
   // aliases
+
+  // keyframes
+  /** Sets `animation: loadingDots value`. */
+  loadingDots(value: string) {
+    return this.add("animation", `loadingDots ${value}`);
+  }
+  /** Sets `animation: spin value`. */
+  spin(value: string) {
+    return this.add("animation", `spin ${value}`);
+  }
+  /** Sets `animation: pulse value`. */
+  pulse(value: string) {
+    return this.add("animation", `pulse ${value}`);
+  }
+  /** Sets `animation: aiStarLoader value`. */
+  aiStarLoader(value: string) {
+    return this.add("animation", `aiStarLoader ${value}`);
+  }
 
   get $(): T & { readonly __kind: S } {
     if (this.opts.runtimeError) {
