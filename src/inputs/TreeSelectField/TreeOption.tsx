@@ -63,7 +63,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
     item: Css.color(Tokens.OnSurface).$,
     hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
     disabled: Css.cursorNotAllowed.color(Tokens.TextDisabled).$,
-    focus: Css.add("boxShadow", `inset 0 0 0 1px var(${Tokens.FocusRingInset})`).$,
+    focus: Css.add("boxShadow", `inset 0 0 0 1px ${Tokens.FocusRingInset}`).$,
   };
 
   return maybeTooltip({

@@ -218,9 +218,9 @@ function LeftNav<F>(props: { sectionsWithRefs: SectionWithRefs<F>[] }) {
 }
 
 // Use inset box shadow rather than thick border to avoid the button text reflowing when the border is applied
-const activeStyles = Css.smSb.boxShadow(`inset 3px 0px 0 0px var(${Tokens.Primary})`).$;
+const activeStyles = Css.smSb.boxShadow(`inset 3px 0px 0 0px ${Tokens.Primary}`).$;
 // Blue50/Blue900 hover chrome has no full semantic match — keep palette fills; inset uses Primary.
-const hoverStyles = Css.bgBlue50.smSb.blue900.boxShadow(`inset 3px 0px 0 0px var(${Tokens.Primary})`).$;
+const hoverStyles = Css.bgBlue50.smSb.blue900.boxShadow(`inset 3px 0px 0 0px ${Tokens.Primary}`).$;
 const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
 
 function SectionNavLink<F>(props: { sectionWithRef: SectionWithRefs<F>; activeSection: string | null }) {

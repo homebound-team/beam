@@ -369,20 +369,21 @@ describe("GridTable", () => {
       <GridTable
         columns={[nameColumn, borderedColumn]}
         rows={rows}
-        style={{ ...defaultStyle, borderStyle: Css.bc(Tokens.TextDisabled).pl2.$ }}
+        // And the custom border style adds a padding in px, not an increment like `pl2`.
+        // An increment compiles to `calc(var(--t-spacing) * n)`, which jsdom gives back only
+        // on the 1st getComputedStyle call for an element; later calls drop all four padding
+        // longhands, the static ones too. toHaveStyle calls getComputedStyle once per asserted
+        // property, so an increment padding reads as empty in every assertion but the first.
+        style={{ ...defaultStyle, borderStyle: Css.bc(Tokens.TextDisabled).plPx(8).$ }}
       />,
     );
 
-    expect(cell(r, 0, 1)).toHaveStyle({
-      borderLeftStyle: "solid",
-      borderLeftWidth: "1px",
-      paddingLeft: "calc(var(--t-spacing) * 2)",
-    });
-    expect(cell(r, 1, 1)).toHaveStyle({
-      borderLeftStyle: "solid",
-      borderLeftWidth: "1px",
-      paddingLeft: "calc(var(--t-spacing) * 2)",
-    });
+    // Then both the header and data cells keep the border geometry
+    expect(cell(r, 0, 1)).toHaveStyle({ borderLeftStyle: "solid", borderLeftWidth: "1px" });
+    expect(cell(r, 1, 1)).toHaveStyle({ borderLeftStyle: "solid", borderLeftWidth: "1px" });
+    // And pick up the rest of the custom border style
+    expect(cell(r, 0, 1)).toHaveStyle({ paddingLeft: "8px" });
+    expect(cell(r, 1, 1)).toHaveStyle({ paddingLeft: "8px" });
   });
 
   describe("client-side sorting", () => {
