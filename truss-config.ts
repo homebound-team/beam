@@ -1,4 +1,4 @@
-import { defineConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
+import { defineConfig, type KeyframesConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
 import { documentScrollContentLeft, documentScrollContentWidth } from "./src/layouts/layoutVars";
 import { motion } from "./truss-motion";
 import { palette } from "./truss-palette";
@@ -169,6 +169,33 @@ const sections: Sections = {
   contentEmpty: () => [newMethod("contentEmpty", { content: "''" })],
 };
 
+/**
+ * The animations our components drive with `animationName` / `animation`.
+ *
+ * Truss writes each block only when some rule uses it, and checks every animation value
+ * against these names, so `Keyframes.Spin` fails the build if the timeline goes away.
+ */
+const keyframes: KeyframesConfig = {
+  // Opacity pulse so dot fill follows --b-loader-fill (ContrastScope / palette).
+  loadingDots: {
+    "0%, 100%": { opacity: 1 },
+    "50%": { opacity: 0.35 },
+  },
+  spin: {
+    "0%": { transform: "rotate(0deg)" },
+    "100%": { transform: "rotate(360deg)" },
+  },
+  pulse: {
+    "50%": { opacity: 0.6 },
+  },
+  // AiLoader's star wave. Each star swells over the first third of the cycle and settles back over
+  // the second, then rests small while its two neighbors take their turn.
+  aiStarLoader: {
+    "0%, 66.67%, 100%": { transform: "scale(0.5)" },
+    "33.33%": { transform: "scale(1)" },
+  },
+};
+
 const aliases: Record<string, string[]> = {};
 
 const breakpoints = { sm: 0, md: 600, lg: 1025 };
@@ -184,6 +211,7 @@ export default defineConfig({
     Font: ["fontSize", "fontWeight", "lineHeight"],
   },
   tokens: Tokens,
+  keyframes,
   breakpoints,
   sections,
 });
