@@ -19,8 +19,8 @@ export function DnDGridItemHandle(props: DnDGridItemHandleProps) {
   const { hoverProps, isHovered } = useHover({});
   const tid = useTestIds(props, "dragHandle");
 
-  const iconButtonNormal = Css.hPx(28).wPx(28).br8.bw2.$;
-  const iconButtonCompact = Css.hPx(18).wPx(18).br4.bw1.$;
+  const iconButtonNormal = Css.sqPx(28).br8.bw2.$;
+  const iconButtonCompact = Css.sqPx(18).br4.bw1.$;
 
   return (
     <button

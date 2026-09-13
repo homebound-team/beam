@@ -133,11 +133,10 @@ function StepIcon({ state, isHovered = false, isPressed = false, isCurrent = fal
 
   // Otherwise state is "incomplete", return the custom circle "icon"
   return (
-    <div css={Css.wPx(24).hPx(24).df.aic.jcc.$}>
+    <div css={Css.sqPx(24).df.aic.jcc.$}>
       <div
         css={
-          Css.wPx(10)
-            .hPx(10)
+          Css.sqPx(10)
             .ba.bw2.br100.add("color", "currentColor")
             .if(isHovered || isPressed || isCurrent)
             .add("backgroundColor", "currentColor").$

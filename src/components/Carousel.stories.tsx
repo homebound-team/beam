@@ -111,7 +111,7 @@ function Container({ children, width = 330 }: { children: JSX.Element; width?: n
 }
 
 function Swatch({ color }: { color: string }) {
-  return <div css={Css.hPx(32).wPx(32).br8.ba.bcGray300.$} style={{ backgroundColor: color }} />;
+  return <div css={Css.sqPx(32).br8.ba.bcGray300.$} style={{ backgroundColor: color }} />;
 }
 
 const swatches = [
