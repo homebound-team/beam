@@ -1,23 +1,23 @@
 import { fireEvent } from "@testing-library/react";
 import { StackBarGraph, type StackBarGraphSegment } from "src/components/StackBarGraph";
-import { TableSummaryReport, type TableSummaryReportProps } from "src/components/TableSummaryReport";
+import { TableSummary, type TableSummaryProps } from "src/components/TableSummary";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
-describe("TableSummaryReport", () => {
+describe("TableSummary", () => {
   it("renders the stack bar graph without status controls", async () => {
     // Given a report without metrics
-    const r = await render(<TableSummaryReport {...createProps({ metrics: [] })} />);
+    const r = await render(<TableSummary {...createProps({ metrics: [] })} />);
     // Then it retains the stack bar graph but hides status controls
     expect(r.stackBarGraph).toBeInTheDocument();
-    expect(r.query.tableSummaryReport_metrics).toBeNull();
-    expect(r.query.tableSummaryReport_statusAction).toBeNull();
+    expect(r.query.tableSummary_metrics).toBeNull();
+    expect(r.query.tableSummary_statusAction).toBeNull();
   });
 
   it("shows no more than four status metrics", async () => {
     // Given a report with five metrics
     const r = await render(
-      <TableSummaryReport
+      <TableSummary
         {...createProps({
           metrics: [
             { value: "one", label: "One", count: 1, status: "error" },
@@ -30,9 +30,9 @@ describe("TableSummaryReport", () => {
       />,
     );
     // Then only the first four are rendered
-    expect(r.tableSummaryReport_metric_one).toBeInTheDocument();
-    expect(r.tableSummaryReport_metric_four).toBeInTheDocument();
-    expect(r.query.tableSummaryReport_metric_five).toBeNull();
+    expect(r.tableSummary_metric_one).toBeInTheDocument();
+    expect(r.tableSummary_metric_four).toBeInTheDocument();
+    expect(r.query.tableSummary_metric_five).toBeNull();
   });
 
   it("reports metric and status action clicks to its parent", async () => {
@@ -40,11 +40,11 @@ describe("TableSummaryReport", () => {
     const onStatusClick = vi.fn();
     // Given an actionable report
     const r = await render(
-      <TableSummaryReport {...createProps({ onMetricClick, statusLabel: "View Items", onStatusClick })} />,
+      <TableSummary {...createProps({ onMetricClick, statusLabel: "View Items", onStatusClick })} />,
     );
     // When the user activates a metric and the status action
-    click(r.tableSummaryReport_metric_missing);
-    click(r.tableSummaryReport_statusAction);
+    click(r.tableSummary_metric_missing);
+    click(r.tableSummary_statusAction);
     // Then the parent receives each action
     expect(onMetricClick).toHaveBeenCalledWith("missing");
     expect(onStatusClick).toHaveBeenCalledTimes(1);
@@ -54,7 +54,7 @@ describe("TableSummaryReport", () => {
     const onMetricClick = vi.fn();
     // Given a disabled missing metric
     const r = await render(
-      <TableSummaryReport
+      <TableSummary
         {...createProps({
           onMetricClick,
           metrics: [{ value: "missing", label: "Missing", count: 4, status: "error", disabled: true }],
@@ -62,30 +62,30 @@ describe("TableSummaryReport", () => {
       />,
     );
     // When it is clicked
-    click(r.tableSummaryReport_metric_missing);
+    click(r.tableSummary_metric_missing);
     // Then it remains disabled and does not notify the parent
-    expect(r.tableSummaryReport_metric_missing).toBeDisabled();
+    expect(r.tableSummary_metric_missing).toBeDisabled();
     expect(onMetricClick).not.toHaveBeenCalled();
   });
 
   it("supports keyboard activation and controlled pressed state", async () => {
     const onMetricClick = vi.fn();
     // Given a metric marked active by its parent
-    const r = await render(<TableSummaryReport {...createProps({ activeMetricValues: ["missing"], onMetricClick })} />);
+    const r = await render(<TableSummary {...createProps({ activeMetricValues: ["missing"], onMetricClick })} />);
     // When keyboard activation occurs
-    r.tableSummaryReport_metric_missing.focus();
-    fireEvent.keyDown(r.tableSummaryReport_metric_missing, { key: "Enter" });
-    fireEvent.keyUp(r.tableSummaryReport_metric_missing, { key: "Enter" });
+    r.tableSummary_metric_missing.focus();
+    fireEvent.keyDown(r.tableSummary_metric_missing, { key: "Enter" });
+    fireEvent.keyUp(r.tableSummary_metric_missing, { key: "Enter" });
     // Then it stays focusable, pressed, and notifies the parent
-    expect(r.tableSummaryReport_metric_missing).toHaveFocus();
-    expect(r.tableSummaryReport_metric_missing).toHaveAttribute("aria-pressed", "true");
+    expect(r.tableSummary_metric_missing).toHaveFocus();
+    expect(r.tableSummary_metric_missing).toHaveAttribute("aria-pressed", "true");
     expect(onMetricClick).toHaveBeenCalledWith("missing");
   });
 
   it("renders a caller-provided footer", async () => {
     // Given a custom stack bar in the footer
     const r = await render(
-      <TableSummaryReport
+      <TableSummary
         {...createProps({
           footer: <StackBarGraph title="Bid package status" totalLabel="Cost Codes" segments={defaultSegments()} />,
         })}
@@ -96,7 +96,7 @@ describe("TableSummaryReport", () => {
   });
 });
 
-function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): TableSummaryReportProps<string> {
+function createProps(overrides: Partial<TableSummaryProps<string>> = {}): TableSummaryProps<string> {
   const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",

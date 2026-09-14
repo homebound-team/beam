@@ -6,19 +6,19 @@ import { Css, Palette, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type TableSummaryReportStatus = "success" | "neutral" | "warning" | "error";
+export type TableSummaryStatus = "success" | "neutral" | "warning" | "error";
 
-export type TableSummaryReportMetric<V extends string | number> = {
+export type TableSummaryMetric<V extends string | number> = {
   value: V;
   label: string;
   count: number;
-  status: Exclude<TableSummaryReportStatus, "neutral" | "success">;
+  status: Exclude<TableSummaryStatus, "neutral" | "success">;
   disabled?: boolean;
 };
 
-export type TableSummaryReportProps<V extends string | number> = {
+export type TableSummaryProps<V extends string | number> = {
   title: ReactNode;
-  metrics?: readonly TableSummaryReportMetric<V>[];
+  metrics?: readonly TableSummaryMetric<V>[];
   activeMetricValues?: readonly V[];
   onMetricClick?: (value: V) => void;
   statusLabel?: ReactNode;
@@ -29,7 +29,7 @@ export type TableSummaryReportProps<V extends string | number> = {
   "data-testid"?: string;
 };
 
-export function TableSummaryReport<V extends string | number>(props: TableSummaryReportProps<V>) {
+export function TableSummary<V extends string | number>(props: TableSummaryProps<V>) {
   const {
     title,
     metrics = [],
@@ -42,7 +42,7 @@ export function TableSummaryReport<V extends string | number>(props: TableSummar
     footer,
   } = props;
   const { sm: isMobile } = useBreakpoint();
-  const tid = useTestIds(props, "tableSummaryReport");
+  const tid = useTestIds(props, "tableSummary");
   const visibleMetrics = metrics.slice(0, 4);
 
   return (
@@ -84,7 +84,7 @@ export function TableSummaryReport<V extends string | number>(props: TableSummar
 }
 
 type MetricButtonProps<V extends string | number> = {
-  metric: TableSummaryReportMetric<V>;
+  metric: TableSummaryMetric<V>;
   active: boolean;
   onClick: ((value: V) => void) | undefined;
   divider: boolean;
@@ -126,14 +126,14 @@ function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
   );
 }
 
-const statusColors: Record<TableSummaryReportStatus, Palette> = {
+const statusColors: Record<TableSummaryStatus, Palette> = {
   success: Palette.Green500,
   neutral: Palette.Gray500,
   warning: Palette.Orange500,
   error: Palette.Red500,
 };
 
-const statusIcons: Record<TableSummaryReportMetric<string | number>["status"], IconKey> = {
+const statusIcons: Record<TableSummaryMetric<string | number>["status"], IconKey> = {
   warning: "errorCircle",
   error: "xCircle",
 };

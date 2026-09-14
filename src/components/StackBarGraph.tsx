@@ -9,7 +9,7 @@ export type StackBarGraphProps = {
   "data-testid"?: string;
 };
 
-/** Horizontal stacked bar with a legend. Compose into `TableSummaryReport` via `footer`, or use standalone. */
+/** Horizontal stacked bar with a legend. Compose into `TableSummary` via `footer`, or use standalone. */
 export function StackBarGraph(props: StackBarGraphProps) {
   const { title, totalLabel, segments } = props;
   const tid = useTestIds(props, "stackBarGraph");

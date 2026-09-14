@@ -4,28 +4,28 @@ import { StackBarGraph, type StackBarGraphSegment } from "src/components/StackBa
 import { GridTable } from "src/components/Table/GridTable";
 import type { GridColumn } from "src/components/Table/types";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { TableSummaryReport, type TableSummaryReportProps } from "src/components/TableSummaryReport";
+import { TableSummary, type TableSummaryProps } from "src/components/TableSummary";
 import { Css } from "src/Css";
 import { newStory, viewportModes } from "src/utils/sb";
 
 export default {
-  component: TableSummaryReport,
+  component: TableSummary,
 } as Meta;
 
 export function Default() {
-  return <TableSummaryReport {...createProps()} />;
+  return <TableSummary {...createProps()} />;
 }
 
-export const Mobile = newStory(() => <TableSummaryReport {...createProps()} />, {
+export const Mobile = newStory(() => <TableSummary {...createProps()} />, {
   parameters: { chromatic: { modes: viewportModes("iphone12") } },
 });
 
 export function NoMetrics() {
-  return <TableSummaryReport {...createProps({ metrics: [] })} />;
+  return <TableSummary {...createProps({ metrics: [] })} />;
 }
 
 export function FourStatuses() {
-  return <TableSummaryReport {...createProps({ metrics: createFourMetrics() })} />;
+  return <TableSummary {...createProps({ metrics: createFourMetrics() })} />;
 }
 
 /** Demonstrates applying a report status filter and scrolling to the filtered table. */
@@ -46,7 +46,7 @@ export function FiltersTableAndScrolls() {
 
   return (
     <div css={Css.df.fdc.gap4.$}>
-      <TableSummaryReport
+      <TableSummary
         {...createProps({
           activeMetricValues,
           onMetricClick: (value) =>
@@ -59,14 +59,14 @@ export function FiltersTableAndScrolls() {
           onStatusClick: () => applyFilter(["missing", "incomplete", "warnings"]),
         })}
       />
-      <div id="tableSummaryReportStoryTable">
+      <div id="tableSummaryStoryTable">
         <GridTable columns={columns} rows={[simpleHeader, ...filteredRows]} />
       </div>
     </div>
   );
 }
 
-function createProps(overrides: Partial<TableSummaryReportProps<string>> = {}): TableSummaryReportProps<string> {
+function createProps(overrides: Partial<TableSummaryProps<string>> = {}): TableSummaryProps<string> {
   const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",
@@ -121,5 +121,5 @@ function createRows(status: string, label: string, count: number): CoverageDataR
 }
 
 function scrollTableIntoView() {
-  document.getElementById("tableSummaryReportStoryTable")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("tableSummaryStoryTable")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
