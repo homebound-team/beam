@@ -19,10 +19,7 @@ export function Loader({ size = "lg" }: LoaderProps) {
           .bw(`${borderSize}px`)
           .add("borderTopColor", spinnerColor)
           .add("textIndent", "-999px")
-          .add("animationName", "spin")
-          .add("animationDuration", "800ms")
-          .add("animationIterationCount", "infinite")
-          .add("animationTimingFunction", "linear")
+          .spin("800ms linear infinite")
           .add("transform", "translateZ(0)").$
       }
     />
