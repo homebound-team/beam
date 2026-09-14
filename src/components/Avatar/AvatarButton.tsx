@@ -95,7 +95,7 @@ export function AvatarButton(props: AvatarButtonProps) {
 }
 
 const resetStyles = Css.br100.cursorPointer.outline0.relative.$;
-export const hoverStyles = Css.boxShadow(`0 0 4px var(${Tokens.OnSurface})`).$;
+export const hoverStyles = Css.boxShadow(`0 0 4px ${Tokens.OnSurface}`).$;
 const focusStyles = Css.bshFocus.$;
 const disabledStyles = Css.cursorNotAllowed.$;
 export const pressedOverlayCss = Css.br100

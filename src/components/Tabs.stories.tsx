@@ -65,8 +65,8 @@ export function TabsWithIconAndMargin() {
 }
 
 export function TabsWithEndAdornment() {
-  const redCircle = <div css={Css.br8.bgRed400.wPx(16).hPx(16).$} />;
-  const greenCircle = <div css={Css.br8.bgGreen400.wPx(16).hPx(16).$} />;
+  const redCircle = <div css={Css.br8.bgRed400.sqPx(16).$} />;
+  const greenCircle = <div css={Css.br8.bgGreen400.sqPx(16).$} />;
   const tabsWithAdornment: TabWithContent<TabValue>[] = [
     { name: "Tab 1", value: "tab1", endAdornment: redCircle, render: () => <TestTabContent content="Tab 1 Content" /> },
     {

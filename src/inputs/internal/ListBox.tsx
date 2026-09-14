@@ -21,6 +21,8 @@ type ListBoxProps<O, V extends AriaKey> = {
   loading?: boolean | (() => JSX.Element);
   disabledOptionsWithReasons?: Record<string, string | undefined>;
   isTree?: boolean;
+  /** Hides the selected-value ToggleChips above the options list. */
+  hideChips?: boolean;
 };
 
 /** A ListBox is an internal component used by SelectField and MultiSelectField to display the list of options */
@@ -36,6 +38,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     loading,
     disabledOptionsWithReasons = {},
     isTree,
+    hideChips = false,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
   const positionMaxHeight = positionProps.style?.maxHeight;
@@ -108,7 +111,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
       ref={listBoxRef}
       {...listBoxProps}
     >
-      {isMultiSelect && selectedOptions.length > 0 && (
+      {isMultiSelect && !hideChips && selectedOptions.length > 0 && (
         <ul
           css={Css.listReset.pt2.pl2.pb1.pr1.df.bb.bc(Tokens.SurfaceSeparator).add("flexWrap", "wrap").maxh("50%").oa.$}
           ref={selectedList}

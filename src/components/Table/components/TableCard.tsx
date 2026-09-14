@@ -246,8 +246,7 @@ function Thumbnail(props: ThumbnailProps) {
         css={
           // The opaque swatch covers the link's own background, so the pressed state tints it with an `::after` on top.
           Css.relative.db.fs0
-            .hPx(32)
-            .wPx(32)
+            .sqPx(32)
             .br8.ba.bcGray300.bgWhite.outline(0)
             .onHover.bshHover.end.onFocusVisible.bshFocus.end.onActive.bcBlue600.element("::after")
             .contentEmpty.absolute.top0.left0.w100.h100.br8.bgBlue600.o(0.28)

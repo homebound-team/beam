@@ -5,7 +5,7 @@ import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
-import { useRightPane } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { Css } from "src/Css";
 import {
@@ -151,15 +151,17 @@ type GridTableLayoutRow = GridTableLayoutHeaderRow | GridTableLayoutParentRow | 
 export function GridTableLayoutExample({
   storageKey,
   withRightPane = false,
+  numNestedRows = 20,
 }: {
   storageKey: string;
   /** When true, row clicks open a document-scroll right pane (desktop split / mobile full-bleed). */
   withRightPane?: boolean;
+  numNestedRows?: number;
 }) {
   const filterDefs = useMemo(() => createGridTableLayoutFilterDefs(), []);
   const columns = useMemo(() => createGridTableLayoutColumns(), []);
-  const rows = useMemo(() => [simpleHeader, ...createGridTableLayoutNestedRows(20)], []);
-  const { openRightPane } = useRightPane();
+  const rows = useMemo(() => [simpleHeader, ...createGridTableLayoutNestedRows(numNestedRows)], [numNestedRows]);
+  const { openRightPane } = useRightPaneActions();
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -336,7 +338,7 @@ function createGridTableLayoutNestedRows(repeat: number = 1): GridDataRow<GridTa
 }
 
 function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
-  const { closeRightPane } = useRightPane();
+  const { closeRightPane } = useRightPaneActions();
   return (
     <div css={Css.df.fdc.h100.$}>
       <div css={Css.df.aic.jcsb.gap1.p2.bb.bc(Tokens.SurfaceSeparator).$}>

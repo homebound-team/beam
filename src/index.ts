@@ -52,10 +52,11 @@ export * from "./components/Layout/FullBleed";
 export * from "./components/Layout/GridTableLayout/GridTableLayout";
 export * from "./components/Layout/layoutTypes";
 export * from "./components/Layout/PreventBrowserScroll";
-export * from "./components/Layout/RightPaneLayout/DocumentScrollRightPaneLayout";
-export * from "./components/Layout/RightPaneLayout/RightPaneContext";
+export * from "./components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 export * from "./components/Layout/RightPaneLayout/RightPaneLayout";
+export * from "./components/Layout/RightPaneLayout/rightPaneStore";
 export * from "./components/Layout/RightPaneLayout/useRightPane";
+export * from "./components/Layout/RightPaneLayout/withRightPane";
 export * from "./components/Layout/ScrollableContent";
 export * from "./components/Layout/ScrollableFooter";
 export * from "./components/Layout/ScrollableParent";
@@ -243,7 +244,7 @@ export {
   documentScrollContentLeft,
   documentScrollContentWidth,
   documentScrollRightPaneHeight,
-  documentScrollRightPaneWidth,
+  documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
   stickyNavAndHeaderOffset,
@@ -281,6 +282,8 @@ export * from "./forms/BoundToggleChipGroupField";
 export * from "./forms/BoundTreeSelectField";
 export * from "./forms/FormHeading";
 export * from "./forms/FormLines";
+export * from "./forms/SelectedOptionPill";
+export * from "./forms/SelectedOptionPillList";
 export * from "./forms/StaticField";
 export * from "./forms/SubmitButton";
 export { FormSection } from "./forms/FormSection/FormSection";

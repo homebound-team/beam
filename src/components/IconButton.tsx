@@ -151,20 +151,20 @@ const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.
 const iconButtonStylesDisabled = Css.cursorNotAllowed.bgColor(Tokens.SurfaceDisabled).$;
 const variantStyles = {
   default: {
-    base: Css.hPx(28).wPx(28).br8.bw2.$,
+    base: Css.sqPx(28).br8.bw2.$,
     hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
     focus: Css.bc(Tokens.FieldBorderFocus).$,
     pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
   },
   compact: {
-    base: Css.hPx(18).wPx(18).br4.bw1.$,
+    base: Css.sqPx(18).br4.bw1.$,
     hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
     focus: Css.bc(Tokens.FieldBorderFocus).$,
     pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
   },
   circle: {
     // Blue100/200 hover fills have no semantic tokens — keep palette for those.
-    base: Css.br100.wPx(48).hPx(48).bc(Tokens.FieldBorderDefault).ba.bw1.df.jcc.aic.$,
+    base: Css.br100.sqPx(48).bc(Tokens.FieldBorderDefault).ba.bw1.df.jcc.aic.$,
     hover: Css.bgBlue100.bcBlue200.$,
     focus: Css.bgBlue100.bc(Tokens.FieldBorderFocus).$,
     pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,

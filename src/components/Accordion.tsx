@@ -111,7 +111,7 @@ export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps
           .br8.onHover.bgColor(Tokens.NeutralFillPressed).$),
       ...(compact && !!titleOnClick && Css.br0.$),
       ...(disabled && Css.color(Tokens.TextDisabled).$),
-      ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px var(${Tokens.FocusRingInset})`).$),
+      ...(isFocusVisible && Css.boxShadow(`inset 0 0 0 2px ${Tokens.FocusRingInset}`).$),
       ...xss,
     }),
     [compact, disabled, isFocusVisible, titleOnClick, xss],

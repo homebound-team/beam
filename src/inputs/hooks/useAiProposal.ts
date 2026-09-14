@@ -24,6 +24,10 @@ export type UseAiProposalResult<V> = {
  *
  * Both are driven by events rather than by watching `value`, because a user rejecting a proposal by
  * re-entering the on-record value produces no change to `value` at all — there is nothing to observe.
+ *
+ * A proposal that matches what is already on record has no original worth striking through, so we
+ * skip it. That is how creation flows arrive: the entity is created from the agent's own values, so
+ * `value` already equals the proposal by the time the user reviews it.
  */
 export function useAiProposal<V>(
   value: V | undefined,
@@ -43,12 +47,17 @@ export function useAiProposal<V>(
   const hasProposal = proposedValue !== undefined;
   const isAiMode = hasProposal && !hasTyped;
 
+  // Compared as display text, so each field's own formatting decides what counts as "the same",
+  // i.e. two `PlainDate`s or two option lists that read identically.
+  const proposedText = hasProposal ? format(proposedValue as V) : undefined;
+  const originalText = originalValue.current !== undefined ? format(originalValue.current) : undefined;
+  const isUnchanged = originalText === proposedText;
+
   return {
     effectiveValue: isAiMode ? proposedValue : value,
     proposalProps: {
-      proposedValue: isAiMode ? format(proposedValue as V) : undefined,
-      originalValue:
-        hasProposal && !isReviewed && originalValue.current !== undefined ? format(originalValue.current) : undefined,
+      proposedValue: isAiMode ? proposedText : undefined,
+      originalValue: hasProposal && !isReviewed && !isUnchanged ? originalText : undefined,
       onUserEdit,
       onUserBlur,
     },

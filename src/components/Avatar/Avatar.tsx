@@ -17,7 +17,7 @@ export function Avatar({ src, name, size = "md", showName = false, preventToolti
   const px = sizeToPixel[size];
   const [showFallback, setShowFallback] = useState(src === undefined);
   // Define min-width as well as width to prevent the image from shrinking when displayed within a flex-child that allows shrinking.
-  const styles = Css.br100.wPx(px).hPx(px).mwPx(px).oh.$;
+  const styles = Css.br100.sqPx(px).mwPx(px).oh.$;
 
   const img = showFallback ? (
     <div

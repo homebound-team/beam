@@ -179,9 +179,7 @@ const variantStyles: Record<
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
     pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.OnSurface).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
-    focusStyles: Css.boxShadow(
-      `0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px var(${Tokens.FocusRingMuted})`,
-    ).$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Tokens.FocusRingInset}, 0px 0px 0px 4px ${Tokens.FocusRingMuted}`).$,
   },
 
   tertiary: {
@@ -197,8 +195,7 @@ const variantStyles: Record<
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
     pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.DangerPressed).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
-    focusStyles: Css.boxShadow(`0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px var(${Tokens.Danger})`)
-      .$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Tokens.FocusRingInset}, 0px 0px 0px 4px ${Tokens.Danger}`).$,
   },
 
   danger: {
@@ -215,9 +212,7 @@ const variantStyles: Record<
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
     pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.OnSurface).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
-    focusStyles: Css.boxShadow(
-      `0px 0px 0px 2px var(${Tokens.FocusRingInset}), 0px 0px 0px 4px var(${Tokens.FocusRingMuted})`,
-    ).$,
+    focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Tokens.FocusRingInset}, 0px 0px 0px 4px ${Tokens.FocusRingMuted}`).$,
   },
 
   caution: {

@@ -50,6 +50,8 @@ type ComboBoxInputProps<O, V extends Value> = {
   isTree?: boolean;
   /* Allows input to wrap to multiple lines */
   multiline?: boolean;
+  /** Hides selected-value chips and the selection count badge. */
+  hideChips?: boolean;
 } & PresentationFieldProps &
   Pick<TextFieldBaseProps<any>, "proposedValue" | "originalValue" | "onUserEdit" | "onUserBlur">;
 
@@ -75,6 +77,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
     inputRef,
     inputWrapRef,
     multiline = false,
+    hideChips = false,
     ...otherProps
   } = props;
 
@@ -87,7 +90,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   const [isFocused, setIsFocused] = useState(false);
   const isMultiSelect = state.selectionManager.selectionMode === "multiple";
   // Show selections as chips when using multiselect when unfocused
-  const showChipSelection = isMultiSelect && state.selectionManager.selectedKeys.size > 0;
+  const showChipSelection = !hideChips && isMultiSelect && state.selectionManager.selectedKeys.size > 0;
   // For MultiSelect only show the `fieldDecoration` when input is not in focus.
   const showFieldDecoration =
     (!isMultiSelect || (isMultiSelect && !isFocused)) && fieldDecoration && selectedOptions.length === 1;
@@ -96,7 +99,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
 
   const chipLabels = isTree ? selectedOptionsLabels || [] : selectedOptions.map((o) => getOptionLabel(o));
   const selectedChipCount = chipLabels.length;
-  const showNumSelection = isMultiSelect && selectedChipCount > 1;
+  const showNumSelection = !hideChips && isMultiSelect && selectedChipCount > 1;
 
   useGrowingTextField({
     // This says: When using a multiselect, then only enable the growing textfield when we are focused on it.
@@ -239,7 +242,10 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
               ? Math.min(
                   String(
                     inputProps.value ||
-                      (isMultiSelect && selectedOptions.length === 1 && getOptionLabel(selectedOptions[0])) ||
+                      (!hideChips &&
+                        isMultiSelect &&
+                        selectedOptions.length === 1 &&
+                        getOptionLabel(selectedOptions[0])) ||
                       nothingSelectedText ||
                       "",
                   ).length || 1,

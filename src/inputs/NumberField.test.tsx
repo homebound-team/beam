@@ -418,6 +418,14 @@ describe("AI mode", () => {
     expect(r.query.age_originalValue).not.toBeInTheDocument();
   });
 
+  it("omits the original when the field's formatting renders both the same", async () => {
+    // The cents are distinct values that both round to $10.00, and it's the display text the user compares
+    const r = await render(<TestNumberField label="Price" type="cents" value={1000.4} proposedValue={1000.1} />);
+    expect(r.price).toHaveValue("$10.00");
+    expect(r.price).toHaveAttribute("data-ai-mode", "true");
+    expect(r.query.price_originalValue).not.toBeInTheDocument();
+  });
+
   it("commits on edit and drops the AI treatment", async () => {
     const r = await render(<TestNumberField label="Age" value={20} proposedValue={25} />);
     type(r.age, "30");

@@ -407,7 +407,7 @@ export function NoRowsFallback() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
   return (
-    <div css={Css.wPx(500).hPx(500).$}>
+    <div css={Css.sqPx(500).$}>
       <GridTable
         columns={[nameColumn, valueColumn]}
         as={"virtual"}
@@ -1417,7 +1417,7 @@ export function StickyColumnsAndHeader() {
   }, []);
 
   return (
-    <div ref={scrollWrap} css={Css.wPx(500).hPx(500).oa.$}>
+    <div ref={scrollWrap} css={Css.sqPx(500).oa.$}>
       <GridTable
         columns={[
           nameColumn,
@@ -1469,7 +1469,7 @@ export function StickyColumnsAndHeaderVirtualized() {
   });
 
   return (
-    <div css={Css.wPx(500).hPx(500).$}>
+    <div css={Css.sqPx(500).$}>
       <GridTable
         columns={[
           nameColumn,

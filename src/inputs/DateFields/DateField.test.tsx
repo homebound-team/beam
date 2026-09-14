@@ -102,6 +102,16 @@ describe("DateField", () => {
       expect(r.query.date_originalValue).not.toBeInTheDocument();
     });
 
+    it("omits the original when the proposal is the same date", async () => {
+      // A separate instance, because a `PlainDate` equal to the original is never `===` to it — the
+      // formatted comparison is the only thing that can see they are the same day
+      const alsoJan2 = new Temporal.PlainDate(2020, 1, 2);
+      const r = await render(<DateField value={jan2} proposedValue={alsoJan2} label="Date" onChange={noop} />);
+      expect(r.date).toHaveValue("01/02/20");
+      expect(r.date).toHaveAttribute("data-ai-mode", "true");
+      expect(r.query.date_originalValue).not.toBeInTheDocument();
+    });
+
     it("ends AI mode when a date is picked from the calendar", async () => {
       // The picker never touches the input, so this path needs its own hook into AI mode
       const r = await render(<TestDateField value={jan2} proposedValue={jan29} />);

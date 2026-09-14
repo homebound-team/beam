@@ -1,5 +1,6 @@
 import { cleanup } from "@testing-library/react";
 import { configure } from "mobx";
+import { resetRightPaneStore } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import { resetWindowScroll } from "src/tests/documentScroll";
 import "src/tests/elementInternals";
 import "src/tests/matchers";
@@ -17,6 +18,7 @@ beforeEach(() => {
   // Reset to a desktop viewport so a viewport set in one test can't leak into the next.
   resetViewport();
   resetWindowScroll();
+  resetRightPaneStore();
   vi.restoreAllMocks();
 });
 afterEach(() => vi.useRealTimers());
