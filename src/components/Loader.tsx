@@ -13,8 +13,7 @@ export function Loader({ size = "lg" }: LoaderProps) {
       aria-label="Loading"
       css={
         Css.br100.ba
-          .hPx(dimensions)
-          .wPx(dimensions)
+          .sqPx(dimensions)
           .bc(bgColor)
           .bw(`${borderSize}px`)
           .add("borderTopColor", spinnerColor)
