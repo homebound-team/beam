@@ -26,7 +26,6 @@ export type TableSummaryProps<V extends string | number> = {
   onStatusClick?: VoidFunction;
   statusDisabled?: boolean;
   footer?: ReactNode;
-  "data-testid"?: string;
 };
 
 export function TableSummary<V extends string | number>(props: TableSummaryProps<V>) {
@@ -43,17 +42,15 @@ export function TableSummary<V extends string | number>(props: TableSummaryProps
   } = props;
   const { sm: isMobile } = useBreakpoint();
   const tid = useTestIds(props, "tableSummary");
-  const visibleMetrics = metrics.slice(0, 4);
 
   return (
-    <section css={Css.df.fdc.bgColor(Tokens.Surface).br12.oh.bshBasic.$} {...tid}>
+    <section css={Css.df.fdc.bgColor(Tokens.Surface).br12.bshBasic.$} {...tid}>
       <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.FieldBorderDefault).$}>
         <div css={Css.mdSb.mw0.py1.$}>{title}</div>
-        {visibleMetrics.length > 0 && statusLabel != null && onStatusClick && (
+        {metrics.length > 0 && statusLabel != null && onStatusClick && (
           <Button
             label={isMobile ? statusMobileLabel : statusLabel}
             variant="tertiary"
-            icon={null}
             endAdornment={<Icon icon="arrowRight" />}
             onClick={onStatusClick}
             disabled={statusDisabled}
@@ -61,24 +58,22 @@ export function TableSummary<V extends string | number>(props: TableSummaryProps
           />
         )}
       </header>
-      {visibleMetrics.length > 0 && (
+      {metrics.length > 0 && (
         <div css={Css.df.fdr.if(isMobile).fdc.$} {...tid.metrics}>
-          {visibleMetrics.map((metric, index) => (
+          {metrics.map((metric, index) => (
             <MetricButton
               key={String(metric.value)}
               metric={metric}
               active={activeMetricValues.includes(metric.value)}
               onClick={onMetricClick}
-              divider={index < visibleMetrics.length - 1}
+              divider={index < metrics.length - 1}
               mobile={isMobile}
               {...tid[`metric_${String(metric.value)}`]}
             />
           ))}
         </div>
       )}
-      {footer !== undefined && (
-        <div css={Css.if(visibleMetrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>
-      )}
+      {footer !== undefined && <div css={Css.if(metrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>}
     </section>
   );
 }
@@ -89,7 +84,6 @@ type MetricButtonProps<V extends string | number> = {
   onClick: ((value: V) => void) | undefined;
   divider: boolean;
   mobile: boolean;
-  "data-testid"?: string;
 };
 
 function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
@@ -107,7 +101,7 @@ function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
     <button
       ref={ref}
       css={{
-        ...Css.bn.outline0.df.flexGrow(1).aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
+        ...Css.df.fg1.aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
         ...Css.if(divider && mobile).bb.bc(Tokens.FieldBorderDefault).$,
         ...Css.if(divider && !mobile).br.bc(Tokens.FieldBorderDefault).$,
         ...(isHovered && !metric.disabled ? Css.bgColor(Tokens.NeutralFillHoverSubtle).$ : {}),

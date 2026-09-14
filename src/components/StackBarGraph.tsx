@@ -6,7 +6,6 @@ export type StackBarGraphProps = {
   title: ReactNode;
   totalLabel: ReactNode;
   segments: readonly StackBarGraphSegment[];
-  "data-testid"?: string;
 };
 
 /** Horizontal stacked bar with a legend. Compose into `TableSummary` via `footer`, or use standalone. */
@@ -29,8 +28,8 @@ export function StackBarGraph(props: StackBarGraphProps) {
           <div
             key={segment.label}
             css={
-              Css.flexGrow(Math.max(0, segment.count))
-                .add("minWidth", segment.count > 0 ? "1px" : 0)
+              Css.w(`${segmentWidth(segment.count, totalCount)}%`)
+                .fs0.add("minWidth", segment.count > 0 ? "1px" : 0)
                 .bgColor(statusColors[segment.status]).$
             }
           />
@@ -60,6 +59,10 @@ export type StackBarGraphSegment = {
 
 function percentage(count: number, total: number): number {
   return total === 0 ? 0 : Math.round((Math.max(0, count) / total) * 100);
+}
+
+function segmentWidth(count: number, total: number): number {
+  return total === 0 ? 0 : (Math.max(0, count) / total) * 100;
 }
 
 const statusColors: Record<StackBarGraphStatus, Palette> = {

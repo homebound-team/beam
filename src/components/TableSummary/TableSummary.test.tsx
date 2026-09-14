@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react";
 import { StackBarGraph, type StackBarGraphSegment } from "src/components/StackBarGraph";
-import { TableSummary, type TableSummaryProps } from "src/components/TableSummary";
+import { TableSummary, type TableSummaryProps } from "src/components/TableSummary/TableSummary";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -14,7 +14,7 @@ describe("TableSummary", () => {
     expect(r.query.tableSummary_statusAction).toBeNull();
   });
 
-  it("shows no more than four status metrics", async () => {
+  it("renders all provided status metrics", async () => {
     // Given a report with five metrics
     const r = await render(
       <TableSummary
@@ -29,10 +29,10 @@ describe("TableSummary", () => {
         })}
       />,
     );
-    // Then only the first four are rendered
+    // Then all five are rendered
     expect(r.tableSummary_metric_one).toBeInTheDocument();
     expect(r.tableSummary_metric_four).toBeInTheDocument();
-    expect(r.query.tableSummary_metric_five).toBeNull();
+    expect(r.tableSummary_metric_five).toBeInTheDocument();
   });
 
   it("reports metric and status action clicks to its parent", async () => {

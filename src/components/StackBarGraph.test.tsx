@@ -31,9 +31,9 @@ describe("StackBarGraph", () => {
         ]}
       />,
     );
-    // Then the bar uses counts as flex proportions
-    expect(r.stackBarGraph_bar.children[0]).toHaveStyle({ flexGrow: "3" });
-    expect(r.stackBarGraph_bar.children[1]).toHaveStyle({ flexGrow: "1" });
+    // Then the bar sizes segments by percentage width
+    expect(r.stackBarGraph_bar.children[0]).toHaveStyle({ width: "75%" });
+    expect(r.stackBarGraph_bar.children[1]).toHaveStyle({ width: "25%" });
   });
 
   it("renders a caller-provided title", async () => {

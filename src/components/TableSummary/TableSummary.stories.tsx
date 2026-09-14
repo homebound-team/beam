@@ -4,7 +4,7 @@ import { StackBarGraph, type StackBarGraphSegment } from "src/components/StackBa
 import { GridTable } from "src/components/Table/GridTable";
 import type { GridColumn } from "src/components/Table/types";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { TableSummary, type TableSummaryProps } from "src/components/TableSummary";
+import { TableSummary, type TableSummaryProps } from "src/components/TableSummary/TableSummary";
 import { Css } from "src/Css";
 import { newStory, viewportModes } from "src/utils/sb";
 
