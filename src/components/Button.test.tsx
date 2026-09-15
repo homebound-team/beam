@@ -1,4 +1,5 @@
 import { Button } from "src/components/Button";
+import { Palette } from "src/Css";
 import { noop } from "src/utils/helpers";
 import { click, render, wait } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
@@ -133,5 +134,31 @@ describe("Button", () => {
 
     expect(r.button).not.toBeDisabled();
     expect(r.button).toHaveTextContent("Button");
+  });
+
+  it("applies colorScheme fill and border on secondary", async () => {
+    // Given secondary buttons with each colorScheme
+    // When rendered
+    const r = await render(
+      <>
+        <Button label="Neutral" variant="secondary" colorScheme="neutral" onClick={noop} />
+        <Button label="Info" variant="secondary" colorScheme="info" onClick={noop} />
+        <Button label="Success" variant="secondary" colorScheme="success" onClick={noop} />
+      </>,
+    );
+
+    // Then each applies its tinted fill and border pair
+    expect(r.neutral).toHaveStyle({ backgroundColor: Palette.Gray100, borderColor: Palette.Gray600 });
+    expect(r.info).toHaveStyle({ backgroundColor: Palette.Blue50, borderColor: Palette.Blue600 });
+    expect(r.success).toHaveStyle({ backgroundColor: Palette.Green50, borderColor: Palette.Green600 });
+  });
+
+  it("ignores colorScheme when variant is not secondary", async () => {
+    // Given a primary button with a colorScheme
+    // When rendered
+    const r = await render(<Button label="Primary" variant="primary" colorScheme="success" onClick={noop} />);
+
+    // Then the scheme fill is not applied
+    expect(r.primary).not.toHaveStyle({ backgroundColor: Palette.Green50 });
   });
 });

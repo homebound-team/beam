@@ -1,5 +1,5 @@
 import type { Node } from "@react-types/shared";
-import { useRef, type JSX, type KeyboardEvent, type MouseEvent } from "react";
+import { useRef, type JSX, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import { useHover, useMenuItem } from "react-aria";
 import { Link, useNavigate } from "react-router-dom";
 import type { TreeState } from "react-stately";
@@ -67,6 +67,7 @@ export function MenuItemImpl(props: MenuItemProps) {
     ref,
   );
 
+  const itemTid = useTestIds(tid[defaultTestId(menuItem?.label ?? "item")]);
   if (!menuItem) {
     return null;
   }
@@ -94,35 +95,41 @@ export function MenuItemImpl(props: MenuItemProps) {
         ...(destructive ? Css.color(Tokens.Danger).$ : {}),
         ...(isSelected ? Css.fw5.$ : {}),
       }}
-      {...tid[defaultTestId(menuItem.label)]}
+      {...itemTid}
     >
       {maybeTooltip({
         title: resolveTooltip(disabled),
         placement: "right",
-        children: renderMenuItem(menuItem, isSelected, isDisabled),
+        children: renderMenuItem(menuItem, isSelected, isDisabled, itemTid),
       })}
     </li>
   );
 }
 
-function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean) {
+function renderMenuItem(menuItem: MenuItem, isSelected: boolean, isDisabled: boolean, itemTid: Record<string, object>) {
+  const showDescription = menuItem.description != null;
+  const body = (
+    <div css={showDescription ? Css.df.fdc.w100.$ : Css.df.aic.$}>
+      {menuItem.ai ? (
+        <AiMenuItem label={menuItem.label} isDisabled={isDisabled} />
+      ) : isIconMenuItem(menuItem) ? (
+        <IconMenuItem {...menuItem} />
+      ) : isImageMenuItem(menuItem) ? (
+        <ImageMenuItem {...menuItem} />
+      ) : (
+        menuItem.label
+      )}
+      {showDescription && (
+        <div css={Css.xs2.$} {...itemTid.description}>
+          {menuItem.description}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div css={Css.df.w100.aic.jcsb.gap2.$}>
-      <div css={Css.df.aic.$}>
-        {maybeWrapInLink(
-          menuItem.onClick,
-          menuItem.ai ? (
-            <AiMenuItem label={menuItem.label} isDisabled={isDisabled} />
-          ) : isIconMenuItem(menuItem) ? (
-            <IconMenuItem {...menuItem} />
-          ) : isImageMenuItem(menuItem) ? (
-            <ImageMenuItem {...menuItem} />
-          ) : (
-            menuItem.label
-          ),
-          isDisabled,
-        )}
-      </div>
+      {maybeWrapInLink(menuItem.onClick, body, isDisabled)}
       {isSelected && <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />}
     </div>
   );
@@ -167,11 +174,7 @@ function IconMenuItem(item: IconMenuItemType) {
   );
 }
 
-function maybeWrapInLink(
-  onClick: MenuItem["onClick"],
-  content: JSX.Element | string,
-  disabled: boolean | undefined,
-): JSX.Element {
+function maybeWrapInLink(onClick: MenuItem["onClick"], content: ReactNode, disabled: boolean | undefined): JSX.Element {
   if (disabled || typeof onClick !== "string") {
     return <>{content}</>;
   }
@@ -184,7 +187,7 @@ function maybeWrapInLink(
       </span>
     </a>
   ) : (
-    <Link className="navLink" css={Css.df.aic.$} to={onClick}>
+    <Link className="navLink" css={Css.df.aic.w100.$} to={onClick}>
       {content}
     </Link>
   );

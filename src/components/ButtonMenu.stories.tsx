@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";
@@ -264,5 +264,72 @@ export function SelectableMenuItems() {
       selectedItem={selectedItem}
       onChange={(key) => setSelectedItem(key)}
     />
+  );
+}
+
+export function CycleTracking() {
+  return (
+    <div css={Css.df.gapPx(48).$}>
+      <ButtonMenu
+        defaultOpen
+        trigger={{ label: "Plan Cycle · Not Started", colorScheme: "neutral" }}
+        header={createCycleHeader({ title: "Plan Cycle" })}
+        items={[{ label: "Start", onClick: action("Start") }]}
+      />
+      <ButtonMenu
+        defaultOpen
+        trigger={{ label: "Plan Cycle · In Progress", colorScheme: "info" }}
+        header={createCycleHeader({ title: "Plan Cycle", meta: "Running: 9d", details: "Started Sep 5, 2026" })}
+        items={[
+          {
+            label: "Mark Complete",
+            onClick: action("Mark Complete"),
+            description: "Records today as the completion date",
+          },
+          {
+            label: "Reset Cycle",
+            onClick: action("Reset Cycle"),
+            description: "Permanently deletes all timestamps",
+            destructive: true,
+          },
+        ]}
+      />
+      <ButtonMenu
+        defaultOpen
+        trigger={{ label: "Plan Cycle · Complete", colorScheme: "success" }}
+        header={createCycleHeader({
+          title: "Plan Cycle",
+          meta: "2 Weeks, 4 days",
+          details: (
+            <>
+              Started August 26, 2026
+              <br />
+              Completed Sep 14, 2026
+            </>
+          ),
+        })}
+        items={[
+          { label: "Reopen", onClick: action("Reopen"), description: "Resumes tracking from original start date." },
+          {
+            label: "Reset Cycle",
+            onClick: action("Reset Cycle"),
+            description: "Permanently deletes all timestamps",
+            destructive: true,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+
+function createCycleHeader({ title, meta, details }: { title: string; meta?: string; details?: ReactNode }) {
+  return (
+    <div css={Css.df.fdc.gapPx(4).$}>
+      <div css={Css.df.aic.gap1.$}>
+        <span css={Css.xsSb.$}>{title}</span>
+        {meta && <span css={Css.xs2.$}>{meta}</span>}
+      </div>
+      {details && <div css={Css.xs2.$}>{details}</div>}
+    </div>
   );
 }

@@ -32,6 +32,8 @@ export type ButtonProps = {
   labelInFlight?: string;
   /** Shows pressed/active styles (useful when a menu is open) */
   active?: boolean;
+  /** Tint fill + border. Only applied when `variant` is `secondary`; ignored otherwise. */
+  colorScheme?: ButtonColorScheme;
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -47,6 +49,7 @@ export function Button(props: ButtonProps) {
     forceFocusStyles = false,
     active = false,
     labelInFlight,
+    colorScheme,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -84,8 +87,8 @@ export function Button(props: ButtonProps) {
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
   const { baseStyles, hoverStyles, disabledStyles, pressedStyles, focusStyles } = useMemo(
-    () => getButtonStyles(variant, size),
-    [variant, size],
+    () => getButtonStyles(variant, size, colorScheme),
+    [variant, size, colorScheme],
   );
 
   const buttonContent = (
@@ -123,8 +126,8 @@ export function Button(props: ButtonProps) {
   });
 }
 
-function getButtonStyles(variant: ButtonVariant, size: ButtonSize) {
-  const styles = variantStyles[variant];
+function getButtonStyles(variant: ButtonVariant, size: ButtonSize, colorScheme?: ButtonColorScheme) {
+  const styles = variant === "secondary" && colorScheme ? colorSchemeStyles[colorScheme] : variantStyles[variant];
   if (variant === "text") {
     // The text variant does not support the 'size'. The `size` prop only effects the button's height and padding which is not relevant for this variant.
     return styles;
@@ -240,6 +243,30 @@ const variantStyles: Record<
   },
 };
 
+const colorSchemeStyles: Record<ButtonColorScheme, (typeof variantStyles)[ButtonVariant]> = {
+  neutral: {
+    baseStyles: Css.bgGray100.bcGray600.bw1.ba.color(Tokens.OnSurface).$,
+    hoverStyles: Css.bgGray200.bcGray700.$,
+    pressedStyles: Css.bgGray300.bcGray800.$,
+    disabledStyles: Css.bgGray100.bcGray400.color(Tokens.TextLinkDisabled).$,
+    focusStyles: Css.bshFocus.$,
+  },
+  info: {
+    baseStyles: Css.bgBlue50.bcBlue600.bw1.ba.color(Tokens.OnSurface).$,
+    hoverStyles: Css.bgBlue100.bcBlue700.$,
+    pressedStyles: Css.bgBlue200.bcBlue800.$,
+    disabledStyles: Css.bgBlue50.bcBlue300.color(Tokens.TextLinkDisabled).$,
+    focusStyles: Css.bshFocus.$,
+  },
+  success: {
+    baseStyles: Css.bgGreen50.bcGreen600.bw1.ba.color(Tokens.OnSurface).$,
+    hoverStyles: Css.bgGreen100.bcGreen700.$,
+    pressedStyles: Css.bgGreen200.bcGreen800.$,
+    disabledStyles: Css.bgGreen50.bcGreen300.color(Tokens.TextLinkDisabled).$,
+    focusStyles: Css.bshFocus.$,
+  },
+};
+
 const sizeStyles: Record<ButtonSize, Properties> = {
   sm: Css.hPx(32).pxPx(12).$,
   md: Css.hPx(40).px2.$,
@@ -253,6 +280,7 @@ const iconStyles: Record<ButtonSize, IconProps["xss"]> = {
 };
 
 export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonColorScheme = "neutral" | "info" | "success";
 export type ButtonVariant =
   | "ai"
   | "primary"
