@@ -1,4 +1,4 @@
-import { useRef, type ReactNode, type RefObject } from "react";
+import { useRef, type ReactNode } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import { Button } from "src/components/Button";
 import { Icon, type IconKey } from "src/components/Icon";
@@ -48,18 +48,20 @@ export function TableSummary<V extends string | number>(props: TableSummaryProps
       <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.FieldBorderDefault).$}>
         <div css={Css.mdSb.mw0.py1.$}>{title}</div>
         {metrics.length > 0 && statusLabel != null && onStatusClick && (
-          <Button
-            label={isMobile ? statusMobileLabel : statusLabel}
-            variant="tertiary"
-            endAdornment={<Icon icon="arrowRight" />}
-            onClick={onStatusClick}
-            disabled={statusDisabled}
-            {...tid.statusAction}
-          />
+          <span css={Css.sm.$}>
+            <Button
+              label={isMobile ? statusMobileLabel : statusLabel}
+              variant="text"
+              endAdornment={<Icon icon="arrowRight" />}
+              onClick={onStatusClick}
+              disabled={statusDisabled}
+              {...tid.statusAction}
+            />
+          </span>
         )}
       </header>
       {metrics.length > 0 && (
-        <div css={Css.df.fdr.if(isMobile).fdc.$} {...tid.metrics}>
+        <div css={Css.df.fdr.ifSm.fdc.$} {...tid.metrics}>
           {metrics.map((metric, index) => (
             <MetricButton
               key={String(metric.value)}
@@ -67,13 +69,12 @@ export function TableSummary<V extends string | number>(props: TableSummaryProps
               active={activeMetricValues.includes(metric.value)}
               onClick={onMetricClick}
               divider={index < metrics.length - 1}
-              mobile={isMobile}
               {...tid[`metric_${String(metric.value)}`]}
             />
           ))}
         </div>
       )}
-      {footer !== undefined && <div css={Css.if(metrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>}
+      {footer && <div css={Css.if(metrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>}
     </section>
   );
 }
@@ -83,15 +84,14 @@ type MetricButtonProps<V extends string | number> = {
   active: boolean;
   onClick: ((value: V) => void) | undefined;
   divider: boolean;
-  mobile: boolean;
 };
 
 function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
-  const { metric, active, onClick, divider, mobile } = props;
-  const ref = useRef<HTMLButtonElement>(null);
-  const { buttonProps, isPressed } = useButton(
+  const { metric, active, onClick, divider } = props;
+  const ref = useRef(null);
+  const { buttonProps } = useButton(
     { onPress: () => onClick?.(metric.value), isDisabled: metric.disabled, "aria-pressed": active },
-    ref as RefObject<HTMLButtonElement>,
+    ref,
   );
   const { hoverProps, isHovered } = useHover({ isDisabled: metric.disabled });
   const { focusProps, isFocusVisible } = useFocusRing();
@@ -101,12 +101,17 @@ function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
     <button
       ref={ref}
       css={{
-        ...Css.df.fg1.aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
-        ...Css.if(divider && mobile).bb.bc(Tokens.FieldBorderDefault).$,
-        ...Css.if(divider && !mobile).br.bc(Tokens.FieldBorderDefault).$,
+        // outline0 drops the UA focus outline (avoids a second ring beside our box-shadow).
+        // relative + z1 paints the focused cell above neighbors so the ring isn't tucked under.
+        ...Css.outline0.relative.df.fg1.aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
+        // Desktop: right divider; small screens: bottom divider (and clear the right edge).
+        ...Css.if(divider)
+          .br.bc(Tokens.FieldBorderDefault)
+          .ifSm.bb.bc(Tokens.FieldBorderDefault)
+          .add("borderRight", "none").$,
         ...(isHovered && !metric.disabled ? Css.bgColor(Tokens.NeutralFillHoverSubtle).$ : {}),
-        ...(isPressed || active ? Css.bgColor(Tokens.NeutralSurfacePressed).$ : {}),
-        ...(isFocusVisible ? Css.bshFocus.$ : {}),
+        // Single blue ring (bshFocus's outer color). FocusRingMuted is near-black — not for these cells.
+        ...(isFocusVisible ? Css.boxShadow(`0px 0px 0px 2px ${Palette.Blue700}`).z1.$ : {}),
         ...(metric.disabled ? Css.cursorNotAllowed.o50.$ : Css.cursorPointer.$),
       }}
       {...mergeProps(buttonProps, hoverProps, focusProps)}
