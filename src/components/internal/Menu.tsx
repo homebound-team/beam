@@ -16,7 +16,7 @@ type MenuProps<T> = {
   persistentItems?: MenuItem[];
   selectedItem: string | undefined;
   onChange: ((key: string) => void) | undefined;
-  /** Non-interactive content above the items. The slot is min 240px so short menus don't hug. */
+  /** Static, non-selectable content above the items — not a menu item. Min 240px so narrow menus don't hug. */
   header?: ReactNode;
 };
 
