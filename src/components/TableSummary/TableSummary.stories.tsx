@@ -55,8 +55,10 @@ export function FiltersTableAndScrolls() {
                 ? activeMetricValues.filter((current) => current !== value)
                 : [...activeMetricValues, value],
             ),
-          statusLabel: "View Items",
-          onStatusClick: () => applyFilter(["missing", "incomplete", "warnings"]),
+          action: {
+            label: "View Items",
+            onClick: () => applyFilter(["missing", "incomplete", "warnings"]),
+          },
         })}
       />
       <div id="tableSummaryStoryTable">
@@ -75,8 +77,7 @@ function createProps(overrides: Partial<TableSummaryProps<string>> = {}): TableS
       { value: "incomplete", label: "Incomplete", count: 9, status: "warning" },
       { value: "warnings", label: "Warnings", count: 3, status: "warning" },
     ],
-    statusLabel: "View Items",
-    onStatusClick: () => {},
+    action: { label: "View Items", onClick: () => {} },
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,
   };

@@ -5,13 +5,13 @@ import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("TableSummary", () => {
-  it("renders the stack bar graph without status controls", async () => {
-    // Given a report without metrics
-    const r = await render(<TableSummary {...createProps({ metrics: [] })} />);
-    // Then it retains the stack bar graph but hides status controls
+  it("renders the footer without controls", async () => {
+    // Given a report without metrics or header action
+    const r = await render(<TableSummary {...createProps({ metrics: [], action: undefined })} />);
+    // Then it retains the footer but hides metrics and the action
     expect(r.stackBarGraph).toBeInTheDocument();
     expect(r.query.tableSummary_metrics).toBeNull();
-    expect(r.query.tableSummary_statusAction).toBeNull();
+    expect(r.query.tableSummary_action).toBeNull();
   });
 
   it("renders all provided status metrics", async () => {
@@ -35,19 +35,19 @@ describe("TableSummary", () => {
     expect(r.tableSummary_metric_five).toBeInTheDocument();
   });
 
-  it("reports metric and status action clicks to its parent", async () => {
+  it("reports metric and action clicks to its parent", async () => {
     const onMetricClick = vi.fn();
-    const onStatusClick = vi.fn();
+    const onActionClick = vi.fn();
     // Given an actionable report
     const r = await render(
-      <TableSummary {...createProps({ onMetricClick, statusLabel: "View Items", onStatusClick })} />,
+      <TableSummary {...createProps({ onMetricClick, action: { label: "View Items", onClick: onActionClick } })} />,
     );
-    // When the user activates a metric and the status action
+    // When the user activates a metric and the header action
     click(r.tableSummary_metric_missing);
-    click(r.tableSummary_statusAction);
+    click(r.tableSummary_action);
     // Then the parent receives each action
     expect(onMetricClick).toHaveBeenCalledWith("missing");
-    expect(onStatusClick).toHaveBeenCalledTimes(1);
+    expect(onActionClick).toHaveBeenCalledTimes(1);
   });
 
   it("does not activate disabled metrics", async () => {
@@ -101,8 +101,7 @@ function createProps(overrides: Partial<TableSummaryProps<string>> = {}): TableS
   return {
     title: "Bid Package Coverage",
     metrics: [{ value: "missing", label: "Missing", count: 4, status: "error" }],
-    statusLabel: "View Items",
-    onStatusClick: () => {},
+    action: { label: "View Items", onClick: () => {} },
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,
   };

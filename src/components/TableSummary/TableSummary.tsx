@@ -16,46 +16,43 @@ export type TableSummaryMetric<V extends string | number> = {
   disabled?: boolean;
 };
 
+/** Optional header text-button CTA (e.g. "View Items"). */
+export type TableSummaryAction = {
+  label: ReactNode;
+  /** Shown below the `sm` breakpoint. Defaults to `"Items"`. */
+  mobileLabel?: ReactNode;
+  onClick: VoidFunction;
+  disabled?: boolean;
+};
+
 export type TableSummaryProps<V extends string | number> = {
   title: ReactNode;
   metrics?: readonly TableSummaryMetric<V>[];
   activeMetricValues?: readonly V[];
   onMetricClick?: (value: V) => void;
-  statusLabel?: ReactNode;
-  statusMobileLabel?: ReactNode;
-  onStatusClick?: VoidFunction;
-  statusDisabled?: boolean;
+  action?: TableSummaryAction;
   footer?: ReactNode;
 };
 
 export function TableSummary<V extends string | number>(props: TableSummaryProps<V>) {
-  const {
-    title,
-    metrics = [],
-    activeMetricValues = [],
-    onMetricClick,
-    statusLabel,
-    statusMobileLabel = "Items",
-    onStatusClick,
-    statusDisabled,
-    footer,
-  } = props;
+  const { title, metrics = [], activeMetricValues = [], onMetricClick, action, footer } = props;
   const { sm: isMobile } = useBreakpoint();
   const tid = useTestIds(props, "tableSummary");
+  const actionMobileLabel = action?.mobileLabel ?? "Items";
 
   return (
     <section css={Css.df.fdc.bgColor(Tokens.Surface).br12.bshBasic.$} {...tid}>
       <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.FieldBorderDefault).$}>
         <div css={Css.mdSb.mw0.py1.$}>{title}</div>
-        {metrics.length > 0 && statusLabel != null && onStatusClick && (
+        {action && (
           <span css={Css.sm.$}>
             <Button
-              label={isMobile ? statusMobileLabel : statusLabel}
+              label={isMobile ? actionMobileLabel : action.label}
               variant="text"
               endAdornment={<Icon icon="arrowRight" />}
-              onClick={onStatusClick}
-              disabled={statusDisabled}
-              {...tid.statusAction}
+              onClick={action.onClick}
+              disabled={action.disabled}
+              {...tid.action}
             />
           </span>
         )}
