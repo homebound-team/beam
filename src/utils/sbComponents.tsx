@@ -359,33 +359,3 @@ function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
     </div>
   );
 }
-
-/** Form sections for composed `FormSectionLayout withRightPane` stories. */
-export function createRightPaneFormSections() {
-  return [
-    { title: "Setup", description: "Basic package details.", fields: <RightPaneStoryPlaceholderFields count={2} /> },
-    { title: "Package Options", fields: <RightPaneStoryPlaceholderFields count={3} /> },
-    { title: "Internal", excludeJumpLink: true, fields: <RightPaneStoryPlaceholderFields count={1} /> },
-  ];
-}
-
-/** Tall centered body for `CenteredLayout withRightPane` stories. */
-export function RightPaneCenteredPlaceholderBody() {
-  return (
-    <div css={Css.df.fdc.gap2.py3.$}>
-      {Array.from({ length: 8 }, (_, i) => (
-        <div key={i} css={Css.hPx(48).br4.bgColor(Tokens.SurfaceSeparator).$} />
-      ))}
-    </div>
-  );
-}
-
-function RightPaneStoryPlaceholderFields({ count }: { count: number }) {
-  return (
-    <div css={Css.df.fdc.gap1.$}>
-      {Array.from({ length: count }, (_, i) => (
-        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
-      ))}
-    </div>
-  );
-}

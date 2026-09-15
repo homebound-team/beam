@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultDocumentScrollRightPaneWidth, resolveWithRightPaneOptions } from "./withRightPane";
 
-describe("resolveWithRightPaneOptions", () => {
+describe("withRightPane", () => {
   it("returns undefined when opted out", () => {
     // Given no / false withRightPane
     // Then both resolve to undefined

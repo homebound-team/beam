@@ -1,5 +1,6 @@
 import { createContext, type CSSProperties, type ReactNode } from "react";
 import { Css } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { beamRightPaneContentMinVar, beamRightPaneWidthVar } from "src/layouts/layoutVars";
 import type { useDocumentScrollRightPaneAnchorRef } from "./useDocumentScrollRightPaneAnchorRef";
 
@@ -10,18 +11,18 @@ export type DocumentScrollRightPaneLayoutRootProps = {
   anchorRef: ReturnType<typeof useDocumentScrollRightPaneAnchorRef>;
   tid: object;
   children: ReactNode;
-  /** `md+` grows the document to fit content + the pane spacer; `sm` stays 100% wide. */
-  expandToMinContent?: boolean;
 };
 
-/** Nested guard, anchor ref, test id, and pane width var for document-scroll right-pane hosts. */
+/** Nested guard, anchor ref, test id, and pane width vars for document-scroll right-pane hosts. */
 export function DocumentScrollRightPaneLayoutRoot(props: DocumentScrollRightPaneLayoutRootProps) {
-  const { anchorRef, tid, children, expandToMinContent = false } = props;
+  const { anchorRef, tid, children } = props;
+  const { sm } = useBreakpoint();
   return (
     <NestedRightPaneLayoutContext.Provider value={true}>
       <div
         ref={anchorRef.setRef}
-        css={expandToMinContent ? Css.wfc.mw100.$ : Css.w100.$}
+        // `md+` grows the document to fit content + the pane spacer; `sm` stays 100% wide.
+        css={sm ? Css.w100.$ : Css.wfc.mw100.$}
         style={{ [beamRightPaneWidthVar]: "0px", [beamRightPaneContentMinVar]: "0px" } as CSSProperties}
         {...tid}
       >

@@ -19,7 +19,7 @@ export type DocumentScrollRightPaneProps = {
   anchorRef?: RefObject<HTMLElement | null>;
 };
 
-/** Detail pane UI: mobile takeover or desktop fixed overlay. */
+/** `sm` full-bleed takeover, or a desktop `position: fixed` pane over the page (content scrolls underneath). */
 export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: DocumentScrollRightPaneProps) {
   const { isRightPaneOpen, clearPane } = useRightPaneOpenState();
   const rightPaneContent = useRightPaneContent();

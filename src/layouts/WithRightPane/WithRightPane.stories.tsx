@@ -12,13 +12,7 @@ import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout"
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { FocusedFormLayout } from "src/layouts/Workflow/FocusedFormLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
-import {
-  createNavbar,
-  createRightPaneFormSections,
-  GridTableLayoutExample,
-  RightPaneCenteredPlaceholderBody,
-  sideNavItems,
-} from "src/utils/sbComponents";
+import { createNavbar, GridTableLayoutExample, sideNavItems } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 
 /** Wait for table/layout measure before opening so column widths can settle. */
@@ -133,4 +127,32 @@ function rightPaneContent(title: string) {
       </RightPanePanel>
     ),
   };
+}
+
+function createRightPaneFormSections() {
+  return [
+    { title: "Setup", description: "Basic package details.", fields: <PlaceholderFields count={2} /> },
+    { title: "Package Options", fields: <PlaceholderFields count={3} /> },
+    { title: "Internal", excludeJumpLink: true, fields: <PlaceholderFields count={1} /> },
+  ];
+}
+
+function RightPaneCenteredPlaceholderBody() {
+  return (
+    <div css={Css.df.fdc.gap2.py3.$}>
+      {Array.from({ length: 8 }, (_, i) => (
+        <div key={i} css={Css.hPx(48).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
+    </div>
+  );
+}
+
+function PlaceholderFields({ count }: { count: number }) {
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
+    </div>
+  );
 }

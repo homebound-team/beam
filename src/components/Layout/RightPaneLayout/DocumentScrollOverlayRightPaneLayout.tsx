@@ -43,7 +43,7 @@ export function DocumentScrollOverlayRightPaneLayout({
   if (nestedInLayout) return <>{children}</>;
 
   return (
-    <DocumentScrollRightPaneLayoutRoot anchorRef={anchorRef} tid={tid} expandToMinContent={!sm}>
+    <DocumentScrollRightPaneLayoutRoot anchorRef={anchorRef} tid={tid}>
       {sm ? (
         <>
           {children}
