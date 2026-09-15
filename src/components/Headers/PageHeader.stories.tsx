@@ -31,6 +31,19 @@ export function WithRightSlot() {
   );
 }
 
+export function WithAutoSave() {
+  return (
+    <PageHeader
+      title="Test Title"
+      withAutoSave
+      actions={[
+        { label: "Upload", variant: "primary", onClick: action("upload") },
+        { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
+      ]}
+    />
+  );
+}
+
 /** Two or more `actions` render as buttons on desktop and collapse into a kebab at `sm`. */
 export const WithActions = newStory(
   () => (

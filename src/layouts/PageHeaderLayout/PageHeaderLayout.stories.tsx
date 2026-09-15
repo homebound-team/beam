@@ -19,7 +19,6 @@ export function Default() {
     </PageHeaderLayout>
   );
 }
-
 function Body() {
   return (
     <div css={{ ...pageContentPaddingX, ...Css.py2.$ }}>

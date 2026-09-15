@@ -77,6 +77,22 @@ describe("PageHeader", () => {
     expect(r.query.verticalDots).toBeNull();
   });
 
+  it("does not render AutoSaveIndicator by default", async () => {
+    // Given a PageHeader without withAutoSave
+    // When rendered
+    const r = await render(<PageHeader title="Documents" />);
+    // Then AutoSaveIndicator is omitted
+    expect(r.query.autoSave).toBeNull();
+  });
+
+  it("renders AutoSaveIndicator in the actions area when withAutoSave is true and actions are omitted", async () => {
+    // Given a PageHeader with withAutoSave and no actions
+    const r = await render(<PageHeader title="Documents" withAutoSave />);
+    // Then the actions slot still renders with AutoSaveIndicator
+    expect(r.header_actions).toBeInTheDocument();
+    expect(r.autoSave).toBeInTheDocument();
+  });
+
   it("still renders rightSlot at sm", async () => {
     // Given a mobile viewport, actions, and a rightSlot
     setViewport("sm");

@@ -14,5 +14,14 @@ describe("PageHeaderLayout", () => {
     // Then the header slot and body slot render
     expect(r.pageHeaderLayout_pageHeader).toHaveTextContent("Page title");
     expect(r.pageHeaderLayout_body).toHaveTextContent("Body content");
+    expect(r.query.autoSave).toBeNull();
+  });
+
+  it("renders AutoSaveIndicator when pageHeader.withAutoSave is true", async () => {
+    // Given a PageHeaderLayout with withAutoSave
+    // When rendered
+    const r = await render(<PageHeaderLayout pageHeader={{ title: "Page title", withAutoSave: true }} />);
+    // Then AutoSaveIndicator is in the page header
+    expect(r.autoSave).toBeInTheDocument();
   });
 });
