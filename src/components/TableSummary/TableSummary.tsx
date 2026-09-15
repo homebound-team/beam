@@ -4,15 +4,16 @@ import { Button } from "src/components/Button";
 import { Icon, type IconKey } from "src/components/Icon";
 import { Css, Palette, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type TableSummaryStatus = "success" | "neutral" | "warning" | "error";
 
-export type TableSummaryMetric<V extends string | number> = {
-  value: V;
+export type TableSummaryMetric = {
   label: string;
   count: number;
   status: Exclude<TableSummaryStatus, "neutral" | "success">;
+  onClick?: VoidFunction;
   disabled?: boolean;
 };
 
@@ -25,17 +26,15 @@ export type TableSummaryAction = {
   disabled?: boolean;
 };
 
-export type TableSummaryProps<V extends string | number> = {
+export type TableSummaryProps = {
   title: ReactNode;
-  metrics?: readonly TableSummaryMetric<V>[];
-  activeMetricValues?: readonly V[];
-  onMetricClick?: (value: V) => void;
+  metrics?: readonly TableSummaryMetric[];
   action?: TableSummaryAction;
   footer?: ReactNode;
 };
 
-export function TableSummary<V extends string | number>(props: TableSummaryProps<V>) {
-  const { title, metrics = [], activeMetricValues = [], onMetricClick, action, footer } = props;
+export function TableSummary(props: TableSummaryProps) {
+  const { title, metrics = [], action, footer } = props;
   const { sm: isMobile } = useBreakpoint();
   const tid = useTestIds(props, "tableSummary");
   const actionMobileLabel = action?.mobileLabel ?? "Items";
@@ -59,16 +58,17 @@ export function TableSummary<V extends string | number>(props: TableSummaryProps
       </header>
       {metrics.length > 0 && (
         <div css={Css.df.fdr.ifSm.fdc.$} {...tid.metrics}>
-          {metrics.map((metric, index) => (
-            <MetricButton
-              key={String(metric.value)}
-              metric={metric}
-              active={activeMetricValues.includes(metric.value)}
-              onClick={onMetricClick}
-              divider={index < metrics.length - 1}
-              {...tid[`metric_${String(metric.value)}`]}
-            />
-          ))}
+          {metrics.map((metric, index) => {
+            const metricId = defaultTestId(metric.label);
+            return (
+              <MetricButton
+                key={metricId}
+                metric={metric}
+                divider={index < metrics.length - 1}
+                {...tid[`metric_${metricId}`]}
+              />
+            );
+          })}
         </div>
       )}
       {footer && <div css={Css.if(metrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>}
@@ -76,20 +76,15 @@ export function TableSummary<V extends string | number>(props: TableSummaryProps
   );
 }
 
-type MetricButtonProps<V extends string | number> = {
-  metric: TableSummaryMetric<V>;
-  active: boolean;
-  onClick: ((value: V) => void) | undefined;
+type MetricButtonProps = {
+  metric: TableSummaryMetric;
   divider: boolean;
 };
 
-function MetricButton<V extends string | number>(props: MetricButtonProps<V>) {
-  const { metric, active, onClick, divider } = props;
+function MetricButton(props: MetricButtonProps) {
+  const { metric, divider } = props;
   const ref = useRef(null);
-  const { buttonProps } = useButton(
-    { onPress: () => onClick?.(metric.value), isDisabled: metric.disabled, "aria-pressed": active },
-    ref,
-  );
+  const { buttonProps } = useButton({ onPress: () => metric.onClick?.(), isDisabled: metric.disabled }, ref);
   const { hoverProps, isHovered } = useHover({ isDisabled: metric.disabled });
   const { focusProps, isFocusVisible } = useFocusRing();
   const tid = useTestIds(props, "metric");
@@ -129,7 +124,7 @@ const statusColors: Record<TableSummaryStatus, Palette> = {
   error: Palette.Red500,
 };
 
-const statusIcons: Record<TableSummaryMetric<string | number>["status"], IconKey> = {
+const statusIcons: Record<TableSummaryMetric["status"], IconKey> = {
   warning: "errorCircle",
   error: "xCircle",
 };

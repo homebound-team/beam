@@ -20,11 +20,11 @@ describe("TableSummary", () => {
       <TableSummary
         {...createProps({
           metrics: [
-            { value: "one", label: "One", count: 1, status: "error" },
-            { value: "two", label: "Two", count: 2, status: "warning" },
-            { value: "three", label: "Three", count: 3, status: "error" },
-            { value: "four", label: "Four", count: 4, status: "warning" },
-            { value: "five", label: "Five", count: 5, status: "error" },
+            { label: "One", count: 1, status: "error" },
+            { label: "Two", count: 2, status: "warning" },
+            { label: "Three", count: 3, status: "error" },
+            { label: "Four", count: 4, status: "warning" },
+            { label: "Five", count: 5, status: "error" },
           ],
         })}
       />,
@@ -40,13 +40,18 @@ describe("TableSummary", () => {
     const onActionClick = vi.fn();
     // Given an actionable report
     const r = await render(
-      <TableSummary {...createProps({ onMetricClick, action: { label: "View Items", onClick: onActionClick } })} />,
+      <TableSummary
+        {...createProps({
+          metrics: [{ label: "Missing", count: 4, status: "error", onClick: onMetricClick }],
+          action: { label: "View Items", onClick: onActionClick },
+        })}
+      />,
     );
     // When the user activates a metric and the header action
     click(r.tableSummary_metric_missing);
     click(r.tableSummary_action);
     // Then the parent receives each action
-    expect(onMetricClick).toHaveBeenCalledWith("missing");
+    expect(onMetricClick).toHaveBeenCalledTimes(1);
     expect(onActionClick).toHaveBeenCalledTimes(1);
   });
 
@@ -56,8 +61,7 @@ describe("TableSummary", () => {
     const r = await render(
       <TableSummary
         {...createProps({
-          onMetricClick,
-          metrics: [{ value: "missing", label: "Missing", count: 4, status: "error", disabled: true }],
+          metrics: [{ label: "Missing", count: 4, status: "error", disabled: true, onClick: onMetricClick }],
         })}
       />,
     );
@@ -68,18 +72,23 @@ describe("TableSummary", () => {
     expect(onMetricClick).not.toHaveBeenCalled();
   });
 
-  it("supports keyboard activation and controlled pressed state", async () => {
+  it("supports keyboard activation", async () => {
     const onMetricClick = vi.fn();
-    // Given a metric marked active by its parent
-    const r = await render(<TableSummary {...createProps({ activeMetricValues: ["missing"], onMetricClick })} />);
+    // Given a focusable metric
+    const r = await render(
+      <TableSummary
+        {...createProps({
+          metrics: [{ label: "Missing", count: 4, status: "error", onClick: onMetricClick }],
+        })}
+      />,
+    );
     // When keyboard activation occurs
     r.tableSummary_metric_missing.focus();
     fireEvent.keyDown(r.tableSummary_metric_missing, { key: "Enter" });
     fireEvent.keyUp(r.tableSummary_metric_missing, { key: "Enter" });
-    // Then it stays focusable, pressed, and notifies the parent
+    // Then it stays focusable and notifies the parent
     expect(r.tableSummary_metric_missing).toHaveFocus();
-    expect(r.tableSummary_metric_missing).toHaveAttribute("aria-pressed", "true");
-    expect(onMetricClick).toHaveBeenCalledWith("missing");
+    expect(onMetricClick).toHaveBeenCalledTimes(1);
   });
 
   it("renders a caller-provided footer", async () => {
@@ -96,11 +105,11 @@ describe("TableSummary", () => {
   });
 });
 
-function createProps(overrides: Partial<TableSummaryProps<string>> = {}): TableSummaryProps<string> {
+function createProps(overrides: Partial<TableSummaryProps> = {}): TableSummaryProps {
   const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",
-    metrics: [{ value: "missing", label: "Missing", count: 4, status: "error" }],
+    metrics: [{ label: "Missing", count: 4, status: "error" }],
     action: { label: "View Items", onClick: () => {} },
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,

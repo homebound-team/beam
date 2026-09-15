@@ -25,36 +25,56 @@ export function NoMetrics() {
 }
 
 export function FourStatuses() {
-  return <TableSummary {...createProps({ metrics: createFourMetrics() })} />;
+  return (
+    <TableSummary
+      {...createProps({
+        metrics: [
+          { label: "Status", count: 4, status: "warning" },
+          { label: "Missing", count: 4, status: "error" },
+          { label: "Incomplete", count: 9, status: "warning" },
+          { label: "Warnings", count: 3, status: "warning" },
+        ],
+      })}
+    />
+  );
 }
 
 /** Demonstrates applying a report status filter and scrolling to the filtered table. */
 export function FiltersTableAndScrolls() {
-  const [activeMetricValues, setActiveMetricValues] = useState<string[]>([]);
+  const [filteredStatuses, setFilteredStatuses] = useState<string[]>([]);
   const rows = useMemo(() => createCoverageRows(), []);
   const filteredRows =
-    activeMetricValues.length === 0 ? rows : rows.filter((row) => activeMetricValues.includes(row.data.status));
+    filteredStatuses.length === 0 ? rows : rows.filter((row) => filteredStatuses.includes(row.data.status));
   const columns: GridColumn<CoverageRow>[] = [
     { header: "Bid Package", data: ({ name }) => name },
     { header: "Status", data: ({ status }) => status },
   ];
 
-  const applyFilter = useCallback((values: string[]) => {
-    setActiveMetricValues(values);
+  const applyFilter = useCallback((statuses: string[]) => {
+    setFilteredStatuses(statuses);
     scrollTableIntoView();
   }, []);
+
+  const toggleStatus = useCallback(
+    (status: string) => {
+      applyFilter(
+        filteredStatuses.includes(status)
+          ? filteredStatuses.filter((current) => current !== status)
+          : [...filteredStatuses, status],
+      );
+    },
+    [applyFilter, filteredStatuses],
+  );
 
   return (
     <div css={Css.df.fdc.gap4.$}>
       <TableSummary
         {...createProps({
-          activeMetricValues,
-          onMetricClick: (value) =>
-            applyFilter(
-              activeMetricValues.includes(value)
-                ? activeMetricValues.filter((current) => current !== value)
-                : [...activeMetricValues, value],
-            ),
+          metrics: [
+            { label: "Missing", count: 4, status: "error", onClick: () => toggleStatus("missing") },
+            { label: "Incomplete", count: 9, status: "warning", onClick: () => toggleStatus("incomplete") },
+            { label: "Warnings", count: 3, status: "warning", onClick: () => toggleStatus("warnings") },
+          ],
           action: {
             label: "View Items",
             onClick: () => applyFilter(["missing", "incomplete", "warnings"]),
@@ -68,28 +88,19 @@ export function FiltersTableAndScrolls() {
   );
 }
 
-function createProps(overrides: Partial<TableSummaryProps<string>> = {}): TableSummaryProps<string> {
+function createProps(overrides: Partial<TableSummaryProps> = {}): TableSummaryProps {
   const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",
     metrics: [
-      { value: "missing", label: "Missing", count: 4, status: "error" },
-      { value: "incomplete", label: "Incomplete", count: 9, status: "warning" },
-      { value: "warnings", label: "Warnings", count: 3, status: "warning" },
+      { label: "Missing", count: 4, status: "error" },
+      { label: "Incomplete", count: 9, status: "warning" },
+      { label: "Warnings", count: 3, status: "warning" },
     ],
     action: { label: "View Items", onClick: () => {} },
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,
   };
-}
-
-function createFourMetrics() {
-  return [
-    { value: "status", label: "Status", count: 4, status: "warning" as const },
-    { value: "missing", label: "Missing", count: 4, status: "error" as const },
-    { value: "incomplete", label: "Incomplete", count: 9, status: "warning" as const },
-    { value: "warnings", label: "Warnings", count: 3, status: "warning" as const },
-  ];
 }
 
 function defaultSegments(): StackBarGraphSegment[] {
