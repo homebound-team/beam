@@ -154,7 +154,7 @@ export function GridTableLayoutExample({
   numNestedRows = 20,
 }: {
   storageKey: string;
-  /** When true, row clicks open a document-scroll right pane (desktop split / mobile full-bleed). */
+  /** When true, row clicks open a document-scroll right pane (desktop overlay / mobile full-bleed). */
   withRightPane?: boolean;
   numNestedRows?: number;
 }) {

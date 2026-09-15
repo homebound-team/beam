@@ -18,6 +18,8 @@ type ButtonMenuBaseProps = {
   items: MenuItem[];
   persistentItems?: MenuItem[];
   searchable?: boolean;
+  /** Static, non-selectable content above the items — not a menu item. Min 240px so narrow menus don't hug. */
+  header?: ReactNode;
   // for storybook purposes
   defaultOpen?: boolean;
 } & Pick<
@@ -34,7 +36,7 @@ type SelectionButtonMenuProps = {
 export type ButtonMenuProps = ButtonMenuBaseProps | SelectionButtonMenuProps;
 
 export function ButtonMenu(props: ButtonMenuProps) {
-  const { defaultOpen, disabled, items, persistentItems, trigger, searchable } = props;
+  const { defaultOpen, disabled, items, persistentItems, trigger, searchable, header } = props;
 
   let selectedItem, onChange;
   if (isSelectionButtonMenuProps(props)) {
@@ -66,6 +68,7 @@ export function ButtonMenu(props: ButtonMenuProps) {
         searchable={searchable}
         selectedItem={selectedItem}
         onChange={onChange}
+        header={header}
         {...tid}
       />
     </OverlayTrigger>
@@ -82,6 +85,8 @@ type MenuItemBase = {
   hasDivider?: boolean;
   /** Shows AiStar and styling on label. This ai icon and styling trumps all other subtypes. */
   ai?: boolean;
+  /** Secondary text shown below the label. */
+  description?: ReactNode;
 };
 
 export type IconMenuItemType = MenuItemBase & {

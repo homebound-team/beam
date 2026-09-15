@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
-import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
+import { type HeaderAction, HeaderActions, splitHeaderActionsOnSm } from "src/components/Headers/HeaderActions";
 import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils/useTestIds";
 
 type ContentHeaderXss = Xss<Padding>;
@@ -11,6 +12,7 @@ export type ContentHeaderLevel = 2 | 3 | 4;
 export type ContentHeaderProps<X = ContentHeaderXss> = {
   title?: string;
   description?: ReactNode;
+  /** Right slot on desktop; `keepVisible` actions move to the bottom slot at `sm`. */
   actions?: HeaderAction[];
   /** When true, prepends `AutoSaveIndicator` in the actions area. */
   withAutoSave?: boolean;
@@ -43,6 +45,9 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
   const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, xss } = props;
   const tid = useTestIds(props, "contentHeader");
+  const { sm } = useBreakpoint();
+  const { bottomSlotActions, rightSlotActions } = splitHeaderActionsOnSm(actions, sm);
+  const showActionsSlot = !!withAutoSave || rightSlotActions.length > 0;
   const { tag: Heading, css: headingCss } = headingByLevel[level];
   const titleCss = aiMode ? { ...headingCss, ...Css.aiBoldText.$ } : headingCss;
 
@@ -75,13 +80,18 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
         ) : (
           descriptionEl
         )}
-        {(withAutoSave || actions) && (
-          <div css={Css.df.gap1.fs0.$} {...tid.actions}>
+        {showActionsSlot && (
+          <div css={Css.df.gap2.fs0.$} {...tid.actions}>
             {withAutoSave && <AutoSaveIndicator />}
-            {actions && <HeaderActions actions={actions} />}
+            {rightSlotActions.length > 0 && <HeaderActions actions={rightSlotActions} />}
           </div>
         )}
       </div>
+      {bottomSlotActions.length > 0 && (
+        <div {...tid.bottomSlot}>
+          <HeaderActions actions={bottomSlotActions} />
+        </div>
+      )}
       {title && descriptionEl}
     </div>
   );

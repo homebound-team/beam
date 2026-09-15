@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import { type PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
+import { type PropsWithChildren, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { type AriaMenuOptions, FocusScope, useFilter, useMenu } from "react-aria";
 import { Item, Section, useTreeData, useTreeState } from "react-stately";
 import type { MenuItem, MenuSection } from "src/components/ButtonMenu";
@@ -16,10 +16,12 @@ type MenuProps<T> = {
   persistentItems?: MenuItem[];
   selectedItem: string | undefined;
   onChange: ((key: string) => void) | undefined;
+  /** Static, non-selectable content above the items — not a menu item. Min 240px so narrow menus don't hug. */
+  header?: ReactNode;
 };
 
 export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
-  const { ariaMenuProps, items, persistentItems, onClose, searchable, selectedItem, onChange } = props;
+  const { ariaMenuProps, items, persistentItems, onClose, searchable, selectedItem, onChange, header } = props;
   // Build out the Menu's Tree data to include the Persistent Action, if any. This is a collection of Nodes that is used
   // by React-Aria to keep track of item states such as focus, and provide hooks for calling those actions.
   const tree = useTreeData({
@@ -91,6 +93,11 @@ export function Menu<T>(props: PropsWithChildren<MenuProps<T>>) {
           Css.df.fdc.myPx(4).outline0.br4.bgColor(Tokens.SurfaceRaised).bshBasic.onHover.bshHover.maxh("inherit").oa.$
         }
       >
+        {header && (
+          <div css={Css.px2.pyPx(12).bb.bc(Tokens.SurfaceSeparator).mwPx(240).$} {...tid.header}>
+            {header}
+          </div>
+        )}
         {searchable && (
           <MenuSearchField
             label=""

@@ -26,12 +26,23 @@ export const beamLayoutContentPaddingXVar = "--beam-layout-content-padding-x";
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
 
 /**
- * Open document-scroll right pane width; `0px` when closed. Published on
+ * Open overlay pane width; `0px` when closed. Published on
  * `DocumentScrollOverlayRightPaneLayout` so sticky right columns (descendants) inherit it.
  * Not subtracted from `documentScrollChromeWidth` — the pane pins below page header /
  * table actions.
  */
 export const beamRightPaneWidthVar = "--beam-right-pane-width";
+
+/**
+ * Content-column min-width while the overlay pane is open; `0px` when closed.
+ * Read on the form shell / table body (not overlay `main`) so JumpLinks sit outside the floor.
+ */
+export const beamRightPaneContentMinVar = "--beam-right-pane-content-min";
+
+/** CSS `min-width` for the form shell or table body; `0px` when the pane is closed. */
+export function documentScrollRightPaneContentMinCss(): string {
+  return `var(${beamRightPaneContentMinVar}, 0px)`;
+}
 
 /**
  * Extra `right` inset for floating page chrome when the document-scroll right pane is open.

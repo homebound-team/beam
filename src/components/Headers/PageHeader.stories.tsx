@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
+import { AutoSaveStatus, AutoSaveStatusContext } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import type { Breadcrumb } from "src/components/Breadcrumbs";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
@@ -31,7 +32,95 @@ export function WithRightSlot() {
   );
 }
 
-/** Two or more `actions` render as buttons on desktop and collapse into a kebab at `sm`. */
+export function AutoSaveSaving() {
+  return (
+    <AutoSaveStatusContext.Provider
+      value={{
+        status: AutoSaveStatus.SAVING,
+        resetStatus() {},
+        errors: [],
+        resolveAutoSave() {},
+        triggerAutoSave() {},
+      }}
+    >
+      <PageHeader
+        title="Test Title"
+        actions={[
+          { label: "Upload", variant: "primary", onClick: action("upload") },
+          { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
+        ]}
+      />
+    </AutoSaveStatusContext.Provider>
+  );
+}
+
+/** `keepVisible` actions stay in the bottom slot at `sm`; the others still collapse into a overflow menu. */
+export const WithKeepVisible = newStory(
+  () => {
+    const [selected, setSelected] = useState(testTabs[0].value);
+    return (
+      <PageHeader
+        title="Bid Packages"
+        breadcrumbs={{
+          breadcrumbs: [
+            { label: "Los Angeles", href: "" },
+            { label: "Altadena", href: "" },
+          ],
+        }}
+        actions={[
+          {
+            kind: "menu",
+            keepVisible: true,
+            trigger: { label: "Plan Cycle · In Progress", variant: "secondary", colorScheme: "info" },
+            items: [
+              { label: "Mark Complete", onClick: action("complete") },
+              { label: "Reset Cycle", onClick: action("reset"), destructive: true },
+            ],
+          },
+          { label: "Upload", variant: "primary", onClick: action("upload") },
+          { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
+        ]}
+        tabs={{
+          tabs: testTabs,
+          selected,
+          onChange: setSelected,
+        }}
+      />
+    );
+  },
+  { parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } } },
+);
+
+/** Same as `WithKeepVisible`, but without tabs — Chromatic should catch missing bottom spacing above the header border. */
+export const WithKeepVisibleNoTabs = newStory(
+  () => (
+    <PageHeader
+      title="Bid Packages"
+      breadcrumbs={{
+        breadcrumbs: [
+          { label: "Los Angeles", href: "" },
+          { label: "Altadena", href: "" },
+        ],
+      }}
+      actions={[
+        {
+          kind: "menu",
+          keepVisible: true,
+          trigger: { label: "Plan Cycle · In Progress", variant: "secondary", colorScheme: "info" },
+          items: [
+            { label: "Mark Complete", onClick: action("complete") },
+            { label: "Reset Cycle", onClick: action("reset"), destructive: true },
+          ],
+        },
+        { label: "Upload", variant: "primary", onClick: action("upload") },
+        { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
+      ]}
+    />
+  ),
+  { parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } } },
+);
+
+/** Two or more `actions` render as buttons on desktop and collapse into a overflow menu at `sm`. */
 export const WithActions = newStory(
   () => (
     <PageHeader

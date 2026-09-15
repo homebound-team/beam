@@ -1,7 +1,15 @@
+import { Button } from "src/components/Button";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { minDocumentScrollContentWidthPx } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
-import { beamLayoutContentPaddingXVar, pageContentPaddingXValue } from "src/layouts/layoutVars";
+import {
+  beamLayoutContentPaddingXVar,
+  beamRightPaneContentMinVar,
+  documentScrollRightPaneContentMinCss,
+  pageContentPaddingXValue,
+} from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
-import { render } from "src/utils/rtl";
+import { clickAndWait, render } from "src/utils/rtl";
 
 describe("CenteredLayout", () => {
   it("caps the lg shell at 1440px and publishes md+ padding", async () => {
@@ -43,4 +51,41 @@ describe("CenteredLayout", () => {
     expect(r.centeredLayout).toHaveTextContent("Form body");
     expect(r.centeredLayout).toHaveStyle({ width: "100%", maxWidth: "768px" });
   });
+
+  it("wraps in DocumentScrollOverlayRightPaneLayout when withRightPane is set", async () => {
+    // Given a centered layout that opts into the right pane
+    const r = await render(
+      <CenteredLayout size="sm" withRightPane>
+        <span>Form body</span>
+      </CenteredLayout>,
+    );
+
+    // Then the document-scroll host wraps the shell
+    expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
+    expect(r.centeredLayout).toHaveTextContent("Form body");
+  });
+
+  it("floors the shell at 480 while the pane is open", async () => {
+    // Given a centered layout that hosts the overlay pane
+    const r = await render(
+      <CenteredLayout size="sm" withRightPane>
+        <OpenPaneButton />
+      </CenteredLayout>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPane);
+
+    // Then the 480 floor is on the shell, not overlay main
+    expect(r.centeredLayout.style.minWidth).toBe(documentScrollRightPaneContentMinCss());
+    expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneContentMinVar)).toBe(
+      `${minDocumentScrollContentWidthPx}px`,
+    );
+    expect(r.documentScrollRightPaneLayout_main).toHaveStyle({ minWidth: "fit-content" });
+  });
 });
+
+function OpenPaneButton() {
+  const { openRightPane } = useRightPaneActions();
+  return <Button label="Open pane" onClick={() => openRightPane({ content: <div>Detail</div> })} />;
+}

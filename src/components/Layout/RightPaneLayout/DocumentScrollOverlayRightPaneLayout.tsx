@@ -1,10 +1,10 @@
-import { type ReactNode, type RefObject, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import {
   beamFloatingRightOffsetVar,
+  beamRightPaneContentMinVar,
   beamRightPaneWidthVar,
-  documentScrollChromeWidth,
   documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
@@ -13,7 +13,7 @@ import { DocumentScrollRightPaneLayoutRoot, NestedRightPaneLayoutContext } from 
 import { useDocumentScrollRightPaneAnchorRef } from "./useDocumentScrollRightPaneAnchorRef";
 import { useRightPaneOpenState } from "./useRightPane";
 import { waitForRightPaneExit } from "./waitForRightPaneExit";
-import { defaultDocumentScrollRightPaneWidth } from "./withRightPane";
+import { defaultDocumentScrollRightPaneWidth, minDocumentScrollContentWidthPx } from "./withRightPane";
 
 export type DocumentScrollOverlayRightPaneLayoutProps = {
   children: ReactNode;
@@ -51,8 +51,10 @@ export function DocumentScrollOverlayRightPaneLayout({
         </>
       ) : (
         <>
-          <div css={Css.df.aifs.mw100.wfc.$}>
-            <div css={Css.fs0.mwfc.w(`min(100%, ${documentScrollChromeWidth()})`).$}>{children}</div>
+          <div css={Css.df.aifs.wfc.mw100.$}>
+            <div css={Css.w100.mwfc.$} {...tid.main}>
+              {children}
+            </div>
             <div ref={spacerRef} aria-hidden css={Css.fs0.fg0.h1.$} style={{ width: 0 }} {...tid.spacer} />
           </div>
           <DocumentScrollOverlayRightPaneHost anchorRef={anchorRef.ref} spacerRef={spacerRef} paneWidth={paneWidth} />
@@ -72,39 +74,42 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
   const { anchorRef, spacerRef, paneWidth } = props;
   const { isRightPaneOpen } = useRightPaneOpenState();
   const paneWidthCss = documentScrollRightPaneWidthCss(paneWidth);
-  const [reserveOverlayChrome, setReserveOverlayChrome] = useState(isRightPaneOpen);
+  const [keepOverlayChrome, setKeepOverlayChrome] = useState(isRightPaneOpen);
 
   // Keep spacer / width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
   useLayoutEffect(() => {
     if (isRightPaneOpen) {
-      setReserveOverlayChrome(true);
+      setKeepOverlayChrome(true);
       return;
     }
-    return waitForRightPaneExit(() => setReserveOverlayChrome(false));
+    return waitForRightPaneExit(() => setKeepOverlayChrome(false));
   }, [isRightPaneOpen]);
 
-  // Imperatively sync scoped pane width, root floating offset, and spacer width while overlay chrome is reserved.
+  // Imperatively sync scoped pane width, content floor, root floating offset, and spacer while the pane is open.
   useLayoutEffect(() => {
     const layoutRoot = anchorRef.current;
     const spacer = spacerRef.current;
     if (!layoutRoot) return;
 
-    const width = reserveOverlayChrome ? paneWidthCss : "0px";
-    layoutRoot.style.setProperty(beamRightPaneWidthVar, width);
+    const openPaneWidth = keepOverlayChrome ? paneWidthCss : "0px";
+    const contentMin = keepOverlayChrome ? `${minDocumentScrollContentWidthPx}px` : "0px";
+    layoutRoot.style.setProperty(beamRightPaneWidthVar, openPaneWidth);
+    layoutRoot.style.setProperty(beamRightPaneContentMinVar, contentMin);
     // Floating right offset helps position elements such as the "scroll to top" button properly when the pane is open.
-    document.documentElement.style.setProperty(beamFloatingRightOffsetVar, width);
+    document.documentElement.style.setProperty(beamFloatingRightOffsetVar, openPaneWidth);
     if (spacer) {
-      spacer.style.width = width;
+      spacer.style.width = openPaneWidth;
     }
 
     return () => {
       layoutRoot.style.setProperty(beamRightPaneWidthVar, "0px");
+      layoutRoot.style.setProperty(beamRightPaneContentMinVar, "0px");
       document.documentElement.style.setProperty(beamFloatingRightOffsetVar, "0px");
       if (spacer) {
         spacer.style.width = "0px";
       }
     };
-  }, [anchorRef, paneWidthCss, reserveOverlayChrome, spacerRef]);
+  }, [anchorRef, keepOverlayChrome, paneWidthCss, spacerRef]);
 
-  return <DocumentScrollRightPane paneWidth={paneWidth} mobile={false} behavior="overlay" anchorRef={anchorRef} />;
+  return <DocumentScrollRightPane paneWidth={paneWidth} mobile={false} anchorRef={anchorRef} />;
 }

@@ -1,7 +1,8 @@
 import type { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
-import { newStory, withBeamDecorator, withRouter } from "src/utils/sb";
+import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { action } from "storybook/actions";
 
 export default {
   component: ContentHeader,
@@ -77,6 +78,29 @@ export function Level4() {
     />
   );
 }
+
+/** `keepVisible` actions stay in the bottom slot at `sm`; other actions stay in the right slot. */
+export const WithKeepVisible = newStory(
+  () => (
+    <ContentHeader
+      title="Trade Partners"
+      description="Assign and manage trade partners for this project."
+      actions={[
+        {
+          kind: "menu",
+          keepVisible: true,
+          trigger: { label: "Plan Cycle · In Progress", variant: "secondary", colorScheme: "info" },
+          items: [
+            { label: "Mark Complete", onClick: action("complete") },
+            { label: "Reset Cycle", onClick: action("reset"), destructive: true },
+          ],
+        },
+        { label: "Add", onClick: () => {} },
+      ]}
+    />
+  ),
+  { parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } }, decorators: [withRouter()] },
+);
 
 /** Overflow / more-actions `ButtonMenu` via `kind: "menu"` (always a `verticalDots` trigger). */
 export const WithOverflowMenu = newStory(
