@@ -34,6 +34,17 @@ export const beamTableActionsHeightVar = "--beam-table-actions-height";
 export const beamRightPaneWidthVar = "--beam-right-pane-width";
 
 /**
+ * Content-column min-width while the overlay pane is open; `0px` when closed.
+ * Read on the form shell / table body (not overlay `main`) so JumpLinks sit outside the floor.
+ */
+export const beamRightPaneContentMinVar = "--beam-right-pane-content-min";
+
+/** CSS `min-width` for the form shell or table body; `0px` when the pane is closed. */
+export function documentScrollRightPaneContentMinCss(): string {
+  return `var(${beamRightPaneContentMinVar}, 0px)`;
+}
+
+/**
  * Extra `right` inset for floating page chrome when the document-scroll right pane is open.
  * Published on `document.documentElement` so siblings outside the pane layout (e.g.
  * `DocumentScrollToTopButton`) can clear the pane. Prefer this over reading

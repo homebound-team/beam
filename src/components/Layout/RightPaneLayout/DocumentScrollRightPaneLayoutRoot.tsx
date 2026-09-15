@@ -1,6 +1,6 @@
 import { createContext, type CSSProperties, type ReactNode } from "react";
 import { Css } from "src/Css";
-import { beamRightPaneWidthVar } from "src/layouts/layoutVars";
+import { beamRightPaneContentMinVar, beamRightPaneWidthVar } from "src/layouts/layoutVars";
 import type { useDocumentScrollRightPaneAnchorRef } from "./useDocumentScrollRightPaneAnchorRef";
 
 /** True when a document-scroll right-pane layout is already mounted above. */
@@ -10,7 +10,7 @@ export type DocumentScrollRightPaneLayoutRootProps = {
   anchorRef: ReturnType<typeof useDocumentScrollRightPaneAnchorRef>;
   tid: object;
   children: ReactNode;
-  /** Tables grow the document with wide content; forms stay leftover-sized. */
+  /** `md+` grows the document to fit content + the pane spacer; `sm` stays 100% wide. */
   expandToMinContent?: boolean;
 };
 
@@ -22,7 +22,7 @@ export function DocumentScrollRightPaneLayoutRoot(props: DocumentScrollRightPane
       <div
         ref={anchorRef.setRef}
         css={expandToMinContent ? Css.wfc.mw100.$ : Css.w100.$}
-        style={{ [beamRightPaneWidthVar]: "0px" } as CSSProperties}
+        style={{ [beamRightPaneWidthVar]: "0px", [beamRightPaneContentMinVar]: "0px" } as CSSProperties}
         {...tid}
       >
         {children}

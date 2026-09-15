@@ -3,7 +3,11 @@ import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/Righ
 import { resolveWithRightPaneOptions, type WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { beamLayoutContentPaddingXVar, pageContentPaddingXValue } from "src/layouts/layoutVars";
+import {
+  beamLayoutContentPaddingXVar,
+  documentScrollRightPaneContentMinCss,
+  pageContentPaddingXValue,
+} from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type CenteredLayoutSize = "sm" | "lg";
@@ -13,7 +17,7 @@ export type CenteredLayoutProps = {
   size: CenteredLayoutSize;
   children?: ReactNode;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`). Default `reserveScroll: "auto"`.
+   * Opt into the document-scroll detail pane (`useRightPane`).
    * Do not also nest another document-scroll right-pane layout (e.g. `FormSectionLayout withRightPane`).
    */
   withRightPane?: WithRightPane;
@@ -24,7 +28,7 @@ export function CenteredLayout(props: CenteredLayoutProps) {
   const { size, children, withRightPane } = props;
   const tid = useTestIds(props, "centeredLayout");
   const { mdAndUp } = useBreakpoint();
-  const rightPane = resolveWithRightPaneOptions(withRightPane, "auto");
+  const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const shell = (
     <div
@@ -33,6 +37,8 @@ export function CenteredLayout(props: CenteredLayoutProps) {
         {
           // layoutContainer descendants (e.g. ContentHeader) read this to inset sticky horizontal chrome within the shell padding.
           [beamLayoutContentPaddingXVar]: mdAndUp ? mdAndUpContentPaddingX : smContentPaddingX,
+          // Floor while an ancestor overlay pane is open (`0px` when closed). `md+` only — phones must not get a dummy scrollbar.
+          ...(mdAndUp ? { minWidth: documentScrollRightPaneContentMinCss() } : undefined),
         } as CSSProperties
       }
       {...tid}
@@ -44,9 +50,7 @@ export function CenteredLayout(props: CenteredLayoutProps) {
   if (!rightPane) return shell;
 
   return (
-    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width} reserveScroll={rightPane.reserveScroll}>
-      {shell}
-    </DocumentScrollOverlayRightPaneLayout>
+    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>{shell}</DocumentScrollOverlayRightPaneLayout>
   );
 }
 

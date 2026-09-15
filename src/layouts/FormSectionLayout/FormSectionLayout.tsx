@@ -37,7 +37,7 @@ export type FormSectionLayoutProps = {
    */
   withJumpLinks?: boolean;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`); default `reserveScroll: "auto"`.
+   * Opt into the document-scroll detail pane (`useRightPane`).
    * Hosts JumpLinks + form — do not also set `withRightPane` on the inner `CenteredLayout`.
    */
   withRightPane?: WithRightPane;
@@ -61,7 +61,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
   } = props;
   const tid = useTestIds(props, "formSectionLayout");
   const { sm: isMobile } = useBreakpoint();
-  const rightPane = resolveWithRightPaneOptions(withRightPane, "auto");
+  const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const jumpLinks = (sections ?? [])
     .filter((section) => !section.excludeJumpLink)
@@ -112,7 +112,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     <div css={Css.df.w100.mb4.$}>
       <JumpLinksRail links={jumpLinks} activeId={activeId} {...tid.jumpLinks} />
       {/* Mirror the rail's width so the form stays centered on the page, as it is without the rail. */}
-      <div css={Css.fg1.mw0.mr(jumpLinksRailReservation).$} {...tid.column}>
+      <div css={Css.fg1.mr(jumpLinksRailReservation).$} {...tid.column}>
         {form}
       </div>
     </div>
@@ -123,8 +123,6 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
   if (!rightPane) return body;
 
   return (
-    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width} reserveScroll={rightPane.reserveScroll}>
-      {body}
-    </DocumentScrollOverlayRightPaneLayout>
+    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>{body}</DocumentScrollOverlayRightPaneLayout>
   );
 }

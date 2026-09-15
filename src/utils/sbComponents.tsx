@@ -1,12 +1,10 @@
 import { type ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
-import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
-import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { Css } from "src/Css";
@@ -362,35 +360,10 @@ function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
   );
 }
 
-/** Placeholder fields plus a control that opens a document-scroll right pane (`RightPanePanel`). */
-export function RightPaneStoryOpenFields({ count = 2 }: { count?: number }) {
-  const { openRightPane } = useRightPaneActions();
-  return (
-    <div css={Css.df.fdc.gap1.$}>
-      {count > 0 && <RightPaneStoryPlaceholderFields count={count} />}
-      <Button
-        label="Open detail pane"
-        onClick={() =>
-          openRightPane({
-            content: (
-              <RightPanePanel title="Package detail">
-                <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
-                  Desktop overlay. Forms use `reserveScroll: "auto"` — when leftover chrome is usable, the form column
-                  is the leftover so the full shell stays visible.
-                </p>
-              </RightPanePanel>
-            ),
-          })
-        }
-      />
-    </div>
-  );
-}
-
-/** Form sections for composed `FormSectionLayout withRightPane` stories — open from Setup. */
+/** Form sections for composed `FormSectionLayout withRightPane` stories. */
 export function createRightPaneFormSections() {
   return [
-    { title: "Setup", description: "Basic package details.", fields: <RightPaneStoryOpenFields /> },
+    { title: "Setup", description: "Basic package details.", fields: <RightPaneStoryPlaceholderFields count={2} /> },
     { title: "Package Options", fields: <RightPaneStoryPlaceholderFields count={3} /> },
     { title: "Internal", excludeJumpLink: true, fields: <RightPaneStoryPlaceholderFields count={1} /> },
   ];
@@ -403,7 +376,6 @@ export function RightPaneCenteredPlaceholderBody() {
       {Array.from({ length: 8 }, (_, i) => (
         <div key={i} css={Css.hPx(48).br4.bgColor(Tokens.SurfaceSeparator).$} />
       ))}
-      <RightPaneStoryOpenFields count={0} />
     </div>
   );
 }
