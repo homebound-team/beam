@@ -95,6 +95,34 @@ export function ContrastVariations() {
 }
 ContrastVariations.globals = { backgrounds: { value: "dark" } };
 
+export function ColorSchemes() {
+  return (
+    <div css={Css.df.fdc.gap3.$}>
+      {(["neutral", "info", "success"] as const).map((colorScheme) => (
+        <div key={colorScheme}>
+          <h2 css={Css.xl.mb1.$}>{colorScheme}</h2>
+          <div css={Css.df.gap2.aic.$}>
+            <Button
+              variant="secondary"
+              colorScheme={colorScheme}
+              label={`${colorScheme} button`}
+              onClick={action("Clicked")}
+            />
+            <Button
+              variant="secondary"
+              colorScheme={colorScheme}
+              disabled
+              label="Disabled"
+              onClick={action("Clicked")}
+            />
+            <Button variant="secondary" colorScheme={colorScheme} active label="Pressed" onClick={action("Clicked")} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ButtonLink() {
   return (
     <div>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { noop } from "src/utils/helpers";
 import { click, render, type, withRouter } from "src/utils/rtl";
 
@@ -235,6 +235,89 @@ describe("ButtonMenu", () => {
     click(r.trigger);
     // Then the menu should be closed
     expect(r.query.trigger_optionA).toBe(null);
+  });
+
+  it("renders a non-interactive header above menu items", async () => {
+    // Given a ButtonMenu with a header
+    const r = await render(
+      <ButtonMenu
+        trigger={{ label: "Trigger" }}
+        header={<div>Plan Cycle</div>}
+        items={[{ label: "Start", onClick: noop }]}
+      />,
+      withRouter(),
+    );
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then the header is shown and is not a menu item
+    expect(r.trigger_header).toHaveTextContent("Plan Cycle");
+    expect(r.trigger_menuItems.childNodes).toHaveLength(1);
+    expect(r.trigger_start).toBeDefined();
+  });
+
+  it("renders a description on a menu item", async () => {
+    // Given a menu item with a description
+    const r = await render(
+      <ButtonMenu
+        trigger={{ label: "Trigger" }}
+        items={[{ label: "Start", onClick: noop, description: "Records today as the completion date" }]}
+      />,
+      withRouter(),
+    );
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then the description is shown and the label still drives the test id
+    expect(r.trigger_start).toHaveTextContent("Start");
+    expect(r.trigger_start_description).toHaveTextContent("Records today as the completion date");
+  });
+
+  it("fires onClick when clicking a menu item description", async () => {
+    // Given a menu item with a description
+    const onClick = vi.fn();
+    const r = await render(
+      <ButtonMenu
+        trigger={{ label: "Trigger" }}
+        items={[{ label: "Start", onClick, description: "Records today as the completion date" }]}
+      />,
+      withRouter(),
+    );
+
+    // When opening the menu and clicking the description
+    click(r.trigger);
+    click(r.trigger_start_description);
+
+    // Then the item action runs
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a destructive item and its description danger-colored", async () => {
+    // Given a destructive menu item with a description
+    const r = await render(
+      <ButtonMenu
+        trigger={{ label: "Trigger" }}
+        items={[
+          {
+            label: "Reset Cycle",
+            onClick: noop,
+            description: "Permanently deletes all timestamps",
+            destructive: true,
+          },
+        ]}
+      />,
+      withRouter(),
+    );
+
+    // When opening the menu
+    click(r.trigger);
+
+    // Then the item and description inherit the danger color
+    expect(r.trigger_resetCycle).toHaveTextContent("Permanently deletes all timestamps");
+    expect(r.trigger_resetCycle).toHaveStyle({ color: `var(${Tokens.Danger})` });
+    expect(r.trigger_resetCycle_description).toBeDefined();
   });
 });
 
