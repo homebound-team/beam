@@ -56,32 +56,6 @@ describe("TableSummary", () => {
     expect(onActionClick).toHaveBeenCalledTimes(1);
   });
 
-  it("does not activate disabled metrics", async () => {
-    const onMetricClick = vi.fn();
-    // Given a disabled missing metric
-    const r = await render(
-      <TableSummary
-        {...createProps({
-          metrics: [
-            {
-              label: "Missing",
-              count: 4,
-              icon: "xCircle",
-              color: Palette.Red500,
-              disabled: true,
-              onClick: onMetricClick,
-            },
-          ],
-        })}
-      />,
-    );
-    // When it is clicked
-    click(r.tableSummary_metric_missing);
-    // Then it remains disabled and does not notify the parent
-    expect(r.tableSummary_metric_missing).toBeDisabled();
-    expect(onMetricClick).not.toHaveBeenCalled();
-  });
-
   it("supports keyboard activation", async () => {
     const onMetricClick = vi.fn();
     // Given a focusable metric

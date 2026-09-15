@@ -14,7 +14,6 @@ export type TableSummaryMetric = {
   icon: IconKey;
   color: BeamColor;
   onClick?: VoidFunction;
-  disabled?: boolean;
 };
 
 /** Optional header text-button CTA (e.g. "View Items"). */
@@ -23,7 +22,6 @@ export type TableSummaryAction = {
   /** Shown below the `sm` breakpoint. Defaults to `"Items"`. */
   mobileLabel?: ReactNode;
   onClick: VoidFunction;
-  disabled?: boolean;
 };
 
 export type TableSummaryProps = {
@@ -50,7 +48,6 @@ export function TableSummary(props: TableSummaryProps) {
               variant="text"
               endAdornment={<Icon icon="arrowRight" />}
               onClick={action.onClick}
-              disabled={action.disabled}
               {...tid.action}
             />
           </span>
@@ -84,8 +81,8 @@ type MetricButtonProps = {
 function MetricButton(props: MetricButtonProps) {
   const { metric, divider } = props;
   const ref = useRef(null);
-  const { buttonProps } = useButton({ onPress: () => metric.onClick?.(), isDisabled: metric.disabled }, ref);
-  const { hoverProps, isHovered } = useHover({ isDisabled: metric.disabled });
+  const { buttonProps } = useButton({ onPress: () => metric.onClick?.() }, ref);
+  const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
   const tid = useTestIds(props, "metric");
 
@@ -101,10 +98,10 @@ function MetricButton(props: MetricButtonProps) {
           .br.bc(Tokens.FieldBorderDefault)
           .ifSm.bb.bc(Tokens.FieldBorderDefault)
           .add("borderRight", "none").$,
-        ...(isHovered && !metric.disabled ? Css.bgColor(Tokens.NeutralFillHoverSubtle).$ : {}),
+        ...(isHovered ? Css.bgColor(Tokens.NeutralFillHoverSubtle).$ : {}),
         // Single blue ring (bshFocus's outer color). FocusRingMuted is near-black — not for these cells.
         ...(isFocusVisible ? Css.boxShadow(`0px 0px 0px 2px ${Palette.Blue700}`).z1.$ : {}),
-        ...(metric.disabled ? Css.cursorNotAllowed.o50.$ : Css.cursorPointer.$),
+        ...Css.cursorPointer.$,
       }}
       {...mergeProps(buttonProps, hoverProps, focusProps)}
       {...tid}
