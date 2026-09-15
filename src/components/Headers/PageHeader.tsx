@@ -35,7 +35,7 @@ export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(
         (bottomSlotActions.length > 0 || tabs) && (
           <>
             {bottomSlotActions.length > 0 && (
-              <div css={pageContentPaddingX} {...tid.bottomSlot}>
+              <div css={{ ...pageContentPaddingX, ...Css.if(!tabs).mb2.$ }} {...tid.bottomSlot}>
                 <HeaderActions actions={bottomSlotActions} />
               </div>
             )}
