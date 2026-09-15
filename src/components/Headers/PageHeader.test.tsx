@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { AutoSaveStatus, AutoSaveStatusContext } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
 import type { Tab } from "src/components/Tabs";
@@ -77,6 +79,38 @@ describe("PageHeader", () => {
     expect(r.query.verticalDots).toBeNull();
   });
 
+  it("hides AutoSaveIndicator while idle", async () => {
+    // Given a PageHeader with no in-flight auto-save
+    // When rendered
+    const r = await render(<PageHeader title="Documents" />);
+    // Then AutoSaveIndicator is hidden
+    expect(r.query.autoSave).toBeNull();
+  });
+
+  it("prepends AutoSaveIndicator in the actions area while saving", async () => {
+    // Given a PageHeader with actions and an in-flight auto-save
+    const r = await render(
+      <MockAutoSaveProvider status={AutoSaveStatus.SAVING}>
+        <PageHeader title="Documents" actions={[{ label: "Upload", onClick: noop }]} />
+      </MockAutoSaveProvider>,
+    );
+    // Then AutoSaveIndicator renders before the actions
+    expect(r.autoSave).toHaveTextContent("Saving");
+    expect(r.autoSave.compareDocumentPosition(r.upload)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("renders AutoSaveIndicator in the actions area while saving when actions are omitted", async () => {
+    // Given a PageHeader with an in-flight auto-save and no actions
+    const r = await render(
+      <MockAutoSaveProvider status={AutoSaveStatus.SAVING}>
+        <PageHeader title="Documents" />
+      </MockAutoSaveProvider>,
+    );
+    // Then the actions slot still renders with AutoSaveIndicator
+    expect(r.header_actions).toBeInTheDocument();
+    expect(r.autoSave).toHaveTextContent("Saving");
+  });
+
   it("still renders rightSlot at sm", async () => {
     // Given a mobile viewport, actions, and a rightSlot
     setViewport("sm");
@@ -96,3 +130,19 @@ describe("PageHeader", () => {
     expect(r.verticalDots).toBeInTheDocument();
   });
 });
+
+function MockAutoSaveProvider({
+  status = AutoSaveStatus.IDLE,
+  children,
+}: {
+  status?: AutoSaveStatus;
+  children: ReactNode;
+}) {
+  return (
+    <AutoSaveStatusContext.Provider
+      value={{ status, resetStatus: noop, errors: [], resolveAutoSave: noop, triggerAutoSave: noop }}
+    >
+      {children}
+    </AutoSaveStatusContext.Provider>
+  );
+}
