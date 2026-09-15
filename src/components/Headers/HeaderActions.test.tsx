@@ -60,7 +60,7 @@ describe("HeaderActions", () => {
       />,
       withRouter(),
     );
-    // Then the kebab is shown and the individual buttons are not
+    // Then the overflow menu is shown and the individual buttons are not
     expect(r.verticalDots).toBeInTheDocument();
     expect(r.query.upload).toBeNull();
     expect(r.query.refresh).toBeNull();
@@ -84,7 +84,7 @@ describe("HeaderActions", () => {
       />,
       withRouter(),
     );
-    // When opening the collapsed kebab
+    // When opening the collapsed overflow menu
     click(r.verticalDots);
     // Then the menu item still shows that icon
     expect(r.verticalDots_refresh.querySelector("[data-icon='refresh']")).toBeInTheDocument();
@@ -107,7 +107,7 @@ describe("HeaderActions", () => {
       />,
       withRouter(),
     );
-    // When opening the collapsed kebab
+    // When opening the collapsed overflow menu
     click(r.verticalDots);
     // Then both the button action and the nested menu item are in that one menu
     expect(r.verticalDots_upload).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("HeaderActions", () => {
     // Given collapseOnSm, one action, and a mobile viewport
     setViewport("sm");
     const r = await render(<HeaderActions collapseOnSm actions={[{ label: "Upload", onClick: () => {} }]} />);
-    // Then it stays a button, with no kebab
+    // Then it stays a button, with no overflow menu
     expect(r.upload).toBeInTheDocument();
     expect(r.query.verticalDots).toBeNull();
   });

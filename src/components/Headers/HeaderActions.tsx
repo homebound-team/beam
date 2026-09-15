@@ -16,14 +16,19 @@ import { useTestIds } from "src/utils/useTestIds";
  * Labels are `string` so actions can collapse into a `ButtonMenu` on mobile.
  * Icon actions always render with the `outline` `IconButton` variant, so `variant` is omitted here.
  */
+type HeaderActionKeepVisible = {
+  /** At `sm`, render this action below the title instead of collapsing it into the overflow menu. */
+  keepVisible?: boolean;
+};
+
 export type HeaderAction =
-  | ({ kind?: "default" } & Omit<ButtonProps, "label"> & { label: string })
-  | ({ kind: "icon" } & Omit<IconButtonProps, "variant" | "label"> & { label: string })
-  | ({ kind: "menu" } & ButtonMenuProps);
+  | ({ kind?: "default" } & HeaderActionKeepVisible & Omit<ButtonProps, "label"> & { label: string })
+  | ({ kind: "icon" } & HeaderActionKeepVisible & Omit<IconButtonProps, "variant" | "label"> & { label: string })
+  | ({ kind: "menu" } & HeaderActionKeepVisible & ButtonMenuProps);
 
 export type HeaderActionsProps = {
   actions: HeaderAction[];
-  /** Collapse two or more actions into a kebab `ButtonMenu` at `sm`. */
+  /** Collapse two or more actions into a overflow menu `ButtonMenu` at `sm`. */
   collapseOnSm?: boolean;
 };
 
@@ -36,28 +41,45 @@ export function HeaderActions(props: HeaderActionsProps) {
 
   if (collapse) {
     return (
-      <div css={Css.df.aic.gap1.fs0.$} {...tid}>
+      <div css={actionRowCss} {...tid}>
         <ButtonMenu trigger={{ icon: "verticalDots", variant: "outline" }} items={toMenuItems(actions)} />
       </div>
     );
   }
 
   return (
-    <div css={Css.df.aic.gap1.fs0.$} {...tid}>
-      {actions.map((action, i) => {
-        const key = headerActionKey(action, i);
-        if (action.kind === "icon") {
-          return <IconButton key={key} {...action} variant="outline" />;
-        }
-        if (action.kind === "menu") {
-          const { kind, ...menuProps } = action;
-          void kind;
-          return <ButtonMenu key={key} {...menuProps} />;
-        }
-        return <Button key={key} {...action} />;
-      })}
+    <div css={actionRowCss} {...tid}>
+      {actions.map(renderHeaderAction)}
     </div>
   );
+}
+
+/** At `sm`, `keepVisible` actions go in `bottomSlotActions`; the rest stay in `rightSlotActions`. */
+export function splitHeaderActionsOnSm(
+  actions: HeaderAction[] | undefined,
+  sm: boolean,
+): { bottomSlotActions: HeaderAction[]; rightSlotActions: HeaderAction[] } {
+  if (!sm) return { bottomSlotActions: [], rightSlotActions: actions ?? [] };
+  return {
+    bottomSlotActions: actions?.filter((action) => action.keepVisible) ?? [],
+    rightSlotActions: actions?.filter((action) => !action.keepVisible) ?? [],
+  };
+}
+
+const actionRowCss = Css.df.aic.fww.gap2.fs0.$;
+
+function renderHeaderAction(action: HeaderAction, index: number) {
+  const key = headerActionKey(action, index);
+  if (action.kind === "icon") {
+    const { kind: _kind, keepVisible: _keepVisible, ...iconProps } = action;
+    return <IconButton key={key} {...iconProps} variant="outline" />;
+  }
+  if (action.kind === "menu") {
+    const { kind: _kind, keepVisible: _keepVisible, ...menuProps } = action;
+    return <ButtonMenu key={key} {...menuProps} />;
+  }
+  const { keepVisible: _keepVisible, kind: _kind, ...buttonProps } = action;
+  return <Button key={key} {...buttonProps} />;
 }
 
 function headerActionKey(action: HeaderAction, index: number): string {

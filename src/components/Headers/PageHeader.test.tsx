@@ -62,7 +62,7 @@ describe("PageHeader", () => {
       />,
       withRouter(),
     );
-    // Then the kebab is shown instead of the individual buttons
+    // Then the overflow menu is shown instead of the individual buttons
     expect(r.verticalDots).toBeInTheDocument();
     expect(r.query.upload).toBeNull();
     click(r.verticalDots);
@@ -128,6 +128,24 @@ describe("PageHeader", () => {
     // Then rightSlot is still shown next to the collapsed actions
     expect(r.custom).toBeInTheDocument();
     expect(r.verticalDots).toBeInTheDocument();
+  });
+
+  it("renders keepVisible-only actions in the bottom slot at sm without a overflow menu", async () => {
+    // Given a mobile viewport and only keepVisible actions
+    setViewport("sm");
+    const r = await render(
+      <PageHeader
+        title="Bid Packages"
+        actions={[
+          { keepVisible: true, label: "Start Cycle", onClick: noop },
+          { keepVisible: true, label: "View History", onClick: noop },
+        ]}
+      />,
+    );
+    // Then both render in the bottom slot and there is no overflow menu
+    expect(r.header_bottomSlot).toHaveTextContent("Start Cycle");
+    expect(r.header_bottomSlot).toHaveTextContent("View History");
+    expect(r.query.verticalDots).toBeNull();
   });
 });
 
