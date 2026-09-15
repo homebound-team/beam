@@ -49,16 +49,12 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
 
-  const innerCss =
-    autoHideState === "static"
-      ? Css.sticky.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$
-      : Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).transitionTop.$;
-
-  // Hidden top = revealed top minus headerHeight so the slide matches navbar lockstep.
-  const innerStyle: CSSProperties | undefined =
-    autoHideState !== "static"
-      ? { top: autoHideState === "revealed" ? outerTop : `calc(${outerTop} - ${headerHeight}px)` }
-      : undefined;
+  // Always `fixed` so horizontal document scroll cannot move the header. `left`/`width` use the
+  // chrome var (jumps on nav toggle) — `transitionAll` eases them with the rail (200ms).
+  const innerCss = Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).transitionAll.$;
+  const innerStyle: CSSProperties = {
+    top: autoHideState === "hidden" ? `calc(${outerTop} - ${headerHeight}px)` : outerTop,
+  };
 
   const pageHeaderEl = useMemo(() => <PageHeader {...pageHeader} />, [pageHeader]);
 

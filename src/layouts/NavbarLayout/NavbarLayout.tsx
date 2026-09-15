@@ -41,21 +41,12 @@ export function NavbarLayout(props: NavbarLayoutProps) {
 
   const innerWidth = `var(${beamLayoutViewportWidthVar}, 100vw)`;
 
-  const innerCss =
-    autoHideState === "static"
-      ? // Sticky horizontally; scrolls away vertically with the document.
-        Css.sticky.left0.z(zIndices.navbar).w(innerWidth).$
-      : // Fixed; inline `top` slides between hidden/revealed.
-        Css.fixed.left0.z(zIndices.navbar).w(innerWidth).transitionTop.$;
-
+  // Always `fixed` so horizontal document scroll cannot move the navbar (same as the env banner).
+  const innerCss = Css.fixed.left0.z(zIndices.navbar).w(innerWidth).transitionTop.$;
   const bannerTop = `var(${beamEnvironmentBannerLayoutHeightVar}, 0px)`;
-
-  const innerStyle: CSSProperties | undefined =
-    autoHideState !== "static"
-      ? {
-          top: autoHideState === "revealed" ? bannerTop : `calc(${bannerTop} - ${navHeight}px)`,
-        }
-      : undefined;
+  const innerStyle: CSSProperties = {
+    top: autoHideState === "hidden" ? `calc(${bannerTop} - ${navHeight}px)` : bannerTop,
+  };
 
   // Memoize so scroll-state re-renders don't re-render Navbar.
   const navbarEl = useMemo(() => <Navbar {...navbar} />, [navbar]);

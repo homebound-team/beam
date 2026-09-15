@@ -46,6 +46,7 @@ After editing a test file, run `yarn lint:fix:files` on that path (see **Linting
 
 ### Structure
 
+- **One top-level `describe`:** The file has a single top-level `describe` named after the file (without extension), e.g. `describe("withRightPane", …)` in `withRightPane.test.ts`. Nest further `describe`s inside it.
 - **Given/When/Then:** In each `it` block, use `// Given …` for setup, `// When …` for the action (render, click, rerender, etc.), and `// Then …` before assertions. Omit `When` only when there is no separate action step after setup. See [`PageHeaderLayout.test.tsx`](src/layouts/PageHeaderLayout/PageHeaderLayout.test.tsx).
 - Each test should focus on one behavior; cover happy path and important edge cases.
 - Use descriptive `it` names.

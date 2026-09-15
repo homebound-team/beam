@@ -20,6 +20,7 @@ import {
   beamTableActionsHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
+  documentScrollRightPaneContentMinCss,
   stickyNavAndHeaderOffset,
 } from "src/layouts/layoutVars";
 import { noop } from "src/utils/helpers";
@@ -60,7 +61,7 @@ export type GridTableLayoutProps<
   withCardView?: boolean;
   defaultView?: TableView;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`). Default mode `overlay` (spacer).
+   * Opt into the document-scroll detail pane (`useRightPane`).
    * Only applies inside a document-scroll layout; hosts the pane around the table body only.
    */
   withRightPane?: WithRightPane;
@@ -108,7 +109,7 @@ function GridTableLayoutComponent<
     emptyFallback: layoutEmptyFallback,
     withRightPane,
   } = props;
-  const rightPane = resolveWithRightPaneOptions(withRightPane, "overlay");
+  const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const tid = useTestIds(props);
   const columns = tableProps.columns;
@@ -245,7 +246,8 @@ function GridTableLayoutComponent<
         // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
         rightPane ? (
           <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>
-            {tableBody}
+            {/* Content floor while the pane is open — tables are not a CenteredLayout shell. */}
+            <div css={Css.mw(documentScrollRightPaneContentMinCss()).$}>{tableBody}</div>
           </DocumentScrollOverlayRightPaneLayout>
         ) : (
           tableBody
