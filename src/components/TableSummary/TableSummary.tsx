@@ -1,5 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
+import type { BeamColor } from "src/colors";
 import { Button } from "src/components/Button";
 import { Icon, type IconKey } from "src/components/Icon";
 import { Css, Palette, Tokens } from "src/Css";
@@ -7,12 +8,11 @@ import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type TableSummaryStatus = "success" | "neutral" | "warning" | "error";
-
 export type TableSummaryMetric = {
   label: string;
   count: number;
-  status: Exclude<TableSummaryStatus, "neutral" | "success">;
+  icon: IconKey;
+  color: BeamColor;
   onClick?: VoidFunction;
   disabled?: boolean;
 };
@@ -109,22 +109,10 @@ function MetricButton(props: MetricButtonProps) {
       {...mergeProps(buttonProps, hoverProps, focusProps)}
       {...tid}
     >
-      <Icon icon={statusIcons[metric.status]} color={statusColors[metric.status]} inc={4} />
+      <Icon icon={metric.icon} color={metric.color} inc={4} />
       <span css={Css.lg.wsnw.$}>
         {metric.count} {metric.label}
       </span>
     </button>
   );
 }
-
-const statusColors: Record<TableSummaryStatus, Palette> = {
-  success: Palette.Green500,
-  neutral: Palette.Gray500,
-  warning: Palette.Orange500,
-  error: Palette.Red500,
-};
-
-const statusIcons: Record<TableSummaryMetric["status"], IconKey> = {
-  warning: "errorCircle",
-  error: "xCircle",
-};

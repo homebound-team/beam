@@ -1,6 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { StackBarGraph, type StackBarGraphSegment } from "src/components/StackBarGraph";
 import { TableSummary, type TableSummaryProps } from "src/components/TableSummary/TableSummary";
+import { Palette } from "src/Css";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -14,17 +15,17 @@ describe("TableSummary", () => {
     expect(r.query.tableSummary_action).toBeNull();
   });
 
-  it("renders all provided status metrics", async () => {
+  it("renders all provided metrics", async () => {
     // Given a report with five metrics
     const r = await render(
       <TableSummary
         {...createProps({
           metrics: [
-            { label: "One", count: 1, status: "error" },
-            { label: "Two", count: 2, status: "warning" },
-            { label: "Three", count: 3, status: "error" },
-            { label: "Four", count: 4, status: "warning" },
-            { label: "Five", count: 5, status: "error" },
+            { label: "One", count: 1, icon: "xCircle", color: Palette.Red500 },
+            { label: "Two", count: 2, icon: "errorCircle", color: Palette.Orange500 },
+            { label: "Three", count: 3, icon: "xCircle", color: Palette.Red500 },
+            { label: "Four", count: 4, icon: "errorCircle", color: Palette.Orange500 },
+            { label: "Five", count: 5, icon: "xCircle", color: Palette.Red500 },
           ],
         })}
       />,
@@ -42,7 +43,7 @@ describe("TableSummary", () => {
     const r = await render(
       <TableSummary
         {...createProps({
-          metrics: [{ label: "Missing", count: 4, status: "error", onClick: onMetricClick }],
+          metrics: [{ label: "Missing", count: 4, icon: "xCircle", color: Palette.Red500, onClick: onMetricClick }],
           action: { label: "View Items", onClick: onActionClick },
         })}
       />,
@@ -61,7 +62,16 @@ describe("TableSummary", () => {
     const r = await render(
       <TableSummary
         {...createProps({
-          metrics: [{ label: "Missing", count: 4, status: "error", disabled: true, onClick: onMetricClick }],
+          metrics: [
+            {
+              label: "Missing",
+              count: 4,
+              icon: "xCircle",
+              color: Palette.Red500,
+              disabled: true,
+              onClick: onMetricClick,
+            },
+          ],
         })}
       />,
     );
@@ -78,7 +88,7 @@ describe("TableSummary", () => {
     const r = await render(
       <TableSummary
         {...createProps({
-          metrics: [{ label: "Missing", count: 4, status: "error", onClick: onMetricClick }],
+          metrics: [{ label: "Missing", count: 4, icon: "xCircle", color: Palette.Red500, onClick: onMetricClick }],
         })}
       />,
     );
@@ -109,7 +119,7 @@ function createProps(overrides: Partial<TableSummaryProps> = {}): TableSummaryPr
   const { footer, ...rest } = overrides;
   return {
     title: "Bid Package Coverage",
-    metrics: [{ label: "Missing", count: 4, status: "error" }],
+    metrics: [{ label: "Missing", count: 4, icon: "xCircle", color: Palette.Red500 }],
     action: { label: "View Items", onClick: () => {} },
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
     ...rest,

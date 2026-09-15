@@ -5,7 +5,7 @@ import { GridTable } from "src/components/Table/GridTable";
 import type { GridColumn } from "src/components/Table/types";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TableSummary, type TableSummaryProps } from "src/components/TableSummary/TableSummary";
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import { newStory, viewportModes } from "src/utils/sb";
 
 export default {
@@ -29,10 +29,10 @@ export function FourStatuses() {
     <TableSummary
       {...createProps({
         metrics: [
-          { label: "Status", count: 4, status: "warning" },
-          { label: "Missing", count: 4, status: "error" },
-          { label: "Incomplete", count: 9, status: "warning" },
-          { label: "Warnings", count: 3, status: "warning" },
+          { label: "Status", count: 4, icon: "errorCircle", color: Palette.Orange500 },
+          { label: "Missing", count: 4, icon: "xCircle", color: Palette.Red500 },
+          { label: "Incomplete", count: 9, icon: "errorCircle", color: Palette.Orange500 },
+          { label: "Warnings", count: 3, icon: "errorCircle", color: Palette.Orange500 },
         ],
       })}
     />
@@ -71,9 +71,27 @@ export function FiltersTableAndScrolls() {
       <TableSummary
         {...createProps({
           metrics: [
-            { label: "Missing", count: 4, status: "error", onClick: () => toggleStatus("missing") },
-            { label: "Incomplete", count: 9, status: "warning", onClick: () => toggleStatus("incomplete") },
-            { label: "Warnings", count: 3, status: "warning", onClick: () => toggleStatus("warnings") },
+            {
+              label: "Missing",
+              count: 4,
+              icon: "xCircle",
+              color: Palette.Red500,
+              onClick: () => toggleStatus("missing"),
+            },
+            {
+              label: "Incomplete",
+              count: 9,
+              icon: "errorCircle",
+              color: Palette.Orange500,
+              onClick: () => toggleStatus("incomplete"),
+            },
+            {
+              label: "Warnings",
+              count: 3,
+              icon: "errorCircle",
+              color: Palette.Orange500,
+              onClick: () => toggleStatus("warnings"),
+            },
           ],
           action: {
             label: "View Items",
@@ -93,9 +111,9 @@ function createProps(overrides: Partial<TableSummaryProps> = {}): TableSummaryPr
   return {
     title: "Bid Package Coverage",
     metrics: [
-      { label: "Missing", count: 4, status: "error" },
-      { label: "Incomplete", count: 9, status: "warning" },
-      { label: "Warnings", count: 3, status: "warning" },
+      { label: "Missing", count: 4, icon: "xCircle", color: Palette.Red500 },
+      { label: "Incomplete", count: 9, icon: "errorCircle", color: Palette.Orange500 },
+      { label: "Warnings", count: 3, icon: "errorCircle", color: Palette.Orange500 },
     ],
     action: { label: "View Items", onClick: () => {} },
     footer: footer ?? <StackBarGraph title="Coverage by status" totalLabel="Cost Codes" segments={defaultSegments()} />,
