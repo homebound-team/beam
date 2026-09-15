@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
+import { AutoSaveStatus, AutoSaveStatusContext } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import type { Breadcrumb } from "src/components/Breadcrumbs";
 import { Button } from "src/components/Button";
 import { PageHeader } from "src/components/Headers/PageHeader";
@@ -31,16 +32,17 @@ export function WithRightSlot() {
   );
 }
 
-export function WithAutoSave() {
+export function AutoSaveSaving() {
   return (
-    <PageHeader
-      title="Test Title"
-      withAutoSave
-      actions={[
-        { label: "Upload", variant: "primary", onClick: action("upload") },
-        { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
-      ]}
-    />
+    <AutoSaveStatusContext.Provider value={createAutoSaveContext(AutoSaveStatus.SAVING)}>
+      <PageHeader
+        title="Test Title"
+        actions={[
+          { label: "Upload", variant: "primary", onClick: action("upload") },
+          { kind: "default", variant: "secondary", icon: "refresh", label: "Refresh", onClick: action("refresh") },
+        ]}
+      />
+    </AutoSaveStatusContext.Provider>
   );
 }
 
@@ -135,4 +137,8 @@ export function WithRightSlotAndTabsAndBreadcrumbs() {
       <TabContent tabs={testTabs} selected={selected} />
     </>
   );
+}
+
+function createAutoSaveContext(status: AutoSaveStatus) {
+  return { status, resetStatus() {}, errors: [] as unknown[], resolveAutoSave() {}, triggerAutoSave() {} };
 }
