@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { BeamColor } from "src/colors";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
@@ -13,10 +13,7 @@ export type StackBarGraphProps = {
 export function StackBarGraph(props: StackBarGraphProps) {
   const { title, totalLabel, segments } = props;
   const tid = useTestIds(props, "stackBarGraph");
-  const totalCount = useMemo(
-    () => segments.reduce((total, segment) => total + Math.max(0, segment.count), 0),
-    [segments],
-  );
+  const totalCount = segments.reduce((total, segment) => total + Math.max(0, segment.count), 0);
 
   return (
     <div css={Css.df.fdc.gap2.p2.$} {...tid}>
@@ -28,11 +25,7 @@ export function StackBarGraph(props: StackBarGraphProps) {
         {segments.map((segment) => (
           <div
             key={segment.label}
-            css={
-              Css.w(`${segmentWidth(segment.count, totalCount)}%`)
-                .fs0.add("minWidth", segment.count > 0 ? "1px" : 0)
-                .bgColor(segment.color).$
-            }
+            css={Css.w(`${segmentWidth(segment.count, totalCount)}%`).fs0.bgColor(segment.color).$}
           />
         ))}
       </div>

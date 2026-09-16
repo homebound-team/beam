@@ -32,6 +32,8 @@ describe("TableSummary", () => {
     );
     // Then all five are rendered
     expect(r.tableSummary_metric_one).toBeInTheDocument();
+    expect(r.tableSummary_metric_two).toBeInTheDocument();
+    expect(r.tableSummary_metric_three).toBeInTheDocument();
     expect(r.tableSummary_metric_four).toBeInTheDocument();
     expect(r.tableSummary_metric_five).toBeInTheDocument();
   });

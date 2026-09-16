@@ -38,9 +38,9 @@ export function TableSummary(props: TableSummaryProps) {
   const actionMobileLabel = action?.mobileLabel ?? "Items";
 
   return (
-    <section css={Css.df.fdc.bgColor(Tokens.Surface).br12.bshBasic.$} {...tid}>
-      <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.FieldBorderDefault).$}>
-        <div css={Css.mdSb.mw0.py1.$}>{title}</div>
+    <section css={Css.df.fdc.bgColor(Tokens.SurfaceRaised).br12.bshBasic.$} {...tid}>
+      <header css={Css.df.aic.jcsb.gap2.px2.pyPx(12).bb.bc(Tokens.SurfaceSeparator).$}>
+        <h3 css={Css.mdSb.mw0.py1.m0.$}>{title}</h3>
         {action && (
           <span css={Css.sm.$}>
             <Button
@@ -55,20 +55,17 @@ export function TableSummary(props: TableSummaryProps) {
       </header>
       {metrics.length > 0 && (
         <div css={Css.df.fdr.ifSm.fdc.$} {...tid.metrics}>
-          {metrics.map((metric, index) => {
-            const metricId = defaultTestId(metric.label);
-            return (
-              <MetricButton
-                key={metricId}
-                metric={metric}
-                divider={index < metrics.length - 1}
-                {...tid[`metric_${metricId}`]}
-              />
-            );
-          })}
+          {metrics.map((metric, index) => (
+            <MetricButton
+              key={defaultTestId(metric.label)}
+              metric={metric}
+              divider={index < metrics.length - 1}
+              {...tid[`metric_${defaultTestId(metric.label)}`]}
+            />
+          ))}
         </div>
       )}
-      {footer && <div css={Css.if(metrics.length > 0).bt.bc(Tokens.FieldBorderDefault).$}>{footer}</div>}
+      {footer && <div css={Css.if(metrics.length > 0).bt.bc(Tokens.SurfaceSeparator).$}>{footer}</div>}
     </section>
   );
 }
@@ -92,22 +89,22 @@ function MetricButton(props: MetricButtonProps) {
       css={{
         // outline0 drops the UA focus outline (avoids a second ring beside our box-shadow).
         // relative + z1 paints the focused cell above neighbors so the ring isn't tucked under.
-        ...Css.outline0.relative.df.fg1.aic.jcc.gap1.p2.mw0.bgColor(Tokens.Surface).color(Tokens.OnSurface).$,
+        ...Css.outline0.relative.df.fg1.aic.jcc.gap1.p2.mw0.bgColor(Tokens.SurfaceRaised).color(Tokens.OnSurface)
+          .cursorPointer.$,
         // Desktop: right divider; small screens: bottom divider (and clear the right edge).
-        ...Css.if(divider)
-          .br.bc(Tokens.FieldBorderDefault)
-          .ifSm.bb.bc(Tokens.FieldBorderDefault)
-          .add("borderRight", "none").$,
+        ...Css.if(divider).br.bc(Tokens.SurfaceSeparator).ifSm.bb.bc(Tokens.SurfaceSeparator).add("borderRight", "none")
+          .$,
         ...(isHovered ? Css.bgColor(Tokens.NeutralFillHoverSubtle).$ : {}),
         // Single blue ring (bshFocus's outer color). FocusRingMuted is near-black — not for these cells.
         ...(isFocusVisible ? Css.boxShadow(`0px 0px 0px 2px ${Palette.Blue700}`).z1.$ : {}),
-        ...Css.cursorPointer.$,
       }}
       {...mergeProps(buttonProps, hoverProps, focusProps)}
       {...tid}
     >
-      <Icon icon={metric.icon} color={metric.color} inc={4} />
-      <span css={Css.lg.wsnw.$}>
+      <span css={Css.fs0.$}>
+        <Icon icon={metric.icon} color={metric.color} inc={4} />
+      </span>
+      <span css={Css.lg.$}>
         {metric.count} {metric.label}
       </span>
     </button>

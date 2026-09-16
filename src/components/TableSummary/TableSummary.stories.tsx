@@ -6,19 +6,16 @@ import type { GridColumn } from "src/components/Table/types";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TableSummary, type TableSummaryProps } from "src/components/TableSummary/TableSummary";
 import { Css, Palette } from "src/Css";
-import { newStory, viewportModes } from "src/utils/sb";
+import { viewportModes } from "src/utils/sb";
 
 export default {
   component: TableSummary,
+  parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } },
 } as Meta;
 
 export function Default() {
   return <TableSummary {...createProps()} />;
 }
-
-export const Mobile = newStory(() => <TableSummary {...createProps()} />, {
-  parameters: { chromatic: { modes: viewportModes("iphone12") } },
-});
 
 export function NoMetrics() {
   return <TableSummary {...createProps({ metrics: [] })} />;
