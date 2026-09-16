@@ -199,6 +199,38 @@ describe("useUnsavedChangesGuard", () => {
       // Then we remain on the current route
       expect(router.location.pathname).toBe("/");
     });
+
+    it("allows a query-string-only change when dirty", async () => {
+      // Given a dirty form
+      const router = withRouter("/");
+      const r = await render(<Harness isDirty={() => true} onCancel={vi.fn()} />, router);
+
+      // When url-synced table state writes the query string
+      await act(async () => {
+        await router.navigate("/?filter=%7B%7D");
+      });
+
+      // Then the navigation goes through with no confirm modal
+      expect(router.location.pathname).toBe("/");
+      expect(router.location.search).toBe("?filter=%7B%7D");
+      expect(r.query.discardChanges).toBeNull();
+    });
+
+    it("allows a hash-only change when dirty", async () => {
+      // Given a dirty form
+      const router = withRouter("/");
+      const r = await render(<Harness isDirty={() => true} onCancel={vi.fn()} />, router);
+
+      // When only the hash changes
+      await act(async () => {
+        await router.navigate("/#section");
+      });
+
+      // Then the navigation goes through with no confirm modal
+      expect(router.location.pathname).toBe("/");
+      expect(router.location.hash).toBe("#section");
+      expect(r.query.discardChanges).toBeNull();
+    });
   });
 });
 

@@ -39,7 +39,12 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
   }, []);
 
   // Always call the hook; the callback returns false when `isDirty` is omitted.
-  const blocker = useBlocker(() => !!isDirtyRef.current?.());
+  // Only a route change unmounts the form; a query string or hash change keeps it mounted, so
+  // url-synced table filter/search state must not trip the guard.
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      currentLocation.pathname !== nextLocation.pathname && !!isDirtyRef.current?.(),
+  );
 
   const onCancelClick = (e: PressEvent) => {
     if (!isDirty?.()) {
