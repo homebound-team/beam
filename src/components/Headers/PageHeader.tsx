@@ -27,8 +27,8 @@ export function PageHeader<V extends string, X extends Only<TabsContentXss, X>>(
         <div css={Css.df.gap2.fs0.$} {...tid.actions}>
           {/* Hidden while idle so pages that never auto-save stay clean. */}
           <AutoSaveIndicator hideOnIdle />
-          {rightSlot}
           {rightSlotActions.length > 0 && <HeaderActions actions={rightSlotActions} collapseOnSm />}
+          {rightSlot}
         </div>
       }
       bottomSlot={
