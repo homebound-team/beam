@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
@@ -122,6 +124,25 @@ describe("FocusedFormLayout", () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
+  it("lets a dirty form switch variants on its listing, and still prompts when leaving it", async () => {
+    // Given a listing page mounted at its first variant
+    const router = withRouter("/material-catalog/ml:7/mv:1", "/material-catalog/:listingId/:variantId");
+    const r = await render(<MaterialListingPage />, router);
+
+    // When the user edits a field, then clicks another variant's thumbnail
+    await clickAndWait(r.editDesignNotes);
+    await clickAndWait(r.secondVariant);
+
+    // Then that route change happens with no confirm modal, so the edits stay put
+    expect(router.location.pathname).toBe("/material-catalog/ml:7/mv:2");
+    expect(r.query.discardChanges).toBeNull();
+
+    // And leaving for a different listing still prompts
+    await clickAndWait(r.otherListing);
+    expect(router.location.pathname).toBe("/material-catalog/ml:7/mv:2");
+    expect(r.discardChanges).toBeInTheDocument();
+  });
+
   it("calls onSaveAndExit when Save & Exit is clicked", async () => {
     // Given a focused form with onSaveAndExit
     const onSaveAndExit = vi.fn();
@@ -196,6 +217,39 @@ function baseProps(overrides: Partial<FocusedFormLayoutProps> = {}): FocusedForm
     ),
     ...rest,
   };
+}
+
+/** Mirrors the consumer page this prop exists for: one form, with the selected variant in the URL. */
+function MaterialListingPage() {
+  const navigate = useNavigate();
+  const { listingId } = useParams();
+  const [dirty, setDirty] = useState(false);
+  return (
+    <FocusedFormLayout
+      title="Kwikset Square Halifax Lever"
+      onCancel={() => {}}
+      completeLabel="Save"
+      onComplete={() => {}}
+      isDirty={() => dirty}
+      allowNavigation={({ nextLocation }) => nextLocation.pathname.startsWith(`/material-catalog/${listingId}/`)}
+    >
+      <FormSectionLayout
+        title="Material Details"
+        sections={[
+          {
+            title: "Variant Details",
+            fields: (
+              <>
+                <Button label="Edit Design Notes" onClick={() => setDirty(true)} />
+                <Button label="Second Variant" onClick={() => navigate("/material-catalog/ml:7/mv:2")} />
+                <Button label="Other Listing" onClick={() => navigate("/material-catalog/ml:99/mv:5")} />
+              </>
+            ),
+          },
+        ]}
+      />
+    </FocusedFormLayout>
+  );
 }
 
 function OpenPaneButton() {
