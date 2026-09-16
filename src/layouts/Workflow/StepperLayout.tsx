@@ -3,6 +3,7 @@ import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import type { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
+import type { AllowNavigationArgs } from "./useUnsavedChangesGuard";
 import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
@@ -26,6 +27,8 @@ export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleS
     defaultStep?: string;
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
+    /** Consulted only while dirty — return true to allow a route change that stays on this form. */
+    allowNavigation?: (args: AllowNavigationArgs) => boolean;
     /** Full-bleed AI wash on the body. Pair with `aiMode` on a step's `FormSectionLayout`. */
     aiMode?: boolean;
   };
@@ -36,8 +39,18 @@ export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleS
  * Header does not auto-hide; stepper tabs collapse on mobile; body is the active step's `content`.
  */
 export function StepperLayout(props: StepperLayoutProps) {
-  const { steps, defaultStep, onCancel, completeLabel, onComplete, onSaveAndExit, isDirty, aiMode, ...headerProps } =
-    props;
+  const {
+    steps,
+    defaultStep,
+    onCancel,
+    completeLabel,
+    onComplete,
+    onSaveAndExit,
+    isDirty,
+    allowNavigation,
+    aiMode,
+    ...headerProps
+  } = props;
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(stepTabs, defaultStep));
   const tid = useTestIds(props, "stepperLayout");
@@ -54,6 +67,7 @@ export function StepperLayout(props: StepperLayoutProps) {
       aiMode={aiMode}
       stepperTabs={{ steps: stepTabs, currentStep, onChange: setCurrentStep }}
       isDirty={isDirty}
+      allowNavigation={allowNavigation}
       isFirstStep={isFirstStep}
       isLastStep={isLastStep}
       onBack={() => {

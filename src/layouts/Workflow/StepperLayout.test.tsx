@@ -119,6 +119,29 @@ describe("StepperLayout", () => {
     expect(router.location.pathname).toBe("/other");
   });
 
+  it("skips the leave prompt for navigations allowNavigation permits", async () => {
+    // Given a dirty StepperLayout that allows navigations under /workflow
+    const router = withRouter("/workflow/a");
+    const r = await render(
+      <StepperLayout
+        {...baseProps({
+          isDirty: () => true,
+          allowNavigation: ({ nextLocation }) => nextLocation.pathname.startsWith("/workflow/"),
+        })}
+      />,
+      router,
+    );
+
+    // When navigating within the workflow
+    await act(async () => {
+      await router.navigate("/workflow/b");
+    });
+
+    // Then navigation proceeds with no confirm modal
+    expect(router.location.pathname).toBe("/workflow/b");
+    expect(r.query.discardChanges).toBeNull();
+  });
+
   it("stays on the page when Continue Editing is chosen after a blocked navigation", async () => {
     // Given a dirty StepperLayout with a blocked navigation
     const router = withRouter("/");

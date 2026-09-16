@@ -1,12 +1,17 @@
 import type { PressEvent } from "@react-types/shared";
 import { useEffect, useRef } from "react";
-import { useBlocker } from "react-router-dom";
+import { type BlockerFunction, useBlocker } from "react-router-dom";
 import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
 import { useModal } from "src/components/Modal/useModal";
+
+/** The pending in-app navigation, as React Router reports it (pathnames are basename-stripped). */
+export type AllowNavigationArgs = Parameters<BlockerFunction>[0];
 
 type UseUnsavedChangesGuardOptions = {
   /** When this returns true, Cancel / in-app route changes / tab close require confirmation. */
   isDirty?: () => boolean;
+  /** Consulted only while dirty — return true to allow a route change that stays on this form. */
+  allowNavigation?: (args: AllowNavigationArgs) => boolean;
   onCancel: (e: PressEvent) => void;
 };
 
@@ -22,11 +27,13 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
   onCancelClick: (e: PressEvent) => void;
   navigationBlocker: NavigationBlockerActions | undefined;
 } {
-  const { isDirty, onCancel } = options;
+  const { isDirty, allowNavigation, onCancel } = options;
   const { openModal } = useModal();
 
   const isDirtyRef = useRef(isDirty);
   isDirtyRef.current = isDirty;
+  const allowNavigationRef = useRef(allowNavigation);
+  allowNavigationRef.current = allowNavigation;
 
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -38,8 +45,11 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, []);
 
-  // Always call the hook; the callback returns false when `isDirty` is omitted.
-  const blocker = useBlocker(() => !!isDirtyRef.current?.());
+  // Always call the hook; block only when dirty and the app has not allowlisted this navigation.
+  const blocker = useBlocker((args) => {
+    // Short-circuits, so a clean form is never asked and never blocks.
+    return !!isDirtyRef.current?.() && !allowNavigationRef.current?.(args);
+  });
 
   const onCancelClick = (e: PressEvent) => {
     if (!isDirty?.()) {

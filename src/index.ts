@@ -260,6 +260,7 @@ export { FocusedFormLayout } from "./layouts/Workflow/FocusedFormLayout";
 export type { FocusedFormLayoutProps } from "./layouts/Workflow/FocusedFormLayout";
 export { StepperLayout } from "./layouts/Workflow/StepperLayout";
 export type { StepperLayoutProps, StepperLayoutStep } from "./layouts/Workflow/StepperLayout";
+export type { AllowNavigationArgs } from "./layouts/Workflow/useUnsavedChangesGuard";
 // ./forms
 export * from "./forms/BoundCheckboxField";
 export * from "./forms/BoundCheckboxGroupField";
