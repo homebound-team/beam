@@ -102,9 +102,9 @@ function createProps(overrides: Partial<TableSummaryProps> = {}): TableSummaryPr
 
 function defaultSegments(): StackBarGraphSegment[] {
   return [
-    { label: "Complete", count: 40, status: "success" },
-    { label: "In Progress", count: 32, status: "neutral" },
-    { label: "Incomplete", count: 9, status: "warning" },
-    { label: "Missing", count: 4, status: "error" },
+    { label: "Complete", count: 40, color: Palette.Green500 },
+    { label: "In Progress", count: 32, color: Palette.Gray500 },
+    { label: "Incomplete", count: 9, color: Palette.Orange500 },
+    { label: "Missing", count: 4, color: Palette.Red500 },
   ];
 }

@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+import { Palette } from "src/Css";
 import { StackBarGraph } from "src/components/StackBarGraph";
 
 export default {
@@ -11,10 +12,10 @@ export function Default() {
       title="Coverage by status"
       totalLabel="Cost Codes"
       segments={[
-        { label: "Complete", count: 40, status: "success" },
-        { label: "In Progress", count: 32, status: "neutral" },
-        { label: "Incomplete", count: 9, status: "warning" },
-        { label: "Missing", count: 4, status: "error" },
+        { label: "Complete", count: 40, color: Palette.Green500 },
+        { label: "In Progress", count: 32, color: Palette.Gray500 },
+        { label: "Incomplete", count: 9, color: Palette.Orange500 },
+        { label: "Missing", count: 4, color: Palette.Red500 },
       ]}
     />
   );
@@ -26,8 +27,8 @@ export function ZeroTotal() {
       title="Coverage by status"
       totalLabel="Cost Codes"
       segments={[
-        { label: "Complete", count: 0, status: "success" },
-        { label: "Missing", count: 0, status: "error" },
+        { label: "Complete", count: 0, color: Palette.Green500 },
+        { label: "Missing", count: 0, color: Palette.Red500 },
       ]}
     />
   );

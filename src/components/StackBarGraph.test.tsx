@@ -1,3 +1,4 @@
+import { Palette } from "src/Css";
 import { StackBarGraph } from "src/components/StackBarGraph";
 import { render } from "src/utils/rtl";
 
@@ -9,8 +10,8 @@ describe("StackBarGraph", () => {
         title="Coverage by status"
         totalLabel="Cost Codes"
         segments={[
-          { label: "Complete", count: 0, status: "success" },
-          { label: "Missing", count: 0, status: "error" },
+          { label: "Complete", count: 0, color: Palette.Green500 },
+          { label: "Missing", count: 0, color: Palette.Red500 },
         ]}
       />,
     );
@@ -26,8 +27,8 @@ describe("StackBarGraph", () => {
         title="Coverage by status"
         totalLabel="Cost Codes"
         segments={[
-          { label: "Complete", count: 3, status: "success" },
-          { label: "Missing", count: 1, status: "error" },
+          { label: "Complete", count: 3, color: Palette.Green500 },
+          { label: "Missing", count: 1, color: Palette.Red500 },
         ]}
       />,
     );
@@ -42,7 +43,7 @@ describe("StackBarGraph", () => {
       <StackBarGraph
         title="Bid package status"
         totalLabel="Cost Codes"
-        segments={[{ label: "Complete", count: 40, status: "success" }]}
+        segments={[{ label: "Complete", count: 40, color: Palette.Green500 }]}
       />,
     );
     // Then the custom title is shown

@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from "react";
-import { Css, Palette } from "src/Css";
+import type { BeamColor } from "src/colors";
+import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type StackBarGraphProps = {
@@ -30,7 +31,7 @@ export function StackBarGraph(props: StackBarGraphProps) {
             css={
               Css.w(`${segmentWidth(segment.count, totalCount)}%`)
                 .fs0.add("minWidth", segment.count > 0 ? "1px" : 0)
-                .bgColor(statusColors[segment.status]).$
+                .bgColor(segment.color).$
             }
           />
         ))}
@@ -38,7 +39,7 @@ export function StackBarGraph(props: StackBarGraphProps) {
       <div css={Css.df.fww.aic.gap2.$} {...tid.legend}>
         {segments.map((segment) => (
           <div key={segment.label} css={Css.dif.aic.gapPx(4).$}>
-            <span css={Css.br100.wPx(8).hPx(8).bgColor(statusColors[segment.status]).$} />
+            <span css={Css.br100.wPx(8).hPx(8).bgColor(segment.color).$} />
             <span css={Css.xs.$}>
               {percentage(segment.count, totalCount)}% {segment.label} ({segment.count})
             </span>
@@ -49,12 +50,10 @@ export function StackBarGraph(props: StackBarGraphProps) {
   );
 }
 
-export type StackBarGraphStatus = "success" | "neutral" | "warning" | "error";
-
 export type StackBarGraphSegment = {
   label: string;
   count: number;
-  status: StackBarGraphStatus;
+  color: BeamColor;
 };
 
 function percentage(count: number, total: number): number {
@@ -64,10 +63,3 @@ function percentage(count: number, total: number): number {
 function segmentWidth(count: number, total: number): number {
   return total === 0 ? 0 : (Math.max(0, count) / total) * 100;
 }
-
-const statusColors: Record<StackBarGraphStatus, Palette> = {
-  success: Palette.Green500,
-  neutral: Palette.Gray500,
-  warning: Palette.Orange500,
-  error: Palette.Red500,
-};
