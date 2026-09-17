@@ -1283,6 +1283,36 @@ describe("GridTable", () => {
       expect(cell(r, 2, 0)).toHaveStyle({ boxShadow: "none" });
     });
 
+    it("applies rowStyles background to the companion row", async () => {
+      // Given a data row with a companion and a row background via rowStyles
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rowStyles={{
+            data: {
+              rowCss: Css.bgRed300.$,
+              cellCss: (row) => (row.data.value === 1 ? Css.bgRed300.$ : {}),
+            },
+          }}
+          rows={[
+            simpleHeader,
+            {
+              kind: "data",
+              id: "1",
+              data: { name: "foo", value: 1 },
+              companion: () => <span>Note</span>,
+            },
+          ]}
+        />,
+      );
+
+      // Then the parent cells get the background color
+      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: Palette.Red300 });
+      // And the companion row and cell get the same background color
+      expect(r.companion_1).toHaveStyle({ backgroundColor: Palette.Red300 });
+      expect(cell(r, 2, 0)).toHaveStyle({ backgroundColor: Palette.Red300 });
+    });
+
     it("hoists a companion into the pinned section with its parent row", async () => {
       // Given a body row with a companion, between two other data rows
       const api = new GridTableApiImpl<Row>();
