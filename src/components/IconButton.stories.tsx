@@ -86,6 +86,10 @@ export const Circle = Template.bind({});
 // @ts-ignore
 Circle.args = { variant: "circle" };
 
+export const CircleCompact = Template.bind({});
+// @ts-ignore
+CircleCompact.args = { variant: "circle", compact: true };
+
 export const Outline = Template.bind({});
 // @ts-ignore
 Outline.args = { variant: "outline" };

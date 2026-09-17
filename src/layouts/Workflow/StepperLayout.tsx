@@ -3,6 +3,7 @@ import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import type { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
+import type { RightPaneTrigger } from "./RightPaneTriggers";
 import type { AllowNavigationArgs } from "./useUnsavedChangesGuard";
 import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
@@ -31,6 +32,8 @@ export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleS
     allowNavigation?: (args: AllowNavigationArgs) => boolean;
     /** Full-bleed AI wash on the body. Pair with `aiMode` on a step's `FormSectionLayout`. */
     aiMode?: boolean;
+    /** Icon triggers that open the document-scroll right pane. Hosts the pane — do not also set `withRightPane` on a step body. */
+    rightPaneTriggers?: RightPaneTrigger[];
   };
 
 /**
@@ -49,6 +52,7 @@ export function StepperLayout(props: StepperLayoutProps) {
     isDirty,
     allowNavigation,
     aiMode,
+    rightPaneTriggers,
     ...headerProps
   } = props;
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
@@ -79,6 +83,7 @@ export function StepperLayout(props: StepperLayoutProps) {
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={activeStep?.primaryDisabled}
+      rightPaneTriggers={rightPaneTriggers}
       onContinue={async () => {
         const onContinue = activeStep?.onContinue;
         if (onContinue) {
