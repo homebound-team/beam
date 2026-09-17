@@ -38,6 +38,7 @@ import type {
 } from "src/components/Table/types";
 import { assignDefaultColumnIds, withColumnGutters } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
+import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
@@ -578,6 +579,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     ): ReactElement => {
       const levelStyle =
         style.levels && (typeof style.levels === "function" ? style.levels(rs.level) : style.levels[rs.level]);
+      const rowStyle = rowStyles?.[rs.row.kind as R["kind"]];
       return (
         <CompanionRow
           key={`${rs.key}-companion`}
@@ -591,6 +593,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           position={resolved.position}
           companion={resolved.content}
           levelIndent={levelStyle?.rowIndent}
+          rowCss={maybeApplyFunction(rs.row as any, rowStyle?.rowCss)}
+          cellCss={maybeApplyFunction(rs.row as any, rowStyle?.cellCss)}
         />
       );
     };

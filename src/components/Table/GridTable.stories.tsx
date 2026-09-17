@@ -709,7 +709,7 @@ export function InteractiveGroupRowPinning() {
   );
 }
 
-/** AI-suggestion style companions: full-width content with a data row and no mid separator. */
+/** AI-suggestion companions with a `rowStyles` background color that covers the parent and companion. */
 export const CompanionRows = newStory(() => {
   type OptionData = {
     code: string;
@@ -803,7 +803,17 @@ export const CompanionRows = newStory(() => {
     },
   ];
 
-  return <GridTable columns={columns} rows={rows} />;
+  const rowStyles: RowStyles<OptionRow> = {
+    data: {
+      cellCss: (row) => {
+        if (row.data.suggestion === "add") return Css.bgPurple50.$;
+        if (row.data.suggestion === "remove") return Css.bgRed50.$;
+        return {};
+      },
+    },
+  };
+
+  return <GridTable columns={columns} rows={rows} rowStyles={rowStyles} />;
 }, {});
 
 /**
