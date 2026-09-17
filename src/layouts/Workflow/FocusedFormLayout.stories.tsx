@@ -55,6 +55,27 @@ export function WithoutJumpLinks() {
   );
 }
 
+export function WithRightPaneTriggers() {
+  return (
+    <WithEnvironmentBanner>
+      <FocusedFormLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        rightPaneTriggers={createRightPaneTriggers()}
+      >
+        <FormSectionLayout
+          withJumpLinks
+          title="Link Design Package"
+          description="Connect this package to a market and give it a name."
+          sections={createSections()}
+        />
+      </FocusedFormLayout>
+    </WithEnvironmentBanner>
+  );
+}
+
 export function AiMode() {
   return (
     <WithEnvironmentBanner>
@@ -87,6 +108,23 @@ function createSections() {
     { title: "Package Options", fields: <PlaceholderFields count={3} /> },
     { title: "Internal", excludeJumpLink: true, fields: <PlaceholderFields count={1} /> },
   ];
+}
+
+function createRightPaneTriggers() {
+  return [
+    { icon: "comment" as const, label: "Comments", content: <PanePlaceholder lines={4} /> },
+    { icon: "history" as const, label: "History", content: <PanePlaceholder lines={3} /> },
+  ];
+}
+
+function PanePlaceholder({ lines }: { lines: number }) {
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      {Array.from({ length: lines }, (_, i) => (
+        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
+    </div>
+  );
 }
 
 function PlaceholderFields({ count }: { count: number }) {

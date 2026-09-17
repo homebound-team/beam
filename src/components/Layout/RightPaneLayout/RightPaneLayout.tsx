@@ -22,7 +22,7 @@ export function RightPaneLayout(props: {
       <>
         <div
           css={{
-            ...Css.w(`calc(100% - ${paneWidth + 24}px)`).add("transition", "width .2s linear").h100.mr3.oxa.$,
+            ...Css.w(`calc(100% - ${paneWidth + 24}px)`).transitionWidth.h100.mr3.oxa.$,
             ...Css.if(!isRightPaneOpen).w100.mr0.$,
             ...Css.if(!!defaultPaneContent).w(`calc(100% - ${paneWidth + 24}px)`).mr3.$,
           }}
@@ -57,8 +57,9 @@ export function RightPaneLayout(props: {
                 // Keeping initial x to offset pane width and space between panel and page content
                 initial={{ x: paneWidth + 24, position: "absolute" }}
                 animate={{ x: 0 }}
-                transition={{ ease: "linear", duration: 0.2 }}
-                exit={{ transition: { ease: "linear", duration: 0.2 }, x: paneWidth }}
+                // Copy Css.transition* / truss-motion `normal` + `standard`.
+                transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                exit={{ transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] }, x: paneWidth }}
                 // Clear the content of the detail pane when the animation is completed and only when pane is closing
                 onAnimationComplete={(definition: { x: number }) => definition.x !== 0 && clearPane()}
               >

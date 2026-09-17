@@ -92,7 +92,8 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
           initial={{ x: slideX }}
           animate={{ x: 0 }}
           exit={{ x: slideX }}
-          transition={{ ease: "linear", duration: 0.2 }}
+          // Copy Css.transition* / truss-motion `normal` + `standard`.
+          transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
           onAnimationComplete={(definition: { x?: number | string }) => {
             if (definition.x !== 0 && definition.x !== undefined) releaseAfterExit();
           }}

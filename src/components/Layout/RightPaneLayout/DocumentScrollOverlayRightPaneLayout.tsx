@@ -55,7 +55,13 @@ export function DocumentScrollOverlayRightPaneLayout({
             <div css={Css.w100.mwfc.$} {...tid.main}>
               {children}
             </div>
-            <div ref={spacerRef} aria-hidden css={Css.fs0.fg0.h1.$} style={{ width: 0 }} {...tid.spacer} />
+            <div
+              ref={spacerRef}
+              aria-hidden
+              css={Css.fs0.fg0.h1.transitionWidth.$}
+              style={{ width: 0 }}
+              {...tid.spacer}
+            />
           </div>
           <DocumentScrollOverlayRightPaneHost anchorRef={anchorRef.ref} spacerRef={spacerRef} paneWidth={paneWidth} />
         </>
@@ -76,7 +82,7 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
   const paneWidthCss = documentScrollRightPaneWidthCss(paneWidth);
   const [keepOverlayChrome, setKeepOverlayChrome] = useState(isRightPaneOpen);
 
-  // Keep spacer / width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
+  // Keep width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
   useLayoutEffect(() => {
     if (isRightPaneOpen) {
       setKeepOverlayChrome(true);
@@ -85,10 +91,16 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
     return waitForRightPaneExit(() => setKeepOverlayChrome(false));
   }, [isRightPaneOpen]);
 
-  // Imperatively sync scoped pane width, content floor, root floating offset, and spacer while the pane is open.
+  // Spacer follows open state so width can CSS-transition with the pane slide.
+  useLayoutEffect(() => {
+    const spacer = spacerRef.current;
+    if (!spacer) return;
+    spacer.style.width = isRightPaneOpen ? paneWidthCss : "0px";
+  }, [isRightPaneOpen, paneWidthCss, spacerRef]);
+
+  // Keep width vars until exit so sticky-right columns do not jump mid-slide.
   useLayoutEffect(() => {
     const layoutRoot = anchorRef.current;
-    const spacer = spacerRef.current;
     if (!layoutRoot) return;
 
     const openPaneWidth = keepOverlayChrome ? paneWidthCss : "0px";
@@ -97,19 +109,13 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
     layoutRoot.style.setProperty(beamRightPaneContentMinVar, contentMin);
     // Floating right offset helps position elements such as the "scroll to top" button properly when the pane is open.
     document.documentElement.style.setProperty(beamFloatingRightOffsetVar, openPaneWidth);
-    if (spacer) {
-      spacer.style.width = openPaneWidth;
-    }
 
     return () => {
       layoutRoot.style.setProperty(beamRightPaneWidthVar, "0px");
       layoutRoot.style.setProperty(beamRightPaneContentMinVar, "0px");
       document.documentElement.style.setProperty(beamFloatingRightOffsetVar, "0px");
-      if (spacer) {
-        spacer.style.width = "0px";
-      }
     };
-  }, [anchorRef, keepOverlayChrome, paneWidthCss, spacerRef]);
+  }, [anchorRef, keepOverlayChrome, paneWidthCss]);
 
   return <DocumentScrollRightPane paneWidth={paneWidth} mobile={false} anchorRef={anchorRef} />;
 }
