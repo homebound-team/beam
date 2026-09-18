@@ -108,7 +108,7 @@ export function WithContentHeaderAndTable() {
   );
 }
 
-/** Workflow-hosted Comments / History triggers — do not also set `withRightPane` on the step body. */
+/** Per-step Comments / History triggers — do not also set `withRightPane` on the step body. */
 export function WithRightPaneTriggers() {
   return (
     <WithEnvironmentBanner>
@@ -117,10 +117,10 @@ export function WithRightPaneTriggers() {
         onCancel={action("cancel clicked")}
         completeLabel="Create"
         onComplete={action("complete clicked")}
-        rightPaneTriggers={createRightPaneTriggers()}
         steps={[
           {
             label: "Details",
+            rightPaneTriggers: createRightPaneTriggers(),
             content: (
               <FormSectionLayout
                 withJumpLinks

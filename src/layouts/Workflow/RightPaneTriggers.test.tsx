@@ -49,6 +49,7 @@ describe("RightPaneTriggers", () => {
     expect(r.rightPanePanel_header).toHaveTextContent("Comments");
     expect(r.rightPanePanel_body).toHaveTextContent("Comments body");
     expect(r.rightPanePanel_header.contains(r.rightPanePanel_close)).toBe(true);
+    expect(r.rightPanePanel_close).toHaveFocus();
     expect(r.rightPaneTriggers).toHaveAttribute("aria-hidden", "true");
     expect(r.rightPaneTriggers).toHaveAttribute("inert");
     expect(r.rightPaneTriggers).toHaveStyle({ transform: "translateX(calc(100% + 24px))" });
@@ -66,30 +67,39 @@ describe("RightPaneTriggers", () => {
     expect(r.focusedFormLayout_header.contains(r.rightPaneTriggers)).toBe(false);
   });
 
-  it("keeps the open pane when changing stepper steps", async () => {
-    // Given a stepper with right pane triggers
+  it("closes the pane when changing stepper steps", async () => {
+    // Given a stepper whose first step has right pane triggers
     const r = await render(
       <StepperLayout
         title="Test Workflow"
         onCancel={() => {}}
         completeLabel="Save"
         onComplete={() => {}}
-        rightPaneTriggers={createTriggers()}
         steps={[
-          { label: "Step One", content: <div data-testid="body">Body content</div> },
+          {
+            label: "Step One",
+            content: <div data-testid="body">Body content</div>,
+            rightPaneTriggers: createTriggers(),
+          },
           { label: "Step Two", content: <div data-testid="stepTwoBody">Step two content</div> },
         ]}
       />,
       withRouter(),
     );
 
-    // When Comments is opened and the second step is selected
+    // When Comments is opened
     await clickAndWait(r.rightPaneTriggers_comment);
-    click(r.header_stepperTabs_tab_stepTwo);
 
-    // Then the step changes and the pane stays open
-    expect(r.stepTwoBody).toBeInTheDocument();
+    // Then the pane is open
     expect(r.rightPanePanel_body).toHaveTextContent("Comments body");
+
+    // When the second step is selected
+    await clickAndWait(r.header_stepperTabs_tab_stepTwo);
+
+    // Then the step changes, the pane closes, and this step has no triggers
+    expect(r.stepTwoBody).toBeInTheDocument();
+    expect(r.query.rightPaneContent).toBeNull();
+    expect(r.query.rightPaneTriggers).toBeNull();
   });
 });
 

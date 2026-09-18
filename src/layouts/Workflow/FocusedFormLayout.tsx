@@ -18,7 +18,7 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
     aiMode?: boolean;
     /** Icon triggers that open the document-scroll right pane. Hosts the pane — do not also set `withRightPane` on the body. */
     rightPaneTriggers?: RightPaneTrigger[];
-    /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks` / `withRightPane`). */
+    /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks`). */
     children: ReactNode;
   };
 
