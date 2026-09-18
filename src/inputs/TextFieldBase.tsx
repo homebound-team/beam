@@ -51,7 +51,7 @@ export type TextFieldBaseProps<X> = {
   unfocusedPlaceholder?: ReactNode;
   /** Value proposed by an AI model; puts the field in AI mode. Pre-formatted for display. */
   proposedValue?: string;
-  /** The formatted value on record, rendered struck through beside the input. Independent of `proposedValue`. */
+  /** The formatted value on record, rendered struck through below the field. Independent of `proposedValue`. */
   originalValue?: string;
   /** Called on any edit the user makes, so the owning field can end AI mode. */
   onUserEdit?: VoidFunction;
@@ -138,8 +138,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
 
   // Takes precedence over the `inputStylePalette` / `borderless` / `borderOnHover` backgrounds below.
   const showProposal = proposedValue !== undefined;
-  // Rendered as a sibling of the input rather than an overlay, so it survives focus.
   const showOriginal = originalValue !== undefined && originalValue !== "";
+  // Read-only draws both halves inline instead, since it renders no field for the original to sit under,
+  // and a compound field's halves sit inside its own bordered boxes, so it owns everything below them.
+  const originalBelow = showOriginal && !inputProps.readOnly && !compound ? originalValue : undefined;
+  // Compound fields draw their own; otherwise supporting copy is noise on a field nobody can edit.
+  const showErrorAndHelper = alwaysShowHelperText || (!compound && !inputProps.disabled && !inputProps.readOnly);
 
   const [bgColor, hoverBgColor, disabledBgColor] = showProposal
     ? [Tokens.AiFieldBg, Palette.Purple100, Tokens.FieldBgDisabled]
@@ -335,14 +339,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
                 <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
-              {showOriginal && (
-                <span
-                  css={Css.df.aic.fs0.pr1.tdlt.color(Tokens.OnSurfaceMuted).if(multiline).asfs.pyPx(11).$}
-                  {...tid.originalValue}
-                >
-                  {originalValue}
-                </span>
-              )}
               {unfocusedPlaceholder && (
                 <div
                   // Setting -1 tabIndex as this is a scrollable container, which is focusable by default.
@@ -401,35 +397,57 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             </div>
           ),
         })}
-        {/* Compound fields will handle their own error and helper text.
-          * Do not show error or helper text when 'readOnly' or disabled
-          except if alwaysShowHelperText is provided */}
-        {labelStyle !== "left" &&
-          (alwaysShowHelperText || (!compound && !inputProps.disabled && !inputProps.readOnly)) && (
-            <>
-              {errorMsg && !errorInTooltip && (
-                <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
-              )}
-              {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-            </>
-          )}
+        {labelStyle !== "left" && (
+          <>
+            {/* Outside `showErrorAndHelper`, because a disabled field still shows what it's replacing. */}
+            {originalBelow && <OriginalValue originalValue={originalBelow} {...tid.originalValue} />}
+            {showErrorAndHelper && (
+              <>
+                {errorMsg && !errorInTooltip && (
+                  <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+                )}
+                {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+              </>
+            )}
+          </>
+        )}
       </div>
-      {/* Error message and helper text for "left" labelStyle */}
+      {/* Original value, error message, and helper text for "left" labelStyle, whose container is a row.
+       * TODO: check with design on this look. This block has always hung at the container's left edge,
+       * i.e. under the label rather than under the field, which reads fine for helper prose but leaves
+       * the struck original stranded away from the value it's replacing. Aligning it would mean
+       * offsetting the whole block by `labelLeftFieldWidth`, which moves every left-label field in Beam. */}
       {labelStyle === "left" &&
-        (alwaysShowHelperText ||
+        (originalBelow ||
+          alwaysShowHelperText ||
           (!compound &&
             !inputProps.disabled &&
             !inputProps.readOnly &&
             ((errorMsg && !errorInTooltip) || helperText))) && (
           // Reduces the margin between the error/helper text and input field
           <div css={Css.mtPx(-8).$}>
-            {errorMsg && !errorInTooltip && (
-              <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+            {originalBelow && <OriginalValue originalValue={originalBelow} {...tid.originalValue} />}
+            {showErrorAndHelper && (
+              <>
+                {errorMsg && !errorInTooltip && (
+                  <ErrorMessage id={errorMessageId} errorMsg={errorMsg} hidden={hideErrorMessage} {...tid.errorMsg} />
+                )}
+                {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
+              </>
             )}
-            {helperText && <HelperText helperText={helperText} {...tid.helperText} />}
           </div>
         )}
     </>
+  );
+}
+
+/** The on-record value, struck through, in the slot below the field. */
+function OriginalValue(props: { originalValue: string }) {
+  const { originalValue, ...others } = props;
+  return (
+    <div css={Css.color(Tokens.TextHelper).xs.mtPx(4).tdlt.$} {...others}>
+      {originalValue}
+    </div>
   );
 }
 

@@ -16,7 +16,7 @@ export type UseAiProposalResult<V> = {
 
 /**
  * Drives a field's "AI mode": the proposal becomes the field's effective value — displayed and handed
- * to its input — while the on-record value is rendered struck through beside it.
+ * to its input — while the on-record value is rendered struck through below it.
  *
  * The two halves end at different times, on purpose. The AI styling drops as soon as the user types,
  * so they see their own text normally, but the struck original stays until they leave the field so it

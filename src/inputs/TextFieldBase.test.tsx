@@ -51,7 +51,7 @@ describe("TextFieldBase", () => {
   });
 
   describe("AI mode", () => {
-    it("renders the original struck through beside the input", async () => {
+    it("renders the original struck through below the field", async () => {
       const r = await render(
         <TextFieldBase inputProps={{ value: "Down" }} label="Test" originalValue="Up" proposedValue="Down" />,
       );
@@ -60,17 +60,80 @@ describe("TextFieldBase", () => {
       expect(r.test).toHaveAttribute("data-ai-mode", "true");
       expect(r.test_originalValue).toHaveTextContent("Up");
       expect(r.test_originalValue).toHaveStyle({ textDecoration: "line-through" });
+      // Below the field, not inside it, so a long original can't crowd out the proposal
+      expect(r.test.parentElement).not.toContainElement(r.test_originalValue);
     });
 
     it("keeps the original visible on focus", async () => {
-      // The whole point of it being a sibling rather than an overlay
+      // It stays put while the user types over the proposal, so it remains a reference
       const r = await render(
         <TextFieldBase inputProps={{ value: "Down" }} label="Test" originalValue="Up" proposedValue="Down" />,
       );
       focus(r.test);
       expect(r.test_originalValue).toBeInTheDocument();
       expect(r.test).toHaveAttribute("data-ai-mode", "true");
-      expect(r.test).not.toHaveStyle({ position: "absolute" });
+    });
+
+    it("stacks the original above the error and helper text", async () => {
+      const r = await render(
+        <TextFieldBase
+          inputProps={{ value: "Down" }}
+          label="Test"
+          originalValue="Up"
+          proposedValue="Down"
+          errorMsg="Error"
+          helperText="Helper"
+        />,
+      );
+      // Reading down the field: label, original, error, helper
+      expect(r.test_originalValue.parentElement).toHaveTextContent(/Test.*Up.*Error.*Helper/);
+    });
+
+    it("renders the original outside the row when the label is to the left", async () => {
+      // That layout puts the label and field in a flex row, so the original has to render after it
+      const r = await render(
+        <TextFieldBase
+          inputProps={{ value: "Down" }}
+          label="Test"
+          originalValue="Up"
+          proposedValue="Down"
+          labelStyle="left"
+        />,
+      );
+      const labelAndFieldRow = r.test.parentElement!.parentElement!;
+      expect(labelAndFieldRow).not.toContainElement(r.test_originalValue);
+      expect(r.test_originalValue).toHaveTextContent("Up");
+    });
+
+    it("shows the original when disabled", async () => {
+      // Unlike helper text, which is noise on a field nobody can edit, the original is what's being replaced
+      const r = await render(
+        <TextFieldBase
+          inputProps={{ value: "Down", disabled: true }}
+          label="Test"
+          originalValue="Up"
+          proposedValue="Down"
+          helperText="Helper"
+        />,
+      );
+      expect(r.test_originalValue).toHaveTextContent("Up");
+      expect(r.query.test_helperText).not.toBeInTheDocument();
+    });
+
+    it("shows the original when disabled and the label is to the left", async () => {
+      // "left" keeps the original and the helper text in one block, so they can still part ways
+      const r = await render(
+        <TextFieldBase
+          inputProps={{ value: "Down", disabled: true }}
+          label="Test"
+          originalValue="Up"
+          proposedValue="Down"
+          helperText="Helper"
+          labelStyle="left"
+        />,
+      );
+      expect(r.test_originalValue).toHaveTextContent("Up");
+      expect(r.query.test_helperText).not.toBeInTheDocument();
     });
 
     it("omits the original when the field had no prior value", async () => {
