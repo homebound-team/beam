@@ -34,6 +34,8 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
   isDirtyRef.current = isDirty;
   const allowNavigationRef = useRef(allowNavigation);
   allowNavigationRef.current = allowNavigation;
+  // Set only while a confirmed Cancel runs, so if a navigation redirect happens during onCancel, that redirect is not blocked by useBlocker
+  const allowCancelNavigationRef = useRef(false);
 
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -47,9 +49,19 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
 
   // Always call the hook; block only when dirty and the app has not allowlisted this navigation.
   const blocker = useBlocker((args) => {
+    if (allowCancelNavigationRef.current) {
+      return false;
+    }
     // Short-circuits, so a clean form is never asked and never blocks.
     return !!isDirtyRef.current?.() && !allowNavigationRef.current?.(args);
   });
+
+  const confirmCancel = (e: PressEvent) => {
+    allowCancelNavigationRef.current = true;
+    onCancel(e);
+    // Only the navigation started from this onCancel is allowlisted.
+    allowCancelNavigationRef.current = false;
+  };
 
   const onCancelClick = (e: PressEvent) => {
     if (!isDirty?.()) {
@@ -58,7 +70,7 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
     }
     openModal({
       allowClosing: false,
-      content: <ConfirmCloseModal onClose={() => onCancel(e)} />,
+      content: <ConfirmCloseModal onClose={() => confirmCancel(e)} />,
     });
   };
 
