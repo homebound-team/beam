@@ -25,7 +25,7 @@ export function WorkflowPageRightPaneTriggers(props: { triggers: RightPaneTrigge
   const tid = useTestIds(props, "rightPaneTriggers");
   const pageTriggerInsetPx = 24;
 
-  const onSelect = useCallback(
+  const onClick = useCallback(
     (trigger: RightPaneTrigger) => {
       openRightPane({
         content: <RightPanePanel title={trigger.label}>{trigger.content}</RightPanePanel>,
@@ -60,7 +60,7 @@ export function WorkflowPageRightPaneTriggers(props: { triggers: RightPaneTrigge
           label={trigger.label}
           variant="circle"
           compact={isMobile}
-          onClick={() => onSelect(trigger)}
+          onClick={() => onClick(trigger)}
           {...tid[trigger.icon]}
         />
       ))}
