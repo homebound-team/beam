@@ -22,6 +22,8 @@ export const zIndices = {
   scrollShadow: 50,
   // Document-scroll detail pane (DocumentScrollOverlayRightPaneLayout) — above table sticky chrome, below page sticky headers.
   rightPane: 60,
+  // Workflow floating right-pane triggers — above the pane, below sticky headers.
+  rightPaneTriggers: 65,
   pageStickyHeader: 70,
   // Sticky mobile action footer (workflow layouts) — same tier as pageStickyHeader; header and footer never overlap on screen.
   pageStickyFooter: 70,
