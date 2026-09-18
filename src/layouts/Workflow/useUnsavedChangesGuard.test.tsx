@@ -67,6 +67,47 @@ describe("useUnsavedChangesGuard", () => {
       // Then onCancel is not called
       expect(onCancel).not.toHaveBeenCalled();
     });
+
+    it("does not open a second confirm modal when Discard Changes navigates away while still dirty", async () => {
+      // Given a dirty form whose Cancel handler starts a redirect (typical product onCancel)
+      const router = withRouter("/");
+      const r = await render(
+        <Harness
+          isDirty={() => true}
+          onCancel={() => {
+            void router.navigate("/other");
+          }}
+        />,
+        router,
+      );
+
+      // When the user Cancels and confirms Discard Changes
+      click(r.cancel);
+      expect(r.discardChanges).toBeInTheDocument();
+      await clickAndWait(r.discardChanges);
+
+      // Then the cancel-driven navigation is not re-blocked by useBlocker
+      expect(r.queryByText("Leave page?")).toBeNull();
+      expect(r.query.discardChanges).toBeNull();
+      expect(router.location.pathname).toBe("/other");
+    });
+
+    it("still blocks later navigations if Cancel discard does not navigate", async () => {
+      // Given a dirty form whose Cancel handler does not redirect
+      const router = withRouter("/");
+      const r = await render(<Harness isDirty={() => true} onCancel={vi.fn()} />, router);
+
+      // When the user Cancels and confirms Discard Changes, then later navigates away
+      click(r.cancel);
+      click(r.discardChanges);
+      await act(async () => {
+        await router.navigate("/other");
+      });
+
+      // Then that later navigation is still blocked
+      expect(router.location.pathname).toBe("/");
+      expect(r.getByText("Leave page?")).toBeInTheDocument();
+    });
   });
 
   describe("beforeunload", () => {

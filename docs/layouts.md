@@ -121,7 +121,7 @@ import {
 </FocusedFormLayout>
 ```
 
-When `isDirty` returns true, Cancel, in-app React Router navigation, and tab close/refresh ask the user to confirm before leaving. Requires a data router (`RouterProvider` / `createBrowserRouter`) for in-app blocking. Do **not** also register the same form with an app-level navigation check (e.g. `useRegisterNavigationCheck`) — only one `useBlocker` should guard the page.
+When `isDirty` returns true, Cancel, in-app React Router navigation, and tab close/refresh ask the user to confirm before leaving. Confirming Discard on Cancel lets `onCancel`'s navigation through without a second prompt — do not clear dirty first. Requires a data router (`RouterProvider` / `createBrowserRouter`) for in-app blocking. Do **not** also register the same form with an app-level navigation check (e.g. `useRegisterNavigationCheck`) — only one `useBlocker` should guard the page.
 
 #### Allowing route changes that stay on the same form
 
