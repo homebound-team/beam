@@ -188,8 +188,8 @@ export function Modal(props: ModalProps) {
                   Use `fdrr` so that the close icon won't sit between "modal header search field"
                   and the modal body results in the DOM focus order, i.e. in our global search modal.
                 */}
-                {/* `pb2` because `main` supplies the other half of the gap, inside its scroll area. */}
-                <header css={Css.df.fdrr.p3.pb2.fs0.if(drawHeaderBorder).bb.bc(Tokens.SurfaceSeparator).$}>
+                {/* Half the gap to the body; `main` owns the other half, inside its scroll area. */}
+                <header css={Css.df.fdrr.p3.pbPx(12).fs0.if(drawHeaderBorder).bb.bc(Tokens.SurfaceSeparator).$}>
                   <span css={Css.fs0.pl1.$}>
                     {allowClosing && <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />}
                   </span>
@@ -206,7 +206,7 @@ export function Modal(props: ModalProps) {
                 <div ref={modalBannerRef} css={Css.fs0.$} />
                 <main
                   ref={modalBodyRef}
-                  css={Css.fg1.oya.pt2.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
+                  css={Css.fg1.oya.ptPx(12).if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {content}
@@ -232,7 +232,14 @@ export function ModalHeader({ children }: { children: ReactNode }): JSX.Element 
 export function ModalBanner({ children }: { children: ReactNode }): JSX.Element {
   const { modalBannerDiv } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
-  return createPortal(<div {...testId.banner}>{children}</div>, modalBannerDiv);
+  // 4px over the header's 12px gives the 16px the design wants; a bottom margin would sit outside
+  // `main` and strand a gap the body can't scroll.
+  return createPortal(
+    <div css={Css.mtPx(4).$} {...testId.banner}>
+      {children}
+    </div>,
+    modalBannerDiv,
+  );
 }
 
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */
