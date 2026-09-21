@@ -1,14 +1,11 @@
 import { useResizeObserver } from "@react-aria/utils";
 import {
-  createContext,
   type JSX,
   type MutableRefObject,
   type PropsWithChildren,
   type ReactNode,
   useCallback,
-  useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -21,7 +18,6 @@ import { BlueprintAiLogo } from "src/components/Logos/BlueprintAiLogo";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, type Only, Tokens, type Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { ModalProvider } from "./ModalContext";
@@ -63,9 +59,6 @@ export type ModalProps = {
 export type ModalApi = {
   setSize: (size: ModalProps["size"]) => void;
 };
-
-/** Lets `ModalBanner` tell `Modal` it exists, so the header and body can reflow their padding around it. */
-const SetHasBannerContext = createContext<(hasBanner: boolean) => void>(noop);
 
 /**
  * Internal component for displaying a Modal; see `useModal` for the public API.
@@ -124,7 +117,6 @@ export function Modal(props: ModalProps) {
   }
 
   const [hasScroll, setHasScroll] = useState(forceScrolling ?? false);
-  const [hasBanner, setHasBanner] = useState(false);
 
   useResizeObserver({
     ref: modalBodyRef,
@@ -196,9 +188,8 @@ export function Modal(props: ModalProps) {
                   Use `fdrr` so that the close icon won't sit between "modal header search field"
                   and the modal body results in the DOM focus order, i.e. in our global search modal.
                 */}
-                <header
-                  css={Css.df.fdrr.p3.fs0.if(hasBanner).pb2.if(drawHeaderBorder).bb.bc(Tokens.SurfaceSeparator).$}
-                >
+                {/* `pb2` because `main` supplies the other half of the gap, inside its scroll area. */}
+                <header css={Css.df.fdrr.p3.pb2.fs0.if(drawHeaderBorder).bb.bc(Tokens.SurfaceSeparator).$}>
                   <span css={Css.fs0.pl1.$}>
                     {allowClosing && <IconButton icon="x" onClick={closeModal} {...testId.titleClose} />}
                   </span>
@@ -215,13 +206,10 @@ export function Modal(props: ModalProps) {
                 <div ref={modalBannerRef} css={Css.fs0.$} />
                 <main
                   ref={modalBodyRef}
-                  css={
-                    Css.fg1.oya.if(hasBanner).pt3.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys
-                      .$
-                  }
+                  css={Css.fg1.oya.pt2.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
-                  <SetHasBannerContext.Provider value={setHasBanner}>{content}</SetHasBannerContext.Provider>
+                  {content}
                 </main>
                 <footer css={Css.fs0.$}>
                   <div ref={modalFooterRef} />
@@ -243,13 +231,7 @@ export function ModalHeader({ children }: { children: ReactNode }): JSX.Element 
 /** A full-bleed slot between the header and the body, i.e. for an `AiSlimBanner`. */
 export function ModalBanner({ children }: { children: ReactNode }): JSX.Element {
   const { modalBannerDiv } = useBeamContext();
-  const setHasBanner = useContext(SetHasBannerContext);
   const testId = useTestIds({}, testIdPrefix);
-  // Layout effect so the modal's padding reflows before the first paint, i.e. without a jump.
-  useLayoutEffect(() => {
-    setHasBanner(true);
-    return () => setHasBanner(false);
-  }, [setHasBanner]);
   return createPortal(<div {...testId.banner}>{children}</div>, modalBannerDiv);
 }
 
