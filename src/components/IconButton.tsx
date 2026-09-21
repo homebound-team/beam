@@ -159,8 +159,8 @@ function variantStyles(variant: IconButtonVariant, { compact }: { compact: boole
         .sqPx(compact ? 32 : 48)
         .bc(Tokens.FieldBorderDefault)
         .ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
-      hover: Css.bgBlue100.bcBlue200.$,
-      focus: Css.bgBlue100.bc(Tokens.FieldBorderFocus).$,
+      hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
+      focus: Css.bgColor(Tokens.SurfaceRaisedHover).bc(Tokens.FieldBorderFocus).$,
       pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,
     };
   }
