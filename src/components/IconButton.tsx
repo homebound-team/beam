@@ -24,7 +24,10 @@ export type IconButtonProps = {
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement | null>;
-  /** Shrinks the control: 18px for default, 32px for `circle`. */
+  /**
+   * Opts into the smaller size: 18px instead of 28px, or 32px instead of 48px for `circle` so the ring still pads the icon. `outline` ignores this.
+   * Treat these sizes as interim — IconButton is expected to be revisited with Design System.
+   */
   compact?: boolean;
   /** Visual variant of the button. Defaults to "default". */
   variant?: IconButtonVariant;
