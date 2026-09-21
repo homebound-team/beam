@@ -16,7 +16,11 @@ import {
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useMeasuredHeight } from "../useMeasuredHeight";
-import { UnsavedChangesNavigationModal, useUnsavedChangesGuard } from "./useUnsavedChangesGuard";
+import {
+  type AllowNavigationArgs,
+  UnsavedChangesNavigationModal,
+  useUnsavedChangesGuard,
+} from "./useUnsavedChangesGuard";
 import { WorkflowActions, type WorkflowActionsProps } from "./WorkflowActions";
 
 export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
@@ -26,6 +30,8 @@ export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentT
     aiMode?: boolean;
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
+    /** Consulted only while dirty — return true to allow a route change that stays on this form. */
+    allowNavigation?: (args: AllowNavigationArgs) => boolean;
     children: ReactNode;
   };
 
@@ -33,11 +39,21 @@ const mobileFooterHeightPx = 80;
 
 /** Internal fixed header + mobile footer + optional AI wash. Not part of the public API. */
 export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
-  const { stepperTabs, aiMode, isDirty, children, title, documentTitleSuffix, breadcrumbs, onCancel, ...actionProps } =
-    props;
+  const {
+    stepperTabs,
+    aiMode,
+    isDirty,
+    allowNavigation,
+    children,
+    title,
+    documentTitleSuffix,
+    breadcrumbs,
+    onCancel,
+    ...actionProps
+  } = props;
   const tid = useTestIds(props, "workflowPageLayout");
   const { sm: isMobile } = useBreakpoint();
-  const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard({ isDirty, onCancel });
+  const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard({ isDirty, allowNavigation, onCancel });
   const actions = <WorkflowActions {...actionProps} aiMode={aiMode} onCancel={onCancelClick} />;
 
   const headerMetricsRef = useRef<HTMLDivElement>(null);

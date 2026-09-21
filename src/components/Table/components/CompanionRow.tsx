@@ -3,7 +3,7 @@ import { isValidElement, type ReactNode } from "react";
 import { maybeApply } from "src/components/Table/GridTableApi";
 import type { GridStyle } from "src/components/Table/TableStyles";
 import type { MaybeFn, RenderAs } from "src/components/Table/types";
-import { Css } from "src/Css";
+import { Css, type Properties } from "src/Css";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
 import { beamRightPaneWidthVar, documentScrollChromeLeft, documentScrollChromeWidth } from "src/layouts/layoutVars";
@@ -22,6 +22,10 @@ type CompanionRowProps = {
   position?: CompanionPosition;
   companion: CompanionContent;
   levelIndent?: number;
+  /** Owning row's `rowStyles.rowCss`, mirrored onto this wrapper. */
+  rowCss?: Properties;
+  /** Owning row's `rowStyles.cellCss` — background color lives here (cells sit over the wrapper). */
+  cellCss?: Properties;
 };
 
 /** Full-width row rendered beside a data row when `GridDataRow.companion` is set. */
@@ -37,6 +41,8 @@ function CompanionRowImpl(props: CompanionRowProps) {
     companion,
     position = "trailing",
     levelIndent,
+    rowCss,
+    cellCss,
   } = props;
   const RowTag = as === "table" ? "tr" : "div";
   const CellTag = as === "table" ? "td" : "div";
@@ -61,6 +67,7 @@ function CompanionRowImpl(props: CompanionRowProps) {
         ...(isFirstBodyRow && style.firstBodyRowCss),
         ...(levelIndent && Css.mlPx(levelIndent).$),
         ...(isLastBodyRow && style.lastRowCss),
+        ...rowCss,
       }}
       data-gridrow
       {...tid[rowId]}
@@ -74,6 +81,7 @@ function CompanionRowImpl(props: CompanionRowProps) {
           ...(isLastBodyRow && style.lastRowCellCss),
           ...(isLastBodyRow && style.lastRowFirstCellCss),
           ...(isLastBodyRow && style.lastRowLastCellCss),
+          ...cellCss,
           // Companion content is arbitrary — allow wrapping and grow with content.
           ...Css.h("auto")
             .whiteSpace("normal")

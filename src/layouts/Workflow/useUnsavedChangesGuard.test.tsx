@@ -2,7 +2,11 @@ import type { PressEvent } from "@react-types/shared";
 import { act } from "@testing-library/react";
 import { Button } from "src/components/Button";
 import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
-import { UnsavedChangesNavigationModal, useUnsavedChangesGuard } from "./useUnsavedChangesGuard";
+import {
+  type AllowNavigationArgs,
+  UnsavedChangesNavigationModal,
+  useUnsavedChangesGuard,
+} from "./useUnsavedChangesGuard";
 
 describe("useUnsavedChangesGuard", () => {
   describe("Cancel", () => {
@@ -62,6 +66,47 @@ describe("useUnsavedChangesGuard", () => {
 
       // Then onCancel is not called
       expect(onCancel).not.toHaveBeenCalled();
+    });
+
+    it("does not open a second confirm modal when Discard Changes navigates away while still dirty", async () => {
+      // Given a dirty form whose Cancel handler starts a redirect (typical product onCancel)
+      const router = withRouter("/");
+      const r = await render(
+        <Harness
+          isDirty={() => true}
+          onCancel={() => {
+            void router.navigate("/other");
+          }}
+        />,
+        router,
+      );
+
+      // When the user Cancels and confirms Discard Changes
+      click(r.cancel);
+      expect(r.discardChanges).toBeInTheDocument();
+      await clickAndWait(r.discardChanges);
+
+      // Then the cancel-driven navigation is not re-blocked by useBlocker
+      expect(r.queryByText("Leave page?")).toBeNull();
+      expect(r.query.discardChanges).toBeNull();
+      expect(router.location.pathname).toBe("/other");
+    });
+
+    it("still blocks later navigations if Cancel discard does not navigate", async () => {
+      // Given a dirty form whose Cancel handler does not redirect
+      const router = withRouter("/");
+      const r = await render(<Harness isDirty={() => true} onCancel={vi.fn()} />, router);
+
+      // When the user Cancels and confirms Discard Changes, then later navigates away
+      click(r.cancel);
+      click(r.discardChanges);
+      await act(async () => {
+        await router.navigate("/other");
+      });
+
+      // Then that later navigation is still blocked
+      expect(router.location.pathname).toBe("/");
+      expect(r.getByText("Leave page?")).toBeInTheDocument();
     });
   });
 
@@ -200,9 +245,141 @@ describe("useUnsavedChangesGuard", () => {
       expect(router.location.pathname).toBe("/");
     });
   });
+
+  describe("allowNavigation", () => {
+    it("lets an allowed navigation through while dirty", async () => {
+      // Given a dirty form that allows other variants of the same listing
+      const router = withRouter("/listing/mv:1");
+      const r = await render(<Harness {...allowSameListing()} />, router);
+
+      // When navigating to another variant
+      await act(async () => {
+        await router.navigate("/listing/mv:2");
+      });
+
+      // Then navigation proceeds with no confirm modal
+      expect(router.location.pathname).toBe("/listing/mv:2");
+      expect(r.query.discardChanges).toBeNull();
+    });
+
+    it("still blocks navigations it does not allow", async () => {
+      // Given a dirty form that allows other variants of the same listing
+      const router = withRouter("/listing/mv:1");
+      const r = await render(<Harness {...allowSameListing()} />, router);
+
+      // When navigating off the listing
+      await act(async () => {
+        await router.navigate("/other-listing/mv:9");
+      });
+
+      // Then navigation is blocked and a confirm modal appears
+      expect(router.location.pathname).toBe("/listing/mv:1");
+      expect(r.discardChanges).toBeInTheDocument();
+    });
+
+    it("is given the pending navigation", async () => {
+      // Given a dirty form that allows everything
+      const allowNavigation = vi.fn().mockReturnValue(true);
+      const router = withRouter("/listing/mv:1");
+      await render(<Harness isDirty={() => true} allowNavigation={allowNavigation} onCancel={vi.fn()} />, router);
+
+      // When navigating
+      await act(async () => {
+        await router.navigate("/listing/mv:2");
+      });
+
+      // Then it saw where the user came from and is going
+      expect(allowNavigation).toHaveBeenCalledWith({
+        currentLocation: expect.objectContaining({ pathname: "/listing/mv:1" }),
+        nextLocation: expect.objectContaining({ pathname: "/listing/mv:2" }),
+        historyAction: "PUSH",
+      });
+    });
+
+    it("is consulted for browser Back", async () => {
+      // Given a dirty form the user reached from outside the listing
+      const allowNavigation = vi.fn((args: AllowNavigationArgs) => args.nextLocation.pathname.startsWith("/listing/"));
+      const router = withRouter("/other");
+      const r = await render(
+        <Harness isDirty={() => true} allowNavigation={allowNavigation} onCancel={vi.fn()} />,
+        router,
+      );
+      await act(async () => {
+        await router.navigate("/listing/mv:1");
+      });
+
+      // When they press Back, which leaves the listing
+      await act(async () => {
+        await router.memoryRouter.navigate(-1);
+      });
+
+      // Then the POP was offered to the callback, and its answer honored
+      expect(allowNavigation).toHaveBeenLastCalledWith(expect.objectContaining({ historyAction: "POP" }));
+      expect(router.location.pathname).toBe("/listing/mv:1");
+      expect(r.discardChanges).toBeInTheDocument();
+    });
+
+    it("is not consulted when the form is clean", async () => {
+      // Given a clean form whose allowNavigation would refuse everything
+      const allowNavigation = vi.fn().mockReturnValue(false);
+      const router = withRouter("/listing/mv:1");
+      await render(<Harness isDirty={() => false} allowNavigation={allowNavigation} onCancel={vi.fn()} />, router);
+
+      // When navigating away
+      await act(async () => {
+        await router.navigate("/other");
+      });
+
+      // Then a clean form never asks, and never blocks
+      expect(allowNavigation).not.toHaveBeenCalled();
+      expect(router.location.pathname).toBe("/other");
+    });
+
+    it("does not affect tab close", async () => {
+      // Given a dirty form that allows every in-app navigation
+      await render(<Harness isDirty={() => true} allowNavigation={() => true} onCancel={vi.fn()} />, withRouter());
+
+      // When beforeunload fires
+      const event = new Event("beforeunload", { cancelable: true });
+      const preventDefault = vi.spyOn(event, "preventDefault");
+      window.dispatchEvent(event);
+
+      // Then the unload is still cancelled — a reload loses the form either way
+      expect(preventDefault).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not affect Cancel", async () => {
+      // Given a dirty form that allows every in-app navigation
+      const onCancel = vi.fn();
+      const r = await render(
+        <Harness isDirty={() => true} allowNavigation={() => true} onCancel={onCancel} />,
+        withRouter(),
+      );
+
+      // When Cancel is clicked
+      click(r.cancel);
+
+      // Then it still confirms before leaving
+      expect(r.discardChanges).toBeInTheDocument();
+      expect(onCancel).not.toHaveBeenCalled();
+    });
+  });
 });
 
-function Harness(props: { isDirty?: () => boolean; onCancel: (e: PressEvent) => void }) {
+/** A dirty form that keeps the user on `/listing/...`, i.e. variant swaps on the same form. */
+function allowSameListing() {
+  return {
+    isDirty: () => true,
+    allowNavigation: ({ nextLocation }: AllowNavigationArgs) => nextLocation.pathname.startsWith("/listing/"),
+    onCancel: vi.fn(),
+  };
+}
+
+function Harness(props: {
+  isDirty?: () => boolean;
+  allowNavigation?: (args: AllowNavigationArgs) => boolean;
+  onCancel: (e: PressEvent) => void;
+}) {
   const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard(props);
   return (
     <>

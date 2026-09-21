@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { useTestIds } from "src/utils/useTestIds";
+import type { AllowNavigationArgs } from "./useUnsavedChangesGuard";
 import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
@@ -10,6 +11,8 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
     primaryDisabled?: WorkflowActionsProps["primaryDisabled"];
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
+    /** Consulted only while dirty — return true to allow a route change that stays on this form. */
+    allowNavigation?: (args: AllowNavigationArgs) => boolean;
     /** Full-bleed AI wash on the body and the `ai` Create/Save variant. Pair with body `aiMode` (e.g. FormSectionLayout). */
     aiMode?: boolean;
     /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks` / `withRightPane`). */
@@ -29,6 +32,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
     onSaveAndExit,
     primaryDisabled,
     isDirty,
+    allowNavigation,
     aiMode,
     children,
     ...headerProps
@@ -41,6 +45,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
       {...headerProps}
       aiMode={aiMode}
       isDirty={isDirty}
+      allowNavigation={allowNavigation}
       onCancel={onCancel}
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}

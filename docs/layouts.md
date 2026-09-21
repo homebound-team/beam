@@ -18,8 +18,8 @@ This document is the **canonical contract** for structural page layouts in Beam.
 | `NavbarLayout`            | `Navbar`                       | `navbar: NavbarProps`; body → **`children`**                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `SideNavLayout`           | `SideNav`                      | `sideNav: SideNavProps`; content → **`children`**; `railWidthPx?`, `showCollapseToggle?`, `contrastRail?`                                                                                                                                                                                                                                                                                                                                                |
 | `PageHeaderLayout`        | `PageHeader`                   | `pageHeader: PageHeaderProps`; always includes `AutoSaveIndicator` in the header actions area (hidden while idle); body → **`children`**                                                                                                                                                                                                                                                                                                                |
-| `StepperLayout`           | `WorkflowHeader` + steps       | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?` flattened onto `StepperLayoutProps`, `steps: StepperLayoutStep[]` (label/`primaryDisabled?`/`disabled?`/content — no `value`, it's derived from `label`) — `primaryDisabled` gates Continue/Complete (`boolean \| ReactNode`, same as `Button.disabled`); `disabled` only locks the tab. Active step's `content` is the body and need not be `FormSectionLayout`; `defaultStep?` picks the initial step; standalone, only ever under `EnvironmentBannerLayout` (see rule 3). `aiMode?` paints the body AI background and uses the `ai` Continue/Complete variant — pair with `FormSectionLayout` `aiMode` for the card + gradient title. |
-| `FocusedFormLayout`       | `WorkflowHeader` (no steps)    | Same flattened chrome as `StepperLayout`, plus `primaryDisabled?` (gates Create/Save; a ReactNode is the tooltip), `aiMode?` (page wash + `ai` CTA), and body → **`children`** (typically `FormSectionLayout`). Does **not** own JumpLinks or the right pane — pass `withJumpLinks` / `withRightPane` on the body `FormSectionLayout`. Standalone, only ever under `EnvironmentBannerLayout` (see rule 3). |
+| `StepperLayout`           | `WorkflowHeader` + steps       | `title`, `onCancel`, `completeLabel`, `onComplete`, `onSaveAndExit?`, `isDirty?`, `allowNavigation?` flattened onto `StepperLayoutProps`, `steps: StepperLayoutStep[]` (label/`primaryDisabled?`/`disabled?`/content — no `value`, it's derived from `label`) — `primaryDisabled` gates Continue/Complete (`boolean \| ReactNode`, same as `Button.disabled`); `disabled` only locks the tab. Active step's `content` is the body and need not be `FormSectionLayout`; `defaultStep?` picks the initial step; standalone, only ever under `EnvironmentBannerLayout` (see rule 3). `aiMode?` paints the body AI background and uses the `ai` Continue/Complete variant — pair with `FormSectionLayout` `aiMode` for the card + gradient title. |
+| `FocusedFormLayout`       | `WorkflowHeader` (no steps)    | Same flattened chrome as `StepperLayout` (`isDirty?` / `allowNavigation?` included), plus `primaryDisabled?` (gates Create/Save; a ReactNode is the tooltip), `aiMode?` (page wash + `ai` CTA), and body → **`children`** (typically `FormSectionLayout`). Does **not** own JumpLinks or the right pane — pass `withJumpLinks` / `withRightPane` on the body `FormSectionLayout`. Standalone, only ever under `EnvironmentBannerLayout` (see rule 3). |
 | `CenteredLayout`          | centered body-width shell      | `size: "sm" \| "lg"`; body → **`children`**; optional `withRightPane?` wraps the shell in `DocumentScrollOverlayRightPaneLayout`. **Not** a chrome peer (see rule 2). Horizontal padding 12px / 24px from `md`, publishes `--beam-layout-content-padding-x` for `layoutContainer` / sticky in-column chrome. `sm` = 720px content (768px shell max); `lg` = 1392px content (1440px shell max). `FormSectionLayout` wraps `CenteredLayout size="sm"` — do not wrap it again, and do not also set `withRightPane` on that inner shell when the form already hosts the pane. `FormSectionLayout` `aiMode` wraps that content in `AiCard`. |
 | `FormSectionLayout`       | form + optional JumpLinks      | `title`, `sections?`, `withJumpLinks?` (default false; rail needs 2+ includable sections, hidden on `sm`), `excludeJumpLink` on a section to omit it from the rail, `aiMode?` (`AiCard` + gradient title), `withRightPane?` (`true` / px / `{ width? }`) to host JumpLinks + form in `DocumentScrollOverlayRightPaneLayout` (open via `useRightPane` — do not nest another right-pane host). Use as a `StepperLayout` step body or as `FocusedFormLayout` children. The rail does **not** shift the form: the content column mirrors the rail's 192px on its right, so the shell stays centered on the page exactly as it is without the rail (CSS-only `clamp`, no measuring). Below ~1152px there is no room for both, so the mirror shrinks and the form keeps its full width instead of narrowing. |
 
@@ -121,7 +121,27 @@ import {
 </FocusedFormLayout>
 ```
 
-When `isDirty` returns true, Cancel, in-app React Router navigation, and tab close/refresh ask the user to confirm before leaving. Requires a data router (`RouterProvider` / `createBrowserRouter`) for in-app blocking. Do **not** also register the same form with an app-level navigation check (e.g. `useRegisterNavigationCheck`) — only one `useBlocker` should guard the page.
+When `isDirty` returns true, Cancel, in-app React Router navigation, and tab close/refresh ask the user to confirm before leaving. Confirming Discard on Cancel lets `onCancel`'s navigation through without a second prompt — do not clear dirty first. Requires a data router (`RouterProvider` / `createBrowserRouter`) for in-app blocking. Do **not** also register the same form with an app-level navigation check (e.g. `useRegisterNavigationCheck`) — only one `useBlocker` should guard the page.
+
+#### Allowing route changes that stay on the same form
+
+Some pages address their own state in the URL, so a route change is not always "leaving". Pass `allowNavigation` to allowlist those: it is consulted **only while `isDirty` is true**, and returning true lets that navigation through without prompting. It receives React Router's blocker args (`currentLocation`, `nextLocation`, `historyAction`), with pathnames already basename-stripped like `useLocation`.
+
+```tsx
+<FocusedFormLayout
+  title={title}
+  onCancel={onCancel}
+  completeLabel="Save"
+  onComplete={onSave}
+  isDirty={() => formState.dirty}
+  // Swapping variants stays on this listing and this form; every other path still prompts.
+  allowNavigation={({ nextLocation }) => isVariantOnThisListing(nextLocation.pathname)}
+>
+  <FormSectionLayout title={formTitle} sections={sections} />
+</FocusedFormLayout>
+```
+
+The allowlist covers in-app navigation only — Cancel and tab close/refresh still confirm while dirty, since both lose the form's changes regardless of where the user was headed. Keep the callback cheap and side-effect free: it runs on every navigation attempt, including browser Back (`historyAction === "POP"`).
 
 #### Multiple form states (one per step)
 
