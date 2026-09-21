@@ -3,7 +3,8 @@ export const rightPaneContentDataAttribute = "data-right-pane-content";
 
 /**
  * Poll until the pane node leaves the DOM (exit animation finished).
- * Hosts keep the spacer / `--beam-floating-right-offset` until then so chrome does not jump mid-slide.
+ * Hosts keep `--beam-right-pane-width` / `--beam-floating-right-offset` until then so sticky-right
+ * columns do not jump mid-slide. The overlay spacer width follows open state and CSS-transitions.
  * Also used as a jsdom fallback when `onAnimationComplete` does not fire.
  */
 export function waitForRightPaneExit(onComplete: () => void): () => void {

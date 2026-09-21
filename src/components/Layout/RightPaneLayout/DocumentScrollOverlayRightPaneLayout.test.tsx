@@ -38,7 +38,10 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     // Then overlay layout is ready while closed; spacer is 0 and the content floor is unset
     expect(r.documentScrollRightPaneLayout).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout_spacer).toBeInTheDocument();
-    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: "0px" });
+    expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({
+      width: "0px",
+      transition: "width 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    });
     expect(r.documentScrollRightPaneLayout_main).toHaveStyle({ minWidth: "fit-content" });
     expect(r.query.rightPaneContent).toBeNull();
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");

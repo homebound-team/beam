@@ -1,8 +1,10 @@
 import { type ReactNode, useState } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import type { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
+import type { RightPaneTrigger } from "./RightPaneTriggers";
 import type { AllowNavigationArgs } from "./useUnsavedChangesGuard";
 import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
@@ -17,6 +19,8 @@ export type StepperLayoutStep = Omit<StepperTabsStep, "value" | "disabled"> & {
   disabled?: boolean;
   /** Continue/Complete is disabled. A ReactNode is shown in Beam's tooltip. */
   primaryDisabled?: boolean | ReactNode;
+  /** Icon triggers for this step. Chrome is rendered by the workflow; the pane closes on step change. */
+  rightPaneTriggers?: RightPaneTrigger[];
 };
 
 export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
@@ -54,31 +58,39 @@ export function StepperLayout(props: StepperLayoutProps) {
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(stepTabs, defaultStep));
   const tid = useTestIds(props, "stepperLayout");
+  const { closeRightPane } = useRightPaneActions();
 
   const currentIndex = hasStep(stepTabs, currentStep) ? stepTabs.findIndex((step) => step.value === currentStep) : 0;
   const isFirstStep = currentIndex <= 0;
   const isLastStep = currentIndex >= stepTabs.length - 1;
   const activeStep = stepTabs[currentIndex];
 
+  function goToStep(value: string) {
+    if (value === currentStep) return;
+    closeRightPane();
+    setCurrentStep(value);
+  }
+
   return (
     <WorkflowPageLayout
       {...tid}
       {...headerProps}
       aiMode={aiMode}
-      stepperTabs={{ steps: stepTabs, currentStep, onChange: setCurrentStep }}
+      stepperTabs={{ steps: stepTabs, currentStep, onChange: goToStep }}
       isDirty={isDirty}
       allowNavigation={allowNavigation}
       isFirstStep={isFirstStep}
       isLastStep={isLastStep}
       onBack={() => {
         const prev = stepTabs[currentIndex - 1];
-        if (prev) setCurrentStep(prev.value);
+        if (prev) goToStep(prev.value);
       }}
       onCancel={onCancel}
       onSaveAndExit={onSaveAndExit}
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={activeStep?.primaryDisabled}
+      rightPaneTriggers={activeStep?.rightPaneTriggers}
       onContinue={async () => {
         const onContinue = activeStep?.onContinue;
         if (onContinue) {
@@ -86,7 +98,7 @@ export function StepperLayout(props: StepperLayoutProps) {
           if (allowed === false) return;
         }
         const next = stepTabs[currentIndex + 1];
-        if (next) setCurrentStep(next.value);
+        if (next) goToStep(next.value);
       }}
     >
       {activeStep?.content}

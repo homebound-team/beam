@@ -108,6 +108,51 @@ export function WithContentHeaderAndTable() {
   );
 }
 
+/** Per-step Comments / History triggers — do not also set `withRightPane` on the step body. */
+export function WithRightPaneTriggers() {
+  return (
+    <WithEnvironmentBanner>
+      <StepperLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        steps={[
+          {
+            label: "Details",
+            rightPaneTriggers: createRightPaneTriggers(),
+            content: (
+              <FormSectionLayout
+                withJumpLinks
+                title="Link Design Package"
+                description="Connect this package to a market and give it a name."
+                sections={[
+                  {
+                    title: "Setup",
+                    description: "Basic package details.",
+                    fields: <JumpLinkPlaceholderFields count={2} />,
+                  },
+                  { title: "Package Options", fields: <JumpLinkPlaceholderFields count={3} /> },
+                ]}
+              />
+            ),
+          },
+          {
+            label: "Review",
+            content: (
+              <FormSectionLayout
+                title="Review"
+                description="Confirm before creating."
+                sections={[{ title: "Summary", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+        ]}
+      />
+    </WithEnvironmentBanner>
+  );
+}
+
 /** Form step with JumpLinks on {@link FormSectionLayout} — Stepper itself does not own the rail. */
 export function WithJumpLinks() {
   return (
@@ -159,6 +204,13 @@ export function WithJumpLinks() {
 
 function WithEnvironmentBanner({ children }: { children: ReactNode }) {
   return <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>{children}</EnvironmentBannerLayout>;
+}
+
+function createRightPaneTriggers() {
+  return [
+    { icon: "comment" as const, label: "Comments", content: <JumpLinkPlaceholderFields count={4} /> },
+    { icon: "history" as const, label: "History", content: <JumpLinkPlaceholderFields count={3} /> },
+  ];
 }
 
 function JumpLinkPlaceholderFields({ count }: { count: number }) {

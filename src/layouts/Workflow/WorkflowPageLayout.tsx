@@ -1,6 +1,7 @@
-import { type ReactNode, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
+import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 import type { StepperTabsProps } from "src/components/StepperTabs/StepperTabs";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
@@ -16,10 +17,11 @@ import {
   documentScrollChromeWidth,
 } from "../layoutVars";
 import { useMeasuredHeight } from "../useMeasuredHeight";
+import { WorkflowPageRightPaneTriggers, type RightPaneTrigger } from "./RightPaneTriggers";
 import {
-  type AllowNavigationArgs,
   UnsavedChangesNavigationModal,
   useUnsavedChangesGuard,
+  type AllowNavigationArgs,
 } from "./useUnsavedChangesGuard";
 import { WorkflowActions, type WorkflowActionsProps } from "./WorkflowActions";
 
@@ -32,6 +34,8 @@ export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentT
     isDirty?: () => boolean;
     /** Consulted only while dirty — return true to allow a route change that stays on this form. */
     allowNavigation?: (args: AllowNavigationArgs) => boolean;
+    /** Floating / header icon triggers that open the document-scroll right pane. Hosts the pane. */
+    rightPaneTriggers?: RightPaneTrigger[];
     children: ReactNode;
   };
 
@@ -49,12 +53,15 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
     documentTitleSuffix,
     breadcrumbs,
     onCancel,
+    rightPaneTriggers,
     ...actionProps
   } = props;
   const tid = useTestIds(props, "workflowPageLayout");
   const { sm: isMobile } = useBreakpoint();
   const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard({ isDirty, allowNavigation, onCancel });
   const actions = <WorkflowActions {...actionProps} aiMode={aiMode} onCancel={onCancelClick} />;
+  const triggers = rightPaneTriggers ?? [];
+  const pageTriggers = triggers.length > 0 ? <WorkflowPageRightPaneTriggers triggers={triggers} /> : undefined;
 
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
@@ -94,7 +101,7 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
               title={title}
               documentTitleSuffix={documentTitleSuffix}
               breadcrumbs={breadcrumbs}
-              rightSlot={isMobile ? undefined : actions}
+              rightSlot={isMobile ? pageTriggers : actions}
               stepperTabs={stepperTabs}
             />
           </div>
@@ -107,8 +114,13 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
           }}
           {...tid.body}
         >
-          {children}
+          {triggers.length > 0 ? (
+            <DocumentScrollOverlayRightPaneLayout>{children}</DocumentScrollOverlayRightPaneLayout>
+          ) : (
+            children
+          )}
         </div>
+        {!isMobile && pageTriggers}
 
         {showFooter && (
           <div css={Css.fs0.w100.hPx(mobileFooterHeightPx).$}>

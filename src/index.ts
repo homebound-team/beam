@@ -260,6 +260,7 @@ export { PageHeaderLayout } from "./layouts/PageHeaderLayout/PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./layouts/PageHeaderLayout/PageHeaderLayout";
 export { FocusedFormLayout } from "./layouts/Workflow/FocusedFormLayout";
 export type { FocusedFormLayoutProps } from "./layouts/Workflow/FocusedFormLayout";
+export type { RightPaneTrigger } from "./layouts/Workflow/RightPaneTriggers";
 export { StepperLayout } from "./layouts/Workflow/StepperLayout";
 export type { StepperLayoutProps, StepperLayoutStep } from "./layouts/Workflow/StepperLayout";
 export type { AllowNavigationArgs } from "./layouts/Workflow/useUnsavedChangesGuard";

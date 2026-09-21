@@ -24,7 +24,10 @@ export type IconButtonProps = {
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement | null>;
-  /** Whether to show a 16x16px version of the IconButton */
+  /**
+   * Opts into the smaller size: 18px instead of 28px, or 32px instead of 48px for `circle` so the ring still pads the icon. `outline` ignores this.
+   * Treat these sizes as interim — IconButton is expected to be revisited with Design System.
+   */
   compact?: boolean;
   /** Visual variant of the button. Defaults to "default". */
   variant?: IconButtonVariant;
@@ -92,8 +95,7 @@ export function IconButton(props: IconButtonProps) {
   const isCircle = variant === "circle";
   const isOutline = variant === "outline";
   const styles = useMemo(() => {
-    const variantKey = isCircle ? "circle" : isOutline ? "outline" : compact ? "compact" : "default";
-    const { base, hover, focus, pressed } = variantStyles[variantKey];
+    const { base, hover, focus, pressed } = variantStyles(variant, { compact });
     return {
       ...iconButtonStylesReset,
       ...base,
@@ -103,7 +105,7 @@ export function IconButton(props: IconButtonProps) {
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     };
-  }, [isHovered, isFocusVisible, isDisabled, compact, isCircle, isOutline, isPressing, bgColor, forceFocusStyles]);
+  }, [isHovered, isFocusVisible, isDisabled, compact, variant, isPressing, bgColor, forceFocusStyles]);
   const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
@@ -149,30 +151,31 @@ const defaultIconColor = Tokens.OnSurface;
 const circleIconColor = Tokens.OnSurfaceMuted;
 const iconButtonStylesReset = Css.bcTransparent.bss.bgTransparent.cursorPointer.outline0.dif.aic.jcc.transition.$;
 const iconButtonStylesDisabled = Css.cursorNotAllowed.bgColor(Tokens.SurfaceDisabled).$;
-const variantStyles = {
-  default: {
-    base: Css.sqPx(28).br8.bw2.$,
-    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
-    focus: Css.bc(Tokens.FieldBorderFocus).$,
-    pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
-  },
-  compact: {
-    base: Css.sqPx(18).br4.bw1.$,
-    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
-    focus: Css.bc(Tokens.FieldBorderFocus).$,
-    pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
-  },
-  circle: {
+function variantStyles(variant: IconButtonVariant, { compact }: { compact: boolean }) {
+  if (variant === "circle") {
     // Blue100/200 hover fills have no semantic tokens — keep palette for those.
-    base: Css.br100.sqPx(48).bc(Tokens.FieldBorderDefault).ba.bw1.df.jcc.aic.$,
-    hover: Css.bgBlue100.bcBlue200.$,
-    focus: Css.bgBlue100.bc(Tokens.FieldBorderFocus).$,
-    pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,
-  },
-  outline: {
-    base: Css.br8.wPx(42).hPx(40).bcGray300.ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
-    hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
-    focus: Css.bshFocus.$,
-    pressed: Css.bgColor(Tokens.SurfaceRaisedPressed).$,
-  },
-} as const;
+    return {
+      base: Css.br100
+        .sqPx(compact ? 32 : 48)
+        .bc(Tokens.FieldBorderDefault)
+        .ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
+      hover: Css.bgBlue100.bcBlue200.$,
+      focus: Css.bgBlue100.bc(Tokens.FieldBorderFocus).$,
+      pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,
+    };
+  }
+  if (variant === "outline") {
+    return {
+      base: Css.br8.wPx(42).hPx(40).bcGray300.ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
+      hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
+      focus: Css.bshFocus.$,
+      pressed: Css.bgColor(Tokens.SurfaceRaisedPressed).$,
+    };
+  }
+  return {
+    base: compact ? Css.sqPx(18).br4.bw1.$ : Css.sqPx(28).br8.bw2.$,
+    hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+    focus: Css.bc(Tokens.FieldBorderFocus).$,
+    pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
+  };
+}

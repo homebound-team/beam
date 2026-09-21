@@ -62,4 +62,20 @@ describe("IconButton", () => {
     expect(r.trash).toHaveAttribute("target", "_blank");
     expect(r.trash).toHaveAttribute("rel", "noreferrer noopener");
   });
+
+  it("renders a 48px circle by default", async () => {
+    // Given a circle IconButton
+    const r = await render(<IconButton icon="comment" variant="circle" onClick={noop} />);
+
+    // Then it is 48px
+    expect(r.comment).toHaveStyle({ width: "48px", height: "48px" });
+  });
+
+  it("renders a 32px circle when compact", async () => {
+    // Given a compact circle IconButton
+    const r = await render(<IconButton icon="comment" variant="circle" compact onClick={noop} />);
+
+    // Then it is 32px
+    expect(r.comment).toHaveStyle({ width: "32px", height: "32px" });
+  });
 });
