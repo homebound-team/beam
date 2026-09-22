@@ -412,11 +412,8 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           </>
         )}
       </div>
-      {/* Original value, error message, and helper text for "left" labelStyle, whose container is a row.
-       * TODO: check with design on this look. This block has always hung at the container's left edge,
-       * i.e. under the label rather than under the field, which reads fine for helper prose but leaves
-       * the struck original stranded away from the value it's replacing. Aligning it would mean
-       * offsetting the whole block by `labelLeftFieldWidth`, which moves every left-label field in Beam. */}
+      {/* Original value, error message, and helper text for the deprecated "left" labelStyle, whose container is a row.
+       * Shifted half the container width so it sits under the field instead of the label. */}
       {labelStyle === "left" &&
         (originalBelow ||
           alwaysShowHelperText ||
@@ -425,7 +422,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             !inputProps.readOnly &&
             ((errorMsg && !errorInTooltip) || helperText))) && (
           // Reduces the margin between the error/helper text and input field
-          <div css={Css.mtPx(-8).$}>
+          <div css={Css.mtPx(-8).ml("50%").$}>
             {originalBelow && <OriginalValue originalValue={originalBelow} {...tid.originalValue} />}
             {showErrorAndHelper && (
               <>
