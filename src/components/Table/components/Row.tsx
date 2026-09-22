@@ -409,6 +409,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale
               ? Css.typography(maybeContent.typeScale).$
               : {}),
+            ...(isBodyRow &&
+              (column.isField || (isGridCellContent(maybeContent) && maybeContent.field)) &&
+              style.fieldCellCss),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell

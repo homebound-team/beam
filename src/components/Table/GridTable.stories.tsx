@@ -16,6 +16,7 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
+import { fieldCell } from "src/components/Table/components/cell";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { PinToggle } from "src/components/Table/components/PinToggle";
@@ -30,6 +31,7 @@ import {
   column,
   dateColumn,
   dragHandleColumn,
+  fieldColumn,
   numericColumn,
   pinColumn,
   selectColumn,
@@ -43,6 +45,7 @@ import { useComputed } from "src/hooks/useComputed";
 import { DateField } from "src/inputs/DateFields/DateField";
 import { NumberField } from "src/inputs/NumberField";
 import { SelectField } from "src/inputs/SelectField";
+import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { noop } from "src/utils/helpers";
 import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
@@ -1109,6 +1112,148 @@ export const DataTypeColumns = newStory(() => {
     />
   );
 }, {});
+
+type FieldCellData = {
+  lot: string;
+  name: string;
+  height: number;
+  count: number;
+  priceInCents: number;
+  start: PlainDate;
+  location: string;
+};
+type FieldCellRow = SimpleHeaderAndData<FieldCellData>;
+
+/** Flexible rows mixing field cells and plain values. One row is in AI mode, so content is top-aligned. */
+export function FieldCellWithAiProposal() {
+  const [name, setName] = useState("Old Cottage");
+  const [height, setHeight] = useState(20);
+  const [start, setStart] = useState(jan2);
+  const [location, setLocation] = useState("up");
+  const locations = [
+    { id: "up", name: "Up" },
+    { id: "down", name: "Down" },
+    { id: "sideways", name: "Sideways" },
+  ];
+  const isProposal = (rowId: string) => rowId === "proposal";
+
+  const lotColumn = column<FieldCellRow>({ header: "Lot", data: ({ lot }) => lot });
+  const nameColumn = column<FieldCellRow>({
+    header: "Name",
+    data: (data, { row }) =>
+      isProposal(row.id)
+        ? fieldCell({
+            content: () => (
+              <TextField
+                label="Name"
+                value={name}
+                proposedValue="Janes Cottage"
+                onChange={(value) => value !== undefined && setName(value)}
+              />
+            ),
+          })
+        : data.name,
+  });
+  const heightColumn = fieldColumn<FieldCellRow>({
+    header: "Height",
+    align: "right",
+    w: "120px",
+    data: (data, { row }) => ({
+      content: () => (
+        <NumberField
+          label="Height"
+          value={isProposal(row.id) ? height : data.height}
+          proposedValue={isProposal(row.id) ? 25 : undefined}
+          onChange={isProposal(row.id) ? (value) => value !== undefined && setHeight(value) : noop}
+        />
+      ),
+    }),
+  });
+  const countColumn = numericColumn<FieldCellRow>({ header: "Count", w: "96px", data: ({ count }) => count });
+  const priceColumn = numericColumn<FieldCellRow>({
+    header: "Price",
+    w: "120px",
+    data: ({ priceInCents }) => priceInCents / 100,
+  });
+  const startColumn = fieldColumn<FieldCellRow>({
+    header: "Start",
+    w: "140px",
+    data: (data, { row }) => ({
+      content: () => (
+        <DateField
+          label="Start"
+          value={isProposal(row.id) ? start : data.start}
+          proposedValue={isProposal(row.id) ? jan29 : undefined}
+          onChange={isProposal(row.id) ? (value) => value !== undefined && setStart(value) : noop}
+        />
+      ),
+    }),
+  });
+  const locationColumn = fieldColumn<FieldCellRow>({
+    header: "Location",
+    data: (data, { row }) => ({
+      content: () => (
+        <SelectField
+          label="Location"
+          value={isProposal(row.id) ? location : data.location}
+          proposedValue={isProposal(row.id) ? "down" : undefined}
+          options={locations}
+          onSelect={isProposal(row.id) ? (value) => value !== undefined && setLocation(value) : noop}
+        />
+      ),
+    }),
+  });
+
+  return (
+    <GridTable<FieldCellRow>
+      columns={[lotColumn, nameColumn, heightColumn, countColumn, priceColumn, startColumn, locationColumn]}
+      style={{ vAlign: "top" }}
+      rows={[
+        simpleHeader,
+        {
+          kind: "data",
+          id: "plain",
+          data: {
+            lot: "North",
+            name: "Untouched lot",
+            height: 18,
+            count: 4,
+            priceInCents: 1200_00,
+            start: jan1,
+            location: "up",
+          },
+        },
+        {
+          kind: "data",
+          id: "proposal",
+          aiMode: true,
+          data: {
+            lot: "Cottage",
+            name: "Old Cottage",
+            height: 20,
+            count: 12,
+            priceInCents: 2500_00,
+            start: jan2,
+            location: "up",
+          },
+        },
+        {
+          kind: "data",
+          id: "another",
+          data: {
+            lot: "Side",
+            name: "Side lot",
+            height: 22,
+            count: 7,
+            priceInCents: 980_00,
+            start: jan29,
+            location: "sideways",
+          },
+        },
+      ]}
+    />
+  );
+}
 
 export function WrappedHeaders() {
   const leftAlignedColumn = column<Row2>({

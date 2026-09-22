@@ -20,10 +20,11 @@ describe("RightPanePanel", () => {
     );
     await clickAndWait(r.openPaneBtn);
 
-    // Then title and body render; close is present
+    // Then title and body render; close is present and focused
     expect(r.rightPanePanel_header).toHaveTextContent("Comments");
     expect(r.rightPanePanel_body).toHaveTextContent("Hello");
     expect(r.rightPanePanel_close).toBeInTheDocument();
+    expect(r.rightPanePanel_close).toHaveFocus();
 
     // When closing via the built-in control
     click(r.rightPanePanel_close);

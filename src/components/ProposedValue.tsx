@@ -12,7 +12,7 @@ export type ProposedValueProps = {
  * Renders an AI proposal as `original proposed`, with the original struck through.
  *
  * Only used on the read-only path, which renders no input. Editable fields instead style the input's
- * own text and render the original as a sibling, so it survives focus. See `TextFieldBase`.
+ * own text and render the original in a slot below the field. See `TextFieldBase`.
  */
 export function ProposedValue(props: ProposedValueProps) {
   const { original, proposed } = props;

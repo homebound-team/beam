@@ -21,7 +21,8 @@ export function RightPanePanel(props: RightPanePanelProps) {
     <div css={Css.relative.df.fdc.h100.$} {...tid}>
       <div css={Css.df.aic.jcsb.gap1.p2.bb.bc(Tokens.SurfaceSeparator).fs0.$} {...tid.header}>
         <div css={Css.mdSb.$}>{title}</div>
-        {withClose && <IconButton icon="x" label="Close" onClick={closeRightPane} {...tid.close} />}
+        {/* Move focus into the pane so it is not left on the control that opened it. */}
+        {withClose && <IconButton icon="x" label="Close" autoFocus onClick={closeRightPane} {...tid.close} />}
       </div>
       <div css={Css.fg1.mh0.oya.p2.$} {...tid.body}>
         {children}

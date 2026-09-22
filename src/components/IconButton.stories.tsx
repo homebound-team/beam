@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { ContrastScope, Css, IconButton, type IconButtonProps, Icons, Palette, Tokens } from "src";
 import { noop } from "src/utils/helpers";
-import { withRouter } from "src/utils/sb";
+import { newStory, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
 
 export default {
@@ -70,31 +70,25 @@ function Template(args: IconButtonStoryArgs) {
   );
   return storyContrast ? <ContrastScope>{content}</ContrastScope> : content;
 }
-export const Regular = Template.bind({});
+export const Regular = newStory(Template, {});
 
-export const Compact = Template.bind({});
-// @ts-ignore
-Compact.args = { compact: true };
+export const Compact = newStory(Template, { args: { compact: true } });
 
-export const Contrast = Template.bind({});
-// @ts-ignore
-Contrast.args = { storyContrast: true };
-// @ts-ignore
-Contrast.globals = { backgrounds: { value: "dark" } };
+export const Contrast = newStory(Template, {
+  args: { storyContrast: true },
+  globals: { backgrounds: { value: "dark" } },
+});
 
-export const Circle = Template.bind({});
-// @ts-ignore
-Circle.args = { variant: "circle" };
+export const Circle = newStory(Template, { args: { variant: "circle" } });
 
-export const Outline = Template.bind({});
-// @ts-ignore
-Outline.args = { variant: "outline" };
+export const CircleCompact = newStory(Template, { args: { variant: "circle", compact: true } });
 
-export const OutlineContrast = Template.bind({});
-// @ts-ignore
-OutlineContrast.args = { variant: "outline", storyContrast: true };
-// @ts-ignore
-OutlineContrast.globals = { backgrounds: { value: "dark" } };
+export const Outline = newStory(Template, { args: { variant: "outline" } });
+
+export const OutlineContrast = newStory(Template, {
+  args: { variant: "outline", storyContrast: true },
+  globals: { backgrounds: { value: "dark" } },
+});
 
 export function WithTooltip() {
   return (

@@ -39,7 +39,17 @@ export type GridCellContent = {
   css?: Properties;
   /** Tooltip to add to a cell */
   tooltip?: ReactNode;
+  /** Set by `fieldCell`. Flexible body rows use 4px vertical padding. */
+  field?: true;
 };
+
+/** Marks a cell as hosting a field. Flexible rows use 4px vertical padding so the field lines up with text cells. */
+export function fieldCell(cell: ReactNode | Omit<GridCellContent, "field">): GridCellContent {
+  if (typeof cell === "object" && cell !== null && "content" in cell) {
+    return { ...cell, field: true };
+  }
+  return { content: cell, field: true };
+}
 
 /** Allows rendering a specific cell. */
 export type RenderCellFn<R extends Kinded> = (

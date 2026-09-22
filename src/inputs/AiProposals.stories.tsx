@@ -9,7 +9,7 @@ import { MultiSelectField } from "src/inputs/MultiSelectField";
 import { NumberField } from "src/inputs/NumberField";
 import { SelectField } from "src/inputs/SelectField";
 import { TextAreaField } from "src/inputs/TextAreaField";
-import { TextField } from "src/inputs/TextField";
+import { TextField, type TextFieldProps } from "src/inputs/TextField";
 import type { DateRange, HasIdAndName, PlainDate } from "src/types";
 import { jan1, jan10, jan19, jan2, jan29 } from "src/utils/testDates";
 
@@ -57,11 +57,13 @@ export function AllFields() {
         <AiTextField original="Old Cottage" />
         <AiNumberField original={20} />
         <AiSelectField original="up" />
-        <AiMultiSelectField original={["up"]} />
+        {/* Two originals, so the joined-label case is visible next to the single-value fields */}
+        <AiMultiSelectField original={["up", "sideways"]} />
         <AiDateField original={jan2} />
         <AiDateRangeField original={{ from: jan2, to: jan10 }} />
         <AiAutocomplete original="Old Supplier" />
         <AiTextAreaField original="Old note about the framing." />
+        <AiTextAreaField original="An extremely long note about framing that should wrap. Right now this will probably look pretty bad. Probably rightttttt about NOW.......Now? Anyways. We have ideas about creating a reusable component that truncates N lines and renders a button, or itself is clickable, that when pressed will show the full text. Right now this is the only use case but it'll be a handy component to have on hand and plug in as the need arises. Is this line wrap ugly enough yet to warrant the dev investment? Hope so!" />
       </Section>
 
       <Section title="With no original value, i.e. the AI filled in a blank">
@@ -91,6 +93,25 @@ export function AllFields() {
         <AiSelectField original="up" readOnly />
       </Section>
 
+      <Section title="Stacked under the field: original, then error, then helper text">
+        <AiTextField original="Old Cottage" />
+        <AiTextField original="Old Cottage" helperText="The name buyers will see." />
+        <AiTextField original="Old Cottage" errorMsg="Already taken" />
+        <AiTextField original="Old Cottage" errorMsg="Already taken" helperText="The name buyers will see." />
+        <AiTextField original="Old Cottage" disabled="Set by the agent" helperText="Hidden while disabled." />
+        {/* No original, so the spacing of a plain field can be compared against the rows above */}
+        <AiTextField original={undefined} errorMsg="Already taken" helperText="The name buyers will see." />
+      </Section>
+
+      <Section title="The same, with the label to the left" labelStyle="left">
+        <AiTextField original="Old Cottage" />
+        <AiTextField original="Old Cottage" helperText="The name buyers will see." />
+        <AiTextField original="Old Cottage" errorMsg="Already taken" />
+        <AiTextField original="Old Cottage" errorMsg="Already taken" helperText="The name buyers will see." />
+        <AiTextField original="Old Cottage" disabled="Set by the agent" helperText="Hidden while disabled." />
+        <AiTextField original={undefined} errorMsg="Already taken" helperText="The name buyers will see." />
+      </Section>
+
       <Section title="Beside a normal field, to check alignment is unchanged">
         <AiTextField original="Old Cottage" />
         <PlainTextField />
@@ -99,26 +120,36 @@ export function AllFields() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  labelStyle,
+  children,
+}: {
+  title: string;
+  labelStyle?: TextFieldProps<any>["labelStyle"];
+  children: React.ReactNode;
+}) {
   return (
     <div css={Css.df.fdc.gap2.$}>
       <h1 css={Css.lg.$}>{title}</h1>
-      <FormLines width="md">{children}</FormLines>
+      {/* Spread, because `FormLines` only overrides the ambient labelStyle when the prop is present */}
+      <FormLines width="md" {...(labelStyle ? { labelStyle } : {})}>
+        {children}
+      </FormLines>
     </div>
   );
 }
 
-function AiTextField({ original, readOnly }: { original: string | undefined; readOnly?: boolean }) {
+function AiTextField({
+  original,
+  ...others
+}: { original: string | undefined } & Pick<
+  TextFieldProps<any>,
+  "readOnly" | "disabled" | "helperText" | "errorMsg" | "labelStyle"
+>) {
   const [value, setValue] = useState<string | undefined>(original);
   return (
-    <TextField
-      label="Name"
-      required
-      value={value}
-      proposedValue={proposed.name}
-      onChange={setValue}
-      readOnly={readOnly}
-    />
+    <TextField label="Name" required value={value} proposedValue={proposed.name} onChange={setValue} {...others} />
   );
 }
 

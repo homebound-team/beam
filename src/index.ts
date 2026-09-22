@@ -187,7 +187,13 @@ export type {
   CardStatusSlot,
   CardTitleSlot,
 } from "./components/Table/cardSlots";
-export { defaultRenderFn, headerRenderFn, rowClickRenderFn, rowLinkRenderFn } from "./components/Table/components/cell";
+export {
+  defaultRenderFn,
+  fieldCell,
+  headerRenderFn,
+  rowClickRenderFn,
+  rowLinkRenderFn,
+} from "./components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "./components/Table/components/cell";
 export type {
   CompanionConfig,
@@ -260,6 +266,7 @@ export { PageHeaderLayout } from "./layouts/PageHeaderLayout/PageHeaderLayout";
 export type { PageHeaderLayoutProps } from "./layouts/PageHeaderLayout/PageHeaderLayout";
 export { FocusedFormLayout } from "./layouts/Workflow/FocusedFormLayout";
 export type { FocusedFormLayoutProps } from "./layouts/Workflow/FocusedFormLayout";
+export type { RightPaneTrigger } from "./layouts/Workflow/RightPaneTriggers";
 export { StepperLayout } from "./layouts/Workflow/StepperLayout";
 export type { StepperLayoutProps, StepperLayoutStep } from "./layouts/Workflow/StepperLayout";
 export type { AllowNavigationArgs } from "./layouts/Workflow/useUnsavedChangesGuard";
