@@ -11,6 +11,7 @@ import {
   cardStatusSlot,
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
+import { fieldCell } from "src/components/Table/components/cell";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, type OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { type GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
@@ -23,6 +24,7 @@ import {
   calcColumnSizes,
   collapseColumn,
   column,
+  fieldColumn,
   generateColumnId,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
@@ -212,6 +214,60 @@ describe("GridTable", () => {
     expect(r.field).not.toHaveStyle({ whiteSpace: "nowrap" });
     expect(r.field).not.toHaveStyle({ overflow: "hidden" });
     expect(r.field).not.toHaveStyle({ textOverflow: "ellipsis" });
+  });
+
+  it("uses 4px vertical padding for field cells and field columns on flexible rows", async () => {
+    // Given a flexible table with a conditional field cell and a field column
+    const columns: GridColumn<Row>[] = [
+      { header: "Name", data: ({ name }) => name },
+      {
+        header: "Value",
+        data: ({ value }, { row }) => (row.id === "field" ? fieldCell({ content: String(value) }) : String(value)),
+      },
+      fieldColumn({ header: "Field", data: ({ value }) => String(value) }),
+    ];
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "plain", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "field", data: { name: "bar", value: 2 } },
+    ];
+    // When rendered
+    const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={columns} rows={rows} />);
+    // Then the field column affects every body row, while fieldCell only affects its marked row
+    expect(cell(r, 1, 1)).toHaveStyle({ paddingTop: "12px", paddingBottom: "12px" });
+    expect(cell(r, 1, 2)).toHaveStyle({ paddingTop: "4px", paddingBottom: "4px" });
+    expect(cell(r, 2, 1)).toHaveStyle({ paddingTop: "4px", paddingBottom: "4px" });
+    expect(cell(r, 2, 2)).toHaveStyle({ paddingTop: "4px", paddingBottom: "4px" });
+    expect(cell(r, 1, 0)).toHaveStyle({ paddingTop: "12px", paddingBottom: "12px" });
+    expect(cell(r, 0, 2)).toHaveStyle({ paddingTop: "12px", paddingBottom: "12px" });
+  });
+
+  it("does not tighten field cell or field column padding on fixed rows", async () => {
+    // Given a fixed-height table with a field cell and field column
+    const columns: GridColumn<Row>[] = [
+      { header: "Value", data: ({ value }) => fieldCell({ content: String(value) }) },
+      fieldColumn({ header: "Field", data: ({ value }) => String(value) }),
+    ];
+    const rows: GridDataRow<Row>[] = [simpleHeader, { kind: "data", id: "1", data: { name: "foo", value: 1 } }];
+    // When rendered
+    const r = await render(<GridTable style={{ rowHeight: "fixed" }} columns={columns} rows={rows} />);
+    // Then the fixed row height is unchanged
+    expect(cell(r, 1, 0)).not.toHaveStyle({ paddingTop: "4px" });
+    expect(cell(r, 1, 0)).not.toHaveStyle({ paddingBottom: "4px" });
+    expect(cell(r, 1, 1)).not.toHaveStyle({ paddingTop: "4px" });
+    expect(cell(r, 1, 1)).not.toHaveStyle({ paddingBottom: "4px" });
+  });
+
+  it("lets field cell css override the flexible padding", async () => {
+    // Given a field cell with its own vertical padding
+    const columns: GridColumn<Row>[] = [
+      { header: "Value", data: ({ value }) => fieldCell({ content: String(value), css: Css.pyPx(8).$ }) },
+    ];
+    const rows: GridDataRow<Row>[] = [simpleHeader, { kind: "data", id: "1", data: { name: "foo", value: 1 } }];
+    // When rendered in a flexible table
+    const r = await render(<GridTable style={{ rowHeight: "flexible" }} columns={columns} rows={rows} />);
+    // Then the cell css wins
+    expect(cell(r, 1, 0)).toHaveStyle({ paddingTop: "8px", paddingBottom: "8px" });
   });
 
   it("can have per-row styles", async () => {

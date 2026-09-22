@@ -187,7 +187,13 @@ export type {
   CardStatusSlot,
   CardTitleSlot,
 } from "./components/Table/cardSlots";
-export { defaultRenderFn, headerRenderFn, rowClickRenderFn, rowLinkRenderFn } from "./components/Table/components/cell";
+export {
+  defaultRenderFn,
+  fieldCell,
+  headerRenderFn,
+  rowClickRenderFn,
+  rowLinkRenderFn,
+} from "./components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "./components/Table/components/cell";
 export type {
   CompanionConfig,

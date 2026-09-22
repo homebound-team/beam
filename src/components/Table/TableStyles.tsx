@@ -96,6 +96,8 @@ export type GridStyle = {
   keptLastRowCss?: Properties;
   /** Applied to every cell of a runtime-pinned row — the blue highlight for the pinned section. */
   pinnedRowCss?: Properties;
+  /** Vertical padding for `fieldCell`s. Set on flexible rows so a compact field lines up with text cells. */
+  fieldCellCss?: Properties;
 };
 
 // If adding a new `GridStyleDef`, ensure if it added to the `defKeys` in the `resolveStyles` function below
@@ -223,6 +225,8 @@ function memoizedTableStyles() {
         keptLastRowCss: Css.boxShadow("inset 0px -14px 8px -11px rgba(63,63,63,.18)").$,
         // Pinned rows keep Blue50 until a selection-surface token exists.
         pinnedRowCss: Css.bgColor(Palette.Blue50).$,
+        // A compact field is 8px of its own padding and border; 4px here matches a text cell's 12px inset.
+        ...(rowHeight === "flexible" ? { fieldCellCss: Css.pyPx(4).$ } : {}),
       };
     }
 
@@ -284,6 +288,8 @@ export const cardStyle: GridStyle = {
     ...Css.p1.m0.xsSb.color(Tokens.OnSurfaceMuted).$,
   },
   rowHoverColor: "none",
+  // Cards use their own cell padding; don't inherit flexible-row field padding.
+  fieldCellCss: undefined,
   // this will allow having N amount of nested childs without having to define each level margin
   levels: (level) => ({ rowIndent: level > 0 ? 24 * level : undefined }),
 };
