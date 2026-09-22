@@ -31,3 +31,13 @@ export const CustomCopy = () => (
     <AiLoadingPanel title="Reading your spec..." message="We'll email you when this finishes." />
   </div>
 );
+
+/**
+ * `estimateInSeconds` adds a footer strip, and takes over the default's vaguer "a few minutes".
+ * The panel times itself from mount, so leave this story open ~ a minute to watch it go to the 'taking longer than usual' state.
+ */
+export const WithEstimate = () => (
+  <div css={Css.wPx(956).$}>
+    <AiLoadingPanel title="We're importing your material..." estimateInSeconds={30} />
+  </div>
+);
