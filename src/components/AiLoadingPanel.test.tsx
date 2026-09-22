@@ -26,14 +26,14 @@ describe("AiLoadingPanel", () => {
       // Given recent runs that usually finish in 3 minutes
       const r = await render(<AiLoadingPanel estimateInSeconds={180} />);
       // Then the strip quotes it, and the body no longer hedges about "a few minutes"
-      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually about 3 minutes");
+      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually takes about 3 minutes");
       expect(r.aiLoadingPanel_message).toHaveTextContent("Feel free to keep working in another tab.");
       expect(r.aiLoadingPanel_message).not.toHaveTextContent("can take a few minutes");
     });
 
     it("rounds a sub-minute estimate rather than saying zero minutes", async () => {
       const r = await render(<AiLoadingPanel estimateInSeconds={20} />);
-      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually less than a minute");
+      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually takes less than a minute");
     });
 
     it("keeps caller copy in charge of the message", async () => {
@@ -41,7 +41,7 @@ describe("AiLoadingPanel", () => {
       const r = await render(<AiLoadingPanel message="We'll email you." estimateInSeconds={180} />);
       // Then the strip is additive rather than overriding
       expect(r.aiLoadingPanel_message).toHaveTextContent("We'll email you.");
-      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually about 3 minutes");
+      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually takes about 3 minutes");
     });
   });
 
@@ -49,7 +49,7 @@ describe("AiLoadingPanel", () => {
     it("admits it once the run is half again past the estimate", async () => {
       // Given a 3 minute estimate, i.e. unusual after 4:30
       const r = await render(<AiLoadingPanel estimateInSeconds={180} />);
-      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually about 3 minutes");
+      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually takes about 3 minutes");
       // When it is still going past that
       act(() => void vi.advanceTimersByTime(271_000));
       // Then we stop quoting an estimate we've already missed
@@ -61,7 +61,7 @@ describe("AiLoadingPanel", () => {
       const r = await render(<AiLoadingPanel estimateInSeconds={180} />);
       act(() => void vi.advanceTimersByTime(240_000));
       // Then we have not given up on it yet
-      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually about 3 minutes");
+      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually takes about 3 minutes");
     });
 
     it("gives short estimates a floor of extra slack before crying wolf", async () => {
@@ -70,7 +70,7 @@ describe("AiLoadingPanel", () => {
       // When 50s have passed
       act(() => void vi.advanceTimersByTime(15_000));
       // Then it is still inside the minimum floor of a minute
-      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually less than a minute");
+      expect(r.aiLoadingPanel_estimate).toHaveTextContent("Usually takes less than a minute");
       // And only past that floor do we call it late
       act(() => void vi.advanceTimersByTime(60_000));
       expect(r.aiLoadingPanel_estimate).toHaveTextContent("Taking longer than usual");
