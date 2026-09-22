@@ -45,15 +45,10 @@ export function AiLoadingPanel(props: AiLoadingPanelProps) {
           {resolvedMessage}
         </span>
         {estimateInSeconds !== undefined && (
-          <div
-            css={{
-              ...Css.w100.df.aic.jcc.gap1.mt1.pt2.bt.bc(Tokens.SurfaceSeparator).xs.$,
-              ...(isRunningLong ? Css.orange700.$ : Css.color(Tokens.OnSurfaceMuted).$),
-            }}
-          >
+          <div css={Css.w100.df.aic.jcc.gap1.mt1.pt2.bt.bc(Tokens.SurfaceSeparator).xs.$}>
             <Icon icon="time" inc={2} />
             <span {...tid.estimate}>
-              {isRunningLong ? "Taking longer than usual" : `Usually ${formatDuration(estimateInSeconds)}`}
+              {isRunningLong ? "Taking longer than usual" : `Usually takes ${formatDuration(estimateInSeconds)}`}
             </span>
           </div>
         )}
