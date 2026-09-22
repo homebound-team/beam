@@ -86,6 +86,8 @@ export type GridColumn<R extends Kinded> = {
   wrapAction?: false;
   /** Used as a signal to defer adding the row's level indentation styling */
   isAction?: true;
+  /** Marks every body cell in this column as hosting a field. */
+  isField?: true;
   /** Injected layout gutter column; excluded from content-column behavior (indent, resize, CSV). */
   isLayoutGutter?: true;
   /** Column id that will be used to generate an unique identifier for every row cell */
@@ -127,6 +129,7 @@ export const nonKindGridColumnKeys = [
   "border",
   "wrapAction",
   "isAction",
+  "isField",
   "isLayoutGutter",
   "id",
   "canHide",

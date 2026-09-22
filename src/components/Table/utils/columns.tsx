@@ -27,6 +27,11 @@ export function numericColumn<T extends Kinded>(columnDef: GridColumn<T>): GridC
   return { canHide: true, initHidden: false, ...columnDef, align: "right" };
 }
 
+/** Provides default styling for a GridColumn whose body cells contain fields. */
+export function fieldColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
+  return { canHide: true, initHidden: false, ...columnDef, isField: true };
+}
+
 /** Provides default styling for a GridColumn representing an Action. */
 export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { clientSideSort: false, ...columnDef, align: "center", isAction: true, wrapAction: false };

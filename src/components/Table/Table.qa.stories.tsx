@@ -11,7 +11,14 @@ import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
 import { getTableStyles } from "src/components/Table/TableStyles";
 import type { GridColumn } from "src/components/Table/types";
-import { collapseColumn, column, dateColumn, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import {
+  collapseColumn,
+  column,
+  dateColumn,
+  fieldColumn,
+  numericColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { emptyCell } from "src/components/Table/utils/utils";
 import { Tag } from "src/components/Tag";
@@ -952,7 +959,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
   }
 
   return [
-    column<InputFieldRows>({
+    fieldColumn<InputFieldRows>({
       header: "Name",
       data: (data, { row }) => ({
         content: () => {
@@ -961,7 +968,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
         },
       }),
     }),
-    column<InputFieldRows>({
+    fieldColumn<InputFieldRows>({
       header: "Biography",
       data: (data, { row }) => ({
         content: () => {
@@ -975,7 +982,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
       }),
       w: 2,
     }),
-    column<InputFieldRows>({
+    fieldColumn<InputFieldRows>({
       header: "Birthdate",
       data: (data, { row }) => ({
         content: () => {
@@ -985,7 +992,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
       }),
       w: "136px",
     }),
-    numericColumn<InputFieldRows>({
+    fieldColumn<InputFieldRows>({
       header: "Height",
       data: (data, { row }) => ({
         content: () => {
@@ -993,9 +1000,10 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
           return <BoundNumberField field={os.heightInInches} {...applyStateProps(row.id)} />;
         },
       }),
+      align: "right",
       w: "136px",
     }),
-    column<InputFieldRows>({
+    fieldColumn<InputFieldRows>({
       header: "Favorite Sport",
       data: (data, { row }) => ({
         content: () => {
@@ -1004,7 +1012,7 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
         },
       }),
     }),
-    column<InputFieldRows>({
+    fieldColumn<InputFieldRows>({
       header: "Favorite Shapes",
       data: (data, { row }) => ({
         content: () => {
