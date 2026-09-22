@@ -27,6 +27,30 @@ describe("GridStyleDef", () => {
     expect(highlightAndGrouped).toBe(highlightAndGrouped2);
   });
 
+  it("defaults body cell vertical alignment to top for flexible rows", () => {
+    // Given the default (flexible) table styles
+    const { cellCss } = getTableStyles();
+    // Then body cells are top-aligned
+    expect(cellCss?.alignItems?.[1]).toEqual({ "--alignItems": "flex-start" });
+  });
+
+  it("defaults body cell vertical alignment to center for fixed rows", () => {
+    // Given fixed-height table styles
+    const { cellCss } = getTableStyles({ rowHeight: "fixed" });
+    // Then body cells stay vertically centered
+    expect(cellCss?.alignItems?.[1]).toEqual({ "--alignItems": "center" });
+  });
+
+  it("lets vAlign override the row-height default", () => {
+    // Given explicit vertical alignment on either row height
+    // Then the explicit value wins
+    expect(getTableStyles({ vAlign: "center" }).cellCss?.alignItems?.[1]).toEqual({ "--alignItems": "center" });
+    expect(getTableStyles({ vAlign: "bottom" }).cellCss?.alignItems?.[1]).toEqual({ "--alignItems": "flex-end" });
+    expect(getTableStyles({ rowHeight: "fixed", vAlign: "top" }).cellCss?.alignItems?.[1]).toEqual({
+      "--alignItems": "flex-start",
+    });
+  });
+
   it("omits first head-row corner radii when roundedHeader is false", () => {
     const rounded = getTableStyles({ roundedHeader: true });
     const square = getTableStyles({ roundedHeader: false });
