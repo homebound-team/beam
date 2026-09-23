@@ -8,6 +8,7 @@ import { Css } from "src/Css";
 import { FormSection, type FormSectionProps } from "src/forms/FormSection/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
+import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 import { JumpLinksRail, jumpLinksRailReservation } from "./JumpLinksRail";
@@ -32,10 +33,12 @@ export type FormSectionLayoutProps = {
   /** When true, wraps in {@link AiCard} and applies AI title styling. */
   aiMode?: boolean;
   /**
-   * When true, show a JumpLinks rail from section titles (needs 2+ includable sections; hidden on `sm`).
+   * When true, show a JumpLinks rail from section titles (needs 2+ includable links; hidden on `sm`).
    * Default false — opt in for FocusedForm / Stepper form steps that want the rail.
    */
   withJumpLinks?: boolean;
+  /** When true with `withJumpLinks`, prepend the form `title` as the first rail link. */
+  includeTitleJumpLink?: boolean;
   /**
    * Opt into the document-scroll detail pane (`useRightPane`).
    * Hosts JumpLinks + form — do not also set `withRightPane` on the inner `CenteredLayout`.
@@ -57,24 +60,32 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     sections,
     aiMode = false,
     withJumpLinks = false,
+    includeTitleJumpLink = false,
     withRightPane,
   } = props;
   const tid = useTestIds(props, "formSectionLayout");
   const { sm: isMobile } = useBreakpoint();
   const rightPane = resolveWithRightPaneOptions(withRightPane);
+  /** Anchor for the form title when `includeTitleJumpLink` is on — avoids colliding with section ids. */
+  const formSectionLayoutTitleId = "formSectionLayoutTitle";
 
-  const jumpLinks = (sections ?? [])
+  const sectionLinks = (sections ?? [])
     .filter((section) => !section.excludeJumpLink)
     .map((section) => {
       const id = defaultTestId(section.title);
       return { id, label: section.title };
     });
+  const titleAnchor = withJumpLinks && includeTitleJumpLink;
+  const jumpLinks = [...(titleAnchor ? [{ id: formSectionLayoutTitleId, label: title }] : []), ...sectionLinks];
   const showRail = withJumpLinks && jumpLinks.length >= 2 && !isMobile;
   const activeId = useActiveJumpLink(showRail ? jumpLinks.map((link) => link.id) : []);
 
   const content = (
     <div css={Css.df.fdc.gap8.if(aiMode).p3.$}>
-      <div css={Css.df.fdc.gap3.$}>
+      <div
+        id={titleAnchor ? formSectionLayoutTitleId : undefined}
+        css={Css.df.fdc.gap3.if(titleAnchor).add("scrollMarginTop", stickyNavAndHeaderOffset()).$}
+      >
         <ContentHeader
           {...tid}
           title={title}

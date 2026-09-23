@@ -201,6 +201,68 @@ describe("FormSectionLayout", () => {
     expect(r.query.formSectionLayout_jumpLinks).toBeNull();
   });
 
+  it("prepends the form title as the first jump link when includeTitleJumpLink is true", async () => {
+    // Given withJumpLinks and includeTitleJumpLink
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        includeTitleJumpLink
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then the title is the first rail link and the title block is the scroll target
+    expect(r.formSectionLayout_jumpLinks_link_0).toHaveTextContent("Link Design Package");
+    expect(r.formSectionLayout_jumpLinks_link_0).toHaveAttribute("href", "#formSectionLayoutTitle");
+    expect(r.formSectionLayout_jumpLinks).toHaveTextContent("Setup");
+    expect(document.getElementById("formSectionLayoutTitle")).toBeInTheDocument();
+
+    // When the title jump link is clicked
+    Element.prototype.scrollIntoView = vi.fn();
+    click(r.formSectionLayout_jumpLinks_link_0);
+
+    // Then the title block scrolls into view
+    expect(document.getElementById("formSectionLayoutTitle")!.scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the rail for one section when the title is included as a jump link", async () => {
+    // Given withJumpLinks, includeTitleJumpLink, and only one section
+    const r = await render(
+      <FormSectionLayout
+        withJumpLinks
+        includeTitleJumpLink
+        title="Link Design Package"
+        sections={[{ title: "Setup", fields: <div /> }]}
+      />,
+    );
+
+    // Then the rail has the title and the section
+    expect(r.formSectionLayout_jumpLinks).toHaveTextContent("Link Design Package");
+    expect(r.formSectionLayout_jumpLinks).toHaveTextContent("Setup");
+  });
+
+  it("does not include the title in the rail when includeTitleJumpLink is set without withJumpLinks", async () => {
+    // Given includeTitleJumpLink but not withJumpLinks
+    const r = await render(
+      <FormSectionLayout
+        includeTitleJumpLink
+        title="Link Design Package"
+        sections={[
+          { title: "Setup", fields: <div /> },
+          { title: "Package Options", fields: <div /> },
+        ]}
+      />,
+    );
+
+    // Then no rail or title anchor renders
+    expect(r.query.formSectionLayout_jumpLinks).toBeNull();
+    expect(document.getElementById("formSectionLayoutTitle")).toBeNull();
+  });
+
   it("hides the rail on mobile", async () => {
     // Given a mobile viewport
     setViewport("sm");
