@@ -32,12 +32,9 @@ export const CustomCopy = () => (
   </div>
 );
 
-/**
- * `estimateInSeconds` adds a footer strip, and takes over the default's vaguer "a few minutes".
- * The panel times itself from mount, so leave this story open ~ a minute to watch it go to the 'taking longer than usual' state.
- */
-export const WithEstimate = () => (
+/** `progressText` adds a footer strip, and takes over the default's vaguer "a few minutes". */
+export const WithProgressText = () => (
   <div css={Css.wPx(956).$}>
-    <AiLoadingPanel title="We're importing your material..." estimateInSeconds={30} />
+    <AiLoadingPanel title="We're importing your material..." progressText="Usually takes about 3 minutes" />
   </div>
 );
