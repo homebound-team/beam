@@ -157,10 +157,7 @@ function getEnvironmentBannerConfig(
 /** Rounded bottom-edge cutout via box-shadow; `side` controls horizontal shadow offset. */
 function getInvertedCorner(side: "left" | "right", bgColorVar: string): ReactNode {
   const invertedCornerRadiusPx = 12;
-  const shell = Css.absolute.oh
-    .bottomPx(-invertedCornerRadiusPx)
-    .sqPx(invertedCornerRadiusPx)
-    .add("pointerEvents", "none").z1.$;
+  const shell = Css.absolute.oh.bottomPx(-invertedCornerRadiusPx).sqPx(invertedCornerRadiusPx).pen.z1.$;
   const outerPosition = side === "left" ? Css.left0.$ : Css.right0.$;
   const shadowXOffset = side === "left" ? -invertedCornerRadiusPx : invertedCornerRadiusPx;
 

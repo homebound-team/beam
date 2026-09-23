@@ -20,6 +20,9 @@ export const zIndices = {
 
   // Page chrome - ensure these items sit above the table
   scrollShadow: 50,
+  // Viewport-fixed spinner over a dimmed `GridTable.loading` table — above table chrome and scroll
+  // shadows, below the right pane and page sticky headers.
+  tableLoadingOverlay: 55,
   // Document-scroll detail pane (DocumentScrollOverlayRightPaneLayout) — above table sticky chrome, below page sticky headers.
   rightPane: 60,
   // Workflow floating right-pane triggers — above the pane, below sticky headers.
