@@ -116,7 +116,7 @@ export type GridStyleDef = {
   bordered?: boolean;
   /** Whether to show a hover effect on rows. Defaults to true */
   rowHover?: boolean;
-  /** Defines the vertical alignment of the content of the cells for the whole table (not including the 'header' rows). Defaults to `center` */
+  /** Vertical alignment of body cell content (not headers). Defaults to `top` for flexible rows and `center` for fixed rows. */
   vAlign?: "top" | "center" | "bottom";
   /** Defines the Typography for the table body's cells (not the header). This only applies to rows that are not nested/grouped */
   cellTypography?: Typography;
@@ -137,7 +137,7 @@ function memoizedTableStyles() {
       cellHighlight = false,
       allWhite = false,
       bordered = false,
-      vAlign = "center",
+      vAlign = rowHeight === "fixed" ? "center" : "top",
       cellTypography = "xs" as const,
       highlightOnHover = true,
       roundedHeader = true,
@@ -239,6 +239,9 @@ export const getTableStyles = memoizedTableStyles();
 export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
 export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("pageBreakInside", "avoid").$;
+
+/** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */
+export const loadingTableCss = Css.o50.pen.$;
 
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type RowStyles<R extends Kinded> = {

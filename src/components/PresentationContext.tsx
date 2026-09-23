@@ -6,9 +6,9 @@ export type InputStylePalette = "success" | "warning" | "caution" | "info";
 
 export interface PresentationFieldProps {
   numberAlignment?: "left" | "right";
-  /** Sets the label position or visibility. Defaults to "above" */
-  labelStyle?: "inline" | "hidden" | "above" | "left";
-  /** Defines the width property of the input field wrapper when using `labelStyle="left"`. */
+  /** Sets the label position or visibility. Defaults to "above"; "left" is deprecated. */
+  labelStyle?: "inline" | "hidden" | "above" | /** @deprecated Use "above"; left labels are being retired. */ "left";
+  /** @deprecated Defines the width property of the input field wrapper when using the deprecated `labelStyle="left"`. */
   labelLeftFieldWidth?: number | string;
   labelSuffix?: LabelSuffixStyle;
   // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior

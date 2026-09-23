@@ -308,6 +308,33 @@ describe("GridTable", () => {
     expect(cell(r, 2, 0)).toHaveStyle({ color: Palette.Red500 });
   });
 
+  it("dims the table and blocks clicks while loading", async () => {
+    // Given a table that is waiting on a new query
+    // When rendered
+    const r = await render(<GridTable {...{ columns, rows }} loading />);
+    // Then the whole table is dimmed and non-interactive
+    expect(r.gridTable).toHaveStyle({ opacity: "0.5", pointerEvents: "none" });
+  });
+
+  it("overlays a viewport-centered spinner that never blocks clicks while loading", async () => {
+    // Given a table that is waiting on a new query
+    // When rendered
+    const r = await render(<GridTable {...{ columns, rows }} loading />);
+    // Then the spinner is pinned to the viewport, outside the dimmed table so it stays legible
+    expect(r.gridTable_loadingOverlay).toHaveStyle({ position: "fixed", pointerEvents: "none" });
+    expect(r.gridTable_loadingOverlay).toContainElement(r.gridTable_loadingSpinner);
+    expect(r.gridTable).not.toContainElement(r.gridTable_loadingOverlay);
+  });
+
+  it("does not dim the table when not loading", async () => {
+    // Given a table with its rows loaded
+    // When rendered
+    const r = await render(<GridTable {...{ columns, rows }} />);
+    // Then nothing is dimmed and no spinner is shown
+    expect(r.gridTable).not.toHaveStyle({ opacity: "0.5" });
+    expect(r.query.gridTable_loadingOverlay).toBeNull();
+  });
+
   it("can apply cell-specific styling", async () => {
     // Given a column
     const nameColumn: GridColumn<Row> = {

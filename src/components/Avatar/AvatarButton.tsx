@@ -98,7 +98,5 @@ const resetStyles = Css.br100.cursorPointer.outline0.relative.$;
 export const hoverStyles = Css.boxShadow(`0 0 4px ${Tokens.OnSurface}`).$;
 const focusStyles = Css.bshFocus.$;
 const disabledStyles = Css.cursorNotAllowed.$;
-export const pressedOverlayCss = Css.br100
-  .bgColor(Tokens.OnSurface)
-  .w100.h100.absolute.top0.left0.add("opacity", "0.2")
-  .add("pointerEvents", "none").$;
+export const pressedOverlayCss = Css.br100.bgColor(Tokens.OnSurface).w100.h100.absolute.top0.left0.add("opacity", "0.2")
+  .pen.$;

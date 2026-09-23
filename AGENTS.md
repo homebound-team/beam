@@ -91,6 +91,7 @@ const tid = useTestIds(props, "myComponent");
 return <div {...tid}>…</div>;
 ```
 
+- **Never declare `"data-testid"` on a component’s props type.** Do not add `"data-testid"?: string` (or `data-testid?: string`) to `FooProps`. It is not part of the public API. `useTestIds(props, …)` already reads `props["data-testid"]` if a parent forwarded a prefix via `{...tid.child}`.
 - Prefix comes from `props["data-testid"]` when a parent forwarded it, otherwise `defaultTestId(defaultPrefix)` (e.g. `"myComponent"`).
 - Named parts use the proxy: `tid.trigger` → `{ "data-testid": "myComponent_trigger" }`.
 - Apply with spreads only: `{...tid}` on the root, `{...tid.panel}` on named DOM nodes.

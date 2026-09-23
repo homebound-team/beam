@@ -114,7 +114,7 @@ export function NestedChildSections() {
   );
 }
 
-/** JumpLinks rail from section titles (2+ includable sections; hidden on `sm`). */
+/** JumpLinks rail from section titles (2+ includable links; hidden on `sm`). */
 export function WithJumpLinks() {
   return (
     <FormSectionLayout
@@ -125,6 +125,23 @@ export function WithJumpLinks() {
         { title: "Setup", description: "Basic package details.", fields: <PlaceholderFields count={2} /> },
         { title: "Package Options", fields: <PlaceholderFields count={3} /> },
         { title: "Internal", excludeJumpLink: true, fields: <PlaceholderFields count={1} /> },
+      ]}
+    />
+  );
+}
+
+/** JumpLinks rail including the form title as the first link. */
+export function WithTitleJumpLink() {
+  return (
+    <FormSectionLayout
+      withJumpLinks
+      includeTitleJumpLink
+      title="Link Design Package"
+      description="Connect this package to a market and give it a name."
+      initialFields={<PlaceholderFields count={2} />}
+      sections={[
+        { title: "Setup", description: "Basic package details.", fields: <PlaceholderFields count={2} /> },
+        { title: "Package Options", fields: <PlaceholderFields count={3} /> },
       ]}
     />
   );
