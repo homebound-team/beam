@@ -1207,7 +1207,6 @@ export function FieldCellWithAiProposal() {
   return (
     <GridTable<FieldCellRow>
       columns={[lotColumn, nameColumn, heightColumn, countColumn, priceColumn, startColumn, locationColumn]}
-      style={{ vAlign: "top" }}
       rows={[
         simpleHeader,
         {
