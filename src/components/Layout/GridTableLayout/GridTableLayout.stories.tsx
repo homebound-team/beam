@@ -89,6 +89,27 @@ export function GridTableLayout() {
   );
 }
 
+/** The `loading` spinner floats over the table's content area, clear of the side nav and sticky chrome. */
+export function Loading() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: { filterDefs, storageKey: "grid-table-layout-loading" },
+    search: "client",
+  });
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout while loading" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{ columns, rows: [simpleHeader, ...makeNestedRows(3)], loading: true }}
+      />
+    </TestProjectLayout>
+  );
+}
+
 export function ManyFilters() {
   const filterDefs = useMemo(() => getManyFilterDefs(), []);
   const columns = useMemo(() => getColumns(), []);

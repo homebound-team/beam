@@ -54,7 +54,13 @@ import { Css, type Only } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { stickyTableHeaderOffset } from "src/layouts/layoutVars";
+import {
+  beamRightPaneWidthVar,
+  documentScrollChromeLeft,
+  documentScrollChromeWidth,
+  getFloatingBottomOffset,
+  stickyTableHeaderOffset,
+} from "src/layouts/layoutVars";
 import { isPromise } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
@@ -756,10 +762,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} {...tid.probe} />
         {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
         {loading && (
-          <div
-            css={Css.fixed.top0.right0.bottom0.left0.df.aic.jcc.pen.z(zIndices.tableLoadingOverlay).$}
-            {...tid.loadingOverlay}
-          >
+          <div css={loadingOverlayCss} {...tid.loadingOverlay}>
             <Loader {...tid.loadingSpinner} />
           </div>
         )}
@@ -816,6 +819,18 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     </TableStateContext.Provider>
   );
 }
+
+/**
+ * Floats `GridTable.loading`'s spinner over the table's visible area rather than the whole viewport:
+ * inset past the side nav, sticky chrome, an open right pane, and the workflow mobile footer. Each
+ * var falls back to `0`, so a table outside those layouts still centers on the viewport.
+ */
+const loadingOverlayCss = Css.fixed
+  .top(stickyTableHeaderOffset())
+  .bottom(getFloatingBottomOffset())
+  .left(documentScrollChromeLeft())
+  .w(`calc(${documentScrollChromeWidth()} - var(${beamRightPaneWidthVar}, 0px))`)
+  .df.aic.jcc.pen.z(zIndices.tableLoadingOverlay).$;
 
 // Determine which HTML element to use to build the GridTable (card and virtual modes are handled separately)
 const renders: Record<Exclude<RenderAs, "card" | "virtual">, typeof renderTable> = {
