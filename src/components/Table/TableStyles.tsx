@@ -240,6 +240,9 @@ export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
 export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("pageBreakInside", "avoid").$;
 
+/** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */
+export const loadingTableCss = Css.o50.add("pointerEvents", "none").$;
+
 /** Defines row-specific styling for each given row `kind` in `R` */
 export type RowStyles<R extends Kinded> = {
   [P in R["kind"]]?: RowStyle<DiscriminateUnion<R, "kind", P>>;

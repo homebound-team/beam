@@ -22,6 +22,7 @@ import {
   defaultStyle,
   type GridStyle,
   type GridStyleDef,
+  loadingTableCss,
   resolveStyles,
   type RowStyles,
   tableRowPrintBreakCss,
@@ -185,6 +186,8 @@ export type GridTableProps<R extends Kinded, X> = {
    * The storage key is automatically generated using the current URL pathname and the table's `id`.
    */
   persistScrollPosition?: boolean;
+  /** Dims the table and blocks clicks on it, i.e. while a refetch is in flight over the prior rows. */
+  loading?: boolean;
   xss?: X;
   /** Accepts the api, from `useGridTableApi`, that the caller wants to use for this table. */
   api?: GridTableApi<R>;
@@ -272,6 +275,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     infoMessage,
     persistCollapse,
     persistScrollPosition,
+    loading = false,
     resizeTarget,
     activeRowId,
     activeCellId,
@@ -750,6 +754,19 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
         <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} {...tid.probe} />
+        {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
+        {loading && (
+          <div
+            css={
+              Css.fixed.top0.right0.bottom0.left0.df.aic.jcc
+                .add("pointerEvents", "none")
+                .z(zIndices.tableLoadingOverlay).$
+            }
+            {...tid.loadingOverlay}
+          >
+            <Loader {...tid.loadingSpinner} />
+          </div>
+        )}
         {as === "card" ? (
           <CardView
             cardRows={visibleDataRows}
@@ -757,6 +774,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             virtuosoRangeRef={virtuosoRangeRef}
             infiniteScroll={infiniteScroll}
             persistScrollPosition={persistScrollPosition}
+            loading={loading}
           />
         ) : _as === "virtual" ? (
           <VirtualGridTableView
@@ -775,6 +793,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             stickyOffset={stickyOffset}
             infiniteScroll={infiniteScroll}
             persistScrollPosition={persistScrollPosition}
+            loading={loading}
           />
         ) : (
           renders[_as as Exclude<RenderAs, "card" | "virtual">](
@@ -791,6 +810,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
             virtuosoRangeRef,
             tableHeadRows,
             stickyOffset,
+            loading,
             infiniteScroll,
             tableContainerRef,
             persistScrollPosition,
@@ -822,6 +842,7 @@ function renderDiv<R extends Kinded>(
   _virtuosoRangeRef: MutableRefObject<ListRange | null>,
   tableHeadRows: ReactElement[],
   stickyOffset: number,
+  loading: boolean,
   _infiniteScroll?: InfiniteScroll,
   tableContainerRef?: MutableRefObject<HTMLElement | null>,
   _persistScrollPosition?: boolean,
@@ -838,6 +859,7 @@ function renderDiv<R extends Kinded>(
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
+        ...(loading && loadingTableCss),
       }}
       data-testid={id}
     >
@@ -894,6 +916,7 @@ function renderTable<R extends Kinded>(
   _virtuosoRangeRef: MutableRefObject<ListRange | null>,
   tableHeadRows: ReactElement[],
   stickyOffset: number,
+  loading: boolean,
   _infiniteScroll?: InfiniteScroll,
   tableContainerRef?: MutableRefObject<HTMLElement | null>,
   _persistScrollPosition?: boolean,
@@ -906,6 +929,7 @@ function renderTable<R extends Kinded>(
         ...style.rootCss,
         ...(style.minWidthPx ? Css.mwPx(style.minWidthPx).$ : {}),
         ...xss,
+        ...(loading && loadingTableCss),
       }}
       data-testid={id}
     >
@@ -971,6 +995,7 @@ type VirtualGridTableViewProps<R extends Kinded = Kinded> = {
   stickyOffset: number;
   infiniteScroll?: InfiniteScroll;
   persistScrollPosition?: boolean;
+  loading?: boolean;
 };
 
 /**
@@ -1009,6 +1034,7 @@ function VirtualGridTableView<R extends Kinded>({
   stickyOffset,
   infiniteScroll,
   persistScrollPosition = infiniteScroll === undefined,
+  loading = false,
 }: VirtualGridTableViewProps<R>): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
 
@@ -1033,6 +1059,43 @@ function VirtualGridTableView<R extends Kinded>({
       ? savedScrollIndex + topItemCount
       : undefined;
 
+  const components = useMemo<Components>(
+    () => ({
+      // zIndex keeps the pinned head above sticky columns; `top` matches the offsets used by
+      // the div/table render paths so virtualized tables pin below the global nav + page header.
+      TopItemList: React.forwardRef((props, ref) => (
+        <div
+          {...props}
+          ref={ref as MutableRefObject<HTMLDivElement>}
+          css={Css.transitionTop.$}
+          style={{
+            ...props.style,
+            ...(style.minWidthPx !== undefined ? { minWidth: style.minWidthPx } : {}),
+            zIndex: zIndices.tableStickyHeader,
+            top: stickyTableHeaderOffset(stickyOffset),
+          }}
+        />
+      )),
+      List: VirtualRoot(style, columns as any, id, xss),
+      Footer: () => {
+        return (
+          <div
+            css={
+              Css.if(style.virtualFooterPaddingBottomPx !== undefined).pbPx(style.virtualFooterPaddingBottomPx ?? 0).$
+            }
+          >
+            {fetchMoreInProgress && (
+              <div css={Css.h5.df.aic.jcc.$}>
+                <Loader size={"xs"} />
+              </div>
+            )}
+          </div>
+        );
+      },
+    }),
+    [columns, fetchMoreInProgress, id, stickyOffset, style, xss],
+  );
+
   // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
   const virtuosoKey = !!validatedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
   return (
@@ -1041,41 +1104,12 @@ function VirtualGridTableView<R extends Kinded>({
       key={virtuosoKey}
       overscan={5}
       ref={virtuosoRef}
+      // Virtuoso owns its root element, so dim via its className/style props; routing this through
+      // the `List` component would change its identity and remount (and scroll-jump) the whole list.
+      {...(loading ? Css.props(loadingTableCss) : {})}
       {...(customScrollParent ? { customScrollParent } : {})}
       {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
-      components={{
-        // zIndex keeps the pinned head above sticky columns; `top` matches the offsets used by
-        // the div/table render paths so virtualized tables pin below the global nav + page header.
-        TopItemList: React.forwardRef((props, ref) => (
-          <div
-            {...props}
-            ref={ref as MutableRefObject<HTMLDivElement>}
-            css={Css.transitionTop.$}
-            style={{
-              ...props.style,
-              ...(style.minWidthPx !== undefined ? { minWidth: style.minWidthPx } : {}),
-              zIndex: zIndices.tableStickyHeader,
-              top: stickyTableHeaderOffset(stickyOffset),
-            }}
-          />
-        )),
-        List: VirtualRoot(style, columns as any, id, xss),
-        Footer: () => {
-          return (
-            <div
-              css={
-                Css.if(style.virtualFooterPaddingBottomPx !== undefined).pbPx(style.virtualFooterPaddingBottomPx ?? 0).$
-              }
-            >
-              {fetchMoreInProgress && (
-                <div css={Css.h5.df.aic.jcc.$}>
-                  <Loader size={"xs"} />
-                </div>
-              )}
-            </div>
-          );
-        },
-      }}
+      components={components}
       // Pin/sticky both the header row(s) + firstRowMessage to the top
       topItemCount={topItemCount}
       itemContent={(index) => {
@@ -1191,6 +1225,7 @@ type CardViewProps = {
   virtuosoRangeRef: MutableRefObject<ListRange | null>;
   infiniteScroll?: InfiniteScroll;
   persistScrollPosition?: boolean;
+  loading?: boolean;
 };
 
 function CardView({
@@ -1199,6 +1234,7 @@ function CardView({
   virtuosoRangeRef,
   infiniteScroll,
   persistScrollPosition = infiniteScroll === undefined,
+  loading = false,
 }: CardViewProps): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
 
@@ -1222,14 +1258,14 @@ function CardView({
   // VirtuosoGrid requires layout measurement; in jsdom fall back to a plain div so tests can render cards.
   if (runningInJest) {
     return (
-      <div css={Css.py2.$}>
+      <div css={{ ...Css.py2.$, ...(loading && loadingTableCss) }}>
         <div css={Css.dg.gtc(`repeat(auto-fill, minmax(${CARD_MIN_WIDTH_PX}px, 1fr))`).jcc.gap3.p3.$}>{cardRows}</div>
       </div>
     );
   }
 
   return (
-    <div css={Css.pb2.h100.$}>
+    <div css={{ ...Css.pb2.h100.$, ...(loading && loadingTableCss) }}>
       <VirtuosoGrid
         useWindowScroll={inDocumentScrollLayout && !customScrollParent}
         {...(customScrollParent ? { customScrollParent } : {})}

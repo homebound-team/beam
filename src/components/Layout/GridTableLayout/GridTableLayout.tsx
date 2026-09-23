@@ -40,7 +40,6 @@ type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>,
   QData
 > & {
   emptyFallback?: string;
-  keepHeaderWhenLoading?: boolean;
 };
 
 export type GridTableLayoutProps<
@@ -190,7 +189,10 @@ function GridTableLayoutComponent<
   );
 
   const cardAs = view === "card" ? ("card" as const) : undefined;
-  const tableStyle = resolveGridTableLayoutStyle(tableProps.style, inDocumentScrollLayout);
+  const tableStyle = useMemo(
+    () => resolveGridTableLayoutStyle(tableProps.style, inDocumentScrollLayout),
+    [tableProps.style, inDocumentScrollLayout],
+  );
 
   const tableBody = (
     <>

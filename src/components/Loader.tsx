@@ -1,16 +1,20 @@
 import { Css, Tokens } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
 type LoaderProps = {
   size?: "xs" | "sm" | "md" | "lg";
 };
 
-export function Loader({ size = "lg" }: LoaderProps) {
+export function Loader(props: LoaderProps) {
+  const { size = "lg" } = props;
   const [dimensions, borderSize] = sizeToPixels[size];
   const [bgColor, spinnerColor] = [Tokens.LoaderTrack, Tokens.LoaderSpinner];
+  const tid = useTestIds(props, "loader");
 
   return (
     <div
       aria-label="Loading"
+      {...tid}
       css={
         Css.br100.ba
           .sqPx(dimensions)
