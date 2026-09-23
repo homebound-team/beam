@@ -31,3 +31,10 @@ export const CustomCopy = () => (
     <AiLoadingPanel title="Reading your spec..." message="We'll email you when this finishes." />
   </div>
 );
+
+/** `progressText` adds a footer strip, and takes over the default's vaguer "a few minutes". */
+export const WithProgressText = () => (
+  <div css={Css.wPx(956).$}>
+    <AiLoadingPanel title="We're importing your material..." progressText="Usually takes about 3 minutes" />
+  </div>
+);
