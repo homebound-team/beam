@@ -44,7 +44,7 @@ export function DocumentScrollToTopButton({ viewportHeight }: DocumentScrollToTo
           .z(zIndices.scrollToTop).df.jcfe.transitionTransform.$,
         ...(visible
           ? Css.add("transform", "translateY(0)").$
-          : Css.add("transform", `translateY(calc(100% + ${scrollToTopOffsetPx}px))`).add("pointerEvents", "none").$),
+          : Css.add("transform", `translateY(calc(100% + ${scrollToTopOffsetPx}px))`).pen.$),
       }}
     >
       <ContrastScope>

@@ -10,6 +10,8 @@ export type QueryResult<QData> = {
   loading: boolean;
   error?: { message: string };
   data?: QData;
+  /** Apollo's last successful result; kept on screen while a refetch is in flight. */
+  previousData?: QData;
 };
 
 export type QueryTableProps<R extends Kinded, QData, X> = Omit<GridTableProps<R, X>, "rows" | "fallback"> & {
@@ -17,34 +19,23 @@ export type QueryTableProps<R extends Kinded, QData, X> = Omit<GridTableProps<R,
   emptyFallback?: string;
   /** Creates the rows given the data; needs to accept undefined so we can create the header row. */
   createRows: (data: QData | undefined) => GridDataRow<R>[];
-  keepHeaderWhenLoading?: boolean;
 };
 
 /**
  * An adaption of GridTable that binds directly to an Apollo QueryResult.
  *
- * This handles the data/loading/error states internally within the table, i.e. we'll show a fallbackMessage
- * for loading/error states, instead of the entire table blinking in/out.
+ * This handles the data/loading/error states internally within the table, i.e. we'll show a skeleton
+ * for the initial load, and dim the existing rows for refetches, instead of the table blinking in/out.
  */
 export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss, X> = any>(
   props: QueryTableProps<R, QData, X>,
 ) {
-  const {
-    emptyFallback,
-    query,
-    createRows,
-    columns,
-    keepHeaderWhenLoading,
-    emptyState: emptyStateProp,
-    ...others
-  } = props;
+  const { emptyFallback, query, createRows, columns, emptyState: emptyStateProp, ...others } = props;
 
-  // Always call createRows to get the header, even if we're loading/error'd. We do force data=undefined
-  // if loading/error though b/c while making/loading a 2nd query, Apollo will keep the 1st query's data.
-  // This is arguably a better UX if we could show a spinner-new-results-coming-soon + the
-  // old-results-are-still-here at the same time.
-  const data = query.loading || query.error ? undefined : query.data;
-  const rows = useMemo(() => createRows(data), [createRows, data]);
+  // While a 2nd query is in flight, Apollo either keeps the 1st query's `data` or moves it to
+  // `previousData`; either way we keep showing it so the page doesn't collapse to a skeleton.
+  const displayData = query.error ? undefined : (query.data ?? query.previousData);
+  const rows = useMemo(() => createRows(displayData), [createRows, displayData]);
 
   const fallbackMessage = query.loading ? "Loading…" : query.error ? `Error: ${query.error.message}` : undefined;
 
@@ -54,19 +45,16 @@ export function QueryTable<R extends Kinded, QData, X extends Only<GridTableXss,
     return { title: emptyFallback };
   }, [emptyFallback, emptyStateProp, query.error, query.loading]);
 
-  const headers = rows.filter((row) => row.kind === "header");
-
-  return query.loading ? (
-    <div>
-      {keepHeaderWhenLoading ? (
-        <GridTable {...{ columns, ...others }} rows={headers} fallbackMessage={fallbackMessage} />
-      ) : (
+  // Nothing to show yet, i.e. the initial load.
+  if (query.loading && displayData === undefined) {
+    return (
+      <div>
         <LoadingTable columns={columns.length} />
-      )}
-    </div>
-  ) : (
-    <GridTable {...{ rows, columns, fallbackMessage, emptyState, ...others }} />
-  );
+      </div>
+    );
+  }
+
+  return <GridTable {...{ rows, columns, fallbackMessage, emptyState, ...others }} loading={query.loading} />;
 }
 
 export type LoadingTableProps = Pick<LoadingSkeletonProps, "columns">;

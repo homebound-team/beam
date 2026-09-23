@@ -209,6 +209,64 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("animationTimingFunction", value);
   }
 
+  // appearance
+  /** Sets `appearance: "none"`. */
+  get appearanceNone() {
+    return this.add("appearance", "none");
+  }
+  /** Sets `appearance: value`. */
+  appearance(value: Properties["appearance"]) {
+    return this.add("appearance", value);
+  }
+
+  // aspectRatio
+  /** Sets `aspectRatio: "1 / 1"`. */
+  get arSquare() {
+    return this.add("aspectRatio", "1 / 1");
+  }
+  /** Sets `aspectRatio: "16 / 9"`. */
+  get arVideo() {
+    return this.add("aspectRatio", "16 / 9");
+  }
+  /** Sets `aspectRatio: value`. */
+  ar(value: Properties["aspectRatio"]) {
+    return this.add("aspectRatio", value);
+  }
+
+  // background
+  /** Sets `background: value`. */
+  bg(value: Properties["background"]) {
+    return this.add("background", value);
+  }
+  /** Sets `backgroundImage: value`. */
+  bgImage(value: Properties["backgroundImage"]) {
+    return this.add("backgroundImage", value);
+  }
+  /** Sets `backgroundSize: value`. */
+  bgSize(value: Properties["backgroundSize"]) {
+    return this.add("backgroundSize", value);
+  }
+  /** Sets `backgroundPosition: value`. */
+  bgPosition(value: Properties["backgroundPosition"]) {
+    return this.add("backgroundPosition", value);
+  }
+  /** Sets `backgroundRepeat: "no-repeat"`. */
+  get bgNoRepeat() {
+    return this.add("backgroundRepeat", "no-repeat");
+  }
+  /** Sets `backgroundRepeat: value`. */
+  bgRepeat(value: Properties["backgroundRepeat"]) {
+    return this.add("backgroundRepeat", value);
+  }
+  /** Sets `backgroundClip: "text"; WebkitBackgroundClip: "text"`. */
+  get bgClipText() {
+    return this.add("backgroundClip", "text").add("WebkitBackgroundClip", "text");
+  }
+  /** Sets `backgroundClip: value`. */
+  bgClip(value: Properties["backgroundClip"]) {
+    return this.add("backgroundClip", value);
+  }
+
   // border
   /** Sets `borderStyle: "solid"; borderWidth: "1px"`. */
   get ba() {
@@ -532,47 +590,21 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   bc(value: Properties["borderColor"]) {
     return this.add("borderColor", value);
   }
-
-  // borderRadius
-  /** Sets `borderRadius: "0"`. */
-  get br0() {
-    return this.add("borderRadius", "0");
+  /** Sets `borderTopColor: value`. */
+  btc(value: Properties["borderTopColor"]) {
+    return this.add("borderTopColor", value);
   }
-  /** Sets `borderRadius: "4px"`. */
-  get br4() {
-    return this.add("borderRadius", "4px");
+  /** Sets `borderRightColor: value`. */
+  brc(value: Properties["borderRightColor"]) {
+    return this.add("borderRightColor", value);
   }
-  /** Sets `borderRadius: "8px"`. */
-  get br8() {
-    return this.add("borderRadius", "8px");
+  /** Sets `borderBottomColor: value`. */
+  bbc(value: Properties["borderBottomColor"]) {
+    return this.add("borderBottomColor", value);
   }
-  /** Sets `borderRadius: "12px"`. */
-  get br12() {
-    return this.add("borderRadius", "12px");
-  }
-  /** Sets `borderRadius: "16px"`. */
-  get br16() {
-    return this.add("borderRadius", "16px");
-  }
-  /** Sets `borderRadius: "24px"`. */
-  get br24() {
-    return this.add("borderRadius", "24px");
-  }
-  /** Sets `borderRadius: "100%"`. */
-  get br100() {
-    return this.add("borderRadius", "100%");
-  }
-  /** Sets `borderRadius: value`. */
-  borderRadius(value: Properties["borderRadius"]) {
-    return this.add("borderRadius", value);
-  }
-  /** Sets `borderTopRightRadius: "4px"; borderTopLeftRadius: "4px"`. */
-  get brt4() {
-    return this.add("borderTopRightRadius", "4px").add("borderTopLeftRadius", "4px");
-  }
-  /** Sets `borderBottomRightRadius: "4px"; borderBottomLeftRadius: "4px"`. */
-  get brb4() {
-    return this.add("borderBottomRightRadius", "4px").add("borderBottomLeftRadius", "4px");
+  /** Sets `borderLeftColor: value`. */
+  blc(value: Properties["borderLeftColor"]) {
+    return this.add("borderLeftColor", value);
   }
 
   // borderStyle
@@ -611,34 +643,24 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("borderWidth", value);
   }
 
-  // boxShadow
-  /** Sets `boxShadow: "none"`. */
-  get bsh0() {
-    return this.add("boxShadow", "none");
+  // breaks
+  /** Sets `breakInside: "avoid"`. */
+  get breakAvoid() {
+    return this.add("breakInside", "avoid");
   }
-  /** Sets `boxShadow: "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);"`. */
-  get bshBasic() {
-    return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);");
+  /** Sets `breakInside: value`. */
+  breakInside(value: Properties["breakInside"]) {
+    return this.add("breakInside", value);
   }
-  /** Sets `boxShadow: "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);"`. */
-  get bshHover() {
-    return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);");
+  /** Sets `breakAfter: value`. */
+  breakAfter(value: Properties["breakAfter"]) {
+    return this.add("breakAfter", value);
   }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
-  get bshFocus() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
-  }
-  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
-  get bshDanger() {
-    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
-  }
-  /** Sets `boxShadow: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"`. */
-  get bshModal() {
-    return this.add("boxShadow", "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)");
-  }
-  /** Sets `boxShadow: value`. */
-  boxShadow(value: Properties["boxShadow"]) {
-    return this.add("boxShadow", value);
+
+  // clipPath
+  /** Sets `clipPath: value`. */
+  clipPath(value: Properties["clipPath"]) {
+    return this.add("clipPath", value);
   }
 
   // container
@@ -840,6 +862,50 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   leftPx(px: number) {
     return this.add("left", `${px}px`);
   }
+  /** Sets `inset: "calc(var(--t-spacing) * 0)"`. */
+  get inset0() {
+    return this.add("inset", "calc(var(--t-spacing) * 0)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 1)"`. */
+  get inset1() {
+    return this.add("inset", "calc(var(--t-spacing) * 1)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 2)"`. */
+  get inset2() {
+    return this.add("inset", "calc(var(--t-spacing) * 2)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 3)"`. */
+  get inset3() {
+    return this.add("inset", "calc(var(--t-spacing) * 3)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 4)"`. */
+  get inset4() {
+    return this.add("inset", "calc(var(--t-spacing) * 4)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 5)"`. */
+  get inset5() {
+    return this.add("inset", "calc(var(--t-spacing) * 5)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 6)"`. */
+  get inset6() {
+    return this.add("inset", "calc(var(--t-spacing) * 6)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 7)"`. */
+  get inset7() {
+    return this.add("inset", "calc(var(--t-spacing) * 7)");
+  }
+  /** Sets `inset: "calc(var(--t-spacing) * 8)"`. */
+  get inset8() {
+    return this.add("inset", "calc(var(--t-spacing) * 8)");
+  }
+  /** Sets `inset: "v"`. */
+  inset(v: number | string) {
+    return this.add("inset", maybeInc(v));
+  }
+  /** Sets `inset: px`. */
+  insetPx(px: number) {
+    return this.add("inset", `${px}px`);
+  }
 
   // cursor
   /** Sets `cursor: "pointer"`. */
@@ -911,6 +977,16 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `display: value`. */
   display(value: Properties["display"]) {
     return this.add("display", value);
+  }
+
+  // filter
+  /** Sets `filter: value`. */
+  filter(value: Properties["filter"]) {
+    return this.add("filter", value);
+  }
+  /** Sets `backdropFilter: value`. */
+  backdropFilter(value: Properties["backdropFilter"]) {
+    return this.add("backdropFilter", value);
   }
 
   // flexbox
@@ -1382,6 +1458,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   gc(value: Properties["gridColumn"]) {
     return this.add("gridColumn", value);
   }
+  /** Sets `gridArea: value`. */
+  ga(value: Properties["gridArea"]) {
+    return this.add("gridArea", value);
+  }
   /** Sets `gridAutoRows: value`. */
   gar(value: Properties["gridAutoRows"]) {
     return this.add("gridAutoRows", value);
@@ -1736,6 +1816,22 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     ).add("textOverflow", "ellipsis");
   }
 
+  // listStyle
+  /** Sets `listStyle: "none"`. */
+  get listNone() {
+    return this.add("listStyle", "none");
+  }
+  /** Sets `listStyle: value`. */
+  listStyle(value: Properties["listStyle"]) {
+    return this.add("listStyle", value);
+  }
+
+  // mask
+  /** Sets `maskImage: value`. */
+  maskImage(value: Properties["maskImage"]) {
+    return this.add("maskImage", value);
+  }
+
   // objectFit
   /** Sets `objectFit: "contain"`. */
   get objectContain() {
@@ -1760,6 +1856,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `objectFit: value`. */
   objectFit(value: Properties["objectFit"]) {
     return this.add("objectFit", value);
+  }
+  /** Sets `objectPosition: value`. */
+  objectPosition(value: Properties["objectPosition"]) {
+    return this.add("objectPosition", value);
   }
 
   // opacity
@@ -1804,6 +1904,22 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `outline: value`. */
   outline(value: Properties["outline"]) {
     return this.add("outline", value);
+  }
+  /** Sets `outlineColor: value`. */
+  outlineColor(value: Properties["outlineColor"]) {
+    return this.add("outlineColor", value);
+  }
+  /** Sets `outlineOffset: value`. */
+  outlineOffset(value: Properties["outlineOffset"]) {
+    return this.add("outlineOffset", value);
+  }
+  /** Sets `outlineStyle: value`. */
+  outlineStyle(value: Properties["outlineStyle"]) {
+    return this.add("outlineStyle", value);
+  }
+  /** Sets `outlineWidth: value`. */
+  outlineWidth(value: Properties["outlineWidth"]) {
+    return this.add("outlineWidth", value);
   }
 
   // overflow
@@ -1868,6 +1984,20 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("overflowX", value);
   }
 
+  // pointerEvents
+  /** Sets `pointerEvents: "none"`. */
+  get pen() {
+    return this.add("pointerEvents", "none");
+  }
+  /** Sets `pointerEvents: "auto"`. */
+  get pea() {
+    return this.add("pointerEvents", "auto");
+  }
+  /** Sets `pointerEvents: value`. */
+  pe(value: Properties["pointerEvents"]) {
+    return this.add("pointerEvents", value);
+  }
+
   // position
   /** Sets `position: "absolute"`. */
   get absolute() {
@@ -1892,6 +2022,222 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `position: value`. */
   position(value: Properties["position"]) {
     return this.add("position", value);
+  }
+
+  // resize
+  /** Sets `resize: "none"`. */
+  get resizeNone() {
+    return this.add("resize", "none");
+  }
+  /** Sets `resize: value`. */
+  resize(value: Properties["resize"]) {
+    return this.add("resize", value);
+  }
+
+  // scroll
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 0)"`. */
+  get smt0() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 0)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 1)"`. */
+  get smt1() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 1)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 2)"`. */
+  get smt2() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 2)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 3)"`. */
+  get smt3() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 3)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 4)"`. */
+  get smt4() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 4)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 5)"`. */
+  get smt5() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 5)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 6)"`. */
+  get smt6() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 6)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 7)"`. */
+  get smt7() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 7)");
+  }
+  /** Sets `scrollMarginTop: "calc(var(--t-spacing) * 8)"`. */
+  get smt8() {
+    return this.add("scrollMarginTop", "calc(var(--t-spacing) * 8)");
+  }
+  /** Sets `scrollMarginTop: "v"`. */
+  smt(v: number | string) {
+    return this.add("scrollMarginTop", maybeInc(v));
+  }
+  /** Sets `scrollMarginTop: px`. */
+  smtPx(px: number) {
+    return this.add("scrollMarginTop", `${px}px`);
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 0)"`. */
+  get smr0() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 0)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 1)"`. */
+  get smr1() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 1)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 2)"`. */
+  get smr2() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 2)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 3)"`. */
+  get smr3() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 3)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 4)"`. */
+  get smr4() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 4)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 5)"`. */
+  get smr5() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 5)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 6)"`. */
+  get smr6() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 6)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 7)"`. */
+  get smr7() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 7)");
+  }
+  /** Sets `scrollMarginRight: "calc(var(--t-spacing) * 8)"`. */
+  get smr8() {
+    return this.add("scrollMarginRight", "calc(var(--t-spacing) * 8)");
+  }
+  /** Sets `scrollMarginRight: "v"`. */
+  smr(v: number | string) {
+    return this.add("scrollMarginRight", maybeInc(v));
+  }
+  /** Sets `scrollMarginRight: px`. */
+  smrPx(px: number) {
+    return this.add("scrollMarginRight", `${px}px`);
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 0)"`. */
+  get smb0() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 0)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 1)"`. */
+  get smb1() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 1)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 2)"`. */
+  get smb2() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 2)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 3)"`. */
+  get smb3() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 3)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 4)"`. */
+  get smb4() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 4)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 5)"`. */
+  get smb5() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 5)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 6)"`. */
+  get smb6() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 6)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 7)"`. */
+  get smb7() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 7)");
+  }
+  /** Sets `scrollMarginBottom: "calc(var(--t-spacing) * 8)"`. */
+  get smb8() {
+    return this.add("scrollMarginBottom", "calc(var(--t-spacing) * 8)");
+  }
+  /** Sets `scrollMarginBottom: "v"`. */
+  smb(v: number | string) {
+    return this.add("scrollMarginBottom", maybeInc(v));
+  }
+  /** Sets `scrollMarginBottom: px`. */
+  smbPx(px: number) {
+    return this.add("scrollMarginBottom", `${px}px`);
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 0)"`. */
+  get sml0() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 0)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 1)"`. */
+  get sml1() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 1)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 2)"`. */
+  get sml2() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 2)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 3)"`. */
+  get sml3() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 3)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 4)"`. */
+  get sml4() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 4)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 5)"`. */
+  get sml5() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 5)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 6)"`. */
+  get sml6() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 6)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 7)"`. */
+  get sml7() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 7)");
+  }
+  /** Sets `scrollMarginLeft: "calc(var(--t-spacing) * 8)"`. */
+  get sml8() {
+    return this.add("scrollMarginLeft", "calc(var(--t-spacing) * 8)");
+  }
+  /** Sets `scrollMarginLeft: "v"`. */
+  sml(v: number | string) {
+    return this.add("scrollMarginLeft", maybeInc(v));
+  }
+  /** Sets `scrollMarginLeft: px`. */
+  smlPx(px: number) {
+    return this.add("scrollMarginLeft", `${px}px`);
+  }
+  /** Sets `scrollPadding: value`. */
+  scrollPadding(value: Properties["scrollPadding"]) {
+    return this.add("scrollPadding", value);
+  }
+  /** Sets `scrollPaddingInline: value`. */
+  scrollPaddingInline(value: Properties["scrollPaddingInline"]) {
+    return this.add("scrollPaddingInline", value);
+  }
+  /** Sets `scrollPaddingBlock: value`. */
+  scrollPaddingBlock(value: Properties["scrollPaddingBlock"]) {
+    return this.add("scrollPaddingBlock", value);
+  }
+  /** Sets `scrollBehavior: "smooth"`. */
+  get scrollSmooth() {
+    return this.add("scrollBehavior", "smooth");
+  }
+  /** Sets `scrollBehavior: value`. */
+  scrollBehavior(value: Properties["scrollBehavior"]) {
+    return this.add("scrollBehavior", value);
+  }
+  /** Sets `overscrollBehavior: "contain"`. */
+  get overscrollContain() {
+    return this.add("overscrollBehavior", "contain");
+  }
+  /** Sets `overscrollBehavior: value`. */
+  overscrollBehavior(value: Properties["overscrollBehavior"]) {
+    return this.add("overscrollBehavior", value);
   }
 
   // scrollSnap
@@ -2811,6 +3157,14 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   fill(value: Properties["fill"]) {
     return this.add("fill", value);
   }
+  /** Sets `accentColor: value`. */
+  accentColor(value: Properties["accentColor"]) {
+    return this.add("accentColor", value);
+  }
+  /** Sets `caretColor: value`. */
+  caretColor(value: Properties["caretColor"]) {
+    return this.add("caretColor", value);
+  }
 
   // spacing
   /** Sets `marginTop: "calc(var(--t-spacing) * 0)"`. */
@@ -3527,6 +3881,20 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     );
   }
 
+  // table
+  /** Sets `borderCollapse: value`. */
+  borderCollapse(value: Properties["borderCollapse"]) {
+    return this.add("borderCollapse", value);
+  }
+  /** Sets `borderSpacing: value`. */
+  borderSpacing(value: Properties["borderSpacing"]) {
+    return this.add("borderSpacing", value);
+  }
+  /** Sets `tableLayout: value`. */
+  tableLayout(value: Properties["tableLayout"]) {
+    return this.add("tableLayout", value);
+  }
+
   // textAlign
   /** Sets `textAlign: "left"`. */
   get tal() {
@@ -3589,6 +3957,20 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("textTransform", value);
   }
 
+  // touchAction
+  /** Sets `touchAction: "none"`. */
+  get touchNone() {
+    return this.add("touchAction", "none");
+  }
+  /** Sets `touchAction: "pan-y"`. */
+  get touchPanY() {
+    return this.add("touchAction", "pan-y");
+  }
+  /** Sets `touchAction: value`. */
+  touchAction(value: Properties["touchAction"]) {
+    return this.add("touchAction", value);
+  }
+
   // transform
   /** Sets `backfaceVisibility: value`. */
   backfaceVisibility(value: Properties["backfaceVisibility"]) {
@@ -3630,38 +4012,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   translate(value: Properties["translate"]) {
     return this.add("translate", value);
   }
-
-  // transition
-  /** Sets `transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transition() {
-    return this.add(
-      "transition",
-      "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-    );
-  }
-  /** Sets `transition: "width 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionWidth() {
-    return this.add("transition", "width 200ms cubic-bezier(0.4, 0, 0.2, 1)");
-  }
-  /** Sets `transition: "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionOpacity() {
-    return this.add("transition", "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)");
-  }
-  /** Sets `transition: "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionTransform() {
-    return this.add("transition", "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)");
-  }
-  /** Sets `transition: "height 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionHeight() {
-    return this.add("transition", "height 200ms cubic-bezier(0.4, 0, 0.2, 1)");
-  }
-  /** Sets `transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionTop() {
-    return this.add("transition", "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
-  }
-  /** Sets `transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
-  get transitionAll() {
-    return this.add("transition", "all 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  /** Sets `willChange: value`. */
+  willChange(value: Properties["willChange"]) {
+    return this.add("willChange", value);
   }
 
   // typeScale
@@ -3750,6 +4103,38 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `lineHeight: px`. */
   lhPx(px: number) {
     return this.lh(`${px}px`);
+  }
+  /** Sets `letterSpacing: value`. */
+  ls(value: Properties["letterSpacing"]) {
+    return this.add("letterSpacing", value);
+  }
+  /** Sets `letterSpacing: px`. */
+  lsPx(px: number) {
+    return this.ls(`${px}px`);
+  }
+  /** Sets `textWrap: "balance"`. */
+  get twb() {
+    return this.add("textWrap", "balance");
+  }
+  /** Sets `textWrap: "pretty"`. */
+  get twp() {
+    return this.add("textWrap", "pretty");
+  }
+  /** Sets `textWrap: value`. */
+  tw(value: Properties["textWrap"]) {
+    return this.add("textWrap", value);
+  }
+  /** Sets `fontVariantNumeric: "tabular-nums"`. */
+  get tabularNums() {
+    return this.add("fontVariantNumeric", "tabular-nums");
+  }
+  /** Sets `fontVariantNumeric: value`. */
+  fontVariantNumeric(value: Properties["fontVariantNumeric"]) {
+    return this.add("fontVariantNumeric", value);
+  }
+  /** Sets `content: value`. */
+  content(value: Properties["content"]) {
+    return this.add("content", value);
   }
 
   // userSelect
@@ -4103,6 +4488,48 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
     return this.add("fontFamily", value);
   }
 
+  // borderRadius
+  /** Sets `borderRadius: "0"`. */
+  get br0() {
+    return this.add("borderRadius", "0");
+  }
+  /** Sets `borderRadius: "4px"`. */
+  get br4() {
+    return this.add("borderRadius", "4px");
+  }
+  /** Sets `borderRadius: "8px"`. */
+  get br8() {
+    return this.add("borderRadius", "8px");
+  }
+  /** Sets `borderRadius: "12px"`. */
+  get br12() {
+    return this.add("borderRadius", "12px");
+  }
+  /** Sets `borderRadius: "16px"`. */
+  get br16() {
+    return this.add("borderRadius", "16px");
+  }
+  /** Sets `borderRadius: "24px"`. */
+  get br24() {
+    return this.add("borderRadius", "24px");
+  }
+  /** Sets `borderRadius: "100%"`. */
+  get br100() {
+    return this.add("borderRadius", "100%");
+  }
+  /** Sets `borderRadius: value`. */
+  borderRadius(value: Properties["borderRadius"]) {
+    return this.add("borderRadius", value);
+  }
+  /** Sets `borderTopRightRadius: "4px"; borderTopLeftRadius: "4px"`. */
+  get brt4() {
+    return this.add("borderTopRightRadius", "4px").add("borderTopLeftRadius", "4px");
+  }
+  /** Sets `borderBottomRightRadius: "4px"; borderBottomLeftRadius: "4px"`. */
+  get brb4() {
+    return this.add("borderBottomRightRadius", "4px").add("borderBottomLeftRadius", "4px");
+  }
+
   // layoutContainer
   /** Sets `width: "min(100%, calc(calc(var(--beam-layout-viewport-width, 100vw) - var(--beam-side-nav-layout-width, 0px)) - 2 * var(--beam-layout-content-padding-x, 0px)))"; left: "calc(var(--beam-side-nav-layout-width, 0px) + var(--beam-layout-content-padding-x, 0px))"; position: "sticky"`. */
   get layoutContainer() {
@@ -4113,6 +4540,69 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
       "position",
       "sticky",
     );
+  }
+
+  // transition
+  /** Sets `transition: "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transition() {
+    return this.add(
+      "transition",
+      "background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), left 200ms cubic-bezier(0.4, 0, 0.2, 1), right 200ms cubic-bezier(0.4, 0, 0.2, 1), margin 200ms cubic-bezier(0.4, 0, 0.2, 1), width 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    );
+  }
+  /** Sets `transition: "width 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionWidth() {
+    return this.add("transition", "width 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionOpacity() {
+    return this.add("transition", "opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionTransform() {
+    return this.add("transition", "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "height 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionHeight() {
+    return this.add("transition", "height 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionTop() {
+    return this.add("transition", "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+  /** Sets `transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
+  get transitionAll() {
+    return this.add("transition", "all 200ms cubic-bezier(0.4, 0, 0.2, 1)");
+  }
+
+  // boxShadow
+  /** Sets `boxShadow: "none"`. */
+  get bsh0() {
+    return this.add("boxShadow", "none");
+  }
+  /** Sets `boxShadow: "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);"`. */
+  get bshBasic() {
+    return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.08), 0px 2px 16px rgba(53, 53, 53, 0.03);");
+  }
+  /** Sets `boxShadow: "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);"`. */
+  get bshHover() {
+    return this.add("boxShadow", "0px 4px 8px rgba(53, 53, 53, 0.1), 0px 2px 24px rgba(53, 53, 53, 0.08);");
+  }
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)"`. */
+  get bshFocus() {
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(29, 78, 216, 1)");
+  }
+  /** Sets `boxShadow: "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)"`. */
+  get bshDanger() {
+    return this.add("boxShadow", "0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 0px 0px 4px rgba(153, 27, 27, 1)");
+  }
+  /** Sets `boxShadow: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)"`. */
+  get bshModal() {
+    return this.add("boxShadow", "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)");
+  }
+  /** Sets `boxShadow: value`. */
+  boxShadow(value: Properties["boxShadow"]) {
+    return this.add("boxShadow", value);
   }
 
   // buttonBase

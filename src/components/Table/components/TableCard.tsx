@@ -249,8 +249,7 @@ function Thumbnail(props: ThumbnailProps) {
             .sqPx(32)
             .br8.ba.bcGray300.bgWhite.outline(0)
             .onHover.bshHover.end.onFocusVisible.bshFocus.end.onActive.bcBlue600.element("::after")
-            .contentEmpty.absolute.top0.left0.w100.h100.br8.bgBlue600.o(0.28)
-            .add("pointerEvents", "none").$
+            .contentEmpty.absolute.top0.left0.w100.h100.br8.bgBlue600.o(0.28).pen.$
         }
       >
         {/* `oh` clips the swatch to the border radius; it can't live on the link, which would clip its focus ring. */}

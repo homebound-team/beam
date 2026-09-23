@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
@@ -794,15 +794,24 @@ export function WithQueryTableInfiniteScroll() {
   });
 
   const query = useExamplePaginatedQuery({ filter: layoutState.filter });
+  const { data, fetchMore } = query;
+  const createRows = useCallback(
+    (data: ExampleQueryData | undefined) => [
+      simpleHeader,
+      ...(data?.simpleData.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
+    ],
+    [],
+  );
 
   const maybeHasMore = useCallback(
     async (index: number) => {
-      if (query.data?.pageInfo.hasNextPage) {
-        await query.fetchMore({ variables: { page: { offset: index, limit: 50 } } });
+      if (data?.pageInfo.hasNextPage) {
+        await fetchMore({ variables: { page: { offset: index, limit: 50 } } });
       }
     },
-    [query],
+    [data?.pageInfo.hasNextPage, fetchMore],
   );
+  const infiniteScroll = useMemo(() => ({ onEndReached: maybeHasMore }), [maybeHasMore]);
 
   return (
     <TestProjectLayout>
@@ -812,11 +821,8 @@ export function WithQueryTableInfiniteScroll() {
           as: "virtual",
           query,
           columns,
-          createRows: (data) => [
-            simpleHeader,
-            ...(data?.simpleData.map((row) => ({ kind: "data" as const, id: row.id, data: row })) ?? []),
-          ],
-          infiniteScroll: { onEndReached: maybeHasMore },
+          createRows,
+          infiniteScroll,
         }}
         layoutState={layoutState}
       />
@@ -824,31 +830,35 @@ export function WithQueryTableInfiniteScroll() {
   );
 }
 
+type ExampleRow = { id: string; name: string; value: number; status: string; priority: number };
+
+// Mimics Apollo: a new filter clears `data` while it loads, and the last result moves to `previousData`.
 function useExampleQuery({ filter }: { filter: Record<string, unknown> }) {
   const filterString = JSON.stringify(filter);
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] =
-    useState<Array<{ id: string; name: string; value: number; status: string; priority: number }>>();
+  const [data, setData] = useState<ExampleRow[]>();
+  const [previousData, setPreviousData] = useState<ExampleRow[]>();
+  const latestData = useRef<ExampleRow[]>(undefined);
 
   useEffect(() => {
     setLoading(true);
+    setPreviousData(latestData.current);
+    setData(undefined);
     const timer = setTimeout(() => {
-      setData([
+      latestData.current = [
         { id: "1", name: "a", value: 1, status: "active", priority: 1 },
         { id: "2", name: "b", value: 2, status: "inactive", priority: 2 },
         { id: "3", name: "c", value: 3, status: "active", priority: 3 },
-      ]);
+      ];
+      setData(latestData.current);
       setLoading(false);
-    }, 500);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [filterString]);
 
-  return {
-    data,
-    loading,
-  };
+  return { data, previousData, loading };
 }
 
 type ExampleQueryData = {

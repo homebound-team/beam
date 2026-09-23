@@ -49,7 +49,7 @@ export function WorkflowPageRightPaneTriggers(props: { triggers: RightPaneTrigge
         // Desktop only — on `sm` the full-bleed pane covers the header slot.
         ...(!isMobile &&
           (isRightPaneOpen
-            ? Css.transform(`translateX(calc(100% + ${pageTriggerInsetPx}px))`).add("pointerEvents", "none").$
+            ? Css.transform(`translateX(calc(100% + ${pageTriggerInsetPx}px))`).pen.$
             : Css.transform("translateX(0)").$)),
       }}
     >
