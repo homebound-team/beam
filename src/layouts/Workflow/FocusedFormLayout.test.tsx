@@ -26,6 +26,23 @@ describe("FocusedFormLayout", () => {
     expect(r.query.header_stepperTabs).toBeNull();
     expect(r.formSectionLayout_title).toHaveTextContent("Link Design Package");
     expect(r.focusedFormLayout_body).toBeInTheDocument();
+    expect(r.query.focusedFormLayout_banner).toBeNull();
+  });
+
+  it("renders a stay-pinned page banner under the header", async () => {
+    // Given a focused form with a page banner
+    // When rendered
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          banner: { type: "info", message: "Updated Costs Ready — review the new calculations." },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // Then the banner sits in the workflow chrome
+    expect(r.focusedFormLayout_banner_message).toHaveTextContent("Updated Costs Ready");
   });
 
   it("disables Create when primaryDisabled is true, and enables it once omitted", async () => {

@@ -76,6 +76,30 @@ export function WithRightPaneTriggers() {
   );
 }
 
+export function WithBanner() {
+  return (
+    <WithEnvironmentBanner>
+      <FocusedFormLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        banner={{
+          type: "info",
+          message: "Updated calculations are ready for 632 configurations.",
+        }}
+      >
+        <FormSectionLayout
+          withJumpLinks
+          title="Link Design Package"
+          description="Connect this package to a market and give it a name."
+          sections={createSections()}
+        />
+      </FocusedFormLayout>
+    </WithEnvironmentBanner>
+  );
+}
+
 export function AiMode() {
   return (
     <WithEnvironmentBanner>

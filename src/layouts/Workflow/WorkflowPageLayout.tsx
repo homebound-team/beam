@@ -1,16 +1,19 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
+import type { BannerProps } from "src/components/Banner";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { WorkflowHeader } from "src/components/Headers/WorkflowHeader";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 import type { StepperTabsProps } from "src/components/StepperTabs/StepperTabs";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { PageBannerSlot } from "src/layouts/PageBannerSlot";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "../layoutSpacing";
 import {
   bannerAndNavbarChromeTop,
+  beamPageBannerHeightVar,
   beamPageHeaderLayoutHeightVar,
   beamWorkflowLayoutFooterHeightVar,
   documentScrollBodyMinHeight,
@@ -28,6 +31,8 @@ import { WorkflowActions, type WorkflowActionsProps } from "./WorkflowActions";
 export type WorkflowPageLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
   Omit<WorkflowActionsProps, "aiMode"> & {
     stepperTabs?: StepperTabsProps;
+    /** Stay-pinned status banner under the header. */
+    banner?: BannerProps;
     /** Full-bleed AI wash on the body, and the `ai` Continue/Complete variant. */
     aiMode?: boolean;
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
@@ -54,6 +59,7 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
     breadcrumbs,
     onCancel,
     rightPaneTriggers,
+    banner,
     ...actionProps
   } = props;
   const tid = useTestIds(props, "workflowPageLayout");
@@ -65,12 +71,20 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
 
   const headerMetricsRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
+  const bannerMetricsRef = useRef<HTMLDivElement>(null);
+  const bannerHeight = useMeasuredHeight(bannerMetricsRef, banner != null);
 
   const headerWidth = documentScrollChromeWidth();
   const outerTop = bannerAndNavbarChromeTop();
 
-  const cssVars: Record<string, string> | undefined =
-    headerHeight > 0 ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
+  const cssVars: Record<string, string> = {};
+  if (headerHeight > 0) {
+    cssVars[beamPageHeaderLayoutHeightVar] = `${headerHeight}px`;
+  }
+  if (banner != null && bannerHeight > 0) {
+    cssVars[beamPageBannerHeightVar] = `${bannerHeight}px`;
+  }
+  const style = Object.keys(cssVars).length > 0 ? cssVars : undefined;
 
   const showFooter = isMobile;
 
@@ -89,7 +103,7 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
 
   return (
     <DocumentScrollLayoutProvider>
-      <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
+      <div css={Css.df.fdc.w100.$} style={style} {...tid}>
         {/* In-flow spacer: the header is `fixed` so horizontal document scroll cannot move it. */}
         <div css={Css.fs0.w100.$} style={{ height: headerHeight }}>
           <div
@@ -106,6 +120,7 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
             />
           </div>
         </div>
+        {banner && <PageBannerSlot {...tid} banner={banner} metricsRef={bannerMetricsRef} />}
 
         <div
           css={{

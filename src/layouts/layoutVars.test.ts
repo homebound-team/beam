@@ -1,6 +1,7 @@
 import {
   bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
+  beamPageBannerHeightVar,
   beamPageHeaderLayoutHeightVar,
   documentScrollBodyMinHeight,
   documentScrollChromeWidth,
@@ -9,6 +10,7 @@ import {
   documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
+  pageBannerChromeTop,
   stickyNavAndHeaderOffset,
   stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,
@@ -47,7 +49,7 @@ describe("layoutVars", () => {
 
       // Then it subtracts the sticky table header offset from the layout viewport height
       expect(result).toBe(
-        "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-table-actions-height, 0px)))",
+        "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-page-banner-height, 0px) + var(--beam-table-actions-height, 0px)))",
       );
     });
   });
@@ -60,7 +62,7 @@ describe("layoutVars", () => {
 
       // Then it subtracts sticky chrome and the workflow footer from the layout viewport height
       expect(result).toBe(
-        "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px)) - var(--beam-workflow-layout-footer-height, 0px))",
+        "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-page-banner-height, 0px)) - var(--beam-workflow-layout-footer-height, 0px))",
       );
     });
   });
@@ -111,15 +113,28 @@ describe("layoutVars", () => {
     });
   });
 
+  describe("pageBannerChromeTop", () => {
+    it("sums the environment banner + navbar + page header height vars", () => {
+      // Given the page banner chrome top helper
+      // When computing the top offset
+      const result = pageBannerChromeTop();
+
+      // Then the env banner, navbar, and page header height vars are summed (not the page banner itself)
+      expect(result).toBe(
+        "calc(var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px))",
+      );
+    });
+  });
+
   describe("stickyNavAndHeaderOffset", () => {
-    it("sums the banner + nav + header height vars with a 0 base by default", () => {
+    it("sums the banner + nav + header + page banner height vars with a 0 base by default", () => {
       // Given the default base offset
       // When computing the sticky offset
       const result = stickyNavAndHeaderOffset();
 
-      // Then the banner, nav, and header height vars are summed with a 0px base
+      // Then the env banner, nav, header, and page banner height vars are summed with a 0px base
       expect(result).toBe(
-        "calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px))",
+        "calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-page-banner-height, 0px))",
       );
     });
 
@@ -130,7 +145,7 @@ describe("layoutVars", () => {
 
       // Then the base is included in the calc expression
       expect(result).toBe(
-        "calc(12px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px))",
+        "calc(12px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-page-banner-height, 0px))",
       );
     });
   });
@@ -142,6 +157,7 @@ describe("layoutVars", () => {
       const el = document.createElement("div");
       el.style.setProperty(beamEnvironmentBannerLayoutHeightVar, "32px");
       el.style.setProperty(beamPageHeaderLayoutHeightVar, "80px");
+      el.style.setProperty(beamPageBannerHeightVar, "72px");
       document.body.appendChild(el);
 
       // When reading the pixel offset from the layout element
@@ -149,8 +165,8 @@ describe("layoutVars", () => {
       el.remove();
       document.documentElement.style.removeProperty(beamPageHeaderLayoutHeightVar);
 
-      // Then banner + header come from the element and the unset navbar var is 0
-      expect(result).toBe(112);
+      // Then env banner + header + page banner come from the element and the unset navbar var is 0
+      expect(result).toBe(184);
     });
   });
 
@@ -162,7 +178,7 @@ describe("layoutVars", () => {
 
       // Then the nav, header, and table actions height vars are summed with a 0px base
       expect(result).toBe(
-        "calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-table-actions-height, 0px))",
+        "calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-page-banner-height, 0px) + var(--beam-table-actions-height, 0px))",
       );
     });
   });

@@ -153,6 +153,54 @@ export function WithRightPaneTriggers() {
   );
 }
 
+/** Stay-pinned page banner under the workflow header. */
+export function WithBanner() {
+  return (
+    <WithEnvironmentBanner>
+      <StepperLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        banner={{
+          type: "info",
+          message: "Updated calculations are ready for 632 configurations.",
+        }}
+        steps={[
+          {
+            label: "Details",
+            content: (
+              <FormSectionLayout
+                withJumpLinks
+                title="Link Design Package"
+                description="Connect this package to a market and give it a name."
+                sections={[
+                  {
+                    title: "Setup",
+                    description: "Basic package details.",
+                    fields: <JumpLinkPlaceholderFields count={2} />,
+                  },
+                  { title: "Package Options", fields: <JumpLinkPlaceholderFields count={3} /> },
+                ]}
+              />
+            ),
+          },
+          {
+            label: "Review",
+            content: (
+              <FormSectionLayout
+                title="Review"
+                description="Confirm before creating."
+                sections={[{ title: "Summary", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+        ]}
+      />
+    </WithEnvironmentBanner>
+  );
+}
+
 /** Form step with JumpLinks on {@link FormSectionLayout} — Stepper itself does not own the rail. */
 export function WithJumpLinks() {
   return (

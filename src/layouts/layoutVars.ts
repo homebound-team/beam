@@ -7,6 +7,9 @@ export const beamNavbarLayoutHeightVar = "--beam-navbar-layout-height";
 /** Effective page header height (px) while pinned; `0` when scrolled away. */
 export const beamPageHeaderLayoutHeightVar = "--beam-page-header-layout-height";
 
+/** Stay-pinned page banner height (px); `0` when unset. */
+export const beamPageBannerHeightVar = "--beam-page-banner-height";
+
 /** Visible viewport width (px); use instead of `100vw` for sticky chrome. */
 export const beamLayoutViewportWidthVar = "--beam-layout-viewport-width";
 
@@ -102,9 +105,14 @@ export function bannerAndNavbarChromeTop(): string {
   return `calc(var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px))`;
 }
 
-/** `top` offset below environment banner + auto-hiding navbar + page header (each var collapses to `0` when scrolled away). */
+/** CSS `top` for the stay-pinned page banner (below env banner + navbar + page header). */
+export function pageBannerChromeTop(): string {
+  return `calc(var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
+}
+
+/** `top` offset below environment banner + auto-hiding navbar + page header + page banner (each var collapses to `0` when scrolled away, except the stay-pinned page banner). */
 export function stickyNavAndHeaderOffset(basePx = 0): string {
-  return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
+  return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamPageBannerHeightVar}, 0px))`;
 }
 
 /** Pixel equivalent of {@link stickyNavAndHeaderOffset}, read from `el`'s computed (inherited) CSS vars. Used by JumpLink scroll-spy, which needs a number rather than a CSS `calc()`. */
@@ -112,7 +120,10 @@ export function stickyNavAndHeaderOffsetPx(el: Element): number {
   const styles = getComputedStyle(el);
   const read = (name: string) => parseFloat(styles.getPropertyValue(name)) || 0;
   return (
-    read(beamEnvironmentBannerLayoutHeightVar) + read(beamNavbarLayoutHeightVar) + read(beamPageHeaderLayoutHeightVar)
+    read(beamEnvironmentBannerLayoutHeightVar) +
+    read(beamNavbarLayoutHeightVar) +
+    read(beamPageHeaderLayoutHeightVar) +
+    read(beamPageBannerHeightVar)
   );
 }
 
@@ -124,13 +135,14 @@ export function stickyTableHeaderOffsetPx(el: Element): number {
     read(beamEnvironmentBannerLayoutHeightVar) +
     read(beamNavbarLayoutHeightVar) +
     read(beamPageHeaderLayoutHeightVar) +
+    read(beamPageBannerHeightVar) +
     read(beamTableActionsHeightVar)
   );
 }
 
-/** `top` offset for sticky table column headers (environment banner + navbar + page header + table actions). */
+/** `top` offset for sticky table column headers (environment banner + navbar + page header + page banner + table actions). */
 export function stickyTableHeaderOffset(basePx = 0): string {
-  return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
+  return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamPageBannerHeightVar}, 0px) + var(${beamTableActionsHeightVar}, 0px))`;
 }
 
 /**

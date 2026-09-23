@@ -5,14 +5,13 @@ import { render, scrollWindowWithAnchor } from "src/utils/rtl";
 const navHeight = 50;
 
 describe("useAutoHideOnScroll", () => {
-  it("starts static and at the top", async () => {
+  it("starts resting at the top", async () => {
     // Given the hook is enabled at the top of the page
     // When it mounts
     const r = await render(<Harness />);
 
-    // Then state is static and atTop is true
-    expect(r.state).toHaveTextContent("static");
-    expect(r.atTop).toHaveTextContent("true");
+    // Then state is resting
+    expect(r.state).toHaveTextContent("resting");
   });
 
   it("hides when scrolling down past the threshold", async () => {
@@ -25,7 +24,6 @@ describe("useAutoHideOnScroll", () => {
 
     // Then the chrome hides
     expect(r.state).toHaveTextContent("hidden");
-    expect(r.atTop).toHaveTextContent("false");
   });
 
   it("reveals when scrolling back up while still past the threshold", async () => {
@@ -42,7 +40,7 @@ describe("useAutoHideOnScroll", () => {
     expect(r.state).toHaveTextContent("revealed");
   });
 
-  it("returns to static (not stuck revealed) once scrolled back to the top", async () => {
+  it("returns to resting (not stuck revealed) once scrolled back to the top", async () => {
     // Given the chrome is revealed mid-page
     const r = await render(<Harness />);
     scrollWindowWithAnchor(r.spacer, 0);
@@ -53,9 +51,8 @@ describe("useAutoHideOnScroll", () => {
     // When scrolling back to the top
     scrollWindowWithAnchor(r.spacer, 0);
 
-    // Then state returns to static
-    expect(r.state).toHaveTextContent("static");
-    expect(r.atTop).toHaveTextContent("true");
+    // Then state returns to resting
+    expect(r.state).toHaveTextContent("resting");
   });
 
   it("holds at the top through negative (iOS) top-overscroll", async () => {
@@ -65,9 +62,8 @@ describe("useAutoHideOnScroll", () => {
     // When rubber-banding past the top (negative scrollY)
     scrollWindowWithAnchor(r.spacer, -40);
 
-    // Then the chrome stays static and atTop
-    expect(r.state).toHaveTextContent("static");
-    expect(r.atTop).toHaveTextContent("true");
+    // Then the chrome stays resting
+    expect(r.state).toHaveTextContent("resting");
   });
 
   it("does not reveal on the upward bounce from bottom-overscroll", async () => {
@@ -85,16 +81,15 @@ describe("useAutoHideOnScroll", () => {
     expect(r.state).toHaveTextContent("hidden");
   });
 
-  it("stays static when disabled", async () => {
+  it("stays resting when disabled", async () => {
     // Given the hook is disabled
     const r = await render(<Harness enabled={false} />);
 
     // When scrolling
     scrollWindowWithAnchor(r.spacer, 300);
 
-    // Then state stays static
-    expect(r.state).toHaveTextContent("static");
-    expect(r.atTop).toHaveTextContent("true");
+    // Then state stays resting
+    expect(r.state).toHaveTextContent("resting");
   });
 
   it("does not reveal when document height changes", async () => {
@@ -111,7 +106,7 @@ describe("useAutoHideOnScroll", () => {
     expect(r.state).toHaveTextContent("hidden");
   });
 
-  it("uses getTopOffset (not 0) as the static / atTop threshold", async () => {
+  it("uses getTopOffset (not 0) as the resting threshold", async () => {
     // Given a placeholder below a 100px top offset (e.g. below a navbar)
     const r = await render(<Harness topOffset={100} />);
     const anchorTop = 150;
@@ -124,26 +119,23 @@ describe("useAutoHideOnScroll", () => {
 
     // Then it stays revealed until rect.top reaches the offset
     expect(r.state).toHaveTextContent("revealed");
-    expect(r.atTop).toHaveTextContent("false");
 
     // When scrolled so rect.top reaches the offset
     scrollWindowWithAnchor(r.spacer, 40, { anchorTop });
 
-    // Then it returns to static / atTop (scrollY is still > 0)
-    expect(r.state).toHaveTextContent("static");
-    expect(r.atTop).toHaveTextContent("true");
+    // Then it returns to resting (scrollY is still > 0)
+    expect(r.state).toHaveTextContent("resting");
   });
 });
 
 function Harness({ enabled = true, topOffset }: { enabled?: boolean; topOffset?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const getTopOffset = topOffset != null ? () => topOffset : undefined;
-  const { state, atTop } = useAutoHideOnScroll(ref as RefObject<HTMLElement>, enabled, getTopOffset);
+  const { state } = useAutoHideOnScroll(ref as RefObject<HTMLElement>, enabled, getTopOffset);
   return (
     <div>
       <div data-testid="spacer" ref={ref} />
       <div data-testid="state">{state}</div>
-      <div data-testid="atTop">{String(atTop)}</div>
     </div>
   );
 }
