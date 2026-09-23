@@ -281,8 +281,7 @@ export function ColumnResizeHandle({
               .leftPx(guideLineX)
               .wPx(4)
               .bgColor(Tokens.OnSurfaceMuted)
-              .add("pointerEvents", "none")
-              .z(zIndices.dragHandle)
+              .pen.z(zIndices.dragHandle)
               .add("transform", "translateX(-50%)").$
           }
           {...tid.guideLine}

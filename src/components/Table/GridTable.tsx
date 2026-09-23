@@ -757,11 +757,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
         {loading && (
           <div
-            css={
-              Css.fixed.top0.right0.bottom0.left0.df.aic.jcc
-                .add("pointerEvents", "none")
-                .z(zIndices.tableLoadingOverlay).$
-            }
+            css={Css.fixed.top0.right0.bottom0.left0.df.aic.jcc.pen.z(zIndices.tableLoadingOverlay).$}
             {...tid.loadingOverlay}
           >
             <Loader {...tid.loadingSpinner} />
