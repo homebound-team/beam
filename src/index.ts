@@ -241,6 +241,7 @@ export { headerContentPaddingX, pageContentGutterPx, pageContentPaddingX } from 
 export {
   bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
+  beamPageBannerHeightVar,
   beamFloatingRightOffsetVar,
   beamLayoutContentPaddingXVar,
   beamLayoutViewportHeightVar,
@@ -262,6 +263,7 @@ export {
   documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
+  pageBannerChromeTop,
   stickyNavAndHeaderOffset,
   stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,

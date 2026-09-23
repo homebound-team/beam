@@ -11,6 +11,23 @@ describe("StepperLayout", () => {
     // Then the header and the first step's content both render
     expect(r.stepperLayout_header).toHaveTextContent("Test Workflow");
     expect(r.stepperLayout_body).toBeInTheDocument();
+    expect(r.query.stepperLayout_banner).toBeNull();
+  });
+
+  it("renders a stay-pinned page banner under the header", async () => {
+    // Given a stepper with a page banner
+    // When rendered
+    const r = await render(
+      <StepperLayout
+        {...baseProps({
+          banner: { type: "info", message: "Updated Costs Ready — review the new calculations." },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // Then the banner sits in the workflow chrome
+    expect(r.stepperLayout_banner_message).toHaveTextContent("Updated Costs Ready");
   });
 
   it("starts on defaultStep instead of the first step", async () => {

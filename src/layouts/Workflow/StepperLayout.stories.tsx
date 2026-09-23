@@ -152,6 +152,47 @@ export function WithRightPaneTriggers() {
   );
 }
 
+/** Stay-pinned page banner under the workflow header. */
+export function WithBanner() {
+  return (
+    <WorkflowChrome>
+      <StepperLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        banner={{
+          type: "info",
+          message: "Updated calculations are ready for 632 configurations.",
+        }}
+        steps={[
+          {
+            label: "Details",
+            content: (
+              <FormSectionLayout
+                withJumpLinks
+                title="Link Design Package"
+                description="Connect this package to a market and give it a name."
+                sections={createFormSections()}
+              />
+            ),
+          },
+          {
+            label: "Review",
+            content: (
+              <FormSectionLayout
+                title="Review"
+                description="Confirm before creating."
+                sections={[{ title: "Summary", fields: <PlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+        ]}
+      />
+    </WorkflowChrome>
+  );
+}
+
 function WorkflowChrome({ children }: { children: ReactNode }) {
   return <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>{children}</EnvironmentBannerLayout>;
 }

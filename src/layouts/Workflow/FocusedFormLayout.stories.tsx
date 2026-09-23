@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import type { ReactNode } from "react";
+import type { BannerProps } from "src/components/Banner";
 import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { Css, Tokens } from "src/Css";
@@ -43,6 +44,20 @@ export function WithRightPaneTriggers() {
   );
 }
 
+/** Stay-pinned page banner under the workflow header. */
+export function WithBanner() {
+  return (
+    <WorkflowChrome
+      banner={{
+        type: "info",
+        message: "Updated calculations are ready for 632 configurations.",
+      }}
+    >
+      <FocusedFormBody />
+    </WorkflowChrome>
+  );
+}
+
 /** `aiMode` on both the workflow chrome and the form body. */
 export function AiMode() {
   return (
@@ -65,6 +80,7 @@ function WorkflowChrome({
 }: {
   children: ReactNode;
   aiMode?: boolean;
+  banner?: BannerProps;
   rightPaneTriggers?: ReturnType<typeof createRightPaneTriggers>;
 }) {
   return (

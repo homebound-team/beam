@@ -1,4 +1,5 @@
 import { type ReactNode, useState } from "react";
+import type { BannerProps } from "src/components/Banner";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import type { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
@@ -35,6 +36,8 @@ export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleS
     allowNavigation?: (args: AllowNavigationArgs) => boolean;
     /** Full-bleed AI wash on the body. Pair with `aiMode` on a step's `FormSectionLayout`. */
     aiMode?: boolean;
+    /** Stay-pinned status banner under the workflow header. */
+    banner?: BannerProps;
   };
 
 /**
@@ -53,6 +56,7 @@ export function StepperLayout(props: StepperLayoutProps) {
     isDirty,
     allowNavigation,
     aiMode,
+    banner,
     ...headerProps
   } = props;
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
@@ -75,6 +79,7 @@ export function StepperLayout(props: StepperLayoutProps) {
     <WorkflowPageLayout
       {...tid}
       {...headerProps}
+      banner={banner}
       aiMode={aiMode}
       stepperTabs={{ steps: stepTabs, currentStep, onChange: goToStep }}
       isDirty={isDirty}

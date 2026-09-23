@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useMemo, useState } from "react";
+import type { BannerProps } from "src/components/Banner";
 import { Button } from "src/components/Button";
 import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
@@ -43,6 +44,21 @@ export function WithoutSideNav() {
   );
 }
 
+/** Stay-pinned page banner under the header. It stays put when the page header auto-hides. */
+export function WithBanner() {
+  return (
+    <TablePageChrome
+      withSideNav
+      banner={{
+        type: "warning",
+        message: "Calculating Updated Costs — Costs shown may be out of date.",
+      }}
+    >
+      <GridTableLayoutExample storageKey="layouts-table-page-banner" withRightPane />
+    </TablePageChrome>
+  );
+}
+
 /** Same chrome, with header tabs. The table's actions own the top gap; Overview uses the tab panel's. */
 export function WithTabs() {
   const [selected, setSelected] = useState<PageTab>("lineItems");
@@ -58,15 +74,18 @@ export function WithTabs() {
 function TablePageChrome({
   withSideNav,
   tabs,
+  banner,
   children,
 }: {
   withSideNav?: boolean;
   tabs?: { tabs: TabWithContent<PageTab>[]; selected: PageTab; onChange: (value: PageTab) => void };
+  banner?: BannerProps;
   children: ReactNode;
 }) {
   const body = (
     <PageHeaderLayout
       pageHeader={{ title: "Projects", rightSlot: <OpenRightPaneButton title="Row detail" />, ...(tabs && { tabs }) }}
+      banner={banner}
     >
       {children}
     </PageHeaderLayout>
