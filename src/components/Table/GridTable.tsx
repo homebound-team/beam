@@ -636,7 +636,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       const children =
         position === "leading" && companionEl ? [companionEl, row] : companionEl ? [row, companionEl] : row;
       // Hover fill only when the row kind has a rowLink/onClick (same as Row cursor/hover).
-      const rowStyle = rowStyles?.[rs.row.kind as R["kind"]];
+      const rowStyle = rowStyles?.[rs.row.kind];
       const hasRowAction = !!(rowStyle?.rowLink || rowStyle?.onClick);
       const showRowHover =
         hasRowAction && !reservedRowKinds.includes(rs.kind) && !omitRowHover && style.rowHoverColor !== "none";
