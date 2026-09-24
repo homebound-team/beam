@@ -14,7 +14,7 @@ import type {
   RenderAs,
 } from "src/components/Table/types";
 import { Css, type Properties, Tokens } from "src/Css";
-import { documentScrollChromeWidth } from "src/layouts/layoutVars";
+import { documentScrollContentWidth } from "src/layouts/layoutVars";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
@@ -318,9 +318,10 @@ export function recursivelyGetContainingRow<R extends Kinded>(
 }
 
 export function getTableRefWidthStyles(isVirtual: boolean, inDocumentScrollLayout: boolean = false) {
-  // When using document-scroll, utilize the documentScrollChromeWidth to get the available width on the page for it.
+  // When using document-scroll, cap at the page's content width (chrome minus any padded ancestor, e.g. CenteredLayout),
+  // so a table whose pinned min-width holds its parent open can still shrink back when the viewport narrows.
   if (inDocumentScrollLayout) {
-    return Css.w(`min(100%, ${documentScrollChromeWidth()})`).mw0.$;
+    return Css.w(`min(100%, ${documentScrollContentWidth()})`).mw0.$;
   }
   // Nested scrolling virtual tables reserve space for Virtuoso / ScrollableParent vertical scrollbars.
   if (isVirtual) {
