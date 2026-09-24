@@ -133,6 +133,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const sortOn = tableState.sortConfig?.on;
 
   // Hover fill matches cursorPointer: only rows with a row-level action.
+  // Also applied on RowGroup for shared parent+companion hover; kept here too because
+  // `as="table"` pinned rows render inside `<thead>` where RowGroup is a Fragment
+  // (no `<tbody>` wrapper), so the group cannot own the hover class.
   const hasRowAction = !!(rowStyle?.rowLink || rowStyle?.onClick);
   const showRowHoverColor =
     hasRowAction && !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
