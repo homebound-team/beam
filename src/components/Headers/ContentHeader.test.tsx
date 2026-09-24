@@ -119,16 +119,6 @@ describe("ContentHeader", () => {
 
   // `pageContentPaddingX` is a media query (12px below `md`, 24px above); jsdom never matches
   // `@media`, so these assert the base rule. The `mdAndUp` value is covered by Chromatic.
-  it("applies page content horizontal padding when withPagePadding is true", async () => {
-    // Given a ContentHeader used full-bleed with withPagePadding
-    const r = await render(<ContentHeader title="Trade Partners" withPagePadding />);
-    // Then it uses the page content inset
-    expect(r.contentHeader).toHaveStyle({
-      paddingLeft: smPageContentPaddingXValue,
-      paddingRight: smPageContentPaddingXValue,
-    });
-  });
-
   it("applies page content padding by default inside a document-scroll layout", async () => {
     // Given a ContentHeader in a document-scroll page body (not inside CenteredLayout)
     const r = await render(
@@ -153,20 +143,6 @@ describe("ContentHeader", () => {
       </DocumentScrollLayoutProvider>,
     );
     // Then the header itself is not padded a second time
-    expect(r.contentHeader).not.toHaveStyle({
-      paddingLeft: smPageContentPaddingXValue,
-      paddingRight: smPageContentPaddingXValue,
-    });
-  });
-
-  it("honors withPagePadding={false} inside a document-scroll layout", async () => {
-    // Given a full-bleed ContentHeader that opts out of the default inset
-    const r = await render(
-      <DocumentScrollLayoutProvider>
-        <ContentHeader title="Trade Partners" withPagePadding={false} />
-      </DocumentScrollLayoutProvider>,
-    );
-    // Then it does not apply page content padding
     expect(r.contentHeader).not.toHaveStyle({
       paddingLeft: smPageContentPaddingXValue,
       paddingRight: smPageContentPaddingXValue,

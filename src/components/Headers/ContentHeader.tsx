@@ -28,11 +28,6 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   startAdornment?: ReactNode;
   /** Shows an info icon after the title with this tooltip content. */
   tooltip?: ReactNode;
-  /**
-   * Horizontal inset from the viewport edge. Defaults on in document-scroll layouts
-   * (`PageHeaderLayout`, `StepperLayout`, …) and off inside {@link CenteredLayout}.
-   */
-  withPagePadding?: boolean;
   /** Style overrides for padding. */
   xss?: X;
 };
@@ -55,7 +50,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
   const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, tooltip, xss } = props;
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const insetHandled = useContentInsetHandled();
-  const withPagePadding = props.withPagePadding ?? (inDocumentScrollLayout && !insetHandled);
+  const withPagePadding = inDocumentScrollLayout && !insetHandled;
   const tid = useTestIds(props, "contentHeader");
   const { sm } = useBreakpoint();
   const { bottomSlotActions, rightSlotActions } = splitHeaderActionsOnSm(actions, sm);

@@ -51,11 +51,9 @@ import {
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, type Only } from "src/Css";
-import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useComputed } from "src/hooks/useComputed";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { layoutGutterPx } from "src/layouts/layoutSpacing";
 import {
   beamRightPaneWidthVar,
   documentScrollChromeLeft,
@@ -299,13 +297,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
-  const { sm } = useBreakpoint();
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
   const columnsWithIds = useMemo(() => {
-    const columns = columnGutter && inDocumentScrollLayout ? withColumnGutters(_columns, layoutGutterPx(sm)) : _columns;
+    const columns = columnGutter && inDocumentScrollLayout ? withColumnGutters(_columns) : _columns;
     return assignDefaultColumnIds(columns);
-  }, [_columns, columnGutter, inDocumentScrollLayout, sm]);
+  }, [_columns, columnGutter, inDocumentScrollLayout]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);

@@ -231,12 +231,7 @@ export { EnvironmentBannerLayout } from "./layouts/EnvironmentBannerLayout/Envir
 export type { EnvironmentBannerLayoutProps } from "./layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 export { FormSectionLayout } from "./layouts/FormSectionLayout/FormSectionLayout";
 export type { FormSectionLayoutProps, FormSectionLayoutSection } from "./layouts/FormSectionLayout/FormSectionLayout";
-export {
-  headerContentPaddingX,
-  layoutGutterPx,
-  pageContentGutterPx,
-  pageContentPaddingX,
-} from "./layouts/layoutSpacing";
+export { headerContentPaddingX, pageContentGutterPx, pageContentPaddingX } from "./layouts/layoutSpacing";
 export {
   bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
