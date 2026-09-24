@@ -100,6 +100,14 @@ describe("ContentHeader", () => {
     expect(r.getByText("Drag").compareDocumentPosition(r.contentHeader_title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
+  it("renders an info icon tooltip after the title when tooltip is provided", async () => {
+    // Given a ContentHeader with a tooltip
+    const r = await render(<ContentHeader title="Trade Partners" tooltip="Partners assigned to this project" />);
+    // Then the tooltip renders after the title
+    expect(r.tooltip).toHaveAttribute("title", "Partners assigned to this project");
+    expect(r.contentHeader_title.compareDocumentPosition(r.tooltip)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
   it("applies aiBoldText to the title when aiMode is true", async () => {
     // Given a ContentHeader with aiMode
     const r = await render(<ContentHeader title="Trade Partners" aiMode />);

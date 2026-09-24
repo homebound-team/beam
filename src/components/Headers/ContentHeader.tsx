@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
 import { type HeaderAction, HeaderActions, splitHeaderActionsOnSm } from "src/components/Headers/HeaderActions";
+import { Icon } from "src/components/Icon";
 import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useTestIds } from "src/utils/useTestIds";
@@ -22,6 +23,8 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   aiMode?: boolean;
   /** Rendered before the title, e.g. a drag handle on `FormSectionChild`. */
   startAdornment?: ReactNode;
+  /** Shows an info icon after the title with this tooltip content. */
+  tooltip?: ReactNode;
   /** Style overrides for padding. */
   xss?: X;
 };
@@ -43,7 +46,7 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
  * from padded ancestors (e.g. {@link CenteredLayout}).
  */
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
-  const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, xss } = props;
+  const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, tooltip, xss } = props;
   const tid = useTestIds(props, "contentHeader");
   const { sm } = useBreakpoint();
   const { bottomSlotActions, rightSlotActions } = splitHeaderActionsOnSm(actions, sm);
@@ -76,6 +79,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
             <Heading css={titleCss} {...tid.title}>
               {title}
             </Heading>
+            {tooltip && <Icon icon="infoCircle" tooltip={tooltip} inc={2} />}
           </div>
         ) : (
           descriptionEl
