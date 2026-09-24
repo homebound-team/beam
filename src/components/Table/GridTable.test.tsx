@@ -42,7 +42,12 @@ import { useComputed } from "src/hooks/useComputed";
 import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
-import { documentScrollChromeWidth } from "src/layouts/layoutVars";
+import {
+  beamRightPaneWidthVar,
+  documentScrollChromeLeft,
+  documentScrollChromeWidth,
+  stickyTableHeaderOffset,
+} from "src/layouts/layoutVars";
 import { isDefined, noop } from "src/utils/helpers";
 import {
   cell,
@@ -316,14 +321,20 @@ describe("GridTable", () => {
     expect(r.gridTable).toHaveStyle({ opacity: "0.5", pointerEvents: "none" });
   });
 
-  it("overlays a viewport-centered spinner that never blocks clicks while loading", async () => {
+  it("floats a spinner over the table's visible area that never blocks clicks while loading", async () => {
     // Given a table that is waiting on a new query
     // When rendered
     const r = await render(<GridTable {...{ columns, rows }} loading />);
-    // Then the spinner is pinned to the viewport, outside the dimmed table so it stays legible
+    // Then the spinner floats outside the dimmed table so it stays legible
     expect(r.gridTable_loadingOverlay).toHaveStyle({ position: "fixed", pointerEvents: "none" });
     expect(r.gridTable_loadingOverlay).toContainElement(r.gridTable_loadingSpinner);
     expect(r.gridTable).not.toContainElement(r.gridTable_loadingOverlay);
+    // And it is inset past the side nav and sticky chrome rather than spanning the whole viewport
+    expect(r.gridTable_loadingOverlay).toHaveStyle({
+      top: stickyTableHeaderOffset(),
+      left: documentScrollChromeLeft(),
+      width: `calc(${documentScrollChromeWidth()} - var(${beamRightPaneWidthVar}, 0px))`,
+    });
   });
 
   it("does not dim the table when not loading", async () => {
