@@ -132,7 +132,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
 
-  const showRowHoverColor = !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
+  // Hover fill matches cursorPointer: only rows with a row-level action.
+  const hasRowAction = !!(rowStyle?.rowLink || rowStyle?.onClick);
+  const showRowHoverColor =
+    hasRowAction && !reservedRowKinds.includes(row.kind) && !omitRowHover && style.rowHoverColor !== "none";
 
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const levelStyle = style.levels && (typeof style.levels === "function" ? style.levels(level) : style.levels[level]);
@@ -164,7 +167,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(as === "table" ? {} : Css.relative.df.fg1.fs1.$),
     ...(isLastBodyRow && style.lastRowCss),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
-    ...((rowStyle?.rowLink || rowStyle?.onClick) && Css.onHover.cursorPointer.$),
+    ...(hasRowAction && Css.onHover.cursorPointer.$),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Row hover paints cells via Row.css.ts (`.beam-row-hover:hover > *`); set the var via Css.style
     // (React CSSProperties rejects custom props without a cast).

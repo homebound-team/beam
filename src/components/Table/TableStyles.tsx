@@ -114,7 +114,7 @@ export type GridStyleDef = {
   allWhite?: boolean;
   /** Whether to apply a border around the whole table */
   bordered?: boolean;
-  /** Whether to show a hover effect on rows. Defaults to true */
+  /** Whether to show a hover effect on clickable rows (those with rowLink/onClick). Defaults to true */
   rowHover?: boolean;
   /** Vertical alignment of body cell content (not headers). Defaults to `top` for flexible rows and `center` for fixed rows. */
   vAlign?: "top" | "center" | "bottom";
