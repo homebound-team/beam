@@ -6,6 +6,7 @@ import { Css, Tokens } from "src/Css";
  * - `.beam-bhp` / `.beam-bhc`: when a row is hovered, child fields get a focus-colored border
  *   (unless the field itself is hovered). Used with TextFieldBase `borderOnHover`.
  * - `.beam-row-hover`: paints cells with `--beam-row-hover-bg` on hover. The class sits on the
+ *   row (or RowGroup) only when that row has a rowLink/onClick.
  *   row itself (`> *` = cells) or on a RowGroup wrapper (`> [data-gridrow] > *` = cells of the
  *   parent and companion).
  */

@@ -1546,7 +1546,7 @@ describe("GridTable", () => {
     });
 
     it("groups parent and companion in one row group for shared hover in div mode", async () => {
-      // Given a trailing companion followed by another data row
+      // Given a trailing companion followed by another data row, with a rowLink so hover applies
       const r = await render(
         <GridTable<Row>
           columns={[nameColumn, valueColumn]}
@@ -1560,7 +1560,9 @@ describe("GridTable", () => {
             },
             { kind: "data", id: "2", data: { name: "bar", value: 2 } },
           ]}
+          rowStyles={{ data: { rowLink: () => "/detail" } }}
         />,
+        withRouter(),
       );
 
       // Then parent and companion share a row group wrapper, separate from the next row
@@ -1915,6 +1917,34 @@ describe("GridTable", () => {
     click(cell(r, 1, 0));
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClick.mock.calls[0][0].data.name).toEqual("foo");
+  });
+
+  it("does not apply row hover class without rowLink or onClick", async () => {
+    // Given a table without a row-level action
+    // When rendered
+    const r = await render(<GridTable {...{ columns, rows }} />);
+    // Then data rows do not get the hover class
+    expect(row(r, 1)).not.toHaveClass("beam-row-hover");
+    expect(row(r, 1).parentElement).not.toHaveClass("beam-row-hover");
+  });
+
+  it("applies row hover class when rowLink is set", async () => {
+    // Given a table with a rowLink
+    // When rendered
+    const r = await render(
+      <GridTable {...{ columns, rows, rowStyles: { data: { rowLink: () => "/detail" } } }} />,
+      withRouter(),
+    );
+    // Then the row group gets the hover class (body rows are wrapped in RowGroup)
+    expect(row(r, 1).parentElement).toHaveClass("beam-row-hover");
+  });
+
+  it("applies row hover class when onClick is set", async () => {
+    // Given a table with an onClick row action
+    // When rendered
+    const r = await render(<GridTable {...{ columns, rows, rowStyles: { data: { onClick: noop } } }} />);
+    // Then the row group gets the hover class
+    expect(row(r, 1).parentElement).toHaveClass("beam-row-hover");
   });
 
   it("can omit onClick for columns", async () => {
