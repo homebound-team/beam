@@ -14,6 +14,7 @@ import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { TextField } from "src/inputs/TextField";
 import type { Value } from "src/inputs/Value";
+import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils/useTestIds";
@@ -78,6 +79,9 @@ function GridTableLayoutActionsComponent<
 
   const { sm } = useBreakpoint();
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const insetHandled = useContentInsetHandled();
+  // An inset ancestor (e.g. CenteredLayout) already pads us in from the viewport edge.
+  const withPagePadding = inDocumentScrollLayout && !insetHandled;
   const [showSearch, setShowSearch] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -132,9 +136,10 @@ function GridTableLayoutActionsComponent<
     <div css={Css.df.fdc.gap1.pb2.if(view === "card").pb3.$}>
       <div
         css={{
-          ...Css.df.gap1.jcsb.pt3.$,
-          ...(inDocumentScrollLayout ? pageContentPaddingX : undefined),
+          ...Css.df.gap1.jcsb.$,
+          ...(withPagePadding ? pageContentPaddingX : undefined),
         }}
+        {...testId.toolbar}
       >
         <div css={Css.df.gapPx(12).aic.$}>
           {/* Large screen: 244px inline search field */}
@@ -203,7 +208,7 @@ function GridTableLayoutActionsComponent<
       </div>
 
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
-      {sm && showSearch && <div css={pageContentPaddingX}>{searchTextField}</div>}
+      {sm && showSearch && <div css={withPagePadding ? pageContentPaddingX : undefined}>{searchTextField}</div>}
 
       {/* Combined filter panel — omitted when the single control is already inline in the toolbar */}
       {hasFilterControls && !showInlineControl && (

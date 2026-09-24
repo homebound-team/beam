@@ -5,7 +5,6 @@ import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { cardStyle } from "src/components/Table/TableStyles";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import {
   actionColumn,
@@ -17,12 +16,14 @@ import {
   selectColumn,
 } from "src/components/Table/utils/columns";
 import { type SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamFloatingRightOffsetVar,
   beamRightPaneWidthVar,
   beamTableActionsHeightVar,
   documentScrollRightPaneWidthCss,
+  smPageContentPaddingXValue,
 } from "src/layouts/layoutVars";
 import { noop } from "src/utils/helpers";
 import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
@@ -30,7 +31,6 @@ import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
   type GridTableLayoutProps,
-  resolveGridTableLayoutStyle,
   useGridTableLayoutState,
 } from "./GridTableLayout";
 import { getGridTableViewStorageKey } from "./usePersistedTableView";
@@ -641,6 +641,67 @@ describe("GridTableLayout", () => {
       expect(r.query.rightPaneContent).toBeNull();
     });
 
+    // `pageContentPaddingX` is a media query (12px below `md`, 24px above); jsdom never matches
+    // `@media`, so these assert the base rule. The `mdAndUp` value is covered by Chromatic.
+    it("insets the actions toolbar by default in a document-scroll layout", async () => {
+      // Given a GridTableLayout in a document-scroll page body (not inside CenteredLayout)
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={getFilterLayoutStateProps("toolbar-padding-test")}
+            hideEditColumns
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // Then the toolbar insets from the viewport edge
+      expect(r.gridTableLayoutActions_toolbar).toHaveStyle({
+        paddingLeft: smPageContentPaddingXValue,
+        paddingRight: smPageContentPaddingXValue,
+      });
+    });
+
+    it("does not inset the actions toolbar inside CenteredLayout, which already insets children", async () => {
+      // Given a GridTableLayout inside CenteredLayout on a document-scroll page
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <CenteredLayout size="lg">
+            <TestWrapper
+              layoutStateProps={getFilterLayoutStateProps("toolbar-centered-test")}
+              hideEditColumns
+              tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+            />
+          </CenteredLayout>
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // Then the toolbar does not double up on the inset
+      expect(r.gridTableLayoutActions_toolbar).toHaveStyle({ paddingLeft: "", paddingRight: "" });
+    });
+
+    it("does not inject layout gutter columns inside CenteredLayout", async () => {
+      // Given a GridTableLayout inside CenteredLayout on a document-scroll page
+      const api = new GridTableApiImpl<Row>();
+      await render(
+        <DocumentScrollLayoutProvider>
+          <CenteredLayout size="lg">
+            <TestWrapper
+              hideEditColumns
+              layoutStateProps={{}}
+              tableProps={{ api, columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+            />
+          </CenteredLayout>
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // Then the table aligns with the shell padding instead of its own gutters
+      expect(api.getVisibleColumnIds()[0]).toBe("name");
+    });
+
     function getFilterLayoutStateProps(storageKey: string) {
       return {
         persistedFilter: {
@@ -855,44 +916,6 @@ describe("GridTableLayout", () => {
       onEndReached(3);
     });
     expect(onEndReached).toHaveBeenCalledWith(3);
-  });
-
-  describe("resolveGridTableLayoutStyle", () => {
-    it("returns layout defaults when style is omitted", () => {
-      // Given no user style outside document scroll layout
-      // When resolving
-      const style = resolveGridTableLayoutStyle(undefined, false);
-      // Then layout defaults are applied
-      expect(style).toEqual({ allWhite: true, roundedHeader: true });
-    });
-
-    it("sets roundedHeader false inside document scroll layout", () => {
-      // Given no user style inside document scroll layout
-      // When resolving
-      const style = resolveGridTableLayoutStyle(undefined, true);
-      // Then roundedHeader is false
-      expect(style).toEqual({ allWhite: true, roundedHeader: false });
-    });
-
-    it("merges GridStyleDef overrides on top of layout defaults", () => {
-      // Given a partial GridStyleDef that overrides roundedHeader
-      // When resolving inside document scroll layout
-      const style = resolveGridTableLayoutStyle({ bordered: true, roundedHeader: true }, true);
-      // Then defaults remain and user overrides win
-      expect(style).toEqual({
-        allWhite: true,
-        roundedHeader: true,
-        bordered: true,
-      });
-    });
-
-    it("passes a full GridStyle through unchanged", () => {
-      // Given a full GridStyle
-      // When resolving
-      const style = resolveGridTableLayoutStyle(cardStyle, false);
-      // Then layout defaults are not injected
-      expect(style).toBe(cardStyle);
-    });
   });
 });
 

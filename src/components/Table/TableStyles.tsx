@@ -318,9 +318,30 @@ export function isGridStyleDef(style: GridStyle | GridStyleDef): style is GridSt
   return keys.length === 0 || keys.some((k) => defKeys.includes(k));
 }
 
-export function resolveStyles(style: GridStyle | GridStyleDef): GridStyle {
-  if (isGridStyleDef(style)) {
-    return getTableStyles(style);
-  }
+/**
+ * Resolves a def to a full GridStyle, applying layout defaults a def can still override.
+ *
+ * `insetHandled` means a shell already pads the table off the viewport (`CenteredLayout`, the new layouts).
+ */
+export function resolveStyles(
+  style: GridStyle | GridStyleDef,
+  insetHandled: boolean = false,
+  inDocumentScrollLayout: boolean = false,
+): GridStyle {
+  const layoutDefaults = getLayoutDefaults(insetHandled, inDocumentScrollLayout);
+
+  // Spread `style` last so an explicit def always wins over the layout default.
+  if (isGridStyleDef(style)) return getTableStyles({ ...layoutDefaults, ...style });
+  // Otherwise, if not `isGridStyleDef`, then apply the layout defaults.
+  if (style === defaultStyle) return getTableStyles(layoutDefaults);
+  // Any other full GridStyle is opaque — the app picked every rule, so leave it alone.
   return style;
+}
+
+/** Page tables match the page surface; an inset shell also borders and rounds the table. */
+function getLayoutDefaults(insetHandled: boolean, inDocumentScrollLayout: boolean): GridStyleDef {
+  // An inset shell is never full-bleed, so it takes precedence over the page's scroll mode.
+  if (insetHandled) return { allWhite: true, bordered: true, roundedHeader: true };
+  if (inDocumentScrollLayout) return { allWhite: true, roundedHeader: false };
+  return {};
 }

@@ -8,7 +8,6 @@ import type { TableView } from "src/components/Table/components/ViewToggleButton
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
-import { type GridStyle, type GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
 import type { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, type Only, Tokens } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
@@ -189,10 +188,6 @@ function GridTableLayoutComponent<
   );
 
   const cardAs = view === "card" ? ("card" as const) : undefined;
-  const tableStyle = useMemo(
-    () => resolveGridTableLayoutStyle(tableProps.style, inDocumentScrollLayout),
-    [tableProps.style, inDocumentScrollLayout],
-  );
 
   const tableBody = (
     <>
@@ -203,7 +198,6 @@ function GridTableLayoutComponent<
           api={api}
           emptyState={emptyState}
           filter={clientSearch}
-          style={tableStyle}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
@@ -216,7 +210,6 @@ function GridTableLayoutComponent<
           api={api}
           emptyState={emptyState}
           filter={clientSearch}
-          style={tableStyle}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
@@ -262,7 +255,11 @@ function GridTableLayoutComponent<
 
   return (
     /* Wrapper sets --beam-table-actions-height so sticky headers / the pane can read it. */
-    <div ref={tableWrapperRef} css={Css.display("contents").$} {...tid.tableWrapper}>
+    <div
+      ref={tableWrapperRef}
+      css={inDocumentScrollLayout ? Css.df.fdc.wfc.mw100.$ : Css.df.fdc.$}
+      {...tid.tableWrapper}
+    >
       {tableScrollContent}
     </div>
   );
@@ -389,22 +386,4 @@ function useSetTableActionsHeight(
       tableWrapper?.style.removeProperty(beamTableActionsHeightVar);
     };
   }, [tableWrapperRef, syncHeightVar]);
-}
-
-/** Merges layout defaults with a GridStyleDef, or passes a full GridStyle through unchanged. */
-export function resolveGridTableLayoutStyle(
-  userStyle: GridStyle | GridStyleDef | undefined,
-  inDocumentScrollLayout: boolean,
-): GridStyle | GridStyleDef {
-  const layoutDefaults: GridStyleDef = {
-    allWhite: true,
-    roundedHeader: !inDocumentScrollLayout,
-  };
-  if (userStyle === undefined) {
-    return layoutDefaults;
-  }
-  if (isGridStyleDef(userStyle)) {
-    return { ...layoutDefaults, ...userStyle };
-  }
-  return userStyle;
 }
