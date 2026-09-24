@@ -46,6 +46,7 @@ import {
   beamRightPaneWidthVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
+  documentScrollContentWidth,
   stickyTableHeaderOffset,
 } from "src/layouts/layoutVars";
 import { isDefined, noop } from "src/utils/helpers";
@@ -1842,7 +1843,7 @@ describe("GridTable", () => {
     expect(api.getVisibleColumnIds()[0]).toBe("beamCollapseColumn");
   });
 
-  it("uses min(100%, chrome) for the document-scroll width probe", async () => {
+  it("uses min(100%, content width) for the document-scroll width probe", async () => {
     // Given a document-scroll table
     const r = await render(
       <DocumentScrollLayoutProvider>
@@ -1860,9 +1861,9 @@ describe("GridTable", () => {
       </DocumentScrollLayoutProvider>,
     );
 
-    // Then the probe caps at chrome while still honoring a narrower parent via min(100%, …)
+    // Then the probe caps at the padded content width while still honoring a narrower parent via min(100%, …)
     expect(r.gridTable_probe).toHaveStyle({
-      width: `min(100%, ${documentScrollChromeWidth()})`,
+      width: `min(100%, ${documentScrollContentWidth()})`,
       minWidth: "0px",
     });
   });
