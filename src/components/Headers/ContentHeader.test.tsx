@@ -1,10 +1,12 @@
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
+import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamLayoutContentPaddingXVar,
   documentScrollContentLeft,
   documentScrollContentWidth,
   pageContentPaddingXValue,
+  smPageContentPaddingXValue,
 } from "src/layouts/layoutVars";
 import { render } from "src/utils/rtl";
 
@@ -113,5 +115,61 @@ describe("ContentHeader", () => {
     const r = await render(<ContentHeader title="Trade Partners" aiMode />);
     // Then the title uses AI gradient text styling
     expect(r.contentHeader_title).toHaveStyle({ WebkitBackgroundClip: "text" });
+  });
+
+  // `pageContentPaddingX` is a media query (12px below `md`, 24px above); jsdom never matches
+  // `@media`, so these assert the base rule. The `mdAndUp` value is covered by Chromatic.
+  it("applies page content horizontal padding when withPagePadding is true", async () => {
+    // Given a ContentHeader used full-bleed with withPagePadding
+    const r = await render(<ContentHeader title="Trade Partners" withPagePadding />);
+    // Then it uses the page content inset
+    expect(r.contentHeader).toHaveStyle({
+      paddingLeft: smPageContentPaddingXValue,
+      paddingRight: smPageContentPaddingXValue,
+    });
+  });
+
+  it("applies page content padding by default inside a document-scroll layout", async () => {
+    // Given a ContentHeader in a document-scroll page body (not inside CenteredLayout)
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <ContentHeader title="Trade Partners" />
+      </DocumentScrollLayoutProvider>,
+    );
+    // Then it insets from the viewport edge
+    expect(r.contentHeader).toHaveStyle({
+      paddingLeft: smPageContentPaddingXValue,
+      paddingRight: smPageContentPaddingXValue,
+    });
+  });
+
+  it("does not add page padding inside CenteredLayout, which already insets children", async () => {
+    // Given a ContentHeader inside CenteredLayout on a document-scroll page
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <CenteredLayout size="lg">
+          <ContentHeader title="Trade Partners" />
+        </CenteredLayout>
+      </DocumentScrollLayoutProvider>,
+    );
+    // Then the header itself is not padded a second time
+    expect(r.contentHeader).not.toHaveStyle({
+      paddingLeft: smPageContentPaddingXValue,
+      paddingRight: smPageContentPaddingXValue,
+    });
+  });
+
+  it("honors withPagePadding={false} inside a document-scroll layout", async () => {
+    // Given a full-bleed ContentHeader that opts out of the default inset
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <ContentHeader title="Trade Partners" withPagePadding={false} />
+      </DocumentScrollLayoutProvider>,
+    );
+    // Then it does not apply page content padding
+    expect(r.contentHeader).not.toHaveStyle({
+      paddingLeft: smPageContentPaddingXValue,
+      paddingRight: smPageContentPaddingXValue,
+    });
   });
 });

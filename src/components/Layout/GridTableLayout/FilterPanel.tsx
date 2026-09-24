@@ -81,7 +81,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   if (chips.length === 0) return null;
 
   return (
-    <div css={Css.df.gap1.aic.mw0.fww.if(inDocumentScrollLayout).pl3.$}>
+    <div css={{ ...Css.df.gap1.aic.mw0.fww.$, ...(inDocumentScrollLayout ? pageContentPaddingX : undefined) }}>
       {chips}
       <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
     </div>

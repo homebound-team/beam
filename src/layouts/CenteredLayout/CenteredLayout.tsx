@@ -3,10 +3,13 @@ import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/Righ
 import { resolveWithRightPaneOptions, type WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { ContentInsetProvider } from "src/layouts/ContentInsetContext";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import {
   beamLayoutContentPaddingXVar,
   documentScrollRightPaneContentMinCss,
   pageContentPaddingXValue,
+  smPageContentPaddingXValue,
 } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -31,20 +34,22 @@ export function CenteredLayout(props: CenteredLayoutProps) {
   const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const shell = (
-    <div
-      css={{ ...Css.w100.maxwPx(centeredShellMaxPx[size]).mxa.$, ...centeredPaddingX }}
-      style={
-        {
-          // layoutContainer descendants (e.g. ContentHeader) read this to inset sticky horizontal chrome within the shell padding.
-          [beamLayoutContentPaddingXVar]: mdAndUp ? mdAndUpContentPaddingX : smContentPaddingX,
-          // Floor while an ancestor overlay pane is open (`0px` when closed). `md+` only — phones must not get a dummy scrollbar.
-          ...(mdAndUp ? { minWidth: documentScrollRightPaneContentMinCss() } : undefined),
-        } as CSSProperties
-      }
-      {...tid}
-    >
-      {children}
-    </div>
+    <ContentInsetProvider>
+      <div
+        css={{ ...Css.w100.maxwPx(centeredShellMaxPx[size]).mxa.$, ...pageContentPaddingX }}
+        style={
+          {
+            // layoutContainer descendants (e.g. ContentHeader) read this to inset sticky horizontal chrome within the shell padding.
+            [beamLayoutContentPaddingXVar]: mdAndUp ? pageContentPaddingXValue : smPageContentPaddingXValue,
+            // Floor while an ancestor overlay pane is open (`0px` when closed). `md+` only — phones must not get a dummy scrollbar.
+            ...(mdAndUp ? { minWidth: documentScrollRightPaneContentMinCss() } : undefined),
+          } as CSSProperties
+        }
+        {...tid}
+      >
+        {children}
+      </div>
+    </ContentInsetProvider>
   );
 
   if (!rightPane) return shell;
@@ -62,11 +67,3 @@ export const centeredShellMaxPx = {
   sm: centeredContentMaxPx.sm + mdContentPaddingPx * 2,
   lg: centeredContentMaxPx.lg + mdContentPaddingPx * 2,
 } as const;
-
-/** Viewport-edge inset below `md`. */
-const smContentPaddingX = "12px";
-
-/** Viewport-edge inset from `md` up (`px3` / 24px). */
-const mdAndUpContentPaddingX = pageContentPaddingXValue;
-
-const centeredPaddingX = Css.px(smContentPaddingX).ifMdAndUp.px3.$;

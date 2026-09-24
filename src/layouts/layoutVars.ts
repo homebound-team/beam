@@ -150,7 +150,10 @@ export function getFloatingRightOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamFloatingRightOffsetVar}, 0px))`;
 }
 
-/** Page content horizontal inset (px).
+/** Page content horizontal inset (px) at `mdAndUp`.
  * Setting in layoutVars instead of layoutSpacing to avoid circular dependency with truss-config.ts
  */
 export const pageContentPaddingXValue = "24px";
+
+/** Page content horizontal inset (px) below `md`, where 24px eats too much of a phone viewport. */
+export const smPageContentPaddingXValue = "12px";

@@ -4,8 +4,9 @@ import { maybeApply } from "src/components/Table/GridTableApi";
 import type { GridStyle } from "src/components/Table/TableStyles";
 import type { MaybeFn, RenderAs } from "src/components/Table/types";
 import { Css, type Properties } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { pageContentGutterPx } from "src/layouts/layoutSpacing";
+import { layoutGutterPx } from "src/layouts/layoutSpacing";
 import { beamRightPaneWidthVar, documentScrollChromeLeft, documentScrollChromeWidth } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -51,13 +52,13 @@ function CompanionRowImpl(props: CompanionRowProps) {
   const content = maybeApply(companion);
   const isLeading = position === "leading";
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const { sm } = useBreakpoint();
+  const gutterPx = layoutGutterPx(sm);
   // Pin the card to the visible chrome, inset by the layout gutters so padding does not scroll away.
   const chromeCss = inDocumentScrollLayout
     ? Css.w100.sticky
-        .left(`calc(${documentScrollChromeLeft()} + ${pageContentGutterPx}px)`)
-        .maxw(
-          `calc(${documentScrollChromeWidth()} - var(${beamRightPaneWidthVar}, 0px) - ${pageContentGutterPx * 2}px)`,
-        ).$
+        .left(`calc(${documentScrollChromeLeft()} + ${gutterPx}px)`)
+        .maxw(`calc(${documentScrollChromeWidth()} - var(${beamRightPaneWidthVar}, 0px) - ${gutterPx * 2}px)`).$
     : undefined;
 
   return (

@@ -7,6 +7,7 @@ import {
   beamRightPaneContentMinVar,
   documentScrollRightPaneContentMinCss,
   pageContentPaddingXValue,
+  smPageContentPaddingXValue,
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
 import { clickAndWait, render } from "src/utils/rtl";
@@ -36,7 +37,7 @@ describe("CenteredLayout", () => {
     );
 
     // Then layoutContainer descendants inherit the smaller inset
-    expect(r.centeredLayout.style.getPropertyValue(beamLayoutContentPaddingXVar)).toBe("12px");
+    expect(r.centeredLayout.style.getPropertyValue(beamLayoutContentPaddingXVar)).toBe(smPageContentPaddingXValue);
   });
 
   it("caps the sm shell at 768px", async () => {
@@ -47,9 +48,10 @@ describe("CenteredLayout", () => {
       </CenteredLayout>,
     );
 
-    // Then the shell is 768px max (720px content + padding)
+    // Then the shell is 768px max (720px content + padding) and publishes padding for sticky chrome
     expect(r.centeredLayout).toHaveTextContent("Form body");
     expect(r.centeredLayout).toHaveStyle({ width: "100%", maxWidth: "768px" });
+    expect(r.centeredLayout.style.getPropertyValue(beamLayoutContentPaddingXVar)).toBe(pageContentPaddingXValue);
   });
 
   it("wraps in DocumentScrollOverlayRightPaneLayout when withRightPane is set", async () => {

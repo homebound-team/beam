@@ -140,13 +140,17 @@ export function isContentColumn(column: Pick<GridColumn<Kinded>, "isAction" | "i
 }
 
 /** Empty fixed-width column inset for document-scroll table layouts. */
-function layoutGutterColumn<T extends Kinded>(side: "left" | "right", sticky?: "left" | "right"): GridColumn<T> {
+function layoutGutterColumn<T extends Kinded>(
+  side: "left" | "right",
+  sticky: "left" | "right" | undefined,
+  gutterPx: number,
+): GridColumn<T> {
   const id = side === "left" ? layoutGutterLeftColumnId : layoutGutterRightColumnId;
   const base = {
     ...nonKindDefaults(),
     id,
     clientSideSort: false,
-    w: `${pageContentGutterPx}px`,
+    w: `${gutterPx}px`,
     wrapAction: false,
     isLayoutGutter: true,
     canHide: false,
@@ -158,13 +162,16 @@ function layoutGutterColumn<T extends Kinded>(side: "left" | "right", sticky?: "
 }
 
 /** Prepends and appends layout gutter columns for document-scroll table alignment. */
-export function withColumnGutters<T extends Kinded>(columns: GridColumn<T>[]): GridColumn<T>[] {
+export function withColumnGutters<T extends Kinded>(
+  columns: GridColumn<T>[],
+  gutterPx: number = pageContentGutterPx,
+): GridColumn<T>[] {
   const stickyLeft = columns.some((c) => c.sticky === "left");
   const stickyRight = columns.some((c) => c.sticky === "right");
   return [
-    layoutGutterColumn("left", stickyLeft ? "left" : undefined),
+    layoutGutterColumn("left", stickyLeft ? "left" : undefined, gutterPx),
     ...columns,
-    layoutGutterColumn("right", stickyRight ? "right" : undefined),
+    layoutGutterColumn("right", stickyRight ? "right" : undefined, gutterPx),
   ];
 }
 

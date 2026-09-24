@@ -4,6 +4,9 @@ import { type HeaderAction, HeaderActions, splitHeaderActionsOnSm } from "src/co
 import { Icon } from "src/components/Icon";
 import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
+import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
+import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils/useTestIds";
 
 type ContentHeaderXss = Xss<Padding>;
@@ -25,6 +28,11 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   startAdornment?: ReactNode;
   /** Shows an info icon after the title with this tooltip content. */
   tooltip?: ReactNode;
+  /**
+   * Horizontal inset from the viewport edge. Defaults on in document-scroll layouts
+   * (`PageHeaderLayout`, `StepperLayout`, …) and off inside {@link CenteredLayout}.
+   */
+  withPagePadding?: boolean;
   /** Style overrides for padding. */
   xss?: X;
 };
@@ -41,12 +49,13 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
  * so the containing block grows to match the full scrollable width — the same technique `GridTable`
  * uses internally for its own sticky columns (`src/components/Table/GridTable.tsx`).
  *
- * Apply horizontal inset via `xss` when the header should align with padded body content; omit for
- * full-bleed within the page column. `layoutContainer` honors `--beam-layout-content-padding-x`
- * from padded ancestors (e.g. {@link CenteredLayout}).
+ * `layoutContainer` honors `--beam-layout-content-padding-x` from padded ancestors (e.g. {@link CenteredLayout}).
  */
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
   const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, tooltip, xss } = props;
+  const inDocumentScrollLayout = useDocumentScrollLayout();
+  const insetHandled = useContentInsetHandled();
+  const withPagePadding = props.withPagePadding ?? (inDocumentScrollLayout && !insetHandled);
   const tid = useTestIds(props, "contentHeader");
   const { sm } = useBreakpoint();
   const { bottomSlotActions, rightSlotActions } = splitHeaderActionsOnSm(actions, sm);
@@ -68,6 +77,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
     <div
       css={{
         ...Css.df.fdc.gapPx(12).layoutContainer.mw0.bgColor(Tokens.Surface).$,
+        ...(withPagePadding ? pageContentPaddingX : undefined),
         ...xss,
       }}
       {...tid}
