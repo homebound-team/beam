@@ -20,7 +20,7 @@ export function Default() {
 }
 
 export function TitleOnly() {
-  return <ContentHeader title="Trade Partners" />;
+  return <ContentHeader title="Trade Partners" tooltip="Trade partners assigned to this project." />;
 }
 
 /** `xss` accepts padding-only overrides, i.e. to inset the header from its container. */
