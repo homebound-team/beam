@@ -1,12 +1,17 @@
 import type { Meta } from "@storybook/react-vite";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Css } from "src/Css";
+import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
+import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
 
 export default {
   component: ContentHeader,
   decorators: [withBeamDecorator],
+  parameters: {
+    layout: "fullscreen",
+  },
 } as Meta;
 
 export function Default() {
@@ -21,6 +26,34 @@ export function Default() {
 
 export function TitleOnly() {
   return <ContentHeader title="Trade Partners" tooltip="Trade partners assigned to this project." />;
+}
+
+/** Document-scroll page body (no `CenteredLayout`): padding is the default. */
+export function InDocumentScrollLayout() {
+  return (
+    <DocumentScrollLayoutProvider>
+      <ContentHeader
+        title="Trade Partners"
+        description="Assign and manage trade partners for this project."
+        actions={[{ label: "Add", onClick: () => {} }]}
+      />
+    </DocumentScrollLayoutProvider>
+  );
+}
+
+/** `CenteredLayout` already insets children, so the header does not add a second inset. */
+export function InCenteredLayout() {
+  return (
+    <DocumentScrollLayoutProvider>
+      <CenteredLayout size="lg">
+        <ContentHeader
+          title="Trade Partners"
+          description="Assign and manage trade partners for this project."
+          actions={[{ label: "Add", onClick: () => {} }]}
+        />
+      </CenteredLayout>
+    </DocumentScrollLayoutProvider>
+  );
 }
 
 /** `xss` accepts padding-only overrides, i.e. to inset the header from its container. */

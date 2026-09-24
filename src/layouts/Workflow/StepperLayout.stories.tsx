@@ -7,7 +7,6 @@ import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
-import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -96,7 +95,6 @@ export function WithContentHeaderAndTable() {
                   title="Trade Partners"
                   description="Assign and manage trade partners for this project."
                   actions={[{ label: "Add", onClick: action("add clicked") }]}
-                  xss={pageContentPaddingX}
                 />
                 <GridTableLayoutExample storageKey="stepper-layout-grid-table" withRightPane />
               </div>
