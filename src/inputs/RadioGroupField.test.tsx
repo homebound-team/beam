@@ -17,6 +17,22 @@ describe("RadioGroupField", () => {
     click(r.favoriteCheese_a);
   });
 
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(
+      <RadioGroupField
+        label="Favorite cheese"
+        tooltip="What this field is for"
+        value="a"
+        onChange={() => {}}
+        options={[{ value: "a", label: "Asiago" }]}
+      />,
+    );
+    expect(r.favoriteCheese_label.querySelector("[data-testid='tooltip']")).toHaveAttribute(
+      "title",
+      "What this field is for",
+    );
+  });
+
   it("should disable only first option", async () => {
     const r = await render(
       <RadioGroupField

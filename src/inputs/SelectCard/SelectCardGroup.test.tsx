@@ -28,6 +28,19 @@ function createListCategoryOptions(): SelectCardListGroupItemOption<Category>[] 
 }
 
 describe("SelectCardGroup", () => {
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(
+      <SelectCardGroup
+        label="Subject"
+        tooltip="What this field is for"
+        options={createGridCategoryOptions()}
+        value={Category.Math}
+        onChange={() => {}}
+      />,
+    );
+    expect(r.subject_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+  });
+
   it("reflects value from the parent without internal state", async () => {
     const onChange = vi.fn();
     // Given a controlled group with Math selected

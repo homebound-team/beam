@@ -186,3 +186,13 @@ function ValidationNumberField({
     />
   );
 }
+
+/** `tooltip` renders an info icon beside the field's label. */
+export function LabelTooltip() {
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <NumberField label="Cost" tooltip="What this field is for" value={1000} onChange={action("onChange")} />
+      <NumberField label="Cost" value={1000} onChange={action("onChange")} disabled="Why it is disabled" />
+    </div>
+  );
+}

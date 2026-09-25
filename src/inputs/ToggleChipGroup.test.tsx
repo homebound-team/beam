@@ -15,6 +15,20 @@ describe("ToggleGroupChip", () => {
     expect(r.market_m2).toHaveAttribute("data-selected", "true");
   });
 
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(
+      <ToggleChipGroup
+        label="Market"
+        tooltip="What this field is for"
+        options={[{ label: "Bahamas", value: "m:1" }]}
+        values={[]}
+        onChange={() => {}}
+        data-testid="market"
+      />,
+    );
+    expect(r.market_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+  });
+
   it("supports disabled options with tooltips", async () => {
     const options = [
       { label: "Bahamas", value: "m:1" },

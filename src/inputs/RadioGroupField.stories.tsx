@@ -343,3 +343,21 @@ export function HorizontalLayout() {
     </FormLines>
   );
 }
+
+/** `tooltip` renders an info icon beside the group's label. */
+export function LabelTooltip() {
+  return (
+    <FormLines>
+      <RadioGroupField
+        label="Favorite cheese"
+        tooltip="What this field is for"
+        value="a"
+        onChange={action("onChange")}
+        options={[
+          { value: "a", label: "Asiago" },
+          { value: "b", label: "Burratta" },
+        ]}
+      />
+    </FormLines>
+  );
+}

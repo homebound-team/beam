@@ -38,6 +38,8 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   fieldDecoration?: (opt: O) => ReactNode;
   /** Sets the form field label. */
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
   readOnly?: boolean | ReactNode;
   onBlur?: () => void;
@@ -125,6 +127,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     onAddNew,
     autoSort = true,
     hideChips = false,
+    tooltip,
     ...otherProps
   } = props;
   const labelStyle = otherProps.labelStyle ?? fieldProps?.labelStyle ?? "above";
@@ -457,7 +460,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         getOptionLabel={getOptionLabel}
         nothingSelectedText={nothingSelectedText}
         borderless={borderless}
-        tooltip={resolveTooltip(disabled, undefined, readOnly)}
+        tooltip={resolveTooltip(disabled, tooltip, readOnly)}
         resetField={resetField}
         hideChips={hideChips}
         {...proposalProps}

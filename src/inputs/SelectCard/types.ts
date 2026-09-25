@@ -38,6 +38,8 @@ export type SelectCardGroupItemOption<V extends Value> =
 
 type SelectCardGroupFieldPropsBase = {
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   errorMsg?: string;
   helperText?: string | ReactNode;
   disabled?: boolean;

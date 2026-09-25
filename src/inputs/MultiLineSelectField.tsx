@@ -25,6 +25,7 @@ export function MultiLineSelectField<O, V extends Value>(
     getOptionValue = (opt: O) => (opt as any).id,
     getOptionLabel = (opt: O) => (opt as any).name,
     labelStyle,
+    tooltip,
     ...otherProps
   } = props;
 
@@ -38,7 +39,7 @@ export function MultiLineSelectField<O, V extends Value>(
     <div css={Css.mt1.if(labelStyle === "left").df.$}>
       {labelStyle !== "hidden" && (
         <div css={Css.if(labelStyle === "left").w50.$}>
-          <Label {...tid.label} label={props.label} />
+          <Label {...tid.label} label={props.label} tooltip={tooltip} />
         </div>
       )}
       <div css={Css.if(labelStyle === "left").w50.$}>

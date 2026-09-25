@@ -46,6 +46,30 @@ describe("TextAreaFieldTest", () => {
     expect(onBlur).toBeCalledTimes(1);
     expect(r.note).not.toHaveFocus();
   });
+
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(<TestTextAreaField value="foo" tooltip="What this field is for" />);
+    expect(r.note_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+  });
+
+  it("shows the disabled reason on the label icon, in place of the tooltip", async () => {
+    // Given a disabled field that also has a tooltip, only the disabled reason shows — there is one tooltip
+    const r = await render(
+      <TestTextAreaField value="foo" disabled="Disabled reason" tooltip="What this field is for" />,
+    );
+    expect(r.note_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "Disabled reason");
+  });
+
+  it("moves the disabled reason onto the field when the label is hidden", async () => {
+    const r = await render(<TestTextAreaField value="foo" labelStyle="hidden" disabled="Disabled reason" />);
+    expect(r.note.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Disabled reason");
+  });
+
+  it("drops the tooltip when the label is hidden and the field is still editable", async () => {
+    // Nowhere to put it: no icon, and a tooltip over an enabled input misbehaves
+    const r = await render(<TestTextAreaField value="foo" labelStyle="hidden" tooltip="What this field is for" />);
+    expect(r.note.closest("[data-testid='tooltip']")).toBeNull();
+  });
 });
 
 describe("AI mode", () => {
