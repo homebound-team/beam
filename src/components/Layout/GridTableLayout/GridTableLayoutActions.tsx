@@ -133,7 +133,7 @@ function GridTableLayoutActionsComponent<
   }
 
   return (
-    <div css={Css.df.fdc.gap1.pb2.if(view === "card").pb3.$}>
+    <div css={Css.df.fdc.gap1.pt3.pb2.if(view === "card").pb3.$}>
       <div
         css={{
           ...Css.df.gap1.jcsb.$,

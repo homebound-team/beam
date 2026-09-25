@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AutoSaveStatus, AutoSaveStatusContext } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
+import { selfTopSpaced } from "src/layouts/layoutSpacing";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { noop } from "src/utils/helpers";
 import { render } from "src/utils/rtl";
@@ -18,6 +19,32 @@ describe("PageHeaderLayout", () => {
     expect(r.pageHeaderLayout_pageHeader).toHaveTextContent("Page title");
     expect(r.pageHeaderLayout_body).toHaveTextContent("Body content");
     expect(r.query.autoSave).toBeNull();
+  });
+
+  it("spaces the body's first child below the header", async () => {
+    // Given a body whose first child does not pad its own top edge
+    // When rendered
+    const r = await render(
+      <PageHeaderLayout pageHeader={{ title: "Page title" }}>
+        <span>Body content</span>
+      </PageHeaderLayout>,
+    );
+
+    // Then the first child picks up the body's top spacing
+    expect(r.pageHeaderLayout_body.firstElementChild).toHaveStyle({ marginTop: "calc(var(--t-spacing) * 3)" });
+  });
+
+  it("skips the body spacing for chrome that pads its own top edge", async () => {
+    // Given a body that starts with self-spaced chrome
+    // When rendered
+    const r = await render(
+      <PageHeaderLayout pageHeader={{ title: "Page title" }}>
+        <span {...selfTopSpaced}>Body content</span>
+      </PageHeaderLayout>,
+    );
+
+    // Then the body adds no spacing of its own
+    expect(r.pageHeaderLayout_body.firstElementChild).not.toHaveStyle({ marginTop: "calc(var(--t-spacing) * 3)" });
   });
 
   it("shows AutoSaveIndicator in the page header while saving", async () => {

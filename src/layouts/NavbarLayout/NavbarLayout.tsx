@@ -30,8 +30,9 @@ export function NavbarLayout(props: NavbarLayoutProps) {
   const spacerRef = useRef<HTMLDivElement>(null);
 
   const navHeight = useMeasuredHeight(navMetricsRef, true);
-  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true);
-  const navOccupiesViewportTop = autoHideState === "revealed" || atTop;
+  const { state: autoHideState } = useAutoHideOnScroll(spacerRef, true);
+  // The navbar is fixed at the banner offset unless hidden.
+  const navOccupiesViewportTop = autoHideState !== "hidden";
 
   // Occupying height (else 0) — CSS var + context for PageHeaderLayout.
   const navbarOffsetPx = navHeight > 0 && navOccupiesViewportTop ? navHeight : 0;

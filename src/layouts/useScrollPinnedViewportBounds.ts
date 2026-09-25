@@ -3,6 +3,8 @@ import { type RefObject, useCallback, useLayoutEffect, useRef, useState } from "
 export type ScrollPinnedViewportBounds = {
   topPx: number;
   heightPx: number;
+  /** True once pinned, i.e. `topPx` tracks the sticky chrome instead of the scrolling anchor. */
+  isPinned: boolean;
 };
 
 /**
@@ -35,7 +37,11 @@ export function useScrollPinnedViewportBounds(
     const isPinned = rect.top <= pinTopPx + 1;
     const topPx = isPinned ? pinTopPx : Math.round(rect.top);
     const heightPx = Math.max(0, Math.round(window.innerHeight - topPx));
-    setBounds((prev) => (prev?.topPx === topPx && prev?.heightPx === heightPx ? prev : { topPx, heightPx }));
+    setBounds((prev) =>
+      prev?.topPx === topPx && prev?.heightPx === heightPx && prev?.isPinned === isPinned
+        ? prev
+        : { topPx, heightPx, isPinned },
+    );
   }, [anchorRef]);
 
   useLayoutEffect(() => {

@@ -15,6 +15,7 @@ import { useGroupBy } from "src/hooks/useGroupBy";
 import { usePersistedFilter, type UsePersistedFilterProps } from "src/hooks/usePersistedFilter";
 import { useSessionStorage } from "src/hooks/useSessionStorage";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
+import { selfTopSpaced } from "src/layouts/layoutSpacing";
 import {
   beamTableActionsHeightVar,
   documentScrollChromeLeft,
@@ -258,6 +259,7 @@ function GridTableLayoutComponent<
     <div
       ref={tableWrapperRef}
       css={inDocumentScrollLayout ? Css.df.fdc.wfc.mw100.$ : Css.df.fdc.$}
+      {...(showTableActions ? selfTopSpaced : {})}
       {...tid.tableWrapper}
     >
       {tableScrollContent}

@@ -18,6 +18,7 @@ import {
 import { type SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
+import { selfTopSpacedAttr } from "src/layouts/layoutSpacing";
 import {
   beamFloatingRightOffsetVar,
   beamRightPaneWidthVar,
@@ -509,6 +510,48 @@ describe("GridTableLayout", () => {
 
       // Then the table actions height var is not set
       expect(r.tableWrapper.style.getPropertyValue(beamTableActionsHeightVar)).toBe("");
+    });
+
+    it("marks the wrapper as self-spaced when the actions toolbar renders", async () => {
+      // Given a GridTableLayout with filters, so the actions toolbar (and its own top padding) renders
+      // When the layout mounts
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={getFilterLayoutStateProps("self-spaced-test")}
+            hideEditColumns
+            tableProps={{
+              columns: getColumns(),
+              rows: [simpleHeader, ...getRows()],
+            }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // Then a page header body will skip its first-child spacing for us
+      expect(r.tableWrapper).toHaveAttribute(selfTopSpacedAttr);
+    });
+
+    it("does not mark the wrapper when there is no actions toolbar", async () => {
+      // Given a GridTableLayout with no filters, search, or actions
+      // When the layout mounts
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={{}}
+            hideEditColumns
+            tableProps={{
+              columns: getColumns(),
+              rows: [simpleHeader, ...getRows()],
+            }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // Then the page header body still supplies the top spacing
+      expect(r.tableWrapper).not.toHaveAttribute(selfTopSpacedAttr);
     });
 
     it("injects layout gutter columns inside DocumentScrollLayoutProvider", async () => {

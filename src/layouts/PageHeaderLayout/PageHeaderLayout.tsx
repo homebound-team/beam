@@ -39,8 +39,9 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const spacerRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
 
-  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
-  const headerOccupiesPosition = autoHideState === "revealed" || atTop;
+  const { state: autoHideState } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
+  // The header is fixed at `outerTop` unless hidden.
+  const headerOccupiesPosition = autoHideState !== "hidden";
 
   const cssVars: Record<string, string> | undefined =
     headerHeight > 0 && headerOccupiesPosition ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
@@ -67,7 +68,8 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
             {pageHeaderEl}
           </div>
         </div>
-        <div css={Css.df.fdc.fg1.mh0.w100.mt3.$} {...tid.body}>
+        {/* Spaces the body's first child, unless it is chrome that pads its own top edge (`selfTopSpaced`). */}
+        <div css={Css.df.fdc.fg1.mh0.w100.when("> *:first-child:not([data-self-top-spaced])").mt3.$} {...tid.body}>
           {children}
         </div>
       </div>

@@ -86,7 +86,15 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
                   .w(paneWidthCss)
                   .bgColor(Tokens.Surface)
                   .z(zIndices.rightPane)
-                  .bl.bc(Tokens.SurfaceSeparator).$
+                  .bl.bc(Tokens.SurfaceSeparator)
+                  // Pinned, `top` only moves when the chrome above hides or reveals, so ease with it the
+                  // way sticky chrome does. Unpinned it tracks the anchor every scroll and must not lag.
+                  .if(!!paneBounds?.isPinned)
+                  // Copy Css.transitionTop + Css.transitionHeight / truss-motion `normal` + `standard`.
+                  .add(
+                    "transition",
+                    "top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+                  ).$
           }
           style={paneStyle}
           initial={{ x: slideX }}
