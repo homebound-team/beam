@@ -4,6 +4,7 @@ import { selfTopSpaced } from "src/layouts/layoutSpacing";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { noop } from "src/utils/helpers";
 import { render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("PageHeaderLayout", () => {
   it("renders the page header slot and body children", async () => {
@@ -19,6 +20,20 @@ describe("PageHeaderLayout", () => {
     expect(r.pageHeaderLayout_pageHeader).toHaveTextContent("Page title");
     expect(r.pageHeaderLayout_body).toHaveTextContent("Body content");
     expect(r.query.autoSave).toBeNull();
+  });
+
+  it("does not transition the header into place on mount", async () => {
+    // Given the frame after mount has not yet run
+    const raf = vi.spyOn(window, "requestAnimationFrame").mockReturnValue(1);
+
+    // When the page header first renders
+    const r = await render(<PageHeaderLayout pageHeader={{ title: "Page title" }} />);
+
+    // Then the slide transition is held off, so the mount-time top correction does not animate
+    expect(r.pageHeaderLayout_pageHeader).not.toHaveStyle({
+      transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    });
+    raf.mockRestore();
   });
 
   it("spaces the body's first child below the header", async () => {

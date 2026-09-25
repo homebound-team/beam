@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
-import { PageHeader, type PageHeaderProps } from "src/components/Headers/PageHeader";
+import { PageHeader } from "src/components/Headers/PageHeader";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -16,8 +16,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
-import type { TabsContentXss } from "src/components/Tabs";
-import { Css, type Only } from "src/Css";
+import { Css } from "src/Css";
 import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
@@ -49,7 +48,7 @@ export function GridTableLayout() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader
+      <PageHeader
         title="Grid Table Layout Example"
         breadcrumbs={{
           breadcrumbs: [
@@ -102,7 +101,7 @@ export function Loading() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader title="Grid Table Layout while loading" />
+      <PageHeader title="Grid Table Layout while loading" />
       <GridTableLayoutComponent
         layoutState={layoutState}
         tableProps={{ columns, rows: [simpleHeader, ...makeNestedRows(3)], loading: true }}
@@ -125,7 +124,7 @@ export function ManyFilters() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader
+      <PageHeader
         title="Grid Table Layout with Many Filters"
         breadcrumbs={{
           breadcrumbs: [
@@ -161,7 +160,7 @@ export function WithCheckboxFilter() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader
+      <PageHeader
         title="Grid Table Layout with Checkbox Filter"
         breadcrumbs={{
           breadcrumbs: [
@@ -201,7 +200,7 @@ export function QueryTableLayout() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader
+      <PageHeader
         title="Query Table Layout Example"
         breadcrumbs={{
           breadcrumbs: [
@@ -249,7 +248,7 @@ export function DefaultEmptyState() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader title="Product Offerings" rightSlot={<Button label="Create New" onClick={noop} />} />
+      <PageHeader title="Product Offerings" rightSlot={<Button label="Create New" onClick={noop} />} />
       <GridTableLayoutComponent
         tableProps={{
           columns,
@@ -281,7 +280,7 @@ export function EmptyState() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader title="Product Offerings" rightSlot={<Button label="Create New" onClick={noop} />} />
+      <PageHeader title="Product Offerings" rightSlot={<Button label="Create New" onClick={noop} />} />
       <GridTableLayoutComponent
         layoutState={layoutState}
         emptyFallback="No product offerings found"
@@ -326,7 +325,7 @@ export function GridTableLayoutWithColor() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader
+      <PageHeader
         title="Grid Table Layout with Color for clearer column manipulation"
         breadcrumbs={{
           breadcrumbs: [
@@ -786,7 +785,7 @@ export function WithInfiniteScroll() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader title="Grid Table Layout with Infinite Scroll" />
+      <PageHeader title="Grid Table Layout with Infinite Scroll" />
       <GridTableLayoutComponent
         tableProps={{
           as: "virtual",
@@ -837,7 +836,7 @@ export function WithQueryTableInfiniteScroll() {
 
   return (
     <TestProjectLayout>
-      <StoryPageHeader title="Query Table with Infinite Scroll" />
+      <PageHeader title="Query Table with Infinite Scroll" />
       <GridTableLayoutComponent
         tableProps={{
           as: "virtual",
@@ -1218,15 +1217,4 @@ function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
       },
     ];
   });
-}
-
-/** `PageHeaderLayout` gives its body 24px below the header; these stories render `PageHeader` on its own.
- * Doing this to avoid introducing the PageHeaderLayout into the stories and have a lot more churn. These stories will eventually be moved to the PageHeaderLayout stories.
- */
-function StoryPageHeader<V extends string, X extends Only<TabsContentXss, X>>(props: PageHeaderProps<V, X>) {
-  return (
-    <div css={Css.mb3.$}>
-      <PageHeader {...props} />
-    </div>
-  );
 }

@@ -97,18 +97,16 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
   it("does not ease the pane offset while it still follows the anchor", async () => {
     // Given an anchor that has not yet scrolled up under the sticky chrome
-    const rectSpy = vi
-      .spyOn(HTMLElement.prototype, "getBoundingClientRect")
-      .mockReturnValue({
-        top: 200,
-        bottom: 400,
-        height: 200,
-        width: 800,
-        left: 0,
-        right: 800,
-        x: 0,
-        y: 200,
-      } as DOMRect);
+    const rectSpy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      top: 200,
+      bottom: 400,
+      height: 200,
+      width: 800,
+      left: 0,
+      right: 800,
+      x: 0,
+      y: 200,
+    } as DOMRect);
 
     try {
       const r = await render(
