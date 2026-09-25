@@ -44,7 +44,6 @@ type ComboBoxInputProps<O, V extends Value> = {
   getOptionLabel: (opt: O) => string;
   sizeToContent?: boolean;
   nothingSelectedText: string;
-  tooltip?: ReactNode;
   resetField: VoidFunction;
   hideErrorMessage?: boolean;
   isTree?: boolean;
@@ -53,7 +52,7 @@ type ComboBoxInputProps<O, V extends Value> = {
   /** Hides selected-value chips and the selection count badge. */
   hideChips?: boolean;
 } & PresentationFieldProps &
-  Pick<TextFieldBaseProps<any>, "proposedValue" | "originalValue" | "onUserEdit" | "onUserBlur">;
+  Pick<TextFieldBaseProps<any>, "tooltip" | "proposedValue" | "originalValue" | "onUserEdit" | "onUserBlur">;
 
 export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V>) {
   const {

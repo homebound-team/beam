@@ -13,6 +13,11 @@ const options = [
 describe("MultiLineSelectField", () => {
   const onSelect = vi.fn();
 
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(<TestMultiLineSelectField values={[]} options={options} tooltip="What this field is for" />);
+    expect(r.label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+  });
+
   it("has an empty select field by default", async () => {
     // Given a MultiLineSelectField with no selected values
     // When the component is rendered

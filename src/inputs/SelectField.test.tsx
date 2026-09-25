@@ -9,6 +9,20 @@ import { blur, click, focus, getOptions, render, select, wait } from "src/utils/
 import { vi } from "vitest";
 
 describe("SelectFieldTest", () => {
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(
+      <TestSelectField
+        label="Age"
+        value={"1"}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        tooltip="What this field is for"
+      />,
+    );
+    expect(r.age_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+  });
+
   it("can set a value", async () => {
     // Given a MultiSelectField
     const onSelect = vi.fn();

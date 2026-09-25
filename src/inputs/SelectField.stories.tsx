@@ -510,3 +510,34 @@ function TestSelectField<T extends object, V extends Value>(
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** `tooltip` renders an info icon beside the field's label. */
+export function LabelTooltip() {
+  const options = [
+    { id: "1", name: "One" },
+    { id: "2", name: "Two" },
+  ];
+  return (
+    <div css={Css.df.fdc.gap2.p2.$}>
+      <SelectField
+        label="Number"
+        tooltip="What this field is for"
+        value="1"
+        options={options}
+        onSelect={noop}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+      />
+      <SelectField
+        label="Number"
+        labelStyle="hidden"
+        disabled="Why it is disabled"
+        value="1"
+        options={options}
+        onSelect={noop}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+      />
+    </div>
+  );
+}

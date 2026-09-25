@@ -42,7 +42,6 @@ export type TextFieldBaseProps<X> = {
   clearable?: boolean;
   // TextArea specific
   textAreaMinHeight?: number;
-  tooltip?: ReactNode;
   hideErrorMessage?: boolean;
   // If set, the helper text will always be shown (usually we hide the helper text if read only)
   alwaysShowHelperText?: boolean;
@@ -62,6 +61,7 @@ export type TextFieldBaseProps<X> = {
 } & Pick<
   BeamTextFieldProps<X>,
   | "label"
+  | "tooltip"
   | "required"
   | "errorMsg"
   | "errorInTooltip"
@@ -86,6 +86,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};
   const {
     label,
+    tooltip,
     required,
     labelProps,
     inputProps,
@@ -107,7 +108,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
     borderOnHover = fieldProps?.borderOnHover ?? false,
     textAreaMinHeight = 96,
     clearable = false,
-    tooltip,
     visuallyDisabled = fieldProps?.visuallyDisabled ?? true,
     errorInTooltip = fieldProps?.errorInTooltip ?? false,
     hideErrorMessage = false,
@@ -125,6 +125,14 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const typeScale = fieldProps?.typeScale ?? "sm";
   const internalProps: TextFieldInternalProps = (props as any).internalProps || {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
+  // A field has exactly one tooltip. It lives on the label's info icon whenever there is a visible
+  // label to hang it on. With no visible label it falls back to wrapping the field, but only while
+  // the field is non-interactive — a tooltip on top of an enabled input does not behave, so there we
+  // drop it rather than render something broken (tables should put the tooltip on the column header).
+  const hasVisibleLabel = !!label && labelStyle !== "inline" && labelStyle !== "hidden" && !compound;
+  const isInteractive = !inputProps.disabled && !inputProps.readOnly;
+  const tooltipOnLabel = hasVisibleLabel ? tooltip : undefined;
+  const tooltipOnField = !hasVisibleLabel && !isInteractive ? tooltip : undefined;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = useLabelSuffix(required, inputProps.readOnly);
   const tid = useTestIds(props, defaultTestId(label));
@@ -274,11 +282,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             label={label}
             inline={labelStyle !== "above"}
             suffix={labelSuffix}
+            tooltip={tooltipOnLabel}
             {...tid.label}
           />
         )}
         {maybeTooltip({
-          title: tooltip,
+          title: tooltipOnField,
           placement: "top",
           children: inputProps.readOnly ? (
             <div

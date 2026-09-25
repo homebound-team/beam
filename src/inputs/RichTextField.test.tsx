@@ -9,6 +9,13 @@ describe("RichTextField", () => {
     expect(r.getByText("test")).toBeInTheDocument();
   });
 
+  it("shows tooltip via an info icon beside the label", async () => {
+    const r = await render(
+      <RichTextField value="<div>test</div>" onChange={noop} label="Notes" tooltip="What this field is for" />,
+    );
+    expect(r.tooltip).toHaveAttribute("title", "What this field is for");
+  });
+
   it("rehydrates if data populates", async () => {
     const r = await render(<RichTextField value={""} onChange={noop} />);
     r.rerender(<RichTextField value="<div><!--block-->test</div>" onChange={noop} />);

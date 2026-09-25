@@ -55,3 +55,19 @@ export function ToggleChipGroups() {
     </>
   );
 }
+
+/** `tooltip` renders an info icon beside the group's label. */
+export function LabelTooltip() {
+  return (
+    <ToggleChipGroup
+      label="Select Markets"
+      tooltip="What this field is for"
+      options={[
+        { label: "Bahamas", value: "m:1" },
+        { label: "Austin", value: "m:2" },
+      ]}
+      values={["m:1"]}
+      onChange={() => {}}
+    />
+  );
+}

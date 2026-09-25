@@ -31,6 +31,8 @@ export type RadioGroupFieldLayout = "vertical" | "horizontal";
 export type RadioGroupFieldProps<K extends string> = {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   /** The currently selected option value (i.e. an id). */
   value: K | undefined;
   /** Called when an option is selected. We don't support unselecting. */
@@ -67,6 +69,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     errorMsg,
     helperText,
     layout = "vertical",
+    tooltip,
     ...otherProps
   } = props;
 
@@ -89,7 +92,14 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   return (
     // default styling to position `<Label />` above.
     <div css={Css.df.fdc.gap1.aifs.if(labelStyle === "left").fdr.gap2.jcsb.$} {...tid}>
-      <Label label={label} {...labelProps} {...tid.label} suffix={labelSuffix} hidden={labelStyle === "hidden"} />
+      <Label
+        label={label}
+        {...labelProps}
+        {...tid.label}
+        suffix={labelSuffix}
+        tooltip={tooltip}
+        hidden={labelStyle === "hidden"}
+      />
       <div {...radioGroupProps}>
         <div css={Css.df.if(layout === "horizontal").fdr.fww.gap3.else.fdc.gap1.$}>
           {options.map((option) => {
