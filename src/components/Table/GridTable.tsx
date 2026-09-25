@@ -53,6 +53,7 @@ import {
 import { Css, type Only } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { useRenderCount } from "src/hooks/useRenderCount";
+import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import {
   beamRightPaneWidthVar,
@@ -297,12 +298,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const insetHandled = useContentInsetHandled();
+  // Gutters align the table with the page inset; an inset ancestor (e.g. CenteredLayout) already does that.
+  const withGutters = columnGutter && inDocumentScrollLayout && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
   const columnsWithIds = useMemo(() => {
-    const columns = columnGutter && inDocumentScrollLayout ? withColumnGutters(_columns) : _columns;
+    const columns = withGutters ? withColumnGutters(_columns) : _columns;
     return assignDefaultColumnIds(columns);
-  }, [_columns, columnGutter, inDocumentScrollLayout]);
+  }, [_columns, withGutters]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -338,7 +342,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     _setDraggedRow(row);
   };
 
-  const style = resolveStyles(maybeStyle);
+  const style = resolveStyles(maybeStyle, insetHandled, inDocumentScrollLayout);
   const { tableState } = api;
 
   tableState.onRowSelect = onRowSelect;

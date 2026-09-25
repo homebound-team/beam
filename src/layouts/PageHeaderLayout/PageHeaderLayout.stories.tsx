@@ -21,7 +21,7 @@ export function Default() {
 }
 function Body() {
   return (
-    <div css={{ ...pageContentPaddingX, ...Css.py2.$ }}>
+    <div css={{ ...pageContentPaddingX, ...Css.pb2.$ }}>
       {zeroTo(30).map((i) => (
         <p key={i} css={Css.mb3.$}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Section {i + 1}.

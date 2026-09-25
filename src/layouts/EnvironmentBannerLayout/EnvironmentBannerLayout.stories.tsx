@@ -62,7 +62,7 @@ export function Composed() {
           }}
         >
           <PageHeaderLayout pageHeader={{ title: "Page header" }}>
-            <p css={Css.p3.$}>
+            <p css={Css.px3.pb3.$}>
               This text will take up the entire width of its container and get scrolled away both horizontally and
               vertically.
             </p>

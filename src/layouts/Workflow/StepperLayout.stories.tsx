@@ -90,7 +90,7 @@ export function WithContentHeaderAndTable() {
           {
             label: "Trade Partners",
             content: (
-              <div>
+              <div css={Css.df.fdc.gap3.$}>
                 <ContentHeader
                   title="Trade Partners"
                   description="Assign and manage trade partners for this project."

@@ -1,5 +1,11 @@
 import { Css } from "src/Css";
-import { getTableStyles, isGridStyleDef, resolveStyles, type GridStyle } from "src/components/Table/TableStyles";
+import {
+  defaultStyle,
+  getTableStyles,
+  isGridStyleDef,
+  resolveStyles,
+  type GridStyle,
+} from "src/components/Table/TableStyles";
 
 describe("GridStyleDef", () => {
   it("memoizes grid styles correctly", () => {
@@ -94,6 +100,55 @@ describe("resolveStyles", () => {
     // When resolving styles
     const resolved = resolveStyles(style);
     // Then the same object is returned
+    expect(resolved).toBe(style);
+  });
+
+  it("borders and rounds the default style when the inset is handled", () => {
+    // Given the untouched default style inside an inset shell (e.g. CenteredLayout)
+    // When resolving styles
+    const resolved = resolveStyles(defaultStyle, true);
+    // Then the table is all-white, bordered, with a rounded header
+    expect(resolved).toBe(getTableStyles({ allWhite: true, bordered: true, roundedHeader: true }));
+  });
+
+  it("merges the inset defaults under a GridStyleDef", () => {
+    // Given a def that opts out of the border inside an inset shell
+    // When resolving styles
+    const resolved = resolveStyles({ bordered: false }, true);
+    // Then the def wins over the layout default
+    expect(resolved).toBe(getTableStyles({ allWhite: true, bordered: false, roundedHeader: true }));
+  });
+
+  it("uses an all-white square header for a full-bleed document-scroll table", () => {
+    // Given the default style on a document-scroll page that is not inset
+    // When resolving styles
+    const resolved = resolveStyles(defaultStyle, false, true);
+    // Then the header matches the page surface and sits flush to the edge
+    expect(resolved).toBe(getTableStyles({ allWhite: true, roundedHeader: false }));
+  });
+
+  it("prefers the inset defaults over the document-scroll square header", () => {
+    // Given an inset shell on a document-scroll page
+    // When resolving styles
+    const resolved = resolveStyles(defaultStyle, true, true);
+    // Then CenteredLayout's bordered, rounded table wins
+    expect(resolved).toBe(getTableStyles({ allWhite: true, bordered: true, roundedHeader: true }));
+  });
+
+  it("leaves the default style alone outside any page layout", () => {
+    // Given the default style with no layout context
+    // When resolving styles
+    const resolved = resolveStyles(defaultStyle);
+    // Then the widget-table look is untouched
+    expect(resolved).toBe(defaultStyle);
+  });
+
+  it("leaves a custom full GridStyle alone when the inset is handled", () => {
+    // Given an app-provided full GridStyle inside an inset shell
+    const style: GridStyle = { cellCss: Css.p2.$ };
+    // When resolving styles
+    const resolved = resolveStyles(style, true);
+    // Then it is opaque to the layout defaults
     expect(resolved).toBe(style);
   });
 });

@@ -10,6 +10,7 @@ import { filterTestIdPrefix, getActiveFilterCount, updateFilter } from "src/comp
 import { ToggleChip } from "src/components/ToggleChip";
 import { Css } from "src/Css";
 import type { Value } from "src/inputs/Value";
+import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { isDefined, maybeCall, safeEntries } from "src/utils/helpers";
@@ -40,6 +41,8 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
 }: Omit<FilterPanelProps<F, G>, "isOpen">) {
   const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const insetHandled = useContentInsetHandled();
+  const withPagePadding = inDocumentScrollLayout && !insetHandled;
   const activeFilterCount = getActiveFilterCount(filter ?? {});
   const filterControls = filter && setFilter ? buildFilterControls(filterImpls, filter, setFilter, tid) : null;
 
@@ -49,7 +52,7 @@ function FilterPanelOpen<F extends Record<string, unknown>, G extends Value = st
         ...Css.df.aic.gap1.sbwn.$,
         ...Css.ifSm.oxa.mw0.$,
         ...Css.ifMdAndUp.fww.$,
-        ...(inDocumentScrollLayout ? pageContentPaddingX : undefined),
+        ...(withPagePadding ? pageContentPaddingX : undefined),
       }}
     >
       {groupBy && (
@@ -73,6 +76,8 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
 }: Omit<FilterPanelProps<F, G>, "isOpen" | "groupBy">) {
   const tid = useTestIds({}, filterTestIdPrefix);
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const insetHandled = useContentInsetHandled();
+  const withPagePadding = inDocumentScrollLayout && !insetHandled;
 
   if (!filter || !setFilter) return null;
 
@@ -81,7 +86,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
   if (chips.length === 0) return null;
 
   return (
-    <div css={{ ...Css.df.gap1.aic.mw0.fww.$, ...(inDocumentScrollLayout ? pageContentPaddingX : undefined) }}>
+    <div css={{ ...Css.df.gap1.aic.mw0.fww.$, ...(withPagePadding ? pageContentPaddingX : undefined) }}>
       {chips}
       <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
     </div>
