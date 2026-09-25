@@ -95,6 +95,35 @@ export function SchedulesV2TaskName() {
   );
 }
 
+/**
+ * One tooltip per field: on the label's info icon when a label is visible, wrapping the field when it
+ * is not and the field is non-interactive, and dropped when there is no label and it is still editable.
+ */
+export function FieldTooltips() {
+  return (
+    <FormLines width="md">
+      <TestTextArea
+        label="Marketing Description"
+        value="The two description fields are told apart by their tooltips."
+        tooltip="The client-facing description that appears in Checkout."
+      />
+      <TestTextArea
+        label="Design Notes"
+        value="Match the entry door's satin nickel hardware."
+        tooltip="These notes are for internal use and appear on the finish schedule."
+      />
+      <TestTextArea label="Disabled" value="Cannot edit this." disabled="Why it is disabled" />
+      <TestTextArea label="Hidden label" labelStyle="hidden" value="Hover the field." disabled="Why it is disabled" />
+      <TestTextArea
+        label="Hidden label, editable"
+        labelStyle="hidden"
+        value="No tooltip is shown here."
+        tooltip="You can't see this!"
+      />
+    </FormLines>
+  );
+}
+
 function TestTextArea<X extends Only<TextFieldXss, X>>(props: Omit<TextAreaFieldProps<X>, "onChange">) {
   const { value, ...others } = props;
   const [internalValue, setValue] = useState(value);

@@ -1,5 +1,5 @@
 import DOMPurify from "dompurify";
-import { type ChangeEvent, createElement, useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, createElement, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
@@ -23,6 +23,8 @@ export type RichTextFieldProps = {
    */
   mergeTags?: string[];
   label?: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   autoFocus?: boolean;
   placeholder?: string;
   /** Called when the component loses focus */
@@ -155,7 +157,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
     return (
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
-        {label && <Label labelProps={{}} label={label} />}
+        {label && <Label labelProps={{}} label={label} tooltip={props.tooltip} />}
         <div className="beam-trix-editor">
           {/* "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly (https://github.com/basecamp/trix/issues/254#issuecomment-321814353) */}
           <input type="hidden" id={`input-${id}`} value={value} />
@@ -172,7 +174,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
   } else {
     return (
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
-        {label && <Label label={label} />}
+        {label && <Label label={label} tooltip={props.tooltip} />}
         <div
           css={
             Css.mh("120px").bgColor(Tokens.Surface).sm.color(Tokens.OnSurface).bn.p1.br4.bc(Tokens.FieldBorderDefault)

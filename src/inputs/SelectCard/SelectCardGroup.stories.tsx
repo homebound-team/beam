@@ -157,3 +157,17 @@ export function ListRadioGroup() {
     </div>
   );
 }
+
+/** `tooltip` renders an info icon beside the group's label. */
+export const LabelTooltip = newStory(
+  () => (
+    <SelectCardGroup
+      label="Option Type"
+      tooltip="What this field is for"
+      options={createOptionTypes()}
+      value={undefined}
+      onChange={() => {}}
+    />
+  ),
+  { decorators: [withBeamDecorator] },
+);

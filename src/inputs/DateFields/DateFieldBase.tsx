@@ -27,7 +27,7 @@ import { useTestIds } from "src/utils/useTestIds";
 
 type DateFieldCommonProps = Pick<
   TextFieldBaseProps<Properties>,
-  "borderless" | "visuallyDisabled" | "labelStyle" | "compact" | "fullWidth"
+  "borderless" | "visuallyDisabled" | "labelStyle" | "compact" | "fullWidth" | "tooltip"
 > & {
   label: string;
   /** Called when the component loses focus */
@@ -84,6 +84,7 @@ type DateRangeFieldBaseProps = DateRangeFieldProps & {
 export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBaseProps) {
   const {
     label,
+    tooltip,
     disabled,
     required,
     value,
@@ -333,7 +334,7 @@ export function DateFieldBase(props: DateRangeFieldBaseProps | DateSingleFieldBa
         }}
         endAdornment={!iconLeft && EndFieldButtons}
         startAdornment={!hideCalendarIcon && iconLeft && calendarButton}
-        tooltip={resolveTooltip(disabled, undefined, readOnly)}
+        tooltip={resolveTooltip(disabled, tooltip, readOnly)}
         {...others}
       />
       {state.isOpen && (

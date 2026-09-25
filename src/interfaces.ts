@@ -34,6 +34,8 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   helperText?: string | ReactNode;
   /** Input label */
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   /** Marks the field as required or optional, the default is assumed ambiguous/unknown. */
   required?: boolean;
   value: string | undefined;

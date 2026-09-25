@@ -25,6 +25,8 @@ type ToggleChipItemProps = {
 
 export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   options: ToggleChipItemProps[];
   values: string[];
   readonly?: boolean;
@@ -39,6 +41,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
   const {
     values,
     label,
+    tooltip,
     labelStyle = fieldProps?.labelStyle ?? "above",
     options,
     required,
@@ -55,9 +58,11 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
       <Label
         label={label}
         {...labelProps}
+        {...tid.label}
         hidden={labelStyle === "hidden"}
         inline={labelStyle !== "above"}
         suffix={labelSuffix}
+        tooltip={tooltip}
       />
       <div
         css={

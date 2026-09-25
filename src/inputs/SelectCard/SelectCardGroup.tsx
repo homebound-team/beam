@@ -14,6 +14,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
   const { fieldProps } = usePresentationContext();
   const {
     label,
+    tooltip,
     labelStyle = fieldProps?.labelStyle ?? "above",
     value,
     options,
@@ -46,6 +47,7 @@ export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>)
   return (
     <LabeledGroupField
       label={label}
+      tooltip={tooltip}
       labelStyle={labelStyle}
       labelProps={labelProps}
       groupProps={radioGroupProps}
