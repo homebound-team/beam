@@ -7,6 +7,7 @@ import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout"
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { GridTableLayoutExample } from "src/utils/sbComponents";
+import { pageContentPaddingX } from "../layoutSpacing";
 
 export default {
   component: EnvironmentBannerLayout,
@@ -66,7 +67,7 @@ export function Composed() {
               This text will take up the entire width of its container and get scrolled away both horizontally and
               vertically.
             </p>
-            <p css={Css.layoutContainer.py3.$}>
+            <p css={{ ...Css.layoutContainer.py3.$, ...pageContentPaddingX }}>
               This text uses <pre>Css.layoutContainer.$</pre> to fix itself in place horizontally, but will still scroll
               away vertically.
             </p>

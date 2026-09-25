@@ -140,7 +140,7 @@ function createRightPaneFormSections() {
 function RightPaneCenteredPlaceholderBody() {
   return (
     <div css={Css.df.fdc.gap2.pb3.$}>
-      {Array.from({ length: 8 }, (_, i) => (
+      {Array.from({ length: 20 }, (_, i) => (
         <div key={i} css={Css.hPx(48).br4.bgColor(Tokens.SurfaceSeparator).$} />
       ))}
     </div>

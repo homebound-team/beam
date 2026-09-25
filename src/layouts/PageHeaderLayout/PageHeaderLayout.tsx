@@ -14,6 +14,7 @@ import {
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useBannerAndNavbarHeight } from "../useBannerAndNavbarHeight";
 import { useMeasuredHeight } from "../useMeasuredHeight";
+import { useTransitionAfterPaint } from "../useTransitionAfterPaint";
 
 export type PageHeaderLayoutProps<V extends string, X> = {
   /** Props for the {@link PageHeader} rendered as the page-level header. */
@@ -39,8 +40,9 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const spacerRef = useRef<HTMLDivElement>(null);
   const headerHeight = useMeasuredHeight(headerMetricsRef, true);
 
-  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
-  const headerOccupiesPosition = autoHideState === "revealed" || atTop;
+  const { state: autoHideState } = useAutoHideOnScroll(spacerRef, true, getBannerAndNavbarHeight);
+  // The header is fixed at `outerTop` unless hidden.
+  const headerOccupiesPosition = autoHideState !== "hidden";
 
   const cssVars: Record<string, string> | undefined =
     headerHeight > 0 && headerOccupiesPosition ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
@@ -50,8 +52,10 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   const outerTop = bannerAndNavbarChromeTop();
 
   // Always `fixed` so horizontal document scroll cannot move the header. `left`/`width` use the
-  // chrome var (jumps on nav toggle) — `transitionAll` eases them with the rail (200ms).
-  const innerCss = Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).transitionAll.$;
+  // chrome var (jumps on nav toggle). The `top` transition is applied after first paint.
+  const innerCss = Css.fixed.left(headerLeft).w(headerWidth).z(zIndices.pageStickyHeader).$;
+  // Same value as `Css.transitionAll`.
+  useTransitionAfterPaint(headerMetricsRef, "all 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   const innerStyle: CSSProperties = {
     top: autoHideState === "hidden" ? `calc(${outerTop} - ${headerHeight}px)` : outerTop,
   };
@@ -67,7 +71,8 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
             {pageHeaderEl}
           </div>
         </div>
-        <div css={Css.df.fdc.fg1.mh0.w100.mt3.$} {...tid.body}>
+        {/* Spaces the body's first child, unless it is chrome that pads its own top edge (`selfTopSpaced`). */}
+        <div css={Css.df.fdc.fg1.mh0.w100.when("> *:first-child:not([data-self-top-spaced])").mt3.$} {...tid.body}>
           {children}
         </div>
       </div>

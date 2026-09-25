@@ -75,6 +75,62 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
   });
 
+  it("eases the pane offset while pinned so it moves with the chrome above it", async () => {
+    // Given a document-scroll right pane layout whose anchor is already under the sticky chrome
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+          <div>Main content</div>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then top / height ease, so hiding or revealing the page header does not jump the pane
+    expect(r.rightPaneContent).toHaveStyle({
+      transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    });
+  });
+
+  it("does not ease the pane offset while it still follows the anchor", async () => {
+    // Given an anchor that has not yet scrolled up under the sticky chrome
+    const rectSpy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      top: 200,
+      bottom: 400,
+      height: 200,
+      width: 800,
+      left: 0,
+      right: 800,
+      x: 0,
+      y: 200,
+    } as DOMRect);
+
+    try {
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+            <div>Main content</div>
+          </DocumentScrollOverlayRightPaneLayout>
+          <OpenCloseButtons />
+        </DocumentScrollLayoutProvider>,
+      );
+
+      // When the pane is opened
+      await clickAndWait(r.openPaneBtn);
+
+      // Then it sits at the anchor with no transition, so it cannot lag behind the scroll
+      expect(r.rightPaneContent).toHaveStyle({ top: "200px" });
+      expect(r.rightPaneContent).not.toHaveStyle({
+        transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+      });
+    } finally {
+      rectSpy.mockRestore();
+    }
+  });
+
   it("on sm opens a full-bleed overlay below the env banner without a spacer", async () => {
     // Given a mobile viewport and a published environment banner height
     setViewport("sm");

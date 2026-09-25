@@ -12,6 +12,7 @@ import {
 } from "../layoutVars";
 import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useMeasuredHeight } from "../useMeasuredHeight";
+import { useTransitionAfterPaint } from "../useTransitionAfterPaint";
 import { MobileSubNavProvider } from "./MobileSubNavContext";
 import { NavbarLayoutHeightProvider } from "./NavbarLayoutHeightContext";
 
@@ -30,8 +31,9 @@ export function NavbarLayout(props: NavbarLayoutProps) {
   const spacerRef = useRef<HTMLDivElement>(null);
 
   const navHeight = useMeasuredHeight(navMetricsRef, true);
-  const { state: autoHideState, atTop } = useAutoHideOnScroll(spacerRef, true);
-  const navOccupiesViewportTop = autoHideState === "revealed" || atTop;
+  const { state: autoHideState } = useAutoHideOnScroll(spacerRef, true);
+  // The navbar is fixed at the banner offset unless hidden.
+  const navOccupiesViewportTop = autoHideState !== "hidden";
 
   // Occupying height (else 0) — CSS var + context for PageHeaderLayout.
   const navbarOffsetPx = navHeight > 0 && navOccupiesViewportTop ? navHeight : 0;
@@ -42,7 +44,10 @@ export function NavbarLayout(props: NavbarLayoutProps) {
   const innerWidth = `var(${beamLayoutViewportWidthVar}, 100vw)`;
 
   // Always `fixed` so horizontal document scroll cannot move the navbar (same as the env banner).
-  const innerCss = Css.fixed.left0.z(zIndices.navbar).w(innerWidth).transitionTop.$;
+  // The `top` transition is applied after first paint.
+  const innerCss = Css.fixed.left0.z(zIndices.navbar).w(innerWidth).$;
+  // Same value as `Css.transitionTop`.
+  useTransitionAfterPaint(navMetricsRef, "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   const bannerTop = `var(${beamEnvironmentBannerLayoutHeightVar}, 0px)`;
   const innerStyle: CSSProperties = {
     top: autoHideState === "hidden" ? `calc(${bannerTop} - ${navHeight}px)` : bannerTop,

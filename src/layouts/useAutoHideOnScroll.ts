@@ -1,26 +1,24 @@
 import { type RefObject, useLayoutEffect, useRef, useState } from "react";
 
 /**
- * Auto-hide chrome positioning: `static` (in flow), `hidden` (fixed above viewport), `revealed` (fixed at top).
- * Pair with a CSS `top` transition for the slide animation.
+ * Auto-hide chrome positioning: `resting` (resting top while its spacer is in view), `hidden` (above
+ * the viewport), or `revealed` (resting top after upward scroll). Pair with a CSS `top` transition.
  */
-export type AutoHideState = "static" | "hidden" | "revealed";
+export type AutoHideState = "resting" | "hidden" | "revealed";
 
 export type AutoHideResult = {
   state: AutoHideState;
-  /** True when chrome is fully visible at the viewport top (for downstream offset decisions). */
-  atTop: boolean;
 };
 
-/** Scroll distance before committing to fixed positioning. Exported for tests. */
+/** Scroll distance before hiding chrome. Exported for tests. */
 export const THRESHOLD = 80;
 
-function getInitialAutoHideState(): { state: AutoHideState; atTop: boolean } {
+function getInitialAutoHideState(): AutoHideState {
   if (typeof window === "undefined" || window.scrollY <= 0) {
-    return { state: "static", atTop: true };
+    return "resting";
   }
   // Mid-page reload — assume hidden until spacer geometry syncs in layout effect.
-  return { state: "hidden", atTop: false };
+  return "hidden";
 }
 
 export function useAutoHideOnScroll(
@@ -30,10 +28,8 @@ export function useAutoHideOnScroll(
   getTopOffset?: () => number,
 ): AutoHideResult {
   const initial = getInitialAutoHideState();
-  const [state, setState] = useState<AutoHideState>(initial.state);
-  const stateRef = useRef<AutoHideState>(initial.state);
-  const [atTop, setAtTop] = useState(initial.atTop);
-  const atTopRef = useRef(initial.atTop);
+  const [state, setState] = useState<AutoHideState>(initial);
+  const stateRef = useRef<AutoHideState>(initial);
   // Ref avoids re-subscribing the scroll listener when callers pass an unmemoized callback.
   const getTopOffsetRef = useRef(getTopOffset);
   getTopOffsetRef.current = getTopOffset;
@@ -43,42 +39,33 @@ export function useAutoHideOnScroll(
 
   useLayoutEffect(() => {
     if (!enabled) {
-      stateRef.current = "static";
-      atTopRef.current = true;
+      stateRef.current = "resting";
       lastScrollY.current = Number.POSITIVE_INFINITY;
       lastScrollHeight.current = 0;
-      setState("static");
-      setAtTop(true);
+      setState("resting");
       return;
     }
 
-    const commit = (nextState: AutoHideState, nextAtTop: boolean) => {
+    const commit = (nextState: AutoHideState) => {
       if (nextState !== stateRef.current) {
         stateRef.current = nextState;
         setState(nextState);
       }
-      if (nextAtTop !== atTopRef.current) {
-        atTopRef.current = nextAtTop;
-        setAtTop(nextAtTop);
-      }
     };
 
     /** Document height changed — derive state from spacer position only; never reveal chrome. */
-    const autoHideStateOnLayoutChange = (
-      rect: DOMRect,
-      topOffset: number,
-    ): { next: AutoHideState; nextAtTop: boolean } => {
+    const autoHideStateOnLayoutChange = (rect: DOMRect, topOffset: number): AutoHideState => {
       const nextAtTop = rect.top >= topOffset;
       let next = stateRef.current;
 
       if (nextAtTop) {
-        next = "static";
+        next = "resting";
       } else if (rect.bottom < -THRESHOLD && next !== "revealed") {
         // Layout-driven scroll (e.g. when table rows are expanded, or rows filtered) — never reveal; pin hidden when past threshold.
         next = "hidden";
       }
 
-      return { next, nextAtTop };
+      return next;
     };
 
     const updateAutoHideState = () => {
@@ -90,10 +77,10 @@ export function useAutoHideOnScroll(
       const scrollHeightChanged = lastScrollHeight.current !== 0 && currentScrollHeight !== lastScrollHeight.current;
       lastScrollHeight.current = currentScrollHeight;
 
-      // Top of page (or iOS rubber-band overscroll) — stay in flow.
+      // Top of page (or iOS rubber-band overscroll) — stay at the resting top.
       if (window.scrollY <= 0) {
         lastScrollY.current = 0;
-        commit("static", true);
+        commit("resting");
         return;
       }
 
@@ -104,8 +91,7 @@ export function useAutoHideOnScroll(
       // Document height changed — resync scrollY baseline; apply geometry only (never reveal).
       if (scrollHeightChanged) {
         lastScrollY.current = currentY;
-        const { next, nextAtTop } = autoHideStateOnLayoutChange(rect, topOffset);
-        commit(next, nextAtTop);
+        commit(autoHideStateOnLayoutChange(rect, topOffset));
         return;
       }
 
@@ -117,14 +103,14 @@ export function useAutoHideOnScroll(
 
       let next: AutoHideState = stateRef.current;
       if (nextAtTop) {
-        next = "static";
+        next = "resting";
       } else if (rect.bottom < -THRESHOLD) {
         // Only flip on vertical movement — horizontal scroll fires with dy === 0.
         if (dy < 0 && !atBottom) next = "revealed";
         else if (dy > 0) next = "hidden";
       }
 
-      commit(next, nextAtTop);
+      commit(next);
     };
 
     updateAutoHideState();
@@ -132,5 +118,5 @@ export function useAutoHideOnScroll(
     return () => window.removeEventListener("scroll", updateAutoHideState);
   }, [enabled, spacerRef]);
 
-  return { state, atTop };
+  return { state };
 }
