@@ -8,6 +8,7 @@ import type { TableView } from "src/components/Table/components/ViewToggleButton
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
+import { type GridStyle, type GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
 import type { GridTableXss, Kinded } from "src/components/Table/types";
 import { Css, type Only, Tokens } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
@@ -189,6 +190,8 @@ function GridTableLayoutComponent<
   );
 
   const cardAs = view === "card" ? ("card" as const) : undefined;
+  // White is the layout default. Remaining default styles may get applied via GridTable
+  const tableStyle = useMemo(() => getDefaultStyle(tableProps.style), [tableProps.style]);
 
   const tableBody = (
     <>
@@ -199,6 +202,7 @@ function GridTableLayoutComponent<
           api={api}
           emptyState={emptyState}
           filter={clientSearch}
+          style={tableStyle}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
@@ -211,6 +215,7 @@ function GridTableLayoutComponent<
           api={api}
           emptyState={emptyState}
           filter={clientSearch}
+          style={tableStyle}
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
@@ -268,6 +273,12 @@ function GridTableLayoutComponent<
 }
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
+
+/** Layout tables are white. A full `GridStyle` is left unchanged; a def can still set `allWhite: false`. */
+function getDefaultStyle(style: GridStyle | GridStyleDef | undefined): GridStyle | GridStyleDef {
+  if (style !== undefined && !isGridStyleDef(style)) return style;
+  return { allWhite: true, ...style };
+}
 
 // Force columns to have a name and id property for all our table layouts
 function validateColumns(columns: readonly { id?: string; name?: string }[]): void {
