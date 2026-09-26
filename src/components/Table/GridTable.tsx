@@ -771,7 +771,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
         {loading && (
           <div css={loadingOverlayCss} {...tid.loadingOverlay}>
-            <Loader {...tid.loadingSpinner} />
+            <Loader {...tid.loadingSpinner} size="md" />
           </div>
         )}
         {as === "card" ? (

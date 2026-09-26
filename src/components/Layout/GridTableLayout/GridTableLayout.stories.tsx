@@ -243,6 +243,22 @@ export function WithoutHeader() {
   );
 }
 
+/** All-white table with no page shell, so the default is not coming from document scroll. */
+export function OutsidePageLayout() {
+  const columns = useMemo(() => getColumns(false), []);
+
+  return (
+    <div css={Css.bgGray100.p3.h("100vh").$}>
+      <GridTableLayoutComponent
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(1)],
+        }}
+      />
+    </div>
+  );
+}
+
 export function DefaultEmptyState() {
   const columns = useMemo(() => getColumns(false), []);
 

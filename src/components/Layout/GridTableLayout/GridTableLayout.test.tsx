@@ -3,9 +3,9 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
-import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import {
   actionColumn,
   collapseColumn,
