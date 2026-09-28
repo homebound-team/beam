@@ -9,6 +9,7 @@ import { Tag } from "src/components/Tag";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, type Margin, type Only, type Padding, Palette, Tokens, type Xss } from "src/Css";
 import type { BeamFocusableProps } from "src/interfaces";
+import { selfTopSpaced } from "src/layouts/layoutSpacing";
 import type { AnyObject } from "src/types";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
@@ -83,23 +84,29 @@ type RequiredRenderRouteTabs<V extends string, X> = {
  * and `TabContent` components directly.
  */
 export function TabsWithContent<V extends string, X extends Only<TabsContentXss, X>>(
-  props: RequiredRenderTabs<V, X> | RequiredRenderRouteTabs<V, X>,
+  props: (RequiredRenderTabs<V, X> | RequiredRenderRouteTabs<V, X>) & {
+    /** Skip the default top gap. Also set when the tab list is hidden. */
+    omitTopSpacing?: boolean;
+  },
 ) {
-  // Do not apply default top padding styles if the tabs are being hidden. This avoids unnecessary white space being added
-  const styles = hideTabs(props) ? {} : Css.pt3.$;
+  const { omitTopSpacing = false, ...tabProps } = props;
   return (
     <>
-      <Tabs {...props} />
-      <TabContent {...props} contentXss={{ ...styles, ...props.contentXss }} />
+      <Tabs {...tabProps} />
+      {/* Hidden tab lists have no strip to separate from the body, so skip the default gap. */}
+      <TabContent {...tabProps} omitTopSpacing={omitTopSpacing || hideTabs(props)} />
     </>
   );
 }
 
 export function TabContent<V extends string, X extends Only<TabsContentXss, X>>(
-  props: Omit<RequiredRenderTabs<V, X>, "onChange"> | RequiredRenderRouteTabs<V, X>,
+  props: (Omit<RequiredRenderTabs<V, X>, "onChange"> | RequiredRenderRouteTabs<V, X>) & {
+    /** Skip the default top gap. `TabsWithContent` sets this when the tab list is hidden. */
+    omitTopSpacing?: boolean;
+  },
 ) {
   const tid = useTestIds(props, "tab");
-  const { tabs, contentXss = {}, omitFullBleedPadding = false } = props;
+  const { tabs, contentXss = {}, omitFullBleedPadding = false, omitTopSpacing = false } = props;
   const location = useLocation();
   const selectedTab = isRouteTabs(props)
     ? props.tabs.find((t) => {
@@ -119,7 +126,13 @@ export function TabContent<V extends string, X extends Only<TabsContentXss, X>>(
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        css={contentXss}
+        // Opt out of PageHeaderLayout's first-child gap and apply that same rule here, so a
+        // self-spaced child (table actions) is not padded twice.
+        {...selfTopSpaced}
+        css={{
+          ...Css.if(!omitTopSpacing).when("> *:first-child:not([data-self-top-spaced])").pt3.$,
+          ...contentXss,
+        }}
       >
         {selectedTab.render()}
       </div>
