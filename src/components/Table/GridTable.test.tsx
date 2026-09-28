@@ -2031,6 +2031,20 @@ describe("GridTable", () => {
     expect(r.query.gridTable).toBeNull();
   });
 
+  it("renders emptyState illustration when provided", async () => {
+    // Given a table with only a header row and an emptyState illustration
+    const r = await render(
+      <GridTable
+        {...{ columns, rows: [simpleHeader] }}
+        emptyState={{ title: "No documents found", illustration: <svg /> }}
+      />,
+    );
+
+    // Then the illustration is shown with the title
+    expect(r.gridTableEmptyState_illustration).toBeInTheDocument();
+    expect(r.gridTableEmptyState_title).toHaveTextContent("No documents found");
+  });
+
   it("renders emptyState actions when provided", async () => {
     // Given a table with only a header row and emptyState actions
     const onClear = vi.fn();

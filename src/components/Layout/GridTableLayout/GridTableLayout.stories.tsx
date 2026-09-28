@@ -4,6 +4,7 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { PageHeader } from "src/components/Headers/PageHeader";
+import { DocumentUploadIllustration } from "src/components/Illustrations/DocumentUploadIllustration";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -304,6 +305,40 @@ export function EmptyState() {
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function EmptyStateWithIllustration() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-empty-state-illustration",
+    },
+    search: "client",
+  });
+
+  useEffect(() => {
+    layoutState.setSearchString("no-match");
+    // Start filtered so the illustration shows with the filter description and Clear Filters action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Documents" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          emptyState: { title: "No documents found", illustration: <DocumentUploadIllustration /> },
         }}
       />
     </TestProjectLayout>

@@ -65,6 +65,7 @@ export * from "./components/Layout/TableReviewLayout/TableReviewLayout";
 export * from "./components/LinkCard";
 export * from "./components/Loader";
 export * from "./components/LoadingSkeleton";
+export * from "./components/Illustrations/DocumentUploadIllustration";
 export * from "./components/Logos/BeamLogo";
 export * from "./components/Logos/BlueprintAiLogo";
 export * from "./components/Logos/HomeboundLogo";
