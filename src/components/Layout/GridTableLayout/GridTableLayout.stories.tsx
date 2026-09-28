@@ -4,7 +4,6 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { PageHeader } from "src/components/Headers/PageHeader";
-import { DocumentUploadIllustration } from "src/components/Illustrations/DocumentUploadIllustration";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -18,6 +17,7 @@ import { collapseColumn, column, numericColumn, selectColumn } from "src/compone
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
+import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";

@@ -1,13 +1,13 @@
 import { Css, Palette } from "src/Css";
 
 type DocumentUploadIllustrationProps = {
-  /** Width in `Css` increments, i.e. 5 == 40px. Defaults to the artwork's natural 338px; height follows the `viewBox`. */
+  /** Width in px. Defaults to the artwork's natural 338px; height follows the `viewBox`. */
   width?: number;
 };
 
 /** Empty-state artwork of a dashed document with an upload arrow, e.g. for an empty Documents table. */
 export function DocumentUploadIllustration(props: DocumentUploadIllustrationProps) {
-  const { width = "338px" } = props;
+  const { width = 338 } = props;
   const blob = Palette.Gray100;
   const line = Palette.Gray600;
   return (
@@ -17,7 +17,7 @@ export function DocumentUploadIllustration(props: DocumentUploadIllustrationProp
       fill="none"
       aria-hidden
       role="presentation"
-      css={Css.w(width).maxw100.h("auto").$}
+      css={Css.wPx(width).maxw100.h("auto").$}
     >
       <path
         d="M256.146 107.294C256.146 107.294 267.377 64.7481 227.738 51.0067C188.1 37.2653 159.572 58.7309 145.026 75.3184C129.963 92.4952 127.849 132.662 96.9308 140.326C66.0126 147.989 59.4329 170.861 62.313 186.571C65.2199 202.426 72.3548 210.618 107.501 210.618H231.174C231.174 210.618 270.548 216.961 278.476 197.406C286.404 177.85 276.362 168.337 259.978 154.596C243.594 140.854 243.594 131.077 249.143 122.356C254.693 113.636 256.146 107.294 256.146 107.294Z"
