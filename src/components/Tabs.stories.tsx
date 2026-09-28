@@ -61,7 +61,15 @@ export function TabsWithJustNames() {
 
 export function TabsWithIconAndMargin() {
   const [tab, setTab] = useState<TabValue>("tab1");
-  return <TabsWithContent tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} contentXss={Css.m3.p0.$} />;
+  return (
+    <TabsWithContent
+      tabs={tabsWithIconsAndContent}
+      onChange={setTab}
+      selected={tab}
+      contentXss={Css.m3.$}
+      omitTopSpacing
+    />
+  );
 }
 
 export function TabsWithEndAdornment() {
@@ -77,7 +85,9 @@ export function TabsWithEndAdornment() {
     },
   ];
   const [tab, setTab] = useState<TabValue>("tab1");
-  return <TabsWithContent tabs={tabsWithAdornment} onChange={setTab} selected={tab} contentXss={Css.m3.p0.$} />;
+  return (
+    <TabsWithContent tabs={tabsWithAdornment} onChange={setTab} selected={tab} contentXss={Css.m3.$} omitTopSpacing />
+  );
 }
 
 export function TabsWithAiMode() {
@@ -107,7 +117,7 @@ export function TabsSeparateFromContent() {
     <div>
       <Tabs tabs={testTabs} onChange={setTab} selected={tab} />
       <hr />
-      <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={tab} />
+      <TabContent tabs={testTabs} selected={tab} />
     </div>
   );
 }
@@ -117,7 +127,7 @@ export function TabsWithBottomBorder() {
   return (
     <div>
       <Tabs tabs={tabsWithIconsAndContent} onChange={setTab} selected={tab} includeBottomBorder />
-      <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={tab} />
+      <TabContent tabs={testTabs} selected={tab} />
     </div>
   );
 }
@@ -209,8 +219,7 @@ export const TabWithRightContent = () => {
         ariaLabel="Sample Tabs"
         right={right}
       />
-      {/* The tabs will be hidden, which causes the TabContent default top margin to be removed. But we are adding in actions, so add the margin back in ourselves. */}
-      <TabContent contentXss={Css.mt3.$} tabs={testTabs} selected={selectedTab} />
+      <TabContent tabs={testTabs} selected={selectedTab} />
     </>
   );
 };

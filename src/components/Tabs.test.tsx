@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { ScrollableContent, ScrollableParent } from "src";
 import { Css, Palette } from "src/Css";
+import { selfTopSpaced, selfTopSpacedAttr } from "src/layouts/layoutSpacing";
 import { click, render, withRouter } from "src/utils/rtl";
 import { getNextTabValue, type RouteTabWithContent, TabContent, TabsWithContent, type TabWithContent } from "./Tabs";
 import { type TabValue, TestTabContent, testTabs } from "./testData";
@@ -276,6 +277,42 @@ describe("TabsWithContent", () => {
     );
     // Then expect the tab content to have the expected padding based on `contentXss`
     expect(r.tab_panel).toHaveStyle({ paddingLeft: "calc(var(--t-spacing) * 2)" });
+  });
+
+  it("spaces tab content itself so a page header does not add a second gap", async () => {
+    // Given tab content whose body does not pad its own top edge
+    const r = await render(<TabContent tabs={testTabs} selected="tab1" />, withRouter());
+
+    // Then the panel opts out of the page header's first-child gap and spaces its own child
+    expect(r.tab_panel).toHaveAttribute(selfTopSpacedAttr);
+    expect(r.tab_panel.firstElementChild).toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
+  });
+
+  it("skips its top gap when the tab body already pads its top edge", async () => {
+    // Given tab content that denotes its own top spacing
+    const tabs: TabWithContent<TabValue>[] = [
+      { name: "Tab 1", value: "tab1", render: () => <div {...selfTopSpaced}>Table</div> },
+      { name: "Tab 2", value: "tab2", render: () => <div>Other</div> },
+    ];
+    const r = await render(<TabContent tabs={tabs} selected="tab1" />, withRouter());
+
+    // Then the panel does not add another gap above that body
+    expect(r.tab_panel.firstElementChild).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
+  });
+
+  it("does not add a top gap when the tab list is hidden", async () => {
+    // Given a single enabled tab, so TabsWithContent hides the strip
+    const r = await render(
+      <TabsWithContent
+        tabs={[{ name: "Only", value: "only", render: () => <div>Only content</div> }]}
+        selected="only"
+        onChange={() => {}}
+      />,
+      withRouter(),
+    );
+
+    // Then there is no default gap where the strip would have been
+    expect(r.tab_panel.firstElementChild).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
   });
 });
 

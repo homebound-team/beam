@@ -16,7 +16,7 @@ export const pageContentPaddingX = Css.px(smPageContentPaddingXValue).ifMdAndUp.
  */
 export const selfTopSpacedAttr = "data-self-top-spaced";
 
-/** Spread onto the root of page-body chrome that pads its own top edge (e.g. a sticky table actions bar). */
+/** Spread onto page-body chrome that pads its own top edge (table actions, tab content). */
 export const selfTopSpaced = { [selfTopSpacedAttr]: true };
 
 /**

@@ -46,7 +46,7 @@ describe("PageHeaderLayout", () => {
     );
 
     // Then the first child picks up the body's top spacing
-    expect(r.pageHeaderLayout_body.firstElementChild).toHaveStyle({ marginTop: "calc(var(--t-spacing) * 3)" });
+    expect(r.pageHeaderLayout_body.firstElementChild).toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
   });
 
   it("skips the body spacing for chrome that pads its own top edge", async () => {
@@ -59,7 +59,7 @@ describe("PageHeaderLayout", () => {
     );
 
     // Then the body adds no spacing of its own
-    expect(r.pageHeaderLayout_body.firstElementChild).not.toHaveStyle({ marginTop: "calc(var(--t-spacing) * 3)" });
+    expect(r.pageHeaderLayout_body.firstElementChild).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
   });
 
   it("shows AutoSaveIndicator in the page header while saving", async () => {
