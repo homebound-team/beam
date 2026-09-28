@@ -126,11 +126,11 @@ export function TabContent<V extends string, X extends Only<TabsContentXss, X>>(
         role="tabpanel"
         tabIndex={0}
         {...tid.panel}
-        // Opt out of PageHeaderLayout's first-child gap and apply that same rule here, so a
-        // self-spaced child (table actions) is not padded twice.
+        // Opt out of PageHeaderLayout's gap; the panel pads itself below.
         {...selfTopSpaced}
         css={{
-          ...Css.if(!omitTopSpacing).when("> *:first-child:not([data-self-top-spaced])").pt3.$,
+          // Top padding, unless the first child pads its own top (e.g. sticky table actions).
+          ...Css.if(!omitTopSpacing).when(":not(:has(> [data-self-top-spaced]:first-child))").pt3.$,
           ...contentXss,
         }}
       >

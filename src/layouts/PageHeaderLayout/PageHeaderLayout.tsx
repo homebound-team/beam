@@ -71,8 +71,8 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
             {pageHeaderEl}
           </div>
         </div>
-        {/* Spaces the body's first child, unless it is chrome that pads its own top edge (`selfTopSpaced`). */}
-        <div css={Css.df.fdc.fg1.mh0.w100.when("> *:first-child:not([data-self-top-spaced])").pt3.$} {...tid.body}>
+        {/* Pads the body's top, unless its first child pads its own top edge (`selfTopSpaced`). */}
+        <div css={Css.df.fdc.fg1.mh0.w100.when(":not(:has(> [data-self-top-spaced]:first-child))").pt3.$} {...tid.body}>
           {children}
         </div>
       </div>
