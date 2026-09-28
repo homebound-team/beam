@@ -883,6 +883,38 @@ describe("GridTableLayout", () => {
       expect(r.gridTableEmptyState_actions).toHaveTextContent("Clear Filters");
     });
 
+    it("passes the tableProps emptyState illustration through with the filter defaults", async () => {
+      // Given a layout with client search and an emptyState illustration on the table props
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey: "empty-state-illustration-test",
+            },
+            search: "client",
+          }}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+            emptyState: { title: "No documents found", illustration: <svg /> },
+          }}
+        />,
+        withRouter(),
+      );
+
+      // When the search string filters out all rows
+      await typeAndWait(r.search, "zzz-no-match");
+
+      // Then the illustration renders and the filter description and clear action still apply
+      expect(r.gridTableEmptyState_illustration).toBeInTheDocument();
+      expect(r.gridTableEmptyState_title).toHaveTextContent("No documents found");
+      expect(r.gridTableEmptyState_description).toHaveTextContent("Try adjusting your search or filters.");
+      expect(r.gridTableEmptyState_actions).toHaveTextContent("Clear Filters");
+    });
+
     it("clears filters from the empty state clear action", async () => {
       // Given a layout with client search, filters, and data rows
       const r = await render(
