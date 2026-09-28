@@ -1,11 +1,12 @@
 // The atomic css that the truss vite plugin compiles out of our `Css.*.$` chains.
-import "virtual:truss.css";
 import { Preview } from "@storybook/react-vite";
 import { configure } from "mobx";
-import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from "storybook/viewport";
+import { MINIMAL_VIEWPORTS } from "storybook/viewport";
+import "virtual:truss.css";
 import { CssReset, Tokens } from "../src";
 import { contrastDataTheme } from "../src/components/ContrastScope";
 import beamTheme from "./beamTheme";
+import "./docs.css";
 
 // formState doesn't use actions
 configure({ enforceActions: "never" });
@@ -29,7 +30,28 @@ const preview: Preview = {
     actions: { argTypesRegex: "^on.*" },
     options: {
       // https://storybook.js.org/docs/react/writing-stories/naming-components-and-hierarchy#sorting-stories
-      storySort: { order: ["Intro", "Foundations", "Inputs", "Components", "Forms"] },
+      storySort: {
+        // Sort by story/docs name too, so docs sharing a title (e.g. Layouts) follow `order`.
+        includeNames: true,
+        order: [
+          "Intro",
+          "Layouts",
+          [
+            "Which layout to use",
+            "Routing",
+            "Table Page",
+            "Form Page",
+            "Overview Page",
+            "Workflows",
+            ["Focused Form", "Stepper"],
+          ],
+          "Foundations",
+          ["Docs", "Primitive Palette", "Color Tokens", "Typography"],
+          "Inputs",
+          "Components",
+          "Forms",
+        ],
+      },
     },
     // https://storybook.js.org/docs/react/essentials/backgrounds
     backgrounds: {
@@ -49,10 +71,11 @@ const preview: Preview = {
       // https://www.chromatic.com/docs/delay#delay-a-story
       delay: 300,
     },
-    // Catalog of named viewports so per-story `chromatic.modes` (via `viewportModes(...)`) can
-    // reference them by key. This only registers the names — it does not add snapshots; multi-viewport
-    // capture stays opt-in per story. No `initialGlobals.viewport`, so non-moded stories are unaffected.
-    viewport: { options: { ...INITIAL_VIEWPORTS, ...MINIMAL_VIEWPORTS } },
+    // Small mobile / Large mobile / Tablet / Desktop. Per-story `chromatic.modes` (via
+    // `viewportModes(...)`) reference these keys. This only registers the names — it does not add
+    // snapshots; multi-viewport capture stays opt-in per story. No `initialGlobals.viewport`, so
+    // non-moded stories are unaffected.
+    viewport: { options: MINIMAL_VIEWPORTS },
     controls: {
       // Hide NoControls warning
       // https://storybook.js.org/docs/react/essentials/controls#hide-nocontrols-warning

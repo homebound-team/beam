@@ -12,12 +12,12 @@ import { withBeamDecorator, withRouter } from "src/utils/sb";
 import colorTokens from "../../tokens/color.json";
 
 export default {
-  title: "Foundations/Colors",
+  title: "Foundations",
   decorators: [withBeamDecorator, withRouter()],
   parameters: { layout: "fullscreen" },
 } as Meta;
 
-export function SemanticTokens() {
+export function ColorTokens() {
   const layoutState = useGridTableLayoutState({ search: "client" });
   const columns = useMemo(() => createTokenColumns(), []);
   const rows = useMemo(() => [simpleHeader, ...buildGroupedTokenRows()], []);
@@ -25,7 +25,7 @@ export function SemanticTokens() {
   return (
     <PageHeaderLayout
       pageHeader={{
-        title: "Semantic color tokens",
+        title: "Color Tokens",
       }}
     >
       <GridTableLayout
@@ -41,6 +41,7 @@ export function SemanticTokens() {
     </PageHeaderLayout>
   );
 }
+ColorTokens.storyName = "Color Tokens";
 
 type DtcgSrgbColor = {
   colorSpace: "srgb";

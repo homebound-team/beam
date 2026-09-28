@@ -16,9 +16,9 @@ Color tokens are driven from Figma Variables. Motion tokens are hand-authored in
 
 ## Updating colors from Figma
 
-Do **not** use Figma’s per-collection JSON export — wrong shape, and you’d have to merge **Primitive Colors** + **Semantic Tokens** by hand.
+Do **not** use Figma’s per-collection JSON export — wrong shape, and you’d have to merge **Primitive Colors** + **Color Tokens** by hand.
 
-1. Edit Variables in [BEAM_27_LIBRARY](https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY) (`Primitive Colors`, `Semantic Tokens`). Set **Contrast** even when it matches Light.
+1. Edit Variables in [BEAM_27_LIBRARY](https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY) (`Primitive Colors`, `Color Tokens` — Figma still labels this collection **Semantic Tokens**). Set **Contrast** even when it matches Light.
 2. In Cursor: ask for an **MCP export** of those Variables into [`figma-colors.raw.json`](./figma-colors.raw.json) (one file, both collections). Needs an authenticated Figma MCP session.
 3. Run:
    ```
@@ -55,7 +55,7 @@ We mirror [Tailwind theme variable namespaces](https://tailwindcss.com/docs/them
 
 ### `beam.color.primitive.*`
 
-Literal DTCG `srgb` colors (ramps `Gray50` … `Blue900`, etc.). **`White`** and **`Transparent`** are required. No `$extensions["com.homebound.beam"]` unless codegen explicitly supports it. **`$value` must not reference semantic tokens** (semantic may reference primitive only).
+Literal DTCG `srgb` colors (ramps `Gray50` … `Blue900`, etc.). **`White`** and **`Transparent`** are required. No `$extensions["com.homebound.beam"]` unless codegen explicitly supports it. **`$value` must not reference color tokens** (`beam.color.semantic.*` may reference primitive only).
 
 ### `beam.color.semantic.*`
 
@@ -74,7 +74,7 @@ These conventions help humans, agents, and upstream tools stay consistent. **`ya
 
 **Pairing:** Prefer **`On*`** for ink on a fill (`OnSurface` on `Surface`). Use purpose-named globals when the role is not “text on a fill” (e.g. `SelectionIndicator` on `SurfaceRaised`). Use scoped tokens for product-specific copy (e.g. `TextLabel` for labels).
 
-**Semantic roles (by area)** — illustrative; authoritative set is `beam.color.semantic` in `color.json`:
+**Color token roles (by area)** — illustrative; authoritative set is `beam.color.semantic` in `color.json`:
 
 - **Surfaces / ink:** `Surface`, `SurfaceHover` (hover on `Surface`, e.g. table rows), `SurfaceRaised`, `SurfaceRaisedHover` (items on raised panels), `OnSurface`, `OnSurfaceMuted`, `Scrim`, …
 - **Brand / actions:** `Primary`, `PrimaryHover`, `PrimaryPressed`, `OnPrimary`, `SelectionIndicator`, `Danger`, …

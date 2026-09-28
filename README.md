@@ -4,7 +4,7 @@
 
 Homebound's React component design system.
 
-_To see the latest designs, check out the [Figma](https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System-Refresh?node-id=0%3A1) file._
+_To see the latest designs, check out the [Figma](https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=0-1&p=f&m=draw) file._
 
 ## Page layout shells
 
