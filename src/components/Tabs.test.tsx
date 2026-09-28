@@ -283,9 +283,10 @@ describe("TabsWithContent", () => {
     // Given tab content whose body does not pad its own top edge
     const r = await render(<TabContent tabs={testTabs} selected="tab1" />, withRouter());
 
-    // Then the panel opts out of the page header's first-child gap and spaces its own child
+    // Then the panel opts out of the page header's gap and pads its own top instead
     expect(r.tab_panel).toHaveAttribute(selfTopSpacedAttr);
-    expect(r.tab_panel.firstElementChild).toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
+    expect(r.tab_panel).toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
+    expect(r.tab_panel.firstElementChild).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
   });
 
   it("skips its top gap when the tab body already pads its top edge", async () => {
@@ -297,7 +298,7 @@ describe("TabsWithContent", () => {
     const r = await render(<TabContent tabs={tabs} selected="tab1" />, withRouter());
 
     // Then the panel does not add another gap above that body
-    expect(r.tab_panel.firstElementChild).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
+    expect(r.tab_panel).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
   });
 
   it("does not add a top gap when the tab list is hidden", async () => {
@@ -312,7 +313,7 @@ describe("TabsWithContent", () => {
     );
 
     // Then there is no default gap where the strip would have been
-    expect(r.tab_panel.firstElementChild).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
+    expect(r.tab_panel).not.toHaveStyle({ paddingTop: "calc(var(--t-spacing) * 3)" });
   });
 });
 
