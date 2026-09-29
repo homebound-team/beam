@@ -3,13 +3,14 @@ import { useHover } from "react-aria";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { ButtonMenu, type MenuItem } from "./ButtonMenu";
-import { Tag, type TagType } from "./Tag";
+import { Tag, type TagType, type TagVariant } from "./Tag";
 
 export type CardType = "card" | "list";
 export type ImageFitType = "contain" | "cover";
 export type CardTag = {
   text: string;
   type?: TagType;
+  variant?: TagVariant;
 };
 
 export type CardProps = {
@@ -90,12 +91,12 @@ export function Card(props: CardProps) {
       {/* Tag - list cards flow it above the text, otherwise it overlays the image */}
       {tag && !isList && (
         <div css={Css.absolute.left1.topPx(4).$}>
-          <Tag type={tag.type} text={tag.text} {...tid.tag} />
+          <Tag type={tag.type} variant={tag.variant} text={tag.text} {...tid.tag} />
         </div>
       )}
       {/* Titles and detailContent */}
       <div css={Css.df.fdc.aifs.gap1.$}>
-        {tag && isList && <Tag type={tag.type} text={tag.text} {...tid.tag} />}
+        {tag && isList && <Tag type={tag.type} variant={tag.variant} text={tag.text} {...tid.tag} />}
         <div>
           <div css={Css.xsSb.color(Tokens.OnSurfaceMuted).$} {...tid.subtitle}>
             {subtitle}

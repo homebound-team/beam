@@ -87,6 +87,22 @@ export function Default() {
         </div>
       </Sample>
 
+      <Sample title="Bold tag">
+        <InlineFeedbackBanner
+          type="error"
+          tagVariant="bold"
+          tagText="Missing"
+          description="Two bid lines are missing costs."
+          actions={[view]}
+        />
+        <InlineFeedbackBanner
+          type="warning"
+          tagVariant="bold"
+          description="Used as a requirement for Extend Backsplash Kitchen 109."
+          actions={keepAndRemove}
+        />
+      </Sample>
+
       <Sample title="Inline control inside the description">
         <InlineFeedbackBanner
           type="error"

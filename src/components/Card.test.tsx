@@ -1,4 +1,5 @@
 import { fireEvent } from "@testing-library/react";
+import { Palette } from "src/Css";
 import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 import { Card, type CardProps } from "./Card";
@@ -22,6 +23,13 @@ describe("Card Component", () => {
     expect(r.card_img).toHaveAttribute("src", "plan-exterior.png");
     expect(r.card_tag).toHaveTextContent("Active");
     expect(r.card_details).toHaveTextContent("Detail Content");
+  });
+
+  it("passes the tag's variant through", async () => {
+    // Given a card with a bold tag
+    const r = await render(<Card {...defaultProps} tag={{ text: "Active", type: "success", variant: "bold" }} />);
+    // Then the tag takes the bold success fill
+    expect(r.card_tag).toHaveStyle({ backgroundColor: Palette.Green600 });
   });
 
   it("uses a fixed width by default", async () => {

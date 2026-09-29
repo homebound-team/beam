@@ -65,6 +65,17 @@ describe("Tag", () => {
     expect(r.getByText("TRMCLG0004")).toHaveStyle({ textDecoration: "line-through" });
   });
 
+  it("bold variant uses white text and icon on its dark fill", async () => {
+    // Given a bold error tag with an icon
+    const r = await render(<Tag text="Missing" type="error" variant="bold" icon="xCircle" data-testid="tag" />);
+
+    // Then the base gray text is replaced with white, on the darker red fill
+    expect(r.tag).toHaveStyle({ color: Palette.White, backgroundColor: Palette.Red600 });
+
+    // And the icon is white too
+    expect(r.container.querySelector(`[data-icon="xCircle"]`)).toHaveStyle({ fill: Palette.White });
+  });
+
   it("secondary variant does not uppercase text", async () => {
     // Given a secondary tag
     const r = await render(<Tag text="Secondary Label" variant="secondary" data-testid="tag" />);

@@ -47,6 +47,48 @@ export function Examples() {
   );
 }
 
+export function Bold() {
+  return (
+    <div css={Css.dg.gtc("repeat(3, minmax(0, 1fr))").gap1.$}>
+      <div css={Css.df.fdc.aifs.gap1.$}>
+        <h3 css={Css.mb1.mdSb.$}>Label Only</h3>
+        <Tag text="info" type="info" variant="bold" />
+        <Tag text="update" type="update" variant="bold" />
+        <Tag text="error" type="error" variant="bold" />
+        <Tag text="warning" type="warning" variant="bold" />
+        <Tag text="success" type="success" variant="bold" />
+        <Tag text="Neutral" variant="bold" />
+        <Tag text="ai" type="ai" variant="bold" />
+      </div>
+      <div css={Css.df.fdc.aifs.gap1.$}>
+        <h3 css={Css.mb1.mdSb.$}>Label & Icon</h3>
+        <Tag text="info" type="info" variant="bold" icon="refresh" />
+        <Tag text="update" type="update" variant="bold" icon="arrowFromBottom" />
+        <Tag text="error" type="error" variant="bold" icon="xCircle" />
+        <Tag text="warning" type="warning" variant="bold" icon="error" />
+        <Tag text="success" type="success" variant="bold" icon="check" />
+        <Tag text="Neutral" variant="bold" icon="helpCircle" />
+      </div>
+      <div css={Css.df.fdc.aifs.gap1.$}>
+        <h3 css={Css.mb1.mdSb.$}>Icon Only</h3>
+        <Tag text="Information" type="info" variant="bold" icon="refresh" iconOnly />
+        <Tag text="Updates" type="update" variant="bold" icon="arrowFromBottom" iconOnly />
+        <Tag text="Error" type="error" variant="bold" icon="xCircle" iconOnly />
+        <Tag text="Warning" type="warning" variant="bold" icon="error" iconOnly />
+        <Tag text="Success" type="success" variant="bold" icon="check" iconOnly />
+        <Tag text="Neutral" variant="bold" icon="helpCircle" iconOnly />
+      </div>
+    </div>
+  );
+}
+
+Bold.parameters = {
+  design: {
+    type: "figma",
+    url: "https://www.figma.com/design/qDCLrDQECBRgPh5Rx7UFvy/H2-2026-Cost-Intell?node-id=159-10029",
+  },
+};
+
 export function CustomColor() {
   return (
     <div css={Css.df.fdc.aifs.gap1.$}>
