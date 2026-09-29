@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useComputed } from "src/hooks/useComputed";
 import { objectId } from "src/utils/objectId";
 import { click, render } from "src/utils/rtl";
+import { useTestIds } from "src/utils/useTestIds";
 
 let renderedCount = 0;
 let evaledCount = 0;
@@ -125,14 +126,28 @@ describe("useComputed", () => {
     expect(evaledCount).toEqual(3);
     expect(r.name).toHaveTextContent("bar-dep2");
   });
+
+  it("updates a Map lookup when an observable row is added", async () => {
+    // Given an observable collection whose rows are indexed by useComputed
+    const store = observable({ rows: [{ id: "first" }] });
+    const r = await render(<MapLookup store={store} />);
+
+    // When another row is added
+    act(() => {
+      store.rows.push({ id: "second" });
+    });
+
+    // Then the new ID is available from the returned Map
+    expect(r.mapLookup_lookup).toHaveTextContent("second");
+  });
 });
 
 type SomeProxy = { name: string };
 
-interface TestComponentProps {
+type TestComponentProps = {
   someProxy: SomeProxy;
   computedFn?: (o: SomeProxy, dep: string) => any;
-}
+};
 
 function TestComponent(props: TestComponentProps) {
   const { someProxy, computedFn } = props;
@@ -156,4 +171,13 @@ function TestComponent(props: TestComponentProps) {
       </button>
     </div>
   );
+}
+
+/** Displays a lookup from a fresh Map of the observable rows. */
+function MapLookup(props: { store: { rows: { id: string }[] } }) {
+  const { store } = props;
+  const tid = useTestIds(props, "mapLookup");
+  const rowsById = useComputed(() => new Map(store.rows.map((row) => [row.id, row])), [store]);
+
+  return <div {...tid.lookup}>{rowsById.get("second")?.id ?? "missing"}</div>;
 }
