@@ -7,7 +7,7 @@
       "Primitive Colors",
       "Semantic Tokens"
     ],
-    "exportedAt": "2026-08-14T16:27:35.179Z"
+    "exportedAt": "2026-09-29T02:30:00.000Z"
   },
   "primitives": {
     "White": {
@@ -600,6 +600,33 @@
         "alias": "Gray700"
       },
       "description": "Pressed surface for transparent / ghost controls."
+    },
+    "SurfaceActive": {
+      "light": {
+        "alias": "Blue100"
+      },
+      "contrast": {
+        "alias": "Blue100"
+      },
+      "description": "Active fill (indeterminate checkbox, future Pill). Pair with OnSurfaceActive. Hover uses SurfaceActiveHover."
+    },
+    "SurfaceActiveHover": {
+      "light": {
+        "alias": "Blue200"
+      },
+      "contrast": {
+        "alias": "Blue200"
+      },
+      "description": "Hover fill on SurfaceActive (e.g. indeterminate checkbox hover). Pair with SurfaceActive."
+    },
+    "OnSurfaceActive": {
+      "light": {
+        "alias": "Blue600"
+      },
+      "contrast": {
+        "alias": "Blue600"
+      },
+      "description": "Ink on SurfaceActive (indeterminate checkbox dash). Pair with SurfaceActive."
     },
     "OnPrimary": {
       "light": {
