@@ -1507,6 +1507,17 @@
       },
       "$description": "Default body text and icon ink on Surface. Pair with Surface — they invert under contrast so content stays readable."
     },
+    "OnSurfaceActive": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Blue600}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-on-surface-active",
+          "contrast": "{beam.color.primitive.Blue600}"
+        }
+      },
+      "$description": "Ink on SurfaceActive (indeterminate checkbox dash). Pair with SurfaceActive."
+    },
     "OnSurfaceDisabled": {
       "$type": "color",
       "$value": "{beam.color.primitive.Gray400}",
@@ -1636,6 +1647,28 @@
         }
       },
       "$description": "Main application background fill. Pair with OnSurface for default text/icons. SurfaceRaised layers above this."
+    },
+    "SurfaceActive": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Blue100}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-surface-active",
+          "contrast": "{beam.color.primitive.Blue100}"
+        }
+      },
+      "$description": "Active fill (indeterminate checkbox, future Pill). Pair with OnSurfaceActive. Hover uses SurfaceActiveHover."
+    },
+    "SurfaceActiveHover": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Blue200}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-surface-active-hover",
+          "contrast": "{beam.color.primitive.Blue200}"
+        }
+      },
+      "$description": "Hover fill on SurfaceActive (e.g. indeterminate checkbox hover). Pair with SurfaceActive."
     },
     "SurfaceDisabled": {
       "$type": "color",
