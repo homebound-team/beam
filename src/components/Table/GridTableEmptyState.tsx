@@ -6,16 +6,18 @@ import { useTestIds } from "src/utils/useTestIds";
 export type GridTableEmptyStateProps = {
   title?: string;
   description?: string;
+  illustration?: ReactNode;
   /** Optional CTAs, e.g. Clear Filters or Create buttons. */
   actions?: ReactNode;
 };
 
 export function GridTableEmptyState(props: GridTableEmptyStateProps) {
-  const { title = "No results found", description, actions } = props;
+  const { illustration, title = "No results found", description, actions } = props;
   const tid = useTestIds(props, "gridTableEmptyState");
 
   return (
     <div css={Css.df.fdc.aic.py(12).gap2.$} {...tid}>
+      {illustration && <div {...tid.illustration}>{illustration}</div>}
       <div css={Css.xl.$} {...tid.title}>
         {title}
       </div>

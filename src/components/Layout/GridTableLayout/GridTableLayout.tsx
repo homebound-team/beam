@@ -357,6 +357,7 @@ function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, 
   const filterEmptyDescription = "Try adjusting your search or filters.";
 
   return {
+    illustration: tableEmptyState?.illustration,
     title: tableEmptyState?.title ?? tableEmptyFallback ?? layoutEmptyFallback,
     description: tableEmptyState?.description ?? (filteringActive ? filterEmptyDescription : undefined),
     actions:
