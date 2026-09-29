@@ -2,7 +2,7 @@ import { memo, type MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
 import { CountBadge } from "src/components/CountBadge";
 import type { FilterDefs, FilterImpls } from "src/components/Filters/types";
-import { filterTestIdPrefix, getActiveFilterCount } from "src/components/Filters/utils";
+import { filterTestIdPrefix } from "src/components/Filters/utils";
 import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
@@ -20,7 +20,7 @@ import { pageContentPaddingX } from "src/layouts/layoutSpacing";
 import { useTestIds } from "src/utils/useTestIds";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
-import { buildFilterControls, buildFilterImpls, FilterPanel } from "./FilterPanel";
+import { buildFilterControls, buildFilterImpls, FilterPanel, getFilterPills } from "./FilterPanel";
 import { GroupByField, type GroupByFieldProps } from "./GroupByField";
 
 export type SearchBoxProps = {
@@ -101,8 +101,12 @@ function GridTableLayoutActionsComponent<
   const hasFilterControls = controlCount > 0;
   // One control only — nothing to nest behind a toggle; show it inline in the toolbar on desktop.
   const showInlineControl = !sm && controlCount === 1 && (hasGroupBy || !!(filter && setFilter));
-  const activeFilterCount = useMemo(() => (filter ? getActiveFilterCount(filter) : 0), [filter]);
   const filterImpls = useMemo(() => (filterDefs ? buildFilterImpls(filterDefs) : ({} as FilterImpls<F>)), [filterDefs]);
+  // Matches the pills in the collapsed filter panel: one per selected value, not one per filter.
+  const activeFilterCount = useMemo(
+    () => (filter ? getFilterPills(filterImpls, filter).length : 0),
+    [filter, filterImpls],
+  );
 
   const searchTextField = (
     <TextField

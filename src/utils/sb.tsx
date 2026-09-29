@@ -61,6 +61,26 @@ export function newStory<TFn extends Function>(storyFn: TFn, opts: StoryOptions)
   return story;
 }
 
+export type LabeledExample = {
+  label: string;
+  children: ReactNode;
+};
+
+/** Labeled rows of examples for one story. Set `exampleWidth` when the snapshot must wrap at a fixed width. */
+export function LabeledExamples(props: { examples: LabeledExample[]; labelWidth?: number; exampleWidth?: number }) {
+  const { examples, labelWidth = 72, exampleWidth } = props;
+  return (
+    <div css={Css.bgWhite.p2.df.fdc.aifs.gap2.$}>
+      {examples.map((example) => (
+        <div key={example.label} css={exampleWidth ? Css.df.gap2.$ : Css.df.aic.gap2.$}>
+          <span css={Css.xs.gray600.fs0.wPx(labelWidth).if(!!exampleWidth).ptPx(12).$}>{example.label}</span>
+          {exampleWidth ? <div css={Css.wPx(exampleWidth).$}>{example.children}</div> : example.children}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Renders a number of small samples within a single story. */
 export function samples(...samples: [string, ReactNode][]): JSX.Element[] {
   return samples.map((s, i) => {

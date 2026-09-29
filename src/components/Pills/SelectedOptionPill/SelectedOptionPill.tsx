@@ -25,7 +25,7 @@ export function SelectedOptionPill(props: SelectedOptionPillProps) {
           ...(aiMode ? Css.aiBackground.color(Palette.Purple800).$ : Css.bgWhite.color(Tokens.OnSurface).$),
         }}
       >
-        <div css={Css.fg1.wbba.sm.$} {...tid.value}>
+        <div css={Css.fg1.mw0.sm.lineClamp2.$} {...tid.value}>
           {value}
         </div>
         {!disabled && <IconButton icon="x" compact label="Remove" onClick={onRemove} {...tid.remove} />}

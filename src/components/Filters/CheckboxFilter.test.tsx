@@ -104,7 +104,7 @@ describe("CheckboxFilter", () => {
     // When formatting the label for a non-active value
     const label = filter.formatSelectedFilterLabel("inactive");
 
-    // Then no chip label is produced
+    // Then no pill label is produced
     expect(label).toBeUndefined();
   });
 });

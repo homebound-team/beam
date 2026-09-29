@@ -105,7 +105,7 @@ describe("ToggleFilter", () => {
     // When formatting the label for a non-active value
     const label = filter.formatSelectedFilterLabel("no");
 
-    // Then no chip label is produced
+    // Then no pill label is produced
     expect(label).toBeUndefined();
   });
 });

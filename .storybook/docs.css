@@ -95,6 +95,36 @@
   text-decoration: underline;
 }
 
+.sbdocs table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 20px;
+  margin: 16px 0 24px;
+}
+
+.sbdocs th,
+.sbdocs td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--b-surface-separator);
+}
+
+.sbdocs th {
+  font-weight: 600;
+  color: var(--b-on-surface);
+}
+
+.sbdocs td {
+  color: var(--b-on-surface);
+}
+
+.sbdocs .sbdocs-required {
+  font-style: italic;
+  color: var(--b-on-surface-disabled);
+}
+
 .sbdocs :not(pre) > code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 14px;

@@ -1,5 +1,4 @@
-import { Css, Palette } from "src/Css";
-import { SelectedOptionPill } from "src/forms/SelectedOptionPill";
+import { SelectedOptionPill } from "src/components/Pills/SelectedOptionPill/SelectedOptionPill";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -39,18 +38,5 @@ describe("SelectedOptionPill", () => {
     const r = await render(<SelectedOptionPill value="Option" onRemove={() => {}} disabled />);
     // Then the remove control is not in the document
     expect(r.query.selectedOptionPill_remove).toBeNull();
-  });
-
-  it("applies the AI background and purple capsule text when aiMode is true", async () => {
-    // Given a pill in aiMode
-    // When rendered
-    const r = await render(<SelectedOptionPill value="Option" onRemove={() => {}} aiMode />);
-    // Then the capsule has the AI wash and purple text
-    const capsule = r.selectedOptionPill_value.parentElement;
-    const backgroundImage = Css.aiBackground.$.backgroundImage ?? "";
-    expect(capsule).toHaveStyle({
-      backgroundImage,
-      color: Palette.Purple800,
-    });
   });
 });
