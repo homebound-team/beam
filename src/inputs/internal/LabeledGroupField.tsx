@@ -8,6 +8,7 @@ import type { useTestIds } from "src/utils/useTestIds";
 
 type LabeledGroupFieldProps = {
   label: string;
+  tooltip?: ReactNode;
   labelStyle: NonNullable<PresentationFieldProps["labelStyle"]>;
   labelProps: LabelHTMLAttributes<HTMLLabelElement>;
   groupProps: HTMLAttributes<HTMLDivElement>;
@@ -24,6 +25,7 @@ type LabeledGroupFieldProps = {
 export function LabeledGroupField(props: LabeledGroupFieldProps) {
   const {
     label,
+    tooltip,
     labelStyle,
     labelProps,
     groupProps,
@@ -45,6 +47,7 @@ export function LabeledGroupField(props: LabeledGroupFieldProps) {
       {...labelProps}
       {...tid.label}
       suffix={labelSuffix}
+      tooltip={tooltip}
       hidden={isHiddenLabel}
       inline={isLeftLabel}
     />

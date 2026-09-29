@@ -98,3 +98,12 @@ export function FullWidth() {
     />
   );
 }
+
+/** `tooltip` renders an info icon beside the field's label. */
+export function LabelTooltip() {
+  return (
+    <div css={Css.df.fdc.gap2.$}>
+      <RichTextFieldComponent label="Notes" tooltip="What this field is for" value="<div>Hello</div>" onChange={noop} />
+    </div>
+  );
+}

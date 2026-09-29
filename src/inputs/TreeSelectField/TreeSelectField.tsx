@@ -54,6 +54,8 @@ export type TreeSelectFieldProps<O, V extends Value> = {
   fieldDecoration?: (opt: O) => ReactNode;
   /** Sets the form field label. */
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
   readOnly?: boolean | ReactNode;
   onBlur?: () => void;
@@ -656,7 +658,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         getOptionValue={getOptionValue}
         getOptionLabel={getOptionLabel}
         borderless={borderless}
-        tooltip={resolveTooltip(disabled, undefined, readOnly)}
+        tooltip={resolveTooltip(disabled, props.tooltip, readOnly)}
         resetField={resetField}
         nothingSelectedText={nothingSelectedText}
         isTree
