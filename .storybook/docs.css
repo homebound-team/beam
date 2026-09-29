@@ -1,0 +1,107 @@
+/**
+ * Docs-page type and color so MDX matches Beam, not Storybook defaults.
+ * Stories keep product styles via CssReset; these rules are scoped to `.sbdocs`.
+ * Token vars come from `theme-scopes.css` (loaded in the preview iframe).
+ */
+
+.sbdocs.sbdocs-wrapper {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: var(--b-on-surface);
+  background: var(--b-surface);
+}
+
+.sbdocs.sbdocs-content {
+  font-family: inherit;
+}
+
+.sbdocs.sbdocs-h1 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--b-on-surface);
+  margin: 0 0 16px;
+}
+
+.sbdocs.sbdocs-h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--b-on-surface);
+  border-bottom: 1px solid var(--b-surface-separator);
+  padding-bottom: 8px;
+  margin: 32px 0 16px;
+}
+
+/* Dedicated Figma slot — sit this immediately under an h1/h2, not in body copy. */
+.sbdocs-figma {
+  font-size: 14px;
+  line-height: 20px;
+  margin: -8px 0 16px;
+}
+
+.sbdocs .sbdocs-figma a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid var(--b-surface-separator);
+  border-radius: 6px;
+  background: var(--b-surface-hover);
+  color: var(--b-on-surface);
+  text-decoration: none;
+}
+
+.sbdocs .sbdocs-figma a:hover {
+  background: var(--b-surface-subtle);
+  color: var(--b-on-surface);
+  text-decoration: none;
+}
+
+.sbdocs .sbdocs-figma a p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.sbdocs-figma img {
+  height: 16px;
+  display: block;
+}
+
+.sbdocs.sbdocs-h3 {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--b-on-surface);
+  margin: 24px 0 12px;
+}
+
+.sbdocs.sbdocs-p,
+.sbdocs.sbdocs-li {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--b-on-surface);
+}
+
+.sbdocs.sbdocs-a {
+  color: var(--b-text-link-default);
+  text-decoration: none;
+}
+
+.sbdocs.sbdocs-a:hover {
+  color: var(--b-text-link-hover);
+  text-decoration: underline;
+}
+
+.sbdocs :not(pre) > code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--b-on-surface);
+  background: var(--b-surface-hover);
+  border: 1px solid var(--b-surface-separator);
+  border-radius: 4px;
+  padding: 1px 4px;
+}

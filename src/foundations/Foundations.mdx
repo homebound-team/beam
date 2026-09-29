@@ -1,0 +1,37 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Foundations" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Foundations
+
+Foundations are Beam's visual primitives — color and type — not components. Use them through Beam components and `Tokens` / `Css` helpers. Do not pick one-off hex values or invent a parallel type scale.
+
+The full token contract (authoring, naming, contrast) lives in `tokens/README.md`. This page is the visual overview.
+
+## Color
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=12-764">
+    <img src="FigmaLogo.png" alt="" />
+    Color Palette
+  </a>
+</p>
+
+**Color tokens** (`Tokens.Surface`, `Tokens.OnSurface`, `Tokens.Primary`, …) are what product UI should use. They are generated from Figma Variables, map to `--b-*` CSS variables, and swap under contrast (toolbar **Color scheme → Dark**). To export from Figma and regenerate, see `tokens/README.md` (`yarn generate:design-tokens`).
+
+**Primitive palette** (`Gray900`, `Blue600`, …) is the raw ramp those tokens come from. Prefer a color token over a primitive unless you are defining a new token.
+
+See [Primitive Palette](?path=/story/foundations--primitive-palette) and [Color Tokens](?path=/story/foundations--color-tokens).
+
+## Typography
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=17-184">
+    <img src="FigmaLogo.png" alt="" />
+    Typography
+  </a>
+</p>
+
+Beam type is a fixed scale (2XS through 2XL) with regular and semibold where those weights exist. Apply it with Truss helpers (`Css.sm`, `Css.mdSb`, `Css.xl2`, …), not ad-hoc font sizes. Figma labels **MD** as M and **SM** as S — same sizes.
+
+See [Typography](?path=/story/foundations-typography--typography).

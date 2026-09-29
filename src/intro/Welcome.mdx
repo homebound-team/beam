@@ -1,0 +1,48 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Intro" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Welcome to Beam
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=0-1&p=f&m=draw">
+    <img src="FigmaLogo.png" alt="" />
+    BEAM_27_LIBRARY
+  </a>
+</p>
+
+Beam is Homebound's React component library. Use these components and layouts so screens share the same UI, behavior, and visual language.
+
+The package is [`@homebound/beam`](https://www.npmjs.com/package/@homebound/beam).
+
+## Design approach
+
+**Consistency and brevity** over power and flexibility.
+
+Beam is built for Homebound apps, not as a general-purpose toolkit. We keep the API small so a `Button` or `TextField` looks and behaves the same on every page. Fewer props means more consistent UX, easier usage for product apps, and simpler internals.
+
+When a new visual treatment comes up, prefer rolling it out everywhere — or as one named variant — over adding one-off style props.
+
+## Using this Storybook
+
+Use the sidebar search to jump to a component. Stories are grouped as:
+
+- **Foundations** — color and type. Start with the [Foundations](?path=/docs/foundations--docs) overview
+- **Layouts** — complete page and workflow compositions. Start with the [Layouts](?path=/docs/layouts--docs) overview
+- **Inputs** — form fields
+- **Components** — buttons, tables, nav, and the rest of the UI
+- **Forms** — `Bound*` wrappers that plug fields into `@homebound/form-state`
+
+### Docs and stories
+
+Some entries have a **Docs** page (like this one) that explains intended usage. Open a component and use **Canvas** / the story list to see variants. Use **Controls** when they appear to tweak props.
+
+Interactive states (hover, focus) are often driven by a story play function — those stories show the state automatically.
+
+### Toolbar
+
+- **Color scheme** — Light (default) or Dark (contrast). Apps are still light-only; this is for verifying contrast tokens.
+- **Viewport** — resize the preview to check responsive behavior, especially layouts.
+- **Background** — preview on Surface, white, or other backgrounds.
+
+Page structure should use Beam layouts, not ad-hoc wrappers. The full contract is `docs/layouts.md` in the repo (also published with the npm package).

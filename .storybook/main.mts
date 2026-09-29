@@ -2,7 +2,8 @@ import type { StorybookConfig } from "@storybook/react-vite";
 import { mergeConfig } from "vite";
 
 const config: StorybookConfig = {
-  stories: ["../src/**/*.stories.tsx"],
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.tsx"],
+  addons: ["@storybook/addon-docs"],
 
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
   typescript: { check: false },

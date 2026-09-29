@@ -4,16 +4,16 @@ import { BeamProvider } from "src/components/BeamContext";
 import { Css, type Properties } from "src/Css";
 import { documentScrollBodyMinHeight } from "src/layouts/layoutVars";
 import { withRouter as rtlWithRouter } from "src/utils/rtl";
-import type { InitialViewportKeys, MINIMAL_VIEWPORTS } from "storybook/viewport";
+import type { MINIMAL_VIEWPORTS } from "storybook/viewport";
 
-/** Built-in Storybook viewport keys from {@link MINIMAL_VIEWPORTS} and {@link INITIAL_VIEWPORTS}. */
-export type StorybookViewportKey = InitialViewportKeys | keyof typeof MINIMAL_VIEWPORTS;
+/** Storybook viewport keys: `mobile1` (Small mobile), `mobile2` (Large mobile), `tablet`, `desktop`. */
+export type StorybookViewportKey = keyof typeof MINIMAL_VIEWPORTS;
 
 export function withRouter(url?: string, route?: string): Decorator {
   return (Story: () => JSX.Element) => rtlWithRouter(url, route).wrap(<Story />);
 }
 
-/** Return type of {@link viewportModes}; keys must be built-in Storybook viewport names. */
+/** Return type of {@link viewportModes}; keys must be Beam Storybook viewport names. */
 export type ChromaticViewportModes<T extends StorybookViewportKey = StorybookViewportKey> = Record<T, { viewport: T }>;
 
 /** Parameters supported by {@link newStory} and our story conventions. */
@@ -43,8 +43,8 @@ export type StoryOptions<TArgs = Record<string, unknown>> = {
 };
 
 /**
- * Chromatic modes that reference built-in Storybook viewports by key
- * (see [Storybook viewports](https://storybook.js.org/docs/essentials/viewport)).
+ * Chromatic modes that reference Beam Storybook viewports by key
+ * (`mobile1` Small mobile, `mobile2` Large mobile, `tablet`, `desktop`).
  * https://www.chromatic.com/docs/modes/viewports/
  */
 export function viewportModes<const T extends StorybookViewportKey>(...viewports: T[]): ChromaticViewportModes<T> {

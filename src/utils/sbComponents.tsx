@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
+import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import type { GridStyleDef } from "src/components/Table/TableStyles";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import { Css } from "src/Css";
 import {
@@ -136,6 +138,50 @@ function createUser(): NavbarUser {
   };
 }
 
+/** Grey field bars standing in for real inputs in layout stories. */
+export function PlaceholderFields({ count }: { count: number }) {
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      {zeroTo(count).map((i) => (
+        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
+      ))}
+    </div>
+  );
+}
+
+/** `FormSectionLayout` sections shared by the workflow layout stories. */
+export function createFormSections() {
+  return [
+    { title: "Setup", description: "Basic package details.", fields: <PlaceholderFields count={2} /> },
+    { title: "Package Options", fields: <PlaceholderFields count={3} /> },
+    { title: "Internal", excludeJumpLink: true, fields: <PlaceholderFields count={1} /> },
+  ];
+}
+
+/** Comments / History triggers for workflow right-pane stories. */
+export function createRightPaneTriggers() {
+  return [
+    { icon: "comment" as const, label: "Comments", content: <PlaceholderFields count={4} /> },
+    { icon: "history" as const, label: "History", content: <PlaceholderFields count={3} /> },
+  ];
+}
+
+/** Project brand block for the `SideNavLayout` top slot. */
+export function SideNavBrand() {
+  return (
+    <div css={Css.df.fdc.gap1.$}>
+      <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
+        <span css={Css.fs0.$}>
+          <Icon icon="houseFilled" inc={3} />
+        </span>
+        <span css={Css.smSb.$}>Structure</span>
+      </div>
+      <h1 css={Css.lg.$}>1092 Beverly Way - Milam</h1>
+      <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>Altadena, CA 91001</p>
+    </div>
+  );
+}
+
 type GridTableLayoutData = { name: string | undefined; value: number | undefined; status: string; priority: number };
 type GridTableLayoutHeaderRow = { kind: "header"; id: string; data: undefined };
 type GridTableLayoutParentRow = {
@@ -152,11 +198,14 @@ export function GridTableLayoutExample({
   storageKey,
   withRightPane = false,
   numNestedRows = 20,
+  style,
 }: {
   storageKey: string;
   /** When true, row clicks open a document-scroll right pane (desktop overlay / mobile full-bleed). */
   withRightPane?: boolean;
   numNestedRows?: number;
+  /** Forwarded to `GridTable` via `GridTableLayout`. */
+  style?: GridStyleDef;
 }) {
   const filterDefs = useMemo(() => createGridTableLayoutFilterDefs(), []);
   const columns = useMemo(() => createGridTableLayoutColumns(), []);
@@ -176,6 +225,7 @@ export function GridTableLayoutExample({
       as: "virtual" as const,
       columns,
       rows,
+      ...(style ? { style } : {}),
       sorting: { on: "client" as const, initial: [columns[1].id!, "ASC"] as [string, "ASC"] },
       ...(withRightPane
         ? {
@@ -192,7 +242,7 @@ export function GridTableLayoutExample({
           }
         : {}),
     }),
-    [columns, openRightPane, rows, withRightPane],
+    [columns, openRightPane, rows, style, withRightPane],
   );
 
   return (

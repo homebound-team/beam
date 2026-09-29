@@ -1,0 +1,59 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Layouts" name="Routing" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Routing
+
+Route wrappers are pathless layouts in the consuming app's route tree. Which shell a route should use is in [Which layout to use](?path=/docs/layouts--which-layout-to-use). This page is how to register them with React Router data routes.
+
+`PageHeaderLayout`, `StepperLayout`, and `FocusedFormLayout` stay inside the page component. They are not route wrappers.
+
+```tsx
+// AppNavbarLayout.tsx — local wrapper in the consuming app
+export function AppNavbarLayout() {
+  return (
+    <EnvironmentBannerLayout environmentBanner={bannerProps}>
+      <NavbarLayout navbar={navbarProps}>
+        <Outlet />
+      </NavbarLayout>
+    </EnvironmentBannerLayout>
+  );
+}
+
+export function AppSideNavLayout() {
+  return (
+    <SideNavLayout sideNav={sideNavProps}>
+      <Outlet />
+    </SideNavLayout>
+  );
+}
+
+export function AppWorkflowLayout() {
+  return (
+    <EnvironmentBannerLayout environmentBanner={bannerProps}>
+      <Outlet />
+    </EnvironmentBannerLayout>
+  );
+}
+```
+
+```tsx
+// routes.ts
+const routes: RouteObject[] = [
+  {
+    Component: AppNavbarLayout,
+    children: [
+      {
+        Component: AppSideNavLayout,
+        children: [{ path: "projects", Component: ProjectsPage }],
+      },
+    ],
+  },
+  {
+    Component: AppWorkflowLayout,
+    children: [{ path: "create", Component: CreateThingPage }],
+  },
+];
+```
+
+`ProjectsPage` renders `PageHeaderLayout` around its body. `CreateThingPage` renders `StepperLayout` or `FocusedFormLayout`. That page sits under `AppWorkflowLayout`, which has no navbar or side nav.

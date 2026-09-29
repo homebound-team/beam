@@ -11,8 +11,10 @@ export const pageContentGutterPx = 12;
 /** Horizontal inset for page body / page header content: 12px below `md`, 24px at `mdAndUp`. */
 export const pageContentPaddingX = Css.px(smPageContentPaddingXValue).ifMdAndUp.px(pageContentPaddingXValue).$;
 
-/** Marks page-body chrome that pads its own top edge, so a page header does not space it a second time.
- * `PageHeaderLayout` must repeat this literal — Truss `when()` only takes a string literal selector.
+/**
+ * Marks chrome that pads its own top, so `PageHeaderLayout` skips its 24px body padding.
+ * `GridTableLayout` uses it for sticky table actions (a gap outside the pinned bar scrolls away).
+ * `TabContent` uses it and pads the panel. `PageHeaderLayout` repeats this literal for Truss `when()`.
  */
 export const selfTopSpacedAttr = "data-self-top-spaced";
 
