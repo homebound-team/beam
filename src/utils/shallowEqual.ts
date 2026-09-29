@@ -51,7 +51,7 @@ export function shallowEqual(objA: unknown, objB: unknown): boolean {
   return true;
 }
 
-/** Allows ordinary objects (including null-prototype records) to use shallow own-key comparison. */
+/** Accepts object literals and null-prototype records for own-key comparison. */
 function isPlainObject(value: object): boolean {
   const prototype = Object.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
