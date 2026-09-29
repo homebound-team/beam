@@ -38,7 +38,7 @@ describe("SelectCardGroup", () => {
         onChange={() => {}}
       />,
     );
-    expect(r.subject_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+    expect(r.subject_label_0_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("reflects value from the parent without internal state", async () => {

@@ -131,8 +131,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   // drop it rather than render something broken (tables should put the tooltip on the column header).
   const hasVisibleLabel = !!label && labelStyle !== "inline" && labelStyle !== "hidden" && !compound;
   const isInteractive = !inputProps.disabled && !inputProps.readOnly;
-  const tooltipOnLabel = hasVisibleLabel ? tooltip : undefined;
-  const tooltipOnField = !hasVisibleLabel && !isInteractive ? tooltip : undefined;
+  const tooltipLocation = hasVisibleLabel ? "label" : !isInteractive ? "field" : undefined;
   const errorMessageId = `${inputProps.id}-error`;
   const labelSuffix = useLabelSuffix(required, inputProps.readOnly);
   const tid = useTestIds(props, defaultTestId(label));
@@ -282,12 +281,12 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
             label={label}
             inline={labelStyle !== "above"}
             suffix={labelSuffix}
-            tooltip={tooltipOnLabel}
+            tooltip={tooltipLocation === "label" ? tooltip : undefined}
             {...tid.label}
           />
         )}
         {maybeTooltip({
-          title: tooltipOnField,
+          title: tooltipLocation === "field" ? tooltip : undefined,
           placement: "top",
           children: inputProps.readOnly ? (
             <div

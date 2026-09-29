@@ -20,7 +20,7 @@ describe("SelectFieldTest", () => {
         tooltip="What this field is for"
       />,
     );
-    expect(r.age_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+    expect(r.age_label_0_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("can set a value", async () => {

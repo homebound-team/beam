@@ -10,7 +10,7 @@ let lastSet: any = undefined;
 describe("NumberFieldTest", () => {
   it("shows tooltip via an info icon beside the label", async () => {
     const r = await render(<TestNumberField label="Age" value={1} tooltip="What this field is for" />);
-    expect(r.age_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+    expect(r.age_label_0_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("can set a value", async () => {

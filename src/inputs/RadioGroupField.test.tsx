@@ -27,10 +27,7 @@ describe("RadioGroupField", () => {
         options={[{ value: "a", label: "Asiago" }]}
       />,
     );
-    expect(r.favoriteCheese_label.querySelector("[data-testid='tooltip']")).toHaveAttribute(
-      "title",
-      "What this field is for",
-    );
+    expect(r.favoriteCheese_label_0_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("should disable only first option", async () => {

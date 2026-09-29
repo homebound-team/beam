@@ -45,16 +45,16 @@ describe("TextFieldBase", () => {
       <TextFieldBase inputProps={{ disabled: true }} label="Test" labelStyle="hidden" tooltip="Disabled reason" />,
     );
     // Then the tooltip wraps the field itself, so it is still reachable
-    expect(r.test.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Disabled reason");
+    expect(r.tooltip).toHaveAttribute("title", "Disabled reason");
     // And the visually-hidden label does not carry a stranded icon
-    expect(r.test_label.querySelector("[data-testid='tooltip']")).toBeNull();
+    expect(r.query.test_label_0_tooltip).toBeNull();
   });
 
   it("wraps a readOnly field when there is no visible label", async () => {
     const r = await render(
       <TextFieldBase inputProps={{ readOnly: true }} label="Test" labelStyle="hidden" tooltip="Read only reason" />,
     );
-    expect(r.test.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Read only reason");
+    expect(r.tooltip).toHaveAttribute("title", "Read only reason");
   });
 
   it("drops the tooltip on an enabled field with no visible label", async () => {
@@ -62,8 +62,7 @@ describe("TextFieldBase", () => {
     const r = await render(
       <TextFieldBase inputProps={{}} label="Test" labelStyle="hidden" tooltip="What this field is for" />,
     );
-    expect(r.test.closest("[data-testid='tooltip']")).toBeNull();
-    expect(r.test_label.querySelector("[data-testid='tooltip']")).toBeNull();
+    expect(r.query.tooltip).toBeNull();
   });
 
   it("drops the tooltip on an enabled inline-label field", async () => {
@@ -71,14 +70,14 @@ describe("TextFieldBase", () => {
     const r = await render(
       <TextFieldBase inputProps={{}} label="Test" labelStyle="inline" tooltip="What this field is for" />,
     );
-    expect(r.test.closest("[data-testid='tooltip']")).toBeNull();
+    expect(r.query.tooltip).toBeNull();
   });
 
   it("keeps the tooltip on the label icon when the field is disabled", async () => {
     const r = await render(
       <TextFieldBase inputProps={{ disabled: true }} label="Test" tooltip="What this field is for" />,
     );
-    expect(r.test_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+    expect(r.test_label_0_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("handles unfocusedPlaceholder correctly", async () => {

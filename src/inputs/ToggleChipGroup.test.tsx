@@ -26,7 +26,7 @@ describe("ToggleGroupChip", () => {
         data-testid="market"
       />,
     );
-    expect(r.market_label.querySelector("[data-testid='tooltip']")).toHaveAttribute("title", "What this field is for");
+    expect(r.market_label_0_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("supports disabled options with tooltips", async () => {
