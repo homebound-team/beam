@@ -206,7 +206,7 @@ export function Modal(props: ModalProps) {
                 <div ref={modalBannerRef} css={Css.fs0.$} />
                 <main
                   ref={modalBodyRef}
-                  css={Css.fg1.oya.ptPx(12).if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
+                  css={Css.fg1.oya.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
                   {content}
@@ -251,7 +251,7 @@ export function ModalBody({
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
     // If `virtualized`, then we are expecting the `children` will handle their own scrollbar, so have the overflow hidden and adjust padding
-    <div css={Css.h100.if(virtualized).oh.pl3.else.px3.$} {...testId.content}>
+    <div css={Css.h100.ptPx(12).if(virtualized).oh.pl3.else.px3.$} {...testId.content}>
       {children}
     </div>,
     modalBodyDiv,
