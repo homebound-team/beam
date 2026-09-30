@@ -7,7 +7,7 @@ import type {
   SelectedFilterLabelValue,
 } from "src/components/Filters/types";
 import { filterTestIdPrefix, getActiveFilterCount, updateFilter } from "src/components/Filters/utils";
-import { ToggleChip } from "src/components/ToggleChip";
+import { FilterPill } from "src/components/Pills/FilterPill/FilterPill";
 import { Css } from "src/Css";
 import type { Value } from "src/inputs/Value";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
@@ -81,13 +81,20 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
 
   if (!filter || !setFilter) return null;
 
-  const chips = safeEntries(filterImpls).flatMap(([key, f]) => chipsForFilterKey(key, f, filter, setFilter, tid));
+  const pills = getFilterPills(filterImpls, filter);
 
-  if (chips.length === 0) return null;
+  if (pills.length === 0) return null;
 
   return (
     <div css={{ ...Css.df.gap1.aic.mw0.fww.$, ...(withPagePadding ? pageContentPaddingX : undefined) }}>
-      {chips}
+      {pills.map((pill) => (
+        <FilterPill
+          key={pill.key}
+          text={pill.label}
+          onClick={() => setFilter(pill.nextFilter)}
+          {...tid[`pill_${pill.key}`]}
+        />
+      ))}
       <Button label="Clear" variant="tertiary" onClick={() => maybeCall(onClear)} {...tid.clearBtn} />
     </div>
   );
@@ -113,13 +120,26 @@ export function buildFilterImpls<F extends Record<string, unknown>>(filterDefs: 
   return Object.fromEntries(safeEntries(filterDefs).map(([key, fn]) => [key, fn(key as string)])) as FilterImpls<F>;
 }
 
-function chipsForFilterKey<F extends Record<string, unknown>, K extends keyof F>(
+type FilterPillEntry<F> = {
+  key: string;
+  label: string;
+  /** The filter with this value removed. */
+  nextFilter: F;
+};
+
+/** One entry per selected filter value shown as a pill. */
+export function getFilterPills<F extends Record<string, unknown>>(
+  filterImpls: FilterImpls<F>,
+  filter: F,
+): FilterPillEntry<F>[] {
+  return safeEntries(filterImpls).flatMap(([key, f]) => filterPillsForKey(key, f, filter));
+}
+
+function filterPillsForKey<F extends Record<string, unknown>, K extends keyof F>(
   key: K,
   f: FilterImpls<F>[K],
   filter: F,
-  onChange: (filter: F) => void,
-  testId: ReturnType<typeof useTestIds>,
-) {
+): FilterPillEntry<F>[] {
   const value = filter[key];
   if (!isDefined(value)) return [];
 
@@ -127,29 +147,18 @@ function chipsForFilterKey<F extends Record<string, unknown>, K extends keyof F>
     return value.flatMap((item) => {
       const label = f.formatSelectedFilterLabel(item as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
       if (!isDefined(label)) return [];
-
-      const chipKey = `${String(key)}_${item}`;
       const newArray = value.filter((v) => v !== item);
-      return (
-        <ToggleChip
-          key={chipKey}
-          text={label}
-          onClick={() => onChange(updateFilter(filter, key, newArray.length > 0 ? (newArray as F[K]) : undefined))}
-          {...testId[`chip_${chipKey}`]}
-        />
-      );
+      return [
+        {
+          key: `${String(key)}_${item}`,
+          label,
+          nextFilter: updateFilter(filter, key, newArray.length > 0 ? (newArray as F[K]) : undefined),
+        },
+      ];
     });
   }
 
   const label = f.formatSelectedFilterLabel(value as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
   if (!isDefined(label)) return [];
-
-  return (
-    <ToggleChip
-      key={String(key)}
-      text={label}
-      onClick={() => onChange(updateFilter(filter, key, undefined))}
-      {...testId[`chip_${String(key)}`]}
-    />
-  );
+  return [{ key: String(key), label, nextFilter: updateFilter(filter, key, undefined) }];
 }

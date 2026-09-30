@@ -37,16 +37,16 @@ describe("GridTableLayoutActions", () => {
   });
 
   describe("filters", () => {
-    it("renders a single filter inline on desktop without a Filter button or panel chips", async () => {
+    it("renders a single filter inline on desktop without a Filter button or panel pills", async () => {
       // Given a single filter and no groupBy on desktop
       const r = await render(
         <GridTableLayoutActions filterDefs={createSingleFilterDefs()} filter={{}} setFilter={vi.fn()} />,
         withRouter(),
       );
-      // Then the filter control is inline and the toggle / chips are not shown
+      // Then the filter control is inline and the toggle / pills are not shown
       expect(r.filter_needsRevision).toBeInTheDocument();
       expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
-      expect(r.query.filter_chip_needsRevision).toBeNull();
+      expect(r.query.filter_pill_needsRevision).toBeNull();
       expect(r.query.filter_clearBtn).toBeNull();
     });
 
@@ -114,18 +114,35 @@ describe("GridTableLayoutActions", () => {
         return <GridTableLayoutActions filterDefs={createMultiFilterDefs()} filter={filter} setFilter={setFilter} />;
       }
       const r = await render(<Wrapper />, withRouter());
-      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      expect(r.filter_pill_needsRevision).toBeInTheDocument();
 
       // When the filter button is clicked
       click(r.gridTableLayoutActions_filterButton);
-      // Then the panel opens and chips are hidden
-      expect(r.query.filter_chip_needsRevision).toBeNull();
+      // Then the panel opens and pills are hidden
+      expect(r.query.filter_pill_needsRevision).toBeNull();
       expect(r.filter_needsRevision).toBeInTheDocument();
 
       // When the filter button is clicked again
       click(r.gridTableLayoutActions_filterButton);
-      // Then the panel closes and chips reappear
-      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      // Then the panel closes and pills reappear
+      expect(r.filter_pill_needsRevision).toBeInTheDocument();
+    });
+
+    it("counts each selected value in the Filter button badge, matching the pills", async () => {
+      // Given a checkbox filter and a multi filter with two values selected
+      const r = await render(
+        <GridTableLayoutActions
+          filterDefs={createMultiFilterDefs()}
+          filter={{ needsRevision: true, status: ["active", "inactive"] }}
+          setFilter={vi.fn()}
+        />,
+        withRouter(),
+      );
+      // Then the badge shows 3, one per pill
+      expect(r.filter_pill_needsRevision).toBeInTheDocument();
+      expect(r.filter_pill_status_active).toBeInTheDocument();
+      expect(r.filter_pill_status_inactive).toBeInTheDocument();
+      expect(r.countBadge).toHaveTextContent("3");
     });
 
     it("calls clearFilters when Clear is clicked in an open panel", async () => {
@@ -161,12 +178,12 @@ describe("GridTableLayoutActions", () => {
       // Then the small-screen toggle is shown and the control is not inline in the toolbar
       expect(r.gridTableLayoutActions_filterSmallButton).toBeInTheDocument();
       expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
-      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      expect(r.filter_pill_needsRevision).toBeInTheDocument();
 
       // When the filter icon is clicked
       click(r.gridTableLayoutActions_filterSmallButton);
       // Then the panel opens with the filter control
-      expect(r.query.filter_chip_needsRevision).toBeNull();
+      expect(r.query.filter_pill_needsRevision).toBeNull();
       expect(r.filter_needsRevision).toBeInTheDocument();
     });
   });

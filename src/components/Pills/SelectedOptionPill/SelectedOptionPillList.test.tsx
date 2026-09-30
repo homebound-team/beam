@@ -1,4 +1,4 @@
-import { SelectedOptionPillList } from "src/forms/SelectedOptionPillList";
+import { SelectedOptionPillList } from "src/components/Pills/SelectedOptionPill/SelectedOptionPillList";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 

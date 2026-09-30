@@ -61,7 +61,7 @@ describe("DateRangeFilter", () => {
       value: { from: undefined, to: undefined },
     });
 
-    // Then no chip label is produced
+    // Then no pill label is produced
     expect(label).toBeUndefined();
   });
 });

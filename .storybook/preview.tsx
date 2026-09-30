@@ -49,6 +49,7 @@ const preview: Preview = {
           ["Docs", "Primitive Palette", "Color Tokens", "Typography"],
           "Inputs",
           "Components",
+          ["Pills", ["Docs", "Filter Pill", "Selected Option Pill"]],
           "Forms",
         ],
       },

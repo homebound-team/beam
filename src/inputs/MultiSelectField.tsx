@@ -1,6 +1,6 @@
 import { useMemo, type JSX, type ReactNode } from "react";
+import { SelectedOptionPillList } from "src/components/Pills/SelectedOptionPill/SelectedOptionPillList";
 import { Css } from "src/Css";
-import { SelectedOptionPillList } from "src/forms/SelectedOptionPillList";
 import { ComboBoxBase, initializeOptions, type ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
 import type { Value } from "src/inputs/Value";
 import type { HasIdAndName, Optional } from "src/types";
