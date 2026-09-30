@@ -17,6 +17,7 @@ import { collapseColumn, column, numericColumn, selectColumn } from "src/compone
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
+import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
 import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
@@ -304,6 +305,40 @@ export function EmptyState() {
           columns,
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function EmptyStateWithIllustration() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-empty-state-illustration",
+    },
+    search: "client",
+  });
+
+  useEffect(() => {
+    layoutState.setSearchString("no-match");
+    // Start filtered so the illustration shows with the filter description and Clear Filters action
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Documents" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader, ...makeNestedRows(3)],
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          emptyState: { title: "No documents found", illustration: <DocumentUploadIllustration /> },
         }}
       />
     </TestProjectLayout>

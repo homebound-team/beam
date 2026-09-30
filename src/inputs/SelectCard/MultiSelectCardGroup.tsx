@@ -18,6 +18,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
   const { fieldProps } = usePresentationContext();
   const {
     label,
+    tooltip,
     labelStyle = fieldProps?.labelStyle ?? "above",
     values,
     options,
@@ -61,6 +62,7 @@ export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGrou
   return (
     <LabeledGroupField
       label={label}
+      tooltip={tooltip}
       labelStyle={labelStyle}
       labelProps={labelProps}
       groupProps={groupProps}

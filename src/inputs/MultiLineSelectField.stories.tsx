@@ -65,3 +65,20 @@ export function MultiLineSelectFields() {
     </div>
   );
 }
+
+/** `tooltip` renders an info icon beside the field's label. */
+export function LabelTooltip() {
+  return (
+    <FormLines>
+      <MultiLineSelectField
+        label="Shapes"
+        tooltip="What this field is for"
+        values={[]}
+        options={options}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => o.id}
+        onSelect={() => {}}
+      />
+    </FormLines>
+  );
+}

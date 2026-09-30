@@ -1,7 +1,5 @@
-/**
- * An inlined version of shallowEach, see https://github.com/facebook/react/issues/16919
- */
-export function shallowEqual(objA: any, objB: any): boolean {
+/** Compares own values of arrays and plain objects, and members of Maps and Sets. */
+export function shallowEqual(objA: unknown, objB: unknown): boolean {
   if (Object.is(objA, objB)) {
     return true;
   }
@@ -9,6 +7,28 @@ export function shallowEqual(objA: any, objB: any): boolean {
   if (typeof objA !== "object" || objA === null || typeof objB !== "object" || objB === null) {
     return false;
   }
+
+  if (objA instanceof Map || objB instanceof Map) {
+    if (!(objA instanceof Map && objB instanceof Map) || objA.size !== objB.size) return false;
+
+    for (const [key, value] of objA) {
+      if (!objB.has(key) || !Object.is(value, objB.get(key))) return false;
+    }
+    return true;
+  }
+
+  if (objA instanceof Set || objB instanceof Set) {
+    if (!(objA instanceof Set && objB instanceof Set) || objA.size !== objB.size) return false;
+
+    for (const value of objA) {
+      if (!objB.has(value)) return false;
+    }
+    return true;
+  }
+
+  // Other objects can hide their state outside enumerable keys (e.g. Date).
+  if (Array.isArray(objA) !== Array.isArray(objB)) return false;
+  if (!Array.isArray(objA) && (!isPlainObject(objA) || !isPlainObject(objB))) return false;
 
   const keysA = Object.keys(objA);
   const keysB = Object.keys(objB);
@@ -20,10 +40,19 @@ export function shallowEqual(objA: any, objB: any): boolean {
   // Test for A's keys different from B.
   for (let i = 0; i < keysA.length; i++) {
     const currentKey = keysA[i];
-    if (!objB.hasOwnProperty(currentKey) || !Object.is(objA[currentKey], objB[currentKey])) {
+    if (
+      !Object.prototype.hasOwnProperty.call(objB, currentKey) ||
+      !Object.is((objA as Record<string, unknown>)[currentKey], (objB as Record<string, unknown>)[currentKey])
+    ) {
       return false;
     }
   }
 
   return true;
+}
+
+/** Accepts object literals and null-prototype records for own-key comparison. */
+function isPlainObject(value: object): boolean {
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }

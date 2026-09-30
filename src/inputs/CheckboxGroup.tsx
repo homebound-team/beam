@@ -20,6 +20,8 @@ export type CheckboxGroupItemOption = {
 
 export type CheckboxGroupProps = {
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   required?: boolean;
   /** Called when a checkbox is selected or deselected */
   onChange: (values: string[]) => void;
@@ -42,6 +44,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   const {
     options,
     label,
+    tooltip,
     labelStyle = fieldProps?.labelStyle ?? "above",
     values,
     errorMsg,
@@ -60,6 +63,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   return (
     <LabeledGroupField
       label={label}
+      tooltip={tooltip}
       labelStyle={labelStyle}
       labelProps={labelProps}
       groupProps={groupProps}

@@ -44,6 +44,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
     onEnter,
     onEscapeBubble,
     hideErrorMessage,
+    tooltip,
     ...otherProps
   } = props;
 
@@ -91,7 +92,7 @@ export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps
       labelProps={labelProps}
       inputProps={inputProps}
       inputRef={inputRef}
-      tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      tooltip={resolveTooltip(disabled, tooltip, readOnly)}
       hideErrorMessage={hideErrorMessage}
       {...proposalProps}
     />

@@ -61,6 +61,7 @@
   --b-neutral-surface-pressed: rgba(255, 255, 255, 1);
   --b-on-primary: rgba(255, 255, 255, 1);
   --b-on-surface: rgba(36, 36, 36, 1);
+  --b-on-surface-active: rgba(37, 99, 235, 1);
   --b-on-surface-disabled: rgba(201, 201, 201, 1);
   --b-on-surface-muted: rgba(100, 100, 100, 1);
   --b-on-surface-raised-hover: rgba(36, 36, 36, 1);
@@ -72,6 +73,8 @@
   --b-selection-fill: rgba(219, 234, 254, 1);
   --b-selection-indicator: rgba(29, 78, 216, 1);
   --b-surface: rgba(255, 255, 255, 1);
+  --b-surface-active: rgba(219, 234, 254, 1);
+  --b-surface-active-hover: rgba(191, 219, 254, 1);
   --b-surface-disabled: rgba(255, 255, 255, 1);
   --b-surface-hover: rgba(247, 245, 245, 1);
   --b-surface-raised: rgba(255, 255, 255, 1);
@@ -146,6 +149,7 @@
   --b-neutral-surface-pressed: rgba(100, 100, 100, 1);
   --b-on-primary: rgba(255, 255, 255, 1);
   --b-on-surface: rgba(255, 255, 255, 1);
+  --b-on-surface-active: rgba(37, 99, 235, 1);
   --b-on-surface-disabled: rgba(247, 245, 245, 1);
   --b-on-surface-muted: rgba(175, 175, 175, 1);
   --b-on-surface-raised-hover: rgba(221, 220, 220, 1);
@@ -157,6 +161,8 @@
   --b-selection-fill: rgba(100, 100, 100, 1);
   --b-selection-indicator: rgba(255, 255, 255, 1);
   --b-surface: rgba(36, 36, 36, 1);
+  --b-surface-active: rgba(219, 234, 254, 1);
+  --b-surface-active-hover: rgba(191, 219, 254, 1);
   --b-surface-disabled: rgba(141, 141, 141, 1);
   --b-surface-hover: rgba(53, 53, 53, 1);
   --b-surface-raised: rgba(53, 53, 53, 1);

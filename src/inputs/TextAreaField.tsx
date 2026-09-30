@@ -30,6 +30,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
     preventNewLines,
     onEnter,
     maxLines,
+    tooltip,
     ...otherProps
   } = props;
   const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
@@ -75,7 +76,7 @@ export function TextAreaField<X extends Only<TextFieldXss, X>>(props: TextAreaFi
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       textAreaMinHeight={preventNewLines ? 0 : undefined}
-      tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      tooltip={resolveTooltip(disabled, tooltip, readOnly)}
       {...proposalProps}
     />
   );

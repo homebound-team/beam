@@ -101,8 +101,10 @@ export function CheckboxBase(props: CheckboxBaseProps) {
 const baseStyles = Css.hPx(16).mw(px(16)).relative.ba.bc(Tokens.FieldBorderDefault).br4.bgColor(Tokens.Surface)
   .transition.$;
 const filledBoxStyles = Css.bc(Tokens.ChoiceSelected).bgColor(Tokens.ChoiceSelected).$;
-// Blue900 hover has no semantic token — keep palette.
+// Blue900 hover has no semantic token — keep palette. Selected only; indeterminate uses SurfaceActiveHover.
 const filledBoxHoverStyles = Css.bgBlue900.$;
+const indeterminateBoxStyles = Css.bc(Tokens.SurfaceActive).bgColor(Tokens.SurfaceActive).$;
+const indeterminateHoverStyles = Css.bc(Tokens.SurfaceActiveHover).bgColor(Tokens.SurfaceActiveHover).$;
 const disabledBoxStyles = Css.bgColor(Tokens.FieldBgDisabled).bc(Tokens.FieldBgDisabled).$;
 const disabledSelectedBoxStyles = Css.bgColor(Tokens.ChoiceDisabled).bc(Tokens.ChoiceDisabled).$;
 const disabledColor = Css.color(Tokens.FieldBorderDefault).$;
@@ -122,19 +124,28 @@ type StyledCheckboxProps = {
 export function StyledCheckbox(props: StyledCheckboxProps) {
   const { isDisabled = false, isIndeterminate = false, isSelected, isFocusVisible } = props;
   const { hoverProps, isHovered } = useHover({ isDisabled });
-  const markIcon = isIndeterminate ? dashSmall : isSelected ? checkmarkSmall : "";
+  const showSelected = Boolean(isSelected) && !isDisabled;
+  const showIndeterminate = isIndeterminate && !isDisabled;
+  const markIcon = isIndeterminate
+    ? dashMark(isDisabled ? Tokens.OnPrimary : Tokens.OnSurfaceActive)
+    : isSelected
+      ? checkmarkSmall
+      : "";
   const tid = useTestIds(props);
   return (
     <span
       {...hoverProps}
       css={{
         ...baseStyles,
-        ...(((isSelected && !isDisabled) || isIndeterminate) && filledBoxStyles),
-        ...(((isSelected && !isDisabled) || isIndeterminate) && isHovered && filledBoxHoverStyles),
+        ...(showSelected && filledBoxStyles),
+        ...(showIndeterminate && indeterminateBoxStyles),
+        ...(showSelected && isHovered && filledBoxHoverStyles),
+        ...(showIndeterminate && isHovered && indeterminateHoverStyles),
         ...(isDisabled && disabledBoxStyles),
         ...(isDisabled && isSelected && disabledSelectedBoxStyles),
         ...(isFocusVisible && focusRingStyles),
-        ...(isHovered && hoverBorderStyles),
+        // Selected and empty boxes still use the palette hover border. Indeterminate hover sets its own.
+        ...(isHovered && !showIndeterminate && hoverBorderStyles),
       }}
       aria-hidden="true"
       data-checked={isSelected ? true : isIndeterminate ? "mixed" : false}
@@ -154,8 +165,10 @@ const checkmarkSmall = (
   </svg>
 );
 
-const dashSmall = (
-  <svg width="16" height="16" css={markSvgStyles}>
-    <rect x="4" y="7.5" width="8" height="1.35" fill={`var(${Tokens.OnPrimary})`} />
-  </svg>
-);
+function dashMark(fillToken: Tokens) {
+  return (
+    <svg width="16" height="16" css={markSvgStyles}>
+      <rect x="4" y="7.5" width="8" height="1.35" fill={`var(${fillToken})`} />
+    </svg>
+  );
+}

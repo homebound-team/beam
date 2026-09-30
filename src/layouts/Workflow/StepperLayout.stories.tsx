@@ -2,17 +2,23 @@ import type { Meta } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { AiLoadingPanel } from "src/components/AiLoadingPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
-import { Css, Tokens } from "src/Css";
+import { Css } from "src/Css";
 import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
+import { StepperLayout } from "src/layouts/Workflow/StepperLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
-import { GridTableLayoutExample } from "src/utils/sbComponents";
+import {
+  createFormSections,
+  createRightPaneTriggers,
+  GridTableLayoutExample,
+  PlaceholderFields,
+} from "src/utils/sbComponents";
 import { action } from "storybook/actions";
-import { StepperLayout } from "./StepperLayout";
 
 export default {
+  title: "Layouts/Workflows/Stepper",
   component: StepperLayout,
   decorators: [withBeamDecorator, withRouter()],
   parameters: {
@@ -21,31 +27,32 @@ export default {
   },
 } satisfies Meta;
 
-/** Real form-state steps in {@link FormSectionLayout}, under an environment banner. */
-export function WithFormSectionLayout() {
+/** Interactive form-state steps in `FormSectionLayout`, under an environment banner. */
+export function WithFormSections() {
   return (
-    <WithEnvironmentBanner>
+    <WorkflowChrome>
       <StepperLayoutFormApp />
-    </WithEnvironmentBanner>
+    </WorkflowChrome>
   );
 }
 
-/** Same form as {@link WithFormSectionLayout}, with `aiMode` on the workflow and form layout. */
+/** Same interactive steps with `aiMode` on the workflow and each form body. */
 export function AiMode() {
   return (
-    <WithEnvironmentBanner>
+    <WorkflowChrome>
       <StepperLayoutFormApp aiMode />
-    </WithEnvironmentBanner>
+    </WorkflowChrome>
   );
 }
+AiMode.storyName = "AI Mode";
 
-/** Loading step: {@link AiLoadingPanel} with `omitBg` on an `aiMode` {@link StepperLayout}. */
+/** Loading step: `AiLoadingPanel` with `omitBg` on an `aiMode` stepper. */
 export function WithAiLoadingPanel() {
   return (
-    <WithEnvironmentBanner>
+    <WorkflowChrome>
       <StepperLayout
-        title="Import Materials"
         aiMode
+        title="Import Materials"
         defaultStep="importing"
         onCancel={action("cancel clicked")}
         completeLabel="Save"
@@ -58,7 +65,7 @@ export function WithAiLoadingPanel() {
                 aiMode
                 title="Import Details"
                 description="Connect a source and we'll pull in the details."
-                sections={[{ title: "Source", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+                sections={[{ title: "Source", fields: <PlaceholderFields count={2} /> }]}
               />
             ),
           },
@@ -73,14 +80,15 @@ export function WithAiLoadingPanel() {
           },
         ]}
       />
-    </WithEnvironmentBanner>
+    </WorkflowChrome>
   );
 }
+WithAiLoadingPanel.storyName = "With AI Loading Panel";
 
-/** A table step: {@link ContentHeader} above `GridTableLayout`; row click opens a document-scroll right pane. */
-export function WithContentHeaderAndTable() {
+/** Table step: `ContentHeader` above `GridTableLayout`; row click opens the document-scroll pane. */
+export function WithTable() {
   return (
-    <WithEnvironmentBanner>
+    <WorkflowChrome>
       <StepperLayout
         title="Trade Partners"
         onCancel={action("cancel clicked")}
@@ -96,20 +104,20 @@ export function WithContentHeaderAndTable() {
                   description="Assign and manage trade partners for this project."
                   actions={[{ label: "Add", onClick: action("add clicked") }]}
                 />
-                <GridTableLayoutExample storageKey="stepper-layout-grid-table" withRightPane />
+                <GridTableLayoutExample storageKey="layouts-stepper-table" withRightPane />
               </div>
             ),
           },
         ]}
       />
-    </WithEnvironmentBanner>
+    </WorkflowChrome>
   );
 }
 
-/** Per-step Comments / History triggers — do not also set `withRightPane` on the step body. */
+/** Per-step Comments / History triggers — the pane closes when the step changes. */
 export function WithRightPaneTriggers() {
   return (
-    <WithEnvironmentBanner>
+    <WorkflowChrome>
       <StepperLayout
         title="Create Design Package"
         onCancel={action("cancel clicked")}
@@ -124,14 +132,7 @@ export function WithRightPaneTriggers() {
                 withJumpLinks
                 title="Link Design Package"
                 description="Connect this package to a market and give it a name."
-                sections={[
-                  {
-                    title: "Setup",
-                    description: "Basic package details.",
-                    fields: <JumpLinkPlaceholderFields count={2} />,
-                  },
-                  { title: "Package Options", fields: <JumpLinkPlaceholderFields count={3} /> },
-                ]}
+                sections={createFormSections()}
               />
             ),
           },
@@ -141,82 +142,16 @@ export function WithRightPaneTriggers() {
               <FormSectionLayout
                 title="Review"
                 description="Confirm before creating."
-                sections={[{ title: "Summary", fields: <JumpLinkPlaceholderFields count={2} /> }]}
+                sections={[{ title: "Summary", fields: <PlaceholderFields count={2} /> }]}
               />
             ),
           },
         ]}
       />
-    </WithEnvironmentBanner>
+    </WorkflowChrome>
   );
 }
 
-/** Form step with JumpLinks on {@link FormSectionLayout} — Stepper itself does not own the rail. */
-export function WithJumpLinks() {
-  return (
-    <WithEnvironmentBanner>
-      <StepperLayout
-        title="Create Design Package"
-        onCancel={action("cancel clicked")}
-        completeLabel="Create"
-        onComplete={action("complete clicked")}
-        steps={[
-          {
-            label: "Details",
-            content: (
-              <FormSectionLayout
-                withJumpLinks
-                title="Link Design Package"
-                description="Connect this package to a market and give it a name."
-                sections={[
-                  {
-                    title: "Setup",
-                    description: "Basic package details.",
-                    fields: <JumpLinkPlaceholderFields count={2} />,
-                  },
-                  { title: "Package Options", fields: <JumpLinkPlaceholderFields count={3} /> },
-                  {
-                    title: "Internal",
-                    excludeJumpLink: true,
-                    fields: <JumpLinkPlaceholderFields count={1} />,
-                  },
-                ]}
-              />
-            ),
-          },
-          {
-            label: "Review",
-            content: (
-              <FormSectionLayout
-                title="Review"
-                description="Confirm before creating."
-                sections={[{ title: "Summary", fields: <JumpLinkPlaceholderFields count={2} /> }]}
-              />
-            ),
-          },
-        ]}
-      />
-    </WithEnvironmentBanner>
-  );
-}
-
-function WithEnvironmentBanner({ children }: { children: ReactNode }) {
+function WorkflowChrome({ children }: { children: ReactNode }) {
   return <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>{children}</EnvironmentBannerLayout>;
-}
-
-function createRightPaneTriggers() {
-  return [
-    { icon: "comment" as const, label: "Comments", content: <JumpLinkPlaceholderFields count={4} /> },
-    { icon: "history" as const, label: "History", content: <JumpLinkPlaceholderFields count={3} /> },
-  ];
-}
-
-function JumpLinkPlaceholderFields({ count }: { count: number }) {
-  return (
-    <div css={Css.df.fdc.gap1.$}>
-      {Array.from({ length: count }, (_, i) => (
-        <div key={i} css={Css.hPx(36).br4.bgColor(Tokens.SurfaceSeparator).$} />
-      ))}
-    </div>
-  );
 }

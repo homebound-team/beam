@@ -1,0 +1,58 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Layouts" name="Which layout to use" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Which layout to use
+
+Beam page layouts are the structural shells for app screens. Compose them instead of recreating navbar, side nav, or page-header regions with ad-hoc wrappers.
+
+The full contract — nesting rules, props, and scroll coordination — lives in `docs/layouts.md`. This page is how to decide which layout goes where. Registering those shells in the route tree is [Routing](?path=/docs/layouts--routing).
+
+## Two jobs
+
+**Route wrappers** are predefined shells in the route tree. They already exist for a route. A page does not rebuild them.
+
+**Page layouts** are what you choose inside the page component.
+
+### Route wrappers
+
+These are pathless route components in the consuming app. Each one resolves app props (environment, current user, nav items) and renders a Beam layout around `<Outlet />`.
+
+Every route starts with `EnvironmentBannerLayout`. Pass `environmentBanner` when the banner should show; omit it when hidden.
+
+**Does this route show global navigation?**
+
+- **Yes.** Nest `NavbarLayout` under the banner. When the section has its own rail, nest `SideNavLayout` under the navbar.
+- **No — this is a workflow.** The wrapper is only `EnvironmentBannerLayout`. Leave `NavbarLayout` and `SideNavLayout` off so the user stays on the workflow.
+
+### Page layouts
+
+Render these in the page, as the outlet's content. They are not another route wrapper.
+
+**Are you building a workflow page?**
+
+- **It has multiple steps.** Use `StepperLayout`.
+- **It is one page.** Use `FocusedFormLayout`.
+- **It is not a workflow.** Use `PageHeaderLayout` for the title, tabs, and actions. **Table Page** includes a tabs variant.
+
+**What is the page body?**
+
+Put one of these in `children` (a step's `content` on `StepperLayout`). They set the body's width. They are not chrome.
+
+- `FormSectionLayout` — form sections, with optional jump links or a right pane. It already wraps `CenteredLayout` at `sm`.
+- `GridTableLayout` — a table, with an optional right pane.
+- `CenteredLayout` — a centered width shell (`sm` or `lg`) when the body is not a form section or a table. **Overview Page** is the `lg` (1440px) mixed-content example.
+
+## Nesting
+
+The decisions above produce two trees.
+
+**App pages** (global nav on):
+
+`EnvironmentBannerLayout` → `NavbarLayout` → `SideNavLayout` (when the section has a rail) → `PageHeaderLayout` → body
+
+**Workflow pages** (global nav off):
+
+`EnvironmentBannerLayout` → `StepperLayout` or `FocusedFormLayout` → body
+
+Every story in this section is a complete composition. Use them to compare app pages, workflow pages, and variants such as AI mode or right-pane triggers. Navbar, SideNav, and PageHeader are also documented as components.

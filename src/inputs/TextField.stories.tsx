@@ -121,6 +121,53 @@ export function TextFieldReadOnly() {
   );
 }
 
+/**
+ * A field has exactly one tooltip, and a disabled/readOnly reason takes the slot over the caller's
+ * `tooltip`. It lives on the label's info icon when there is a visible label; with no visible label
+ * it wraps the field, but only while the field is non-interactive — over an enabled input a tooltip
+ * misbehaves, so it is dropped (a table should put the tooltip on its column header instead).
+ */
+export function FieldTooltips() {
+  return (
+    <div css={Css.df.fdc.gap5.$}>
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>On the label's info icon</h1>
+        <FormLines width="md">
+          <TestTextField label="Name" value="Brandon" tooltip="The name shown to clients." />
+          <TestTextField label="Name (left label)" value="Brandon" labelStyle="left" tooltip="Also on the icon." />
+          <TestTextField label="Name (disabled)" value="Brandon" disabled="Why it is disabled" />
+          <TestTextField label="Name (read only)" value="Brandon" readOnly="Why it is read only" />
+          <TestTextField
+            label="Name (disabled wins)"
+            value="Brandon"
+            disabled="Why it is disabled"
+            tooltip="This one is not shown — there is only ever one tooltip."
+          />
+        </FormLines>
+      </div>
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>Wrapping the field: no visible label, and not editable</h1>
+        <FormLines width="md">
+          <TestTextField label="Hidden" labelStyle="hidden" value="Brandon" disabled="Why it is disabled" />
+          <TestTextField label="Hidden" labelStyle="hidden" value="Brandon" readOnly="Why it is read only" />
+        </FormLines>
+      </div>
+      <div css={Css.df.fdc.gap2.$}>
+        <h1 css={Css.lg.$}>Dropped: no visible label, but still editable</h1>
+        <FormLines width="md">
+          <TestTextField
+            label="hidden label"
+            labelStyle="hidden"
+            value="Tooltip, no header"
+            tooltip="You can't see this!"
+          />
+          <TestTextField label="Inline" labelStyle="inline" value="Brandon" tooltip="Inline labels have no icon." />
+        </FormLines>
+      </div>
+    </div>
+  );
+}
+
 function TestTextField<X extends Only<TextFieldXss, X>>(props: Omit<TextFieldProps<X>, "onChange">) {
   const { value, ...otherProps } = props;
   const [internalValue, setValue] = useState(value);

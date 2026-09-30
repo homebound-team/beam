@@ -14,6 +14,8 @@ export type NumberFieldType = "cents" | "dollars" | "percent" | "basisPoints" | 
 // exported for testing purposes
 export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelStyle" | "fullWidth"> {
   label: string;
+  /** Adds tooltip for the field, shown via an info icon beside the label. */
+  tooltip?: ReactNode;
   /** If set, the label will be defined as 'aria-label` on the input element */
   type?: NumberFieldType;
   value: number | undefined;
@@ -67,6 +69,7 @@ export function NumberField(props: NumberFieldProps) {
     readOnly,
     type,
     label,
+    tooltip,
     onBlur,
     onFocus,
     errorMsg,
@@ -245,7 +248,7 @@ export function NumberField(props: NumberFieldProps) {
       onFocus={onFocus}
       errorMsg={errorMsg}
       helperText={helperText}
-      tooltip={resolveTooltip(disabled, undefined, readOnly)}
+      tooltip={resolveTooltip(disabled, tooltip, readOnly)}
       {...proposalProps}
       {...otherProps}
     />
