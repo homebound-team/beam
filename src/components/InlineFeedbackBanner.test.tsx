@@ -1,4 +1,5 @@
 import { InlineFeedbackBanner } from "src";
+import { Palette } from "src/Css";
 import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
 
@@ -28,6 +29,15 @@ describe("InlineFeedbackBanner", () => {
   it("falls back to the type as the tag's accessible label", async () => {
     const r = await render(<InlineFeedbackBanner type="warning" description="Used as a requirement." />);
     expect(r.inlineFeedbackBanner_tag).toHaveTextContent("Warning");
+  });
+
+  it("passes tagVariant through to its tag", async () => {
+    // Given a warning banner with a bold tag
+    const r = await render(
+      <InlineFeedbackBanner type="warning" tagVariant="bold" description="Used as a requirement." />,
+    );
+    // Then the tag takes the bold warning fill
+    expect(r.inlineFeedbackBanner_tag).toHaveStyle({ backgroundColor: Palette.Orange600 });
   });
 
   it("fires each action", async () => {

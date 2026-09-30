@@ -7,14 +7,14 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type TagXss = Margin | "backgroundColor" | "color";
 export type TagType = "info" | "update" | "warning" | "error" | "success" | "neutral" | "ai" | "strikethrough";
-export type TagVariant = "primary" | "secondary";
+export type TagVariant = "primary" | "secondary" | "bold";
 
 type TagPropsBase<X> = {
   /** Required even if using `iconOnly + preventTooltip`. In those cases an accessibility friendly message is expected */
   text: ReactNode;
   // Defaults to "neutral".
   type?: TagType;
-  /** Defaults to "primary". Secondary is intended for use in TagGroup. */
+  /** Defaults to "primary". Secondary is intended for use in TagGroup. Bold is a darker fill with white text. */
   variant?: TagVariant;
   xss?: X;
   /** A tooltip will automatically be displayed if the text is truncated. Set to true to prevent this behavior.
@@ -99,11 +99,40 @@ function getVariantStyles(variant: TagVariant, type?: TagType): TagVariantStyles
     };
   }
 
+  if (variant === "bold") {
+    return {
+      background: { ...getBoldBackground(type), ...Css.white.$ },
+      iconColor: Palette.White,
+      typography: Css.xs2Sb.ttu.$,
+      padding: Css.pxPx(6).$,
+    };
+  }
+
   return {
     ...getPrimaryStyles(type),
     typography: Css.xs2Sb.ttu.$,
     padding: Css.pxPx(6).$,
   };
+}
+
+function getBoldBackground(type?: TagType): Properties {
+  switch (type) {
+    case "info":
+      return Css.bgBlue600.$;
+    case "update":
+      return Css.bgYellow600.$;
+    case "warning":
+      return Css.bgOrange600.$;
+    case "error":
+      return Css.bgRed600.$;
+    case "success":
+      return Css.bgGreen600.$;
+    case "ai":
+      return Css.bgPurple600.$;
+    default:
+      // Neutral case
+      return Css.bgGray600.$;
+  }
 }
 
 function getPrimaryStyles(type?: TagType): Pick<TagVariantStyles, "background" | "iconColor"> {

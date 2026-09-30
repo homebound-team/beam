@@ -2,14 +2,15 @@ import type { ReactNode } from "react";
 import type { CardTag } from "src/components/Card";
 import type { IconKey } from "src/components/Icon";
 import type { ProposedValueProps } from "src/components/ProposedValue";
-import type { TagType } from "src/components/Tag";
+import type { TagType, TagVariant } from "src/components/Tag";
 
 type CardSlotBase<K extends string> = { kind: K };
 
-/** Tag props for badge slots — mirrors Tag (type, icon, iconOnly) with string-only text. */
+/** Tag props for badge slots — mirrors Tag (type, variant, icon, iconOnly) with string-only text. */
 export type CardBadgeTag = {
   text: string;
   type?: TagType;
+  variant?: TagVariant;
 } & ({ iconOnly?: false; icon?: IconKey } | { iconOnly: true; icon: IconKey });
 
 /** `text` is either plain, or a `ProposedValueProps` the card renders via `ProposedValue`. */

@@ -4,7 +4,7 @@ import { Button } from "src/components/Button";
 import { ButtonMenu, type ButtonMenuProps } from "src/components/ButtonMenu";
 import type { IconKey } from "src/components/Icon";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
-import { Tag, type TagProps, type TagType } from "src/components/Tag";
+import { Tag, type TagProps, type TagType, type TagVariant } from "src/components/Tag";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -17,6 +17,7 @@ export type InlineFeedbackBannerAction =
 export type InlineFeedbackBannerProps = {
   type: InlineFeedbackBannerType;
   tagText?: TagProps<any>["text"];
+  tagVariant?: TagVariant;
   description: ReactNode;
   /** Rendered in order, always as text buttons (menu triggers included). */
   actions?: InlineFeedbackBannerAction[];
@@ -28,14 +29,14 @@ export type InlineFeedbackBannerProps = {
  * Any background behind the banner belongs to whatever is hosting it.
  */
 export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
-  const { type, tagText, description, actions = [] } = props;
+  const { type, tagText, tagVariant, description, actions = [] } = props;
   const { icon, tagType, borderColor, fallbackTagText } = typeStyles[type];
   const tid = useTestIds(props, "inlineFeedbackBanner");
   // Split rather than an `iconOnly={!tagText}` because Tag's `text` changes job between the two:
   // visible copy when labeled, tooltip and screen-reader label when `iconOnly`.
   const tagProps: TagProps<never> = tagText
-    ? { type: tagType, icon, text: tagText }
-    : { type: tagType, icon, text: fallbackTagText, iconOnly: true };
+    ? { type: tagType, variant: tagVariant, icon, text: tagText }
+    : { type: tagType, variant: tagVariant, icon, text: fallbackTagText, iconOnly: true };
 
   return (
     <div css={Css.df.ais.gap1.w100.p1.br4.xs.bgColor(Tokens.Surface).ba.bc(borderColor).bshBasic.$} {...tid}>
