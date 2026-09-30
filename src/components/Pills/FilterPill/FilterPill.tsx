@@ -26,7 +26,7 @@ export function FilterPill(props: FilterPillProps) {
     title: reason,
     placement: "top",
     children: (
-      <span css={reason ? Css.dif.cursorNotAllowed.$ : Css.display("contents").$}>
+      <span css={Css.if(!!reason).dif.cursorNotAllowed.else.display("contents").$}>
         <button
           type="button"
           disabled={isDisabled}

@@ -91,7 +91,7 @@ function FilterPanelClosed<F extends Record<string, unknown>, G extends Value = 
         <FilterPill
           key={pill.key}
           text={pill.label}
-          onClick={() => setFilter(pill.next)}
+          onClick={() => setFilter(pill.nextFilter)}
           {...tid[`pill_${pill.key}`]}
         />
       ))}
@@ -124,7 +124,7 @@ type FilterPillEntry<F> = {
   key: string;
   label: string;
   /** The filter with this value removed. */
-  next: F;
+  nextFilter: F;
 };
 
 /** One entry per selected filter value shown as a pill. */
@@ -152,7 +152,7 @@ function filterPillsForKey<F extends Record<string, unknown>, K extends keyof F>
         {
           key: `${String(key)}_${item}`,
           label,
-          next: updateFilter(filter, key, newArray.length > 0 ? (newArray as F[K]) : undefined),
+          nextFilter: updateFilter(filter, key, newArray.length > 0 ? (newArray as F[K]) : undefined),
         },
       ];
     });
@@ -160,5 +160,5 @@ function filterPillsForKey<F extends Record<string, unknown>, K extends keyof F>
 
   const label = f.formatSelectedFilterLabel(value as SelectedFilterLabelValue<DefinedFilterValue<F, K>>);
   if (!isDefined(label)) return [];
-  return [{ key: String(key), label, next: updateFilter(filter, key, undefined) }];
+  return [{ key: String(key), label, nextFilter: updateFilter(filter, key, undefined) }];
 }
