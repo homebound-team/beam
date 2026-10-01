@@ -38,6 +38,9 @@ export function TabBaseStates() {
         <div css={{ ...styles.baseStyles, ...styles.hoverStyles }}>{getChildren("hovered")}</div>
         <div css={{ ...styles.baseStyles, ...styles.activeHoverStyles }}>{getChildren("active hover")}</div>
         <div css={{ ...styles.baseStyles, ...styles.aiStyles }}>{getChildren("ai mode")}</div>
+        <div css={{ ...styles.baseStyles, ...styles.activeStyles, ...styles.activeAiStyles }}>
+          {getChildren("active ai mode")}
+        </div>
       </div>
       <div css={Css.df.fdc.gap2.$}>
         <h2>
