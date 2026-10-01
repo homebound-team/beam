@@ -22,7 +22,7 @@ describe("usePersistedFilter", () => {
     });
     const r = await render(<TestPage filterDefs={{ stageSingle: stage }} />, withRouter());
     // Then the filter is initially empty
-    expect(r.filter_stageSingle).toHaveValue("All");
+    expect(r.filter_stageSingle).toHaveTextContent("All");
     expect(r.applied.textContent).toEqual("{}");
   });
 
@@ -38,7 +38,7 @@ describe("usePersistedFilter", () => {
     const r = await render(<TestPage filterDefs={{ stageSingle: stage }} />, withRouter());
     await wait();
     // Then the filter renders with one
-    expect(r.filter_stageSingle).toHaveValue("One");
+    expect(r.filter_stageSingle).toHaveTextContent("One");
     expect(r.applied.textContent).toEqual(`{"stageSingle":"ONE"}`);
   });
 
@@ -108,7 +108,7 @@ describe("usePersistedFilter", () => {
       <TestPage filterDefs={{ date: taskDueFilter }} />,
       withRouter(createFilterRoute({ date: { op: "ON", value: "2020-01-29" } })),
     );
-    expect(r.filter_taskDue_dateOperation).toHaveValue("On");
+    expect(r.filter_taskDue_dateOperation).toHaveTextContent("On");
     expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");
     expect(r.applied.textContent).toEqual('{"date":{"op":"ON","value":"2020-01-29"}}');
   });

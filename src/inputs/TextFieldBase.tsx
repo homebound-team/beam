@@ -14,17 +14,17 @@ import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { InlineLabel, Label } from "src/components/Label";
-import { type InputStylePalette, usePresentationContext } from "src/components/PresentationContext";
-import { ProposedValue } from "src/components/ProposedValue";
+import { usePresentationContext } from "src/components/PresentationContext";
+import { OriginalValue, ProposedValue } from "src/components/ProposedValue";
 import { BorderHoverChild } from "src/components/Table/components/Row";
 import { maybeTooltip } from "src/components/Tooltip";
 // Side-effect import: injects CSS for the border-hover-on-row pattern
 import "src/components/Table/components/Row.css";
-import { Css, increment, type Only, Palette, Tokens } from "src/Css";
+import { Css, type Only, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { useGetRef } from "src/hooks/useGetRef";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { getFieldWidth } from "src/inputs/utils";
+import { getFieldChrome } from "src/inputs/fieldChrome";
 import type { BeamTextFieldProps, TextFieldInternalProps, TextFieldXss } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { maybeCall } from "src/utils/helpers";
@@ -139,9 +139,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   const { hoverProps, isHovered } = useHover({});
   const { focusWithinProps } = useFocusWithin({ onFocusWithinChange: setIsFocused });
   const fieldRef = useGetRef(inputRef);
-  const maybeSmaller = compound ? 2 : 0;
-  const fieldHeight = 40;
-  const compactFieldHeight = 32;
 
   // Takes precedence over the `inputStylePalette` / `borderless` / `borderOnHover` backgrounds below.
   const showProposal = proposedValue !== undefined;
@@ -152,63 +149,27 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   // Compound fields draw their own; otherwise supporting copy is noise on a field nobody can edit.
   const showErrorAndHelper = alwaysShowHelperText || (!compound && !inputProps.disabled && !inputProps.readOnly);
 
-  const [bgColor, hoverBgColor, disabledBgColor] = showProposal
-    ? [Tokens.AiFieldBg, Palette.Purple100, Tokens.FieldBgDisabled]
-    : inputStylePalette
-      ? getInputStylePalette(inputStylePalette)
-      : borderOnHover
-        ? // Use transparent backgrounds to blend with the table row hover color
-          [Palette.Transparent, Palette.Blue100, Palette.Gray100]
-        : borderless && !compound
-          ? [Palette.Gray100, Palette.Gray200, Palette.Gray200]
-          : [Tokens.FieldBgDefault, Tokens.FieldBgHover, Tokens.FieldBgDisabled];
-
-  const fieldMaxWidth = getFieldWidth(fullWidth);
+  const fieldChrome = getFieldChrome({
+    typeScale,
+    labelStyle,
+    labelLeftFieldWidth,
+    compact,
+    borderless,
+    borderOnHover,
+    fullWidth,
+    visuallyDisabled,
+    isHovered,
+    compound,
+    multiline,
+    showProposal,
+    inputStylePalette,
+  });
 
   const fieldStyles = {
-    container: {
-      ...Css.df.fdc.w100.maxw(fieldMaxWidth).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb.aic.$,
-    },
-    inputWrapper: {
-      ...Css.typography(typeScale)
-        .df.aic.br8.pxPx(textFieldBasePadding)
-        .w100.bgColor(bgColor)
-        .color(Tokens.OnSurface)
-        .if(labelStyle === "left")
-        .w(labelLeftFieldWidth).$,
-      // When borderless then perceived vertical alignments are misaligned. As there is no longer a border, then the field looks oddly indented.
-      // This typically happens in tables when a column has a mix of static text (i.e. "roll up" rows and table headers) and input fields.
-      // To remedy this perceived misalignment then we increase the width by the horizontal padding applied (16px), and set a negative margin left margin to re-center the field.
-      // Note: Do not modify width and position of 'compound' fields.
-      ...(borderless && !compound
-        ? Css.bcTransparent.w("calc(100% + 16px)").ml(-1).$
-        : Css.bc(Tokens.FieldBorderDefault).$),
-      // Do not add borders to compound fields. A compound field is responsible for drawing its own borders
-      ...(!compound ? Css.ba.$ : {}),
-      ...(borderOnHover && Css.br4.ba.bcTransparent.add("transition", "border-color 200ms").$),
-      ...(borderOnHover && Css.if(isHovered).bgColor(hoverBgColor).ba.bcBlue300.$),
-      // When multiline is true, then we want to allow the field to grow to the height of the content, but not shrink below the minHeight
-      // Otherwise, set fixed heights values accordingly.
-      ...(multiline
-        ? Css.mhPx(fieldHeight - maybeSmaller)
-            .if(compact)
-            .mhPx(compactFieldHeight - maybeSmaller).$
-        : Css.hPx(fieldHeight - maybeSmaller)
-            .if(compact)
-            .hPx(compactFieldHeight - maybeSmaller).$),
-    },
+    container: fieldChrome.container,
+    inputWrapper: fieldChrome.control,
     // Border-hover-on-row styling is handled by Row.css.ts (imported above as a side-effect)
-    inputWrapperReadOnly: {
-      ...Css.typography(typeScale)
-        .df.aic.w100.color(Tokens.OnSurface)
-        .if(labelStyle === "left")
-        .w(labelLeftFieldWidth).$,
-      // If we are hiding the label, then we are typically in a table. Keep the `mh` in this case to ensure editable and non-editable fields in a single table row line up properly
-      ...(labelStyle === "hidden" &&
-        Css.mhPx(fieldHeight - maybeSmaller)
-          .if(compact)
-          .mhPx(compactFieldHeight - maybeSmaller).$),
-    },
+    inputWrapperReadOnly: fieldChrome.readOnly,
     input: {
       ...Css.w100.mw0.outline0.fg1.bgTransparent
         .if(!inputStylePalette)
@@ -220,12 +181,10 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
         : Css.truncate.$),
       ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
     },
-    hover: Css.bgColor(hoverBgColor).bc(Tokens.FieldBorderHover).$,
-    focus: Css.bc(Tokens.FieldBorderFocus).bgColor(hoverBgColor).if(borderOnHover).bc(Tokens.FieldBorderFocus).$,
-    disabled: visuallyDisabled
-      ? Css.cursorNotAllowed.color(Tokens.FieldTextDisabled).bgColor(disabledBgColor).$
-      : Css.cursorNotAllowed.$,
-    error: Css.bc(Tokens.FieldBorderError).$,
+    hover: fieldChrome.hover,
+    focus: fieldChrome.focus,
+    disabled: fieldChrome.disabled,
+    error: fieldChrome.error,
   };
 
   // Watch for each WIP change, convert empty to undefined, and call the user's onChange
@@ -301,7 +260,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {...tid}
             >
               {labelStyle === "inline" && label && (
-                <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
+                <InlineLabel
+                  multiline={multiline}
+                  labelProps={labelProps}
+                  label={label}
+                  disabled={!!inputProps.disabled && visuallyDisabled}
+                  {...tid.label}
+                />
               )}
               {showProposal ? (
                 // Read-only renders no input at all, so both halves are drawn as text here. Checked
@@ -344,7 +309,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
             >
               {labelStyle === "inline" && label && (
-                <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
+                <InlineLabel
+                  multiline={multiline}
+                  labelProps={labelProps}
+                  label={label}
+                  disabled={!!inputProps.disabled && visuallyDisabled}
+                  {...tid.label}
+                />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
               {unfocusedPlaceholder && (
@@ -446,33 +417,6 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
   );
 }
 
-/** The on-record value, struck through, in the slot below the field. */
-function OriginalValue(props: { originalValue: string }) {
-  const { originalValue, ...others } = props;
-  return (
-    <div css={Css.color(Tokens.TextHelper).xs.mtPx(4).tdlt.$} {...others}>
-      {originalValue}
-    </div>
-  );
-}
-
-function getInputStylePalette(inputStylePalette: InputStylePalette): [Palette, Palette, Palette] {
-  switch (inputStylePalette) {
-    case "success":
-      return [Palette.Green50, Palette.Green100, Palette.Green50];
-    case "caution":
-      return [Palette.Yellow50, Palette.Yellow100, Palette.Yellow50];
-    case "warning":
-      return [Palette.Red50, Palette.Red100, Palette.Red50];
-    case "info":
-      return [Palette.Blue50, Palette.Blue100, Palette.Blue50];
-    default:
-      return [Palette.White, Palette.Gray100, Palette.Gray100];
-  }
-}
-
-// Used in `useGrowingTextField` when `maxLines` adds/removes scrollbar
-export const textFieldBasePadding = increment(1);
 // Prevents text from being cutoff
 // We don't care about `compact` using 7 because we have no `compact` TextAreaField
 export const textFieldBaseMultilineTopPadding = 11;

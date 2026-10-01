@@ -403,16 +403,16 @@ function findListBox(select: HTMLElement): HTMLElement {
   return document.getElementById(listboxId) || fail("listbox not found");
 }
 
-function assertListBoxInput(select: HTMLElement): select is HTMLInputElement | HTMLTextAreaElement {
+function assertListBoxInput(select: HTMLElement): void {
   if (isSelectElement(select)) {
     throw new Error("Beam getOptions helper does not support <select> elements");
   }
-  if (!isInputOrTextAreaElement(select)) {
+  // MenuSelectField's trigger is a button; the other selects type into an input.
+  if (!isInputOrTextAreaElement(select) && select.nodeName !== "BUTTON") {
     throw new Error(
-      `Expected element to be INPUT or TEXTAREA, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
+      `Expected element to be INPUT, TEXTAREA, or BUTTON, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
     );
   }
-  return true;
 }
 
 function isSelectElement(element: HTMLElement): element is HTMLSelectElement {

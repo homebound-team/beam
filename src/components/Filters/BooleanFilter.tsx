@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { SelectField } from "src/inputs/SelectField";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import type { TestIds } from "src/utils/useTestIds";
 
 export type BooleanOption = [boolean | undefined, string];
@@ -33,13 +33,12 @@ class BooleanFilter extends BaseFilter<boolean, BooleanFilterProps> implements F
     // Our options are a list of tuples
     const { options = defaultBooleanOptions, label, defaultValue, ...props } = this.props;
     return (
-      <SelectField<BooleanOption, string>
+      <MenuSelectField<BooleanOption, string>
         {...props}
         label={this.label}
         // We use `String(value)` so that `undefined` becomes "undefined"
         value={String(value)}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
-        sizeToContent={!inModal && !vertical}
         options={options}
         getOptionValue={(o) => String(o[0])}
         getOptionLabel={(o) => o[1]}

@@ -6,12 +6,12 @@ import type { Filter, FilterDefs, FilterImpls } from "src/components/Filters/typ
 import { filterTestIdPrefix, updateFilter } from "src/components/Filters/utils";
 import { useModal } from "src/components/Modal/useModal";
 import { Css } from "src/Css";
-import { SelectField } from "src/inputs/SelectField";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import type { Value } from "src/inputs/Value";
 import { safeEntries, safeKeys } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
-interface FilterProps<F extends Record<string, unknown>, G extends Value = string> {
+type FilterProps<F extends Record<string, unknown>, G extends Value = string> = {
   /** List of filters */
   filterDefs: FilterDefs<F>;
   /** The current filter value. */
@@ -30,7 +30,7 @@ interface FilterProps<F extends Record<string, unknown>, G extends Value = strin
   vertical?: boolean;
   /** Specifies the number of in line filters before more filters modal  */
   numberOfInlineFilters?: number;
-}
+};
 
 function Filters<F extends Record<string, unknown>, G extends Value = string>(props: FilterProps<F, G>) {
   const { filter, onChange, filterDefs, groupBy, vertical = false, numberOfInlineFilters = groupBy ? 3 : 4 } = props;
@@ -56,10 +56,9 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
   const maybeGroupByField = groupBy ? (
     <div>
-      <SelectField
+      <MenuSelectField
         label="Group by"
         labelStyle={!vertical ? "inline" : "above"}
-        sizeToContent={!vertical}
         options={groupBy.options}
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}

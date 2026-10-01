@@ -1,4 +1,4 @@
-import { SelectField } from "src/inputs/SelectField";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import type { Value } from "src/inputs/Value";
 
 export type GroupByFieldProps<G extends Value = string> = {
@@ -10,10 +10,9 @@ export type GroupByFieldProps<G extends Value = string> = {
 /** Group-by select shared by the filter panel and the desktop inline toolbar control. */
 export function GroupByField<G extends Value = string>({ value, setValue, options }: GroupByFieldProps<G>) {
   return (
-    <SelectField
+    <MenuSelectField
       label="Group by"
       labelStyle="inline"
-      sizeToContent
       options={options}
       getOptionValue={(o) => o.id}
       getOptionLabel={(o) => o.name}

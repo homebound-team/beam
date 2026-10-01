@@ -48,14 +48,22 @@ function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) 
 
 export const Label = React.memo(LabelComponent) as typeof LabelComponent;
 
-type InlineLabelProps = Omit<LabelProps<unknown>, "xss" | "inline">;
+type InlineLabelProps = Omit<LabelProps<unknown>, "xss" | "inline"> & {
+  /** Inherit the field's disabled text color instead of the label color. */
+  disabled?: boolean;
+};
 /** Used for showing labels within text fields. */
-export function InlineLabel({ labelProps, label, multiline = false, ...others }: InlineLabelProps) {
+export function InlineLabel({ labelProps, label, multiline = false, disabled = false, ...others }: InlineLabelProps) {
   return (
     <label
       {...labelProps}
       {...others}
-      css={Css.sm.wsnw.prPx(4).add("color", "currentColor").asc.if(multiline).asfs.pt1.$}
+      css={
+        Css.sm.wsnw
+          .prPx(4)
+          .color(disabled ? "currentColor" : Tokens.TextLabel)
+          .asc.if(multiline).asfs.pt1.$
+      }
     >
       {label}:
     </label>

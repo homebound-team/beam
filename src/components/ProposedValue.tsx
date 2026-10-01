@@ -32,3 +32,13 @@ export function ProposedValue(props: ProposedValueProps) {
     </span>
   );
 }
+
+/** The on-record value, struck through, in the slot below an editable field in AI mode. */
+export function OriginalValue(props: { originalValue: string }) {
+  const { originalValue, ...others } = props;
+  return (
+    <div css={Css.color(Tokens.TextHelper).xs.mtPx(4).tdlt.$} {...others}>
+      {originalValue}
+    </div>
+  );
+}

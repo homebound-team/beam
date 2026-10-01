@@ -1,5 +1,3 @@
-import { wait } from "@homebound/rtl-utils";
-import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { booleanFilter } from "src/components/Filters/BooleanFilter";
 import { Filters } from "src/components/Filters/Filters";
@@ -8,10 +6,8 @@ import { singleFilter } from "src/components/Filters/SingleFilter";
 import { type ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import type { FilterDefs } from "src/components/Filters/types";
 import type { HasIdAndName } from "src/types";
-import { click, render } from "src/utils/rtl";
+import { click, getOptions, render, type } from "src/utils/rtl";
 import { zeroTo } from "src/utils/sb";
-import { vi } from "vitest";
-import type { MultiFilterProps } from "./MultiFilter";
 
 describe("Filters", () => {
   it("can match GQL types of enum arrays", () => {
@@ -56,26 +52,20 @@ describe("Filters", () => {
     expect(f).toBeDefined();
   });
 
-  it("calls onSearch with the debounced value", async () => {
-    const onSearchMock = vi.fn();
-    // Given a stateful component that has initial values set
-    const r = await render(<TestFilterSearch onSearch={onSearchMock} />);
+  it("filters menu options as the user types", async () => {
+    // Given a multi filter with two options
+    const r = await render(<TestFilterSearch />);
 
-    // When opening the options and typing in the filter input
+    // When opening the menu and searching
     click(r.filter_multi);
-    // Not sure why fireEvent.input is needed, type does not work
-    fireEvent.input(r.filter_multi, { target: { value: "1" } });
-    // Wait for `onSearch/debounce` to be called
-    await wait();
+    type(r.filter_multi_search, "1");
 
-    // Then the only remaining option is one and the onSearch/debounce function was called with the correct value and delay
-    expect(r.queryAllByRole("option")).toHaveLength(1);
-    expect(onSearchMock).toHaveBeenCalledWith("1");
+    // Then only the matching option remains
+    expect(getOptions(r.filter_multi)).toEqual(["Project 1"]);
   });
 });
 
-function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>, onSelectMock = vi.fn()) {
-  const [, setSearch] = useState<string | undefined>("");
+function TestFilterSearch() {
   const options: HasIdAndName[] = zeroTo(2).map((i) => ({
     id: `p:${i}`,
     name: `Project ${i}`,
@@ -84,24 +74,13 @@ function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>
 
   const defs: FilterDefs<MultiFilter> = {
     stage: multiFilter({
-      options: options,
+      options,
       label: "Multi",
       getOptionValue: (o) => o.id,
       getOptionLabel: (o) => o.name,
-      onSearch: (input) => {
-        onSelectMock(input);
-        setSearch(input);
-      },
-      ...props,
     }),
   };
 
-  const [filter, setFilter] = useState<MultiFilter>({ stage: props.defaultValue });
-  return (
-    <div>
-      <button data-testid="update" onClick={() => setSearch("baseball")} />
-      <Filters filterDefs={defs} filter={filter} onChange={setFilter} />
-      <div data-testid="value">{JSON.stringify(filter)}</div>
-    </div>
-  );
+  const [filter, setFilter] = useState<MultiFilter>({});
+  return <Filters filterDefs={defs} filter={filter} onChange={setFilter} />;
 }

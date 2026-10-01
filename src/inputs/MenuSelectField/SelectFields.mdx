@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { Tag } from "src/components/Tag";
+
+<Meta title="Inputs/Select Fields (new)" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Select fields (new) <span className="sbdocs-status sb-unstyled"><Tag text="Work in progress" type="update" /></span>
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2828-5144">
+    <img src="FigmaLogo.png" alt="" />
+    Select fields
+  </a>
+</p>
+
+Remaining work:
+
+- Support displaying the new `FilterPill` inside and outside the menu.
+- Support built-in display of `SelectedOptionPillList`.
+- Handle mixed-value variants.
+- Support a tree of options on `MenuMultiSelectField`, with nested parents and children the way `TreeSelectField` does.
+
+## Usage
+
+Use `MenuSelectField` when a filter accepts one value and `MenuMultiSelectField` when it accepts several values. Both keep search inside the menu so the closed filter stays compact.
+
+These fields share their trigger chrome, searchable menu, option rows, desktop popover, mobile bottom sheet, and form-state integration. `options` can be the full list, or `{ current, load, options }` so a long filter list loads the first time the menu opens. Pass `proposedValue` (single) or `proposedValues` (multi) for AI mode, matching the other fields. Use the child pages and their Examples stories for the closed field. Open-menu behavior is under Menu Behavior. Single Selection and Multi Selection each show how a row looks. Lazy loading, flipping upward, and opening inside a modal are shared, since those do not depend on how a row is drawn.

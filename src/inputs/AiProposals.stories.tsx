@@ -5,6 +5,8 @@ import { FormLines } from "src/forms/FormLines";
 import { Autocomplete } from "src/inputs/Autocomplete";
 import { DateField } from "src/inputs/DateFields/DateField";
 import { DateRangeField } from "src/inputs/DateFields/DateRangeField";
+import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { MultiSelectField } from "src/inputs/MultiSelectField";
 import { NumberField } from "src/inputs/NumberField";
 import { SelectField } from "src/inputs/SelectField";
@@ -59,6 +61,8 @@ export function AllFields() {
         <AiSelectField original="up" />
         {/* Two originals, so the joined-label case is visible next to the single-value fields */}
         <AiMultiSelectField original={["up", "sideways"]} />
+        <AiMenuSelectField original="up" />
+        <AiMenuMultiSelectField original={["up", "sideways"]} />
         <AiDateField original={jan2} />
         <AiDateRangeField original={{ from: jan2, to: jan10 }} />
         <AiAutocomplete original="Old Supplier" />
@@ -71,6 +75,8 @@ export function AllFields() {
         <AiNumberField original={undefined} />
         <AiSelectField original={undefined} />
         <AiMultiSelectField original={[]} />
+        <AiMenuSelectField original={undefined} />
+        <AiMenuMultiSelectField original={[]} />
         <AiDateField original={undefined} />
         <AiDateRangeField original={undefined} />
         <AiAutocomplete original={undefined} />
@@ -82,6 +88,8 @@ export function AllFields() {
         <AiNumberField original={proposed.ceilingHeight} />
         <AiSelectField original={proposed.bedroomLocation} />
         <AiMultiSelectField original={proposed.bedroomLocations} />
+        <AiMenuSelectField original={proposed.bedroomLocation} />
+        <AiMenuMultiSelectField original={proposed.bedroomLocations} />
         <AiDateField original={proposed.startDate} />
         <AiDateRangeField original={proposed.buildWindow} />
         <AiAutocomplete original={proposed.supplier} />
@@ -91,6 +99,7 @@ export function AllFields() {
       <Section title="Read only">
         <AiTextField original="Old Cottage" readOnly />
         <AiSelectField original="up" readOnly />
+        <AiMenuSelectField original="up" readOnly />
       </Section>
 
       <Section title="Stacked under the field: original, then error, then helper text">
@@ -184,6 +193,33 @@ function AiMultiSelectField({ original }: { original: string[] }) {
   return (
     <MultiSelectField
       label="Bedroom Locations"
+      values={values}
+      proposedValues={proposed.bedroomLocations}
+      options={locations}
+      onSelect={setValues}
+    />
+  );
+}
+
+function AiMenuSelectField({ original, readOnly }: { original: string | undefined; readOnly?: boolean }) {
+  const [value, setValue] = useState<string | undefined>(original);
+  return (
+    <MenuSelectField
+      label="Bedroom Location (Menu)"
+      value={value}
+      proposedValue={proposed.bedroomLocation}
+      options={locations}
+      onSelect={setValue}
+      readOnly={readOnly}
+    />
+  );
+}
+
+function AiMenuMultiSelectField({ original }: { original: string[] }) {
+  const [values, setValues] = useState<string[]>(original);
+  return (
+    <MenuMultiSelectField
+      label="Bedroom Locations (Menu)"
       values={values}
       proposedValues={proposed.bedroomLocations}
       options={locations}

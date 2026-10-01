@@ -3,14 +3,15 @@ import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
-import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
+import { MenuMultiSelectField, type MenuMultiSelectFieldProps } from "src/inputs/MenuSelectField/MenuMultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
+import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 import type { TestIds } from "src/utils/useTestIds";
 
 export type MultiFilterProps<O, V extends Value> = Omit<
-  MultiSelectFieldProps<O, V>,
+  MenuMultiSelectFieldProps<O, V>,
   "values" | "onSelect" | "label"
 > & {
   defaultValue?: V[];
@@ -23,7 +24,11 @@ export function multiFilter<O, V extends Value>(props: MultiFilterProps<O, V>): 
 
 class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O, V>> implements Filter<V[]> {
   formatSelectedFilterLabel(value: SelectedFilterLabelValue<V[]>): string | undefined {
-    const { options, getOptionValue, getOptionLabel } = this.props;
+    const {
+      options,
+      getOptionValue = defaultOptionValue as (opt: O) => V,
+      getOptionLabel = defaultOptionLabel as (opt: O) => string,
+    } = this.props;
     return resolveOptionSelectedFilterLabel(options, getOptionValue, getOptionLabel, value);
   }
 
@@ -40,18 +45,22 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
       this.props.options.length > 0 &&
       this.props.options.length <= 8
     ) {
-      const { disabledOptions } = this.props;
+      const {
+        disabledOptions,
+        getOptionValue = defaultOptionValue as (opt: O) => V,
+        getOptionLabel = defaultOptionLabel as (opt: O) => string,
+      } = this.props;
       const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
       const disabledKeys = Object.keys(disabledOptionsWithReasons);
       return (
         <ToggleChipGroup
           label={this.label}
           options={this.props.options.map((o: O) => {
-            const value = this.props.getOptionValue(o);
+            const value = getOptionValue(o);
             const disabled = value && disabledKeys.includes(value.toString());
             const disabledReason = disabled ? disabledOptionsWithReasons[value.toString()] : undefined;
             return {
-              label: this.props.getOptionLabel(o),
+              label: getOptionLabel(o),
               value: value as string,
               disabled: disabledReason ?? disabled,
             };
@@ -68,12 +77,11 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
 
     const { defaultValue, nothingSelectedText, ...props } = this.props;
     return (
-      <MultiSelectField<O, V>
+      <MenuMultiSelectField<O, V>
         {...props}
         label={this.label}
         values={value || []}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
-        sizeToContent={!inModal && !vertical}
         onSelect={(values) => {
           setValue(values.length === 0 ? undefined : values);
         }}

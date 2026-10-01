@@ -15,6 +15,7 @@ import { Icon } from "src/components/Icon";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
+import { selectedValueCss } from "src/inputs/fieldChrome";
 import { useGrowingTextField } from "src/inputs/hooks/useGrowingTextField";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelectField";
@@ -119,7 +120,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       inputRef={inputRef}
       inputWrapRef={inputWrapRef}
       errorMsg={errorMsg}
-      xss={otherProps.labelStyle !== "inline" && !inputProps.readOnly ? Css.fw5.$ : undefined}
+      xss={selectedValueCss(otherProps.labelStyle, inputProps.readOnly)}
       startAdornment={
         (showNumSelection && (
           <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>

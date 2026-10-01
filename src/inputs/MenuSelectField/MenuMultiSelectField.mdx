@@ -1,0 +1,22 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { Tag } from "src/components/Tag";
+import * as MenuMultiSelectFieldStories from "./MenuMultiSelectField.stories";
+
+<Meta of={MenuMultiSelectFieldStories} parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Menu multi select <span className="sbdocs-status sb-unstyled"><Tag text="Work in progress" type="update" /></span>
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2828-5144">
+    <img src="FigmaLogo.png" alt="" />
+    Menu multi select
+  </a>
+</p>
+
+## Usage
+
+Use `MenuMultiSelectField` when a filter accepts several values. It takes `values` and calls `onSelect(values, options)`. Each row has a checkbox, the menu stays open while options are toggled, and the closed field shows a count badge. A selection hidden by the current search stays selected.
+
+Plug into `@homebound/form-state` with `BoundMenuMultiSelectField`.
+
+See [Select fields (new)](?path=/docs/inputs-select-fields-new--docs) for shared implementation details and remaining work.

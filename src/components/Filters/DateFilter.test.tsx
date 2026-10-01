@@ -1,10 +1,9 @@
-import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { dateFilter } from "src/components/Filters/DateFilter";
 import { Filters } from "src/components/Filters/Filters";
 import { type ProjectFilter, taskDueFilter } from "src/components/Filters/testDomain";
 import type { FilterDefs } from "src/components/Filters/types";
-import { click, render, type } from "src/utils/rtl";
+import { render, select, type } from "src/utils/rtl";
 import { jan29 } from "src/utils/testDates";
 
 describe("DateFilter", () => {
@@ -26,7 +25,7 @@ describe("DateFilter", () => {
         }}
       />,
     );
-    expect(r.filter_taskDue_dateOperation).toHaveValue("Any");
+    expect(r.filter_taskDue_dateOperation).toHaveTextContent("Any");
     expect(r.filter_taskDue_dateField).toBeDisabled();
     expect(r.filter_taskDue_dateField).toHaveValue("01/29/20");
   });
@@ -34,8 +33,7 @@ describe("DateFilter", () => {
   it("can set and unset the date filter", async () => {
     const r = await render(<TestFilters defs={{ date: taskDueFilter }} />);
     // Given we select an operation
-    fireEvent.click(r.filter_taskDue_dateOperation);
-    click(r.getByRole("option", { name: "On" }));
+    select(r.filter_taskDue_dateOperation, "On");
     // Then the date field should become enabled
     expect(r.filter_taskDue_dateField).not.toBeDisabled();
     // And we type in a new date
@@ -43,8 +41,7 @@ describe("DateFilter", () => {
     // Then the filter should be set as a plain date string
     expect(r.filter_value).toHaveTextContent('{"date":{"op":"ON","value":"2021-10-31"}}');
     // When we select Any
-    fireEvent.click(r.filter_taskDue_dateOperation);
-    click(r.getByRole("option", { name: "Any" }));
+    select(r.filter_taskDue_dateOperation, "Any");
     // Then the date field is disabled
     expect(r.filter_taskDue_dateField).toBeDisabled();
     // And it is unset

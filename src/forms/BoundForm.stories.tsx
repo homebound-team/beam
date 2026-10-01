@@ -9,6 +9,8 @@ import {
   boundDateRangeField,
   BoundForm as BoundFormComponent,
   type BoundFormInputConfig,
+  boundMenuMultiSelectField,
+  boundMenuSelectField,
   boundMultilineSelectField,
   boundMultiSelectCardGroupField,
   boundMultiSelectField,
@@ -41,6 +43,9 @@ export function BoundForm() {
       input: {
         firstName: "John",
         lastName: "Doe",
+        displayName: "Jane Doe",
+        menuSelectExample: "s:1",
+        menuMultiSelectExample: ["c:1", "c:2"],
         books: [{ id: "b:1", title: "Book 1", isPublished: true, summary: "Example summary" }],
       },
     },
@@ -191,10 +196,18 @@ type AuthorInput = BaseAuthorInput & {
   switchFieldExample2?: boolean | null;
   toggleChipGroupField?: string[] | null;
   treeSelectExample?: string[] | null;
+  displayName?: string | null;
+  menuSelectExample?: string | null;
+  menuMultiSelectExample?: string[] | null;
 };
 
 const inputConfig: BoundFormInputConfig<AuthorInput> = [
   { firstName: boundTextField(), middleInitial: boundTextField(), lastName: boundTextField() },
+  {
+    displayName: boundTextField({ label: "Display name" }),
+    menuSelectExample: boundMenuSelectField({ label: "Group by", options: sportsOptions }),
+    menuMultiSelectExample: boundMenuMultiSelectField({ label: "Colors", options: colorOptions }),
+  },
   { bio: boundTextAreaField() },
   {
     favoriteSport: boundSelectField({
@@ -279,6 +292,9 @@ const formConfig: ObjectConfig<AuthorInput> = {
   switchFieldExample2: { type: "value" },
   toggleChipGroupField: { type: "value" },
   treeSelectExample: { type: "value" },
+  displayName: { type: "value" },
+  menuSelectExample: { type: "value" },
+  menuMultiSelectExample: { type: "value" },
   books: {
     type: "list",
     config: {

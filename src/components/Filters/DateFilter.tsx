@@ -4,7 +4,7 @@ import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/ty
 import { Label } from "src/components/Label";
 import { DateField } from "src/inputs/DateFields/DateField";
 import { formatDate } from "src/inputs/DateFields/utils";
-import { SelectField } from "src/inputs/SelectField";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import type { Value } from "src/inputs/Value";
 import type { PlainDate } from "src/types";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -58,8 +58,7 @@ class DateFilter<O, V extends Value, DV extends DateFilterValue<V>>
       <>
         {vertical && <Label label={label} />}
         <CompoundField>
-          <SelectField
-            sizeToContent
+          <MenuSelectField
             options={[
               // Always show the 'Any' option
               anyOption as O,

@@ -1,0 +1,26 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { Tag } from "src/components/Tag";
+import * as MenuSelectFieldStories from "./MenuSelectField.stories";
+
+<Meta of={MenuSelectFieldStories} parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Menu select <span className="sbdocs-status sb-unstyled"><Tag text="Work in progress" type="update" /></span>
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2828-5144">
+    <img src="FigmaLogo.png" alt="" />
+    Menu select
+  </a>
+</p>
+
+## Usage
+
+Use `MenuSelectField` when a filter accepts one value. It takes `value` and calls `onSelect(value, option)`. Choosing an option closes the menu, and the selected row shows a check.
+
+Options default to `option.id` and `option.name`. Pass an array, or `{ current, load, options }` to load the list the first time the menu opens. `getOptionMenuLabel` customizes the row. The closed field and the option's accessible name still use `getOptionLabel`. Search matches that string, plus any text from `getOptionSearchText`.
+
+Plug into `@homebound/form-state` with `BoundMenuSelectField`.
+
+On a wide screen the menu is a popover. On a small screen it is a bottom sheet.
+
+See [Select fields (new)](?path=/docs/inputs-select-fields-new--docs) for shared implementation details and remaining work.
