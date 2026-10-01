@@ -81,11 +81,11 @@ describe("TabsWithContent", () => {
       expect(r.tabs_tab2).toHaveStyle({ color: Palette.Purple700 });
     });
 
-    it("keeps the selected tab's own color", async () => {
+    it("tints the selected tab a darker purple", async () => {
       // Given the decorated tab is the selected one
       const r = await render(<TestAiTabs selected="tab2" />, withRouter());
-      // Then it stays with the active treatment rather than going purple
-      expect(r.tabs_tab2).not.toHaveStyle({ color: Palette.Purple700 });
+      // Then it goes the darker purple instead of the default active color
+      expect(r.tabs_tab2).toHaveStyle({ color: Palette.Purple800 });
       expect(r.tabs_tab2).toContainElement(r.tabs_tab2_aiTag);
     });
   });

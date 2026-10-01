@@ -238,8 +238,16 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
   const { disabled = false, name: label, icon, endAdornment, aiMode = false } = tab;
   const isDisabled = !!disabled;
   const { hoverProps, isHovered } = useHover({ isDisabled });
-  const { baseStyles, activeStyles, focusRingStyles, hoverStyles, disabledStyles, activeHoverStyles, aiStyles } =
-    useMemo(() => getTabStyles(), []);
+  const {
+    baseStyles,
+    activeStyles,
+    focusRingStyles,
+    hoverStyles,
+    disabledStyles,
+    activeHoverStyles,
+    aiStyles,
+    activeAiStyles,
+  } = useMemo(() => getTabStyles(), []);
   const uniqueValue = uniqueTabValue(tab);
   const tid = useTestIds(others);
 
@@ -253,9 +261,10 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
     ...others,
     ...Css.props({
       ...baseStyles,
-      // Only tints the label while the tab is unselected; selected keeps its own darker treatment.
       ...(aiMode && aiStyles),
       ...(active && activeStyles),
+      // After `activeStyles` so the selected AI tab stays purple, but before `disabledStyles` so disabled still wins.
+      ...(active && aiMode && activeAiStyles),
       ...(isDisabled && disabledStyles),
       ...(isHovered && hoverStyles),
       ...(isHovered && active && activeHoverStyles),
@@ -325,6 +334,7 @@ export function getTabStyles() {
     disabledStyles: Css.color(Tokens.TextDisabled).cursorNotAllowed.$,
     // The AI label tint is part of the brand ramp rather than a semantic token, same as the sparkle's gradient.
     aiStyles: Css.color(Palette.Purple700).$,
+    activeAiStyles: Css.color(Palette.Purple800).$,
     focusRingStyles: Css.bgBlue50.bshFocus.$,
     hoverStyles: { ...Css.bc(Tokens.FieldBorderHover).$, ...borderBottomStyles },
     activeHoverStyles: { ...Css.bgBlue50.bc(Tokens.FieldBorderFocus).$, ...borderBottomStyles },
