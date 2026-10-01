@@ -117,7 +117,15 @@ export function OverlayTrigger(props: OverlayTriggerProps) {
           {...trigger}
           menuTriggerProps={wrappedMenuTriggerProps}
           buttonRef={buttonRef}
-          endAdornment={!hideEndAdornment ? <Icon icon={state.isOpen ? "chevronUp" : "chevronDown"} /> : null}
+          endAdornment={
+            !hideEndAdornment ? (
+              <Icon
+                icon={state.isOpen ? "chevronUp" : "chevronDown"}
+                // Text triggers: smaller increment keeps the button inline and prevents content from appearing unaligned
+                {...((trigger.variant ?? variant) === "text" && { inc: 2, xss: Css.mlPx(-6).$ })}
+              />
+            ) : null
+          }
           disabled={disabled}
           tooltip={tooltip}
           onClick={wrappedMenuTriggerProps.onPress ?? noop}

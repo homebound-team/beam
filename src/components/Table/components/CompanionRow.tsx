@@ -85,7 +85,9 @@ function CompanionRowImpl(props: CompanionRowProps) {
           // Companion content is arbitrary — allow wrapping and grow with content.
           ...Css.h("auto")
             .whiteSpace("normal")
-            .pyPx(8)
+            // Extra space away from the owning row
+            .ptPx(isLeading ? 12 : 8)
+            .pbPx(isLeading ? 8 : 12)
             .w(`calc(${columnSizes.join(" + ")}${levelIndent ? ` - ${levelIndent}px` : ""})`).$,
         }}
         {...(as === "table" ? { colSpan } : {})}
