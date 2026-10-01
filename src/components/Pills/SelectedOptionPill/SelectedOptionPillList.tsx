@@ -1,5 +1,8 @@
 import { Css } from "src/Css";
-import { SelectedOptionPill, type SelectedOptionPillProps } from "src/forms/SelectedOptionPill";
+import {
+  SelectedOptionPill,
+  type SelectedOptionPillProps,
+} from "src/components/Pills/SelectedOptionPill/SelectedOptionPill";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type SelectedOptionPillListProps = {

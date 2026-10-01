@@ -44,6 +44,10 @@ Tests use a custom wrapper around React Testing Library: [`src/utils/rtl.tsx`](s
 
 After editing a test file, run `yarn lint:fix:files` on that path (see **Linting** below). Before a PR, run `yarn lint:ci`.
 
+### What to test
+
+Test behavior: what renders, what is omitted, and what happens on interaction. Do not assert the default look — colors, type, fill, spacing, or other static styles. Chromatic snapshots stories for that. A style assertion belongs in a test only when the style is the behavior under test and no story captures it, which should be rare.
+
 ### Structure
 
 - **One top-level `describe`:** The file has a single top-level `describe` named after the file (without extension), e.g. `describe("withRightPane", …)` in `withRightPane.test.ts`. Nest further `describe`s inside it.

@@ -155,7 +155,7 @@ describe("NumberRangeFilter", () => {
       max: undefined as unknown as number,
     });
 
-    // Then no chip label is produced
+    // Then no pill label is produced
     expect(label).toBeUndefined();
   });
 });

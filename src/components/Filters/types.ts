@@ -52,7 +52,7 @@ export type Filter<V> = {
    */
   dehydrate?(value: V | undefined): unknown;
 
-  /** Returns the human-readable label for an active filter value, or undefined when the value should not produce a chip. */
+  /** Returns the human-readable label for an active filter value, or undefined when the value should not produce a pill. */
   formatSelectedFilterLabel(value: SelectedFilterLabelValue<V>): string | undefined;
 
   /** Renders the filter into either the page or the modal. */

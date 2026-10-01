@@ -761,9 +761,9 @@ describe("GridTableLayout", () => {
   });
 
   describe("filters", () => {
-    it("removes the filter value when a chip is clicked", async () => {
-      // Given multiple filters so controls nest behind the Filter toggle (chips show when closed)
-      const storageKey = "chip-click-test";
+    it("removes the filter value when a pill is clicked", async () => {
+      // Given multiple filters so controls nest behind the Filter toggle (pills show when closed)
+      const storageKey = "pill-click-test";
       sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
 
       type ChipFilter = { needsRevision?: boolean; status?: string[] };
@@ -797,14 +797,14 @@ describe("GridTableLayout", () => {
       }
 
       const r = await render(<FilterChipWrapper />, withRouter());
-      expect(r.filter_chip_needsRevision).toBeInTheDocument();
+      expect(r.filter_pill_needsRevision).toBeInTheDocument();
       expect(capturedFilter).toEqual({ needsRevision: true });
 
-      // When the chip is clicked
-      click(r.filter_chip_needsRevision);
+      // When the pill is clicked
+      click(r.filter_pill_needsRevision);
 
-      // Then the chip is removed and the filter state is cleared
-      expect(r.query.filter_chip_needsRevision).toBeNull();
+      // Then the pill is removed and the filter state is cleared
+      expect(r.query.filter_pill_needsRevision).toBeNull();
       expect(capturedFilter).toEqual({});
     });
   });

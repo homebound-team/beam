@@ -1,0 +1,121 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as SelectedOptionPillStories from "./SelectedOptionPill.stories";
+
+<Meta of={SelectedOptionPillStories} />
+
+# Selected Option Pill
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2741-2077">
+    <img src="FigmaLogo.png" alt="" />
+    Selected Value Pill
+  </a>
+</p>
+
+`SelectedOptionPill` shows one value selected from a field. Use × to remove it.
+
+It is wider than a filter pill so it can hold richer values, like a code plus a name. Long values are clamped at two lines. Use `SelectedOptionPillList` to stack several beneath a multi-select field.
+
+## SelectedOptionPill
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>The value. Renders ReactNode to allow for rich text (e.g font-weights).</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onRemove</code>
+      </td>
+      <td>
+        <code>{"() => void"}</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Called when × is clicked. Use it to clear this value.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>helperText</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>
+        <code>undefined</code>
+      </td>
+      <td>Caption under the pill, such as source links.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>aiMode</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Marks a value proposed by AI with the purple AI background.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>disabled</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Hides × so the value cannot be removed.</td>
+    </tr>
+  </tbody>
+</table>
+
+## SelectedOptionPillList
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>options</code>
+      </td>
+      <td>
+        <code>{"Array<{ id: string } & SelectedOptionPillProps>"}</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>
+        One pill per entry, stacked vertically. Each <code>id</code> must be unique. Renders nothing when empty.
+      </td>
+    </tr>
+  </tbody>
+</table>
