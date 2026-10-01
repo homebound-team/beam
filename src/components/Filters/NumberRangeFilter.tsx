@@ -1,6 +1,6 @@
+import { CompoundField } from "src/components/CompoundField";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { CompoundField } from "src/components/internal/CompoundField";
 import { Label } from "src/components/Label";
 import { defaultTestId } from "src/utils/defaultTestId";
 import type { TestIds } from "src/utils/useTestIds";

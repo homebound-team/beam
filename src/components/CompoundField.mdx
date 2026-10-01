@@ -1,0 +1,33 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as CompoundFieldStories from "./CompoundField.stories";
+
+<Meta of={CompoundFieldStories} />
+
+# Compound Field
+
+`CompoundField` joins two fields into one bordered control. Focusing either field highlights the shared border.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>children</code>
+      </td>
+      <td>
+        <code>JSX.Element[]</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Exactly two fields. Use inline labels. This control draws the border and the divider.</td>
+    </tr>
+  </tbody>
+</table>
