@@ -317,7 +317,16 @@ export function recursivelyGetContainingRow<R extends Kinded>(
   return undefined;
 }
 
-export function getTableRefWidthStyles(isVirtual: boolean, inDocumentScrollLayout: boolean = false) {
+export function getTableRefWidthStyles(
+  isVirtual: boolean,
+  inDocumentScrollLayout: boolean = false,
+  scrollViewportWidth?: string,
+) {
+  // A layout-provided scroller knows its visible width; size to that, not to a parent the wide table holds open.
+  // E.g. in a modal, the scroll viewport width is the width of the modal body.
+  if (scrollViewportWidth) {
+    return Css.w(scrollViewportWidth).mw0.$;
+  }
   // When using document-scroll, cap at the page's content width (chrome minus any padded ancestor, e.g. CenteredLayout),
   // so a table whose pinned min-width holds its parent open can still shrink back when the viewport narrows.
   if (inDocumentScrollLayout) {

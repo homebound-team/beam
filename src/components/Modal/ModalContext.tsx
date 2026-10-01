@@ -1,17 +1,20 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
 
-interface ModalContextState {
+type ModalContextState = {
   inModal: boolean;
-}
+  /** The modal body's scroll container; `null` when the content owns its own scrolling (i.e. `ModalBody virtualized`). */
+  scrollEl: HTMLElement | null;
+};
 
-export const ModalContext = createContext<ModalContextState>({ inModal: false });
+export const ModalContext = createContext<ModalContextState>({ inModal: false, scrollEl: null });
 
-interface ModalProviderProps {
+type ModalProviderProps = {
   children: ReactNode;
-}
+  scrollEl?: HTMLElement | null;
+};
 
-export function ModalProvider({ children }: ModalProviderProps) {
-  const value = useMemo(() => ({ inModal: true }), []);
+export function ModalProvider({ children, scrollEl = null }: ModalProviderProps) {
+  const value = useMemo(() => ({ inModal: true, scrollEl }), [scrollEl]);
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
 }
 

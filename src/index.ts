@@ -152,6 +152,7 @@ export { HB_QUIPS_FLAVOR, HB_QUIPS_MISSION, HbLoadingSpinner, HbSpinnerProvider 
 export type { HeaderAction } from "./components/Headers/HeaderActions";
 export { ConfirmCloseModal } from "./components/Modal/ConfirmCloseModal";
 export { ModalBanner, ModalBody, ModalFooter, ModalHeader } from "./components/Modal/Modal";
+export { ModalFullBleed } from "./components/Modal/ModalFullBleed";
 export type { ModalProps, ModalSize } from "./components/Modal/Modal";
 export { OpenModal } from "./components/Modal/OpenModal";
 export { Navbar } from "./components/Navbar/Navbar";

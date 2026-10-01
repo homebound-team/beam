@@ -4,6 +4,8 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { PageHeader } from "src/components/Headers/PageHeader";
+import { ModalBody, ModalHeader } from "src/components/Modal/Modal";
+import { useModal } from "src/components/Modal/useModal";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -242,6 +244,35 @@ export function WithoutHeader() {
       />
     </TestProjectLayout>
   );
+}
+
+/** A table in a modal. Content above the actions scrolls away; the actions stay pinned. */
+export function InModal() {
+  const { openModal } = useModal();
+  const open = useCallback(() => {
+    openModal({
+      size: { width: "xl", height: 640 },
+      content: <ModalGridTable />,
+    });
+  }, [openModal]);
+  useEffect(open, [open]);
+  return <Button label="Open" onClick={open} />;
+}
+
+/**
+ * Same table inside `ModalBody virtualized`. The body pads only the left and hides overflow;
+ * the table still cancels padding on both sides.
+ */
+export function InVirtualizedModalBody() {
+  const { openModal } = useModal();
+  const open = useCallback(() => {
+    openModal({
+      size: { width: "xl", height: 640 },
+      content: <ModalGridTable />,
+    });
+  }, [openModal]);
+  useEffect(open, [open]);
+  return <Button label="Open" onClick={open} />;
 }
 
 /** All-white table with no page shell, so the default is not coming from document scroll. */
@@ -1268,4 +1299,40 @@ function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
       },
     ];
   });
+}
+
+function ModalGridTable({ virtualized = false }: { virtualized?: boolean }) {
+  const filterDefs = useMemo(
+    () => ({
+      needsRevision: checkboxFilter({ label: "Needs Revision" }),
+    }),
+    [],
+  );
+  const columns = useMemo(() => getColumns(false), []);
+  const storageKey = virtualized ? "grid-table-layout-modal-virtualized" : "grid-table-layout-modal";
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: { filterDefs, storageKey },
+    persistedColumns: { storageKey: `${storageKey}-columns` },
+    search: "client",
+    groupBy: { none: "None", status: "Status" },
+  });
+
+  return (
+    <>
+      <ModalHeader>Options</ModalHeader>
+      <ModalBody>
+        <div css={Css.bgGray100.p2.mb2.br8.$}>
+          Notes about this list. They sit above the table and scroll away; search and filters stay pinned.
+        </div>
+        <GridTableLayoutComponent
+          layoutState={layoutState}
+          tableProps={{
+            ...(virtualized ? { as: "virtual" } : {}),
+            columns,
+            rows: [simpleHeader, ...makeNestedRows(6)],
+          }}
+        />
+      </ModalBody>
+    </>
+  );
 }

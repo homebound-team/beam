@@ -6,6 +6,7 @@ import { filterTestIdPrefix } from "src/components/Filters/utils";
 import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
+import { useModalContext } from "src/components/Modal/ModalContext";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { type TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
@@ -78,6 +79,7 @@ function GridTableLayoutActionsComponent<
   const filterTid = useTestIds({}, filterTestIdPrefix);
 
   const { sm } = useBreakpoint();
+  const { inModal } = useModalContext();
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const insetHandled = useContentInsetHandled();
   // An inset ancestor (e.g. CenteredLayout) already pads us in from the viewport edge.
@@ -86,11 +88,12 @@ function GridTableLayoutActionsComponent<
   const [showFilters, setShowFilters] = useState(false);
 
   const [{ search: initialValue }, setQueryParams] = useQueryParams({ search: StringParam });
-  const [searchValue, setSearchValue] = useState<string>(initialValue || "");
+  // A modal table must not read or write the page's `search` query param.
+  const [searchValue, setSearchValue] = useState<string>(inModal ? "" : initialValue || "");
   const handleSearchDebounced = useDebouncedCallback((value: string) => {
     if (searchProps) {
       searchProps.onSearch(value);
-      setQueryParams({ search: value || undefined }, "replaceIn");
+      if (!inModal) setQueryParams({ search: value || undefined }, "replaceIn");
     }
   }, 300);
 
@@ -100,7 +103,7 @@ function GridTableLayoutActionsComponent<
   const controlCount = filterCount + (hasGroupBy ? 1 : 0);
   const hasFilterControls = controlCount > 0;
   // One control only — nothing to nest behind a toggle; show it inline in the toolbar on desktop.
-  const showInlineControl = !sm && controlCount === 1 && (hasGroupBy || !!(filter && setFilter));
+  const showInlineControl = !inModal && !sm && controlCount === 1 && (hasGroupBy || !!(filter && setFilter));
   const filterImpls = useMemo(() => (filterDefs ? buildFilterImpls(filterDefs) : ({} as FilterImpls<F>)), [filterDefs]);
   // Matches the pills in the collapsed filter panel: one per selected value, not one per filter.
   const activeFilterCount = useMemo(
@@ -131,7 +134,7 @@ function GridTableLayoutActionsComponent<
       clear: () => {
         handleSearchDebounced.cancel(); // discard any in-flight debounce so it can't reintroduce the stale value
         setSearchValue("");
-        setQueryParams({ search: undefined }, "replaceIn");
+        if (!inModal) setQueryParams({ search: undefined }, "replaceIn");
       },
     };
   }

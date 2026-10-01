@@ -11,7 +11,7 @@ import React, {
 } from "react";
 import { type Components, type ListRange, Virtuoso, VirtuosoGrid, type VirtuosoHandle } from "react-virtuoso";
 import type { ImageFitType } from "src/components/Card";
-import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
+import { useScrollViewportWidth, useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { type GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -216,6 +216,8 @@ export type GridTableProps<R extends Kinded, X> = {
    * This is beneficial when looking at the same table, but of a different subject (i.e. Project A's PreCon Schedule vs Project A's Construction schedule)
    */
   visibleColumnsStorageKey?: string;
+  /** When false, visible columns and widths stay in memory. Defaults to true. */
+  persistVisibleColumns?: boolean;
   /**
    * Infinite scroll is only supported with `as=virtual` mode
    *
@@ -287,6 +289,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     activeRowId,
     activeCellId,
     visibleColumnsStorageKey,
+    persistVisibleColumns = true,
     infiniteScroll,
     onRowSelect,
     onRowDrop: droppedCallback,
@@ -298,6 +301,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const scrollViewportWidth = useScrollViewportWidth();
+  // With an outer scroller (the document, or a layout that names its visible width), the table can grow wider than its probe.
+  const growsIntoScroller = inDocumentScrollLayout || scrollViewportWidth !== undefined;
   const insetHandled = useContentInsetHandled();
   // Gutters align the table with the page inset; an inset ancestor (e.g. CenteredLayout) already does that.
   const withGutters = columnGutter && inDocumentScrollLayout && !insetHandled;
@@ -327,7 +333,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       // Push the initial columns directly into tableState, b/c that is what
       // makes the tests pass, but then further updates we'll do through useEffect
       // to avoid "Cannot update component during render" errors.
-      api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey, persistVisibleColumns);
       return api;
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
@@ -356,14 +362,24 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // Use runInAction so mobx delays any reactions until all the mutations happen
     runInAction(() => {
       tableState.setRows(rows);
-      tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      tableState.setColumns(columnsWithIds, visibleColumnsStorageKey, persistVisibleColumns);
       tableState.setSearch(filter);
       tableState.setCsvPrefixRows(csvPrefixRows);
       tableState.activeRowId = activeRowId;
       tableState.activeCellId = activeCellId;
     });
     tableStateSyncedFromPropsRef.current = true;
-  }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
+  }, [
+    tableState,
+    rows,
+    columnsWithIds,
+    visibleColumnsStorageKey,
+    persistVisibleColumns,
+    activeRowId,
+    activeCellId,
+    filter,
+    csvPrefixRows,
+  ]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
@@ -387,9 +403,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       columns,
       resizeTarget ?? resizeRef,
       expandedColumnIds,
-      visibleColumnsStorageKey,
+      persistVisibleColumns ? visibleColumnsStorageKey : undefined,
       disableColumnResizing,
-      inDocumentScrollLayout,
+      growsIntoScroller,
     );
 
   // Store resetColumnWidths on the API instance so it can be called from EditColumnsButton
@@ -748,15 +764,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [tableState, tableContainerRef],
   );
 
-  // Document-scroll layouts may need a wider table shell than the resize probe when mw/% columns require it.
+  // A table inside an outer scroller may need a wider shell than the resize probe when mw/% columns require it.
   const tableStyle = useMemo(() => {
-    if (!inDocumentScrollLayout || contentWidth === undefined || tableWidth === undefined) return style;
+    if (!growsIntoScroller || contentWidth === undefined || tableWidth === undefined) return style;
 
     const minWidthPx = Math.max(style.minWidthPx ?? 0, contentWidth);
     if (minWidthPx === style.minWidthPx) return style;
 
     return { ...style, minWidthPx };
-  }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
+  }, [contentWidth, growsIntoScroller, style, tableWidth]);
 
   // TableState is updated from props in useEffect; until that runs, noData is stale on the first paint.
   // Keep the table (and width probe) mounted pre-sync; only swap to emptyState once TableState reflects props.
@@ -767,7 +783,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} {...tid.probe} />
+        <div
+          ref={resizeRef}
+          css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout, scrollViewportWidth)}
+          {...tid.probe}
+        />
         {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
         {loading && (
           <div css={loadingOverlayCss} {...tid.loadingOverlay}>
@@ -1056,9 +1076,10 @@ function VirtualGridTableView<R extends Kinded>({
   loading = false,
 }: VirtualGridTableViewProps<R>): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
+  const scrollViewportWidth = useScrollViewportWidth();
 
-  // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
-  // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
+  // Delegate to the window scroller only inside a document-scroll Beam layout; tables with a
+  // `customScrollParent` virtualize against it, and everything else keeps Virtuoso's own scroller.
   const inDocumentScrollLayout = useDocumentScrollLayout();
 
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
@@ -1165,7 +1186,7 @@ function VirtualGridTableView<R extends Kinded>({
               // Ensure the fallback message is the same width as the table
               <div
                 css={{
-                  ...getTableRefWidthStyles(true, inDocumentScrollLayout),
+                  ...getTableRefWidthStyles(true, inDocumentScrollLayout, scrollViewportWidth),
                   ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
                   ...(visibleDataRows.length === 0 && style.lastRowCss),
                 }}
@@ -1257,8 +1278,8 @@ function CardView({
 }: CardViewProps): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
 
-  // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
-  // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
+  // Delegate to the window scroller only inside a document-scroll Beam layout; tables with a
+  // `customScrollParent` virtualize against it, and everything else keeps Virtuoso's own scroller.
   const inDocumentScrollLayout = useDocumentScrollLayout();
 
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);

@@ -3,7 +3,10 @@ import React, { type RefObject, useCallback, useEffect, useLayoutEffect, useMemo
 import { Button } from "src/components/Button";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
-import { ScrollableContent } from "src/components/Layout/ScrollableContent";
+import { useModalTableLayout } from "src/components/Layout/GridTableLayout/useModalTableLayout";
+import { ScrollableContent, VirtualizedScrollParentProvider } from "src/components/Layout/ScrollableContent";
+import { ModalFullBleed } from "src/components/Modal/ModalFullBleed";
+import { modalBodyPaddingX } from "src/components/Modal/modalStyles";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -112,6 +115,7 @@ function GridTableLayoutComponent<
   const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const tid = useTestIds(props);
+  const { inModal, scrollEl, scrollViewportWidth } = useModalTableLayout();
   const columns = tableProps.columns;
 
   const hasHideableColumns = useMemo(() => {
@@ -140,7 +144,8 @@ function GridTableLayoutComponent<
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const tableActionsRef = useRef<HTMLDivElement>(null);
   const tableWrapperRef = useRef<HTMLDivElement>(null);
-  useSetTableActionsHeight(tableWrapperRef, tableActionsRef, inDocumentScrollLayout && showTableActions);
+  // In a modal the header sticks just below the actions. On a document-scroll page the same var clears the page chrome.
+  useSetTableActionsHeight(tableWrapperRef, tableActionsRef, (inDocumentScrollLayout || inModal) && showTableActions);
 
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
@@ -225,24 +230,39 @@ function GridTableLayoutComponent<
     </>
   );
 
-  const tableScrollContent = (
-    <>
-      {showTableActions && (
-        <div
-          ref={tableActionsRef}
-          css={
-            Css.if(inDocumentScrollLayout)
+  const actionsBar = showTableActions && (
+    <div
+      ref={tableActionsRef}
+      css={
+        inModal
+          ? {
+              ...Css.sticky.top0.left0.w("100cqw").z(zIndices.tableActions).bgColor(Tokens.Surface).$,
+              ...modalBodyPaddingX,
+            }
+          : Css.if(inDocumentScrollLayout)
               .transitionTop.sticky.top(stickyNavAndHeaderOffset())
               .left(documentScrollChromeLeft())
               .w(`min(100%, ${documentScrollChromeWidth()})`)
               .z(zIndices.tableActions)
               .bgColor(Tokens.Surface).$
-          }
-          {...tid.stickyContent}
-        >
-          {tableActionsEl}
-        </div>
-      )}
+      }
+      {...tid.stickyContent}
+    >
+      {tableActionsEl}
+    </div>
+  );
+
+  const tableScrollContent = inModal ? (
+    // Wider than the modal when the columns are, so sticky actions have a box to hold in.
+    <div css={Css.wmaxc.mw100.$}>
+      {actionsBar}
+      <VirtualizedScrollParentProvider element={scrollEl} viewportWidth={scrollViewportWidth}>
+        {tableBody}
+      </VirtualizedScrollParentProvider>
+    </div>
+  ) : (
+    <>
+      {actionsBar}
       {inDocumentScrollLayout ? (
         // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
         rightPane ? (
@@ -259,17 +279,19 @@ function GridTableLayoutComponent<
     </>
   );
 
-  return (
-    /* Wrapper sets --beam-table-actions-height so sticky headers / the pane can read it. */
+  /* Wrapper sets --beam-table-actions-height so sticky headers / the pane can read it. */
+  const tableWrapper = (
     <div
       ref={tableWrapperRef}
-      css={inDocumentScrollLayout ? Css.df.fdc.wfc.mw100.$ : Css.df.fdc.$}
-      {...(showTableActions ? selfTopSpaced : {})}
+      css={inModal ? {} : inDocumentScrollLayout ? Css.df.fdc.wfc.mw100.$ : Css.df.fdc.$}
+      {...(showTableActions && !inModal ? selfTopSpaced : {})}
       {...tid.tableWrapper}
     >
       {tableScrollContent}
     </div>
   );
+
+  return inModal ? <ModalFullBleed omitPadding>{tableWrapper}</ModalFullBleed> : tableWrapper;
 }
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;

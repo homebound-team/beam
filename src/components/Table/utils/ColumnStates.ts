@@ -24,8 +24,12 @@ export class ColumnStates<R extends Kinded> {
    * So like you expand a column, and new columns show up, but we'll remember they
    * were hidden last time you looked at this specific expansion of columns.
    */
-  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
-    if (columns.some((c) => c.canHide)) {
+  setColumns(
+    columns: GridColumnWithId<R>[],
+    visibleColumnsStorageKey: string | undefined,
+    persistVisibleColumns = true,
+  ): void {
+    if (persistVisibleColumns && columns.some((c) => c.canHide)) {
       // We optionally auto-calc visible columns based on the currently-_potentially_-visible columns
       visibleColumnsStorageKey ??= camelCase(columns.map((c) => c.id).join());
       this.loadVisible(visibleColumnsStorageKey);

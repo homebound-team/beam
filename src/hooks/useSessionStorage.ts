@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 
 type UseSessionStorage<T> = [T, (value: T) => void];
 
-export function useSessionStorage<T>(key: string, defaultValue: T): UseSessionStorage<T> {
+export function useSessionStorage<T>(key: string, defaultValue: T, persist: boolean = true): UseSessionStorage<T> {
   let hasSessionStorage = false;
   try {
     hasSessionStorage = !!window.sessionStorage;
@@ -11,7 +11,7 @@ export function useSessionStorage<T>(key: string, defaultValue: T): UseSessionSt
   }
 
   const [state, setState] = useState(() => {
-    if (!hasSessionStorage) {
+    if (!persist || !hasSessionStorage) {
       return defaultValue;
     }
     const parsed = getParsedStorage(key);
@@ -24,12 +24,12 @@ export function useSessionStorage<T>(key: string, defaultValue: T): UseSessionSt
 
   const setAndSave = useCallback(
     (value: T) => {
-      if (hasSessionStorage && value) {
+      if (persist && hasSessionStorage && value) {
         sessionStorage.setItem(key, JSON.stringify(value));
       }
       setState(value);
     },
-    [hasSessionStorage, key],
+    [hasSessionStorage, key, persist],
   );
 
   return [state, setAndSave];

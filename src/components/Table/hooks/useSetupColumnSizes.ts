@@ -32,12 +32,12 @@ export function useSetupColumnSizes<R extends Kinded>(
   expandedColumnIds: string[],
   visibleColumnsStorageKey: string | undefined,
   disableColumnResizing: boolean,
-  inDocumentScrollLayout: boolean,
+  growsIntoScroller: boolean,
 ): {
   columnSizes: string[];
   /** Container width from the resize probe (unchanged when content expands). */
   tableWidth: number | undefined;
-  /** Row width required by column defs; only expands beyond probe in document-scroll layouts. */
+  /** Row width required by column defs; only expands beyond probe when the table grows into an outer scroller. */
   contentWidth: number | undefined;
   resizedWidths: ResizedWidths;
   setResizedWidth: (columnId: string, width: number) => void;
@@ -57,7 +57,7 @@ export function useSetupColumnSizes<R extends Kinded>(
   const [contentWidth, setContentWidth] = useState<number | undefined>();
   const [columnSizes, setColumnSizes] = useState<string[]>(
     () =>
-      calcColumnLayout(columns, undefined, style.minWidthPx, expandedColumnIds, resizedWidths, inDocumentScrollLayout)
+      calcColumnLayout(columns, undefined, style.minWidthPx, expandedColumnIds, resizedWidths, growsIntoScroller)
         .columnSizes,
   );
   // Track previous table width to detect container resize
@@ -71,13 +71,13 @@ export function useSetupColumnSizes<R extends Kinded>(
         style.minWidthPx,
         expandedColumnIds,
         resizedWidths,
-        inDocumentScrollLayout,
+        growsIntoScroller,
       );
       setTableWidth(probeWidth);
       setContentWidth(layout.contentWidth);
       setColumnSizes(layout.columnSizes);
     },
-    [columns, style.minWidthPx, expandedColumnIds, resizedWidths, inDocumentScrollLayout],
+    [columns, style.minWidthPx, expandedColumnIds, resizedWidths, growsIntoScroller],
   );
 
   // Scale resized column widths when container width changes

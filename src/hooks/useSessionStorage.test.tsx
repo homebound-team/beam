@@ -34,6 +34,20 @@ describe("useSessionStorage", () => {
     expect(r.firstName).toHaveValue("update");
   });
 
+  it("does not read or write session storage when persist is false", async () => {
+    // Given a saved value
+    sessionStorage.setItem("test", '{ "firstName": "saved" }');
+    // When persist is off
+    const r = await render(<EphemeralTestComponent />);
+    // Then the default is used
+    expect(r.firstName).toHaveValue("default");
+    // When the value changes
+    type(r.firstName, "update");
+    // Then memory updates and the stored value is unchanged
+    expect(r.firstName).toHaveValue("update");
+    expect(sessionStorage.getItem("test")).toBe('{ "firstName": "saved" }');
+  });
+
   it("returns the default value if it cannot parse the stored string", async () => {
     // Given an value in session storage that cannot be parsed in session storage
     sessionStorage.setItem("test", "undefined");
@@ -46,6 +60,13 @@ describe("useSessionStorage", () => {
 
 function TestComponent() {
   const [storage, setStorage] = useSessionStorage("test", { firstName: "default" });
+  return (
+    <TextField label="First Name" value={storage.firstName} onChange={(v) => setStorage({ firstName: v ?? "" })} />
+  );
+}
+
+function EphemeralTestComponent() {
+  const [storage, setStorage] = useSessionStorage("test", { firstName: "default" }, false);
   return (
     <TextField label="First Name" value={storage.firstName} onChange={(v) => setStorage({ firstName: v ?? "" })} />
   );

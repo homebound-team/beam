@@ -3,6 +3,7 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { ModalProvider } from "src/components/Modal/ModalContext";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -992,7 +993,204 @@ describe("GridTableLayout", () => {
     });
     expect(onEndReached).toHaveBeenCalledWith(3);
   });
+
+  it("does not apply document-scroll chrome", async () => {
+    // Given a document-scroll page with the table inside a modal
+    const rectSpy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      height: 40,
+      width: 800,
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      bottom: 40,
+      right: 800,
+      toJSON: () => ({}),
+    } as DOMRect);
+    const api = new GridTableApiImpl<Row>();
+
+    try {
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <ModalProvider>
+            <TestWrapper
+              hideEditColumns
+              layoutStateProps={getModalFilterProps("modal-chrome")}
+              tableProps={{
+                api,
+                columns: getColumns(),
+                rows: [simpleHeader, ...getRows()],
+              }}
+            />
+          </ModalProvider>
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+      // Then page gutters are not applied. The actions height is published so the header sticks below them.
+      expect(api.getVisibleColumnIds()[0]).toBe("name");
+      expect(r.tableWrapper.style.getPropertyValue(beamTableActionsHeightVar)).toBe("40px");
+    } finally {
+      rectSpy.mockRestore();
+    }
+  });
+
+  it("pins actions to the modal scroller", async () => {
+    // Given a modal table
+    const r = await render(
+      <ModalProvider>
+        <TestWrapper
+          hideEditColumns
+          layoutStateProps={getModalFilterProps("modal-scroll")}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />
+      </ModalProvider>,
+      withRouter(),
+    );
+    // Then the actions stick inside the modal instead of owning a separate scroller
+    expect(r.stickyContent).toHaveStyle({ position: "sticky" });
+    expect(r.query.scroll).toBeNull();
+  });
+
+  it("pins actions for a virtualized modal table", async () => {
+    // Given a virtualized table in a modal. jsdom cannot mount Virtuoso, so this stays a div table.
+    setRunningInJest();
+    const r = await render(
+      <ModalProvider>
+        <TestWrapper
+          hideEditColumns
+          layoutStateProps={getModalFilterProps("modal-virtual-scroll")}
+          tableProps={{
+            as: "virtual",
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />
+      </ModalProvider>,
+      withRouter(),
+    );
+    // Then the actions still stick, and the table renders in the modal flow
+    expect(r.stickyContent).toHaveStyle({ position: "sticky" });
+    expect(r.gridTable).toBeInTheDocument();
+  });
+
+  it("does not adopt a filter from the page query", async () => {
+    // Given the page already has a filter query param and nothing stored for the modal
+    const storageKey = "modal-filter";
+    sessionStorage.removeItem(storageKey);
+    const r = await render(
+      <ModalProvider>
+        <TestWrapper
+          hideEditColumns
+          layoutStateProps={{
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey,
+            },
+          }}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />
+      </ModalProvider>,
+      withRouter(`/?filter=${encodeURIComponent(JSON.stringify({ needsRevision: true }))}`),
+    );
+    // Then the modal table ignores the page filter
+    expect(r.query.filter_pill_needsRevision).toBeNull();
+  });
+
+  it("keeps group by off the page query param", async () => {
+    // Given the page groupBy query param and a modal table
+    const r = await render(
+      <ModalProvider>
+        <TestWrapper
+          hideEditColumns
+          layoutStateProps={{
+            groupBy: { none: "None", status: "Status" },
+            persistedFilter: {
+              filterDefs: {
+                needsRevision: checkboxFilter({ label: "Needs Revision" }),
+              },
+              storageKey: "modal-group-by",
+            },
+          }}
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />
+      </ModalProvider>,
+      withRouter("/?groupBy=status"),
+    );
+    // When the consolidated filter panel is opened
+    click(r.gridTableLayoutActions_filterButton);
+    // Then group by starts at the first option instead of the page param
+    expect(r.groupBy).toHaveValue("None");
+  });
+
+  it("restores visible columns from session storage", async () => {
+    // Given stored visible columns
+    const storageKey = "modal-columns";
+    sessionStorage.setItem(storageKey, JSON.stringify(["name"]));
+    const api = new GridTableApiImpl<Row>();
+    // When a modal table uses that key
+    await render(
+      <ModalProvider>
+        <TestWrapper
+          layoutStateProps={{ persistedColumns: { storageKey } }}
+          tableProps={{
+            api,
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />
+      </ModalProvider>,
+      withRouter(),
+    );
+    // Then the stored columns are applied
+    expect(api.getVisibleColumnIds()).toContain("name");
+    expect(api.getVisibleColumnIds()).not.toContain("value");
+  });
+
+  it("restores the list/card view from local storage", async () => {
+    // Given card view is stored
+    const storageKey = getGridTableViewStorageKey("/");
+    localStorage.setItem(storageKey, "card");
+    // When a modal table mounts with list as the default
+    const r = await render(
+      <ModalProvider>
+        <TestWrapper
+          layoutStateProps={{}}
+          withCardView
+          defaultView="list"
+          tableProps={{
+            columns: getColumns(),
+            rows: [simpleHeader, ...getRows()],
+          }}
+        />
+      </ModalProvider>,
+      withRouter(),
+    );
+    // Then card view is restored, which hides the column editor
+    expect(r.query.columns).not.toBeInTheDocument();
+  });
 });
+
+function getModalFilterProps(storageKey: string) {
+  return {
+    persistedFilter: {
+      filterDefs: {
+        needsRevision: checkboxFilter({ label: "Needs Revision" }),
+      },
+      storageKey,
+    },
+  };
+}
 
 type Data = { name: string | undefined; value: number | undefined };
 type HeaderRow = { kind: "header"; id: string; data: undefined };

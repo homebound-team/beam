@@ -157,9 +157,13 @@ export class TableState<R extends Kinded> {
     this.rows = rows;
   }
 
-  setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
+  setColumns(
+    columns: GridColumnWithId<R>[],
+    visibleColumnsStorageKey: string | undefined,
+    persistVisibleColumns = true,
+  ): void {
     if (columns !== this.columns) {
-      this.columnStates.setColumns(columns, visibleColumnsStorageKey);
+      this.columnStates.setColumns(columns, visibleColumnsStorageKey, persistVisibleColumns);
       this.columns = columns;
     }
   }
