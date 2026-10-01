@@ -1,14 +1,15 @@
 import React, { type MutableRefObject } from "react";
 import { DismissButton, OverlayContainer, useOverlay } from "react-aria";
 import { contrastDataTheme, useContrastScope } from "src/components/ContrastScope";
+import { shouldDismissOverlay } from "src/components/internal/shouldDismissOverlay";
 
-interface PopoverProps extends React.PropsWithChildren<any> {
+type PopoverProps = {
   triggerRef: MutableRefObject<HTMLElement | null>;
   popoverRef: MutableRefObject<HTMLDivElement | null>;
   positionProps: React.HTMLAttributes<Element>;
   onClose: () => void;
   isOpen: boolean;
-}
+} & React.PropsWithChildren<any>;
 
 /** Popover is used for generating menus and list-boxes */
 export function Popover(props: PopoverProps) {
@@ -20,21 +21,9 @@ export function Popover(props: PopoverProps) {
       isOpen,
       isDismissable: true,
       shouldCloseOnInteractOutside: (e) => {
-        // By default when passing `isDismissable: true` then Popover will `stopPropagation` of the PointerDown event, which is used nearly everywhere in React-Aria (like for clicking buttons)
-        // We do not want that propagation to be stopped, but we still want the overlay to be dismissable.
-        // When providing `isDimissable: true`, then you can also provide this callback function, `shouldCloseOnInteractOutside`
-        // By returning `false` in this function it will no longer call `stopPropagation`, but it also will not call `onHide` for us, so we need to call `onClose` ourselves.
-
-        // If we clicked the trigger element (or within it), then that will call a `state.toggle` for us.
-        // Return early if that happens.
-        if (triggerRef.current?.contains(e)) {
-          return true;
-        }
-        // Do not close the Popover if the user is interacting with a tribute menu, dialog or alert on top of it, otherwise close it.
-        // A dialog that contains our trigger (i.e. the Modal the menu lives in) is "underneath" the Popover, so clicks there should close it.
-        const dialog = e.closest("[role='dialog']");
-        const isDialogOnTop = !!dialog && !dialog.contains(triggerRef.current);
-        return !(e.closest(".tribute-container") || isDialogOnTop || e.closest("[role='alert']"));
+        // Returning `true` closes and stops the event. Returning `false` lets it through and does not close.
+        if (triggerRef.current?.contains(e)) return true;
+        return shouldDismissOverlay(e, triggerRef.current);
       },
       ...others,
     },
