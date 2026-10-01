@@ -316,7 +316,7 @@ function createGridTableLayoutColumns() {
     header: () => ({ content: "Priority" }),
     parent: (row) => ({ content: row.priority, value: row.priority }),
     data: (row) => ({ content: row.priority }),
-    mw: "80px",
+    mw: "120px",
   });
   const actionColumn = column<GridTableLayoutRow>({
     id: "action-col",

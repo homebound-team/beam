@@ -129,6 +129,51 @@ describe("EditColumnsButton", () => {
     // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
   });
+
+  it("shows an info icon for columns with a hover tooltip", async () => {
+    // Given a hideable column with a tooltip and one without
+    const columnsWithTooltip: GridColumn<Row>[] = [
+      column<Row>({
+        id: "name",
+        name: "Name",
+        header: "Name",
+        data: ({ name }) => name,
+        tooltip: "The row name",
+      }),
+      column<Row>({ id: "value", name: "Value", header: "Value", data: ({ value }) => value }),
+    ];
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <EditColumnsButton columns={columnsWithTooltip} defaultOpen={true} api={_api} />;
+    }
+    // When the menu is open
+    const r = await render(<Test />);
+    // Then only the column with a tooltip shows the icon
+    expect(r.columns_tooltip_name).toHaveAttribute("title", "The row name");
+    expect(r.query.columns_tooltip_value).toBeNull();
+  });
+
+  it("calls a column tooltip and closes the menu", async () => {
+    // Given a column whose tooltip opens a modal
+    const onTooltip = vi.fn();
+    const columnsWithTooltip: GridColumn<Row>[] = [
+      column<Row>({ id: "name", name: "Name", header: "Name", data: ({ name }) => name, tooltip: onTooltip }),
+      column<Row>({ id: "value", name: "Value", header: "Value", data: ({ value }) => value }),
+    ];
+    function Test() {
+      const api = useGridTableApi<Row>();
+      return <EditColumnsButton columns={columnsWithTooltip} defaultOpen={true} api={api} />;
+    }
+    const r = await render(<Test />);
+    expect(r.columns_tooltip_name).toHaveAttribute("aria-label", "Name information");
+    // When the info icon is clicked
+    click(r.columns_tooltip_name);
+    // Then the callback runs and the menu closes
+    expect(onTooltip).toHaveBeenCalledTimes(1);
+    expect(r.query.columns_optionname).toBeNull();
+  });
 });
 
 type Data = { name: string | undefined; value: number | undefined };

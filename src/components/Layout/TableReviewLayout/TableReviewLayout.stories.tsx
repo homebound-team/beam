@@ -253,7 +253,7 @@ export function TableReviewLayout() {
         name: "Priority",
         header: "Priority",
         data: ({ priority }) => priority,
-        w: "90px",
+        w: "120px",
       }),
       column<Row>({
         id: "action",

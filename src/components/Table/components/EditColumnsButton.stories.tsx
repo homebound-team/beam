@@ -1,10 +1,15 @@
 import type { Meta } from "@storybook/react-vite";
+import { Button } from "src/components/Button";
+import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
+import { useModal } from "src/components/Modal/useModal";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn } from "src/components/Table/types";
+import { column } from "src/components/Table/utils/columns";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
+import { newStory, withBeamDecorator } from "src/utils/sb";
 
 export default {
   component: EditColumnsButton,
@@ -120,6 +125,61 @@ export function EditColumnButtonInAction() {
         sorting={{ on: "client" }}
         api={api}
       />
+    </div>
+  );
+}
+
+/** Hover tooltips and a click that opens a modal, on the header and in the menu. */
+export const ColumnTooltips = newStory(() => <ColumnTooltipsExample />, { decorators: [withBeamDecorator] });
+
+function ColumnTooltipsExample() {
+  const { openModal, closeModal } = useModal();
+  const columns: GridColumn<Row>[] = [
+    column<Row>({ id: "total", name: "Total Cost", header: "Total Cost", data: ({ value }) => value, w: "160px" }),
+    column<Row>({
+      id: "indirect",
+      name: "Indirect Hard Costs",
+      header: "Indirect Hard Costs",
+      data: ({ value }) => value,
+      tooltip: "Costs for physical work and materials on the site, but outside the structure itself.",
+      w: "220px",
+    }),
+    column<Row>({
+      id: "direct",
+      name: "Direct Hard Costs",
+      header: "Direct Hard Costs",
+      data: ({ name }) => name,
+      tooltip: () =>
+        openModal({
+          content: (
+            <>
+              <ModalHeader>Direct Hard Costs</ModalHeader>
+              <ModalBody>
+                Costs for the materials and labor that go directly into building the structure itself.
+              </ModalBody>
+              <ModalFooter>
+                <Button label="Done" onClick={closeModal} />
+              </ModalFooter>
+            </>
+          ),
+        }),
+      w: "220px",
+    }),
+  ];
+  const api = useGridTableApi<Row>();
+  return (
+    <div css={Css.df.aifs.gap4.p2.$}>
+      <GridTable
+        columns={columns}
+        sorting={{ on: "client" }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "1", data: { name: "Temp fencing", value: 1 } },
+          { kind: "data", id: "2", data: { name: "Site cleanup", value: 2 } },
+        ]}
+        api={api}
+      />
+      <EditColumnsButton api={api} columns={columns} defaultOpen placement="right" />
     </div>
   );
 }

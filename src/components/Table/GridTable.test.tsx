@@ -5318,6 +5318,67 @@ describe("GridTable", () => {
     expect(cell(r, 1, 0)).toHaveTextContent("1");
     expect(cell(r, 1, 1)).toBeUndefined();
   });
+
+  it("shows a column tooltip on the header", async () => {
+    // Given a column tooltip
+    const columnsWithTooltip: GridColumn<Row>[] = [
+      { id: "name", header: "Name", data: ({ name }) => name, tooltip: "What name means" },
+      valueColumn,
+    ];
+    const r = await render(
+      <GridTable
+        columns={columnsWithTooltip}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
+      />,
+    );
+    // Then the header explains the column and the body cell does not
+    expect(r.columnTooltip).toHaveAttribute("title", "What name means");
+    expect(cell(r, 1, 0).querySelector("[data-testid='columnTooltip']")).toBeNull();
+  });
+
+  it("runs a column tooltip click", async () => {
+    // Given a column tooltip that opens a modal
+    const onTooltip = vi.fn();
+    const columnsWithTooltip: GridColumn<Row>[] = [
+      { id: "name", header: "Name", data: ({ name }) => name, tooltip: onTooltip },
+      valueColumn,
+    ];
+    const r = await render(
+      <GridTable
+        columns={columnsWithTooltip}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
+      />,
+    );
+    expect(r.columnTooltip).toHaveAttribute("aria-label", "Name information");
+    // When the info icon is clicked
+    click(r.columnTooltip);
+    // Then the callback runs
+    expect(onTooltip).toHaveBeenCalledTimes(1);
+  });
+
+  it("prefers a header cell tooltip over the column tooltip", async () => {
+    // Given a header cell tooltip and a column tooltip
+    const onTooltip = vi.fn();
+    const columnsWithTooltip: GridColumn<Row>[] = [
+      {
+        id: "name",
+        header: () => ({ content: "Name", tooltip: "From the cell" }),
+        data: ({ name }) => name,
+        tooltip: onTooltip,
+      },
+      valueColumn,
+    ];
+    // When the table renders
+    const r = await render(
+      <GridTable
+        columns={columnsWithTooltip}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
+      />,
+    );
+    // Then only the cell tooltip is shown
+    expect(r.tooltip).toHaveAttribute("title", "From the cell");
+    expect(r.query.columnTooltip).toBeNull();
+  });
 });
 
 function Collapse({ id }: { id: string }) {

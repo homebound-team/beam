@@ -106,6 +106,11 @@ export type GridColumn<R extends Kinded> = {
   hideOnExpand?: boolean;
   /** Determines whether a column is csv-only or web-only. */
   showIn?: "csv" | "web";
+  /**
+   * Info icon on the `header` row and in Edit Columns.
+   * A node is a hover tooltip; a function runs on click. A header cell's own `tooltip` wins.
+   */
+  tooltip?: ReactNode | VoidFunction;
 };
 
 /**
@@ -138,6 +143,7 @@ export const nonKindGridColumnKeys = [
   "initExpanded",
   "hideOnExpand",
   "showIn",
+  "tooltip",
 ];
 
 /**
