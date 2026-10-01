@@ -5,6 +5,7 @@ import { Button } from "src/components/Button";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
+import { InlineFeedbackBanner } from "src/components/InlineFeedbackBanner";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
 import { ProposedValue } from "src/components/ProposedValue";
 import {
@@ -813,6 +814,90 @@ export const CompanionRows = newStory(() => {
         if (row.data.suggestion === "remove") return Css.bgRed50.$;
         return {};
       },
+    },
+  };
+
+  return <GridTable columns={columns} rows={rows} rowStyles={rowStyles} />;
+}, {});
+
+/** Several `InlineFeedbackBanner`s stacked 8px apart in one companion, as on Blueprint's bid packages page. */
+export const CompanionRowsStackedBanners = newStory(() => {
+  type CostCodeData = { costCode: string; status: "Incomplete" | "Missing" | "Complete" };
+  type CostCodeRow = SimpleHeaderAndData<CostCodeData>;
+
+  const columns: GridColumn<CostCodeRow>[] = [
+    { header: "Cost Code", data: ({ costCode }) => costCode },
+    { header: "Status", data: ({ status }) => status },
+  ];
+
+  const editBid = { label: "Edit Bid", onClick: noop };
+  const rows: GridDataRow<CostCodeRow>[] = [
+    simpleHeader,
+    {
+      kind: "data",
+      id: "1",
+      data: { costCode: "1050 Framing Labor", status: "Incomplete" },
+      companion: () => (
+        <div css={Css.df.fdc.gap1.$}>
+          <InlineFeedbackBanner
+            type="warning"
+            tagText="Missing options"
+            description="Options are missing from the awarded bid package."
+            actions={[editBid]}
+          />
+          <InlineFeedbackBanner
+            type="warning"
+            tagText="Cost missing scope"
+            description="Costs have been awarded but do not have any associated takeoff line items. Remove the bid line or contact the estimation team to update takeoffs."
+            actions={[editBid]}
+          />
+          <InlineFeedbackBanner
+            type="warning"
+            tagText="Missing trade"
+            description="This bid is a provisional estimate and needs to be awarded to a trade."
+            actions={[{ label: "View", onClick: noop }]}
+          />
+        </div>
+      ),
+    },
+    {
+      kind: "data",
+      id: "2",
+      data: { costCode: "2010 Drywall Materials", status: "Missing" },
+      companion: () => (
+        <div css={Css.df.fdc.gap1.$}>
+          <InlineFeedbackBanner
+            type="error"
+            tagText="Missing bids"
+            description="Scope was found for Drywall Materials but no bids exist."
+            actions={[
+              {
+                kind: "menu",
+                label: "Create Bid Package",
+                items: [
+                  { label: "Plan Based", onClick: noop },
+                  { label: "Unit Based", onClick: noop },
+                ],
+              },
+            ]}
+          />
+          <InlineFeedbackBanner
+            type="warning"
+            tagText="Missing costs"
+            description="Some bid packages are missing costs."
+            actions={[editBid]}
+          />
+        </div>
+      ),
+    },
+    { kind: "data", id: "3", data: { costCode: "3000 Plumbing Labor", status: "Complete" } },
+  ];
+
+  // Blueprint tints flagged rows; `cellCss` carries the tint onto the companion
+  const rowStyles: RowStyles<CostCodeRow> = {
+    data: {
+      cellCss: ({ data: { status } }) =>
+        status === "Missing" ? Css.bgRed50.$ : status === "Incomplete" ? Css.bgOrange50.$ : {},
     },
   };
 

@@ -33,6 +33,7 @@ export * from "./components/ButtonMenu";
 export * from "./components/ButtonModal";
 export * from "./components/Card";
 export * from "./components/Carousel";
+export * from "./components/CompoundField";
 export * from "./components/ContrastScope";
 export * from "./components/Copy";
 export * from "./components/CountBadge";

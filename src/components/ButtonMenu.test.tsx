@@ -237,6 +237,21 @@ describe("ButtonMenu", () => {
     expect(r.query.trigger_optionA).toBe(null);
   });
 
+  it("shrinks the chevron for text triggers only", async () => {
+    // Given a text trigger and a default trigger
+    const items = [{ label: "Option A", onClick: noop }];
+    const r = await render(
+      <>
+        <ButtonMenu trigger={{ label: "Text", variant: "text" }} items={items} />
+        <ButtonMenu trigger={{ label: "Default" }} items={items} />
+      </>,
+      withRouter(),
+    );
+    // Then only the text trigger gets the small chevron
+    expect(r.text.querySelector("svg")).toHaveAttribute("width", "16");
+    expect(r.default.querySelector("svg")).toHaveAttribute("width", "24");
+  });
+
   it("renders a non-interactive header above menu items", async () => {
     // Given a ButtonMenu with a header
     const r = await render(
