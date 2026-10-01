@@ -257,6 +257,32 @@ export function WithoutHeader() {
   );
 }
 
+/** A table in a modal. Content above the actions scrolls away; the actions stay pinned. */
+export function InModal() {
+  const { openModal } = useModal();
+  const open = useCallback(() => {
+    openModal({
+      size: { width: "xl", height: 640 },
+      content: <ModalGridTable />,
+    });
+  }, [openModal]);
+  useEffect(open, [open]);
+  return <Button label="Open" onClick={open} />;
+}
+
+/** A virtual table in a plain `ModalBody`. The modal scroller is the table's scroll parent. */
+export function InVirtualizedModalBody() {
+  const { openModal } = useModal();
+  const open = useCallback(() => {
+    openModal({
+      size: { width: "xl", height: 640 },
+      content: <ModalGridTable virtualized />,
+    });
+  }, [openModal]);
+  useEffect(open, [open]);
+  return <Button label="Open" onClick={open} />;
+}
+
 /** All-white table with no page shell, so the default is not coming from document scroll. */
 export function OutsidePageLayout() {
   const columns = useMemo(() => getColumns(false), []);
@@ -1213,7 +1239,7 @@ function getColumns(showColor: boolean = false) {
     parent: (row) => ({ content: row.priority, value: row.priority, css: Css.if(showColor).bgYellow500.$ }),
     data: (row) => ({ content: row.priority, css: Css.if(showColor).bgYellow500.$ }),
     // Room for the label, the reserved sort icon, and the column info icon.
-    mw: "120px",
+    mw: "1220px",
   });
   const actionColumn = column<Row>({
     id: "action-col",
@@ -1294,4 +1320,40 @@ function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
       },
     ];
   });
+}
+
+function ModalGridTable({ virtualized = false }: { virtualized?: boolean }) {
+  const filterDefs = useMemo(
+    () => ({
+      needsRevision: checkboxFilter({ label: "Needs Revision" }),
+    }),
+    [],
+  );
+  const columns = useMemo(() => getColumns(false), []);
+  const storageKey = virtualized ? "grid-table-layout-modal-virtualized" : "grid-table-layout-modal";
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: { filterDefs, storageKey },
+    persistedColumns: { storageKey: `${storageKey}-columns` },
+    search: "client",
+    groupBy: { none: "None", status: "Status" },
+  });
+
+  return (
+    <>
+      <ModalHeader>Options</ModalHeader>
+      <ModalBody>
+        <div css={Css.bgGray100.p2.mb2.br8.$}>
+          Notes about this list. They sit above the table and scroll away; search and filters stay pinned.
+        </div>
+        <GridTableLayoutComponent
+          layoutState={layoutState}
+          tableProps={{
+            ...(virtualized ? { as: "virtual" } : {}),
+            columns,
+            rows: [simpleHeader, ...makeNestedRows(6)],
+          }}
+        />
+      </ModalBody>
+    </>
+  );
 }
