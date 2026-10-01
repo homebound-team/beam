@@ -39,15 +39,15 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
     : { type: tagType, variant: tagVariant, icon, text: fallbackTagText, iconOnly: true };
 
   return (
-    <div css={Css.df.ais.gap1.w100.p1.br4.xs.bgColor(Tokens.Surface).ba.bc(borderColor).bshBasic.$} {...tid}>
-      <span css={Css.df.fs0.$}>
+    <div css={Css.df.ais.w100.p1.br4.xs.bgColor(Tokens.Surface).ba.bc(borderColor).boxShadow(bannerShadow).$} {...tid}>
+      <span css={Css.df.aic.hPx(24).fs0.$}>
         <Tag {...tagProps} {...tid.tag} />
       </span>
-      <span css={Css.fg1.mw0.ptPx(1).color(Tokens.OnSurface).$} {...tid.description}>
+      <span css={Css.fg1.mw0.mlPx(4).pyPx(4).color(Tokens.OnSurface).$} {...tid.description}>
         {description}
       </span>
       {actions.length > 0 && (
-        <div css={Css.df.aic.gap(1.5).fs0.$}>
+        <div css={Css.df.aic.hPx(24).gap2.mlPx(20).fs0.$}>
           {actions.map((action) =>
             "kind" in action ? (
               <ButtonMenu
@@ -66,6 +66,9 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
     </div>
   );
 }
+
+// Design's banner shadow, lighter than `bshBasic`. Intentionally unique to this component.
+const bannerShadow = "0px 2px 4px rgba(53, 53, 53, 0.08)";
 
 type TypeStyle = { icon: IconKey; tagType: TagType; borderColor: BeamColor; fallbackTagText: string };
 

@@ -229,7 +229,7 @@ const variantStyles: Record<
 
   text: {
     baseStyles: Css.color(Tokens.TextLinkDefault).add("fontSize", "inherit").$,
-    hoverStyles: Css.color(Tokens.TextLinkHover).$,
+    hoverStyles: Css.color(Tokens.TextLinkHover).tdu.$,
     pressedStyles: Css.color(Tokens.TextLinkPressed).$,
     disabledStyles: Css.color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
