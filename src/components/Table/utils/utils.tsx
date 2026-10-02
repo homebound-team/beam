@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { Icon } from "src/components/Icon";
 import type { GridCellContent } from "src/components/Table/components/cell";
+import { ColumnTooltipIcon } from "src/components/Table/components/ColumnTooltipIcon";
 import { ExpandableHeader } from "src/components/Table/components/ExpandableHeader";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import type { GridRowApi } from "src/components/Table/GridTableApi";
-import type { GridStyle } from "src/components/Table/TableStyles";
+import { expandableHeaderRowHeight, type GridStyle } from "src/components/Table/TableStyles";
 import type {
   GridCellAlignment,
   GridColumnBorder,
@@ -55,10 +56,20 @@ export function toContent(
       "GridTables with as=virtual & sortable columns should use functions that return JSX, instead of JSX",
     );
   }
-  const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
-  const tooltipEl = tooltip ? (
+  const cellTooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
+  // One icon. A header cell tooltip wins over the column tooltip, in the same slot.
+  const columnTooltip = !cellTooltip && isHeader ? column.tooltip : undefined;
+  const tooltipEl = cellTooltip ? (
     <span css={Css.fs0.mlPx(4).$}>
-      <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.OnSurfaceMuted} />
+      <Icon icon="infoCircle" tooltip={cellTooltip} inc={2} color={Tokens.OnSurfaceMuted} />
+    </span>
+  ) : columnTooltip ? (
+    <span css={Css.fs0.mlPx(4).df.aic.$}>
+      <ColumnTooltipIcon
+        tooltip={columnTooltip}
+        color={Tokens.OnSurfaceMuted}
+        label={typeof content === "string" ? content : column.name}
+      />
     </span>
   ) : null;
 
@@ -97,10 +108,11 @@ export function toContent(
     );
   } else if (content && typeof content === "string" && isExpandableHeader) {
     return (
-      <>
+      // This is the expandable header row, but not an expandable header cell. Styling it similarly in height & alignment to match the expandable header cell.
+      <div css={Css.df.aic.hPx(expandableHeaderRowHeight).$}>
         <span css={Css.lineClamp2.$}>{content}</span>
         {tooltipEl}
-      </>
+      </div>
     );
   } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
     return (

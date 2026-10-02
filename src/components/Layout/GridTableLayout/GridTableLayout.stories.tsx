@@ -4,6 +4,8 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { PageHeader } from "src/components/Headers/PageHeader";
+import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
+import { useModal } from "src/components/Modal/useModal";
 import {
   cardBadgeSlot,
   cardDataBlockSlot,
@@ -37,7 +39,18 @@ type Row = HeaderRow | ParentRow | DataRow;
 
 export function GridTableLayout() {
   const filterDefs = useMemo(() => getFilterDefs(), []);
-  const columns = useMemo(() => getColumns(false), []);
+  const { openModal, closeModal } = useModal();
+  const columns = useMemo(
+    () =>
+      getColumns(false).map((c) => {
+        if (c.id === "status-col") return { ...c, tooltip: "Whether this row is active." };
+        if (c.id === "priority-col") {
+          return { ...c, tooltip: () => openModal({ content: <PriorityModal onDone={closeModal} /> }) };
+        }
+        return c;
+      }),
+    [openModal, closeModal],
+  );
 
   const layoutState = useGridTableLayoutState({
     persistedFilter: {
@@ -1199,7 +1212,8 @@ function getColumns(showColor: boolean = false) {
     header: () => ({ content: "Priority", css: Css.if(showColor).bgYellow500.$ }),
     parent: (row) => ({ content: row.priority, value: row.priority, css: Css.if(showColor).bgYellow500.$ }),
     data: (row) => ({ content: row.priority, css: Css.if(showColor).bgYellow500.$ }),
-    mw: "80px",
+    // Room for the label, the reserved sort icon, and the column info icon.
+    mw: "120px",
   });
   const actionColumn = column<Row>({
     id: "action-col",
@@ -1221,6 +1235,18 @@ function getColumns(showColor: boolean = false) {
     priorityColumn,
     actionColumn,
   ];
+}
+
+function PriorityModal(props: { onDone: VoidFunction }) {
+  return (
+    <>
+      <ModalHeader>Priority</ModalHeader>
+      <ModalBody>How urgently this row should be worked.</ModalBody>
+      <ModalFooter>
+        <Button label="Done" onClick={props.onDone} />
+      </ModalFooter>
+    </>
+  );
 }
 
 function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {

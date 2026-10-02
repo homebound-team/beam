@@ -1,8 +1,9 @@
-import { Fragment, useCallback, useMemo, useRef } from "react";
+import { Fragment, type ReactNode, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { Button } from "src/components/Button";
 import { OverlayTrigger, type OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
+import { ColumnTooltipIcon } from "src/components/Table/components/ColumnTooltipIcon";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn, Kinded } from "src/components/Table/types";
 import { Css, Tokens } from "src/Css";
@@ -20,8 +21,7 @@ type EditColumnsButtonProps<R extends Kinded> = {
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
   const { defaultOpen, disabled, columns, api } = props;
-  // Defaults to a compact icon-only trigger; consumers can override it by passing `trigger`.
-  const state = useMenuTriggerState({ isOpen: defaultOpen });
+  const state = useMenuTriggerState({ defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
@@ -41,7 +41,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           }
           return true;
         })
-        .map((column) => ({ label: column.name!, value: column.id! })),
+        .map((column) => ({ label: column.name!, value: column.id!, tooltip: column.tooltip })),
     [columns],
   );
 
@@ -89,7 +89,17 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
         <div css={Css.dg.gtc("1fr auto").gap2.p2.fg1.mh0.oya.$}>
           {options.map((option) => (
             <Fragment key={option.value}>
-              <div css={Css.sm.truncate.pr1.$}>{option.label}</div>
+              <div css={Css.df.aic.gapPx(4).mw0.pr1.$}>
+                <span css={Css.sm.truncate.mw0.$}>{option.label}</span>
+                {option.tooltip ? (
+                  <ColumnTooltipIcon
+                    {...tid[`tooltip_${option.value}`]}
+                    tooltip={closeMenuOnClickTooltip(option.tooltip, state.close)}
+                    color={Tokens.TextLinkDefault}
+                    label={option.label}
+                  />
+                ) : null}
+              </div>
               <Switch
                 compact
                 selected={selectedValues.includes(option.value)}
@@ -112,4 +122,13 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       </div>
     </OverlayTrigger>
   );
+}
+
+/** Click tooltips close the menu first. React Aria overlays use z-index 100000, so an open menu paints over the modal. Hover content is returned unchanged. */
+function closeMenuOnClickTooltip(tooltip: ReactNode | VoidFunction, closeMenu: () => void): ReactNode | VoidFunction {
+  if (typeof tooltip !== "function") return tooltip;
+  return () => {
+    closeMenu();
+    tooltip();
+  };
 }

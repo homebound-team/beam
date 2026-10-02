@@ -15,15 +15,8 @@ type SortHeaderProps = {
 };
 
 /**
- * Wraps column header names with up/down sorting icons.
- *
- * GridTable will use this automatically if the header content is just a text string.
- *
- * Alternatively, callers can also:
- *
- * - Instantiate this SortHeader directly with some customizations in `xss`, or
- * - Write their own component that uses `GridSortContext` to access the column's
- *   current sort state + `toggleSort` function
+ * Sortable column header. GridTable uses it for string headers, or render it in a header cell yourself.
+ * `iconOnLeft` puts the sort icon before the label.
  */
 export function SortHeader(props: SortHeaderProps) {
   const { content, xss, iconOnLeft = false, sortKey, tooltipEl } = props;
@@ -32,31 +25,50 @@ export function SortHeader(props: SortHeaderProps) {
   const current = useComputed(() => tableState.sortState?.current, [tableState]);
   const sorted = sortKey === current?.columnId ? current?.direction : undefined;
   const toggleSort = useCallback(() => tableState.setSortKey(sortKey), [sortKey, tableState]);
+  const sortVisible = isHovered || sorted !== undefined;
 
   const tid = useTestIds(props, "sortHeader");
 
-  const icon = (
-    <span css={Css.fs0.$}>
+  const sortButton = (
+    <button
+      type="button"
+      aria-label={`Sort ${content}`}
+      tabIndex={-1}
+      aria-hidden
+      onClick={toggleSort}
+      css={Css.bn.bgTransparent.p0.fs0.df.aic.lh(0).h100.outline(0).onFocusVisible.bshFocus.$}
+    >
       <Icon
         icon={sorted === "DESC" ? "sortDown" : "sortUp"}
         color={sorted !== undefined ? Tokens.TextLinkDefault : Tokens.TextDisabled}
         xss={{
           ...Css.ml1.if(iconOnLeft).mr1.ml0.$,
-          ...Css.visibility("hidden")
-            .if(isHovered || sorted !== undefined)
-            .visibility("visible").$,
+          ...Css.visibility("hidden").if(sortVisible).visibility("visible").$,
         }}
         inc={2}
         {...tid.icon}
       />
-    </span>
+    </button>
   );
   return (
-    <div {...tid} css={{ ...Css.df.aic.h100.cursorPointer.usn.$, ...xss }} {...hoverProps} onClick={toggleSort}>
-      {iconOnLeft && icon}
-      <span css={Css.lineClamp2.$}>{content}</span>
+    <div css={{ ...Css.df.aic.h100.usn.mw0.$, ...xss }} {...hoverProps}>
+      {iconOnLeft && sortButton}
+      <button
+        type="button"
+        {...tid}
+        onClick={toggleSort}
+        css={
+          Css.bn.bgTransparent.p0.mw0.cursorPointer
+            .ta("inherit")
+            .fw("inherit")
+            .color("inherit")
+            .usn.df.aic.h100.outline(0).onFocusVisible.bshFocus.$
+        }
+      >
+        <span css={Css.lineClamp2.$}>{content}</span>
+      </button>
       {tooltipEl}
-      {!iconOnLeft && icon}
+      {!iconOnLeft && sortButton}
     </div>
   );
 }
