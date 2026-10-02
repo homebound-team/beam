@@ -1,6 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { ContextTag } from "src/components/ContextTag";
-import { Css } from "src/Css";
+import { LabeledExamples } from "src/utils/sb";
 
 export default {
   title: "Components/Context Tag",
@@ -15,10 +15,30 @@ export default {
 
 export function Examples() {
   return (
-    <div css={Css.df.fdc.aifs.gap2.$}>
-      <ContextTag icon="cube" text="Material" />
-      <ContextTag icon="wrench" text="Labor" />
-      <ContextTag icon="cubeDashed" text="Placeholder" />
-    </div>
+    <LabeledExamples
+      examples={[
+        {
+          label: "Variants",
+          children: (
+            <>
+              <ContextTag icon="cube" text="Material" />
+              <ContextTag icon="wrench" text="Labor" />
+              <ContextTag icon="cubeDashed" text="Placeholder" />
+            </>
+          ),
+        },
+        {
+          label: "Other icons",
+          children: (
+            <>
+              <ContextTag icon="lot" text="Lot" />
+              <ContextTag icon="task" text="Task" />
+              <ContextTag icon="bill" text="Bill" />
+              <ContextTag icon="hardHat" text="Trade" />
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
