@@ -13,7 +13,7 @@ export function ContextTag(props: ContextTagProps) {
   const tid = useTestIds(props, "contextTag");
   return (
     <span css={Css.dif.aic.gapPx(6).hPx(32).plPx(6).prPx(14).br8.bgGray100.sm.gray900.wsnw.$} {...tid}>
-      <Icon icon={icon} />
+      <Icon icon={icon} xss={Css.fs0.$} />
       {text}
     </span>
   );
