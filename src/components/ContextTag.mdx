@@ -1,0 +1,52 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as ContextTagStories from "./ContextTag.stories";
+
+<Meta of={ContextTagStories} />
+
+# Context Tag
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2739-70">
+    <img src="FigmaLogo.png" alt="" />
+    Context Tag
+  </a>
+</p>
+
+`ContextTag` says what something is, like a line item's type or a project's type. It pairs an icon with a short label and isn't interactive. For status, use `Tag`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>icon</code>
+      </td>
+      <td>
+        <code>IconKey</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Any Beam icon, shown at 24px.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>text</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Label shown beside the icon.</td>
+    </tr>
+  </tbody>
+</table>
