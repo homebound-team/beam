@@ -142,11 +142,9 @@ describe("EditColumnsButton", () => {
       }),
       column<Row>({ id: "value", name: "Value", header: "Value", data: ({ value }) => value }),
     ];
-    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
     function Test() {
-      const _api = useGridTableApi<Row>();
-      api.current = _api;
-      return <EditColumnsButton columns={columnsWithTooltip} defaultOpen={true} api={_api} />;
+      const api = useGridTableApi<Row>();
+      return <EditColumnsButton columns={columnsWithTooltip} defaultOpen={true} api={api} />;
     }
     // When the menu is open
     const r = await render(<Test />);
@@ -167,6 +165,7 @@ describe("EditColumnsButton", () => {
       return <EditColumnsButton columns={columnsWithTooltip} defaultOpen={true} api={api} />;
     }
     const r = await render(<Test />);
+    // Then the info icon is named for screen readers
     expect(r.columns_tooltip_name).toHaveAttribute("aria-label", "Name information");
     // When the info icon is clicked
     click(r.columns_tooltip_name);

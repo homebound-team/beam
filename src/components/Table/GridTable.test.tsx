@@ -4243,6 +4243,49 @@ describe("GridTable", () => {
       expect(cell(r, 2, 1)).toHaveTextContent("Dow");
     });
 
+    it("shows expanded children not in the stored visible columns", async () => {
+      // Given visible columns stored from a prior visit while the column was collapsed
+      sessionStorage.setItem("nameAge", JSON.stringify(["name", "age"]));
+      const r = await render(
+        <GridTable
+          columns={[
+            column<ExpandableRow>({
+              id: "name",
+              expandableHeader: () => "Client name",
+              header: emptyCell,
+              data: ({ firstName }) => firstName,
+              expandColumns: [
+                column<ExpandableRow>({
+                  id: "lastName",
+                  expandableHeader: emptyCell,
+                  header: "Last name",
+                  data: ({ lastName }) => lastName,
+                }),
+              ],
+            }),
+            column<ExpandableRow>({
+              id: "age",
+              expandableHeader: () => "Age",
+              header: emptyCell,
+              data: ({ age }) => age,
+            }),
+          ]}
+          rows={[
+            { kind: "header", id: "header", data: {} },
+            { kind: "expandableHeader", id: "expandableHeader", data: {} },
+            { kind: "data", id: "user:1", data: { firstName: "Brandon", lastName: "Dow", age: 36 } },
+          ]}
+        />,
+      );
+
+      // When expanding the column
+      click(r.expandableColumn);
+
+      // Then the child column is shown before the next column
+      expect(cell(r, 2, 1)).toHaveTextContent("Dow");
+      expect(cell(r, 2, 2)).toHaveTextContent("36");
+    });
+
     it("can initialize with a column expanded", async () => {
       // Given a table with expandable columns
       // When initially rendered with the expandable column set to `initExpanded: true`.
@@ -5331,13 +5374,12 @@ describe("GridTable", () => {
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
       />,
     );
-    // Then the header explains the column and the body cell does not
+    // Then only the header shows the icon
     expect(r.columnTooltip).toHaveAttribute("title", "What name means");
-    expect(cell(r, 1, 0).querySelector("[data-testid='columnTooltip']")).toBeNull();
   });
 
-  it("runs a column tooltip click", async () => {
-    // Given a column tooltip that opens a modal
+  it("calls the column tooltip on click", async () => {
+    // Given a column tooltip callback
     const onTooltip = vi.fn();
     const columnsWithTooltip: GridColumn<Row>[] = [
       { id: "name", header: "Name", data: ({ name }) => name, tooltip: onTooltip },
@@ -5349,11 +5391,36 @@ describe("GridTable", () => {
         rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
       />,
     );
-    expect(r.columnTooltip).toHaveAttribute("aria-label", "Name information");
     // When the info icon is clicked
     click(r.columnTooltip);
     // Then the callback runs
     expect(onTooltip).toHaveBeenCalledTimes(1);
+    // And the button is named for screen readers
+    expect(r.columnTooltip).toHaveAttribute("aria-label", "Name information");
+  });
+
+  it("doesn't sort when a column tooltip is clicked", async () => {
+    // Given a sortable column whose tooltip runs on click, and no initial sort
+    const onTooltip = vi.fn();
+    const r = await render(
+      <GridTable
+        columns={[{ id: "name", header: "Name", data: ({ name }) => name, tooltip: onTooltip }, valueColumn]}
+        sorting={{ on: "client", initial: undefined }}
+        rows={[
+          simpleHeader,
+          { kind: "data", id: "2", data: { name: "b", value: 2 } },
+          { kind: "data", id: "1", data: { name: "a", value: 3 } },
+          { kind: "data", id: "3", data: { name: "c", value: 1 } },
+        ]}
+      />,
+    );
+    // When the info icon is clicked
+    click(r.columnTooltip);
+    // Then the tooltip runs and the rows stay in their original order
+    expect(onTooltip).toHaveBeenCalledTimes(1);
+    expect(cell(r, 1, 0)).toHaveTextContent("b");
+    expect(cell(r, 2, 0)).toHaveTextContent("a");
+    expect(cell(r, 3, 0)).toHaveTextContent("c");
   });
 
   it("prefers a header cell tooltip over the column tooltip", async () => {
@@ -5377,6 +5444,15 @@ describe("GridTable", () => {
     );
     // Then only the cell tooltip is shown
     expect(r.tooltip).toHaveAttribute("title", "From the cell");
+    expect(r.query.columnTooltip).toBeNull();
+  });
+
+  it("doesn't add a column tooltip to select or collapse columns", async () => {
+    // Given action columns, whose method-missing proxy answers any key
+    const columns = [selectColumn<Row>(), collapseColumn<Row>(), nameColumn];
+    // When the table renders
+    const r = await render(<GridTable columns={columns} rows={[simpleHeader]} />);
+    // Then those headers have no info icon
     expect(r.query.columnTooltip).toBeNull();
   });
 });

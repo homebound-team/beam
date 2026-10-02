@@ -15,8 +15,8 @@ type SortHeaderProps = {
 };
 
 /**
- * Sortable column header: label, optional tooltip, and sort icon as sibling controls.
- * Order is label, tooltip, sort icon. Right-aligned columns keep the sort icon on the left.
+ * Sortable column header. GridTable uses it for string headers, or render it in a header cell yourself.
+ * `iconOnLeft` puts the sort icon before the label.
  */
 export function SortHeader(props: SortHeaderProps) {
   const { content, xss, iconOnLeft = false, sortKey, tooltipEl } = props;
@@ -33,10 +33,10 @@ export function SortHeader(props: SortHeaderProps) {
     <button
       type="button"
       aria-label={`Sort ${content}`}
-      tabIndex={sortVisible ? 0 : -1}
-      aria-hidden={sortVisible ? undefined : true}
+      tabIndex={-1}
+      aria-hidden
       onClick={toggleSort}
-      css={Css.bn.bgTransparent.p0.fs0.df.aic.lh(0).onFocusVisible.bshFocus.$}
+      css={Css.bn.bgTransparent.p0.fs0.df.aic.lh(0).h100.outline(0).onFocusVisible.bshFocus.$}
     >
       <Icon
         icon={sorted === "DESC" ? "sortDown" : "sortUp"}
@@ -58,8 +58,11 @@ export function SortHeader(props: SortHeaderProps) {
         {...tid}
         onClick={toggleSort}
         css={
-          Css.bn.bgTransparent.p0.mw0.cursorPointer.ta("inherit").fw("inherit").color("inherit").usn.onFocusVisible
-            .bshFocus.$
+          Css.bn.bgTransparent.p0.mw0.cursorPointer
+            .ta("inherit")
+            .fw("inherit")
+            .color("inherit")
+            .usn.df.aic.h100.outline(0).onFocusVisible.bshFocus.$
         }
       >
         <span css={Css.lineClamp2.$}>{content}</span>

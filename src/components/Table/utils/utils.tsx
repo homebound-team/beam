@@ -6,7 +6,7 @@ import { ExpandableHeader } from "src/components/Table/components/ExpandableHead
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { SortHeader } from "src/components/Table/components/SortHeader";
 import type { GridRowApi } from "src/components/Table/GridTableApi";
-import type { GridStyle } from "src/components/Table/TableStyles";
+import { expandableHeaderRowHeight, type GridStyle } from "src/components/Table/TableStyles";
 import type {
   GridCellAlignment,
   GridColumnBorder,
@@ -68,7 +68,7 @@ export function toContent(
       <ColumnTooltipIcon
         tooltip={columnTooltip}
         color={Tokens.OnSurfaceMuted}
-        label={typeof content === "string" ? content : undefined}
+        label={typeof content === "string" ? content : column.name}
       />
     </span>
   ) : null;
@@ -109,7 +109,7 @@ export function toContent(
   } else if (content && typeof content === "string" && isExpandableHeader) {
     return (
       // This is the expandable header row, but not an expandable header cell. Styling it similarly in height & alignment to match the expandable header cell.
-      <div css={Css.df.aic.hPx(40).$}>
+      <div css={Css.df.aic.hPx(expandableHeaderRowHeight).$}>
         <span css={Css.lineClamp2.$}>{content}</span>
         {tooltipEl}
       </div>

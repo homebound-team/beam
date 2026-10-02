@@ -1,5 +1,6 @@
 import { type ReactNode, useCallback, useContext, useState } from "react";
 import { Icon } from "src/components/Icon";
+import { expandableHeaderRowHeight } from "src/components/Table/TableStyles";
 import type { GridColumnWithId, Kinded, RenderAs } from "src/components/Table/types";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css, Tokens } from "src/Css";
@@ -19,7 +20,7 @@ type ExpandableHeaderProps<R extends Kinded> = {
   tooltipEl?: ReactNode;
 };
 
-/** Expandable column header: label, optional tooltip, and expand icon as sibling controls. */
+/** Expandable column header: the whole cell toggles expansion, except the optional tooltip icon. */
 export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<R>) {
   const { title, column, minStickyLeftOffset, as, tooltipEl } = props;
   const { tableState } = useContext(TableStateContext);
@@ -44,8 +45,8 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
     <div
       {...hoverProps}
       css={
-        Css.df.xs.aic.jcsb.px1
-          .hPx(40)
+        Css.relative.df.xs.aic.jcsb.px1
+          .hPx(expandableHeaderRowHeight)
           .mxPx(-8)
           .w("calc(100% + 16px)")
           .br4.color(Tokens.TextLinkDefault)
@@ -53,9 +54,18 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
           .bgColor(Tokens.SurfaceHover).$
       }
     >
+      {/* Covers the whole cell so the click target isn't limited by the sticky title and icon */}
+      <button
+        type="button"
+        aria-expanded={isExpanded}
+        aria-label={title}
+        onClick={toggle}
+        css={Css.absolute.inset0.bn.bgTransparent.p0.br4.cursorPointer.outline(0).onFocusVisible.bshFocus.$}
+        {...tid}
+      />
       <span
         css={
-          Css.df.aic.mw0
+          Css.df.aic.mw0.pen
             .if(applyStickyStyles)
             .sticky.left(`calc(var(${beamSideNavLayoutWidthVar}, 0px) + ${minStickyLeftOffset + 12}px)`)
             .pr2.bgColor(Tokens.Surface)
@@ -64,32 +74,17 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
             .bgColor(Tokens.SurfaceHover).$
         }
       >
-        <button
-          type="button"
-          aria-expanded={isExpanded}
-          {...tid}
-          onClick={toggle}
-          css={Css.bn.bgTransparent.p0.mw0.cursorPointer.ta("inherit").color("inherit").usn.onFocusVisible.bshFocus.$}
-        >
-          <span css={Css.tal.lineClamp2.$}>{title}</span>
-        </button>
-        {tooltipEl}
+        <span css={Css.tal.lineClamp2.usn.$} aria-hidden>
+          {title}
+        </span>
+        {tooltipEl && <span css={Css.relative.df.aic.pea.$}>{tooltipEl}</span>}
       </span>
-
-      <button
-        type="button"
-        aria-expanded={isExpanded}
-        aria-label={isExpanded ? `Collapse ${title}` : `Expand ${title}`}
-        onClick={toggle}
-        css={{
-          ...Css.fg1.jcfe.bn.bgTransparent.pl2.fs0.df.aic.lh(0).cursorPointer.color("inherit").onFocusVisible.bshFocus
-            .$,
-          ...Css.if(applyStickyStyles).sticky.rightPx(12).z(zIndices.tableExpandableIcon).$,
-        }}
-        {...tid.icon}
+      <span
+        css={Css.df.aic.pl2.fs0.lh(0).pen.if(applyStickyStyles).sticky.rightPx(12).z(zIndices.tableExpandableIcon).$}
+        aria-hidden
       >
         {isLoading ? <Loader size="xs" /> : <Icon icon={isExpanded ? "chevronLeft" : "chevronRight"} inc={2} />}
-      </button>
+      </span>
     </div>
   );
 }

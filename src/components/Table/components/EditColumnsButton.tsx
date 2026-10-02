@@ -21,7 +21,6 @@ type EditColumnsButtonProps<R extends Kinded> = {
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
   const { defaultOpen, disabled, columns, api } = props;
-  // Defaults to a compact icon-only trigger; consumers can override it by passing `trigger`.
   const state = useMenuTriggerState({ defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -125,7 +124,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
   );
 }
 
-/** Click tooltips open a modal, so the menu closes first. Hover content is returned unchanged. */
+/** Click tooltips close the menu first. React Aria overlays use z-index 100000, so an open menu paints over the modal. Hover content is returned unchanged. */
 function closeMenuOnClickTooltip(tooltip: ReactNode | VoidFunction, closeMenu: () => void): ReactNode | VoidFunction {
   if (typeof tooltip !== "function") return tooltip;
   return () => {

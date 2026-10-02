@@ -2572,44 +2572,6 @@ export function Tooltips() {
   );
 }
 
-export function ColumnTooltips() {
-  const columns: GridColumn<Row>[] = [
-    column<Row>({
-      id: "name",
-      header: "Name",
-      data: ({ name }) => name,
-      tooltip: "Column tooltip text",
-      w: "220px",
-    }),
-    column<Row>({
-      id: "costs",
-      header: "Tooltip triggers action",
-      data: ({ value }) => value,
-      tooltip: () => action("open column info")(),
-      w: "240px",
-    }),
-    column<Row>({
-      id: "value",
-      header: "Value",
-      data: ({ value }) => value,
-      w: "120px",
-    }),
-  ];
-  return (
-    <div css={Css.p2.$}>
-      <GridTable
-        columns={columns}
-        sorting={{ on: "client" }}
-        rows={[
-          simpleHeader,
-          { kind: "data", id: "1", data: { name: "Temp fencing", value: 1 } },
-          { kind: "data", id: "2", data: { name: "Site cleanup", value: 2 } },
-        ]}
-      />
-    </div>
-  );
-}
-
 export function Headers() {
   function makeColumn(
     header: string | (() => JSX.Element),

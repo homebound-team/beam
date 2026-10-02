@@ -48,5 +48,6 @@ export class ColumnStorage<R extends Kinded> {
 
   done() {
     this.expandedIds = undefined;
+    this.visibleIds = undefined;
   }
 }
