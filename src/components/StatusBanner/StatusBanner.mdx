@@ -1,0 +1,377 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as StatusBannerStories from "./StatusBanner.stories";
+
+<Meta of={StatusBannerStories} />
+
+# StatusBanner
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2923-8876">
+    <img src="FigmaLogo.png" alt="" />
+    Banner
+  </a>
+</p>
+
+Use a banner when a page-level condition requires the user's awareness or action.
+
+## Behaviors
+
+<table>
+  <thead>
+    <tr>
+      <th>Behavior</th>
+      <th>Use it when</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sticky banner</td>
+      <td>It affects the entire page, and it stays persistent regardless of scrolling. See How to use.</td>
+    </tr>
+    <tr>
+      <td>In-line banner</td>
+      <td>It lives within the page content and scrolls with the page. See How to use.</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>Shape</th>
+      <th>Use it when</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Simple banner</td>
+      <td>A single message or page-level status. No detailed content needs to live inside the banner.</td>
+    </tr>
+    <tr>
+      <td>Detailed banner</td>
+      <td>
+        A warning or error that represents multiple specific issues the user may need to review or resolve. Closed by
+        default. Pass <code>items</code> and the banner expands to those rows. In-line only.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Types
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>When to use it</th>
+      <th>Default icon</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>info</code>
+      </td>
+      <td>General information, system status, or new information available. No immediate action required.</td>
+      <td>
+        <code>infoCircle</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>update</code>
+      </td>
+      <td>
+        New or changed information is available and may require the user to review, refresh, or apply it. The current
+        state is still valid and usable, but a newer state is available.
+      </td>
+      <td>
+        <code>refresh</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>warning</code>
+      </td>
+      <td>Something may cause a problem or needs attention, but the user can still continue.</td>
+      <td>
+        <code>error</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>error</code>
+      </td>
+      <td>A problem that prevents the user from completing the task or requires resolution before proceeding.</td>
+      <td>
+        <code>errorCircle</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>success</code>
+      </td>
+      <td>Confirms a completed or successful action. Use sparingly. Prefer the Snackbar for a simple confirmation.</td>
+      <td>
+        <code>checkCircle</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Fills are local to the banner. They are close to `Tag`, but not the same, so the two do not share a palette.
+
+## Location on the page
+
+- If the message affects the entire page, place it above the relevant navigation. That is the sticky banner.
+- If it only affects a specific section, table, form, or workflow step, place it within that section. That is the in-line banner.
+- Steppers: below the title and subtext.
+- Pages with tabs: below the tabs, above the table.
+
+## How to use
+
+### In-line
+
+Render `StatusBanner` in the section it describes. It scrolls with that content. Pass `items` when the message is several specific issues. That shape is in-line only.
+
+```tsx
+<StatusBanner
+  type="error"
+  title="2 Missing Costs"
+  description="Bid lines missing costs are highlighted below."
+  items={[{ title: "Framing" }, { title: "Drywall" }]}
+/>
+```
+
+### Sticky
+
+Use a sticky banner when the message applies to the whole page and should stay pinned under the header. The layout sets `sticky`. Callers pass the banner content and leave `sticky` unset. Item rows stay on the in-line banner.
+
+How a page layout accepts that content is TBD. It lands with the layout updates.
+
+## Anatomy
+
+A simple banner is a tag, a title, descriptive text, and actions. The actions are a primary and a secondary button.
+
+A detailed banner adds a chevron, and each row can carry a text link in its subtext and an outlined call to action.
+
+<table>
+  <thead>
+    <tr>
+      <th>Part</th>
+      <th>Prop</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tag</td>
+      <td>
+        <code>icon</code>. The type sets the default and the color.
+      </td>
+    </tr>
+    <tr>
+      <td>Title</td>
+      <td>
+        <code>title</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Descriptive text</td>
+      <td>
+        <code>description</code>. A text link in the subtext stays caller-owned.
+      </td>
+    </tr>
+    <tr>
+      <td>Primary and secondary</td>
+      <td>
+        <code>primaryAction</code> and <code>secondaryAction</code>. The secondary action sits first.
+      </td>
+    </tr>
+    <tr>
+      <td>Chevron</td>
+      <td>
+        Rendered when <code>items</code> is set. Header actions do not open the rows.
+      </td>
+    </tr>
+    <tr>
+      <td>Outlined call to action</td>
+      <td>
+        Each item's <code>actions</code>, rendered as secondary buttons.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Props
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>type</code>
+      </td>
+      <td>
+        <code>BannerType</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Sets the fill, the in-line border, and the icon color. See Types.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>title</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>The status line.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>description</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td></td>
+      <td>Descriptive text. Links and bold text stay caller-owned.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>icon</code>
+      </td>
+      <td>
+        <code>IconKey</code>
+      </td>
+      <td>per type</td>
+      <td>Replaces the type's tag. The type still sets its color.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>secondaryAction</code>
+      </td>
+      <td>
+        <code>ActionButtonProps</code>
+      </td>
+      <td></td>
+      <td>
+        <code>label</code>, <code>onClick</code>, optional <code>icon</code>, <code>disabled</code>, and{" "}
+        <code>tooltip</code>. Renders as a secondary button, and sits before the primary action.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>primaryAction</code>
+      </td>
+      <td>
+        <code>ActionButtonProps</code>
+      </td>
+      <td></td>
+      <td>
+        Same fields as <code>secondaryAction</code>. Renders as a primary button.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>sticky</code>
+      </td>
+      <td>
+        <code>true</code>
+      </td>
+      <td></td>
+      <td>
+        Set by the layout. Leave this unset. Fill-only chrome: no border, no radius, and no item rows. See How to use.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>items</code>
+      </td>
+      <td>
+        <code>BannerItemProps[]</code>
+      </td>
+      <td></td>
+      <td>Makes it a detailed banner. In-line only. See Items.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>defaultExpanded</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Starts a detailed banner open. Ignored on a simple banner.</td>
+    </tr>
+  </tbody>
+</table>
+
+Copy and actions share one row. When the row is too narrow, the actions wrap below the copy. On a small screen they take that whole row: one action is full width, and two split it. The chevron stays on the copy row.
+
+## Items
+
+Each row is one specific issue.
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>title</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>The issue.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>description</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td></td>
+      <td>Subtext, smaller than the banner's descriptive text. A text link stays caller-owned.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>actions</code>
+      </td>
+      <td>
+        <code>ActionButtonProps[]</code>
+      </td>
+      <td></td>
+      <td>
+        Outlined calls to action. Each renders as a secondary button: <code>label</code>, <code>onClick</code>, optional{" "}
+        <code>icon</code>, <code>disabled</code>, and <code>tooltip</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Closed, the detailed banner uses the in-line chrome plus the chevron. Open, it becomes a white card with a 2px type border, a 16px radius, and a tinted header strip. Rows sit under the header, separated by a hairline. The panel height animates, and the chevron rotates with it. While closed, the rows stay out of the tab order and the accessibility tree.

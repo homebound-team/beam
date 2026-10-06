@@ -34,6 +34,8 @@ export type ButtonProps = {
   active?: boolean;
   /** Tint fill + border. Only applied when `variant` is `secondary`; ignored otherwise. */
   colorScheme?: ButtonColorScheme;
+  /** Fills the container's width and centers the label. */
+  fullWidth?: boolean;
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -50,6 +52,7 @@ export function Button(props: ButtonProps) {
     active = false,
     labelInFlight,
     colorScheme,
+    fullWidth = false,
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -108,7 +111,7 @@ export function Button(props: ButtonProps) {
     ...hoverProps,
     className: asLink ? navLink : undefined,
     ...Css.props({
-      ...Css.buttonBase.tt("inherit").$,
+      ...Css.buttonBase.tt("inherit").if(fullWidth).w100.jcc.$,
       ...baseStyles,
       ...(isHovered && !isPressed && !active ? hoverStyles : {}),
       ...(isPressed || active ? pressedStyles : {}),
