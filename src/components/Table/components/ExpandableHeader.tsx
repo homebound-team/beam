@@ -65,7 +65,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
       />
       <span
         css={
-          Css.df.aic.mw0.pen
+          Css.df.aic.pen
             .if(applyStickyStyles)
             .sticky.left(`calc(var(${beamSideNavLayoutWidthVar}, 0px) + ${minStickyLeftOffset + 12}px)`)
             .pr2.bgColor(Tokens.Surface)
@@ -74,6 +74,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
             .bgColor(Tokens.SurfaceHover).$
         }
       >
+        {/* line-clamp's overflow:hidden would otherwise let this flex item shrink to 0 */}
         <span css={Css.tal.lineClamp2.usn.mwminc.$} aria-hidden>
           {title}
         </span>

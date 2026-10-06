@@ -51,21 +51,18 @@ export function SortHeader(props: SortHeaderProps) {
     </button>
   );
   return (
-    <div css={{ ...Css.df.aic.h100.usn.mw0.$, ...xss }} {...hoverProps}>
+    <div css={{ ...Css.df.aic.h100.usn.$, ...xss }} {...hoverProps}>
       {iconOnLeft && sortButton}
       <button
         type="button"
         {...tid}
         onClick={toggleSort}
         css={
-          // min-content, not 0: the sort icon doesn't shrink, and a 0 floor collapses the name.
-          Css.bn.bgTransparent.p0.mwminc.cursorPointer
-            .ta("inherit")
-            .fw("inherit")
-            .color("inherit")
-            .usn.df.aic.h100.outline(0).onFocusVisible.bshFocus.$
+          Css.bn.bgTransparent.p0.cursorPointer.ta("inherit").fw("inherit").color("inherit").usn.df.aic.h100.outline(0)
+            .onFocusVisible.bshFocus.$
         }
       >
+        {/* line-clamp's overflow:hidden would otherwise let this flex item shrink to 0 */}
         <span css={Css.lineClamp2.mwminc.$}>{content}</span>
       </button>
       {tooltipEl}
