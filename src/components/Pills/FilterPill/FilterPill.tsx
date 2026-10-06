@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Icon } from "src/components/Icon";
-import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
+import { DisabledTooltip } from "src/components/Pills/DisabledTooltip";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -19,31 +19,25 @@ export function FilterPill(props: FilterPillProps) {
   const tid = useTestIds(props, "filterPill");
   const isDisabled = !!disabled;
   const ink = isDisabled ? Palette.Gray600 : Palette.Black;
-  const reason = resolveTooltip(disabled);
 
-  // Disabled buttons don't fire pointer events, and the tooltip trigger has no box, so this wrapper catches the hover.
-  return maybeTooltip({
-    title: reason,
-    placement: "top",
-    children: (
-      <span css={Css.if(!!reason).dif.cursorNotAllowed.else.display("contents").$}>
-        <button
-          type="button"
-          disabled={isDisabled}
-          onClick={onClick}
-          css={pillStyles(isDisabled, !!__storyState?.hovered)}
-          {...tid}
-        >
-          <span css={Css.tal.lineClamp1.wbba.$} title={text}>
-            {text}
-          </span>
-          <span css={Css.fs0.$} {...tid.x}>
-            <Icon icon="x" color={ink} inc={2} />
-          </span>
-        </button>
-      </span>
-    ),
-  });
+  return (
+    <DisabledTooltip disabled={disabled}>
+      <button
+        type="button"
+        disabled={isDisabled}
+        onClick={onClick}
+        css={pillStyles(isDisabled, !!__storyState?.hovered)}
+        {...tid}
+      >
+        <span css={Css.tal.lineClamp1.wbba.$} title={text}>
+          {text}
+        </span>
+        <span css={Css.fs0.$} {...tid.x}>
+          <Icon icon="x" color={ink} inc={2} />
+        </span>
+      </button>
+    </DisabledTooltip>
+  );
 }
 
 /** A disabled button can still match :hover, so the hover fill is skipped when disabled. */

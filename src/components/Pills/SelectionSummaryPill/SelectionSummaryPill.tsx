@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
+import { DisabledTooltip } from "src/components/Pills/DisabledTooltip";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -17,30 +17,24 @@ export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
   const { text, onClick, disabled = false, __storyState } = props;
   const tid = useTestIds(props, "selectionSummaryPill");
   const isDisabled = !!disabled;
-  const reason = resolveTooltip(disabled);
 
-  // Disabled buttons don't fire pointer events, and the tooltip trigger has no box, so this wrapper catches the hover.
-  return maybeTooltip({
-    title: reason,
-    placement: "top",
-    children: (
-      <span css={Css.if(!!reason).dif.cursorNotAllowed.else.display("contents").$}>
-        <button
-          type="button"
-          disabled={isDisabled}
-          onClick={onClick}
-          aria-label={`Clear ${text}`}
-          css={pillStyles(isDisabled, !!__storyState?.hovered)}
-          {...tid}
-        >
-          {text}
-          <span css={Css.color(isDisabled ? Palette.Gray600 : Tokens.OnSurfaceActive).$} {...tid.clear}>
-            Clear
-          </span>
-        </button>
-      </span>
-    ),
-  });
+  return (
+    <DisabledTooltip disabled={disabled}>
+      <button
+        type="button"
+        disabled={isDisabled}
+        onClick={onClick}
+        aria-label={`Clear ${text}`}
+        css={pillStyles(isDisabled, !!__storyState?.hovered)}
+        {...tid}
+      >
+        {text}
+        <span css={Css.color(isDisabled ? Palette.Gray600 : Tokens.OnSurfaceActive).$} {...tid.clear}>
+          Clear
+        </span>
+      </button>
+    </DisabledTooltip>
+  );
 }
 
 /** Figma draws the border inside the box, so the padding gives up 1px to it. */
