@@ -2572,6 +2572,62 @@ export function Tooltips() {
   );
 }
 
+/** 100px columns: the label stays readable beside the tooltip and sort or expand icon. */
+export function TightColumnHeaders() {
+  type ExpandHeaderRow = { kind: "expandableHeader"; id: string; data: Record<string, never> };
+  type HeaderRow = { kind: "header"; id: string; data: Record<string, never> };
+  type ExpandDataRow = { kind: "data"; id: string; data: { trade: string; priority: string } };
+  type ExpandRow = ExpandHeaderRow | HeaderRow | ExpandDataRow;
+  return (
+    <div css={Css.df.fdc.gap4.p2.$}>
+      <GridTable
+        columns={[
+          {
+            id: "subcontractor",
+            header: () => ({ content: "Subcontractor", tooltip: "Trade partner" }),
+            data: ({ name }) => name,
+            w: "100px",
+          },
+          { id: "scope", header: "Scope", data: () => "Framing", w: "160px" },
+        ]}
+        sorting={{ on: "client" }}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "Apex", value: 1 } }]}
+      />
+      <GridTable<ExpandRow>
+        as="div"
+        columns={[
+          column<ExpandRow>({
+            id: "trade",
+            expandableHeader: () => ({ content: "Subcontractor", tooltip: "Trade partner" }),
+            header: "Trade",
+            data: ({ trade }) => trade,
+            w: "100px",
+            expandColumns: [
+              column<ExpandRow>({
+                expandableHeader: emptyCell,
+                header: "Detail",
+                data: () => "More",
+                w: "120px",
+              }),
+            ],
+          }),
+          column<ExpandRow>({
+            expandableHeader: () => ({ content: "Priority", tooltip: "Sort order" }),
+            header: "Priority",
+            data: ({ priority }) => priority,
+            w: "100px",
+          }),
+        ]}
+        rows={[
+          { kind: "header", id: "header", data: {} },
+          { kind: "expandableHeader", id: "expandableHeader", data: {} },
+          { kind: "data", id: "1", data: { trade: "Apex", priority: "High" } },
+        ]}
+      />
+    </div>
+  );
+}
+
 export function Headers() {
   function makeColumn(
     header: string | (() => JSX.Element),
