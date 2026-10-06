@@ -51,21 +51,19 @@ export function SortHeader(props: SortHeaderProps) {
     </button>
   );
   return (
-    <div css={{ ...Css.df.aic.h100.usn.mw0.$, ...xss }} {...hoverProps}>
+    <div css={{ ...Css.df.aic.h100.usn.$, ...xss }} {...hoverProps}>
       {iconOnLeft && sortButton}
       <button
         type="button"
         {...tid}
         onClick={toggleSort}
         css={
-          Css.bn.bgTransparent.p0.mw0.cursorPointer
-            .ta("inherit")
-            .fw("inherit")
-            .color("inherit")
-            .usn.df.aic.h100.outline(0).onFocusVisible.bshFocus.$
+          Css.bn.bgTransparent.p0.cursorPointer.ta("inherit").fw("inherit").color("inherit").usn.df.aic.h100.outline(0)
+            .onFocusVisible.bshFocus.$
         }
       >
-        <span css={Css.lineClamp2.$}>{content}</span>
+        {/* line-clamp's overflow:hidden would otherwise let this flex item shrink to 0 */}
+        <span css={Css.lineClamp2.mwminc.$}>{content}</span>
       </button>
       {tooltipEl}
       {!iconOnLeft && sortButton}
