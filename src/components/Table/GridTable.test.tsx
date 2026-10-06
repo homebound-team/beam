@@ -5362,6 +5362,20 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1)).toBeUndefined();
   });
 
+  it("keeps a sortable header label from shrinking away", async () => {
+    // Given a sortable column whose header is a short label
+    const r = await render(
+      <GridTable
+        columns={[{ id: "name", header: "Location", data: ({ name }) => name }]}
+        sorting={{ on: "client" }}
+        rows={[simpleHeader, { kind: "data", id: "1", data: { name: "a", value: 1 } }]}
+      />,
+    );
+    // Then the label keeps a min-content floor so a flex-shrink: 0 sort icon cannot collapse it
+    expect(r.sortHeader).toHaveStyle({ minWidth: "min-content" });
+    expect(r.getByText("Location")).toHaveStyle({ minWidth: "min-content" });
+  });
+
   it("shows a column tooltip on the header", async () => {
     // Given a column tooltip
     const columnsWithTooltip: GridColumn<Row>[] = [

@@ -74,7 +74,7 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
             .bgColor(Tokens.SurfaceHover).$
         }
       >
-        <span css={Css.tal.lineClamp2.usn.$} aria-hidden>
+        <span css={Css.tal.lineClamp2.usn.mwminc.$} aria-hidden>
           {title}
         </span>
         {tooltipEl && <span css={Css.relative.df.aic.pea.$}>{tooltipEl}</span>}

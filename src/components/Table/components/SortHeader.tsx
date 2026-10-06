@@ -58,14 +58,15 @@ export function SortHeader(props: SortHeaderProps) {
         {...tid}
         onClick={toggleSort}
         css={
-          Css.bn.bgTransparent.p0.mw0.cursorPointer
+          // min-content, not 0: the sort icon doesn't shrink, and a 0 floor collapses the name.
+          Css.bn.bgTransparent.p0.mwminc.cursorPointer
             .ta("inherit")
             .fw("inherit")
             .color("inherit")
             .usn.df.aic.h100.outline(0).onFocusVisible.bshFocus.$
         }
       >
-        <span css={Css.lineClamp2.$}>{content}</span>
+        <span css={Css.lineClamp2.mwminc.$}>{content}</span>
       </button>
       {tooltipEl}
       {!iconOnLeft && sortButton}
