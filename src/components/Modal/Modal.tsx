@@ -230,12 +230,12 @@ export function ModalHeader({ children }: { children: ReactNode }): JSX.Element 
 
 /** A full-bleed slot between the header and the body, i.e. for an `AiSlimBanner`. */
 export function ModalBanner({ children }: { children: ReactNode }): JSX.Element {
-  const { modalBannerDiv } = useBeamContext();
+  const { modalBannerDiv, modalState } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
   // 4px over the header's 12px gives the 16px the design wants; a bottom margin would sit outside
-  // `main` and strand a gap the body can't scroll.
+  // `main` and strand a gap the body can't scroll. A header border is the divider, so sit flush against it.
   return createPortal(
-    <div css={Css.mtPx(4).$} {...testId.banner}>
+    <div css={Css.if(!modalState.current?.drawHeaderBorder).mtPx(4).$} {...testId.banner}>
       {children}
     </div>,
     modalBannerDiv,
