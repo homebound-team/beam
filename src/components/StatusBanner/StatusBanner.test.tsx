@@ -23,6 +23,17 @@ describe("StatusBanner", () => {
     expect(r.banner_description).toHaveTextContent("Updated calculations are ready for 632 configurations.");
   });
 
+  it("stays a single row when items is empty", async () => {
+    // Given a banner with no detail rows
+    // When rendered
+    const r = await render(<StatusBanner type="info" title="Heads up" items={[]} />);
+
+    // Then it does not render an accordion
+    expect(r.banner_title).toHaveTextContent("Heads up");
+    expect(r.query.banner_toggle).toBeNull();
+    expect(r.query.banner_details).toBeNull();
+  });
+
   it("omits the description when it has none", async () => {
     // Given a title-only banner
     // When rendered

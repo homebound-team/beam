@@ -11,7 +11,7 @@ export function BannerItem(props: BannerItemProps & { isLast: boolean }) {
     // Indents past the header's icon so row copy lines up with the banner title.
     <div
       css={{
-        ...Css.df.aic.gapPx(12).fww.p2.bgColor(Tokens.Surface).if(!isLast).bb.bc(Tokens.SurfaceSeparator).$,
+        ...Css.df.aic.gapPx(12).fww.bgColor(Tokens.Surface).if(!isLast).bb.bc(Tokens.SurfaceSeparator).$,
         // Indents row content on med and up screens to align with the parent banner's title and actions.
         ...Css.pPx(12).ifMdAndUp.px6.$,
       }}

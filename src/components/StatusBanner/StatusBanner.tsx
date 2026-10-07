@@ -56,7 +56,7 @@ export function StatusBanner(props: StatusBannerProps) {
     );
   }
 
-  if (props.items) return <BannerAccordion {...props} items={props.items} {...tid} />;
+  if (props.items && props.items.length > 0) return <BannerAccordion {...props} items={props.items} {...tid} />;
 
   return (
     <div css={{ ...background, ...border, ...Css.w100.p2.br12.$ }} role="status" {...tid}>
