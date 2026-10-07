@@ -110,14 +110,14 @@ export function toContent(
     return (
       // This is the expandable header row, but not an expandable header cell. Styling it similarly in height & alignment to match the expandable header cell.
       <div css={Css.df.aic.hPx(expandableHeaderRowHeight).$}>
-        <span css={Css.lineClamp2.$}>{content}</span>
+        <span css={Css.lineClamp2.mwminc.$}>{content}</span>
         {tooltipEl}
       </div>
     );
   } else if (!isContentEmpty(content) && isHeader && typeof content === "string") {
     return (
       <>
-        <span css={Css.lineClamp2.$} title={content}>
+        <span css={Css.lineClamp2.mwminc.$} title={content}>
           {content}
         </span>
         {tooltipEl}

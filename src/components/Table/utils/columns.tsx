@@ -477,7 +477,8 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
             onDrop={(evt) => onDrop?.(row, evt)}
             onDragEnter={(evt) => onDragEnter?.(row, evt)}
             onDragOver={(evt) => onDragOver?.(row, evt)}
-            css={Css.ma.cursorPointer.$}
+            // Horizontal only, so the handle follows the table's `vAlign` like every other cell.
+            css={Css.mxa.cursorPointer.$}
           >
             <Icon icon="drag" inc={2.25} />
           </div>
