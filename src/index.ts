@@ -25,6 +25,13 @@ export * from "./components/Avatar/Avatar";
 export * from "./components/Avatar/AvatarButton";
 export * from "./components/Avatar/AvatarGroup";
 export * from "./components/Banner";
+export { StatusBanner } from "./components/StatusBanner/StatusBanner";
+export type {
+  BannerItemProps,
+  BannerType,
+  PageBannerProps,
+  StatusBannerProps,
+} from "./components/StatusBanner/StatusBanner";
 export * from "./components/Breadcrumbs";
 export * from "./components/Button";
 export * from "./components/ButtonDatePicker";
@@ -304,6 +311,7 @@ export * from "./forms/StaticField";
 export * from "./forms/SubmitButton";
 export { FormSection } from "./forms/FormSection/FormSection";
 export type { FormSectionAction, FormSectionProps } from "./forms/FormSection/FormSection";
+export { FormSectionChild } from "./forms/FormSection/FormSectionChild";
 export type { PlainFormSectionChild, ReorderableFormSectionChild } from "./forms/FormSection/FormSectionChild";
 // ./hooks
 export * from "./hooks/useBodyBackgroundColor";
