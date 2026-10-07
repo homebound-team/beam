@@ -66,14 +66,26 @@ export type LabeledExample = {
   children: ReactNode;
 };
 
-/** Labeled rows of examples for one story. Set `exampleWidth` when the snapshot must wrap at a fixed width. */
-export function LabeledExamples(props: { examples: LabeledExample[]; labelWidth?: number; exampleWidth?: number }) {
-  const { examples, labelWidth = 72, exampleWidth } = props;
+/** Labeled examples for one story. `column` stacks the label above; `row` places it beside. */
+export function LabeledExamples(props: {
+  examples: LabeledExample[];
+  /** `row` is the label beside the example. `column` is the label above it. */
+  direction?: "row" | "column";
+  labelWidth?: number;
+  exampleWidth?: number;
+}) {
+  const { examples, direction = "row", labelWidth = 72, exampleWidth } = props;
+  const stacked = direction === "column";
   return (
-    <div css={Css.bgWhite.p2.df.fdc.aifs.gap2.$}>
+    <div css={Css.bgWhite.p2.df.fdc.gap2.if(!stacked).aifs.if(stacked).w100.$}>
       {examples.map((example) => (
-        <div key={example.label} css={exampleWidth ? Css.df.gap2.$ : Css.df.aic.gap2.$}>
-          <span css={Css.xs.gray600.fs0.wPx(labelWidth).if(!!exampleWidth).ptPx(12).$}>{example.label}</span>
+        <div
+          key={example.label}
+          css={stacked ? Css.df.fdc.gap1.w100.$ : exampleWidth ? Css.df.gap2.$ : Css.df.aic.gap2.$}
+        >
+          <span css={stacked ? Css.xs.gray600.$ : Css.xs.gray600.fs0.wPx(labelWidth).if(!!exampleWidth).ptPx(12).$}>
+            {example.label}
+          </span>
           {exampleWidth ? <div css={Css.wPx(exampleWidth).$}>{example.children}</div> : example.children}
         </div>
       ))}
