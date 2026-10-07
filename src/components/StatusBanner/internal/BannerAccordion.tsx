@@ -61,7 +61,7 @@ export function BannerAccordion(props: BannerAccordionProps) {
       >
         <div ref={contentRef}>
           {items.map((item, i) => (
-            <BannerItem key={item.title} {...item} isLast={i === items.length - 1} {...tid.item} />
+            <BannerItem key={`${item.title}-${i}`} {...item} isLast={i === items.length - 1} {...tid.item} />
           ))}
         </div>
       </div>
