@@ -24,7 +24,7 @@ export type StepperLayoutStep = Omit<StepperTabsStep, "value" | "disabled"> & {
 };
 
 export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
-  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
+  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit" | "onRemove"> & {
     /** The workflow's steps; the active step's `content` is the body, and it drives the header's tab strip. */
     steps: StepperLayoutStep[];
     /** The step shown initially (matched against `defaultTestId(step.label)`); falls back to the first step if omitted or if it doesn't match any step. Uncontrolled — the layout owns step navigation from here. */
@@ -50,6 +50,7 @@ export function StepperLayout(props: StepperLayoutProps) {
     completeLabel,
     onComplete,
     onSaveAndExit,
+    onRemove,
     isDirty,
     allowNavigation,
     aiMode,
@@ -87,6 +88,7 @@ export function StepperLayout(props: StepperLayoutProps) {
       }}
       onCancel={onCancel}
       onSaveAndExit={onSaveAndExit}
+      onRemove={onRemove}
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={activeStep?.primaryDisabled}

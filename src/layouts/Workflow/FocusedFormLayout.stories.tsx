@@ -5,7 +5,7 @@ import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRi
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
-import { FocusedFormLayout } from "src/layouts/Workflow/FocusedFormLayout";
+import { FocusedFormLayout, type FocusedFormLayoutProps } from "src/layouts/Workflow/FocusedFormLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { createFormSections, createRightPaneTriggers } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -43,6 +43,20 @@ export function WithRightPaneTriggers() {
   );
 }
 
+/** Editing an existing object with a destructive `onRemove`: Cancel / Remove / Save. */
+export function WithRemove() {
+  return (
+    <WorkflowChrome completeLabel="Save" onRemove={action("remove clicked")}>
+      <FormSectionLayout
+        withJumpLinks
+        title="Edit Material Listing"
+        description="Update the listing details or remove it from the catalog."
+        sections={createFormSections()}
+      />
+    </WorkflowChrome>
+  );
+}
+
 /** `aiMode` on both the workflow chrome and the form body. */
 export function AiMode() {
   return (
@@ -65,6 +79,8 @@ function WorkflowChrome({
 }: {
   children: ReactNode;
   aiMode?: boolean;
+  completeLabel?: FocusedFormLayoutProps["completeLabel"];
+  onRemove?: FocusedFormLayoutProps["onRemove"];
   rightPaneTriggers?: ReturnType<typeof createRightPaneTriggers>;
 }) {
   return (
