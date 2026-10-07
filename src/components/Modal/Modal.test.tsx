@@ -76,6 +76,15 @@ describe("Modal", () => {
       expect(r.modal_banner.textContent).toBe("Modal Banner");
       // And to sit outside the body's scroll container, i.e. so it stays put as the body scrolls
       expect(r.modal_banner.closest("main")).toBeNull();
+      // And to leave a gap below the header
+      expect(r.modal_banner).toHaveStyle({ marginTop: "4px" });
+    });
+
+    it("sits flush against a header border", async () => {
+      // When rendered with a banner under a header border
+      const r = await render(<TestModalApp drawHeaderBorder content={<TestModalComponent withBanner />} />);
+      // Then expect no gap between the border and the banner
+      expect(r.modal_banner).not.toHaveStyle({ marginTop: "4px" });
     });
 
     it("is not rendered when unused", async () => {
