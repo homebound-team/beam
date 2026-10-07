@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { DisabledTooltip } from "src/components/Pills/DisabledTooltip";
+import { useHover } from "react-aria";
+import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -16,36 +17,38 @@ type SelectionSummaryPillProps = {
 export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
   const { text, onClick, disabled = false, __storyState } = props;
   const tid = useTestIds(props, "selectionSummaryPill");
-  const isDisabled = !!disabled;
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled: !!disabled });
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
 
-  return (
-    <DisabledTooltip disabled={disabled}>
+  return maybeTooltip({
+    title: resolveTooltip(disabled),
+    placement: "top",
+    children: (
       <button
         type="button"
-        disabled={isDisabled}
+        disabled={!!disabled}
         onClick={onClick}
         aria-label={`Clear ${text}`}
-        css={pillStyles(isDisabled, !!__storyState?.hovered)}
+        css={pillStyles(!!disabled, isHovered)}
+        {...hoverProps}
         {...tid}
       >
         {text}
-        <span css={Css.color(isDisabled ? Palette.Gray600 : Tokens.OnSurfaceActive).$} {...tid.clear}>
+        <span css={Css.color(disabled ? Tokens.OnSurfaceActiveDisabled : Tokens.OnSurfaceActive).$} {...tid.clear}>
           Clear
         </span>
       </button>
-    </DisabledTooltip>
-  );
+    ),
+  });
 }
 
 /** Figma draws the border inside the box, so the padding gives up 1px to it. */
 function pillStyles(disabled: boolean, hovered: boolean) {
-  return Css.smSb.dif.aic.gap1.wsnw.ba.bcBlue200
-    .borderRadius("999px")
+  return Css.smSb.dif.aic.gap1.wsnw.ba.brPill
     .pxPx(15)
     .pyPx(7)
-    .color(disabled ? Palette.Gray600 : Palette.Black)
-    .bgColor(hovered && !disabled ? Tokens.SurfaceActiveHover : Palette.Blue50)
-    .if(!disabled)
-    .onHover.bgColor(Tokens.SurfaceActiveHover)
+    .bc(Tokens.SurfaceActiveBorder)
+    .color(disabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900)
+    .bgColor(hovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
     .if(disabled).cursorNotAllowed.$;
 }
