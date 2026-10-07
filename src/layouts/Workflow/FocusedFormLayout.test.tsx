@@ -92,6 +92,18 @@ describe("FocusedFormLayout", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
+  it("renders a danger Remove button before Save when onRemove is set", async () => {
+    // Given an edit form with onRemove
+    const onRemove = vi.fn();
+    const r = await render(<FocusedFormLayout {...baseProps({ completeLabel: "Save", onRemove })} />, withRouter());
+
+    // When Remove is clicked
+    click(r.remove);
+
+    // Then onRemove is called
+    expect(onRemove).toHaveBeenCalledTimes(1);
+  });
+
   it("calls onCancel when Cancel is clicked and the form is clean", async () => {
     // Given a focused form that reports not dirty
     const onCancel = vi.fn();

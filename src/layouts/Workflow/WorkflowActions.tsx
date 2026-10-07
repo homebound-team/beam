@@ -10,6 +10,8 @@ export type WorkflowActionsProps = {
   onCancel: (e: PressEvent) => void;
   /** Saves partial progress and exits. Used whenever canExitEarly is true. */
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
+  /** Destructive action on the object being edited. */
+  onRemove?: (e: PressEvent) => void | Promise<void>;
   /** Label for the completion button shown on the last step (or when there is no next step). */
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. */
@@ -25,11 +27,12 @@ export type WorkflowActionsProps = {
   onContinue?: () => boolean | void | Promise<boolean | void>;
 };
 
-/** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Continue-or-Complete); shared by stepper and focused-form chrome. */
+/** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Remove/Continue-or-Complete); shared by stepper and focused-form chrome. */
 export function WorkflowActions(props: WorkflowActionsProps) {
   const {
     onCancel,
     onSaveAndExit,
+    onRemove,
     completeLabel,
     onComplete,
     primaryDisabled,
@@ -50,6 +53,7 @@ export function WorkflowActions(props: WorkflowActionsProps) {
       <div css={Css.df.aic.gap1.$}>
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />
         {onSaveAndExit && <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} />}
+        {onRemove && <Button label="Remove" variant="danger" onClick={onRemove} />}
         {isLastStep ? (
           <Button label={completeLabel} variant={primaryVariant} onClick={onComplete} disabled={primaryDisabled} />
         ) : (
