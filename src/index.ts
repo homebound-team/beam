@@ -25,6 +25,13 @@ export * from "./components/Avatar/Avatar";
 export * from "./components/Avatar/AvatarButton";
 export * from "./components/Avatar/AvatarGroup";
 export * from "./components/Banner";
+export { StatusBanner } from "./components/StatusBanner/StatusBanner";
+export type {
+  BannerItemProps,
+  BannerType,
+  PageBannerProps,
+  StatusBannerProps,
+} from "./components/StatusBanner/StatusBanner";
 export * from "./components/Breadcrumbs";
 export * from "./components/Button";
 export * from "./components/ButtonDatePicker";
