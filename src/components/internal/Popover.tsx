@@ -30,7 +30,7 @@ export function Popover(props: PopoverProps) {
         if (triggerRef.current?.contains(e)) {
           return true;
         }
-        // Do not close the Popover if the user is interacting with a tribute menu, alert, or a dialog opened on top of it.
+        // Do not close the Popover if the user is interacting with a tribute menu, dialog or alert on top of it, otherwise close it.
         // A dialog that contains our trigger (i.e. the Modal the menu lives in) is "underneath" the Popover, so clicks there should close it.
         const dialog = e.closest("[role='dialog']");
         const isDialogOnTop = !!dialog && !dialog.contains(triggerRef.current);
