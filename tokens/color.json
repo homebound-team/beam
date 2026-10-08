@@ -1518,6 +1518,17 @@
       },
       "$description": "Ink on SurfaceActive (indeterminate checkbox dash). Pair with SurfaceActive."
     },
+    "OnSurfaceActiveDisabled": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Gray600}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-on-surface-active-disabled",
+          "contrast": "{beam.color.primitive.Gray600}"
+        }
+      },
+      "$description": "Disabled ink on SurfaceActive (e.g. disabled pill text). Pair with SurfaceActive."
+    },
     "OnSurfaceDisabled": {
       "$type": "color",
       "$value": "{beam.color.primitive.Gray400}",
@@ -1650,14 +1661,25 @@
     },
     "SurfaceActive": {
       "$type": "color",
-      "$value": "{beam.color.primitive.Blue100}",
+      "$value": "{beam.color.primitive.Blue50}",
       "$extensions": {
         "com.homebound.beam": {
           "cssVar": "--b-surface-active",
-          "contrast": "{beam.color.primitive.Blue100}"
+          "contrast": "{beam.color.primitive.Blue50}"
         }
       },
-      "$description": "Active fill (indeterminate checkbox, future Pill). Pair with OnSurfaceActive. Hover uses SurfaceActiveHover."
+      "$description": "Active fill (pills, indeterminate checkbox). Pair with OnSurfaceActive. Hover uses SurfaceActiveHover."
+    },
+    "SurfaceActiveBorder": {
+      "$type": "color",
+      "$value": "{beam.color.primitive.Blue200}",
+      "$extensions": {
+        "com.homebound.beam": {
+          "cssVar": "--b-surface-active-border",
+          "contrast": "{beam.color.primitive.Blue200}"
+        }
+      },
+      "$description": "Border on SurfaceActive (e.g. selection summary pill). Pair with SurfaceActive."
     },
     "SurfaceActiveHover": {
       "$type": "color",

@@ -603,12 +603,12 @@
     },
     "SurfaceActive": {
       "light": {
-        "alias": "Blue100"
+        "alias": "Blue50"
       },
       "contrast": {
-        "alias": "Blue100"
+        "alias": "Blue50"
       },
-      "description": "Active fill (indeterminate checkbox, future Pill). Pair with OnSurfaceActive. Hover uses SurfaceActiveHover."
+      "description": "Active fill (pills, indeterminate checkbox). Pair with OnSurfaceActive. Hover uses SurfaceActiveHover."
     },
     "SurfaceActiveHover": {
       "light": {
@@ -619,6 +619,15 @@
       },
       "description": "Hover fill on SurfaceActive (e.g. indeterminate checkbox hover). Pair with SurfaceActive."
     },
+    "SurfaceActiveBorder": {
+      "light": {
+        "alias": "Blue200"
+      },
+      "contrast": {
+        "alias": "Blue200"
+      },
+      "description": "Border on SurfaceActive (e.g. selection summary pill). Pair with SurfaceActive."
+    },
     "OnSurfaceActive": {
       "light": {
         "alias": "Blue600"
@@ -627,6 +636,15 @@
         "alias": "Blue600"
       },
       "description": "Ink on SurfaceActive (indeterminate checkbox dash). Pair with SurfaceActive."
+    },
+    "OnSurfaceActiveDisabled": {
+      "light": {
+        "alias": "Gray600"
+      },
+      "contrast": {
+        "alias": "Gray600"
+      },
+      "description": "Disabled ink on SurfaceActive (e.g. disabled pill text). Pair with SurfaceActive."
     },
     "OnPrimary": {
       "light": {

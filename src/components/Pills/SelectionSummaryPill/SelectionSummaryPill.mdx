@@ -1,0 +1,64 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as SelectionSummaryPillStories from "./SelectionSummaryPill.stories";
+
+<Meta of={SelectionSummaryPillStories} />
+
+# Selection Summary Pill
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2741-2094">
+    <img src="FigmaLogo.png" alt="" />
+    Selection Summary Pill
+  </a>
+</p>
+
+`SelectionSummaryPill` stands for a group of selections, shown as a count and an object, e.g. "3 Rows Selected". It always shows Clear, and the whole pill is the button. It is a summary rather than one value, so it is slightly more prominent than a [Filter Pill](?path=/docs/components-pills-filter-pill--docs).
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>text</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Summary shown on the pill, e.g. "3 Rows Selected".</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onClick</code>
+      </td>
+      <td>
+        <code>{"() => void"}</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Called when the pill is clicked. Use it to clear the whole selection.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>disabled</code>
+      </td>
+      <td>
+        <code>{"boolean | ReactNode"}</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>If a ReactNode, its contents will be displayed within a tooltip on hover.</td>
+    </tr>
+  </tbody>
+</table>

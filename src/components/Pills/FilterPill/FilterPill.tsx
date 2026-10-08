@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, Tokens } from "src/Css";
@@ -18,43 +19,39 @@ export function FilterPill(props: FilterPillProps) {
   const { text, onClick, disabled = false, __storyState } = props;
   const tid = useTestIds(props, "filterPill");
   const isDisabled = !!disabled;
-  const ink = isDisabled ? Palette.Gray600 : Palette.Black;
-  const reason = resolveTooltip(disabled);
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
+  const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
+  const ink = isDisabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900;
 
-  // Disabled buttons don't fire pointer events, and the tooltip trigger has no box, so this wrapper catches the hover.
   return maybeTooltip({
-    title: reason,
+    title: resolveTooltip(disabled),
     placement: "top",
     children: (
-      <span css={Css.if(!!reason).dif.cursorNotAllowed.else.display("contents").$}>
-        <button
-          type="button"
-          disabled={isDisabled}
-          onClick={onClick}
-          css={pillStyles(isDisabled, !!__storyState?.hovered)}
-          {...tid}
-        >
-          <span css={Css.tal.lineClamp1.wbba.$} title={text}>
-            {text}
-          </span>
-          <span css={Css.fs0.$} {...tid.x}>
-            <Icon icon="x" color={ink} inc={2} />
-          </span>
-        </button>
-      </span>
+      <button
+        type="button"
+        disabled={isDisabled}
+        onClick={onClick}
+        css={pillStyles(isDisabled, isHovered)}
+        {...hoverProps}
+        {...tid}
+      >
+        <span css={Css.tal.lineClamp1.wbba.$} title={text}>
+          {text}
+        </span>
+        <span css={Css.fs0.$} {...tid.x}>
+          <Icon icon="x" color={ink} inc={2} />
+        </span>
+      </button>
     ),
   });
 }
 
-/** A disabled button can still match :hover, so the hover fill is skipped when disabled. */
 function pillStyles(disabled: boolean, hovered: boolean) {
   return Css.xsSb.dif.aic.br16.px1
     .gapPx(4)
     .pyPx(4)
     .mhPx(24)
-    .color(disabled ? Palette.Gray600 : Palette.Black)
-    .bgColor(hovered && !disabled ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
-    .if(!disabled)
-    .onHover.bgColor(Tokens.SurfaceActiveHover)
+    .color(disabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900)
+    .bgColor(hovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
     .if(disabled).cursorNotAllowed.$;
 }

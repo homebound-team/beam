@@ -15,6 +15,7 @@ import { AutoSaveStatusProvider } from "src/components/AutoSaveStatus/AutoSaveSt
 import { useBeamContext } from "src/components/BeamContext";
 import { IconButton } from "src/components/IconButton";
 import { BlueprintAiLogo } from "src/components/Logos/BlueprintAiLogo";
+import { modalBodyPaddingLeft, modalBodyPaddingX } from "src/components/Modal/modalStyles";
 import { useModal as ourUseModal } from "src/components/Modal/useModal";
 import { Css, type Only, Tokens, type Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
@@ -106,6 +107,12 @@ export function Modal(props: ModalProps) {
   const [[width, height], setSize] = useState(getSize(size));
   const modalBannerRef = useRef<HTMLDivElement | null>(null);
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
+  // Shared through `ModalProvider` so content (i.e. virtual tables) can scroll with the body instead of the window.
+  const [modalScrollEl, setModalScrollEl] = useState<HTMLElement | null>(null);
+  const setModalBodyEl = useCallback((el: HTMLDivElement | null) => {
+    modalBodyRef.current = el;
+    setModalScrollEl(el);
+  }, []);
   const modalFooterRef = useRef<HTMLDivElement | null>(null);
   const modalHeaderRef = useRef<HTMLHeadingElement | null>(null);
   const testId = useTestIds({}, testIdPrefix);
@@ -157,7 +164,7 @@ export function Modal(props: ModalProps) {
   );
 
   return (
-    <ModalProvider>
+    <ModalProvider scrollEl={modalScrollEl}>
       <OverlayContainer>
         <AutoSaveStatusProvider>
           <div css={Css.underlay.z(zIndices.modalUnderlay).$} {...underlayProps} {...testId.underlay}>
@@ -205,7 +212,7 @@ export function Modal(props: ModalProps) {
                 {/* Full-bleed and outside `main` so a banner spans the modal and stays put as the body scrolls. */}
                 <div ref={modalBannerRef} css={Css.fs0.$} />
                 <main
-                  ref={modalBodyRef}
+                  ref={setModalBodyEl}
                   css={Css.fg1.oya.if(hasScroll).bb.bc(Tokens.SurfaceSeparator).if(!!forceScrolling).oys.$}
                 >
                   {/* We'll include content here, but we expect ModalBody and ModalFooter to use their respective portals. */}
@@ -230,29 +237,40 @@ export function ModalHeader({ children }: { children: ReactNode }): JSX.Element 
 
 /** A full-bleed slot between the header and the body, i.e. for an `AiSlimBanner`. */
 export function ModalBanner({ children }: { children: ReactNode }): JSX.Element {
-  const { modalBannerDiv } = useBeamContext();
+  const { modalBannerDiv, modalState } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
   // 4px over the header's 12px gives the 16px the design wants; a bottom margin would sit outside
-  // `main` and strand a gap the body can't scroll.
+  // `main` and strand a gap the body can't scroll. A header border is the divider, so sit flush against it.
   return createPortal(
-    <div css={Css.mtPx(4).$} {...testId.banner}>
+    <div css={Css.if(!modalState.current?.drawHeaderBorder).mtPx(4).$} {...testId.banner}>
       {children}
     </div>,
     modalBannerDiv,
   );
 }
 
+type ModalBodyProps = PropsWithChildren<{
+  /**
+   * Old way to host virtualized content that scrolls inside nested elements, such as `ScrollableParent`.
+   * The modal body stops scrolling so that child owns the scrollbar.
+   */
+  contentOwnsScroll?: boolean;
+}>;
+
 /** Provides consistent styling and the scrolling behavior for a modal's primary content. */
-export function ModalBody({
-  children,
-  virtualized = false,
-}: PropsWithChildren<{ virtualized?: boolean }>): JSX.Element {
+export function ModalBody({ children, contentOwnsScroll = false }: ModalBodyProps): JSX.Element {
   const { modalBodyDiv } = useBeamContext();
   const testId = useTestIds({}, testIdPrefix);
   return createPortal(
-    // If `virtualized`, then we are expecting the `children` will handle their own scrollbar, so have the overflow hidden and adjust padding
-    <div css={Css.h100.ptPx(12).if(virtualized).oh.pl3.else.px3.$} {...testId.content}>
-      {children}
+    // `contentOwnsScroll` children own the scrollbar, so hide overflow and pad the left only. `ctis` lets children size to the body.
+    <div
+      css={{
+        ...Css.h100.ptPx(12).ctis.$,
+        ...(contentOwnsScroll ? { ...Css.oh.$, ...modalBodyPaddingLeft } : modalBodyPaddingX),
+      }}
+      {...testId.content}
+    >
+      {contentOwnsScroll ? <ModalProvider scrollEl={null}>{children}</ModalProvider> : children}
     </div>,
     modalBodyDiv,
   );

@@ -98,6 +98,7 @@ export enum Tokens {
   OnPrimary = "--b-on-primary",
   OnSurface = "--b-on-surface",
   OnSurfaceActive = "--b-on-surface-active",
+  OnSurfaceActiveDisabled = "--b-on-surface-active-disabled",
   OnSurfaceDisabled = "--b-on-surface-disabled",
   OnSurfaceMuted = "--b-on-surface-muted",
   OnSurfaceRaisedHover = "--b-on-surface-raised-hover",
@@ -110,6 +111,7 @@ export enum Tokens {
   SelectionIndicator = "--b-selection-indicator",
   Surface = "--b-surface",
   SurfaceActive = "--b-surface-active",
+  SurfaceActiveBorder = "--b-surface-active-border",
   SurfaceActiveHover = "--b-surface-active-hover",
   SurfaceDisabled = "--b-surface-disabled",
   SurfaceHover = "--b-surface-hover",
@@ -4519,6 +4521,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   /** Sets `borderRadius: "100%"`. */
   get br100() {
     return this.add("borderRadius", "100%");
+  }
+  /** Sets `borderRadius: "999px"`. */
+  get brPill() {
+    return this.add("borderRadius", "999px");
   }
   /** Sets `borderRadius: value`. */
   borderRadius(value: Properties["borderRadius"]) {
