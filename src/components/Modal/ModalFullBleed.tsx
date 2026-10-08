@@ -15,17 +15,14 @@ export function ModalFullBleed({ children, omitPadding = false }: ModalFullBleed
   const { inModal } = useModalContext();
   if (!inModal) return children;
 
-  const { className, style, ...others } = children.props as {
-    className?: string;
-    style?: Record<string, unknown>;
-    [key: string]: unknown;
-  };
-  return cloneElement(children, {
-    ...mergeProps(className, style, {
+  const { className, style } = children.props as { className?: string; style?: Record<string, unknown> };
+  // `cloneElement` keeps the child's other props, so only the merged class and style are passed through.
+  return cloneElement(
+    children,
+    mergeProps(className, style, {
       ...Css.ctis.$,
       ...modalBodyFullBleed,
       ...(omitPadding ? {} : modalBodyPaddingX),
     } as TrussStyleHash),
-    ...others,
-  });
+  );
 }
