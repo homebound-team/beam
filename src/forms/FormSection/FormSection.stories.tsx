@@ -43,7 +43,12 @@ export function WithChildSections() {
           description: "Electrical contracts are needed for the construction to continue",
           actions: [{ label: "Add", onClick: () => {}, variant: "tertiary" }],
         },
-        { id: "plumbing", title: "Plumbing", fields: <PlaceholderFields count={2} /> },
+        {
+          id: "plumbing",
+          title: "Plumbing",
+          fields: <PlaceholderFields count={2} />,
+          tag: { text: "7 days to cutoff", type: "warning" },
+        },
         {
           id: "hvac",
           title: "HVAC",

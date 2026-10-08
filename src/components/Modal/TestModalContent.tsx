@@ -19,7 +19,7 @@ import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { action } from "storybook/actions";
 
-export interface TestModalContentProps {
+export type TestModalContentProps = {
   initNumSentences?: number;
   showLeftAction?: boolean;
   withTag?: boolean;
@@ -27,7 +27,7 @@ export interface TestModalContentProps {
   withTextArea?: boolean;
   withTextField?: boolean;
   allowClosing?: boolean;
-}
+};
 
 /** A fake modal content component that we share across the modal and superdrawer stories. */
 export function TestModalContent(props: TestModalContentProps) {
@@ -134,10 +134,8 @@ export function VirtualizedTable() {
   return (
     <>
       <ModalHeader>Filterable table</ModalHeader>
-      {/* Define `virtualized` on ModalBody to
-          (1) disable the modal's scrollbar, as it'll be introduced by the virtualized content.
-          (2) adjust padding to keep the scrollbar to the far right of the screen */}
-      <ModalBody virtualized>
+      {/* Old path: `contentOwnsScroll` lets this nested `ScrollableParent` own the scrollbar. */}
+      <ModalBody contentOwnsScroll>
         {/*
         Using ScrollableParent and ScrollableContent to keep TextField stuck to the top while ensuring
         GridTable's scrollbar takes up only the 100% of the scrollable content area, and not all of ModalBody's.
@@ -145,9 +143,9 @@ export function VirtualizedTable() {
         However, if the only content within the ModalBody is the virtualized table, then there is no need for the
         ScrollableParent and ScrollableContent. Would be much more simple, such as:
         ```
-          <ModalBody virtualized>
+          <ModalBody contentOwnsScroll>
             <GridTable as="virtual" ... />
-          </ModalBod>
+          </ModalBody>
         ```
         */}
 
