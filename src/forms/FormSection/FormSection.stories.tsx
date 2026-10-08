@@ -1,5 +1,6 @@
 import { createObjectState, type ObjectConfig } from "@homebound/form-state";
 import type { Meta } from "@storybook/react-vite";
+import { useMemo } from "react";
 import { Css, Tokens } from "src/Css";
 import { FormSection } from "src/forms/FormSection/FormSection";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
@@ -72,6 +73,54 @@ export function WithDraggableChildSections() {
     />
   );
 }
+
+/** A checkbox child that opts into an add-on, alongside plain children. */
+export function WithCheckboxChildSections() {
+  const formState = useMemo(() => createObjectState(selectionConfig, { addWasherDryer: true }), []);
+  return (
+    <FormSection
+      title="Whole House"
+      childSections={[
+        { id: "flooring", title: "Flooring", fields: <PlaceholderFields count={2} /> },
+        {
+          id: "washerDryer",
+          title: "Add Washer and Dryer",
+          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+          selectedField: formState.addWasherDryer,
+          tag: { text: "7 days to cutoff", type: "warning" },
+          fields: <PlaceholderFields count={2} />,
+        },
+      ]}
+    />
+  );
+}
+
+/** `selectedChildField` turns the childSections into a single radio group; the field holds the selected child's `id`. */
+export function WithRadioChildSections() {
+  const formState = useMemo(() => createObjectState(selectionConfig, { applianceId: "topLoad" }), []);
+  return (
+    <FormSection
+      title="Washer and Dryer"
+      selectedChildField={formState.applianceId}
+      childSections={[
+        { id: "frontLoad", title: "Front Load Washer and Dryer", fields: <PlaceholderFields count={1} /> },
+        { id: "topLoad", title: "Top Load Washer and Dryer", fields: <PlaceholderFields count={1} /> },
+        {
+          id: "stacked",
+          title: "Stacked Washer and Dryer",
+          fields: <PlaceholderFields count={1} />,
+          tag: { text: "7 days to cutoff", type: "warning" },
+        },
+      ]}
+    />
+  );
+}
+
+type SelectionInput = { addWasherDryer?: boolean | null; applianceId?: string | null };
+const selectionConfig: ObjectConfig<SelectionInput> = {
+  addWasherDryer: { type: "value" },
+  applianceId: { type: "value" },
+};
 
 type OrderInput = { order?: number | null };
 const orderConfig: ObjectConfig<OrderInput> = { order: { type: "value" } };
