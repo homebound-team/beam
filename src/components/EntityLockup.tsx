@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
+import { isDefined } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type EntityLockupProps = {
@@ -29,7 +30,7 @@ export function EntityLockup(props: EntityLockupProps) {
           <div css={styles.title} {...tid.title}>
             {title}
           </div>
-          {hasContent(description) && (
+          {isDefined(description) && (
             <div
               css={{ ...styles.description, ...(typeof description === "string" ? styles.clamp : {}) }}
               {...tid.description}
@@ -38,7 +39,7 @@ export function EntityLockup(props: EntityLockupProps) {
             </div>
           )}
         </div>
-        {hasContent(right) && (
+        {isDefined(right) && (
           <div css={styles.right} {...tid.right}>
             {right}
           </div>
@@ -77,8 +78,3 @@ const compactStyles = {
   clamp: Css.truncate.$,
   right: Css.fs0.maxw("50%").df.fdc.aife.gapPx(6).asfs.tar.$,
 };
-
-/** Skips `null`, `undefined`, booleans and `""`, but keeps `0` so it renders inside the styled wrapper. */
-function hasContent(node: ReactNode): boolean {
-  return node !== undefined && node !== null && typeof node !== "boolean" && node !== "";
-}
