@@ -5,8 +5,8 @@ import { defaultLabel } from "src/utils/defaultLabel";
 import { maybeCall } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type BoundRadioGroupFieldProps<K extends string> = Omit<
-  RadioGroupFieldProps<K>,
+export type BoundRadioGroupFieldProps<K extends string, O extends object = object> = Omit<
+  RadioGroupFieldProps<K, O>,
   "value" | "onChange" | "label"
 > & {
   field: FieldState<K | null | undefined>;
@@ -16,7 +16,9 @@ export type BoundRadioGroupFieldProps<K extends string> = Omit<
 };
 
 /** Wraps `TextField` and binds it to a form field. */
-export function BoundRadioGroupField<K extends string>(props: BoundRadioGroupFieldProps<K>) {
+export function BoundRadioGroupField<K extends string, O extends object = object>(
+  props: BoundRadioGroupFieldProps<K, O>,
+) {
   const {
     field,
     onChange = (value) => field.set(value),
@@ -29,7 +31,7 @@ export function BoundRadioGroupField<K extends string>(props: BoundRadioGroupFie
   return (
     <Observer>
       {() => (
-        <RadioGroupField<K>
+        <RadioGroupField<K, O>
           label={label}
           required={field.required}
           value={field.value || undefined}

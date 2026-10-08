@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { type RadioFieldOption, RadioGroupField } from "src/inputs/RadioGroupField";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("RadioGroupField", () => {
   it("has data-testids for its options", async () => {
@@ -197,6 +198,76 @@ describe("RadioGroupField", () => {
       expect(r.finish_chrome.closest("label")!.style.getPropertyValue("--borderColor")).toBe(
         "var(--b-field-border-default)",
       );
+    });
+  });
+
+  describe("custom option rows", () => {
+    const packages: RadioFieldOption<string>[] = [
+      { value: "front", label: "Front Load Washer and Dryer" },
+      { value: "top", label: "Top Load Washer and Dryer" },
+      { value: "stacked", label: "Stacked Washer and Dryer", disabled: "Doesn't fit" },
+    ];
+
+    function TestRows(props: { onChange: (value: string) => void }) {
+      const [value, setValue] = useState<string | undefined>("front");
+      return (
+        <RadioGroupField
+          label="Washer and Dryer"
+          value={value}
+          onChange={(v) => {
+            setValue(v);
+            props.onChange(v);
+          }}
+          options={packages}
+          renderOption={(option, radio) => (
+            <label data-testid={`row_${option.value}`}>
+              {radio}
+              <span>{option.label}</span>
+              <span data-testid={`price_${option.value}`}>+ $10.00</span>
+              <img data-testid={`img_${option.value}`} src="washer.png" alt="" />
+            </label>
+          )}
+        />
+      );
+    }
+
+    it("can click anywhere on the option area", async () => {
+      const onChange = vi.fn();
+      const r = await render(<TestRows onChange={onChange} />);
+      click(r.price_top);
+      expect(onChange).toHaveBeenLastCalledWith("top");
+      expect(r.washerAndDryer_top).toBeChecked();
+      click(r.img_front);
+      expect(onChange).toHaveBeenLastCalledWith("front");
+      expect(r.washerAndDryer_front).toBeChecked();
+    });
+
+    it("renders only the control, named by the option's label", async () => {
+      const r = await render(<TestRows onChange={() => {}} />);
+      // The radio's own label text and label element are gone, so the consumer's row is the only label.
+      expect(r.row_top.querySelectorAll("label")).toHaveLength(0);
+      expect(r.row_top).toHaveTextContent(/^Top Load Washer and Dryer\+ \$10\.00$/);
+      expect(r.getByRole("radio", { name: "Top Load Washer and Dryer" })).toBe(r.washerAndDryer_top);
+    });
+
+    it("supports controlOnly and withLabelElement without renderOption", async () => {
+      const r = await render(
+        <RadioGroupField
+          label="Favorite cheese"
+          controlOnly
+          withLabelElement={false}
+          value="a"
+          onChange={() => {}}
+          options={[
+            { value: "a", label: "Asiago", description: "Aged" },
+            { value: "b", label: "Burratta" },
+          ]}
+        />,
+      );
+      expect(r.favoriteCheese_a.parentElement!.tagName).toBe("SPAN");
+      expect(r.queryByText("Asiago")).toBeNull();
+      expect(r.queryByText("Aged")).toBeNull();
+      expect(r.getByRole("radio", { name: "Asiago" })).toBe(r.favoriteCheese_a);
     });
   });
 });
