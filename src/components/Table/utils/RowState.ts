@@ -153,6 +153,21 @@ export class RowState<R extends Kinded> {
     return this.selected;
   }
 
+  /** This row's share of `TableState.selectedRowCount`, see `GridDataRow.selectionCount`. */
+  get selectedRowCount(): number {
+    if (!this.isSelected || this.isReservedKind || this.isCountedByAncestor) return 0;
+    // A parent that's only checked through its children isn't a row of its own, unless it says how many it stands for
+    return this.row.selectionCount ?? (this.isParent ? 0 : 1);
+  }
+
+  /** Whether a selected ancestor's `selectionCount` already counts this row. */
+  private get isCountedByAncestor(): boolean {
+    for (let parent = this.parent; parent; parent = parent.parent) {
+      if (parent.isSelected && parent.row.selectionCount !== undefined) return true;
+    }
+    return false;
+  }
+
   /** The UI state for checked/unchecked + "partially checked" for parents. */
   get selectedState(): SelectedState {
     // Parent `selectedState` is special b/c it does not directly depend on the parent's own selected-ness,

@@ -584,6 +584,8 @@ export type GridDataRow<R extends Kinded> = {
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
+  /** How many rows this row stands for in `GridTableLayout`'s selection summary, e.g. a group whose children load lazily. */
+  selectionCount?: number;
   /** Whether this row is draggable, usually to allow drag & drop reordering of rows */
   draggable?: boolean;
   /** Image src for the row, to be used for card view */

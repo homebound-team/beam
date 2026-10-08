@@ -7,6 +7,7 @@ import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderA
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { useModalContext } from "src/components/Modal/ModalContext";
+import { SelectionSummaryPill } from "src/components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { type TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
@@ -18,6 +19,7 @@ import type { Value } from "src/inputs/Value";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
+import { pluralize } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
@@ -51,6 +53,9 @@ type GridTableLayoutActionsProps<
   clearFilters?: () => void;
   searchApi?: MutableRefObject<SearchBoxApi | undefined>;
   actions?: HeaderAction[];
+  /** Shows the selection summary pill when above zero. */
+  selectedRowCount?: number;
+  onClearSelections?: VoidFunction;
 };
 
 function GridTableLayoutActionsComponent<
@@ -73,6 +78,8 @@ function GridTableLayoutActionsComponent<
     clearFilters,
     searchApi,
     actions,
+    selectedRowCount = 0,
+    onClearSelections,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
   // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
@@ -203,8 +210,14 @@ function GridTableLayoutActionsComponent<
             />
           )}
         </div>
-        {(hasHideableColumns || withCardView || !!actions?.length) && (
+        {(hasHideableColumns || withCardView || !!actions?.length || selectedRowCount > 0) && (
           <div css={Css.df.aic.gapPx(12).$}>
+            {selectedRowCount > 0 && onClearSelections && (
+              <SelectionSummaryPill
+                text={`${selectedRowCount} ${pluralize(selectedRowCount, "Row")} Selected`}
+                onClick={onClearSelections}
+              />
+            )}
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}

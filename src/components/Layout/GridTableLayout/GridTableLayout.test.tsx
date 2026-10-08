@@ -452,6 +452,159 @@ describe("GridTableLayout", () => {
     });
   });
 
+  describe("selection summary", () => {
+    it("counts selected rows before the columns selector, and hides with none selected", async () => {
+      // Given a selectable table with the selection summary
+      const r = await render(
+        <GridTableLayoutComponent
+          selectionSummary
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+      // Then nothing shows while nothing is selected
+      expect(r.query.selectionSummaryPill).toBeNull();
+
+      // When selecting a row
+      click(r.select_1);
+      // Then the pill counts it
+      expect(r.selectionSummaryPill).toHaveTextContent("1 Row SelectedClear");
+
+      // And when selecting a second
+      click(r.select_2);
+      // Then it counts both, ahead of the columns selector
+      expect(r.selectionSummaryPill).toHaveTextContent("2 Rows SelectedClear");
+      expect(r.selectionSummaryPill.compareDocumentPosition(r.columns)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it("deselects every row on Clear, then calls onClear", async () => {
+      // Given two selected rows
+      const onClear = vi.fn();
+      const r = await render(
+        <GridTableLayoutComponent
+          selectionSummary={{ onClear }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+      click(r.select_1);
+      click(r.select_2);
+
+      // When clicking the pill
+      click(r.selectionSummaryPill);
+
+      // Then nothing is selected, the pill is gone, and onClear ran
+      expect(r.select_0).not.toBeChecked();
+      expect(r.select_1).not.toBeChecked();
+      expect(r.select_2).not.toBeChecked();
+      expect(r.query.selectionSummaryPill).toBeNull();
+      expect(onClear).toHaveBeenCalledTimes(1);
+    });
+
+    it("counts a checked group's rows, not the group", async () => {
+      // Given a group of three rows
+      const r = await render(
+        <GridTableLayoutComponent<any, GroupedRow, any, any>
+          selectionSummary
+          tableProps={{
+            columns: getGroupedColumns(),
+            rows: [
+              simpleHeader,
+              {
+                kind: "group",
+                id: "g1",
+                data: { name: "Framing" },
+                children: [
+                  { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
+                  { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
+                  { kind: "data", id: "3", data: { name: "Gamma", value: 30 } },
+                ],
+              },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // When checking the group
+      click(r.select_1);
+
+      // Then its three rows count, and the group doesn't add a fourth
+      expect(r.selectionSummaryPill).toHaveTextContent("3 Rows SelectedClear");
+    });
+
+    it("counts a row's selectionCount in place of its children", async () => {
+      // Given a group whose 12 rows haven't loaded, so it's selectable on its own over a placeholder child
+      // And a loaded group of two rows that also says how many it stands for
+      const r = await render(
+        <GridTableLayoutComponent<any, GroupedRow, any, any>
+          selectionSummary
+          tableProps={{
+            columns: getGroupedColumns(),
+            rows: [
+              simpleHeader,
+              {
+                kind: "group",
+                id: "g1",
+                data: { name: "Plumbing" },
+                selectionCount: 12,
+                inferSelectedState: false,
+                children: [{ kind: "data", id: "g1-loading", data: { name: "Loading", value: 0 }, selectable: false }],
+              },
+              {
+                kind: "group",
+                id: "g2",
+                data: { name: "Framing" },
+                selectionCount: 2,
+                children: [
+                  { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
+                  { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
+                ],
+              },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // When checking the unloaded group
+      click(r.select_1);
+      // Then it counts as its 12 rows
+      expect(r.selectionSummaryPill).toHaveTextContent("12 Rows SelectedClear");
+
+      // And when checking one of the loaded group's rows
+      click(r.select_4);
+      // Then the partly checked group counts only that row
+      expect(r.selectionSummaryPill).toHaveTextContent("13 Rows SelectedClear");
+
+      // And when checking its other row, which fills the group
+      click(r.select_5);
+      // Then the group counts as its 2, without its rows counting again
+      expect(r.selectionSummaryPill).toHaveTextContent("14 Rows SelectedClear");
+    });
+
+    it("keeps counting a selected row after it leaves the rows", async () => {
+      // Given a selected row
+      const columns = [selectColumn<Row>(), ...getColumns()];
+      const r = await render(
+        <GridTableLayoutComponent selectionSummary tableProps={{ columns, rows: [simpleHeader, ...getRows()] }} />,
+        withRouter(),
+      );
+      click(r.select_1);
+
+      // When a server-side filter drops it from the rows
+      r.rerender(
+        <GridTableLayoutComponent
+          selectionSummary
+          tableProps={{ columns, rows: [simpleHeader, ...getRows().filter((row) => row.id !== "1")] }}
+        />,
+      );
+
+      // Then it still counts, since it's still selected
+      expect(r.selectionSummaryPill).toHaveTextContent("1 Row SelectedClear");
+    });
+  });
+
   describe("document scroll layout", () => {
     afterEach(() => {
       document.documentElement.style.removeProperty(beamFloatingRightOffsetVar);
@@ -1150,6 +1303,8 @@ type Data = { name: string | undefined; value: number | undefined };
 type HeaderRow = { kind: "header"; id: string; data: undefined };
 type DataRow = { kind: "data"; id: string; data: Data };
 type Row = HeaderRow | DataRow;
+type GroupRow = { kind: "group"; id: string; data: { name: string } };
+type GroupedRow = HeaderRow | GroupRow | DataRow;
 
 // Because we also want to test the use of the useGridTableLayoutState hook, we need create a wrapper component
 type TestWrapperProps = Omit<GridTableLayoutProps<any, Row, any, any>, "layoutState"> & {
@@ -1172,6 +1327,20 @@ function getColumns() {
     column<Row>({ header: () => "Name", data: (row) => row.name, id: "name", name: "Name", canHide: true }),
     numericColumn<Row>({ header: () => "Value", data: (row) => row.value, id: "value", name: "Value", canHide: true }),
     actionColumn<Row>({ header: () => "Action", data: () => <div>Actions</div>, id: "action", name: "Action" }),
+  ];
+}
+
+function getGroupedColumns() {
+  return [
+    selectColumn<GroupedRow>(),
+    column<GroupedRow>({
+      header: () => "Name",
+      group: (row) => row.name,
+      data: (row) => row.name,
+      id: "name",
+      name: "Name",
+      canHide: true,
+    }),
   ];
 }
 
