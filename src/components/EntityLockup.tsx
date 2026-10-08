@@ -24,44 +24,48 @@ export function EntityLockup(props: EntityLockupProps) {
       <div css={styles.image}>
         <img src={imgSrc} alt="" loading="lazy" css={Css.w100.h100.objectCover.db.$} {...tid.image} />
       </div>
-      <div css={styles.text}>
-        <div css={styles.title} {...tid.title}>
-          {title}
+      <div css={styles.body}>
+        <div css={styles.text}>
+          <div css={styles.title} {...tid.title}>
+            {title}
+          </div>
+          {description && (
+            <div
+              css={{ ...styles.description, ...(typeof description === "string" ? styles.clamp : {}) }}
+              {...tid.description}
+            >
+              {description}
+            </div>
+          )}
         </div>
-        {description && (
-          <div
-            css={{ ...styles.description, ...(typeof description === "string" ? styles.clamp : {}) }}
-            {...tid.description}
-          >
-            {description}
+        {right && (
+          <div css={styles.right} {...tid.right}>
+            {right}
           </div>
         )}
       </div>
-      {right && (
-        <div css={styles.right} {...tid.right}>
-          {right}
-        </div>
-      )}
     </div>
   );
 }
 
 const defaultStyles = {
-  // On small screens, `right` wraps to its own row under the text, so the text keeps its width.
-  container: Css.df.aifs.gap2.ifSm.fww.rg1.$,
+  container: Css.df.aifs.gap2.$,
   image: Css.fs0.sqPx(96).br8.ba.bcGray300.oh.bgWhite.$,
-  // A zero basis keeps the text beside the image instead of wrapping under it.
-  text: Css.df.fdc.mw0.fg1.gap1.ifSm.fb(0).$,
+  // On small screens, `right` moves under the description so the text keeps its width.
+  body: Css.df.fg1.mw0.gap2.ifSm.fdc.gap1.$,
+  text: Css.df.fdc.mw0.fg1.gap1.$,
   title: Css.smSb.color(Tokens.OnSurface).$,
   description: Css.xs.color(Tokens.OnSurface).$,
   clamp: Css.lineClamp2.$,
-  right: Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.ifSm.fb("100%").fdr.aic.jcsb.plPx(112).$,
+  right: Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.ifSm.fdr.aic.jcsb.asStretch.$,
 };
 
 const compactStyles = {
   container: Css.df.aic.gapPx(12).$,
   image: Css.fs0.sqPx(62).br8.ba.bcGray200.oh.bgWhite.$,
-  text: Css.df.fdc.mw0.fg1.gapPx(2).$,
+  // Stretches to the image's height so `right` stays top-aligned while the text is centered.
+  body: Css.df.fg1.mw0.gapPx(12).asStretch.$,
+  text: Css.df.fdc.mw0.fg1.gapPx(2).asc.$,
   title: Css.xsSb.color(Tokens.OnSurface).$,
   description: Css.xs2.gray800.$,
   clamp: Css.truncate.$,
