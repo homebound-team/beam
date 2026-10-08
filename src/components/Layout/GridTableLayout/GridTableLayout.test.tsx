@@ -27,6 +27,7 @@ import {
   documentScrollRightPaneWidthCss,
   smPageContentPaddingXValue,
 } from "src/layouts/layoutVars";
+import { setViewport } from "src/tests/viewport";
 import { noop } from "src/utils/helpers";
 import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
@@ -475,6 +476,26 @@ describe("GridTableLayout", () => {
       // Then it counts both, ahead of the columns selector
       expect(r.selectionSummaryPill).toHaveTextContent("2 Rows SelectedClear");
       expect(r.selectionSummaryPill.compareDocumentPosition(r.columns)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it("shows just the count on small screens", async () => {
+      // Given a selectable table with the selection summary on a phone
+      setViewport("sm");
+      const r = await render(
+        <GridTableLayoutComponent
+          selectionSummary
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+
+      // When selecting two rows
+      click(r.select_1);
+      click(r.select_2);
+
+      // Then the pill shows just the count beside its ×
+      expect(r.selectionSummaryPill.textContent).toBe("2");
+      expect(r.selectionSummaryPill_count).toHaveTextContent("2");
     });
 
     it("deselects every row on Clear, then calls onClear", async () => {

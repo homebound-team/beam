@@ -14,6 +14,17 @@ describe("SelectionSummaryPill", () => {
     expect(r.selectionSummaryPill).toHaveAccessibleName("Clear 3 Rows Selected");
   });
 
+  it("shows just the count and an × when compact, keeping the text as its name", async () => {
+    // Given a compact selection summary pill
+    // When rendered
+    const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={() => {}} compactCount={3} />);
+    // Then only the count shows beside the ×, and screen readers still hear the full summary
+    expect(r.selectionSummaryPill.textContent).toBe("3");
+    expect(r.selectionSummaryPill_count).toHaveTextContent("3");
+    expect(r.selectionSummaryPill_clear).toBeInTheDocument();
+    expect(r.selectionSummaryPill).toHaveAccessibleName("Clear 3 Rows Selected");
+  });
+
   it("calls onClick when the pill is clicked", async () => {
     // Given a selection summary pill with an onClick handler
     const onClick = vi.fn();

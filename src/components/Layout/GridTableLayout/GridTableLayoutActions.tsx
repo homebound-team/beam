@@ -216,6 +216,7 @@ function GridTableLayoutActionsComponent<
               <SelectionSummaryPill
                 text={`${selectedRowCount} ${pluralize(selectedRowCount, "Row")} Selected`}
                 onClick={onClearSelections}
+                compactCount={sm ? selectedRowCount : undefined}
               />
             )}
             {hasHideableColumns && view === "list" && columns && api && (
