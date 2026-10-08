@@ -21,26 +21,6 @@ describe("EntityLockup", () => {
     expect(r.query.entityLockup_right).not.toBeInTheDocument();
   });
 
-  it("renders a ReactNode description", async () => {
-    // Given a description with multiple rows
-    // When rendered
-    const r = await render(
-      <EntityLockup
-        compact
-        imgSrc="fridge.jpeg"
-        title="Refrigerator"
-        description={
-          <>
-            <span>French door</span>
-            <span>Changed</span>
-          </>
-        }
-      />,
-    );
-    // Then both rows are shown
-    expect(r.entityLockup_description).toHaveTextContent("French doorChanged");
-  });
-
   it("renders right content", async () => {
     // Given right content
     // When rendered

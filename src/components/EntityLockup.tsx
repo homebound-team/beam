@@ -24,7 +24,7 @@ export function EntityLockup(props: EntityLockupProps) {
       <div css={styles.image}>
         <img src={imgSrc} alt="" loading="lazy" css={Css.w100.h100.objectCover.db.$} {...tid.image} />
       </div>
-      <div css={{ ...Css.df.fdc.mw0.fg1.$, ...styles.text }}>
+      <div css={styles.text}>
         <div css={styles.title} {...tid.title}>
           {title}
         </div>
@@ -38,7 +38,7 @@ export function EntityLockup(props: EntityLockupProps) {
         )}
       </div>
       {right && (
-        <div css={Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.$} {...tid.right}>
+        <div css={styles.right} {...tid.right}>
           {right}
         </div>
       )}
@@ -47,19 +47,23 @@ export function EntityLockup(props: EntityLockupProps) {
 }
 
 const defaultStyles = {
-  container: Css.df.aifs.gap2.$,
+  // On small screens, `right` wraps to its own row under the text, so the text keeps its width.
+  container: Css.df.aifs.gap2.ifSm.fww.rg1.$,
   image: Css.fs0.sqPx(96).br8.ba.bcGray300.oh.bgWhite.$,
-  text: Css.gap1.$,
+  // A zero basis keeps the text beside the image instead of wrapping under it.
+  text: Css.df.fdc.mw0.fg1.gap1.ifSm.fb(0).$,
   title: Css.smSb.color(Tokens.OnSurface).$,
   description: Css.xs.color(Tokens.OnSurface).$,
   clamp: Css.lineClamp2.$,
+  right: Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.ifSm.fb("100%").fdr.aic.jcsb.plPx(112).$,
 };
 
 const compactStyles = {
   container: Css.df.aic.gapPx(12).$,
   image: Css.fs0.sqPx(62).br8.ba.bcGray200.oh.bgWhite.$,
-  text: Css.gapPx(2).$,
+  text: Css.df.fdc.mw0.fg1.gapPx(2).$,
   title: Css.xsSb.color(Tokens.OnSurface).$,
   description: Css.xs2.gray800.$,
   clamp: Css.truncate.$,
+  right: Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.$,
 };
