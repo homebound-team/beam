@@ -1,10 +1,12 @@
 import type { Meta } from "@storybook/react-vite";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { ContrastScope } from "src/components/ContrastScope";
+import { ModalBody, ModalHeader } from "src/components/Modal/Modal";
+import { useModal } from "src/components/Modal/useModal";
 import { Css } from "src/Css";
-import { withDimensions, withRouter } from "src/utils/sb";
+import { withBeamDecorator, withDimensions, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
 
 export default {
@@ -321,6 +323,35 @@ export function CycleTracking() {
     </div>
   );
 }
+
+/** Clicking anywhere in the modal outside the menu should dismiss the menu, but keep the modal open. */
+export function InsideModal() {
+  const { openModal } = useModal();
+  const open = () =>
+    openModal({
+      content: (
+        <>
+          <ModalHeader>Menu inside a modal</ModalHeader>
+          <ModalBody>
+            <div css={Css.df.jcsb.aic.$}>
+              <span>Click anywhere in the modal to dismiss the menu</span>
+              <ButtonMenu
+                trigger={{ icon: "verticalDots" }}
+                items={[
+                  { label: "Remove", onClick: action("Remove") },
+                  { label: "Add Elevation Impact", onClick: action("Add Elevation Impact") },
+                ]}
+              />
+            </div>
+          </ModalBody>
+        </>
+      ),
+    });
+  // Immediately open the modal for Chromatic snapshots
+  useEffect(open, [openModal]);
+  return <Button label="Open" onClick={open} />;
+}
+InsideModal.decorators = [withBeamDecorator];
 
 function createCycleHeader({ title, meta, details }: { title: string; meta?: string; details?: ReactNode }) {
   return (
