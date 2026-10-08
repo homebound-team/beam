@@ -50,10 +50,7 @@ export type GridTableLayoutProps<
   emptyFallback?: string;
   /** Inline buttons, icon buttons, and an optional overflow menu (`kind: "menu"`). */
   actions?: HeaderAction[];
-  /**
-   * Shows "N Rows Selected · Clear" before the columns selector while rows are selected.
-   * Clear deselects every row, then calls `onClear`. Rows can stand for more than one with `GridDataRow.selectionCount`.
-   */
+  /** Shows "N Rows Selected · Clear" before the columns selector; Clear deselects every row, then calls `onClear`. */
   selectionSummary?: true | { onClear?: () => void };
   hideEditColumns?: boolean;
   totalCount?: number;

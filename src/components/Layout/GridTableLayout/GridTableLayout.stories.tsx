@@ -124,7 +124,6 @@ export function Loading() {
   );
 }
 
-/** `selectionSummary` shows "N Rows Selected · Clear" before the columns selector; a checked parent counts its children. */
 export function WithSelectionSummary() {
   const columns = useMemo(() => getColumns(false), []);
   const rows = useMemo(() => [simpleHeader, ...makeSelectedRows()], []);
@@ -1347,7 +1346,7 @@ function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
   });
 }
 
-/** A parent whose children start selected, so the selection summary shows without interaction, beside one that doesn't. */
+/** p1's children start selected, so the pill shows without interaction. */
 function makeSelectedRows(): GridDataRow<Row>[] {
   return [
     {

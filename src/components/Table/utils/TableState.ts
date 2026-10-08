@@ -251,7 +251,7 @@ export class TableState<R extends Kinded> {
     this.rowStates.get(id).select(selected);
   }
 
-  /** Deselects every row, including children of `inferSelectedState: false` rows that unselecting the header skips. */
+  /** Deselects every row, unlike unchecking the header. */
   clearSelections(): void {
     for (const rs of this.rowStates.allStates) rs.selected = false;
   }

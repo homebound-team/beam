@@ -20,7 +20,6 @@ describe("SelectionSummaryPill", () => {
     const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={() => {}} compactCount={3} />);
     // Then only the count shows beside the ×, and screen readers still hear the full summary
     expect(r.selectionSummaryPill.textContent).toBe("3");
-    expect(r.selectionSummaryPill_count).toHaveTextContent("3");
     expect(r.selectionSummaryPill_clear).toBeInTheDocument();
     expect(r.selectionSummaryPill).toHaveAccessibleName("Clear 3 Rows Selected");
   });

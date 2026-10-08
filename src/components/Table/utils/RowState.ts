@@ -156,7 +156,7 @@ export class RowState<R extends Kinded> {
   /** This row's share of `TableState.selectedRowCount`, see `GridDataRow.selectionCount`. */
   get selectedRowCount(): number {
     if (!this.isSelected || this.isReservedKind || this.isCountedByAncestor) return 0;
-    // A parent that's only checked through its children isn't a row of its own, unless it says how many it stands for
+    // A parent checked only through its children isn't a row itself
     return this.row.selectionCount ?? (this.isParent ? 0 : 1);
   }
 

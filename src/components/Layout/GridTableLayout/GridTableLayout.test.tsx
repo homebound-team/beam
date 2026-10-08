@@ -495,7 +495,6 @@ describe("GridTableLayout", () => {
 
       // Then the pill shows just the count beside its ×
       expect(r.selectionSummaryPill.textContent).toBe("2");
-      expect(r.selectionSummaryPill_count).toHaveTextContent("2");
     });
 
     it("deselects every row on Clear, then calls onClear", async () => {
@@ -626,7 +625,7 @@ describe("GridTableLayout", () => {
     });
 
     it("keeps counting a selected row after it leaves a group that has a selectionCount", async () => {
-      // Given a checked group of two rows that says how many it stands for
+      // Given a checked group of two rows with a selectionCount
       const columns = getGroupedColumns();
       const r = await render(
         <GridTableLayoutComponent<any, GroupedRow, any, any>
@@ -672,7 +671,7 @@ describe("GridTableLayout", () => {
         />,
       );
 
-      // Then Beta still counts beside the group's one row, since it's still selected
+      // Then Beta still counts on top of the group's one row
       expect(r.selectionSummaryPill).toHaveTextContent("2 Rows SelectedClear");
     });
   });

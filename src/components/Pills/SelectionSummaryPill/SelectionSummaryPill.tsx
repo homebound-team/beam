@@ -59,7 +59,7 @@ export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
 
 /** Figma draws the border inside the box, so the padding gives up 1px to it. */
 function pillStyles(disabled: boolean, hovered: boolean, compact: boolean) {
-  // Compact matches the 40px icon buttons beside it in a small-screen toolbar; Figma trims the right side for the ×'s inset
+  // Compact: Figma pads 4px more on the left
   return Css.smSb.dif.aic.gap1.wsnw.ba.brPill
     .plPx(compact ? 19 : 15)
     .prPx(15)
