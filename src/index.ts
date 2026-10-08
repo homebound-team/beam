@@ -45,6 +45,7 @@ export * from "./components/ContextTag";
 export * from "./components/ContrastScope";
 export * from "./components/Copy";
 export * from "./components/CountBadge";
+export * from "./components/EntityLockup";
 export * from "./components/EnvironmentBanner/EnvironmentBanner";
 export * from "./components/Filters/FilterModal";
 export * from "./components/Filters/Filters";
@@ -162,6 +163,7 @@ export { HB_QUIPS_FLAVOR, HB_QUIPS_MISSION, HbLoadingSpinner, HbSpinnerProvider 
 export type { HeaderAction } from "./components/Headers/HeaderActions";
 export { ConfirmCloseModal } from "./components/Modal/ConfirmCloseModal";
 export { ModalBanner, ModalBody, ModalFooter, ModalHeader } from "./components/Modal/Modal";
+export { ModalFullBleed } from "./components/Modal/ModalFullBleed";
 export type { ModalProps, ModalSize } from "./components/Modal/Modal";
 export { OpenModal } from "./components/Modal/OpenModal";
 export { Navbar } from "./components/Navbar/Navbar";
@@ -247,8 +249,8 @@ export { FormSectionLayout } from "./layouts/FormSectionLayout/FormSectionLayout
 export type { FormSectionLayoutProps, FormSectionLayoutSection } from "./layouts/FormSectionLayout/FormSectionLayout";
 export { headerContentPaddingX, pageContentGutterPx, pageContentPaddingX } from "./layouts/layoutSpacing";
 export {
-  bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
+  beamPageBannerHeightVar,
   beamFloatingRightOffsetVar,
   beamLayoutContentPaddingXVar,
   beamLayoutViewportHeightVar,
@@ -260,6 +262,7 @@ export {
   beamSideNavLayoutWidthVar,
   beamTableActionsHeightVar,
   beamWorkflowLayoutFooterHeightVar,
+  belowNavbarOffset,
   documentScrollBodyMinHeight,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
@@ -270,10 +273,12 @@ export {
   documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
+  pageBannerOffset,
   stickyNavAndHeaderOffset,
   stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,
 } from "./layouts/layoutVars";
+export { PageBanner, usePageBanner } from "./layouts/PageBanner/usePageBanner";
 export { NavbarLayout } from "./layouts/NavbarLayout/NavbarLayout";
 export type { NavbarLayoutProps } from "./layouts/NavbarLayout/NavbarLayout";
 export { PageHeaderLayout } from "./layouts/PageHeaderLayout/PageHeaderLayout";

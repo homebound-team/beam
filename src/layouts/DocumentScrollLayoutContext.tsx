@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import type { BeamColor } from "src/colors";
+import { useModalContext } from "src/components/Modal/ModalContext";
 import { Css, Tokens } from "src/Css";
 import { useBodyBackgroundColor } from "src/hooks/useBodyBackgroundColor";
 import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";
@@ -46,9 +47,10 @@ export function DocumentScrollLayoutProvider({
   );
 }
 
-/** True when inside a document-scroll Beam layout (e.g. for virtualized `GridTable` scroll delegation). */
+/** True inside a document-scroll layout. False inside a modal, so modal content does not inherit page chrome. */
 export function useDocumentScrollLayout(): boolean {
-  return useContext(DocumentScrollLayoutContext);
+  const { inModal } = useModalContext();
+  return useContext(DocumentScrollLayoutContext) && !inModal;
 }
 
 function DocumentScrollLayoutViewportRoot({
