@@ -116,18 +116,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
             };
             return (
               <Fragment key={option.value}>
-                {maybeTooltip({
-                  // Thumbnails have no visible text, so their label doubles as the tooltip, unless there's a disabled reason.
-                  title: isThumbnail
-                    ? (resolveTooltip(option.disabled) ?? option.label)
-                    : resolveTooltip(option.disabled),
-                  placement: isThumbnail ? "top" : "bottom",
-                  children: isThumbnail ? (
-                    <ThumbnailRadio {...radioProps} />
-                  ) : (
-                    <Radio parentId={name} {...radioProps} />
-                  ),
-                })}
+                {isThumbnail ? <ThumbnailRadio {...radioProps} /> : <Radio parentId={name} {...radioProps} />}
               </Fragment>
             );
           })}
@@ -153,7 +142,7 @@ function Radio<K extends string>(props: {
 }) {
   const {
     parentId,
-    option: { description, label, value },
+    option: { description, label, value, disabled: disabledReason },
     state,
     isOptionDisabled,
     ...others
@@ -174,43 +163,47 @@ function Radio<K extends string>(props: {
   const { focusProps, isFocusVisible } = useFocusRing();
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
 
-  return (
-    <label css={Css.df.cursorPointer.if(disabled).add("cursor", "initial").$} {...hoverProps}>
-      <input
-        type="radio"
-        ref={ref}
-        css={{
-          ...radioReset,
-          ...radioDefault,
-          ...getRadioStateStyles({ isDisabled: disabled, isSelected }),
-          ...(isHovered && !disabled ? radioHover : {}),
-          ...(isFocusVisible ? radioFocus : {}),
-          // Nudge down so the center of the circle lines up with the label text
-          ...Css.mtPx(2).mr1.$,
-        }}
-        disabled={disabled}
-        aria-labelledby={labelId}
-        {...inputProps}
-        {...focusProps}
-        // Put others here b/c it could have data-testid in it or onX events.
-        {...others}
-      />
-      <div>
-        <div
-          id={labelId}
-          css={Css.sm.color(Tokens.OnSurface).if(disabled).color(Tokens.TextDisabled).$}
-          {...(description ? { "aria-describedby": descriptionId } : {})}
-        >
-          {label}
-        </div>
-        {description && (
-          <div id={descriptionId} css={Css.sm.color(Tokens.OnSurfaceMuted).if(disabled).color(Tokens.TextDisabled).$}>
-            {typeof description === "function" ? description() : description}
+  return maybeTooltip({
+    title: resolveTooltip(disabledReason),
+    placement: "bottom",
+    children: (
+      <label css={Css.df.cursorPointer.if(disabled).add("cursor", "initial").$} {...hoverProps}>
+        <input
+          type="radio"
+          ref={ref}
+          css={{
+            ...radioReset,
+            ...radioDefault,
+            ...getRadioStateStyles({ isDisabled: disabled, isSelected }),
+            ...(isHovered && !disabled ? radioHover : {}),
+            ...(isFocusVisible ? radioFocus : {}),
+            // Nudge down so the center of the circle lines up with the label text
+            ...Css.mtPx(2).mr1.$,
+          }}
+          disabled={disabled}
+          aria-labelledby={labelId}
+          {...inputProps}
+          {...focusProps}
+          // Put others here b/c it could have data-testid in it or onX events.
+          {...others}
+        />
+        <div>
+          <div
+            id={labelId}
+            css={Css.sm.color(Tokens.OnSurface).if(disabled).color(Tokens.TextDisabled).$}
+            {...(description ? { "aria-describedby": descriptionId } : {})}
+          >
+            {label}
           </div>
-        )}
-      </div>
-    </label>
-  );
+          {description && (
+            <div id={descriptionId} css={Css.sm.color(Tokens.OnSurfaceMuted).if(disabled).color(Tokens.TextDisabled).$}>
+              {typeof description === "function" ? description() : description}
+            </div>
+          )}
+        </div>
+      </label>
+    ),
+  });
 }
 
 /**
@@ -228,7 +221,7 @@ function ThumbnailRadio<K extends string>(props: {
   onFocus?: () => void;
 }) {
   const {
-    option: { label, value, imgSrc },
+    option: { label, value, imgSrc, disabled: disabledReason },
     state,
     isOptionDisabled,
     ...others
@@ -239,52 +232,54 @@ function ThumbnailRadio<K extends string>(props: {
   // Like `Radio`, a disabled option doesn't show as selected.
   const isSelected = !isDisabled && state.selectedValue === value;
   const { focusProps, isFocusVisible } = useFocusRing();
+  const { hoverProps, isHovered } = useHover({ isDisabled });
   // preventFocusOnPress keeps a mouse click from reading as "virtual" focus and showing the keyboard
   // focus ring; see `SelectCardShell` for the full story. Keyboard focus goes straight to the input.
-  const { pressProps } = usePress({ isDisabled, preventFocusOnPress: true });
+  const { pressProps, isPressed } = usePress({ isDisabled, preventFocusOnPress: true });
 
-  return (
-    <label
-      css={
-        Css.relative.db.fs0
-          .sqPx(32)
-          .br8.ba.bc(Tokens.FieldBorderDefault)
-          .bgColor(Tokens.Surface)
-          .outline(0)
-          // Lets a wrapping `Carousel` snap to each thumbnail.
-          .ssa("start")
-          .if(isSelected)
-          .bc(Tokens.Primary)
-          .end.if(isFocusVisible)
-          .bshFocus.end.if(isDisabled)
-          .cursorNotAllowed.else.cursorPointer.end.if(!isDisabled && !isFocusVisible)
-          .onHover.bshHover.end.if(!isDisabled && !isSelected)
-          // Selected thumbnails skip the pressed border, otherwise Truss would let it replace the selected one.
-          .onActive.bc(Tokens.Primary)
-          .end.if(!isDisabled)
-          .onActive.element("::after")
-          .contentEmpty.absolute.top0.left0.w100.h100.br8.bgColor(Tokens.Primary)
-          .o(0.28).pen.$
-      }
-      data-selected={isSelected}
-      data-disabled={isDisabled}
-      {...pressProps}
-    >
-      {/* A span, b/c this sits inside the thumbnail's `<label>`, where a `<div>` isn't valid HTML. */}
-      <VisuallyHidden elementType="span">
-        {/* Merge others last b/c it could have data-testid in it or onX events. */}
-        <input {...mergeProps(inputProps, focusProps, others)} ref={ref} />
-      </VisuallyHidden>
-      <span css={Css.relative.db.w100.h100.oh.br8.$}>
-        <img src={imgSrc} alt="" loading="lazy" css={Css.w100.h100.objectCover.db.if(isDisabled).o50.$} />
-        {isSelected && (
-          <span
-            css={Css.absolute.top0.left0.w100.h100.bgColor(Tokens.SelectionFill).pen.add("mixBlendMode", "multiply").$}
-          />
-        )}
-      </span>
-      {/* An inner white ring that separates the image from the border. */}
-      <span css={Css.absolute.top0.left0.w100.h100.br8.pen.boxShadow("inset 0 0 0 2px white").$} />
-    </label>
-  );
+  return maybeTooltip({
+    // Thumbnails have no visible text, so their label doubles as the tooltip, unless there's a disabled reason.
+    title: resolveTooltip(disabledReason) ?? label,
+    placement: "top",
+    children: (
+      <label
+        css={{
+          // The padding over the white background is the inner ring between the border and the image.
+          ...Css.db.fs0
+            .sqPx(32)
+            .pPx(2)
+            .br8.ba.bc(Tokens.FieldBorderDefault)
+            .bgColor(Tokens.SurfaceRaised)
+            .outline(0)
+            .cursorPointer// Lets a wrapping `Carousel` snap to each thumbnail.
+            .ssa("start").$,
+          ...(isHovered && !isFocusVisible ? Css.bshHover.$ : {}),
+          ...(isSelected || isPressed ? Css.bc(Tokens.Primary).$ : {}),
+          ...(isFocusVisible ? Css.bshFocus.$ : {}),
+          ...(isDisabled ? Css.cursorNotAllowed.$ : {}),
+        }}
+        data-selected={isSelected}
+        data-disabled={isDisabled}
+        {...mergeProps(hoverProps, pressProps)}
+      >
+        {/* A span, b/c this sits inside the thumbnail's `<label>`, where a `<div>` isn't valid HTML. */}
+        <VisuallyHidden elementType="span">
+          {/* Merge others last b/c it could have data-testid in it or onX events. */}
+          <input {...mergeProps(inputProps, focusProps, others)} ref={ref} />
+        </VisuallyHidden>
+        <span css={Css.relative.db.w100.h100.oh.br4.$}>
+          <img src={imgSrc} alt={label} loading="lazy" css={Css.w100.h100.objectCover.db.if(isDisabled).o50.$} />
+          {(isSelected || isPressed) && (
+            <span
+              css={{
+                ...Css.absolute.top0.left0.w100.h100.pen.$,
+                ...(isSelected ? Css.bgColor(Tokens.SelectionFill).add("mixBlendMode", "multiply").$ : {}),
+                ...(isPressed ? Css.bgColor(Tokens.Primary).o(0.28).add("mixBlendMode", "normal").$ : {}),
+              }}
+            />
+          )}
+        </span>
+      </label>
+    ),
+  });
 }

@@ -363,25 +363,24 @@ export function LabelTooltip() {
   );
 }
 
-const finishImages = ["disposal.png", "counter-top.jpeg", "fridge.jpeg", "fireplace.jpeg", "fridge2.jpeg"];
-const finishes = [
-  "Chrome",
-  "Brushed Nickel",
-  "Satin Nickel",
-  "Matte Black",
-  "Brass",
-  "Gold",
-  "Bronze",
-  "Copper",
-  "Pewter",
-  "Graphite",
-  "Antique Brass",
-  "Polished Brass",
-  "Oil Rubbed Bronze",
-  "Stainless Steel",
-].map((label, i) => ({ label, value: `finish-${i + 1}`, imgSrc: finishImages[i % finishImages.length] }));
-
 export function ThumbnailLayout() {
+  const finishImages = ["disposal.png", "counter-top.jpeg", "fridge.jpeg", "fireplace.jpeg", "fridge2.jpeg"];
+  const finishes = [
+    "Chrome",
+    "Brushed Nickel",
+    "Satin Nickel",
+    "Matte Black",
+    "Brass",
+    "Gold",
+    "Bronze",
+    "Copper",
+    "Pewter",
+    "Graphite",
+    "Antique Brass",
+    "Polished Brass",
+    "Oil Rubbed Bronze",
+    "Stainless Steel",
+  ].map((label, i) => ({ label, value: `finish-${i + 1}`, imgSrc: finishImages[i % finishImages.length] }));
   const [value, setValue] = useState<string | undefined>("finish-1");
   return (
     <FormLines width="sm" gap={5}>
