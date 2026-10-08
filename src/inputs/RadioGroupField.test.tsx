@@ -179,5 +179,24 @@ describe("RadioGroupField", () => {
       );
       expect(titles).toEqual(["Chrome", "Matte Black", "Out of stock"]);
     });
+
+    it("doesn't show a disabled option as selected", async () => {
+      // When the selected option is in a disabled group
+      const r = await render(
+        <RadioGroupField
+          label="Finish"
+          layout="thumbnail"
+          disabled
+          value="chrome"
+          onChange={() => {}}
+          options={finishes}
+        />,
+      );
+      // Then its thumbnail doesn't get the selected styles, like a text radio
+      expect(r.finish_chrome.closest("label")).toHaveAttribute("data-selected", "false");
+      expect(r.finish_chrome.closest("label")!.style.getPropertyValue("--borderColor")).toBe(
+        "var(--b-field-border-default)",
+      );
+    });
   });
 });

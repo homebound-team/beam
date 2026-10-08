@@ -381,11 +381,6 @@ const finishes = [
   "Stainless Steel",
 ].map((label, i) => ({ label, value: `finish-${i + 1}`, imgSrc: finishImages[i % finishImages.length] }));
 
-/**
- * `layout="thumbnail"` shows each option's `imgSrc` as a swatch, with its label as the tooltip.
- *
- * Wrap the group in a `Carousel` to scroll the thumbnails on a single row; each thumbnail snaps into place.
- */
 export function ThumbnailLayout() {
   const [value, setValue] = useState<string | undefined>("finish-1");
   return (

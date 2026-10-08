@@ -235,11 +235,9 @@ function ThumbnailRadio<K extends string>(props: {
   } = props;
 
   const ref = useRef<HTMLInputElement>(null);
-  const { inputProps, isDisabled, isSelected } = useRadio(
-    { value, "aria-label": label, isDisabled: isOptionDisabled },
-    state,
-    ref,
-  );
+  const { inputProps, isDisabled } = useRadio({ value, "aria-label": label, isDisabled: isOptionDisabled }, state, ref);
+  // Like `Radio`, a disabled option doesn't show as selected.
+  const isSelected = !isDisabled && state.selectedValue === value;
   const { focusProps, isFocusVisible } = useFocusRing();
   // preventFocusOnPress keeps a mouse click from reading as "virtual" focus and showing the keyboard
   // focus ring; see `SelectCardShell` for the full story. Keyboard focus goes straight to the input.
@@ -278,7 +276,7 @@ function ThumbnailRadio<K extends string>(props: {
         <input {...mergeProps(inputProps, focusProps, others)} ref={ref} />
       </VisuallyHidden>
       <span css={Css.relative.db.w100.h100.oh.br8.$}>
-        <img src={imgSrc} alt="" loading="lazy" css={Css.w100.h100.objectFit("cover").db.if(isDisabled).o50.$} />
+        <img src={imgSrc} alt="" loading="lazy" css={Css.w100.h100.objectCover.db.if(isDisabled).o50.$} />
         {isSelected && (
           <span
             css={Css.absolute.top0.left0.w100.h100.bgColor(Tokens.SelectionFill).pen.add("mixBlendMode", "multiply").$}
@@ -286,7 +284,7 @@ function ThumbnailRadio<K extends string>(props: {
         )}
       </span>
       {/* An inner white ring that separates the image from the border. */}
-      <span css={Css.absolute.top0.left0.w100.h100.br8.pen.add("boxShadow", "inset 0 0 0 2px white").$} />
+      <span css={Css.absolute.top0.left0.w100.h100.br8.pen.boxShadow("inset 0 0 0 2px white").$} />
     </label>
   );
 }
