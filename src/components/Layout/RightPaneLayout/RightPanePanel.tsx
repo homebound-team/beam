@@ -1,10 +1,9 @@
-import { useResizeObserver } from "@react-aria/utils";
-import { type ReactNode, useRef, useState } from "react";
-import { Button, type ButtonProps } from "src/components/Button";
+import type { ReactNode } from "react";
+import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
+import { type DeleteActionProps, MaybeDeleteAction } from "src/components/Layout/RightPaneLayout/internal/DeleteAction";
 import { Css, Tokens } from "src/Css";
-import { noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { useRightPaneActions } from "./useRightPane";
 
@@ -17,7 +16,7 @@ export type RightPanePanelProps = {
   primaryAction?: ActionButtonProps & { variant?: "primary" | "ai" };
   secondaryAction?: ActionButtonProps;
   /** Destructive action as a trash icon; `count > 1` adds `Delete (count)` label. */
-  deleteAction?: Pick<ButtonProps, "onClick" | "disabled" | "tooltip"> & { count?: number };
+  deleteAction?: DeleteActionProps;
 };
 
 /** Pane body chrome: title row, close control, scrollable children, and an optional footer. See `docs/layouts.md`. */
@@ -45,56 +44,6 @@ export function RightPanePanel(props: RightPanePanelProps) {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-type DeleteActionProps = NonNullable<RightPanePanelProps["deleteAction"]>;
-
-function MaybeDeleteAction(props: Partial<DeleteActionProps>) {
-  const { count = 0, onClick, ...buttonProps } = props;
-  if (!onClick) return null;
-  return count > 1 ? (
-    <BulkDeleteAction count={count} onClick={onClick} {...buttonProps} />
-  ) : (
-    <IconButton icon="trash" label="Delete" onClick={onClick} {...buttonProps} />
-  );
-}
-
-/** `Delete (count)`, shortened to `(count)` when it doesn't fit beside the CTAs. */
-function BulkDeleteAction(props: DeleteActionProps & { count: number }) {
-  const { count, ...buttonProps } = props;
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [overflows, setOverflows] = useState(false);
-  const onResize = () => {
-    if (!containerRef.current || !contentRef.current) return;
-    setOverflows(contentRef.current.offsetWidth > containerRef.current.clientWidth);
-  };
-  // The slot narrows when the CTAs grow; the copy widens with `count` or a font swap.
-  useResizeObserver({ ref: containerRef, onResize });
-  useResizeObserver({ ref: contentRef, onResize });
-
-  return (
-    // Offset the Button's padding so the trash aligns with the footer inset.
-    <div ref={containerRef} css={Css.relative.fg1.mw0.mlPx(-16).$}>
-      {/* Measured instead of the visible button, whose width changes when compacted. */}
-      <div aria-hidden css={Css.absolute.top0.left0.w100.oh.visibility("hidden").pen.$}>
-        <div ref={contentRef} css={Css.add("width", "max-content").$}>
-          <Button variant="quaternary" icon="trash" label={`Delete (${count})`} onClick={noop} />
-        </div>
-      </div>
-      <Button
-        variant="quaternary"
-        icon="trash"
-        // Visually hidden so the accessible name keeps "Delete"; the outer span keeps the space (the button is flex).
-        label={
-          <span>
-            <span css={Css.if(overflows).visuallyHidden.$}>Delete</span> ({count})
-          </span>
-        }
-        {...buttonProps}
-      />
     </div>
   );
 }
