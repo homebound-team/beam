@@ -27,6 +27,9 @@ export const zIndices = {
   rightPane: 60,
   // Workflow floating right-pane triggers — above the pane, below sticky headers.
   rightPaneTriggers: 65,
+  // Stay-pinned page banner under the header — above the floating triggers it pins above, and below
+  // pageStickyHeader so the auto-hiding header paints over it during the slide.
+  pageBanner: 68,
   pageStickyHeader: 70,
   // Sticky mobile action footer (workflow layouts) — same tier as pageStickyHeader; header and footer never overlap on screen.
   pageStickyFooter: 70,
