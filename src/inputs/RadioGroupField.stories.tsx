@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
+import { Carousel } from "src/components/Carousel";
 import { Css } from "src/Css";
 import { FormLines } from "src/forms/FormLines";
 import {
@@ -358,6 +359,67 @@ export function LabelTooltip() {
           { value: "b", label: "Burratta" },
         ]}
       />
+    </FormLines>
+  );
+}
+
+const finishImages = ["disposal.png", "counter-top.jpeg", "fridge.jpeg", "fireplace.jpeg", "fridge2.jpeg"];
+const finishes = [
+  "Chrome",
+  "Brushed Nickel",
+  "Satin Nickel",
+  "Matte Black",
+  "Brass",
+  "Gold",
+  "Bronze",
+  "Copper",
+  "Pewter",
+  "Graphite",
+  "Antique Brass",
+  "Polished Brass",
+  "Oil Rubbed Bronze",
+  "Stainless Steel",
+].map((label, i) => ({ label, value: `finish-${i + 1}`, imgSrc: finishImages[i % finishImages.length] }));
+
+/**
+ * `layout="thumbnail"` shows each option's `imgSrc` as a swatch, with its label as the tooltip.
+ *
+ * Wrap the group in a `Carousel` to scroll the thumbnails on a single row; each thumbnail snaps into place.
+ */
+export function ThumbnailLayout() {
+  const [value, setValue] = useState<string | undefined>("finish-1");
+  return (
+    <FormLines width="sm" gap={5}>
+      <RadioGroupField
+        label="Cabinet Hardware"
+        layout="thumbnail"
+        value={value}
+        onChange={setValue}
+        options={finishes}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <RadioGroupField
+        label="With a disabled option, helper text and an error"
+        layout="thumbnail"
+        value={value}
+        onChange={setValue}
+        options={finishes.slice(0, 5).map((o, i) => (i === 2 ? { ...o, disabled: "Discontinued" } : o))}
+        helperText="Pick the finish for every pull in the house."
+        errorMsg="Required"
+      />
+      <div css={Css.wPx(240).$}>
+        <Carousel>
+          <RadioGroupField
+            label="In a Carousel"
+            labelStyle="hidden"
+            layout="thumbnail"
+            value={value}
+            onChange={setValue}
+            options={finishes}
+          />
+        </Carousel>
+      </div>
     </FormLines>
   );
 }
