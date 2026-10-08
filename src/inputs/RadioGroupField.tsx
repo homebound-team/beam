@@ -18,7 +18,7 @@ export type RadioFieldOption<K extends string> = {
   // testId?: string;
   /** The label for a specific option, i.e. "Cheddar". */
   label: string;
-  /** An optional longer description to render under the label. */
+  /** An optional longer description to render under the label. Not shown for `layout="thumbnail"`. */
   description?: string | (() => ReactNode);
   /** The undisplayed value, i.e. an id of some sort. */
   value: K;
@@ -228,14 +228,14 @@ function ThumbnailRadio<K extends string>(props: {
   onFocus?: () => void;
 }) {
   const {
-    option: { description, label, value, imgSrc },
+    option: { label, value, imgSrc },
     state,
     isOptionDisabled,
     ...others
   } = props;
 
   const ref = useRef<HTMLInputElement>(null);
-  const { inputProps, descriptionProps, isDisabled, isSelected } = useRadio(
+  const { inputProps, isDisabled, isSelected } = useRadio(
     { value, "aria-label": label, isDisabled: isOptionDisabled },
     state,
     ref,
@@ -287,11 +287,6 @@ function ThumbnailRadio<K extends string>(props: {
       </span>
       {/* An inner white ring that separates the image from the border. */}
       <span css={Css.absolute.top0.left0.w100.h100.br8.pen.add("boxShadow", "inset 0 0 0 2px white").$} />
-      {description && (
-        <VisuallyHidden elementType="span" {...descriptionProps}>
-          {typeof description === "function" ? description() : description}
-        </VisuallyHidden>
-      )}
     </label>
   );
 }

@@ -118,7 +118,7 @@ describe("RadioGroupField", () => {
   describe("thumbnail layout", () => {
     const finishes: RadioFieldOption<string>[] = [
       { value: "chrome", label: "Chrome", imgSrc: "chrome.png" },
-      { value: "black", label: "Matte Black", imgSrc: "black.png", description: "Powder coated" },
+      { value: "black", label: "Matte Black", imgSrc: "black.png" },
       { value: "gold", label: "Gold", imgSrc: "gold.png", disabled: "Out of stock" },
     ];
 
@@ -145,8 +145,6 @@ describe("RadioGroupField", () => {
       expect(r.finish_chrome).toHaveAttribute("type", "radio");
       expect(r.finish_chrome).toHaveAccessibleName("Chrome");
       expect(r.finish_black).toHaveAccessibleName("Matte Black");
-      // And the option's description is still announced
-      expect(r.finish_black).toHaveAccessibleDescription("Powder coated");
       // And each thumbnail shows its image
       expect(r.finish_chrome.closest("label")!.querySelector("img")).toHaveAttribute("src", "chrome.png");
     });
