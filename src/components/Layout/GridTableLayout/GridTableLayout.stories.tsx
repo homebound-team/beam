@@ -1239,7 +1239,7 @@ function getColumns(showColor: boolean = false) {
     parent: (row) => ({ content: row.priority, value: row.priority, css: Css.if(showColor).bgYellow500.$ }),
     data: (row) => ({ content: row.priority, css: Css.if(showColor).bgYellow500.$ }),
     // Room for the label, the reserved sort icon, and the column info icon.
-    mw: "1220px",
+    mw: "120px",
   });
   const actionColumn = column<Row>({
     id: "action-col",
