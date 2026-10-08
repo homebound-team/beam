@@ -26,8 +26,8 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   aiMode?: boolean;
   /** Rendered before the title, e.g. a drag handle on `FormSectionChild`. */
   startAdornment?: ReactNode;
-  /** Rendered at the start of the right slot, before actions, e.g. a Tag on `FormSectionChild`. */
-  endAdornment?: ReactNode;
+  /** Rendered first in the right slot, before the autosave indicator and actions, e.g. a Tag on `FormSectionChild`. */
+  rightSlotLead?: ReactNode;
   /** Shows an info icon after the title with this tooltip content. */
   tooltip?: ReactNode;
   /** Style overrides for padding. */
@@ -57,7 +57,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
     level = 2,
     aiMode = false,
     startAdornment,
-    endAdornment,
+    rightSlotLead,
     tooltip,
     xss,
   } = props;
@@ -67,7 +67,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
   const tid = useTestIds(props, "contentHeader");
   const { sm } = useBreakpoint();
   const { bottomSlotActions, rightSlotActions } = splitHeaderActionsOnSm(actions, sm);
-  const showActionsSlot = !!withAutoSave || !!endAdornment || rightSlotActions.length > 0;
+  const showActionsSlot = !!withAutoSave || !!rightSlotLead || rightSlotActions.length > 0;
   const { tag: Heading, css: headingCss } = headingByLevel[level];
   const titleCss = aiMode ? { ...headingCss, ...Css.aiBoldText.$ } : headingCss;
 
@@ -104,7 +104,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
         )}
         {showActionsSlot && (
           <div css={Css.df.aic.gap2.fs0.$} {...tid.actions}>
-            {endAdornment}
+            {rightSlotLead}
             {withAutoSave && <AutoSaveIndicator />}
             {rightSlotActions.length > 0 && <HeaderActions actions={rightSlotActions} />}
           </div>

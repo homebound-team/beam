@@ -1,6 +1,5 @@
 import { createObjectState, type ObjectConfig } from "@homebound/form-state";
 import type { Meta } from "@storybook/react-vite";
-import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { FormSection } from "src/forms/FormSection/FormSection";
 import { withBeamDecorator, withRouter } from "src/utils/sb";
@@ -48,7 +47,7 @@ export function WithChildSections() {
           id: "plumbing",
           title: "Plumbing",
           fields: <PlaceholderFields count={2} />,
-          tag: <Tag text="7 days to cutoff" type="warning" />,
+          tag: { text: "7 days to cutoff", type: "warning" },
         },
         {
           id: "hvac",

@@ -1,15 +1,16 @@
 import type { FieldState } from "@homebound/form-state";
-import { type ReactNode, useRef } from "react";
+import { useRef } from "react";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { Tag, type TagProps } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import type { FormSectionProps } from "./FormSection";
 
 type FormSectionChildBase = Omit<FormSectionProps, "childSections"> & {
-  /** Rendered top-right of the header. */
-  tag?: ReactNode;
+  /** Renders a `Tag` top-right of the header. */
+  tag?: TagProps<any>;
 };
 
 /** A single, non-draggable entry in a `FormSection`'s `childSections` — never itself nests further children. */
@@ -44,7 +45,7 @@ export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormS
         description={description}
         actions={actions}
         level={4}
-        endAdornment={tag}
+        rightSlotLead={tag && <Tag {...tag} {...tid.tag} />}
         startAdornment={
           isDraggable ? <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact /> : undefined
         }

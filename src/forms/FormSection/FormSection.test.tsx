@@ -92,13 +92,12 @@ describe("FormSection", () => {
     const r = await render(
       <FormSection
         title="Trade Partners"
-        childSections={[
-          { id: "plumbing", title: "Plumbing", tag: <span data-testid="cutoffTag">7 days to cutoff</span> },
-        ]}
+        childSections={[{ id: "plumbing", title: "Plumbing", tag: { text: "7 days to cutoff", type: "warning" } }]}
       />,
     );
-    // Then the tag renders in the child header's actions slot
-    expect(r.formSection_childSection_header_actions).toContainElement(r.cutoffTag);
+    // Then a Tag renders in the child header's actions slot
+    expect(r.formSection_childSection_tag).toHaveTextContent("7 days to cutoff");
+    expect(r.formSection_childSection_header_actions).toContainElement(r.formSection_childSection_tag);
   });
 
   it("does not render a DnDGrid or drag handles when childSections have no orderField", async () => {
