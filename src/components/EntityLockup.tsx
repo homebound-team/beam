@@ -31,10 +31,7 @@ export function EntityLockup(props: EntityLockupProps) {
             {title}
           </div>
           {isDefined(description) && (
-            <div
-              css={{ ...styles.description, ...(typeof description === "string" ? styles.clamp : {}) }}
-              {...tid.description}
-            >
+            <div css={styles.description} {...tid.description}>
               {description}
             </div>
           )}
@@ -51,13 +48,12 @@ export function EntityLockup(props: EntityLockupProps) {
 
 const defaultStyles = {
   container: Css.df.aifs.gap2.$,
-  image: Css.fs0.sqPx(96).br8.ba.bc(Tokens.FieldBorderDefault).oh.bgWhite.$,
+  image: Css.fs0.sqPx(96).br8.ba.bc(Tokens.FieldBorderDefault).oh.bgColor(Tokens.SurfaceRaised).$,
   // On small screens, `right` moves under the description so the text keeps its width.
   body: Css.df.fg1.mw0.gap2.ifSm.fdc.gap1.$,
   text: Css.df.fdc.mw0.fg1.gap1.$,
-  title: Css.smSb.color(Tokens.OnSurface).lineClamp2.$,
+  title: Css.smSb.color(Tokens.OnSurface).$,
   description: Css.xs.color(Tokens.OnSurface).$,
-  clamp: Css.lineClamp2.$,
   // Capped at half the row so wide content can't squeeze the text to nothing; on small screens it gets its own row.
   // A lone child (fewer than two elements) stays right-aligned instead of falling to the start under `jcsb`.
   right: Css.fs0
@@ -69,12 +65,11 @@ const defaultStyles = {
 
 const compactStyles = {
   container: Css.df.aic.gapPx(12).$,
-  image: Css.fs0.sqPx(62).br8.ba.bc(Tokens.SurfaceSeparator).oh.bgWhite.$,
-  // Stretches to the image's height so `right` stays top-aligned while the text is centered.
+  image: Css.fs0.sqPx(62).br8.ba.bc(Tokens.SurfaceSeparator).oh.bgColor(Tokens.SurfaceRaised).$,
+  // Stretches to the image's height so the text and `right` both align to the top of the row.
   body: Css.df.fg1.mw0.gapPx(12).asStretch.$,
-  text: Css.df.fdc.mw0.fg1.gapPx(2).asc.$,
-  title: Css.xsSb.color(Tokens.OnSurface).lineClamp1.$,
+  text: Css.df.fdc.mw0.fg1.gapPx(2).ptPx(4).$,
+  title: Css.xsSb.color(Tokens.OnSurface).$,
   description: Css.xs2.color(Tokens.OnSurface).$,
-  clamp: Css.truncate.$,
   right: Css.fs0.maxw("50%").df.fdc.aife.gapPx(6).asfs.tar.$,
 };
