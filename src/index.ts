@@ -247,8 +247,8 @@ export { FormSectionLayout } from "./layouts/FormSectionLayout/FormSectionLayout
 export type { FormSectionLayoutProps, FormSectionLayoutSection } from "./layouts/FormSectionLayout/FormSectionLayout";
 export { headerContentPaddingX, pageContentGutterPx, pageContentPaddingX } from "./layouts/layoutSpacing";
 export {
-  bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
+  beamPageBannerHeightVar,
   beamFloatingRightOffsetVar,
   beamLayoutContentPaddingXVar,
   beamLayoutViewportHeightVar,
@@ -260,6 +260,7 @@ export {
   beamSideNavLayoutWidthVar,
   beamTableActionsHeightVar,
   beamWorkflowLayoutFooterHeightVar,
+  belowNavbarOffset,
   documentScrollBodyMinHeight,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
@@ -270,10 +271,12 @@ export {
   documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
+  pageBannerOffset,
   stickyNavAndHeaderOffset,
   stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,
 } from "./layouts/layoutVars";
+export { PageBanner, usePageBanner } from "./layouts/PageBanner/usePageBanner";
 export { NavbarLayout } from "./layouts/NavbarLayout/NavbarLayout";
 export type { NavbarLayoutProps } from "./layouts/NavbarLayout/NavbarLayout";
 export { PageHeaderLayout } from "./layouts/PageHeaderLayout/PageHeaderLayout";

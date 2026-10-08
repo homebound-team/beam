@@ -1,4 +1,5 @@
 import { act } from "@testing-library/react";
+import { usePageBanner } from "src/layouts/PageBanner/usePageBanner";
 import { setViewport } from "src/tests/viewport";
 import { click, clickAndWait, render, withRouter } from "src/utils/rtl";
 import { StepperLayout, type StepperLayoutProps, type StepperLayoutStep } from "./StepperLayout";
@@ -11,6 +12,45 @@ describe("StepperLayout", () => {
     // Then the header and the first step's content both render
     expect(r.stepperLayout_header).toHaveTextContent("Test Workflow");
     expect(r.stepperLayout_body).toBeInTheDocument();
+    expect(r.query.stepperLayout_banner).toBeNull();
+  });
+
+  it("renders a stay-pinned page banner under the header", async () => {
+    // Given a stepper with a page banner
+    // When rendered
+    const r = await render(
+      <StepperLayout
+        {...baseProps({
+          banner: { type: "info", title: "Updated Costs Ready", description: "Review the new calculations." },
+        })}
+      />,
+      withRouter(),
+    );
+
+    // Then the banner sits in the workflow chrome
+    expect(r.stepperLayout_banner_title).toHaveTextContent("Updated Costs Ready");
+  });
+
+  it("pins a step's usePageBanner and clears it when the step changes", async () => {
+    // Given a first step that registers a page banner and a second step that does not
+    const r = await render(
+      <StepperLayout
+        {...baseProps({
+          steps: [
+            { label: "Step One", content: <StepWithBanner /> },
+            { label: "Step Two", content: <div>Second step</div> },
+          ],
+        })}
+      />,
+      withRouter(),
+    );
+    expect(r.stepperLayout_banner_title).toHaveTextContent("Step banner");
+
+    // When moving to the next step
+    click(r.continue);
+
+    // Then the banner leaves with the first step
+    expect(r.query.stepperLayout_banner).toBeNull();
   });
 
   it("starts on defaultStep instead of the first step", async () => {
@@ -340,6 +380,11 @@ function makeSteps(
       content: <div data-testid="stepTwoBody">Step two content</div>,
     },
   ];
+}
+
+function StepWithBanner() {
+  usePageBanner({ type: "update", title: "Step banner" });
+  return <div>First step</div>;
 }
 
 function baseProps(overrides: Partial<StepperLayoutProps> = {}): StepperLayoutProps {
