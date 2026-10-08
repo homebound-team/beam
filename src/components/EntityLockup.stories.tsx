@@ -42,6 +42,19 @@ export function Examples() {
           children: <EntityLockup imgSrc="counter-top.jpeg" title="Quartz Countertop" />,
         },
         {
+          label: "With price only",
+          children: (
+            <div css={Css.w100.maxwPx(720).$}>
+              <EntityLockup
+                imgSrc="counter-top.jpeg"
+                title="Natural 7” Plank"
+                description={longDescription()}
+                right={<span css={Css.sm.gray900.$}>+ $10.00</span>}
+              />
+            </div>
+          ),
+        },
+        {
           label: "With tag and price",
           children: (
             <div css={Css.w100.maxwPx(720).$}>

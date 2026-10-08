@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-type EntityLockupProps = {
+export type EntityLockupProps = {
   /** Thumbnail image URL. */
   imgSrc: string;
   title: string;
@@ -29,7 +29,7 @@ export function EntityLockup(props: EntityLockupProps) {
           <div css={styles.title} {...tid.title}>
             {title}
           </div>
-          {description && (
+          {hasContent(description) && (
             <div
               css={{ ...styles.description, ...(typeof description === "string" ? styles.clamp : {}) }}
               {...tid.description}
@@ -38,7 +38,7 @@ export function EntityLockup(props: EntityLockupProps) {
             </div>
           )}
         </div>
-        {right && (
+        {hasContent(right) && (
           <div css={styles.right} {...tid.right}>
             {right}
           </div>
@@ -50,24 +50,35 @@ export function EntityLockup(props: EntityLockupProps) {
 
 const defaultStyles = {
   container: Css.df.aifs.gap2.$,
-  image: Css.fs0.sqPx(96).br8.ba.bcGray300.oh.bgWhite.$,
+  image: Css.fs0.sqPx(96).br8.ba.bc(Tokens.FieldBorderDefault).oh.bgWhite.$,
   // On small screens, `right` moves under the description so the text keeps its width.
   body: Css.df.fg1.mw0.gap2.ifSm.fdc.gap1.$,
   text: Css.df.fdc.mw0.fg1.gap1.$,
-  title: Css.smSb.color(Tokens.OnSurface).$,
+  title: Css.smSb.color(Tokens.OnSurface).lineClamp2.$,
   description: Css.xs.color(Tokens.OnSurface).$,
   clamp: Css.lineClamp2.$,
-  right: Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.ifSm.fdr.aic.jcsb.asStretch.$,
+  // Capped at half the row so wide content can't squeeze the text to nothing; on small screens it gets its own row.
+  // A lone child (fewer than two elements) stays right-aligned instead of falling to the start under `jcsb`.
+  right: Css.fs0
+    .maxw("50%")
+    .df.fdc.aife.gapPx(6)
+    .asfs.tar.ifSm.maxw("none")
+    .fdr.aic.jcsb.asStretch.when(":not(:has(> :nth-child(2)))").jcfe.$,
 };
 
 const compactStyles = {
   container: Css.df.aic.gapPx(12).$,
-  image: Css.fs0.sqPx(62).br8.ba.bcGray200.oh.bgWhite.$,
+  image: Css.fs0.sqPx(62).br8.ba.bc(Tokens.SurfaceSeparator).oh.bgWhite.$,
   // Stretches to the image's height so `right` stays top-aligned while the text is centered.
   body: Css.df.fg1.mw0.gapPx(12).asStretch.$,
   text: Css.df.fdc.mw0.fg1.gapPx(2).asc.$,
-  title: Css.xsSb.color(Tokens.OnSurface).$,
-  description: Css.xs2.gray800.$,
+  title: Css.xsSb.color(Tokens.OnSurface).lineClamp1.$,
+  description: Css.xs2.color(Tokens.OnSurface).$,
   clamp: Css.truncate.$,
-  right: Css.fs0.df.fdc.aife.gapPx(6).asfs.tar.$,
+  right: Css.fs0.maxw("50%").df.fdc.aife.gapPx(6).asfs.tar.$,
 };
+
+/** Skips `null`, `undefined`, booleans and `""`, but keeps `0` so it renders inside the styled wrapper. */
+function hasContent(node: ReactNode): boolean {
+  return node !== undefined && node !== null && typeof node !== "boolean" && node !== "";
+}

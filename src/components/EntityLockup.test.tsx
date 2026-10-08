@@ -21,6 +21,15 @@ describe("EntityLockup", () => {
     expect(r.query.entityLockup_right).not.toBeInTheDocument();
   });
 
+  it("renders 0 inside its wrapper and skips false", async () => {
+    // Given a numeric zero description and a conditional `right` that resolved to false
+    // When rendered
+    const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" description={0} right={false} />);
+    // Then the zero renders as the description and the false right is omitted
+    expect(r.entityLockup_description).toHaveTextContent("0");
+    expect(r.query.entityLockup_right).not.toBeInTheDocument();
+  });
+
   it("renders right content", async () => {
     // Given right content
     // When rendered
