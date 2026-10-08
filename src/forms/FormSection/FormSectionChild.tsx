@@ -3,11 +3,15 @@ import { useRef } from "react";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { Tag, type TagProps } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import type { FormSectionProps } from "./FormSection";
 
-type FormSectionChildBase = Omit<FormSectionProps, "childSections">;
+type FormSectionChildBase = Omit<FormSectionProps, "childSections"> & {
+  /** Renders a `Tag` top-right of the header. */
+  tag?: TagProps<any>;
+};
 
 /** A single, non-draggable entry in a `FormSection`'s `childSections` — never itself nests further children. */
 export type PlainFormSectionChild = FormSectionChildBase & { id?: string; orderField?: never };
@@ -23,7 +27,7 @@ export type ReorderableFormSectionChild = FormSectionChildBase & {
 
 /** A single, non-nestable child row within a `FormSection`'s `childSections`. Internal to `FormSection`. */
 export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormSectionChild) {
-  const { title, description, actions, fields, orderField } = props;
+  const { title, description, actions, fields, orderField, tag } = props;
   const tid = useTestIds(props, "formSectionChild");
   const itemRef = useRef(null);
   const isDraggable = !!orderField;
@@ -41,6 +45,7 @@ export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormS
         description={description}
         actions={actions}
         level={4}
+        rightSlotLead={tag && <Tag {...tag} {...tid.tag} />}
         startAdornment={
           isDraggable ? <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact /> : undefined
         }

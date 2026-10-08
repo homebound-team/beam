@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { FilterDefs, FilterImpls } from "src/components/Filters/types";
+import { useModalContext } from "src/components/Modal/ModalContext";
 import { useSessionStorage } from "src/hooks/useSessionStorage";
 import type { AnyObject } from "src/types";
 import { safeEntries, safeKeys } from "src/utils/helpers";
@@ -15,12 +16,9 @@ type PersistedFilterHook<F> = {
   setFilter: (filter: F) => void;
 };
 
-/**
- * Persists filter details in both browser storage and query parameters.
- * If a valid filter is present in the query params, then that will be used.
- * Otherwise it looks at browser storage, and finally the defaultFilter prop.
- */
+/** Persists filters in session storage, and in the query string outside a modal. */
 export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFilterProps<F>): PersistedFilterHook<F> {
+  const { inModal } = useModalContext();
   const filterImpls = useMemo(
     () => Object.fromEntries(safeEntries(filterDefs).map(([key, def]) => [key, def(key as string)])) as FilterImpls<F>,
     [filterDefs],
@@ -62,16 +60,26 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
         : undefined,
     [filterImpls, filterKeys, storedFilterSnapshot],
   );
-  // Prefer query params over session storage over defaults, but then keep the returned object
-  // reference stable for logically-equal filters. Callers frequently put `filter` into effect
-  // dependency arrays, so returning a fresh object every render can cause accidental rerender loops.
-  const rawFilter = hydratedQueryParamsFilter ?? hydratedStoredFilter ?? (defaultFilter as F);
+  // Outside a modal, query params win over session storage. A modal ignores the page query.
+  // Keep the returned object reference stable for logically-equal filters. Callers frequently put
+  // `filter` into effect dependency arrays, so a fresh object every render can cause rerender loops.
+  const rawFilter = inModal
+    ? (hydratedStoredFilter ?? (defaultFilter as F))
+    : (hydratedQueryParamsFilter ?? hydratedStoredFilter ?? (defaultFilter as F));
   const filter = useStableValue(rawFilter);
 
-  const setFilter = (filter: F) => setQueryParams({ filter: dehydrateFilter(filterImpls, filter) });
+  const setFilter = (next: F) => {
+    const dehydrated = dehydrateFilter(filterImpls, next);
+    if (inModal) {
+      setStoredFilter(dehydrated);
+      return;
+    }
+    setQueryParams({ filter: dehydrated });
+  };
 
   useEffect(
     () => {
+      if (inModal) return;
       if (queryParamsFilter === undefined) {
         // if there is no filter in the query params, use stored filter
         // "replaceIn" replaces the url in history instead of creating a new history item
@@ -88,7 +96,7 @@ export function usePersistedFilter<F>({ storageKey, filterDefs }: UsePersistedFi
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [storedFilter, setStoredFilter, setQueryParams, queryParamsFilter],
+    [inModal, storedFilter, setStoredFilter, setQueryParams, queryParamsFilter],
   );
 
   return { setFilter, filter };
