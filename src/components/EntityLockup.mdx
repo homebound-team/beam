@@ -1,0 +1,89 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as EntityLockupStories from "./EntityLockup.stories";
+
+<Meta of={EntityLockupStories} />
+
+# Entity Lockup
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/givQaQnS8wqXaD89AnBkcR/Guided-Change-Event-Workflow?node-id=2324-7685">
+    <img src="FigmaLogo.png" alt="" />
+    Entity Lockup
+  </a>
+</p>
+
+`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. Use `compact` in dense lists like sidebars. Put trailing details, like a `Tag` and a price, in `right`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>imgSrc</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Thumbnail image URL. The image is decorative, since the title sits beside it.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>title</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Name of the entity.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>description</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>—</td>
+      <td>
+        Shown under the title and never truncated, so long text wraps in full. Can include extra rows, like a status.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>right</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>—</td>
+      <td>
+        Trailing content, right-aligned and stacked, e.g. a `Tag` above a price. On small screens it moves to its own
+        row under the text, except when compact.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>compact</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Smaller image and text, vertically centered.</td>
+    </tr>
+  </tbody>
+</table>

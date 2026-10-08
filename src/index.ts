@@ -45,6 +45,7 @@ export * from "./components/ContextTag";
 export * from "./components/ContrastScope";
 export * from "./components/Copy";
 export * from "./components/CountBadge";
+export * from "./components/EntityLockup";
 export * from "./components/EnvironmentBanner/EnvironmentBanner";
 export * from "./components/Filters/FilterModal";
 export * from "./components/Filters/Filters";
