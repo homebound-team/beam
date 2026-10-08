@@ -26,6 +26,8 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   aiMode?: boolean;
   /** Rendered before the title, e.g. a drag handle on `FormSectionChild`. */
   startAdornment?: ReactNode;
+  /** Rendered at the start of the right slot, before actions, e.g. a Tag on `FormSectionChild`. */
+  endAdornment?: ReactNode;
   /** Shows an info icon after the title with this tooltip content. */
   tooltip?: ReactNode;
   /** Style overrides for padding. */
@@ -47,14 +49,25 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
  * `layoutContainer` honors `--beam-layout-content-padding-x` from padded ancestors (e.g. {@link CenteredLayout}).
  */
 export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: ContentHeaderProps<X>) {
-  const { title, description, actions, withAutoSave, level = 2, aiMode = false, startAdornment, tooltip, xss } = props;
+  const {
+    title,
+    description,
+    actions,
+    withAutoSave,
+    level = 2,
+    aiMode = false,
+    startAdornment,
+    endAdornment,
+    tooltip,
+    xss,
+  } = props;
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const insetHandled = useContentInsetHandled();
   const withPagePadding = inDocumentScrollLayout && !insetHandled;
   const tid = useTestIds(props, "contentHeader");
   const { sm } = useBreakpoint();
   const { bottomSlotActions, rightSlotActions } = splitHeaderActionsOnSm(actions, sm);
-  const showActionsSlot = !!withAutoSave || rightSlotActions.length > 0;
+  const showActionsSlot = !!withAutoSave || !!endAdornment || rightSlotActions.length > 0;
   const { tag: Heading, css: headingCss } = headingByLevel[level];
   const titleCss = aiMode ? { ...headingCss, ...Css.aiBoldText.$ } : headingCss;
 
@@ -90,7 +103,8 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
           descriptionEl
         )}
         {showActionsSlot && (
-          <div css={Css.df.gap2.fs0.$} {...tid.actions}>
+          <div css={Css.df.aic.gap2.fs0.$} {...tid.actions}>
+            {endAdornment}
             {withAutoSave && <AutoSaveIndicator />}
             {rightSlotActions.length > 0 && <HeaderActions actions={rightSlotActions} />}
           </div>

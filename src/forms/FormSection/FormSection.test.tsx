@@ -87,6 +87,20 @@ describe("FormSection", () => {
     });
   });
 
+  it("renders a childSection's tag in the header's right slot", async () => {
+    // Given a childSection with a tag
+    const r = await render(
+      <FormSection
+        title="Trade Partners"
+        childSections={[
+          { id: "plumbing", title: "Plumbing", tag: <span data-testid="cutoffTag">7 days to cutoff</span> },
+        ]}
+      />,
+    );
+    // Then the tag renders in the child header's actions slot
+    expect(r.formSection_childSection_header_actions).toContainElement(r.cutoffTag);
+  });
+
   it("does not render a DnDGrid or drag handles when childSections have no orderField", async () => {
     // Given a FormSection with childSections that don't set orderField
     const r = await render(
