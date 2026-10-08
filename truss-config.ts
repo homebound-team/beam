@@ -84,6 +84,7 @@ const sections: Sections = {
       br16: "16px",
       br24: "24px",
       br100: "100%",
+      brPill: "999px",
     }),
     newMethod("brt4", { borderTopRightRadius: "4px", borderTopLeftRadius: "4px" }),
     newMethod("brb4", { borderBottomRightRadius: "4px", borderBottomLeftRadius: "4px" }),

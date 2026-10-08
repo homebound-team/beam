@@ -45,6 +45,7 @@ export * from "./components/ContextTag";
 export * from "./components/ContrastScope";
 export * from "./components/Copy";
 export * from "./components/CountBadge";
+export * from "./components/EntityLockup";
 export * from "./components/EnvironmentBanner/EnvironmentBanner";
 export * from "./components/Filters/FilterModal";
 export * from "./components/Filters/Filters";
@@ -84,6 +85,7 @@ export * from "./components/Pagination";
 export * from "./components/Pills/FilterPill/FilterPill";
 export * from "./components/Pills/SelectedOptionPill/SelectedOptionPill";
 export * from "./components/Pills/SelectedOptionPill/SelectedOptionPillList";
+export * from "./components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 export * from "./components/ProposedValue";
 export * from "./components/RightSidebar";
 export * from "./components/ScrollShadows";
@@ -246,8 +248,8 @@ export { FormSectionLayout } from "./layouts/FormSectionLayout/FormSectionLayout
 export type { FormSectionLayoutProps, FormSectionLayoutSection } from "./layouts/FormSectionLayout/FormSectionLayout";
 export { headerContentPaddingX, pageContentGutterPx, pageContentPaddingX } from "./layouts/layoutSpacing";
 export {
-  bannerAndNavbarChromeTop,
   beamEnvironmentBannerLayoutHeightVar,
+  beamPageBannerHeightVar,
   beamFloatingRightOffsetVar,
   beamLayoutContentPaddingXVar,
   beamLayoutViewportHeightVar,
@@ -259,6 +261,7 @@ export {
   beamSideNavLayoutWidthVar,
   beamTableActionsHeightVar,
   beamWorkflowLayoutFooterHeightVar,
+  belowNavbarOffset,
   documentScrollBodyMinHeight,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
@@ -269,10 +272,12 @@ export {
   documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
+  pageBannerOffset,
   stickyNavAndHeaderOffset,
   stickyNavAndHeaderOffsetPx,
   stickyTableHeaderOffset,
 } from "./layouts/layoutVars";
+export { PageBanner, usePageBanner } from "./layouts/PageBanner/usePageBanner";
 export { NavbarLayout } from "./layouts/NavbarLayout/NavbarLayout";
 export type { NavbarLayoutProps } from "./layouts/NavbarLayout/NavbarLayout";
 export { PageHeaderLayout } from "./layouts/PageHeaderLayout/PageHeaderLayout";
@@ -310,6 +315,7 @@ export * from "./forms/StaticField";
 export * from "./forms/SubmitButton";
 export { FormSection } from "./forms/FormSection/FormSection";
 export type { FormSectionAction, FormSectionProps } from "./forms/FormSection/FormSection";
+export { FormSectionChild } from "./forms/FormSection/FormSectionChild";
 export type { PlainFormSectionChild, ReorderableFormSectionChild } from "./forms/FormSection/FormSectionChild";
 // ./hooks
 export * from "./hooks/useBodyBackgroundColor";

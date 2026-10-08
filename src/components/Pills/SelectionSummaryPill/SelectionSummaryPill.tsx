@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
 import { useHover } from "react-aria";
-import { Icon } from "src/components/Icon";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-type FilterPillProps = {
+type SelectionSummaryPillProps = {
   text: string;
   onClick: () => void;
   /** If a ReactNode, that reason is shown in a tooltip. */
@@ -14,14 +13,12 @@ type FilterPillProps = {
   __storyState?: { hovered?: boolean };
 };
 
-/** Dismissible pill. The whole control is the button, including the close icon. */
-export function FilterPill(props: FilterPillProps) {
+/** Summarizes a group of selections, e.g. "3 Rows Selected". The whole pill is the button that clears them. */
+export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
   const { text, onClick, disabled = false, __storyState } = props;
-  const tid = useTestIds(props, "filterPill");
-  const isDisabled = !!disabled;
-  const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled });
+  const tid = useTestIds(props, "selectionSummaryPill");
+  const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled: !!disabled });
   const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
-  const ink = isDisabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900;
 
   return maybeTooltip({
     title: resolveTooltip(disabled),
@@ -29,28 +26,28 @@ export function FilterPill(props: FilterPillProps) {
     children: (
       <button
         type="button"
-        disabled={isDisabled}
+        disabled={!!disabled}
         onClick={onClick}
-        css={pillStyles(isDisabled, isHovered)}
+        aria-label={`Clear ${text}`}
+        css={pillStyles(!!disabled, isHovered)}
         {...hoverProps}
         {...tid}
       >
-        <span css={Css.tal.lineClamp1.wbba.$} title={text}>
-          {text}
-        </span>
-        <span css={Css.fs0.$} {...tid.x}>
-          <Icon icon="x" color={ink} inc={2} />
+        {text}
+        <span css={Css.color(disabled ? Tokens.OnSurfaceActiveDisabled : Tokens.OnSurfaceActive).$} {...tid.clear}>
+          Clear
         </span>
       </button>
     ),
   });
 }
 
+/** Figma draws the border inside the box, so the padding gives up 1px to it. */
 function pillStyles(disabled: boolean, hovered: boolean) {
-  return Css.xsSb.dif.aic.br16.px1
-    .gapPx(4)
-    .pyPx(4)
-    .mhPx(24)
+  return Css.smSb.dif.aic.gap1.wsnw.ba.brPill
+    .pxPx(15)
+    .pyPx(7)
+    .bc(Tokens.SurfaceActiveBorder)
     .color(disabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900)
     .bgColor(hovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
     .if(disabled).cursorNotAllowed.$;

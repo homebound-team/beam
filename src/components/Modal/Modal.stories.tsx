@@ -51,6 +51,9 @@ export const AiMode = () => <AiModalExample />;
 /** A `ModalBanner` bleeds edge-to-edge and stays put while the body scrolls under it. */
 export const AiModeWithBanner = () => <AiModalExample withBanner />;
 export const AiModeWithBannerAndScroll = () => <AiModalExample withBanner numSentences={30} />;
+/** A `ModalBanner` sits 16px below the header, or flush against the header's border when it draws one. */
+export const WithBanner = () => <AiModalExample aiMode={false} withBanner />;
+export const WithBannerAndHeaderBorder = () => <AiModalExample aiMode={false} drawHeaderBorder withBanner />;
 export const VirtualizedTableInBody = () => {
   const { openModal } = useModal();
   const open = () =>
@@ -197,9 +200,10 @@ export const WithTooltip = () => {
   );
 };
 
-function AiModalExample(props: AiModalContentProps) {
+function AiModalExample(props: AiModalContentProps & Pick<ModalProps, "aiMode" | "drawHeaderBorder">) {
+  const { aiMode = true, drawHeaderBorder, ...contentProps } = props;
   const { openModal } = useModal();
-  const open = () => openModal({ size: "lg", aiMode: true, content: <AiModalContent {...props} /> });
+  const open = () => openModal({ size: "lg", aiMode, drawHeaderBorder, content: <AiModalContent {...contentProps} /> });
   // Immediately open the modal for Chromatic snapshots
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(open, [openModal]);

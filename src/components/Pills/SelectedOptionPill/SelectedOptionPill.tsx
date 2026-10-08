@@ -20,8 +20,7 @@ export function SelectedOptionPill(props: SelectedOptionPillProps) {
     <div css={Css.df.fdc.gap1.w100.$} {...tid}>
       <div
         css={{
-          // Setting border-radius to 999px to make it a pill shape.
-          ...Css.df.aic.gap2.w100.plPx(20).pr2.py1.borderRadius("999px").ba.bcGray300.$,
+          ...Css.df.aic.gap2.w100.plPx(20).pr2.py1.brPill.ba.bcGray300.$,
           ...(aiMode ? Css.aiBackground.color(Palette.Purple800).$ : Css.bgWhite.color(Tokens.OnSurface).$),
         }}
       >
