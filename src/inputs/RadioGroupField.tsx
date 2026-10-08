@@ -245,14 +245,10 @@ function ThumbnailRadio<K extends string>(props: {
       <label
         css={{
           // The padding over the white background is the inner ring between the border and the image.
-          ...Css.db.fs0
-            .sqPx(32)
-            .pPx(2)
-            .br8.ba.bc(Tokens.FieldBorderDefault)
-            .bgColor(Tokens.SurfaceRaised)
-            .outline(0)
-            .cursorPointer// Lets a wrapping `Carousel` snap to each thumbnail.
-            .ssa("start").$,
+          ...Css.db.fs0.sqPx(32).pPx(2).br8.ba.bc(Tokens.FieldBorderDefault).bgColor(Tokens.SurfaceRaised).outline(0)
+            .cursorPointer.$,
+          // Lets a wrapping `Carousel` snap to each thumbnail.
+          ...Css.ssa("start").$,
           ...(isHovered && !isFocusVisible ? Css.bshHover.$ : {}),
           ...(isSelected || isPressed ? Css.bc(Tokens.Primary).$ : {}),
           ...(isFocusVisible ? Css.bshFocus.$ : {}),
