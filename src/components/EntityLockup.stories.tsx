@@ -21,6 +21,7 @@ export default {
 export function Examples() {
   return (
     <LabeledExamples
+      direction="column"
       examples={[
         {
           label: "Default",
@@ -31,7 +32,7 @@ export function Examples() {
         {
           label: "Long description",
           children: (
-            <div css={Css.wPx(480).$}>
+            <div css={Css.w100.maxwPx(480).$}>
               <EntityLockup imgSrc="fridge.jpeg" title="Olympus Appliance Pull" description={longDescription()} />
             </div>
           ),
@@ -43,7 +44,7 @@ export function Examples() {
         {
           label: "With tag and price",
           children: (
-            <div css={Css.wPx(720).$}>
+            <div css={Css.w100.maxwPx(720).$}>
               <EntityLockup
                 imgSrc="counter-top.jpeg"
                 title="Natural 7” Plank"
@@ -65,7 +66,7 @@ export function Examples() {
         {
           label: "Compact sidebar row",
           children: (
-            <div css={Css.wPx(332).$}>
+            <div css={Css.w100.maxwPx(332).$}>
               <EntityLockup
                 compact
                 imgSrc="counter-top.jpeg"
