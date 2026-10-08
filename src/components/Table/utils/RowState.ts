@@ -162,6 +162,8 @@ export class RowState<R extends Kinded> {
 
   /** Whether a selected ancestor's `selectionCount` already counts this row. */
   private get isCountedByAncestor(): boolean {
+    // A server-filtered row is no longer in its parent's count
+    if (this.removed === "soft") return false;
     for (let parent = this.parent; parent; parent = parent.parent) {
       if (parent.isSelected && parent.row.selectionCount !== undefined) return true;
     }

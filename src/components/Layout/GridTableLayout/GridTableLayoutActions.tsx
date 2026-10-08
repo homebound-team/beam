@@ -55,6 +55,7 @@ type GridTableLayoutActionsProps<
   actions?: HeaderAction[];
   /** Shows the selection summary pill when above zero. */
   selectedRowCount?: number;
+  /** Opts into the selection summary pill. */
   onClearSelections?: VoidFunction;
 };
 
@@ -105,6 +106,7 @@ function GridTableLayoutActionsComponent<
   }, 300);
 
   const hasSearch = !!searchProps;
+  const hasSelectionSummary = !!onClearSelections;
   const filterCount = Object.keys(filterDefs ?? {}).length;
   const hasGroupBy = !!groupBy;
   const controlCount = filterCount + (hasGroupBy ? 1 : 0);
@@ -150,7 +152,8 @@ function GridTableLayoutActionsComponent<
     <div css={Css.df.fdc.gap1.pt3.pb2.if(view === "card").pb3.$}>
       <div
         css={{
-          ...Css.df.gap1.jcsb.$,
+          // Holds the pill's row open at the toolbar's 40px button height
+          ...Css.df.gap1.jcsb.if(hasSelectionSummary).mhPx(40).$,
           ...(withPagePadding ? pageContentPaddingX : undefined),
         }}
         {...testId.toolbar}

@@ -21,7 +21,7 @@ import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
-import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
@@ -146,6 +146,8 @@ export function WithSelectionSummary() {
     </TestProjectLayout>
   );
 }
+
+WithSelectionSummary.parameters = { chromatic: { modes: viewportModes("desktop", "mobile1") } };
 
 export function ManyFilters() {
   const filterDefs = useMemo(() => getManyFilterDefs(), []);

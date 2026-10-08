@@ -137,6 +137,7 @@ function GridTableLayoutComponent<
     hasHideableColumns ||
     withCardView ||
     actions?.length ||
+    // Rendered before anything's selected, so the pill doesn't shift the table
     withSelectionSummary
   );
   // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
@@ -198,7 +199,7 @@ function GridTableLayoutComponent<
       searchApi={searchApiRef}
       actions={actions}
       selectedRowCount={selectedRowCount}
-      onClearSelections={clearSelections}
+      onClearSelections={withSelectionSummary ? clearSelections : undefined}
     />
   );
 

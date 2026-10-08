@@ -624,6 +624,57 @@ describe("GridTableLayout", () => {
       // Then it still counts, since it's still selected
       expect(r.selectionSummaryPill).toHaveTextContent("1 Row SelectedClear");
     });
+
+    it("keeps counting a selected row after it leaves a group that has a selectionCount", async () => {
+      // Given a checked group of two rows that says how many it stands for
+      const columns = getGroupedColumns();
+      const r = await render(
+        <GridTableLayoutComponent<any, GroupedRow, any, any>
+          selectionSummary
+          tableProps={{
+            columns,
+            rows: [
+              simpleHeader,
+              {
+                kind: "group",
+                id: "g1",
+                data: { name: "Framing" },
+                selectionCount: 2,
+                children: [
+                  { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
+                  { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
+                ],
+              },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+      click(r.select_1);
+
+      // When a server-side filter drops Beta, and the group's count follows
+      r.rerender(
+        <GridTableLayoutComponent<any, GroupedRow, any, any>
+          selectionSummary
+          tableProps={{
+            columns,
+            rows: [
+              simpleHeader,
+              {
+                kind: "group",
+                id: "g1",
+                data: { name: "Framing" },
+                selectionCount: 1,
+                children: [{ kind: "data", id: "1", data: { name: "Alpha", value: 10 } }],
+              },
+            ],
+          }}
+        />,
+      );
+
+      // Then Beta still counts beside the group's one row, since it's still selected
+      expect(r.selectionSummaryPill).toHaveTextContent("2 Rows SelectedClear");
+    });
   });
 
   describe("document scroll layout", () => {

@@ -251,6 +251,11 @@ export class TableState<R extends Kinded> {
     this.rowStates.get(id).select(selected);
   }
 
+  /** Deselects every row, including children of `inferSelectedState: false` rows that unselecting the header skips. */
+  clearSelections(): void {
+    for (const rs of this.rowStates.allStates) rs.selected = false;
+  }
+
   get collapsedIds(): string[] {
     return this.rowStates.collapsedRows.map((rs) => rs.row.id);
   }

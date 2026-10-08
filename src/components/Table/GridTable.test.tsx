@@ -3188,6 +3188,30 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds()).toEqual([]);
   });
 
+  it("can deselect children of an inferSelectedState: false row via 'clearSelections'", async () => {
+    // Given a parent that doesn't infer its selected state from its children
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        ...{ kind: "parent", id: "p1", inferSelectedState: false, data: { name: "parent 1" } },
+        children: [
+          { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
+          { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+        ],
+      },
+    ];
+    const api: MutableRefObject<GridTableApi<NestedRow> | undefined> = { current: undefined };
+    const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
+    // And the parent and one of its children are selected
+    click(cellAnd(r, 1, 1, "select"));
+    click(cellAnd(r, 2, 1, "select"));
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1"]);
+    // When using the api to clear the selected rows
+    act(() => api.current!.clearSelections());
+    // Then the child is deselected too, not just the parent
+    expect(api.current!.getSelectedRowIds()).toEqual([]);
+  });
+
   it("sets the selected state of the group row as expected when children are collapsed", async () => {
     // Given a table that can apply a filter and three parents with children.
     const rows: GridDataRow<NestedRow>[] = [
