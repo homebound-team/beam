@@ -15,7 +15,6 @@ import type {
   RenderAs,
 } from "src/components/Table/types";
 import { Css, type Properties, Tokens } from "src/Css";
-import { documentScrollContentWidth } from "src/layouts/layoutVars";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
@@ -329,16 +328,11 @@ export function recursivelyGetContainingRow<R extends Kinded>(
   return undefined;
 }
 
-export function getTableRefWidthStyles(isVirtual: boolean, inDocumentScrollLayout: boolean = false) {
-  // When using document-scroll, cap at the page's content width (chrome minus any padded ancestor, e.g. CenteredLayout),
-  // so a table whose pinned min-width holds its parent open can still shrink back when the viewport narrows.
-  if (inDocumentScrollLayout) {
-    return Css.w(`min(100%, ${documentScrollContentWidth()})`).mw0.$;
-  }
+/** Size the measuring element to `columnMeasureWidth`, or to the table itself when that is unset. */
+export function getTableRefWidthStyles(isVirtual: boolean, columnMeasureWidth?: string) {
+  // Stay at the given width so a wide table cannot stretch the measurement it is based on.
+  if (columnMeasureWidth) return Css.w(columnMeasureWidth).mw0.$;
   // Nested scrolling virtual tables reserve space for Virtuoso / ScrollableParent vertical scrollbars.
-  if (isVirtual) {
-    return Css.w("calc(100% - 20px)").$;
-  }
-  // Otherwise, use the full width of the container (nested scroll, non-virtual tables)
+  if (isVirtual) return Css.w("calc(100% - 20px)").$;
   return Css.w100.$;
 }
