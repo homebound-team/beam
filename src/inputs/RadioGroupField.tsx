@@ -130,7 +130,10 @@ export function RadioGroupField<K extends string, O extends object = object>(pro
         tooltip={tooltip}
         hidden={labelStyle === "hidden"}
       />
-      <div {...radioGroupProps} css={stretchOptions ? (labelStyle === "left" ? Css.fg1.$ : Css.w100.$) : {}}>
+      <div
+        {...radioGroupProps}
+        css={Css.if(stretchOptions && labelStyle === "left").fg1.end.if(stretchOptions && labelStyle !== "left").w100.$}
+      >
         <div css={Css.df.fdc.gap1.if(layout !== "vertical").fdr.fww.end.if(layout === "horizontal").gap3.$}>
           {options.map((option) => {
             const radioProps = {
@@ -175,7 +178,6 @@ function Radio<K extends string>(props: {
   isOptionDisabled?: boolean;
   withLabelElement: boolean;
   controlOnly: boolean;
-  /** Places the radio inside a consumer's row, see `RadioGroupFieldProps.renderOption`. */
   render?: (radio: ReactNode) => ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
@@ -203,7 +205,6 @@ function Radio<K extends string>(props: {
   const isSelected = !disabled && state.selectedValue === value;
   const { focusProps, isFocusVisible } = useFocusRing();
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
-  // A span, not a div, b/c this usually sits inside the consumer's `<label>`, where a `<div>` isn't valid HTML.
   const Tag = withLabelElement ? "label" : "span";
 
   const radio = (
