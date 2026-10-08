@@ -246,7 +246,7 @@ describe("ButtonMenu", () => {
     click(r.trigger);
     expect(r.trigger_optionA).toBeDefined();
     // When clicking elsewhere within the modal
-    // fireEvent.pointerDown(r.outside);
+    fireEvent.pointerDown(r.outside);
     click(r.outside);
     // Then the menu should be closed
     expect(r.query.trigger_optionA).toBe(null);
