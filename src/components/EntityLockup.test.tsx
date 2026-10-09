@@ -8,6 +8,7 @@ describe("EntityLockup", () => {
     const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" description="French door" />);
     // Then it shows the image, title and description
     expect(r.entityLockup_image).toHaveAttribute("src", "fridge.jpeg");
+    expect(r.entityLockup_image).toHaveAttribute("alt", "Refrigerator");
     expect(r.entityLockup_title).toHaveTextContent("Refrigerator");
     expect(r.entityLockup_description).toHaveTextContent("French door");
   });
@@ -27,5 +28,22 @@ describe("EntityLockup", () => {
     const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" right="+ $10.00" />);
     // Then it is shown
     expect(r.entityLockup_right).toHaveTextContent("+ $10.00");
+  });
+
+  it("renders the eyebrow above the title", async () => {
+    // Given a lockup with an eyebrow
+    // When rendered
+    const r = await render(<EntityLockup imgSrc="fridge.jpeg" eyebrow="Lenox" title="Holiday Lighting" />);
+    // Then the eyebrow comes before the title
+    expect(r.entityLockup_eyebrow).toHaveTextContent("Lenox");
+    expect(r.entityLockup_eyebrow.compareDocumentPosition(r.entityLockup_title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("omits the eyebrow when not provided", async () => {
+    // Given a lockup with only a title
+    // When rendered
+    const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" />);
+    // Then the eyebrow is not rendered
+    expect(r.query.entityLockup_eyebrow).not.toBeInTheDocument();
   });
 });
