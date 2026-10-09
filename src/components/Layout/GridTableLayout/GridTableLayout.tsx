@@ -50,6 +50,8 @@ export type GridTableLayoutProps<
   emptyFallback?: string;
   /** Inline buttons, icon buttons, and an optional overflow menu (`kind: "menu"`). */
   actions?: HeaderAction[];
+  /** Shows "N Rows Selected · Clear" before the columns selector; Clear deselects every row, then calls `onClear`. */
+  selectionSummary?: true | { onClear?: () => void };
   hideEditColumns?: boolean;
   totalCount?: number;
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
@@ -98,6 +100,7 @@ function GridTableLayoutComponent<
     tableProps,
     layoutState,
     actions,
+    selectionSummary,
     hideEditColumns = false,
     withCardView,
     defaultView = "list",
@@ -124,12 +127,15 @@ function GridTableLayoutComponent<
   );
   const [view, setView] = usePersistedTableView(defaultView, !!withCardView);
   const clientSearch = layoutState?.search === "client" ? layoutState.searchString : undefined;
+  const withSelectionSummary = !!selectionSummary;
   const showTableActions = !!(
     layoutState?.filterDefs ||
     layoutState?.search ||
     hasHideableColumns ||
     withCardView ||
-    actions?.length
+    actions?.length ||
+    // Rendered before anything's selected, so the pill doesn't shift the table
+    withSelectionSummary
   );
   // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
   // (which only controls whether the list/card toggle is shown).
@@ -144,6 +150,16 @@ function GridTableLayoutComponent<
   }, [visibleColumnIds, layoutState]);
 
   const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
+
+  const selectedRowCount = useComputed(
+    () => (withSelectionSummary ? api.tableState.selectedRowCount : 0),
+    [api, withSelectionSummary],
+  );
+  const onClear = typeof selectionSummary === "object" ? selectionSummary.onClear : undefined;
+  const clearSelections = useCallback(() => {
+    api.clearSelections();
+    onClear?.();
+  }, [api, onClear]);
 
   const filterSearchProps = useMemo(
     () => (layoutState?.search ? { onSearch: layoutState.setSearchString } : undefined),
@@ -179,6 +195,8 @@ function GridTableLayoutComponent<
       clearFilters={clearFilters}
       searchApi={searchApiRef}
       actions={actions}
+      selectedRowCount={selectedRowCount}
+      onClearSelections={withSelectionSummary ? clearSelections : undefined}
     />
   );
 

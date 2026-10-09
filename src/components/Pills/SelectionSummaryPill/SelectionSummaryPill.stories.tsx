@@ -34,6 +34,21 @@ export const Examples = newStory(
             <SelectionSummaryPill text="3 Rows Selected" onClick={action("onClick")} disabled="Selections are locked" />
           ),
         },
+        {
+          label: "Compact",
+          children: <SelectionSummaryPill text="3 Rows Selected" onClick={action("onClick")} compactCount={3} />,
+        },
+        {
+          label: "Compact hovered",
+          children: (
+            <SelectionSummaryPill
+              text="3 Rows Selected"
+              onClick={action("onClick")}
+              compactCount={3}
+              __storyState={{ hovered: true }}
+            />
+          ),
+        },
       ]}
     />
   ),

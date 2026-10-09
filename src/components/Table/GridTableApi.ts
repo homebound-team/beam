@@ -188,7 +188,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   public clearSelections(id?: string) {
-    this.tableState.selectRow("header", false);
+    this.tableState.clearSelections();
   }
 
   public setActiveRowId(id: string | undefined) {
