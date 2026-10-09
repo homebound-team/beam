@@ -9,6 +9,7 @@ import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getRadioStateStyles, radioDefault, radioFocus, radioHover, radioReset } from "src/inputs/internal/radioStyles";
+import type { StyledRadioProps } from "src/inputs/StyledRadio";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -30,7 +31,7 @@ export type RadioFieldOption<K extends string> = {
 
 export type RadioGroupFieldLayout = "vertical" | "horizontal" | "thumbnail";
 
-export type RadioGroupFieldProps<K extends string> = {
+export type RadioGroupFieldProps<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>> = {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
@@ -40,7 +41,7 @@ export type RadioGroupFieldProps<K extends string> = {
   /** Called when an option is selected. We don't support unselecting. */
   onChange: (value: K) => void;
   /** The list of options. */
-  options: RadioFieldOption<K>[];
+  options: (RadioFieldOption<K> & O)[];
   disabled?: boolean;
   /** Whether the field is required. When true, renders the required suffix (i.e. "*") next to the label. */
   required?: boolean;
@@ -50,6 +51,13 @@ export type RadioGroupFieldProps<K extends string> = {
   onFocus?: () => void;
   /** The options' arrangement. Defaults to "vertical". */
   layout?: RadioGroupFieldLayout;
+  /**
+   * Renders each option's whole row, like a title, price and images. Not used by `layout="thumbnail"`.
+   *
+   * Wrap the row in a `<label>` and place `<StyledRadio {...radioProps} />` inside it, so a click anywhere in the row
+   * selects the option.
+   */
+  renderOption?: (option: RadioFieldOption<K> & O, radioProps: StyledRadioProps) => ReactNode;
 } & Pick<PresentationFieldProps, "labelStyle">;
 
 /**
@@ -59,7 +67,9 @@ export type RadioGroupFieldProps<K extends string> = {
  *
  * TODO: Add hover (non selected and selected) styles
  */
-export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>) {
+export function RadioGroupField<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>>(
+  props: RadioGroupFieldProps<K, O>,
+) {
   const {
     label,
     labelStyle,
@@ -72,6 +82,7 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
     helperText,
     layout = "vertical",
     tooltip,
+    renderOption,
     ...otherProps
   } = props;
 
@@ -92,6 +103,8 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
   const { labelProps, radioGroupProps } = useRadioGroup({ label, isDisabled: disabled, isRequired: required }, state);
 
   const isThumbnail = layout === "thumbnail";
+  // Custom rows stretch to the field's width, or fill the space beside a left label.
+  const stretchOptions = !!renderOption && !isThumbnail;
 
   return (
     // default styling to position `<Label />` above.
@@ -104,7 +117,10 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
         tooltip={tooltip}
         hidden={labelStyle === "hidden"}
       />
-      <div {...radioGroupProps}>
+      <div
+        {...radioGroupProps}
+        css={Css.if(stretchOptions && labelStyle === "left").fg1.end.if(stretchOptions && labelStyle !== "left").w100.$}
+      >
         <div css={Css.df.fdc.gap1.if(layout !== "vertical").fdr.fww.end.if(layout === "horizontal").gap3.$}>
           {options.map((option) => {
             const radioProps = {
@@ -116,7 +132,13 @@ export function RadioGroupField<K extends string>(props: RadioGroupFieldProps<K>
             };
             return (
               <Fragment key={option.value}>
-                {isThumbnail ? <ThumbnailRadio {...radioProps} /> : <Radio parentId={name} {...radioProps} />}
+                {isThumbnail ? (
+                  <ThumbnailRadio {...radioProps} />
+                ) : renderOption ? (
+                  <CustomRadio {...radioProps} renderOption={renderOption} />
+                ) : (
+                  <Radio parentId={name} {...radioProps} />
+                )}
               </Fragment>
             );
           })}
@@ -203,6 +225,45 @@ function Radio<K extends string>(props: {
         </div>
       </label>
     ),
+  });
+}
+
+/**
+ * A radio option that the caller lays out with `renderOption`.
+ *
+ * We handle the radio's state and accessibility, and pass the caller `StyledRadioProps` to render the circle with.
+ */
+function CustomRadio<K extends string, O extends RadioFieldOption<K>>(props: {
+  option: O;
+  state: RadioGroupState;
+  // Per-option disabled flag, kept separate from state; see `Radio` for why.
+  isOptionDisabled?: boolean;
+  renderOption: (option: O, radioProps: StyledRadioProps) => ReactNode;
+  onBlur?: () => void;
+  onFocus?: () => void;
+}) {
+  const { option, state, isOptionDisabled, renderOption, ...others } = props;
+  const ref = useRef<HTMLInputElement>(null);
+  // The caller's row has no label element for us to point at, so the option's label is the accessible name.
+  const { inputProps, isDisabled } = useRadio(
+    { value: option.value, "aria-label": option.label, isDisabled: isOptionDisabled },
+    state,
+    ref,
+  );
+  // Like `Radio`, a disabled option doesn't show as selected.
+  const isSelected = !isDisabled && state.selectedValue === option.value;
+  const { focusProps, isFocusVisible } = useFocusRing();
+
+  return maybeTooltip({
+    title: resolveTooltip(option.disabled),
+    placement: "bottom",
+    children: renderOption(option, {
+      // Merge others last b/c it could have data-testid in it or onX events.
+      inputProps: { ...mergeProps(inputProps, focusProps, others), ref },
+      isSelected,
+      isDisabled,
+      isFocusVisible,
+    }),
   });
 }
 
