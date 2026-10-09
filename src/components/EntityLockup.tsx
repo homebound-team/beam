@@ -11,8 +11,6 @@ export type EntityLockupProps = {
   eyebrow?: ReactNode;
   /** Secondary content under the title; can include extra rows like a status. */
   description?: ReactNode;
-  /** Leading content before the image, e.g. a Checkbox. */
-  left?: ReactNode;
   /** Trailing content aligned to the right, e.g. a Tag and price. */
   right?: ReactNode;
   /** Smaller variant for dense lists, e.g. sidebars. */
@@ -21,18 +19,13 @@ export type EntityLockupProps = {
 
 /** Image thumbnail beside a title and description, identifying an entity such as a product or option. */
 export function EntityLockup(props: EntityLockupProps) {
-  const { imgSrc, title, eyebrow, description, left, right, compact = false } = props;
+  const { imgSrc, title, eyebrow, description, right, compact = false } = props;
   const tid = useTestIds(props, "entityLockup");
   const styles = compact ? compactStyles : defaultStyles;
   return (
     <div css={styles.container} {...tid}>
-      {isDefined(left) && (
-        <div css={styles.left} {...tid.left}>
-          {left}
-        </div>
-      )}
       <div css={styles.image}>
-        <img src={imgSrc} alt="" loading="lazy" css={Css.w100.h100.objectCover.db.$} {...tid.image} />
+        <img src={imgSrc} alt={title} loading="lazy" css={Css.w100.h100.objectCover.db.$} {...tid.image} />
       </div>
       <div css={styles.body}>
         <div css={styles.text}>
@@ -64,7 +57,6 @@ export function EntityLockup(props: EntityLockupProps) {
 
 const defaultStyles = {
   container: Css.df.aifs.gap2.$,
-  left: Css.fs0.df.$,
   image: Css.fs0.sqPx(96).br8.ba.bc(Tokens.FieldBorderDefault).oh.bgColor(Tokens.SurfaceRaised).$,
   // On small screens, `right` moves under the description so the text keeps its width.
   body: Css.df.fg1.mw0.gap2.ifSm.fdc.gap1.$,
@@ -84,7 +76,6 @@ const defaultStyles = {
 
 const compactStyles = {
   container: Css.df.aic.gapPx(12).$,
-  left: Css.fs0.df.$,
   image: Css.fs0.sqPx(62).br8.ba.bc(Tokens.SurfaceSeparator).oh.bgColor(Tokens.SurfaceRaised).$,
   // Stretches to the image's height so the text and `right` both align to the top of the row.
   body: Css.df.fg1.mw0.gapPx(12).asStretch.$,
