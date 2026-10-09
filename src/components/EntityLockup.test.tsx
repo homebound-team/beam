@@ -1,4 +1,5 @@
 import { EntityLockup } from "src/components/EntityLockup";
+import { setViewport } from "src/tests/viewport";
 import { render } from "src/utils/rtl";
 
 describe("EntityLockup", () => {
@@ -45,5 +46,22 @@ describe("EntityLockup", () => {
     const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" />);
     // Then the eyebrow is not rendered
     expect(r.query.entityLockup_eyebrow).not.toBeInTheDocument();
+  });
+
+  it("uses the compact layout on small screens", async () => {
+    // Given a mobile viewport
+    setViewport("sm");
+    // When a lockup is rendered without `compact`
+    const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" />);
+    // Then it uses the compact title size
+    expect(r.entityLockup_title).toHaveStyle({ fontSize: "12px" });
+  });
+
+  it("uses the default layout on larger screens", async () => {
+    // Given the default desktop viewport
+    // When a lockup is rendered without `compact`
+    const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" />);
+    // Then it uses the default title size
+    expect(r.entityLockup_title).toHaveStyle({ fontSize: "14px" });
   });
 });
