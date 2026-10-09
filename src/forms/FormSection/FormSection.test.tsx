@@ -1,13 +1,19 @@
 import { createObjectState, type ObjectConfig } from "@homebound/form-state";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { FormSection } from "src/forms/FormSection/FormSection";
-import { render } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 
 type OrderInput = { order?: number | null };
 const orderConfig: ObjectConfig<OrderInput> = { order: { type: "value" } };
 /** A real form-state `FieldState<number>`, so orderField tests exercise the actual integration. */
 function orderField(value: number | null) {
   return createObjectState(orderConfig, { order: value }).order;
+}
+
+type SelectedInput = { selected?: boolean | null; selectedId?: string | null };
+const selectedConfig: ObjectConfig<SelectedInput> = { selected: { type: "value" }, selectedId: { type: "value" } };
+function selectedFields(input: SelectedInput) {
+  return createObjectState(selectedConfig, input);
 }
 
 describe("FormSection", () => {
@@ -271,5 +277,73 @@ describe("FormSection", () => {
     expect(hvacOrder.value).toBe(0);
     expect(plumbingOrder.value).toBe(1);
     expect(electricalOrder.value).toBe(2);
+  });
+
+  it("renders a checkbox on a child section", async () => {
+    // Given a childSection with an unchecked selectedField
+    const { selected } = selectedFields({ selected: false });
+    const r = await render(
+      <FormSection
+        title="Whole House"
+        childSections={[{ id: "washer", title: "Add Washer and Dryer", selectedField: selected }]}
+      />,
+    );
+    // Then a checkbox labeled by the child's title renders unchecked
+    expect(r.formSection_childSection_checkbox).toHaveAttribute("aria-label", "Add Washer and Dryer");
+    expect(r.formSection_childSection_checkbox).not.toBeChecked();
+    // When the user checks it
+    click(r.formSection_childSection_checkbox);
+    // Then the field is set
+    expect(selected.value).toBe(true);
+    expect(r.formSection_childSection_checkbox).toBeChecked();
+  });
+
+  it("renders a radio on each child section", async () => {
+    // Given childSections with a selectedChildField preselecting "top"
+    const { selectedId } = selectedFields({ selectedId: "top" });
+    const r = await render(
+      <FormSection
+        title="Washer and Dryer"
+        selectedChildField={selectedId}
+        childSections={[
+          { id: "front", title: "Front Load" },
+          { id: "top", title: "Top Load" },
+        ]}
+      />,
+    );
+    // Then the children sit in a radiogroup labeled by the section title
+    expect(r.formSection_childRadioGroup).toHaveAttribute("role", "radiogroup");
+    expect(r.formSection_childRadioGroup).toHaveAttribute("aria-label", "Washer and Dryer");
+    // And each child renders a radio labeled by its title, with only "top" checked
+    expect(r.formSection_childSection_radio_0).toHaveAttribute("aria-label", "Front Load");
+    expect(r.formSection_childSection_radio_0).not.toBeChecked();
+    expect(r.formSection_childSection_radio_1).toBeChecked();
+    // When the user selects "Front Load"
+    click(r.formSection_childSection_radio_0);
+    // Then the field holds that child's id, and only it is checked
+    expect(selectedId.value).toBe("front");
+    expect(r.formSection_childSection_radio_0).toBeChecked();
+    expect(r.formSection_childSection_radio_1).not.toBeChecked();
+  });
+
+  it("updates the selected radio when the field changes", async () => {
+    // Given a radio group with nothing selected
+    const { selectedId } = selectedFields({});
+    const r = await render(
+      <FormSection
+        title="Washer and Dryer"
+        selectedChildField={selectedId}
+        childSections={[
+          { id: "front", title: "Front Load" },
+          { id: "top", title: "Top Load" },
+        ]}
+      />,
+    );
+    expect(r.formSection_childSection_radio_0).not.toBeChecked();
+    expect(r.formSection_childSection_radio_1).not.toBeChecked();
+    // When the field is set outside the component
+    act(() => selectedId.set("top"));
+    // Then the matching radio becomes checked
+    expect(r.formSection_childSection_radio_1).toBeChecked();
   });
 });
