@@ -4,8 +4,8 @@ import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { Icon } from "src/components/Icon";
-import { IconButton } from "src/components/IconButton";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
+import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import type { GridStyleDef } from "src/components/Table/TableStyles";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
@@ -390,22 +390,21 @@ function createGridTableLayoutNestedRows(repeat: number = 1): GridDataRow<GridTa
 function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
   const { closeRightPane } = useRightPaneActions();
   return (
-    <div css={Css.df.fdc.h100.$}>
-      <div css={Css.df.aic.jcsb.gap1.p2.bb.bc(Tokens.SurfaceSeparator).$}>
-        <div css={Css.mdSb.$}>{name}</div>
-        <IconButton icon="x" onClick={closeRightPane} />
-      </div>
-      <div css={Css.fg1.oya.p2.$}>
-        <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
-          Independent pane scroll. On desktop, table columns stay reachable via horizontal document scroll; on mobile
-          the pane is a full-bleed overlay below the environment banner.
-        </p>
-        {zeroTo(40).map((i) => (
-          <div key={i} css={Css.py1.$}>
-            Detail line {i + 1}
-          </div>
-        ))}
-      </div>
-    </div>
+    <RightPanePanel
+      title={name}
+      deleteAction={{ onClick: action("delete"), count: 5 }}
+      secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
+      primaryAction={{ label: "Save", onClick: action("save") }}
+    >
+      <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
+        Independent pane scroll. On desktop, table columns stay reachable via horizontal document scroll; on mobile the
+        pane is a full-bleed overlay below the environment banner.
+      </p>
+      {zeroTo(40).map((i) => (
+        <div key={i} css={Css.py1.$}>
+          Detail line {i + 1}
+        </div>
+      ))}
+    </RightPanePanel>
   );
 }
