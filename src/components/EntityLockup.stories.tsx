@@ -87,11 +87,10 @@ export function Examples() {
           children: <EntityLockup compact imgSrc="plan-exterior.png" title="Modern Tudor (B)" description="Exterior" />,
         },
         {
-          label: "Compact with tag",
+          label: "Compact by width (400px or less)",
           children: (
             <div css={Css.w100.maxwPx(332).$}>
               <EntityLockup
-                compact
                 imgSrc="plan-exterior.png"
                 title="Modern Tudor (B)"
                 description={

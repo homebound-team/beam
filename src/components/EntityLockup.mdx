@@ -12,7 +12,7 @@ import * as EntityLockupStories from "./EntityLockup.stories";
   </a>
 </p>
 
-`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. It switches to a compact layout, with a smaller image and text, on small screens. Use `compact` to get that layout on any screen, e.g. in dense lists like sidebars. Put trailing details, like a `Tag` and a price, in `right`, and a brand above the title in `eyebrow`.
+`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. It switches to a compact layout, with a smaller image and text, when the lockup itself is 400px wide or less. This depends on the lockup's own width, not the screen's, so it also applies when it's squeezed between side panes. Use `compact` to get that layout at any width, e.g. in sidebars. Put trailing details, like a `Tag` and a price, in `right`, and a brand above the title in `eyebrow`.
 
 <table>
   <thead>
@@ -93,10 +93,7 @@ import * as EntityLockupStories from "./EntityLockup.stories";
       <td>
         <code>false</code>
       </td>
-      <td>
-        Smaller image and text, vertically centered, on every screen size. Small screens use the compact sizes either
-        way.
-      </td>
+      <td>Smaller image and text at any width. Lockups 400px wide or less use it either way.</td>
     </tr>
   </tbody>
 </table>
