@@ -46,4 +46,12 @@ describe("EntityLockup", () => {
     // Then the eyebrow is not rendered
     expect(r.query.entityLockup_eyebrow).not.toBeInTheDocument();
   });
+
+  it("is a container for the compact layout", async () => {
+    // Given a lockup
+    // When rendered
+    const r = await render(<EntityLockup imgSrc="fridge.jpeg" title="Refrigerator" />);
+    // Then its children can query its width
+    expect(r.entityLockup).toHaveStyle({ containerType: "inline-size", containerName: "entityLockup" });
+  });
 });
