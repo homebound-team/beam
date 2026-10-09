@@ -3,8 +3,8 @@ import { Tag } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { SelectCardShell } from "src/inputs/SelectCard/SelectCardShell";
-import { StyledRadio } from "src/inputs/SelectCard/StyledRadio";
 import type { SelectCardItemProps } from "src/inputs/SelectCard/types";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 

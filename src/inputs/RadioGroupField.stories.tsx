@@ -13,6 +13,7 @@ import {
   radioUnchecked,
 } from "src/inputs/internal/radioStyles";
 import { RadioGroupField } from "src/inputs/RadioGroupField";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { action } from "storybook/actions";
 
 export default {
@@ -436,7 +437,6 @@ export function CustomOptionRows() {
     },
   ];
   const [value, setValue] = useState<string | undefined>("top");
-  const [simpleValue, setSimpleValue] = useState<string | undefined>("a");
   return (
     <FormLines width="full" gap={5}>
       <div css={Css.wPx(720).maxw100.$}>
@@ -446,8 +446,8 @@ export function CustomOptionRows() {
           value={value}
           onChange={setValue}
           options={packages}
-          renderOption={({ label, price, images, disabled }, radio) => {
-            const isDisabled = !!disabled;
+          renderOption={({ label, price, images }, radioProps) => {
+            const { isDisabled = false } = radioProps;
             return (
               <label
                 css={
@@ -457,12 +457,13 @@ export function CustomOptionRows() {
                     .cursorNotAllowed.color(Tokens.TextDisabled).$
                 }
               >
-                <div css={Css.df.aic.gap1.$}>
-                  {radio}
+                {/* Spans, b/c a `<div>` isn't valid HTML inside a `<label>`. */}
+                <span css={Css.df.aic.gap1.$}>
+                  <StyledRadio {...radioProps} />
                   <span css={Css.fg1.mdSb.$}>{label}</span>
                   <span css={Css.md.$}>{price}</span>
-                </div>
-                <div css={Css.df.gap2.ml3.$}>
+                </span>
+                <span css={Css.df.gap2.ml3.$}>
                   {images.map((src) => (
                     <img
                       key={src}
@@ -471,22 +472,10 @@ export function CustomOptionRows() {
                       css={Css.sqPx(96).p1.br8.ba.bc(Tokens.FieldBorderDefault).objectContain.if(isDisabled).o50.$}
                     />
                   ))}
-                </div>
+                </span>
               </label>
             );
           }}
-        />
-      </div>
-      <div>
-        <RadioGroupField
-          label="Control only, with no option labels"
-          controlOnly
-          value={simpleValue}
-          onChange={setSimpleValue}
-          options={[
-            { value: "a", label: "Asiago" },
-            { value: "b", label: "Burratta" },
-          ]}
         />
       </div>
     </FormLines>

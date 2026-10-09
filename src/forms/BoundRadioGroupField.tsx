@@ -1,11 +1,11 @@
 import type { FieldState } from "@homebound/form-state";
 import { Observer } from "mobx-react";
-import { RadioGroupField, type RadioGroupFieldProps } from "src/inputs/RadioGroupField";
+import { type RadioFieldOption, RadioGroupField, type RadioGroupFieldProps } from "src/inputs/RadioGroupField";
 import { defaultLabel } from "src/utils/defaultLabel";
 import { maybeCall } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type BoundRadioGroupFieldProps<K extends string, O extends object = object> = Omit<
+export type BoundRadioGroupFieldProps<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>> = Omit<
   RadioGroupFieldProps<K, O>,
   "value" | "onChange" | "label"
 > & {
@@ -16,7 +16,7 @@ export type BoundRadioGroupFieldProps<K extends string, O extends object = objec
 };
 
 /** Wraps `TextField` and binds it to a form field. */
-export function BoundRadioGroupField<K extends string, O extends object = object>(
+export function BoundRadioGroupField<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>>(
   props: BoundRadioGroupFieldProps<K, O>,
 ) {
   const {

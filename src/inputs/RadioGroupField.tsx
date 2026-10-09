@@ -9,6 +9,7 @@ import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getRadioStateStyles, radioDefault, radioFocus, radioHover, radioReset } from "src/inputs/internal/radioStyles";
+import type { StyledRadioProps } from "src/inputs/StyledRadio";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -30,8 +31,7 @@ export type RadioFieldOption<K extends string> = {
 
 export type RadioGroupFieldLayout = "vertical" | "horizontal" | "thumbnail";
 
-/** `O` is any extra fields on the options, so `renderOption` can read them. */
-export type RadioGroupFieldProps<K extends string, O extends object = object> = {
+export type RadioGroupFieldProps<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>> = {
   /** The label for the choice itself, i.e. "Favorite Cheese". */
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
@@ -52,25 +52,12 @@ export type RadioGroupFieldProps<K extends string, O extends object = object> = 
   /** The options' arrangement. Defaults to "vertical". */
   layout?: RadioGroupFieldLayout;
   /**
-   * Renders each option's whole row, e.g. a title, price and images, with `radio` placed wherever it should go.
+   * Renders each option's whole row, like a title, price and images. Not used by `layout="thumbnail"`.
    *
-   * Wrap the row in a `<label>` so a click anywhere in it selects the option. Defaults `withLabelElement` to false and
-   * `controlOnly` to true. Not used by `layout="thumbnail"`.
+   * Wrap the row in a `<label>` and place `<StyledRadio {...radioProps} />` inside it, so a click anywhere in the row
+   * selects the option.
    */
-  renderOption?: (option: RadioFieldOption<K> & O, radio: ReactNode) => ReactNode;
-  /**
-   * If false, each option is wrapped in a `span` instead of a `label`.
-   * Expects the implementer to wrap it in a `label` element to work properly.
-   * Not used by `layout="thumbnail"`.
-   * @default true, or false when `renderOption` is set
-   */
-  withLabelElement?: boolean;
-  /**
-   * Renders only the radio control, without its label or description. The label is still its accessible name.
-   * Not used by `layout="thumbnail"`.
-   * @default false, or true when `renderOption` is set
-   */
-  controlOnly?: boolean;
+  renderOption?: (option: RadioFieldOption<K> & O, radioProps: StyledRadioProps) => ReactNode;
 } & Pick<PresentationFieldProps, "labelStyle">;
 
 /**
@@ -80,7 +67,9 @@ export type RadioGroupFieldProps<K extends string, O extends object = object> = 
  *
  * TODO: Add hover (non selected and selected) styles
  */
-export function RadioGroupField<K extends string, O extends object = object>(props: RadioGroupFieldProps<K, O>) {
+export function RadioGroupField<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>>(
+  props: RadioGroupFieldProps<K, O>,
+) {
   const {
     label,
     labelStyle,
@@ -94,8 +83,6 @@ export function RadioGroupField<K extends string, O extends object = object>(pro
     layout = "vertical",
     tooltip,
     renderOption,
-    withLabelElement = !renderOption,
-    controlOnly = !!renderOption,
     ...otherProps
   } = props;
 
@@ -147,14 +134,10 @@ export function RadioGroupField<K extends string, O extends object = object>(pro
               <Fragment key={option.value}>
                 {isThumbnail ? (
                   <ThumbnailRadio {...radioProps} />
+                ) : renderOption ? (
+                  <CustomRadio {...radioProps} renderOption={renderOption} />
                 ) : (
-                  <Radio
-                    parentId={name}
-                    {...radioProps}
-                    withLabelElement={withLabelElement}
-                    controlOnly={controlOnly}
-                    render={renderOption && ((radio) => renderOption(option, radio))}
-                  />
+                  <Radio parentId={name} {...radioProps} />
                 )}
               </Fragment>
             );
@@ -176,9 +159,6 @@ function Radio<K extends string>(props: {
   // react-aria uses a WeakMap keyed by the state object identity to store radio group
   // metadata, so spreading state into a new object breaks the lookup.
   isOptionDisabled?: boolean;
-  withLabelElement: boolean;
-  controlOnly: boolean;
-  render?: (radio: ReactNode) => ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
 }) {
@@ -187,9 +167,6 @@ function Radio<K extends string>(props: {
     option: { description, label, value, disabled: disabledReason },
     state,
     isOptionDisabled,
-    withLabelElement,
-    controlOnly,
-    render,
     ...others
   } = props;
 
@@ -198,62 +175,95 @@ function Radio<K extends string>(props: {
   const ref = useRef<HTMLInputElement>(null);
   // Pass per-option isDisabled via useRadio's props rather than overriding state.isDisabled.
   // useRadio merges props.isDisabled with state.isDisabled internally (props.isDisabled || state.isDisabled).
-  // Control-only radios have no label element to point at, so their label becomes the accessible name directly.
-  const labelProps = controlOnly ? { "aria-label": label } : { "aria-labelledby": labelId };
-  const { inputProps, isDisabled } = useRadio({ value, ...labelProps, isDisabled: isOptionDisabled }, state, ref);
+  const { inputProps, isDisabled } = useRadio(
+    { value, "aria-labelledby": labelId, isDisabled: isOptionDisabled },
+    state,
+    ref,
+  );
   const disabled = isDisabled;
   const isSelected = !disabled && state.selectedValue === value;
   const { focusProps, isFocusVisible } = useFocusRing();
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
-  const Tag = withLabelElement ? "label" : "span";
-
-  const radio = (
-    <Tag css={Css.df.cursorPointer.if(disabled).add("cursor", "initial").$} {...hoverProps}>
-      <input
-        type="radio"
-        ref={ref}
-        css={{
-          ...radioReset,
-          ...radioDefault,
-          ...getRadioStateStyles({ isDisabled: disabled, isSelected }),
-          ...(isHovered && !disabled ? radioHover : {}),
-          ...(isFocusVisible ? radioFocus : {}),
-          // Nudge down so the center of the circle lines up with the label text
-          ...(!controlOnly ? Css.mtPx(2).mr1.$ : {}),
-        }}
-        disabled={disabled}
-        {...labelProps}
-        {...inputProps}
-        {...focusProps}
-        // Put others here b/c it could have data-testid in it or onX events.
-        {...others}
-      />
-      {!controlOnly && (
-        <span>
-          <span
-            id={labelId}
-            css={Css.db.sm.color(Tokens.OnSurface).if(disabled).color(Tokens.TextDisabled).$}
-            {...(description ? { "aria-describedby": descriptionId } : {})}
-          >
-            {label}
-          </span>
-          {description && (
-            <span
-              id={descriptionId}
-              css={Css.db.sm.color(Tokens.OnSurfaceMuted).if(disabled).color(Tokens.TextDisabled).$}
-            >
-              {typeof description === "function" ? description() : description}
-            </span>
-          )}
-        </span>
-      )}
-    </Tag>
-  );
 
   return maybeTooltip({
     title: resolveTooltip(disabledReason),
     placement: "bottom",
-    children: render ? render(radio) : radio,
+    children: (
+      <label css={Css.df.cursorPointer.if(disabled).add("cursor", "initial").$} {...hoverProps}>
+        <input
+          type="radio"
+          ref={ref}
+          css={{
+            ...radioReset,
+            ...radioDefault,
+            ...getRadioStateStyles({ isDisabled: disabled, isSelected }),
+            ...(isHovered && !disabled ? radioHover : {}),
+            ...(isFocusVisible ? radioFocus : {}),
+            // Nudge down so the center of the circle lines up with the label text
+            ...Css.mtPx(2).mr1.$,
+          }}
+          disabled={disabled}
+          aria-labelledby={labelId}
+          {...inputProps}
+          {...focusProps}
+          // Put others here b/c it could have data-testid in it or onX events.
+          {...others}
+        />
+        <div>
+          <div
+            id={labelId}
+            css={Css.sm.color(Tokens.OnSurface).if(disabled).color(Tokens.TextDisabled).$}
+            {...(description ? { "aria-describedby": descriptionId } : {})}
+          >
+            {label}
+          </div>
+          {description && (
+            <div id={descriptionId} css={Css.sm.color(Tokens.OnSurfaceMuted).if(disabled).color(Tokens.TextDisabled).$}>
+              {typeof description === "function" ? description() : description}
+            </div>
+          )}
+        </div>
+      </label>
+    ),
+  });
+}
+
+/**
+ * A radio option that the caller lays out with `renderOption`.
+ *
+ * We handle the radio's state and accessibility, and pass the caller `StyledRadioProps` to render the circle with.
+ */
+function CustomRadio<K extends string, O extends RadioFieldOption<K>>(props: {
+  option: O;
+  state: RadioGroupState;
+  // Per-option disabled flag, kept separate from state; see `Radio` for why.
+  isOptionDisabled?: boolean;
+  renderOption: (option: O, radioProps: StyledRadioProps) => ReactNode;
+  onBlur?: () => void;
+  onFocus?: () => void;
+}) {
+  const { option, state, isOptionDisabled, renderOption, ...others } = props;
+  const ref = useRef<HTMLInputElement>(null);
+  // The caller's row has no label element for us to point at, so the option's label is the accessible name.
+  const { inputProps, isDisabled } = useRadio(
+    { value: option.value, "aria-label": option.label, isDisabled: isOptionDisabled },
+    state,
+    ref,
+  );
+  // Like `Radio`, a disabled option doesn't show as selected.
+  const isSelected = !isDisabled && state.selectedValue === option.value;
+  const { focusProps, isFocusVisible } = useFocusRing();
+
+  return maybeTooltip({
+    title: resolveTooltip(option.disabled),
+    placement: "bottom",
+    children: renderOption(option, {
+      // Merge others last b/c it could have data-testid in it or onX events.
+      inputProps: { ...mergeProps(inputProps, focusProps, others), ref },
+      isSelected,
+      isDisabled,
+      isFocusVisible,
+    }),
   });
 }
 
