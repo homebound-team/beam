@@ -12,7 +12,7 @@ import * as EntityLockupStories from "./EntityLockup.stories";
   </a>
 </p>
 
-`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. Use `compact` in dense lists like sidebars. Put trailing details, like a `Tag` and a price, in `right`.
+`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. Use `compact` in dense lists like sidebars. Put trailing details, like a `Tag` and a price, in `right`, a brand above the title in `eyebrow`, and a selection `Checkbox` in `left`.
 
 <table>
   <thead>
@@ -50,6 +50,16 @@ import * as EntityLockupStories from "./EntityLockup.stories";
     </tr>
     <tr>
       <td>
+        <code>eyebrow</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>—</td>
+      <td>Short line above the title, e.g. a brand.</td>
+    </tr>
+    <tr>
+      <td>
         <code>description</code>
       </td>
       <td>
@@ -59,6 +69,16 @@ import * as EntityLockupStories from "./EntityLockup.stories";
       <td>
         Shown under the title and never truncated, so long text wraps in full. Can include extra rows, like a status.
       </td>
+    </tr>
+    <tr>
+      <td>
+        <code>left</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>—</td>
+      <td>Leading content before the image, e.g. a `Checkbox` for selectable options.</td>
     </tr>
     <tr>
       <td>
