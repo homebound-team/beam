@@ -12,7 +12,7 @@ import * as EntityLockupStories from "./EntityLockup.stories";
   </a>
 </p>
 
-`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. Use `compact` in dense lists like sidebars. Put trailing details, like a `Tag` and a price, in `right`.
+`EntityLockup` identifies an entity, such as a product or option, with an image thumbnail beside its title and description. Use `compact` in dense lists like sidebars. Put trailing details, like a `Tag` and a price, in `right`, and a brand above the title in `eyebrow`.
 
 <table>
   <thead>
@@ -34,7 +34,7 @@ import * as EntityLockupStories from "./EntityLockup.stories";
       <td>
         <span className="sbdocs-required">required</span>
       </td>
-      <td>Thumbnail image URL. The image is decorative, since the title sits beside it.</td>
+      <td>Thumbnail image URL. The title is used as its alt text.</td>
     </tr>
     <tr>
       <td>
@@ -47,6 +47,16 @@ import * as EntityLockupStories from "./EntityLockup.stories";
         <span className="sbdocs-required">required</span>
       </td>
       <td>Name of the entity.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>eyebrow</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>—</td>
+      <td>Short line above the title, e.g. a brand.</td>
     </tr>
     <tr>
       <td>

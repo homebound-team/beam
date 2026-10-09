@@ -1,9 +1,11 @@
 import type { Meta } from "@storybook/react-vite";
+import { useState } from "react";
 import { EntityLockup } from "src/components/EntityLockup";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
+import { Checkbox } from "src/inputs/Checkbox";
 import { LabeledExamples } from "src/utils/sb";
 import { action } from "storybook/actions";
 
@@ -73,6 +75,14 @@ export function Examples() {
           ),
         },
         {
+          label: "With brand and checkbox",
+          children: (
+            <div css={Css.w100.maxwPx(720).$}>
+              <SelectableOption />
+            </div>
+          ),
+        },
+        {
           label: "Compact",
           children: <EntityLockup compact imgSrc="plan-exterior.png" title="Modern Tudor (B)" description="Exterior" />,
         },
@@ -105,6 +115,40 @@ export function Examples() {
         },
       ]}
     />
+  );
+}
+
+function SelectableOption() {
+  const [selected, setSelected] = useState(true);
+  // The checkbox is composed beside the lockup rather than passed into it.
+  return (
+    <div css={Css.df.aifs.gap2.$}>
+      <div css={Css.fs0.$}>
+        <Checkbox checkboxOnly label="Select Holiday Lighting" selected={selected} onChange={setSelected} />
+      </div>
+      <div css={Css.fg1.mw0.$}>
+        <EntityLockup
+          imgSrc="plan-exterior.png"
+          eyebrow="Lenox"
+          title="Holiday Lighting"
+          description={
+            <div css={Css.df.fdc.gap1.$}>
+              <span>Location: Whole House</span>
+              <span>
+                Adds two 110V outlets in exterior soffit overhangs which are switched at the front entry. Does not
+                include lights.
+              </span>
+            </div>
+          }
+          right={
+            <>
+              <Tag type="update" text="7 days to cutoff" />
+              <span css={Css.sm.gray900.$}>+ $10.00</span>
+            </>
+          }
+        />
+      </div>
+    </div>
   );
 }
 
