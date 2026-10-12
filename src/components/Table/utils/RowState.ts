@@ -153,21 +153,12 @@ export class RowState<R extends Kinded> {
     return this.selected;
   }
 
-  /** This row's share of `TableState.selectedRowCount`, see `GridDataRow.childrenCount`. */
-  get selectedRowCount(): number {
-    if (!this.isSelected || this.isReservedKind || this.isCountedByAncestor) return 0;
-    // A parent checked only through its children isn't a row itself
-    return this.row.childrenCount ?? (this.isParent ? 0 : 1);
-  }
-
-  /** Whether a selected ancestor's `childrenCount` already counts this row. */
-  private get isCountedByAncestor(): boolean {
-    // A server-filtered row is no longer in its parent's count
-    if (this.removed === "soft") return false;
-    for (let parent = this.parent; parent; parent = parent.parent) {
-      if (parent.isSelected && parent.row.childrenCount !== undefined) return true;
-    }
-    return false;
+  /** This row's share of `TableState.selectedLeafRowCount`, see `GridDataRow.childrenCount`. */
+  get selectedLeafRowCount(): number {
+    if (this.isReservedKind || !this.selected) return 0;
+    // Loaded children count themselves; a lazy group's placeholder child isn't selectable
+    if (this.children?.some((c) => c.row.selectable !== false)) return 0;
+    return this.row.childrenCount ?? 1;
   }
 
   /** The UI state for checked/unchecked + "partially checked" for parents. */

@@ -150,12 +150,6 @@ function GridTableLayoutComponent<
 
   const visibleColumnsStorageKey = layoutState?.persistedColumnsStorageKey;
 
-  const selectedRowCount = useComputed(
-    () => (selectionSummary ? api.getSelectedRowCount() : 0),
-    [api, selectionSummary],
-  );
-  const clearSelections = useCallback(() => api.clearSelections(), [api]);
-
   const filterSearchProps = useMemo(
     () => (layoutState?.search ? { onSearch: layoutState.setSearchString } : undefined),
     [layoutState?.search, layoutState?.setSearchString],
@@ -190,8 +184,7 @@ function GridTableLayoutComponent<
       clearFilters={clearFilters}
       searchApi={searchApiRef}
       actions={actions}
-      selectedRowCount={selectedRowCount}
-      onClearSelections={selectionSummary ? clearSelections : undefined}
+      selectionSummary={selectionSummary}
     />
   );
 

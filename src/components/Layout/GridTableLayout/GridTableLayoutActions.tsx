@@ -14,6 +14,7 @@ import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn, Kinded } from "src/components/Table/types";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useComputed } from "src/hooks/useComputed";
 import { TextField } from "src/inputs/TextField";
 import type { Value } from "src/inputs/Value";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
@@ -53,10 +54,8 @@ type GridTableLayoutActionsProps<
   clearFilters?: () => void;
   searchApi?: MutableRefObject<SearchBoxApi | undefined>;
   actions?: HeaderAction[];
-  /** Shows the selection summary pill when above zero. */
-  selectedRowCount?: number;
-  /** Opts into the selection summary pill. */
-  onClearSelections?: VoidFunction;
+  /** Shows the selection summary pill while any rows are selected. */
+  selectionSummary?: boolean;
 };
 
 function GridTableLayoutActionsComponent<
@@ -79,8 +78,7 @@ function GridTableLayoutActionsComponent<
     clearFilters,
     searchApi,
     actions,
-    selectedRowCount = 0,
-    onClearSelections,
+    selectionSummary = false,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
   // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
@@ -104,9 +102,12 @@ function GridTableLayoutActionsComponent<
       if (!inModal) setQueryParams({ search: value || undefined }, "replaceIn");
     }
   }, 300);
+  const selectedRowCount = useComputed(
+    () => (selectionSummary && api ? api.getSelectedLeafRowCount() : 0),
+    [api, selectionSummary],
+  );
 
   const hasSearch = !!searchProps;
-  const hasSelectionSummary = !!onClearSelections;
   const filterCount = Object.keys(filterDefs ?? {}).length;
   const hasGroupBy = !!groupBy;
   const controlCount = filterCount + (hasGroupBy ? 1 : 0);
@@ -153,7 +154,7 @@ function GridTableLayoutActionsComponent<
       <div
         css={{
           // Holds the row at the 40px button height, so a pill alone in it doesn't shift the table when it appears
-          ...Css.df.gap1.jcsb.if(hasSelectionSummary).mhPx(40).$,
+          ...Css.df.gap1.jcsb.if(selectionSummary).mhPx(40).$,
           ...(withPagePadding ? pageContentPaddingX : undefined),
         }}
         {...testId.toolbar}
@@ -215,11 +216,11 @@ function GridTableLayoutActionsComponent<
         </div>
         {(hasHideableColumns || withCardView || !!actions?.length || selectedRowCount > 0) && (
           <div css={Css.df.aic.gapPx(12).$}>
-            {selectedRowCount > 0 && onClearSelections && (
+            {selectedRowCount > 0 && api && (
               <SelectionSummaryPill
                 text={`${selectedRowCount} ${pluralize(selectedRowCount, "Row")} Selected`}
                 count={selectedRowCount}
-                onClick={onClearSelections}
+                onClick={() => api.clearSelections()}
                 numberOnly={sm}
               />
             )}

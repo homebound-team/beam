@@ -49,8 +49,8 @@ export type GridTableApi<R extends Kinded> = {
   getSelectedRows(): GridDataRow<R>[];
   /** Returns the currently-selected rows of the given `kind`. */
   getSelectedRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
-  /** Returns how many rows are selected; see `GridDataRow.childrenCount`. */
-  getSelectedRowCount(): number;
+  /** Returns how many leaf rows are selected; see `GridDataRow.childrenCount`. */
+  getSelectedLeafRowCount(): number;
   /** Set selected state of a row by id. */
   selectRow(id: string, selected?: boolean): void;
   /** De-selects all selected rows. */
@@ -170,8 +170,8 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     return this.tableState.selectedRows.filter((rs) => !kind || rs.kind === kind).map((rs) => rs.row);
   }
 
-  public getSelectedRowCount(): number {
-    return this.tableState.selectedRowCount;
+  public getSelectedLeafRowCount(): number {
+    return this.tableState.selectedLeafRowCount;
   }
 
   // The `any` is not great, but getting the overload to handle the optional kind is annoying
@@ -194,7 +194,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   public clearSelections(id?: string) {
-    this.tableState.clearSelections();
+    this.tableState.selectRow("header", false);
   }
 
   public setActiveRowId(id: string | undefined) {

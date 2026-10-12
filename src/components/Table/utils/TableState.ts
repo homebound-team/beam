@@ -225,9 +225,9 @@ export class TableState<R extends Kinded> {
     return this.rowStates.allStates.filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind));
   }
 
-  /** How many rows are selected, for `GridTableLayout`'s selection summary; see `GridDataRow.childrenCount`. */
-  get selectedRowCount(): number {
-    return this.rowStates.allStates.reduce((sum, rs) => sum + rs.selectedRowCount, 0);
+  /** How many leaf rows are selected, for `GridTableLayout`'s selection summary; see `GridDataRow.childrenCount`. */
+  get selectedLeafRowCount(): number {
+    return this.rowStates.allStates.reduce((sum, rs) => sum + rs.selectedLeafRowCount, 0);
   }
 
   /** Returns kept group row, with the latest kept children, if any. */
@@ -249,11 +249,6 @@ export class TableState<R extends Kinded> {
 
   selectRow(id: string, selected: boolean): void {
     this.rowStates.get(id).select(selected);
-  }
-
-  /** Deselects every row, unlike unchecking the header. */
-  clearSelections(): void {
-    for (const rs of this.rowStates.allStates) rs.selected = false;
   }
 
   get collapsedIds(): string[] {
