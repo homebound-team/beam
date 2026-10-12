@@ -74,19 +74,18 @@ export function WithDraggableChildSections() {
   );
 }
 
-/** A checkbox child that opts into an add-on, alongside plain children. */
-export function WithCheckboxChildSections() {
+/** A `toggle` child opts into an add-on with its own boolean field, alongside plain children. */
+export function WithToggleChildSection() {
   const formState = useMemo(() => createObjectState(selectionConfig, { addWasherDryer: true }), []);
   return (
     <FormSection
       title="Whole House"
       childSections={[
-        { id: "flooring", title: "Flooring", fields: <PlaceholderFields count={2} /> },
+        { title: "Flooring", fields: <PlaceholderFields count={2} /> },
         {
-          id: "washerDryer",
           title: "Add Washer and Dryer",
           description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
-          selectedField: formState.addWasherDryer,
+          selection: { mode: "toggle", field: formState.addWasherDryer },
           tag: { text: "7 days to cutoff", type: "warning" },
           fields: <PlaceholderFields count={2} />,
         },
@@ -95,19 +94,19 @@ export function WithCheckboxChildSections() {
   );
 }
 
-/** `selectedChildField` turns the childSections into a single radio group; the field holds the selected child's `id`. */
-export function WithRadioChildSections() {
-  const formState = useMemo(() => createObjectState(selectionConfig, { applianceId: "topLoad" }), []);
+/** A `single` selection renders a radio on every child; the field holds the selected child's `value`. */
+export function WithSingleSelection() {
+  const formState = useMemo(() => createObjectState(selectionConfig, { applianceTypeId: "topLoad" }), []);
   return (
     <FormSection
-      title="Washer and Dryer"
-      selectedChildField={formState.applianceId}
+      title="Washer and Dryer Type"
+      selection={{ mode: "single", field: formState.applianceTypeId }}
       childSections={[
-        { id: "frontLoad", title: "Front Load Washer and Dryer", fields: <PlaceholderFields count={1} /> },
-        { id: "topLoad", title: "Top Load Washer and Dryer", fields: <PlaceholderFields count={1} /> },
+        { value: "frontLoad", title: "Front Load", fields: <PlaceholderFields count={1} /> },
+        { value: "topLoad", title: "Top Load", fields: <PlaceholderFields count={1} /> },
         {
-          id: "stacked",
-          title: "Stacked Washer and Dryer",
+          value: "stacked",
+          title: "Stacked",
           fields: <PlaceholderFields count={1} />,
           tag: { text: "7 days to cutoff", type: "warning" },
         },
@@ -116,10 +115,30 @@ export function WithRadioChildSections() {
   );
 }
 
-type SelectionInput = { addWasherDryer?: boolean | null; applianceId?: string | null };
+/** A `multiple` selection renders a checkbox on every child; the field holds the selected children's `value`s. */
+export function WithMultipleSelection() {
+  const formState = useMemo(() => createObjectState(selectionConfig, { applianceIds: ["washer"] }), []);
+  return (
+    <FormSection
+      title="Included Appliances"
+      selection={{ mode: "multiple", field: formState.applianceIds }}
+      childSections={[
+        { value: "washer", title: "Washer", fields: <PlaceholderFields count={1} /> },
+        { value: "dryer", title: "Dryer", fields: <PlaceholderFields count={1} /> },
+      ]}
+    />
+  );
+}
+
+type SelectionInput = {
+  addWasherDryer?: boolean | null;
+  applianceTypeId?: string | null;
+  applianceIds?: string[] | null;
+};
 const selectionConfig: ObjectConfig<SelectionInput> = {
   addWasherDryer: { type: "value" },
-  applianceId: { type: "value" },
+  applianceTypeId: { type: "value" },
+  applianceIds: { type: "value" },
 };
 
 type OrderInput = { order?: number | null };
