@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
 import { Carousel } from "src/components/Carousel";
-import { Css } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { FormLines } from "src/forms/FormLines";
 import {
   radioChecked,
@@ -13,6 +13,7 @@ import {
   radioUnchecked,
 } from "src/inputs/internal/radioStyles";
 import { RadioGroupField } from "src/inputs/RadioGroupField";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { action } from "storybook/actions";
 
 export default {
@@ -413,6 +414,69 @@ export function ThumbnailLayout() {
             options={finishes}
           />
         </Carousel>
+      </div>
+    </FormLines>
+  );
+}
+
+export function CustomOptionRows() {
+  const packages = [
+    {
+      value: "front",
+      label: "Front Load Washer and Dryer",
+      price: "+ $10.00",
+      images: ["fridge.jpeg", "fridge2.jpeg"],
+    },
+    { value: "top", label: "Top Load Washer and Dryer", price: "+ $10.00", images: ["disposal.png", "fireplace.jpeg"] },
+    {
+      value: "stacked",
+      label: "Stacked Washer and Dryer",
+      price: "+ $25.00",
+      images: ["counter-top.jpeg"],
+      disabled: "Doesn't fit the laundry room",
+    },
+  ];
+  const [value, setValue] = useState<string | undefined>("top");
+  return (
+    <FormLines width="full" gap={5}>
+      <div css={Css.wPx(720).maxw100.$}>
+        <RadioGroupField
+          label="Washer and Dryer"
+          labelStyle="hidden"
+          value={value}
+          onChange={setValue}
+          options={packages}
+          renderOption={({ label, price, images }, radioProps) => {
+            const { isDisabled = false } = radioProps;
+            return (
+              <label
+                css={
+                  Css.df.fdc.gap2.py2.bb
+                    .bc(Tokens.FieldBorderDefault)
+                    .cursorPointer.if(isDisabled)
+                    .cursorNotAllowed.color(Tokens.TextDisabled).$
+                }
+              >
+                {/* Spans, b/c a `<div>` isn't valid HTML inside a `<label>`. */}
+                <span css={Css.df.aic.gap1.$}>
+                  <StyledRadio {...radioProps} />
+                  <span css={Css.fg1.mdSb.$}>{label}</span>
+                  <span css={Css.md.$}>{price}</span>
+                </span>
+                <span css={Css.df.gap2.ml3.$}>
+                  {images.map((src) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt=""
+                      css={Css.sqPx(96).p1.br8.ba.bc(Tokens.FieldBorderDefault).objectContain.if(isDisabled).o50.$}
+                    />
+                  ))}
+                </span>
+              </label>
+            );
+          }}
+        />
       </div>
     </FormLines>
   );
