@@ -87,6 +87,32 @@ export function Examples() {
           children: <EntityLockup compact imgSrc="plan-exterior.png" title="Modern Tudor (B)" description="Exterior" />,
         },
         {
+          label: "Compact by width (400px or less)",
+          children: (
+            <div css={Css.w100.maxwPx(332).$}>
+              <EntityLockup
+                imgSrc="plan-exterior.png"
+                title="Modern Tudor (B)"
+                description={
+                  <span css={Css.df.aic.gapPx(4).$}>
+                    <Icon icon="refresh" inc={2} color={Palette.Blue600} />
+                    Exterior
+                  </span>
+                }
+                right={
+                  <>
+                    <div css={Css.df.aic.gap1.$}>
+                      <span css={Css.sm.gray900.$}>$10.00</span>
+                      <IconButton icon="x" label="Remove" onClick={action("remove")} />
+                    </div>
+                    <Tag type="update" text="7 days to cutoff" />
+                  </>
+                }
+              />
+            </div>
+          ),
+        },
+        {
           label: "Compact sidebar row",
           children: (
             <div css={Css.w100.maxwPx(332).$}>
