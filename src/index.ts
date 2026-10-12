@@ -342,6 +342,7 @@ export * from "./inputs/MultiSelectField";
 export * from "./inputs/NumberField";
 export * from "./inputs/RichTextField";
 export * from "./inputs/SelectField";
+export * from "./inputs/StyledRadio";
 export * from "./inputs/Switch";
 export * from "./inputs/TextAreaField";
 export * from "./inputs/TextField";
