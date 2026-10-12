@@ -225,7 +225,7 @@ export class TableState<R extends Kinded> {
     return this.rowStates.allStates.filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind));
   }
 
-  /** How many rows are selected, for `GridTableLayout`'s selection summary; see `GridDataRow.selectionCount`. */
+  /** How many rows are selected, for `GridTableLayout`'s selection summary; see `GridDataRow.childrenCount`. */
   get selectedRowCount(): number {
     return this.rowStates.allStates.reduce((sum, rs) => sum + rs.selectedRowCount, 0);
   }

@@ -6,7 +6,7 @@ describe("SelectionSummaryPill", () => {
   it("renders the text and Clear on one button", async () => {
     // Given a selection summary pill
     // When rendered
-    const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={() => {}} />);
+    const r = await render(<SelectionSummaryPill text="3 Rows Selected" count={3} onClick={() => {}} />);
     // Then the text and Clear are on the button, and screen readers hear the action first
     expect(r.selectionSummaryPill.tagName).toBe("BUTTON");
     expect(r.selectionSummaryPill).toHaveTextContent("3 Rows Selected");
@@ -14,10 +14,10 @@ describe("SelectionSummaryPill", () => {
     expect(r.selectionSummaryPill).toHaveAccessibleName("Clear 3 Rows Selected");
   });
 
-  it("shows just the count and an × when compact, keeping the text as its name", async () => {
-    // Given a compact selection summary pill
+  it("shows just the count and an × when numberOnly, keeping the text as its name", async () => {
+    // Given a number-only selection summary pill
     // When rendered
-    const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={() => {}} compactCount={3} />);
+    const r = await render(<SelectionSummaryPill text="3 Rows Selected" count={3} onClick={() => {}} numberOnly />);
     // Then only the count shows beside the ×, and screen readers still hear the full summary
     expect(r.selectionSummaryPill.textContent).toBe("3");
     expect(r.selectionSummaryPill_clear).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe("SelectionSummaryPill", () => {
   it("calls onClick when the pill is clicked", async () => {
     // Given a selection summary pill with an onClick handler
     const onClick = vi.fn();
-    const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={onClick} />);
+    const r = await render(<SelectionSummaryPill text="3 Rows Selected" count={3} onClick={onClick} />);
     // When the pill is clicked
     click(r.selectionSummaryPill);
     // Then onClick is called
@@ -37,7 +37,7 @@ describe("SelectionSummaryPill", () => {
   it("ignores clicks when disabled", async () => {
     // Given a disabled selection summary pill
     const onClick = vi.fn();
-    const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={onClick} disabled />);
+    const r = await render(<SelectionSummaryPill text="3 Rows Selected" count={3} onClick={onClick} disabled />);
     // When the pill is clicked
     click(r.selectionSummaryPill);
     // Then onClick is not called and there is no tooltip
@@ -49,7 +49,9 @@ describe("SelectionSummaryPill", () => {
   it("shows the disabled reason in a tooltip", async () => {
     // Given a selection summary pill disabled with a reason
     const onClick = vi.fn();
-    const r = await render(<SelectionSummaryPill text="3 Rows Selected" onClick={onClick} disabled="Locked" />);
+    const r = await render(
+      <SelectionSummaryPill text="3 Rows Selected" count={3} onClick={onClick} disabled="Locked" />,
+    );
     // Then the pill is disabled and the reason is on the tooltip
     expect(r.selectionSummaryPill).toBeDisabled();
     expect(r.tooltip).toHaveAttribute("title", "Locked");

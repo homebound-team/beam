@@ -20,31 +20,42 @@ export const Examples = newStory(
       examples={[
         {
           label: "Default",
-          children: <SelectionSummaryPill text="3 Rows Selected" onClick={action("onClick")} />,
+          children: <SelectionSummaryPill text="3 Rows Selected" count={3} onClick={action("onClick")} />,
         },
         {
           label: "Hovered",
           children: (
-            <SelectionSummaryPill text="3 Rows Selected" onClick={action("onClick")} __storyState={{ hovered: true }} />
+            <SelectionSummaryPill
+              text="3 Rows Selected"
+              count={3}
+              onClick={action("onClick")}
+              __storyState={{ hovered: true }}
+            />
           ),
         },
         {
           label: "Disabled",
           children: (
-            <SelectionSummaryPill text="3 Rows Selected" onClick={action("onClick")} disabled="Selections are locked" />
+            <SelectionSummaryPill
+              text="3 Rows Selected"
+              count={3}
+              onClick={action("onClick")}
+              disabled="Selections are locked"
+            />
           ),
         },
         {
-          label: "Compact",
-          children: <SelectionSummaryPill text="3 Rows Selected" onClick={action("onClick")} compactCount={3} />,
+          label: "Number only",
+          children: <SelectionSummaryPill text="3 Rows Selected" count={3} onClick={action("onClick")} numberOnly />,
         },
         {
-          label: "Compact hovered",
+          label: "Number only hovered",
           children: (
             <SelectionSummaryPill
               text="3 Rows Selected"
+              count={3}
               onClick={action("onClick")}
-              compactCount={3}
+              numberOnly
               __storyState={{ hovered: true }}
             />
           ),

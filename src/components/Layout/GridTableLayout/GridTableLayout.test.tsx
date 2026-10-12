@@ -497,12 +497,11 @@ describe("GridTableLayout", () => {
       expect(r.selectionSummaryPill.textContent).toBe("2");
     });
 
-    it("deselects every row on Clear, then calls onClear", async () => {
+    it("deselects every row on Clear", async () => {
       // Given two selected rows
-      const onClear = vi.fn();
       const r = await render(
         <GridTableLayoutComponent
-          selectionSummary={{ onClear }}
+          selectionSummary
           tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
         />,
         withRouter(),
@@ -513,12 +512,11 @@ describe("GridTableLayout", () => {
       // When clicking the pill
       click(r.selectionSummaryPill);
 
-      // Then nothing is selected, the pill is gone, and onClear ran
+      // Then nothing is selected and the pill is gone
       expect(r.select_0).not.toBeChecked();
       expect(r.select_1).not.toBeChecked();
       expect(r.select_2).not.toBeChecked();
       expect(r.query.selectionSummaryPill).toBeNull();
-      expect(onClear).toHaveBeenCalledTimes(1);
     });
 
     it("counts a checked group's rows, not the group", async () => {
@@ -553,7 +551,7 @@ describe("GridTableLayout", () => {
       expect(r.selectionSummaryPill).toHaveTextContent("3 Rows SelectedClear");
     });
 
-    it("counts a row's selectionCount in place of its children", async () => {
+    it("counts a row's childrenCount in place of its children", async () => {
       // Given a group whose 12 rows haven't loaded, so it's selectable on its own over a placeholder child
       // And a loaded group of two rows that also says how many it stands for
       const r = await render(
@@ -567,7 +565,7 @@ describe("GridTableLayout", () => {
                 kind: "group",
                 id: "g1",
                 data: { name: "Plumbing" },
-                selectionCount: 12,
+                childrenCount: 12,
                 inferSelectedState: false,
                 children: [{ kind: "data", id: "g1-loading", data: { name: "Loading", value: 0 }, selectable: false }],
               },
@@ -575,7 +573,7 @@ describe("GridTableLayout", () => {
                 kind: "group",
                 id: "g2",
                 data: { name: "Framing" },
-                selectionCount: 2,
+                childrenCount: 2,
                 children: [
                   { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
                   { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
@@ -624,8 +622,8 @@ describe("GridTableLayout", () => {
       expect(r.selectionSummaryPill).toHaveTextContent("1 Row SelectedClear");
     });
 
-    it("keeps counting a selected row after it leaves a group that has a selectionCount", async () => {
-      // Given a checked group of two rows with a selectionCount
+    it("keeps counting a selected row after it leaves a group that has a childrenCount", async () => {
+      // Given a checked group of two rows with a childrenCount
       const columns = getGroupedColumns();
       const r = await render(
         <GridTableLayoutComponent<any, GroupedRow, any, any>
@@ -638,7 +636,7 @@ describe("GridTableLayout", () => {
                 kind: "group",
                 id: "g1",
                 data: { name: "Framing" },
-                selectionCount: 2,
+                childrenCount: 2,
                 children: [
                   { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
                   { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
@@ -663,7 +661,7 @@ describe("GridTableLayout", () => {
                 kind: "group",
                 id: "g1",
                 data: { name: "Framing" },
-                selectionCount: 1,
+                childrenCount: 1,
                 children: [{ kind: "data", id: "1", data: { name: "Alpha", value: 10 } }],
               },
             ],

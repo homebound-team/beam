@@ -38,6 +38,20 @@ import * as SelectionSummaryPillStories from "./SelectionSummaryPill.stories";
     </tr>
     <tr>
       <td>
+        <code>count</code>
+      </td>
+      <td>
+        <code>number</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>
+        How many are selected, shown alone when <code>numberOnly</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
         <code>onClick</code>
       </td>
       <td>
@@ -62,16 +76,16 @@ import * as SelectionSummaryPillStories from "./SelectionSummaryPill.stories";
     </tr>
     <tr>
       <td>
-        <code>compactCount</code>
+        <code>numberOnly</code>
       </td>
       <td>
-        <code>number</code>
+        <code>boolean</code>
       </td>
       <td>
-        <code>undefined</code>
+        <code>false</code>
       </td>
       <td>
-        Shows just this count and an × instead of the text, e.g. on small screens. <code>text</code> stays the
+        Shows just <code>count</code> and an × instead of the text, e.g. on small screens. <code>text</code> stays the
         accessible name.
       </td>
     </tr>

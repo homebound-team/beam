@@ -153,19 +153,19 @@ export class RowState<R extends Kinded> {
     return this.selected;
   }
 
-  /** This row's share of `TableState.selectedRowCount`, see `GridDataRow.selectionCount`. */
+  /** This row's share of `TableState.selectedRowCount`, see `GridDataRow.childrenCount`. */
   get selectedRowCount(): number {
     if (!this.isSelected || this.isReservedKind || this.isCountedByAncestor) return 0;
     // A parent checked only through its children isn't a row itself
-    return this.row.selectionCount ?? (this.isParent ? 0 : 1);
+    return this.row.childrenCount ?? (this.isParent ? 0 : 1);
   }
 
-  /** Whether a selected ancestor's `selectionCount` already counts this row. */
+  /** Whether a selected ancestor's `childrenCount` already counts this row. */
   private get isCountedByAncestor(): boolean {
     // A server-filtered row is no longer in its parent's count
     if (this.removed === "soft") return false;
     for (let parent = this.parent; parent; parent = parent.parent) {
-      if (parent.isSelected && parent.row.selectionCount !== undefined) return true;
+      if (parent.isSelected && parent.row.childrenCount !== undefined) return true;
     }
     return false;
   }

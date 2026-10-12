@@ -8,18 +8,20 @@ import { useTestIds } from "src/utils/useTestIds";
 
 type SelectionSummaryPillProps = {
   text: string;
+  /** How many are selected, shown alone when `numberOnly`. */
+  count: number;
   onClick: () => void;
   /** If a ReactNode, that reason is shown in a tooltip. */
   disabled?: boolean | ReactNode;
-  /** Shows just this count and an × instead of the text, e.g. on small screens. `text` stays the accessible name. */
-  compactCount?: number;
+  /** Shows just `count` and an × instead of the text, e.g. on small screens. `text` stays the accessible name. */
+  numberOnly?: boolean;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
   __storyState?: { hovered?: boolean };
 };
 
 /** Summarizes a group of selections, e.g. "3 Rows Selected". The whole pill is the button that clears them. */
 export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
-  const { text, onClick, disabled = false, compactCount, __storyState } = props;
+  const { text, count, onClick, disabled = false, numberOnly = false, __storyState } = props;
   const tid = useTestIds(props, "selectionSummaryPill");
   const { hoverProps, isHovered: isHoveredFromEvents } = useHover({ isDisabled: !!disabled });
   const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
@@ -33,13 +35,13 @@ export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
         disabled={!!disabled}
         onClick={onClick}
         aria-label={`Clear ${text}`}
-        css={pillStyles(!!disabled, isHovered, compactCount !== undefined)}
+        css={pillStyles(!!disabled, isHovered, numberOnly)}
         {...hoverProps}
         {...tid}
       >
-        {compactCount !== undefined ? (
+        {numberOnly ? (
           <>
-            <CountBadge count={compactCount} bgColor={disabled ? Palette.Gray400 : Palette.Blue600} {...tid.count} />
+            <CountBadge count={count} bgColor={disabled ? Palette.Gray400 : Palette.Blue600} {...tid.count} />
             <span css={Css.df.fs0.$} {...tid.clear}>
               <Icon icon="x" color={disabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900} />
             </span>
@@ -58,10 +60,10 @@ export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
 }
 
 /** Figma draws the border inside the box, so the padding gives up 1px to it. */
-function pillStyles(disabled: boolean, hovered: boolean, compact: boolean) {
-  // Compact: Figma pads 4px more on the left
+function pillStyles(disabled: boolean, hovered: boolean, numberOnly: boolean) {
+  // Number only: Figma pads 4px more on the left
   return Css.smSb.dif.aic.gap1.wsnw.ba.brPill
-    .plPx(compact ? 19 : 15)
+    .plPx(numberOnly ? 19 : 15)
     .prPx(15)
     .pyPx(7)
     .bc(Tokens.SurfaceActiveBorder)

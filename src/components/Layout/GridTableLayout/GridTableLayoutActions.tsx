@@ -152,7 +152,7 @@ function GridTableLayoutActionsComponent<
     <div css={Css.df.fdc.gap1.pt3.pb2.if(view === "card").pb3.$}>
       <div
         css={{
-          // Holds the pill's row open at the toolbar's 40px button height
+          // Holds the row at the 40px button height, so a pill alone in it doesn't shift the table when it appears
           ...Css.df.gap1.jcsb.if(hasSelectionSummary).mhPx(40).$,
           ...(withPagePadding ? pageContentPaddingX : undefined),
         }}
@@ -218,8 +218,9 @@ function GridTableLayoutActionsComponent<
             {selectedRowCount > 0 && onClearSelections && (
               <SelectionSummaryPill
                 text={`${selectedRowCount} ${pluralize(selectedRowCount, "Row")} Selected`}
+                count={selectedRowCount}
                 onClick={onClearSelections}
-                compactCount={sm ? selectedRowCount : undefined}
+                numberOnly={sm}
               />
             )}
             {hasHideableColumns && view === "list" && columns && api && (
