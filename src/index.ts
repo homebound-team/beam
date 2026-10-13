@@ -315,9 +315,13 @@ export * from "./forms/FormLines";
 export * from "./forms/StaticField";
 export * from "./forms/SubmitButton";
 export { FormSection } from "./forms/FormSection/FormSection";
-export type { FormSectionAction, FormSectionProps } from "./forms/FormSection/FormSection";
+export type { FormSectionAction, FormSectionProps, FormSectionSelection } from "./forms/FormSection/FormSection";
 export { FormSectionChild } from "./forms/FormSection/FormSectionChild";
-export type { PlainFormSectionChild, ReorderableFormSectionChild } from "./forms/FormSection/FormSectionChild";
+export type {
+  FormSectionChildSelection,
+  PlainFormSectionChild,
+  ReorderableFormSectionChild,
+} from "./forms/FormSection/FormSectionChild";
 // ./hooks
 export * from "./hooks/useBodyBackgroundColor";
 export * from "./hooks/useBreakpoint";
