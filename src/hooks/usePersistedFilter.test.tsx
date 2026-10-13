@@ -1,10 +1,12 @@
 import { withRouter } from "@homebound/rtl-react-router-utils";
 import { useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { booleanFilter } from "src/components/Filters/BooleanFilter";
 import { Filters } from "src/components/Filters/Filters";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import { type ProjectFilter, Stage, taskCompleteFilter, taskDueFilter } from "src/components/Filters/testDomain";
 import type { FilterDefs } from "src/components/Filters/types";
+import { ModalProvider } from "src/components/Modal/ModalContext";
 import { usePersistedFilter } from "src/hooks/usePersistedFilter";
 import { objectId } from "src/utils/objectId";
 import { click, render, wait } from "src/utils/rtl";
@@ -66,6 +68,41 @@ describe("usePersistedFilter", () => {
     expect(JSON.parse(r.filterIds.textContent!)).toEqual([firstId, firstId, firstId]);
   });
 
+  it("stores a modal filter in session storage without changing the page query", async () => {
+    // Given a page filter query param and no stored modal filter
+    sessionStorage.removeItem("modal-filter");
+    const r = await render(
+      <ModalProvider>
+        <ModalMemoryFilter />
+      </ModalProvider>,
+      withRouter(createFilterRoute({ stageSingle: "ONE" })),
+    );
+    // Then the modal filter ignores the page param
+    expect(r.applied).toHaveTextContent("{}");
+    expect(r.locationSearch).toHaveTextContent("ONE");
+    // When the filter changes
+    click(r.applyStage);
+    // Then it is stored, and the page query is unchanged
+    expect(r.applied).toHaveTextContent('{"stageSingle":"TWO"}');
+    expect(sessionStorage.getItem("modal-filter")).toContain("TWO");
+    expect(r.locationSearch).toHaveTextContent("ONE");
+    expect(r.locationSearch.textContent).not.toContain("TWO");
+  });
+
+  it("restores a modal filter from session storage instead of the page query", async () => {
+    // Given a stored filter that differs from the page query
+    sessionStorage.setItem("modal-filter", JSON.stringify({ stageSingle: "TWO" }));
+    const r = await render(
+      <ModalProvider>
+        <ModalMemoryFilter />
+      </ModalProvider>,
+      withRouter(createFilterRoute({ stageSingle: "ONE" })),
+    );
+    // Then the stored filter is applied and the page query is left alone
+    expect(r.applied).toHaveTextContent('{"stageSingle":"TWO"}');
+    expect(r.locationSearch).toHaveTextContent("ONE");
+  });
+
   it("rehydrates plain date strings for persisted date filters", async () => {
     const r = await render(
       <TestPage filterDefs={{ date: taskDueFilter }} />,
@@ -122,6 +159,29 @@ function StableFilterTestPage(props: { filterDefs: FilterDefs<ProjectFilter> }) 
       <div data-testid="filterIds">{JSON.stringify(filterIds.current)}</div>
     </div>
   );
+}
+
+function ModalMemoryFilter() {
+  const filterDefs = useMemo(() => ({ stageSingle: createStageFilter() }), []);
+  const { filter, setFilter } = usePersistedFilter<ProjectFilter>({ storageKey: "modal-filter", filterDefs });
+  const { search } = useLocation();
+  return (
+    <div>
+      <button data-testid="applyStage" onClick={() => setFilter({ stageSingle: Stage.StageTwo })}>
+        apply
+      </button>
+      <div data-testid="applied">{JSON.stringify(filter)}</div>
+      <div data-testid="locationSearch">{search}</div>
+    </div>
+  );
+}
+
+function createStageFilter(): FilterDefs<ProjectFilter>["stageSingle"] {
+  return singleFilter({
+    options: [{ stage: Stage.StageOne }, { stage: Stage.StageTwo }],
+    getOptionValue: (s) => s.stage,
+    getOptionLabel: (s) => (s.stage === Stage.StageOne ? "One" : "Two"),
+  });
 }
 
 function createFilterRoute(filter: unknown): string {

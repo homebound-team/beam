@@ -1,38 +1,33 @@
-import { useResizeObserver } from "@react-aria/utils";
-import React, { type RefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "src/components/Button";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
-import { ScrollableContent } from "src/components/Layout/ScrollableContent";
+import {
+  GridTableLayoutActions,
+  type SearchBoxApi,
+} from "src/components/Layout/GridTableLayout/GridTableLayoutActions";
+import { GridTableLayoutHost } from "src/components/Layout/GridTableLayout/GridTableLayoutHost";
+import { QueryTable, type QueryTableProps } from "src/components/Layout/GridTableLayout/QueryTable";
+import { useGridTableLayoutHost } from "src/components/Layout/GridTableLayout/useGridTableLayoutHost";
+import { usePersistedTableView } from "src/components/Layout/GridTableLayout/usePersistedTableView";
+import {
+  type BaseQueryTableProps,
+  type GridTablePropsWithRows,
+  isGridTableProps,
+} from "src/components/Layout/layoutTypes";
+import { resolveWithRightPaneOptions, type WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import type { GridTableEmptyStateProps } from "src/components/Table/GridTableEmptyState";
 import { type GridStyle, type GridStyleDef, isGridStyleDef } from "src/components/Table/TableStyles";
 import type { GridTableXss, Kinded } from "src/components/Table/types";
-import { Css, type Only, Tokens } from "src/Css";
+import type { Only } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { usePersistedFilter, type UsePersistedFilterProps } from "src/hooks/usePersistedFilter";
 import { useSessionStorage } from "src/hooks/useSessionStorage";
-import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
-import { selfTopSpaced } from "src/layouts/layoutSpacing";
-import {
-  beamTableActionsHeightVar,
-  documentScrollChromeLeft,
-  documentScrollChromeWidth,
-  documentScrollRightPaneContentMinCss,
-  stickyNavAndHeaderOffset,
-} from "src/layouts/layoutVars";
-import { noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
-import { zIndices } from "src/utils/zIndices";
-import { type BaseQueryTableProps, type GridTablePropsWithRows, isGridTableProps } from "../layoutTypes";
-import { DocumentScrollOverlayRightPaneLayout } from "../RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
-import { resolveWithRightPaneOptions, type WithRightPane } from "../RightPaneLayout/withRightPane";
-import { GridTableLayoutActions, type SearchBoxApi } from "./GridTableLayoutActions";
-import { QueryTable, type QueryTableProps } from "./QueryTable";
-import { usePersistedTableView } from "./usePersistedTableView";
 
 // GridTableLayout-specific query props extend the shared base with display extras.
 type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseQueryTableProps<
@@ -112,6 +107,8 @@ function GridTableLayoutComponent<
   const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const tid = useTestIds(props);
+  const host = useGridTableLayoutHost();
+  const includeColumnGutters = host.kind === "document-scroll" || host.kind === "modal";
   const columns = tableProps.columns;
 
   const hasHideableColumns = useMemo(() => {
@@ -137,10 +134,6 @@ function GridTableLayoutComponent<
   // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
   // (which only controls whether the list/card toggle is shown).
   const isVirtualized = tableProps.as === "virtual" || view === "card";
-  const inDocumentScrollLayout = useDocumentScrollLayout();
-  const tableActionsRef = useRef<HTMLDivElement>(null);
-  const tableWrapperRef = useRef<HTMLDivElement>(null);
-  useSetTableActionsHeight(tableWrapperRef, tableActionsRef, inDocumentScrollLayout && showTableActions);
 
   // Sync API changes back to persisted state when persistedColumns is provided
   const visibleColumnIds = useComputed(() => api.getVisibleColumnIds(), [api]);
@@ -206,7 +199,7 @@ function GridTableLayoutComponent<
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
-          columnGutter={inDocumentScrollLayout}
+          columnGutter={includeColumnGutters}
         />
       ) : (
         <QueryTable
@@ -219,56 +212,22 @@ function GridTableLayoutComponent<
           stickyHeader
           disableColumnResizing={false}
           visibleColumnsStorageKey={visibleColumnsStorageKey}
-          columnGutter={inDocumentScrollLayout}
+          columnGutter={includeColumnGutters}
         />
       )}
     </>
   );
 
-  const tableScrollContent = (
-    <>
-      {showTableActions && (
-        <div
-          ref={tableActionsRef}
-          css={
-            Css.if(inDocumentScrollLayout)
-              .transitionTop.sticky.top(stickyNavAndHeaderOffset())
-              .left(documentScrollChromeLeft())
-              .w(`min(100%, ${documentScrollChromeWidth()})`)
-              .z(zIndices.tableActions)
-              .bgColor(Tokens.Surface).$
-          }
-          {...tid.stickyContent}
-        >
-          {tableActionsEl}
-        </div>
-      )}
-      {inDocumentScrollLayout ? (
-        // Scope the pane to the table only — actions stay outside so they remain full-bleed sticky chrome.
-        rightPane ? (
-          <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>
-            {/* Content floor while the pane is open — tables are not a CenteredLayout shell. */}
-            <div css={Css.mw(documentScrollRightPaneContentMinCss()).$}>{tableBody}</div>
-          </DocumentScrollOverlayRightPaneLayout>
-        ) : (
-          tableBody
-        )
-      ) : (
-        <ScrollableContent virtualized={isVirtualized}>{tableBody}</ScrollableContent>
-      )}
-    </>
-  );
-
   return (
-    /* Wrapper sets --beam-table-actions-height so sticky headers / the pane can read it. */
-    <div
-      ref={tableWrapperRef}
-      css={inDocumentScrollLayout ? Css.df.fdc.wfc.mw100.$ : Css.df.fdc.$}
-      {...(showTableActions ? selfTopSpaced : {})}
-      {...tid.tableWrapper}
+    <GridTableLayoutHost
+      host={host}
+      actions={showTableActions ? tableActionsEl : undefined}
+      rightPane={rightPane}
+      isVirtualized={isVirtualized}
+      testIds={tid}
     >
-      {tableScrollContent}
-    </div>
+      {tableBody}
+    </GridTableLayoutHost>
   );
 }
 
@@ -366,38 +325,4 @@ function composeEmptyState<F extends Record<string, unknown>, R extends Kinded, 
         <Button label="Clear Filters" variant="tertiary" onClick={clearFilters} data-testid="clearFilters" />
       ) : undefined),
   };
-}
-
-/** Sets `--beam-table-actions-height` on the table wrapper so the sticky header can read it without re-rendering children. */
-function useSetTableActionsHeight(
-  tableWrapperRef: RefObject<HTMLElement | null>,
-  tableActionsRef: RefObject<HTMLElement | null>,
-  enabled: boolean,
-) {
-  const syncHeightVar = useCallback(() => {
-    const tableWrapper = tableWrapperRef.current;
-    if (!tableWrapper) return;
-
-    if (!enabled) {
-      tableWrapper.style.removeProperty(beamTableActionsHeightVar);
-      return;
-    }
-
-    const height = tableActionsRef.current ? Math.round(tableActionsRef.current.getBoundingClientRect().height) : 0;
-
-    if (height > 0) {
-      tableWrapper.style.setProperty(beamTableActionsHeightVar, `${height}px`);
-    } else {
-      tableWrapper.style.removeProperty(beamTableActionsHeightVar);
-    }
-  }, [enabled, tableActionsRef, tableWrapperRef]);
-
-  useResizeObserver({ ref: tableActionsRef, onResize: enabled ? syncHeightVar : noop });
-  useLayoutEffect(() => {
-    syncHeightVar();
-    const tableWrapper = tableWrapperRef.current;
-    return () => {
-      tableWrapper?.style.removeProperty(beamTableActionsHeightVar);
-    };
-  }, [tableWrapperRef, syncHeightVar]);
 }

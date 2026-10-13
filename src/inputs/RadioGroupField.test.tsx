@@ -1,5 +1,8 @@
-import { RadioGroupField } from "src/inputs/RadioGroupField";
+import { useState } from "react";
+import { type RadioFieldOption, RadioGroupField } from "src/inputs/RadioGroupField";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { click, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("RadioGroupField", () => {
   it("has data-testids for its options", async () => {
@@ -112,5 +115,140 @@ describe("RadioGroupField", () => {
     // The flex container that wraps the option labels uses row direction.
     const optionsContainer = r.container.querySelector(`[data-testid="favoriteCheese_a"]`)!.closest("div")!;
     expect(optionsContainer).toHaveStyle({ "flex-direction": "row" });
+  });
+
+  describe("thumbnail layout", () => {
+    const finishes: RadioFieldOption<string>[] = [
+      { value: "chrome", label: "Chrome", imgSrc: "chrome.png" },
+      { value: "black", label: "Matte Black", imgSrc: "black.png" },
+      { value: "gold", label: "Gold", imgSrc: "gold.png", disabled: "Out of stock" },
+    ];
+
+    function TestThumbnails(props: { onChange?: (value: string) => void }) {
+      const [value, setValue] = useState<string | undefined>("chrome");
+      return (
+        <RadioGroupField
+          label="Finish"
+          layout="thumbnail"
+          value={value}
+          onChange={(v) => {
+            setValue(v);
+            props.onChange?.(v);
+          }}
+          options={finishes}
+        />
+      );
+    }
+
+    it("renders each option as a labelled radio with its image", async () => {
+      // When rendering a thumbnail group
+      const r = await render(<TestThumbnails />);
+      // Then each input is a radio named by its option label, since the thumbnail has no visible text
+      expect(r.finish_chrome).toHaveAttribute("type", "radio");
+      expect(r.finish_chrome).toHaveAccessibleName("Chrome");
+      expect(r.finish_black).toHaveAccessibleName("Matte Black");
+      // And each thumbnail shows its image
+      expect(r.finish_chrome.closest("label")!.querySelector("img")).toHaveAttribute("src", "chrome.png");
+    });
+
+    it("selects an option when its thumbnail is clicked", async () => {
+      // Given a thumbnail group with the first option selected
+      const onChange = vi.fn();
+      const r = await render(<TestThumbnails onChange={onChange} />);
+      expect(r.finish_chrome).toBeChecked();
+      // When clicking another thumbnail
+      click(r.finish_black);
+      // Then it becomes the selected option
+      expect(onChange).toHaveBeenCalledWith("black");
+      expect(r.finish_black).toBeChecked();
+      expect(r.finish_chrome).not.toBeChecked();
+      expect(r.finish_black.closest("label")).toHaveAttribute("data-selected", "true");
+      // And only the selected thumbnail gets the selected border (jsdom can't resolve token vars, so check the var itself)
+      expect(r.finish_black.closest("label")!.style.getPropertyValue("--borderColor")).toBe("var(--b-primary)");
+      expect(r.finish_chrome.closest("label")!.style.getPropertyValue("--borderColor")).toBe(
+        "var(--b-field-border-default)",
+      );
+    });
+
+    it("shows the option label as a tooltip, unless there's a disabled reason", async () => {
+      // When rendering a thumbnail group with a disabled option
+      const r = await render(<TestThumbnails />);
+      // Then the disabled option's input is disabled
+      expect(r.finish_gold).toBeDisabled();
+      // And the tooltips show the label for enabled options, and the reason for the disabled one
+      const titles = Array.from(r.container.querySelectorAll(`[data-testid="tooltip"]`)).map((t) =>
+        t.getAttribute("title"),
+      );
+      expect(titles).toEqual(["Chrome", "Matte Black", "Out of stock"]);
+    });
+
+    it("doesn't show a disabled option as selected", async () => {
+      // When the selected option is in a disabled group
+      const r = await render(
+        <RadioGroupField
+          label="Finish"
+          layout="thumbnail"
+          disabled
+          value="chrome"
+          onChange={() => {}}
+          options={finishes}
+        />,
+      );
+      // Then its thumbnail doesn't get the selected styles, like a text radio
+      expect(r.finish_chrome.closest("label")).toHaveAttribute("data-selected", "false");
+      expect(r.finish_chrome.closest("label")!.style.getPropertyValue("--borderColor")).toBe(
+        "var(--b-field-border-default)",
+      );
+    });
+  });
+
+  describe("custom option rows", () => {
+    const packages = [
+      { value: "front", label: "Front Load Washer and Dryer", price: "+ $10.00" },
+      { value: "top", label: "Top Load Washer and Dryer", price: "+ $10.00" },
+      { value: "stacked", label: "Stacked Washer and Dryer", price: "+ $25.00", disabled: "Doesn't fit" },
+    ];
+
+    function TestRows(props: { onChange: (value: string) => void }) {
+      const [value, setValue] = useState<string | undefined>("front");
+      return (
+        <RadioGroupField
+          label="Washer and Dryer"
+          value={value}
+          onChange={(v) => {
+            setValue(v);
+            props.onChange(v);
+          }}
+          options={packages}
+          renderOption={(option, radioProps) => (
+            <label data-testid={`row_${option.value}`}>
+              <StyledRadio {...radioProps} />
+              <span>{option.label}</span>
+              <span data-testid={`price_${option.value}`}>{option.price}</span>
+              <img data-testid={`img_${option.value}`} src="washer.png" alt="" />
+            </label>
+          )}
+        />
+      );
+    }
+
+    it("can click anywhere on the option area", async () => {
+      const onChange = vi.fn();
+      const r = await render(<TestRows onChange={onChange} />);
+      click(r.price_top);
+      expect(onChange).toHaveBeenLastCalledWith("top");
+      expect(r.washerAndDryer_top).toBeChecked();
+      click(r.img_front);
+      expect(onChange).toHaveBeenLastCalledWith("front");
+      expect(r.washerAndDryer_front).toBeChecked();
+    });
+
+    it("renders the caller's row, with the option's label as the radio's name", async () => {
+      const r = await render(<TestRows onChange={() => {}} />);
+      // We don't render our own label, so the caller's row is the only label.
+      expect(r.row_top.querySelectorAll("label")).toHaveLength(0);
+      expect(r.row_top).toHaveTextContent(/^Top Load Washer and Dryer\+ \$10\.00$/);
+      expect(r.getByRole("radio", { name: "Top Load Washer and Dryer" })).toBe(r.washerAndDryer_top);
+    });
   });
 });

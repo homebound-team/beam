@@ -1,6 +1,7 @@
 import { cleanup } from "@testing-library/react";
 import { configure } from "mobx";
 import { resetRightPaneStore } from "src/components/Layout/RightPaneLayout/rightPaneStore";
+import { resetPageBannerStore } from "src/layouts/PageBanner/pageBannerStore";
 import { resetWindowScroll } from "src/tests/documentScroll";
 import "src/tests/elementInternals";
 import "src/tests/matchers";
@@ -19,6 +20,7 @@ beforeEach(() => {
   resetViewport();
   resetWindowScroll();
   resetRightPaneStore();
+  resetPageBannerStore();
   vi.restoreAllMocks();
 });
 afterEach(() => vi.useRealTimers());

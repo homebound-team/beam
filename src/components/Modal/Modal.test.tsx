@@ -3,10 +3,12 @@ import { useEffect } from "react";
 import { vi } from "vitest";
 
 import { ModalBanner, ModalBody, ModalFooter, ModalHeader, type ModalProps } from "src/components/Modal/Modal";
+import { useModalContext } from "src/components/Modal/ModalContext";
 import { OpenModal } from "src/components/Modal/OpenModal";
 import { useModal } from "src/components/Modal/useModal";
 import { Tooltip } from "src/components/Tooltip";
 import { click, render, wait } from "src/utils/rtl";
+import { useTestIds } from "src/utils/useTestIds";
 
 describe("Modal", () => {
   it("renders", async () => {
@@ -56,6 +58,20 @@ describe("Modal", () => {
       const r = await render(<TestModalApp content={<TestModalComponent />} />);
       // Then expect the content to be displayed
       expect(r.modal_content.textContent).toBe("Modal Body");
+    });
+
+    it("shares the body's scroll container with its content", async () => {
+      // When rendered with content that reads the modal's scroll container
+      const r = await render(<TestModalApp content={<ScrollElBody />} />);
+      // Then the content sees the scrolling `main`
+      expect(r.scrollEl.textContent).toBe("MAIN");
+    });
+
+    it("hides the scroll container when content owns scrolling", async () => {
+      // When rendered with content that owns its scroll
+      const r = await render(<TestModalApp content={<ScrollElBody contentOwnsScroll />} />);
+      // Then the content does not see the modal's scroll container
+      expect(r.scrollEl.textContent).toBe("none");
     });
   });
 
@@ -160,4 +176,18 @@ function TestModalComponent({
       <ModalFooter>Modal Footer</ModalFooter>
     </>
   );
+}
+
+function ScrollElBody({ contentOwnsScroll = false }: { contentOwnsScroll?: boolean }) {
+  return (
+    <ModalBody contentOwnsScroll={contentOwnsScroll}>
+      <ScrollElTag />
+    </ModalBody>
+  );
+}
+
+function ScrollElTag() {
+  const { scrollEl } = useModalContext();
+  const tid = useTestIds({}, "scrollEl");
+  return <span {...tid}>{scrollEl?.tagName ?? "none"}</span>;
 }

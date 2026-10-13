@@ -11,7 +11,7 @@ import React, {
 } from "react";
 import { type Components, type ListRange, Virtuoso, VirtuosoGrid, type VirtuosoHandle } from "react-virtuoso";
 import type { ImageFitType } from "src/components/Card";
-import { useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
+import { useScrollViewportWidth, useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { type GridTableApi, GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -59,6 +59,7 @@ import {
   beamRightPaneWidthVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
+  documentScrollContentWidth,
   getFloatingBottomOffset,
   stickyTableHeaderOffset,
 } from "src/layouts/layoutVars";
@@ -236,7 +237,7 @@ export type GridTableProps<R extends Kinded, X> = {
   onRowDrop?: (draggedRow: GridDataRow<R>, droppedRow: GridDataRow<R>, indexOffset: number) => void;
   /** Disable column resizing functionality. Defaults to false. */
   disableColumnResizing?: boolean;
-  /** Injects fixed left/right gutter columns when inside a document-scroll layout. */
+  /** Injects fixed left/right gutter columns. Skipped when an ancestor already applies the inset. */
   columnGutter?: boolean;
   /** Fixed height for `as="card"` cards in px. Defaults to 430. */
   cardHeight?: number;
@@ -298,9 +299,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   } = props;
 
   const inDocumentScrollLayout = useDocumentScrollLayout();
+  const columnMeasureWidth = useColumnMeasureWidth();
+  // Set on a page or in a modal: columns are measured against that on-screen width and may grow wider than it.
+  // Unset when the table has its own scrollbar, so columns just fill the table.
+  const columnsMayExceedMeasure = columnMeasureWidth !== undefined;
   const insetHandled = useContentInsetHandled();
-  // Gutters align the table with the page inset; an inset ancestor (e.g. CenteredLayout) already does that.
-  const withGutters = columnGutter && inDocumentScrollLayout && !insetHandled;
+  // Gutters follow `columnGutter` in any host. An inset ancestor (e.g. CenteredLayout) already aligns the table.
+  const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
   const columnsWithIds = useMemo(() => {
@@ -389,7 +394,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       expandedColumnIds,
       visibleColumnsStorageKey,
       disableColumnResizing,
-      inDocumentScrollLayout,
+      columnsMayExceedMeasure,
     );
 
   // Store resetColumnWidths on the API instance so it can be called from EditColumnsButton
@@ -748,15 +753,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     [tableState, tableContainerRef],
   );
 
-  // Document-scroll layouts may need a wider table shell than the resize probe when mw/% columns require it.
+  // When columns may exceed the measurement, make the table as wide as they need.
   const tableStyle = useMemo(() => {
-    if (!inDocumentScrollLayout || contentWidth === undefined || tableWidth === undefined) return style;
+    if (!columnsMayExceedMeasure || contentWidth === undefined || tableWidth === undefined) return style;
 
     const minWidthPx = Math.max(style.minWidthPx ?? 0, contentWidth);
     if (minWidthPx === style.minWidthPx) return style;
 
     return { ...style, minWidthPx };
-  }, [contentWidth, inDocumentScrollLayout, style, tableWidth]);
+  }, [columnsMayExceedMeasure, contentWidth, style, tableWidth]);
 
   // TableState is updated from props in useEffect; until that runs, noData is stale on the first paint.
   // Keep the table (and width probe) mounted pre-sync; only swap to emptyState once TableState reflects props.
@@ -767,7 +772,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   return (
     <TableStateContext.Provider value={rowStateContext}>
       <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", inDocumentScrollLayout)} {...tid.probe} />
+        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", columnMeasureWidth)} {...tid.probe} />
         {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
         {loading && (
           <div css={loadingOverlayCss} {...tid.loadingOverlay}>
@@ -1056,9 +1061,10 @@ function VirtualGridTableView<R extends Kinded>({
   loading = false,
 }: VirtualGridTableViewProps<R>): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
+  const columnMeasureWidth = useColumnMeasureWidth();
 
-  // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
-  // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
+  // Delegate to the window scroller only inside a document-scroll Beam layout; tables with a
+  // `customScrollParent` virtualize against it, and everything else keeps Virtuoso's own scroller.
   const inDocumentScrollLayout = useDocumentScrollLayout();
 
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
@@ -1165,7 +1171,7 @@ function VirtualGridTableView<R extends Kinded>({
               // Ensure the fallback message is the same width as the table
               <div
                 css={{
-                  ...getTableRefWidthStyles(true, inDocumentScrollLayout),
+                  ...getTableRefWidthStyles(true, columnMeasureWidth),
                   ...(keptSelectedRows.length === 0 && style.firstBodyRowCss),
                   ...(visibleDataRows.length === 0 && style.lastRowCss),
                 }}
@@ -1257,8 +1263,8 @@ function CardView({
 }: CardViewProps): ReactElement {
   const customScrollParent = useVirtualizedScrollParent();
 
-  // Delegate to the window scroller only inside a document-scroll Beam layout; legacy pages and tables
-  // with a `customScrollParent` (a `ScrollableParent`) keep Virtuoso's own scroller.
+  // Delegate to the window scroller only inside a document-scroll Beam layout; tables with a
+  // `customScrollParent` virtualize against it, and everything else keeps Virtuoso's own scroller.
   const inDocumentScrollLayout = useDocumentScrollLayout();
 
   const [fetchMoreInProgress, setFetchMoreInProgress] = useState(false);
@@ -1380,5 +1386,18 @@ const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: s
     });
   },
 );
+
+/**
+ * Width columns are measured against: the page or modal on screen.
+ * Unset when the table scrolls inside its own box and should just fill it.
+ */
+function useColumnMeasureWidth(): string | undefined {
+  const scrollViewportWidth = useScrollViewportWidth();
+  const inDocumentScrollLayout = useDocumentScrollLayout();
+  if (scrollViewportWidth) return scrollViewportWidth;
+  // Stay at the page content width. Measuring the table itself would let a wide table stretch that measurement, so it could never shrink.
+  if (inDocumentScrollLayout) return `min(100%, ${documentScrollContentWidth()})`;
+  return undefined;
+}
 
 const CARD_MIN_WIDTH_PX = 330;

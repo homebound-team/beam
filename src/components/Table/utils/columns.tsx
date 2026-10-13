@@ -161,7 +161,7 @@ function layoutGutterColumn<T extends Kinded>(
   return newMethodMissingProxy(base, () => () => emptyCell) as GridColumn<T>;
 }
 
-/** Prepends and appends layout gutter columns for document-scroll table alignment. */
+/** Prepends and appends layout gutter columns so the table aligns with its host inset. */
 export function withColumnGutters<T extends Kinded>(
   columns: GridColumn<T>[],
   gutterPx: number = pageContentGutterPx,
@@ -379,14 +379,14 @@ export type ColumnLayoutResult = {
   contentWidth: number | undefined;
 };
 
-/** Size columns for a measured container; resolves content width when in a document-scroll layout. */
+/** Size columns for a measured width. When allowed, columns may be wider than that measurement. */
 export function calcColumnLayout<R extends Kinded>(
   columns: GridColumnWithId<R>[],
   probeWidth: number | undefined,
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],
   resizedWidths: ResizedWidths | undefined,
-  inDocumentScrollLayout: boolean,
+  columnsMayExceedMeasure: boolean,
 ): ColumnLayoutResult {
   if (probeWidth === undefined) {
     return {
@@ -395,7 +395,7 @@ export function calcColumnLayout<R extends Kinded>(
     };
   }
 
-  if (!inDocumentScrollLayout) {
+  if (!columnsMayExceedMeasure) {
     return {
       columnSizes: calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths),
       contentWidth: probeWidth,

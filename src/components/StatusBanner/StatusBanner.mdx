@@ -145,9 +145,80 @@ Render `StatusBanner` in the section it describes. It scrolls with that content.
 
 ### Sticky
 
-Use a sticky banner when the message applies to the whole page and should stay pinned under the header. The layout sets `sticky`. Callers pass the banner content and leave `sticky` unset. Item rows stay on the in-line banner.
+Use a sticky banner when the message applies to the whole page and should stay pinned under the header. The layout sets `sticky`. Callers leave it unset. The slot accepts `PageBannerProps`: `type`, `icon`, `title`, `description`, and the two actions. Item rows stay on the in-line banner.
 
-How a page layout accepts that content is TBD. It lands with the layout updates.
+The page has one sticky banner. Pass it on the layout when the whole page shares it. Call `usePageBanner` when a tab, step, or the body loaded it and should take it down on the way out.
+
+#### On the layout
+
+Pass `banner` to `PageHeaderLayout`, `StepperLayout`, or `FocusedFormLayout`. The layout renders that object directly. A new object on the next render updates the slot. Omit the prop, or pass `undefined`, and the slot goes away. See [Table Page / With banner](?path=/story/layouts-table-page--with-banner).
+
+```tsx
+<PageHeaderLayout
+  pageHeader={{ title: "Projects" }}
+  banner={{ type: "update", title: "Calculating Updated Costs", description: "Costs shown may be out of date." }}
+>
+  {children}
+</PageHeaderLayout>
+```
+
+#### From a tab, step, or body
+
+Call `usePageBanner` from the component that owns the message. `<PageBanner {...props} />` is the same call and renders nothing in place. A descendant's banner replaces the layout's `banner` prop while that caller is mounted. A second call replaces the first. Outside a page layout the hook warns in development and the banner does not render. See [Table Page / With tab banner](?path=/story/layouts-table-page--with-tab-banner).
+
+```tsx
+function LineItemsTab() {
+  const { data } = useLineItemsQuery();
+  const banner = useMemo(
+    () => (data?.costsStale ? { type: "update", title: "Updated Costs Ready" } : undefined),
+    [data?.costsStale],
+  );
+  usePageBanner(banner);
+  return <GridTableLayout />;
+}
+```
+
+Memoize the object. The hook treats a new object as a change, so an inline `{ type, title }` publishes again on every render of that component. Mutating fields on the object it already has does nothing.
+
+#### Lifecycle
+
+<table>
+  <thead>
+    <tr>
+      <th>Change</th>
+      <th>
+        Layout <code>banner</code>
+      </th>
+      <th>
+        <code>usePageBanner</code>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Show</td>
+      <td>Pass the object.</td>
+      <td>Pass the object.</td>
+    </tr>
+    <tr>
+      <td>Update</td>
+      <td>Pass the new content on the next render.</td>
+      <td>Pass a new object. Memoize it while the content is unchanged.</td>
+    </tr>
+    <tr>
+      <td>Remove</td>
+      <td>
+        Omit the prop, or pass <code>undefined</code>.
+      </td>
+      <td>
+        Pass <code>undefined</code>, or unmount the component that called the hook. That is the tab or step leaving.
+        Unmounting a sibling leaves the banner up. <code>PageBanner</code> clears when that element unmounts.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+The banner stays pinned when the page header auto-hides. The height var other sticky elements sit below is in `docs/layouts.md`.
 
 ## Anatomy
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
+import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
 import { useTestIds } from "src/utils/useTestIds";
 import type { RightPaneTrigger } from "./RightPaneTriggers";
 import type { AllowNavigationArgs } from "./useUnsavedChangesGuard";
@@ -18,6 +19,8 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
     aiMode?: boolean;
     /** Icon triggers that open the document-scroll right pane. Hosts the pane — do not also set `withRightPane` on the body. */
     rightPaneTriggers?: RightPaneTrigger[];
+    /** Stay-pinned status banner under the workflow header. */
+    banner?: PageBannerProps;
     /** Page body — typically {@link FormSectionLayout} (optionally with `withJumpLinks`). */
     children: ReactNode;
   };
@@ -39,6 +42,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
     allowNavigation,
     aiMode,
     rightPaneTriggers,
+    banner,
     children,
     ...headerProps
   } = props;
@@ -48,6 +52,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
     <WorkflowPageLayout
       {...tid}
       {...headerProps}
+      banner={banner}
       aiMode={aiMode}
       isDirty={isDirty}
       allowNavigation={allowNavigation}

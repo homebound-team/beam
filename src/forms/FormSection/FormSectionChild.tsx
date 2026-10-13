@@ -1,13 +1,29 @@
 import type { FieldState } from "@homebound/form-state";
 import { useRef } from "react";
+import { mergeProps, useCheckboxGroupItem, useFocusRing, useRadio, VisuallyHidden } from "react-aria";
+import type { CheckboxGroupState, RadioGroupState } from "react-stately";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { Tag, type TagProps } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
+import { BoundCheckboxField } from "src/forms/BoundCheckboxField";
+import { StyledCheckbox } from "src/inputs/CheckboxBase";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { useTestIds } from "src/utils/useTestIds";
-import type { FormSectionProps } from "./FormSection";
+import type { FormSectionBaseProps } from "./FormSection";
 
-type FormSectionChildBase = Omit<FormSectionProps, "childSections">;
+/** An independent checkbox on one child. Its boolean field lives on that child. */
+export type FormSectionChildSelection = { mode: "toggle"; field: FieldState<boolean | null | undefined> };
+
+type FormSectionChildBase = FormSectionBaseProps & {
+  /** Renders a `Tag` top-right of the header. */
+  tag?: TagProps<any>;
+  /** Stored in the parent field when this child belongs to a `single` or `multiple` group. */
+  value?: string;
+  /** Independent checkbox. Only set when the parent section has no group `selection`. */
+  selection?: FormSectionChildSelection;
+};
 
 /** A single, non-draggable entry in a `FormSection`'s `childSections` — never itself nests further children. */
 export type PlainFormSectionChild = FormSectionChildBase & { id?: string; orderField?: never };
@@ -21,13 +37,28 @@ export type ReorderableFormSectionChild = FormSectionChildBase & {
   orderField: FieldState<number | null | undefined>;
 };
 
+/** Set by `FormSection` when its `selection` is a group, so every child renders that group's control. */
+export type FormSectionChildGroup =
+  { mode: "single"; state: RadioGroupState } | { mode: "multiple"; state: CheckboxGroupState };
+
+type FormSectionChildProps = (PlainFormSectionChild | ReorderableFormSectionChild) & { group?: FormSectionChildGroup };
+
 /** A single, non-nestable child row within a `FormSection`'s `childSections`. Internal to `FormSection`. */
-export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormSectionChild) {
-  const { title, description, actions, fields, orderField } = props;
+export function FormSectionChild(props: FormSectionChildProps) {
+  const { title, description, actions, fields, orderField, tag, value = title, selection, group } = props;
   const tid = useTestIds(props, "formSectionChild");
   const itemRef = useRef(null);
   const isDraggable = !!orderField;
   const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: props.id ?? title, itemRef });
+
+  const control =
+    group?.mode === "single" ? (
+      <FormSectionChildRadio state={group.state} value={value} label={title} {...tid.radio} />
+    ) : group?.mode === "multiple" ? (
+      <FormSectionChildCheckbox state={group.state} value={value} label={title} {...tid.checkbox} />
+    ) : selection ? (
+      <BoundCheckboxField field={selection.field} label={title} checkboxOnly {...tid.checkbox} />
+    ) : undefined;
 
   return (
     <div
@@ -41,11 +72,56 @@ export function FormSectionChild(props: PlainFormSectionChild | ReorderableFormS
         description={description}
         actions={actions}
         level={4}
+        rightSlotLead={tag && <Tag {...tag} {...tid.tag} />}
         startAdornment={
-          isDraggable ? <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact /> : undefined
+          isDraggable || control ? (
+            <>
+              {isDraggable && <DnDGridItemHandle dragHandleProps={dragHandleProps} icon="drag" compact />}
+              {control}
+            </>
+          ) : undefined
         }
       />
       {fields}
     </div>
+  );
+}
+
+type FormSectionChildControlProps<S> = { state: S; value: string; label: string };
+
+/** A label-less radio, one per child, sharing the parent `FormSection`'s radio group state. */
+function FormSectionChildRadio(props: FormSectionChildControlProps<RadioGroupState>) {
+  const { state, value, label } = props;
+  const ref = useRef<HTMLInputElement>(null);
+  const { inputProps, isDisabled, isSelected } = useRadio({ value, "aria-label": label }, state, ref);
+  const { focusProps, isFocusVisible } = useFocusRing();
+  const tid = useTestIds(props);
+
+  return (
+    <StyledRadio
+      isDisabled={isDisabled}
+      isSelected={isSelected}
+      isFocusVisible={isFocusVisible}
+      inputProps={{ ...mergeProps(inputProps, focusProps), ref, ...tid }}
+    />
+  );
+}
+
+/** A label-less checkbox, one per child, sharing the parent `FormSection`'s checkbox group state. */
+function FormSectionChildCheckbox(props: FormSectionChildControlProps<CheckboxGroupState>) {
+  const { state, value, label } = props;
+  const ref = useRef<HTMLInputElement>(null);
+  const { inputProps, isDisabled, isSelected } = useCheckboxGroupItem({ value, "aria-label": label }, state, ref);
+  const { focusProps, isFocusVisible } = useFocusRing();
+  const tid = useTestIds(props);
+
+  return (
+    // `StyledCheckbox` is just the visual box, so the label makes clicking it toggle the hidden input
+    <label css={Css.df.cursorPointer.if(isDisabled).cursorNotAllowed.$}>
+      <VisuallyHidden>
+        <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} />
+      </VisuallyHidden>
+      <StyledCheckbox isDisabled={isDisabled} isSelected={isSelected} isFocusVisible={isFocusVisible} />
+    </label>
   );
 }

@@ -1,9 +1,31 @@
-import { createContext, useContext, useEffect, type JSX, type ReactNode, type ReactPortal } from "react";
+import { createContext, useContext, useEffect, useMemo, type JSX, type ReactNode, type ReactPortal } from "react";
 import { createPortal } from "react-dom";
 import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { Css, type Palette } from "src/Css";
 
-const VirtualizedScrollParentContext = createContext<HTMLElement | null>(null);
+type VirtualizedScrollParent = {
+  element: HTMLElement | null;
+  /** CSS width of the visible area, when the table must size to the scroller rather than a parent it holds open. */
+  viewportWidth?: string;
+};
+
+const VirtualizedScrollParentContext = createContext<VirtualizedScrollParent | null>(null);
+
+type VirtualizedScrollParentProviderProps = {
+  element: HTMLElement | null;
+  viewportWidth?: string;
+  children: ReactNode;
+};
+
+/** Shares a layout's scroll element with a virtual `GridTable`. */
+export function VirtualizedScrollParentProvider({
+  element,
+  viewportWidth,
+  children,
+}: VirtualizedScrollParentProviderProps) {
+  const value = useMemo(() => ({ element, viewportWidth }), [element, viewportWidth]);
+  return <VirtualizedScrollParentContext.Provider value={value}>{children}</VirtualizedScrollParentContext.Provider>;
+}
 
 type ScrollableContentProps = {
   children: ReactNode;
@@ -79,7 +101,7 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
   const virtualizedScrollParent = virtualized ? scrollableEl.parentElement : null;
 
   return createPortal(
-    <VirtualizedScrollParentContext.Provider value={virtualizedScrollParent}>
+    <VirtualizedScrollParentProvider element={virtualizedScrollParent}>
       <div
         css={{
           ...Css.h100.pr(paddingRight).pl(paddingLeft).if(virtualized).pr0.$,
@@ -89,11 +111,16 @@ export function ScrollableContent(props: ScrollableContentProps): ReactPortal | 
         {children}
         {showBottomSpacer && <div css={Css.h2.$} />}
       </div>
-    </VirtualizedScrollParentContext.Provider>,
+    </VirtualizedScrollParentProvider>,
     scrollableEl,
   );
 }
 
 export function useVirtualizedScrollParent(): HTMLElement | null {
-  return useContext(VirtualizedScrollParentContext);
+  return useContext(VirtualizedScrollParentContext)?.element ?? null;
+}
+
+/** CSS width of the visible scroll area, when a layout has set one. */
+export function useScrollViewportWidth(): string | undefined {
+  return useContext(VirtualizedScrollParentContext)?.viewportWidth;
 }

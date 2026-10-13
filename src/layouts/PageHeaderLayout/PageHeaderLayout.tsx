@@ -1,13 +1,16 @@
 import { type CSSProperties, type ReactNode, useCallback, useMemo, useRef } from "react";
 import { PageHeader, type PageHeaderProps } from "src/components/Headers/PageHeader";
+import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
 import type { TabsContentXss } from "src/components/Tabs";
 import { Css, type Only } from "src/Css";
+import { usePageBannerSlot } from "src/layouts/PageBanner/internal/usePageBannerSlot";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
 import {
-  bannerAndNavbarChromeTop,
+  beamPageBannerHeightVar,
   beamPageHeaderLayoutHeightVar,
+  belowNavbarOffset,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
 } from "../layoutVars";
@@ -19,6 +22,8 @@ import { useTransitionAfterPaint } from "../useTransitionAfterPaint";
 export type PageHeaderLayoutProps<V extends string, X> = {
   /** Props for the {@link PageHeader} rendered as the page-level header. */
   pageHeader: PageHeaderProps<V, X>;
+  /** Stay-pinned status banner under the header. A descendant's `usePageBanner` takes precedence. */
+  banner?: PageBannerProps;
   /** Slot: main page body (tables, forms, etc.). */
   children?: ReactNode;
 };
@@ -27,8 +32,9 @@ export type PageHeaderLayoutProps<V extends string, X> = {
 export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss, X>>(
   props: PageHeaderLayoutProps<V, X>,
 ) {
-  const { pageHeader, children } = props;
+  const { pageHeader, banner: bannerProp, children } = props;
   const tid = useTestIds(props, "pageHeaderLayout");
+  const { slot: bannerSlot, height: bannerHeight } = usePageBannerSlot(bannerProp, tid);
 
   // Ref mirrors context so the scroll handler avoids per-scroll getComputedStyle.
   const bannerAndNavbarHeight = useBannerAndNavbarHeight();
@@ -44,12 +50,18 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
   // The header is fixed at `outerTop` unless hidden.
   const headerOccupiesPosition = autoHideState !== "hidden";
 
-  const cssVars: Record<string, string> | undefined =
-    headerHeight > 0 && headerOccupiesPosition ? { [beamPageHeaderLayoutHeightVar]: `${headerHeight}px` } : undefined;
+  const cssVars: Record<string, string> = {};
+  if (headerHeight > 0 && headerOccupiesPosition) {
+    cssVars[beamPageHeaderLayoutHeightVar] = `${headerHeight}px`;
+  }
+  if (bannerHeight > 0) {
+    cssVars[beamPageBannerHeightVar] = `${bannerHeight}px`;
+  }
+  const style = Object.keys(cssVars).length > 0 ? cssVars : undefined;
 
   const headerLeft = documentScrollChromeLeft();
   const headerWidth = documentScrollChromeWidth();
-  const outerTop = bannerAndNavbarChromeTop();
+  const outerTop = belowNavbarOffset();
 
   // Always `fixed` so horizontal document scroll cannot move the header. `left`/`width` use the
   // chrome var (jumps on nav toggle). The `top` transition is applied after first paint.
@@ -64,13 +76,14 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
 
   return (
     <DocumentScrollLayoutProvider>
-      <div css={Css.df.fdc.w100.$} style={cssVars} {...tid}>
+      <div css={Css.df.fdc.w100.$} style={style} {...tid}>
         {/* Spacer reserves height when inner flips to fixed. */}
         <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: headerHeight }}>
           <div ref={headerMetricsRef} css={innerCss} style={innerStyle} {...tid.pageHeader}>
             {pageHeaderEl}
           </div>
         </div>
+        {bannerSlot}
         {/* Pads the body's top, unless its first child pads its own top edge (`selfTopSpaced`). */}
         <div css={Css.df.fdc.fg1.mh0.w100.when(":not(:has(> [data-self-top-spaced]:first-child))").pt3.$} {...tid.body}>
           {children}

@@ -31,7 +31,10 @@ export function Popover(props: PopoverProps) {
           return true;
         }
         // Do not close the Popover if the user is interacting with a tribute menu, dialog or alert on top of it, otherwise close it.
-        return !(e.closest(".tribute-container") || e.closest("[role='dialog']") || e.closest("[role='alert']"));
+        // A dialog that contains our trigger (i.e. the Modal the menu lives in) is "underneath" the Popover, so clicks there should close it.
+        const dialog = e.closest("[role='dialog']");
+        const isDialogOnTop = !!dialog && !dialog.contains(triggerRef.current);
+        return !(e.closest(".tribute-container") || isDialogOnTop || e.closest("[role='alert']"));
       },
       ...others,
     },

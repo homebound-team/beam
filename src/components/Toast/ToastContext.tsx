@@ -17,6 +17,7 @@ export const ToastContext = createContext<ToastContextProps>({
   notice: undefined,
 });
 
+/** @deprecated Use `usePageBanner` for page status, or the Snackbar for transient confirmations. */
 export function ToastProvider(props: { children: ReactNode }) {
   const [notice, setNotice] = useState<ToastNoticeProps>();
   const clear = useCallback(() => setNotice(undefined), [setNotice]);

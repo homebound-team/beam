@@ -1,8 +1,10 @@
 import { fireEvent } from "@testing-library/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
+import { ModalBody } from "src/components/Modal/Modal";
+import { useModal } from "src/components/Modal/useModal";
 import { Css, Tokens } from "src/Css";
 import { noop } from "src/utils/helpers";
 import { click, render, type, withRouter } from "src/utils/rtl";
@@ -237,6 +239,40 @@ describe("ButtonMenu", () => {
     expect(r.query.trigger_optionA).toBe(null);
   });
 
+  it("closes the menu when clicking outside of it inside a modal", async () => {
+    // Given a ButtonMenu within a Modal
+    const r = await render(<TestModalWithButtonMenu />, withRouter());
+    // And the menu is open
+    click(r.trigger);
+    expect(r.trigger_optionA).toBeDefined();
+    // When clicking elsewhere within the modal
+    fireEvent.pointerDown(r.outside);
+    click(r.outside);
+    // Then the menu should be closed
+    expect(r.query.trigger_optionA).toBe(null);
+    // And the modal should remain open
+    expect(r.modal).toBeDefined();
+  });
+
+  it("does not close the menu when interacting with a dialog on top of it", async () => {
+    // Given a ButtonMenu and a separate dialog that does not contain the trigger
+    const r = await render(
+      <>
+        <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Option A", onClick: noop }]} />
+        <div role="dialog" data-testid="topDialog" />
+      </>,
+      withRouter(),
+    );
+    // And the menu is open
+    click(r.trigger);
+    expect(r.trigger_optionA).toBeDefined();
+    // When interacting with the dialog
+    fireEvent.pointerDown(r.topDialog);
+    click(r.topDialog);
+    // Then the menu should remain open
+    expect(r.trigger_optionA).toBeDefined();
+  });
+
   it("shrinks the chevron for text triggers only", async () => {
     // Given a text trigger and a default trigger
     const items = [{ label: "Option A", onClick: noop }];
@@ -335,6 +371,23 @@ describe("ButtonMenu", () => {
     expect(r.trigger_resetCycle_description).toBeDefined();
   });
 });
+
+function TestModalWithButtonMenu() {
+  const { openModal } = useModal();
+  useEffect(
+    () =>
+      openModal({
+        content: (
+          <ModalBody>
+            <ButtonMenu trigger={{ label: "Trigger" }} items={[{ label: "Option A", onClick: noop }]} />
+            <div data-testid="outside">Outside</div>
+          </ModalBody>
+        ),
+      }),
+    [openModal],
+  );
+  return <h1>Page title</h1>;
+}
 
 /** Renders the current router pathname so tests can assert on in-app navigation. */
 function LocationDisplay() {

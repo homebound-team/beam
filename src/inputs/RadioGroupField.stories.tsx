@@ -1,6 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
-import { Css } from "src/Css";
+import { Carousel } from "src/components/Carousel";
+import { Css, Tokens } from "src/Css";
 import { FormLines } from "src/forms/FormLines";
 import {
   radioChecked,
@@ -12,6 +13,7 @@ import {
   radioUnchecked,
 } from "src/inputs/internal/radioStyles";
 import { RadioGroupField } from "src/inputs/RadioGroupField";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { action } from "storybook/actions";
 
 export default {
@@ -358,6 +360,124 @@ export function LabelTooltip() {
           { value: "b", label: "Burratta" },
         ]}
       />
+    </FormLines>
+  );
+}
+
+export function ThumbnailLayout() {
+  const finishImages = ["disposal.png", "counter-top.jpeg", "fridge.jpeg", "fireplace.jpeg", "fridge2.jpeg"];
+  const finishes = [
+    "Chrome",
+    "Brushed Nickel",
+    "Satin Nickel",
+    "Matte Black",
+    "Brass",
+    "Gold",
+    "Bronze",
+    "Copper",
+    "Pewter",
+    "Graphite",
+    "Antique Brass",
+    "Polished Brass",
+    "Oil Rubbed Bronze",
+    "Stainless Steel",
+  ].map((label, i) => ({ label, value: `finish-${i + 1}`, imgSrc: finishImages[i % finishImages.length] }));
+  const [value, setValue] = useState<string | undefined>("finish-1");
+  return (
+    <FormLines width="sm" gap={5}>
+      <RadioGroupField
+        label="Cabinet Hardware"
+        layout="thumbnail"
+        value={value}
+        onChange={setValue}
+        options={finishes}
+        onBlur={action("onBlur")}
+        onFocus={action("onFocus")}
+      />
+      <RadioGroupField
+        label="With a disabled option, helper text and an error"
+        layout="thumbnail"
+        value={value}
+        onChange={setValue}
+        options={finishes.slice(0, 5).map((o, i) => (i === 2 ? { ...o, disabled: "Discontinued" } : o))}
+        helperText="Pick the finish for every pull in the house."
+        errorMsg="Required"
+      />
+      <div css={Css.wPx(240).$}>
+        <Carousel>
+          <RadioGroupField
+            label="In a Carousel"
+            labelStyle="hidden"
+            layout="thumbnail"
+            value={value}
+            onChange={setValue}
+            options={finishes}
+          />
+        </Carousel>
+      </div>
+    </FormLines>
+  );
+}
+
+export function CustomOptionRows() {
+  const packages = [
+    {
+      value: "front",
+      label: "Front Load Washer and Dryer",
+      price: "+ $10.00",
+      images: ["fridge.jpeg", "fridge2.jpeg"],
+    },
+    { value: "top", label: "Top Load Washer and Dryer", price: "+ $10.00", images: ["disposal.png", "fireplace.jpeg"] },
+    {
+      value: "stacked",
+      label: "Stacked Washer and Dryer",
+      price: "+ $25.00",
+      images: ["counter-top.jpeg"],
+      disabled: "Doesn't fit the laundry room",
+    },
+  ];
+  const [value, setValue] = useState<string | undefined>("top");
+  return (
+    <FormLines width="full" gap={5}>
+      <div css={Css.wPx(720).maxw100.$}>
+        <RadioGroupField
+          label="Washer and Dryer"
+          labelStyle="hidden"
+          value={value}
+          onChange={setValue}
+          options={packages}
+          renderOption={({ label, price, images }, radioProps) => {
+            const { isDisabled = false } = radioProps;
+            return (
+              <label
+                css={
+                  Css.df.fdc.gap2.py2.bb
+                    .bc(Tokens.FieldBorderDefault)
+                    .cursorPointer.if(isDisabled)
+                    .cursorNotAllowed.color(Tokens.TextDisabled).$
+                }
+              >
+                {/* Spans, b/c a `<div>` isn't valid HTML inside a `<label>`. */}
+                <span css={Css.df.aic.gap1.$}>
+                  <StyledRadio {...radioProps} />
+                  <span css={Css.fg1.mdSb.$}>{label}</span>
+                  <span css={Css.md.$}>{price}</span>
+                </span>
+                <span css={Css.df.gap2.ml3.$}>
+                  {images.map((src) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt=""
+                      css={Css.sqPx(96).p1.br8.ba.bc(Tokens.FieldBorderDefault).objectContain.if(isDisabled).o50.$}
+                    />
+                  ))}
+                </span>
+              </label>
+            );
+          }}
+        />
+      </div>
     </FormLines>
   );
 }

@@ -1715,7 +1715,7 @@ describe("GridTable", () => {
       const columns = getExpandTestColumns();
       const tableWidth = 643;
 
-      // When sizing columns in a document-scroll layout
+      // When the row may be wider than the probe
       const { contentWidth } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
 
       // Then the resolved content width expands beyond the probe
@@ -1732,7 +1732,7 @@ describe("GridTable", () => {
       })) as GridColumnWithId<any>[];
       const tableWidth = 1012;
 
-      // When sizing columns in a document-scroll layout
+      // When the row may be wider than the probe
       const { contentWidth } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
 
       // Then content width follows the column sum, not the probe
@@ -1740,11 +1740,11 @@ describe("GridTable", () => {
     });
 
     it("does not expand content width on the legacy column layout path", () => {
-      // Given columns that would expand in document-scroll mode
+      // Given columns that would expand when the row may exceed the probe
       const columns = getLegacyGateColumns();
       const tableWidth = 643;
 
-      // When sizing columns outside a document-scroll layout
+      // When the row must fit the probe
       const legacy = calcColumnLayout(columns, tableWidth, undefined, [], undefined, false);
 
       // Then content width stays at the probe and column sizes match a single calcColumnSizes pass
@@ -1829,7 +1829,7 @@ describe("GridTable", () => {
     expect(columns[columns.length - 1].sticky).toBeUndefined();
   });
 
-  it("does not inject layout gutter columns outside document-scroll layout", async () => {
+  it("injects layout gutter columns when columnGutter is set outside a document-scroll layout", async () => {
     const api = new GridTableApiImpl();
     await render(
       <GridTable
@@ -1840,7 +1840,8 @@ describe("GridTable", () => {
       />,
     );
 
-    expect(api.getVisibleColumnIds()[0]).toBe("beamCollapseColumn");
+    expect(api.getVisibleColumnIds()[0]).toBe(layoutGutterLeftColumnId);
+    expect(api.getVisibleColumnIds().at(-1)).toBe(layoutGutterRightColumnId);
   });
 
   it("uses min(100%, content width) for the document-scroll width probe", async () => {

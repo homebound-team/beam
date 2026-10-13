@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import type { FilterDefs } from "src/components/Filters/types";
+import { ModalProvider } from "src/components/Modal/ModalContext";
 import { setViewport } from "src/tests/viewport";
 import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
@@ -25,6 +27,27 @@ describe("GridTableLayoutActions", () => {
       expect(r.query.search).not.toBeInTheDocument();
     });
 
+    it("does not read or write the search query param inside a modal", async () => {
+      // Given a page search param and a table rendered in a modal
+      const onSearch = vi.fn();
+      const r = await render(
+        <ModalProvider>
+          <GridTableLayoutActions searchProps={{ onSearch }} />
+          <SearchLocation />
+        </ModalProvider>,
+        withRouter("/?search=alpha"),
+      );
+      // Then the modal search starts empty and leaves the page param alone
+      expect(r.search).toHaveValue("");
+      expect(r.locationSearch).toHaveTextContent("search=alpha");
+      // When the user types
+      await typeAndWait(r.search, "beta");
+      // Then search runs in memory and the page query param is unchanged
+      expect(onSearch).toHaveBeenCalledWith("beta");
+      expect(r.locationSearch).toHaveTextContent("search=alpha");
+      expect(r.locationSearch.textContent).not.toContain("beta");
+    });
+
     it("calls onSearch after typing a value", async () => {
       // Given the search field is rendered
       const onSearch = vi.fn();
@@ -37,6 +60,19 @@ describe("GridTableLayoutActions", () => {
   });
 
   describe("filters", () => {
+    it("nests a single filter behind the Filter button inside a modal", async () => {
+      // Given a single filter rendered in a modal
+      const r = await render(
+        <ModalProvider>
+          <GridTableLayoutActions filterDefs={createSingleFilterDefs()} filter={{}} setFilter={vi.fn()} />
+        </ModalProvider>,
+        withRouter(),
+      );
+      // Then the control is behind the Filter button instead of inline
+      expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
+      expect(r.query.filter_needsRevision).toBeNull();
+    });
+
     it("renders a single filter inline on desktop without a Filter button or panel pills", async () => {
       // Given a single filter and no groupBy on desktop
       const r = await render(
@@ -237,6 +273,11 @@ function createSingleFilterDefs(): FilterDefs<SingleFilter> {
   return {
     needsRevision: checkboxFilter({ label: "Needs Revision" }),
   };
+}
+
+function SearchLocation() {
+  const { search } = useLocation();
+  return <div data-testid="locationSearch">{search}</div>;
 }
 
 function createMultiFilterDefs(): FilterDefs<MultiFilter> {
