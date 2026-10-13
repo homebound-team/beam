@@ -72,7 +72,8 @@ export function StepperLayout(props: StepperLayoutProps) {
 
   function goToStep(value: string) {
     if (value === currentStep) return;
-    closeRightPane();
+    // The step changes regardless, so a discard prompt couldn't keep the user here
+    closeRightPane({ force: true });
     setCurrentStep(value);
   }
 

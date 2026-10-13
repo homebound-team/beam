@@ -3,6 +3,7 @@ import {
   rightPaneContentStore,
   rightPaneOpenActions,
   rightPaneOpenStore,
+  type CloseRightPaneOpts,
   type OpenRightPaneOpts,
   type RightPaneOpenActions,
 } from "./rightPaneStore";
@@ -12,10 +13,10 @@ export type RightPaneOpenState = RightPaneOpenActions & {
 };
 
 export type UseRightPaneHook = {
-  /** Opens a right pane */
+  /** Opens a right pane; asks first if the open panel is dirty and the new content would replace it. */
   openRightPane: (opts: OpenRightPaneOpts) => void;
-  /** Closes the right pane */
-  closeRightPane: () => void;
+  /** Closes the right pane; asks first if the open panel is dirty, unless `force` is set. */
+  closeRightPane: (opts?: CloseRightPaneOpts) => void;
   /** Whether the right pane is currently open. */
   isRightPaneOpen: boolean;
 };

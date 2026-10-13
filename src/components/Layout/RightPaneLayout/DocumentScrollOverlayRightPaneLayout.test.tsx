@@ -246,7 +246,7 @@ function OpenCloseButtons() {
       data-testid="openPaneBtn"
       label="Open"
       onClick={() =>
-        openRightPane({ content: <Button data-testid="closePaneBtn" label="Close" onClick={closeRightPane} /> })
+        openRightPane({ content: <Button data-testid="closePaneBtn" label="Close" onClick={() => closeRightPane()} /> })
       }
     />
   );

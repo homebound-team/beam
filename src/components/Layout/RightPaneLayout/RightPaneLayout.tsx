@@ -15,7 +15,7 @@ export function RightPaneLayout(props: {
   const rightPaneContent = useRightPaneContent();
 
   // Close pane on page unmount because otherwise the next page that has a right pane will show our stale content
-  useEffect(() => closePane, [closePane]);
+  useEffect(() => () => closePane({ force: true }), [closePane]);
 
   return (
     <div css={Css.h100.df.oxh.$}>

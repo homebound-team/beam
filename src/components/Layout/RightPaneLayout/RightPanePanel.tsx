@@ -1,8 +1,11 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { type DeleteActionProps, MaybeDeleteAction } from "src/components/Layout/RightPaneLayout/internal/DeleteAction";
+import { setRightPaneConfirmDiscard } from "src/components/Layout/RightPaneLayout/internal/rightPaneConfirmDiscard";
+import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
+import { useModal } from "src/components/Modal/useModal";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { useRightPaneActions } from "./useRightPane";
@@ -10,6 +13,8 @@ import { useRightPaneActions } from "./useRightPane";
 export type RightPanePanelProps = {
   title: string;
   children: ReactNode;
+  /** When it returns true, closing the pane or swapping in other content asks to discard changes first. */
+  isDirty?: () => boolean;
   /** When false, omit the built-in close control (caller provides their own). Default true. */
   withClose?: boolean;
   /** Variant defaults to primary */
@@ -21,16 +26,25 @@ export type RightPanePanelProps = {
 
 /** Pane body chrome: title row, close control, scrollable children, and an optional footer. See `docs/layouts.md`. */
 export function RightPanePanel(props: RightPanePanelProps) {
-  const { title, children, withClose = true, primaryAction, secondaryAction, deleteAction } = props;
+  const { title, children, isDirty, withClose = true, primaryAction, secondaryAction, deleteAction } = props;
   const tid = useTestIds(props, "rightPanePanel");
   const { closeRightPane } = useRightPaneActions();
+  const { openModal } = useModal();
+
+  useEffect(() => {
+    if (!isDirty) return;
+    return setRightPaneConfirmDiscard((proceed) => {
+      if (!isDirty()) return proceed();
+      openModal({ content: <ConfirmCloseModal title="Discard unsaved changes?" onClose={proceed} /> });
+    });
+  }, [isDirty, openModal]);
 
   return (
     <div css={Css.relative.df.fdc.h100.$} {...tid}>
       <div css={Css.df.aic.jcsb.gap1.px3.py2.bb.bc(Tokens.SurfaceSeparator).fs0.$} {...tid.header}>
         <div css={Css.mdSb.$}>{title}</div>
         {/* Move focus into the pane so it is not left on the control that opened it. */}
-        {withClose && <IconButton icon="x" label="Close" autoFocus onClick={closeRightPane} {...tid.close} />}
+        {withClose && <IconButton icon="x" label="Close" autoFocus onClick={() => closeRightPane()} {...tid.close} />}
       </div>
       <div css={Css.fg1.mh0.oya.p3.$} {...tid.body}>
         {children}

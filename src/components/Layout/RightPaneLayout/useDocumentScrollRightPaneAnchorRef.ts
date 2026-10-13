@@ -9,7 +9,7 @@ export function useDocumentScrollRightPaneAnchorRef() {
   const setRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (!node && ref.current) {
-        closePane();
+        closePane({ force: true });
       }
       ref.current = node;
     },

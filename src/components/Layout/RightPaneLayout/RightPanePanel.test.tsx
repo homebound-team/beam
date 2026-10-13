@@ -1,9 +1,12 @@
 import { waitFor } from "@homebound/rtl-utils";
+import { useState } from "react";
 import { Button } from "src/components/Button";
+import { TextField } from "src/inputs/TextField";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render } from "src/utils/rtl";
+import { click, clickAndWait, render, type } from "src/utils/rtl";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
+import { RightPaneLayout } from "./RightPaneLayout";
 import { RightPanePanel } from "./RightPanePanel";
 import { useRightPaneActions } from "./useRightPane";
 
@@ -110,6 +113,117 @@ describe("RightPanePanel", () => {
     // The hidden measuring copy isn't exposed as a second button
     expect(r.getAllByRole("button", { name: "Delete (3)" })).toHaveLength(1);
   });
+
+  describe("isDirty", () => {
+    it("closes a clean pane without asking", async () => {
+      // Given an open pane without edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+
+      // When closing
+      click(r.rightPanePanel_close);
+
+      // Then it closes without asking
+      expect(r.query.discardChanges).toBeNull();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it.each([
+      ["the X", "rightPanePanel_close"],
+      ["a caller's closeRightPane", "cancel"],
+    ])("asks before %s closes a dirty pane", async (_, closeTestId) => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When closing
+      click(r.getByTestId(closeTestId));
+
+      // Then it asks and stays open until the user discards
+      expect(r.discardChanges).toBeInTheDocument();
+      expect(r.rightPanePanel_header).toHaveTextContent("A");
+      click(r.discardChanges);
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it("keeps a dirty pane and its edits when the user continues editing", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When closing, then choosing to continue editing
+      click(r.rightPanePanel_close);
+      click(r.continueEditing);
+
+      // Then the pane stays open with its edits
+      expect(r.query.discardChanges).toBeNull();
+      expect(r.notes).toHaveValue("edits");
+    });
+
+    it("asks before swapping a dirty pane to content with another key", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When opening other content
+      click(r.openB);
+
+      // Then it asks, and only swaps once the user discards
+      expect(r.rightPanePanel_header).toHaveTextContent("A");
+      click(r.discardChanges);
+      expect(r.rightPanePanel_header).toHaveTextContent("B");
+      expect(r.notes).toHaveValue("");
+    });
+
+    it("updates a dirty pane in place when the content keeps its type and key", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When re-opening the same panel with new props, i.e. a bulk edit gaining a row
+      click(r.updateA);
+
+      // Then it doesn't ask, and the edits survive
+      expect(r.query.discardChanges).toBeNull();
+      expect(r.rightPanePanel_header).toHaveTextContent("A (2)");
+      expect(r.notes).toHaveValue("edits");
+    });
+
+    it("closes a dirty pane without asking when forced", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When force-closing, i.e. after deleting the shown item
+      click(r.forceClose);
+
+      // Then it closes without asking
+      expect(r.query.discardChanges).toBeNull();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it.each(["documentScroll", "rightPaneLayout"] as const)(
+      "closes a dirty pane without asking when its %s host unmounts",
+      async (host) => {
+        // Given a pane with unsaved edits
+        const r = await render(<GuardedPane host={host} />);
+        await clickAndWait(r.openA);
+        type(r.notes, "edits");
+
+        // When the page hosting it goes away
+        await clickAndWait(r.leavePage);
+
+        // Then it closes without asking
+        expect(r.query.discardChanges).toBeNull();
+        expect(r.query.rightPaneContent).toBeNull();
+      },
+    );
+  });
 });
 
 function OpenPanelButton() {
@@ -128,5 +242,42 @@ function OpenPanelButton() {
         })
       }
     />
+  );
+}
+
+/** A pane host plus the buttons a caller would use to swap, update, or close its content. */
+function GuardedPane(props: { host?: "documentScroll" | "rightPaneLayout" }) {
+  const { host = "documentScroll" } = props;
+  const { openRightPane, closeRightPane } = useRightPaneActions();
+  const [showHost, setShowHost] = useState(true);
+  return (
+    <DocumentScrollLayoutProvider>
+      {showHost &&
+        (host === "documentScroll" ? (
+          <DocumentScrollOverlayRightPaneLayout>
+            <div>Main</div>
+          </DocumentScrollOverlayRightPaneLayout>
+        ) : (
+          <RightPaneLayout>
+            <div>Main</div>
+          </RightPaneLayout>
+        ))}
+      <Button label="Open A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A" /> })} />
+      <Button label="Update A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A (2)" /> })} />
+      <Button label="Open B" onClick={() => openRightPane({ content: <DraftPanel key="b" title="B" /> })} />
+      <Button label="Cancel" onClick={() => closeRightPane()} />
+      <Button label="Force Close" onClick={() => closeRightPane({ force: true })} />
+      <Button label="Leave Page" onClick={() => setShowHost(false)} />
+    </DocumentScrollLayoutProvider>
+  );
+}
+
+function DraftPanel(props: { title: string }) {
+  const { title } = props;
+  const [notes, setNotes] = useState<string>();
+  return (
+    <RightPanePanel title={title} isDirty={() => !!notes}>
+      <TextField label="Notes" value={notes} onChange={setNotes} />
+    </RightPanePanel>
   );
 }
