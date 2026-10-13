@@ -64,6 +64,10 @@ export const zIndices = {
   // Both layouts own their Toast internally so it renders inside the overlay header.
   pageOverlay: 1000,
 
+  // Anchored menus / listboxes and the mobile bottom sheet — above modals, drawers, and page overlays
+  // so a field inside any of them can open; below snackbar.
+  popover: 1050,
+
   // Top of stack
   snackbar: 1100,
 } as const;
