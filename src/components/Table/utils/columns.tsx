@@ -1,3 +1,4 @@
+import type { BeamColor } from "src/colors";
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { PinToggle } from "src/components/Table/components/PinToggle";
@@ -10,6 +11,39 @@ import { Css } from "src/Css";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
 import { isFunction } from "src/utils/helpers";
 import { newMethodMissingProxy } from "src/utils/useTestIds";
+
+/**
+ * Tags each leaf with one group id and label. Spread the result into `columns`.
+ * The span follows visible leaves. A leaf `name` is prefixed with the group label.
+ */
+export function groupColumns<T extends Kinded>(opts: {
+  id: string;
+  header: string;
+  /** Paints every cell in the group. A leaf's own `bgColor` wins. */
+  bgColor?: BeamColor;
+  columns: Array<Omit<GridColumn<T>, "groupHeader">>;
+}): GridColumn<T>[] {
+  const { id, header, bgColor, columns } = opts;
+  return columns.map(
+    (column) =>
+      ({
+        canHide: true,
+        initHidden: false,
+        ...column,
+        groupId: id,
+        groupLabel: header,
+        groupHeader: header,
+        bgColor: column.bgColor ?? bgColor,
+        name: prefixGroupColumnName(header, column.name),
+      }) as GridColumn<T>,
+  );
+}
+
+/** Edit Columns has no group row, so the leaf name carries the group label. */
+function prefixGroupColumnName(groupLabel: string, name: string | undefined): string | undefined {
+  if (!name || name.startsWith(`${groupLabel}: `)) return name;
+  return `${groupLabel}: ${name}`;
+}
 
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
@@ -54,8 +88,9 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
     w: "40px",
     wrapAction: false,
     isAction: true,
-    // Select Column should not display the select toggle for `expandableHeader` or `totals` row kinds
+    // Select Column should not display the select toggle for group, expandable, or totals header rows.
     expandableHeader: emptyCell,
+    groupHeader: emptyCell,
     totals: emptyCell,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
@@ -85,8 +120,9 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
     w: "38px",
     wrapAction: false,
     isAction: true,
-    // Collapse Column should not display the collapse toggle for `expandableHeader` or `totals` row kinds
+    // Collapse Column should not display the collapse toggle for group, expandable, or totals header rows.
     expandableHeader: emptyCell,
+    groupHeader: emptyCell,
     totals: emptyCell,
     ...columnDef,
   };
@@ -119,6 +155,7 @@ export function pinColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>):
     isAction: true,
     header: emptyCell,
     expandableHeader: emptyCell,
+    groupHeader: emptyCell,
     totals: emptyCell,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,
@@ -155,6 +192,7 @@ function layoutGutterColumn<T extends Kinded>(
     isLayoutGutter: true,
     canHide: false,
     expandableHeader: emptyCell,
+    groupHeader: emptyCell,
     totals: emptyCell,
     ...(sticky ? { sticky } : {}),
   };
@@ -454,6 +492,7 @@ export function dragHandleColumn<T extends Kinded>(columnDef?: Partial<GridColum
     wrapAction: false,
     isAction: true,
     expandableHeader: emptyCell,
+    groupHeader: emptyCell,
     totals: emptyCell,
     // Use any of the user's per-row kind methods if they have them.
     ...columnDef,

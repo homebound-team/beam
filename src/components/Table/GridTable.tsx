@@ -44,6 +44,7 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
   getTableRefWidthStyles,
+  GROUP_HEADER,
   HEADER,
   isCursorBelowMidpoint,
   KEPT_GROUP,
@@ -519,7 +520,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   ] = useComputed(() => {
     if (as === "card") {
       const cardElements = tableState.visibleRows
-        .filter((rs) => ![HEADER, EXPANDABLE_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind))
+        .filter((rs) => ![HEADER, EXPANDABLE_HEADER, GROUP_HEADER, TOTALS, KEPT_GROUP].includes(rs.kind))
         .map((rs) => (
           <TableCard
             key={rs.key}
@@ -538,6 +539,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     // Split out the header rows from the data rows so that we can put an `infoMessage` in between them (if needed).
     const headerRows: ReactElement[] = [];
     const expandableHeaderRows: ReactElement[] = [];
+    const groupHeaderRows: ReactElement[] = [];
     const totalsRows: ReactElement[] = [];
     const keptSelectedRows: ReactElement[] = [];
     let visibleDataRows: ReactElement[] = [];
@@ -549,9 +551,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     const pinnedIds = new Set(pinnedRowStates.map((rs) => rs.row.id));
     const visibleRows = tableState.visibleRows.filter((rs) => !pinnedIds.has(rs.row.id));
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
+    const hasGroupHeader = visibleRows.some((rs) => rs.kind === GROUP_HEADER);
 
     const omitRowHover = "rowHover" in maybeStyle && maybeStyle.rowHover === false;
-    const isHeadKind = (kind: string) => [HEADER, EXPANDABLE_HEADER, TOTALS].includes(kind);
+    const isHeadKind = (kind: string) => [HEADER, EXPANDABLE_HEADER, GROUP_HEADER, TOTALS].includes(kind);
 
     // Builds a `<Row>` element; shared by the partition loop and the pinned section so they stay in sync.
     const makeRow = (
@@ -578,6 +581,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
           omitRowHover,
           hasExpandableHeader,
+          hasGroupHeader,
           isFirstHeadRow,
           isFirstBodyRow,
           isLastBodyRow,
@@ -676,6 +680,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
         headerRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
       } else if (rs.kind === "expandableHeader") {
         expandableHeaderRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
+      } else if (rs.kind === GROUP_HEADER) {
+        groupHeaderRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
       } else if (rs.kind === "totals") {
         totalsRows.push(makeRow(rs, isFirstHeadRow, false, false, false));
       } else if (rs.isKept || rs.kind === KEPT_GROUP) {
@@ -686,7 +692,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     });
 
     // Once our header rows are created we can organize them in expected order.
-    const tableHeadRows = expandableHeaderRows.concat(headerRows).concat(totalsRows);
+    const tableHeadRows = groupHeaderRows.concat(expandableHeaderRows).concat(headerRows).concat(totalsRows);
 
     // Build the runtime pinned section from `pinnedRowStates` (sourced from all states, so pins the
     // current filter would otherwise hide still show — mirroring how kept rows are sourced).
