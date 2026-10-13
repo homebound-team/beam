@@ -5,13 +5,23 @@ import { IconButton } from "src/components/IconButton";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 
+export type WorkflowDestructiveAction = {
+  /** Runs once the user confirms. The dirty guard is suspended while it runs, so its own navigation is not blocked. */
+  onConfirm: (e: PressEvent) => void | Promise<void>;
+  /** Button and confirm label. Defaults to "Remove". */
+  label?: string;
+  /** Confirm modal copy. Defaults to "Are you sure?" / "This can't be undone." */
+  confirmTitle?: ReactNode;
+  confirmMessage?: ReactNode;
+};
+
 export type WorkflowActionsProps = {
   /** Leaves the workflow without saving. Always shown. */
   onCancel: (e: PressEvent) => void;
   /** Saves partial progress and exits. Used whenever canExitEarly is true. */
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
-  /** Destructive action on the object being edited. */
-  onRemove?: (e: PressEvent) => void | Promise<void>;
+  /** Destructive action on the workflow, rendered as a `danger` button before Continue/Complete. */
+  destructiveAction?: WorkflowDestructiveAction;
   /** Label for the completion button shown on the last step (or when there is no next step). */
   completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. */
@@ -27,12 +37,12 @@ export type WorkflowActionsProps = {
   onContinue?: () => boolean | void | Promise<boolean | void>;
 };
 
-/** The workflow's fixed CTA set (Back/Cancel/Save & Exit/Remove/Continue-or-Complete); shared by stepper and focused-form chrome. */
+/** The workflow's fixed CTA set (Back/Cancel/Save & Exit/destructive/Continue-or-Complete); shared by stepper and focused-form chrome. */
 export function WorkflowActions(props: WorkflowActionsProps) {
   const {
     onCancel,
     onSaveAndExit,
-    onRemove,
+    destructiveAction,
     completeLabel,
     onComplete,
     primaryDisabled,
@@ -53,7 +63,9 @@ export function WorkflowActions(props: WorkflowActionsProps) {
       <div css={Css.df.aic.gap1.$}>
         <Button label="Cancel" variant="quaternary" onClick={onCancel} />
         {onSaveAndExit && <Button label="Save & Exit" variant="secondary" onClick={onSaveAndExit} />}
-        {onRemove && <Button label="Remove" variant="danger" onClick={onRemove} />}
+        {destructiveAction && (
+          <Button label={destructiveAction.label ?? "Remove"} variant="danger" onClick={destructiveAction.onConfirm} />
+        )}
         {isLastStep ? (
           <Button label={completeLabel} variant={primaryVariant} onClick={onComplete} disabled={primaryDisabled} />
         ) : (

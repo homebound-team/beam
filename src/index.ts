@@ -283,6 +283,7 @@ export type { FocusedFormLayoutProps } from "./layouts/Workflow/FocusedFormLayou
 export type { RightPaneTrigger } from "./layouts/Workflow/RightPaneTriggers";
 export { StepperLayout } from "./layouts/Workflow/StepperLayout";
 export type { StepperLayoutProps, StepperLayoutStep } from "./layouts/Workflow/StepperLayout";
+export type { WorkflowDestructiveAction } from "./layouts/Workflow/WorkflowActions";
 export type { AllowNavigationArgs } from "./layouts/Workflow/useUnsavedChangesGuard";
 // ./forms
 export * from "./forms/BoundCheckboxField";

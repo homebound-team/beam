@@ -43,10 +43,17 @@ export function WithRightPaneTriggers() {
   );
 }
 
-/** Editing an existing object with a destructive `onRemove`: Cancel / Remove / Save. */
-export function WithRemove() {
+/** Editing an existing object with a destructive action: Cancel / Remove / Save. Remove confirms before it runs. */
+export function WithDestructiveAction() {
   return (
-    <WorkflowChrome completeLabel="Save" onRemove={action("remove clicked")}>
+    <WorkflowChrome
+      completeLabel="Save"
+      destructiveAction={{
+        onConfirm: action("remove confirmed"),
+        confirmTitle: "Remove this material?",
+        confirmMessage: "The listing and its variants will be deleted from the catalog.",
+      }}
+    >
       <FormSectionLayout
         withJumpLinks
         title="Edit Material Listing"
@@ -80,7 +87,7 @@ function WorkflowChrome({
   children: ReactNode;
   aiMode?: boolean;
   completeLabel?: FocusedFormLayoutProps["completeLabel"];
-  onRemove?: FocusedFormLayoutProps["onRemove"];
+  destructiveAction?: FocusedFormLayoutProps["destructiveAction"];
   rightPaneTriggers?: ReturnType<typeof createRightPaneTriggers>;
 }) {
   return (

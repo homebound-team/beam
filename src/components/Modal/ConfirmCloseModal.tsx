@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useBeamContext } from "src/components/BeamContext";
-import { Button } from "src/components/Button";
+import { Button, type ButtonVariant } from "src/components/Button";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 
 type ConfirmCloseModalProps = {
@@ -11,6 +11,8 @@ type ConfirmCloseModalProps = {
   message?: ReactNode;
   discardText?: string;
   continueText?: string;
+  /** Defaults to `primary`; `danger` when continuing is the destructive choice. */
+  continueVariant?: ButtonVariant;
 };
 
 /** Modal content for discarding unsaved changes (SuperDrawer close, workflow leave, etc.). */
@@ -22,6 +24,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
     message = "Any changes you've made so far will be lost.",
     discardText = "Discard Changes",
     continueText = "Continue Editing",
+    continueVariant = "primary",
   } = props;
   const { modalState } = useBeamContext();
 
@@ -50,6 +53,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
         />
         <Button
           label={continueText}
+          variant={continueVariant}
           onClick={() => {
             onContinue?.();
             closeModal();

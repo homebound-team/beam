@@ -92,16 +92,69 @@ describe("FocusedFormLayout", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it("renders a danger Remove button before Save when onRemove is set", async () => {
-    // Given an edit form with onRemove
-    const onRemove = vi.fn();
-    const r = await render(<FocusedFormLayout {...baseProps({ completeLabel: "Save", onRemove })} />, withRouter());
+  it("renders the destructive button before Save and runs it only after confirming", async () => {
+    // Given an edit form with a destructive action using the default label and copy
+    const onConfirm = vi.fn();
+    const r = await render(
+      <FocusedFormLayout {...baseProps({ completeLabel: "Save", destructiveAction: { onConfirm } })} />,
+      withRouter(),
+    );
+
+    // Then Remove sits between Cancel and Save
+    expect(r.focusedFormLayout_header).toHaveTextContent("CancelRemoveSave");
 
     // When Remove is clicked
     click(r.remove);
 
-    // Then onRemove is called
-    expect(onRemove).toHaveBeenCalledTimes(1);
+    // Then a confirm modal opens and the action has not run
+    expect(r.getByText("Are you sure?")).toBeInTheDocument();
+    expect(r.getByText("This can't be undone.")).toBeInTheDocument();
+    expect(onConfirm).not.toHaveBeenCalled();
+
+    // When the modal's Cancel is clicked
+    click(r.getAllByTestId("cancel")[1]);
+
+    // Then the action still has not run
+    expect(onConfirm).not.toHaveBeenCalled();
+
+    // When Remove is clicked and confirmed
+    click(r.remove);
+    await clickAndWait(r.getAllByTestId("remove")[1]);
+
+    // Then the action runs
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not ask about unsaved changes when the destructive action navigates away from a dirty form", async () => {
+    // Given a dirty form whose destructive action redirects after async work
+    const router = withRouter("/");
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({
+          completeLabel: "Save",
+          isDirty: () => true,
+          destructiveAction: {
+            label: "Delete",
+            confirmTitle: "Delete this package?",
+            onConfirm: async () => {
+              await Promise.resolve();
+              void router.navigate("/other");
+            },
+          },
+        })}
+      />,
+      router,
+    );
+
+    // When Delete is clicked and confirmed, with the custom copy shown
+    click(r.delete);
+    expect(r.query.discardChanges).toBeNull();
+    expect(r.getByText("Delete this package?")).toBeInTheDocument();
+    await clickAndWait(r.getAllByTestId("delete")[1]);
+
+    // Then the redirect goes through with no Leave page? prompt
+    expect(router.location.pathname).toBe("/other");
+    expect(r.queryByText("Leave page?")).toBeNull();
   });
 
   it("calls onCancel when Cancel is clicked and the form is clean", async () => {

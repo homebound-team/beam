@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { type BlockerFunction, useBlocker } from "react-router-dom";
 import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
 import { useModal } from "src/components/Modal/useModal";
+import type { WorkflowDestructiveAction } from "./WorkflowActions";
 
 /** The pending in-app navigation, as React Router reports it (pathnames are basename-stripped). */
 export type AllowNavigationArgs = Parameters<BlockerFunction>[0];
@@ -13,6 +14,8 @@ type UseUnsavedChangesGuardOptions = {
   /** Consulted only while dirty — return true to allow a route change that stays on this form. */
   allowNavigation?: (args: AllowNavigationArgs) => boolean;
   onCancel: (e: PressEvent) => void;
+  /** A destructive action on the workflow, this will always render a confirmation modal before the action is run. */
+  destructiveAction?: WorkflowDestructiveAction;
 };
 
 type NavigationBlockerActions = {
@@ -25,16 +28,17 @@ type NavigationBlockerActions = {
 /** Gates Cancel, `useBlocker`, and `beforeunload` when `isDirty` reports unsaved changes. */
 export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): {
   onCancelClick: (e: PressEvent) => void;
+  onDestructiveActionClick: ((e: PressEvent) => void) | undefined;
   navigationBlocker: NavigationBlockerActions | undefined;
 } {
-  const { isDirty, allowNavigation, onCancel } = options;
+  const { isDirty, allowNavigation, onCancel, destructiveAction } = options;
   const { openModal } = useModal();
 
   const isDirtyRef = useRef(isDirty);
   isDirtyRef.current = isDirty;
   const allowNavigationRef = useRef(allowNavigation);
   allowNavigationRef.current = allowNavigation;
-  // Set only while a confirmed Cancel runs, so if a navigation redirect happens during onCancel, that redirect is not blocked by useBlocker
+  // Set only while a confirmed Cancel or destructive action runs, so a redirect inside the handler is not blocked by useBlocker
   const allowCancelNavigationRef = useRef(false);
 
   useEffect(() => {
@@ -74,12 +78,44 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
     });
   };
 
+  const onDestructiveActionClick = destructiveAction
+    ? (e: PressEvent) => {
+        const {
+          label = "Remove",
+          confirmTitle = "Are you sure?",
+          confirmMessage = "This can't be undone.",
+          onConfirm,
+        } = destructiveAction;
+        openModal({
+          allowClosing: false,
+          content: (
+            <ConfirmCloseModal
+              title={confirmTitle}
+              message={confirmMessage}
+              discardText="Cancel"
+              onClose={() => {}}
+              continueText={label}
+              continueVariant="danger"
+              onContinue={async () => {
+                allowCancelNavigationRef.current = true;
+                try {
+                  await onConfirm(e);
+                } finally {
+                  allowCancelNavigationRef.current = false;
+                }
+              }}
+            />
+          ),
+        });
+      }
+    : undefined;
+
   const navigationBlocker: NavigationBlockerActions | undefined =
     blocker.state === "blocked"
       ? { proceed: () => blocker.proceed?.(), cancelNavigation: () => blocker.reset?.() }
       : undefined;
 
-  return { onCancelClick, navigationBlocker };
+  return { onCancelClick, onDestructiveActionClick, navigationBlocker };
 }
 
 /** Opens the discard modal while React Router has a blocked navigation. */
