@@ -153,6 +153,14 @@ export class RowState<R extends Kinded> {
     return this.selected;
   }
 
+  /** This row's share of `TableState.selectedLeafRowCount`, see `GridDataRow.childrenCount`. */
+  get selectedLeafRowCount(): number {
+    if (this.isReservedKind || !this.selected) return 0;
+    // Loaded children count themselves; a lazy group's placeholder child isn't selectable
+    if (this.children?.some((c) => c.row.selectable !== false)) return 0;
+    return this.row.childrenCount ?? 1;
+  }
+
   /** The UI state for checked/unchecked + "partially checked" for parents. */
   get selectedState(): SelectedState {
     // Parent `selectedState` is special b/c it does not directly depend on the parent's own selected-ness,

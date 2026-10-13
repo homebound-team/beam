@@ -225,6 +225,11 @@ export class TableState<R extends Kinded> {
     return this.rowStates.allStates.filter((rs) => rs.isSelected && !reservedRowKinds.includes(rs.row.kind));
   }
 
+  /** How many leaf rows are selected, for `GridTableLayout`'s selection summary; see `GridDataRow.childrenCount`. */
+  get selectedLeafRowCount(): number {
+    return this.rowStates.allStates.reduce((sum, rs) => sum + rs.selectedLeafRowCount, 0);
+  }
+
   /** Returns kept group row, with the latest kept children, if any. */
   get keptRowGroup(): GridDataRow<R> {
     return this.rowStates.get(KEPT_GROUP).row;
