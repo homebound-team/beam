@@ -14,7 +14,7 @@ import {
   initializeOptions,
   type OptionsOrLoad,
   unsetOption,
-} from "src/inputs/internal/selectOptions";
+} from "src/inputs/internal/selectFieldHelpers";
 import { getFieldWidth } from "src/inputs/utils";
 import { keyToValue, type Value, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";

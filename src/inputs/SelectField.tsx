@@ -1,7 +1,7 @@
 import { useMemo, type JSX } from "react";
 import type { Value } from "src/inputs/Value";
 import { ComboBoxBase, type ComboBoxBaseProps } from "src/inputs/internal/ComboBoxBase";
-import { unsetOption } from "src/inputs/internal/selectOptions";
+import { unsetOption } from "src/inputs/internal/selectFieldHelpers";
 import type { HasIdIsh, HasNameIsh, Optional } from "src/types";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 

@@ -6,7 +6,7 @@ import { Popover } from "src/components/internal/Popover";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { ListBox } from "src/inputs/internal/ListBox";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectOptions";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { type Value, valueToKey } from "src/inputs/Value";
 

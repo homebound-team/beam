@@ -19,7 +19,7 @@ import { resolveTooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectOptions";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
 import {
   findOption,
   findOptions,
