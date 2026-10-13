@@ -3,13 +3,15 @@ import { DismissButton, OverlayContainer, useOverlay } from "react-aria";
 import { contrastDataTheme, useContrastScope } from "src/components/ContrastScope";
 import { shouldDismissOverlay } from "src/components/internal/shouldDismissOverlay";
 
-type PopoverProps = {
+// `interface extends any` still checks these fields. `{ ... } & PropsWithChildren<any>` collapses to `any`.
+// oxlint-disable-next-line typescript/consistent-type-definitions
+interface PopoverProps extends React.PropsWithChildren<any> {
   triggerRef: MutableRefObject<HTMLElement | null>;
   popoverRef: MutableRefObject<HTMLDivElement | null>;
   positionProps: React.HTMLAttributes<Element>;
   onClose: () => void;
   isOpen: boolean;
-} & React.PropsWithChildren<any>;
+}
 
 /** Popover is used for generating menus and list-boxes */
 export function Popover(props: PopoverProps) {
@@ -22,6 +24,7 @@ export function Popover(props: PopoverProps) {
       isDismissable: true,
       shouldCloseOnInteractOutside: (e) => {
         // Returning `true` closes and stops the event. Returning `false` lets it through and does not close.
+        // A press on the trigger returns `true` because the trigger toggles the menu itself.
         if (triggerRef.current?.contains(e)) return true;
         return shouldDismissOverlay(e, triggerRef.current);
       },
