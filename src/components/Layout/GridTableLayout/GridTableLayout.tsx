@@ -50,6 +50,8 @@ export type GridTableLayoutProps<
   emptyFallback?: string;
   /** Inline buttons, icon buttons, and an optional overflow menu (`kind: "menu"`). */
   actions?: HeaderAction[];
+  /** Shows "N Rows Selected · Clear" before the columns selector; Clear deselects every row. */
+  selectionSummary?: boolean;
   hideEditColumns?: boolean;
   totalCount?: number;
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
@@ -98,6 +100,7 @@ function GridTableLayoutComponent<
     tableProps,
     layoutState,
     actions,
+    selectionSummary = false,
     hideEditColumns = false,
     withCardView,
     defaultView = "list",
@@ -129,7 +132,9 @@ function GridTableLayoutComponent<
     layoutState?.search ||
     hasHideableColumns ||
     withCardView ||
-    actions?.length
+    actions?.length ||
+    // Rendered before anything's selected, so the pill doesn't shift the table
+    selectionSummary
   );
   // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
   // (which only controls whether the list/card toggle is shown).
@@ -179,6 +184,7 @@ function GridTableLayoutComponent<
       clearFilters={clearFilters}
       searchApi={searchApiRef}
       actions={actions}
+      selectionSummary={selectionSummary}
     />
   );
 

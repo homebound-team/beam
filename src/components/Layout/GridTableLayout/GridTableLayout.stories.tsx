@@ -21,7 +21,7 @@ import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { Css } from "src/Css";
 import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
-import { withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
@@ -123,6 +123,30 @@ export function Loading() {
     </TestProjectLayout>
   );
 }
+
+export function WithSelectionSummary() {
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => [simpleHeader, ...makeSelectedRows()], []);
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with selection summary" />
+      <GridTableLayoutComponent
+        selectionSummary
+        tableProps={{ columns, rows }}
+        actions={[
+          {
+            kind: "menu",
+            trigger: { icon: "verticalDots", variant: "outline" },
+            items: [{ label: "Bulk Edit", onClick: noop }],
+          },
+        ]}
+      />
+    </TestProjectLayout>
+  );
+}
+
+WithSelectionSummary.parameters = { chromatic: { modes: viewportModes("desktop", "mobile1") } };
 
 export function ManyFilters() {
   const filterDefs = useMemo(() => getManyFilterDefs(), []);
@@ -1320,6 +1344,37 @@ function makeNestedRows(repeat: number = 1): GridDataRow<Row>[] {
       },
     ];
   });
+}
+
+/** p1's children start selected, so the pill shows without interaction. */
+function makeSelectedRows(): GridDataRow<Row>[] {
+  return [
+    {
+      kind: "parent",
+      id: "p1",
+      data: { name: "parent 1", value: 100, status: "active", priority: 1 },
+      children: [
+        {
+          kind: "data",
+          id: "p1c1",
+          data: { name: "child p1c1", value: 50, status: "active", priority: 2 },
+          initSelected: true,
+        },
+        {
+          kind: "data",
+          id: "p1c2",
+          data: { name: "child p1c2", value: 30, status: "inactive", priority: 1 },
+          initSelected: true,
+        },
+      ],
+    },
+    {
+      kind: "parent",
+      id: "p2",
+      data: { name: "parent 2", value: 200, status: "inactive", priority: 2 },
+      children: [{ kind: "data", id: "p2c1", data: { name: "child p2c1", value: 100, status: "active", priority: 3 } }],
+    },
+  ];
 }
 
 function ModalGridTable({ virtualized = false }: { virtualized?: boolean }) {
