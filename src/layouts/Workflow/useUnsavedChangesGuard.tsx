@@ -95,7 +95,7 @@ export function useUnsavedChangesGuard(options: UseUnsavedChangesGuardOptions): 
               discardText="Cancel"
               onClose={() => {}}
               continueText={label}
-              continueVariant="danger"
+              isDestructive
               onContinue={async () => {
                 allowCancelNavigationRef.current = true;
                 try {
