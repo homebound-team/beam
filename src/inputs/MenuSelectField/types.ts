@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
-import type { OptionsOrLoad } from "src/inputs/internal/selectOptions";
+import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import type { Value } from "src/inputs/Value";
 
 /** Common menu select presentation and option props. */

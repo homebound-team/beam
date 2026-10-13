@@ -3,7 +3,7 @@ import { type KeyboardEvent, useId, useLayoutEffect, useMemo, useRef, useState }
 import { useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
-import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectOptions";
+import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectFieldHelpers";
 import { MenuSelectKeyboardDelegate } from "src/inputs/MenuSelectField/internal/menuSelectKeyboard";
 import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { MenuSelectFieldBaseProps } from "src/inputs/MenuSelectField/types";
