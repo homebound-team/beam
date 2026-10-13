@@ -11,6 +11,8 @@ type ConfirmCloseModalProps = {
   message?: ReactNode;
   discardText?: string;
   continueText?: string;
+  /** Renders the continue button as `danger` when continuing is the destructive choice. */
+  isDestructive?: boolean;
 };
 
 /** Modal content for discarding unsaved changes (SuperDrawer close, workflow leave, etc.). */
@@ -22,6 +24,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
     message = "Any changes you've made so far will be lost.",
     discardText = "Discard Changes",
     continueText = "Continue Editing",
+    isDestructive = false,
   } = props;
   const { modalState } = useBeamContext();
 
@@ -50,6 +53,7 @@ export function ConfirmCloseModal(props: ConfirmCloseModalProps) {
         />
         <Button
           label={continueText}
+          variant={isDestructive ? "danger" : "primary"}
           onClick={() => {
             onContinue?.();
             closeModal();

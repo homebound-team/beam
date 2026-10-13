@@ -6,7 +6,7 @@ import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
-import { FocusedFormLayout } from "src/layouts/Workflow/FocusedFormLayout";
+import { FocusedFormLayout, type FocusedFormLayoutProps } from "src/layouts/Workflow/FocusedFormLayout";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { createFormSections, createRightPaneTriggers } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -38,6 +38,27 @@ export function WithRightPaneTriggers() {
         withJumpLinks
         title="Link Design Package"
         description="Connect this package to a market and give it a name."
+        sections={createFormSections()}
+      />
+    </WorkflowChrome>
+  );
+}
+
+/** Editing an existing object with a destructive action: Cancel / Remove / Save. Remove confirms before it runs. */
+export function WithDestructiveAction() {
+  return (
+    <WorkflowChrome
+      completeLabel="Save"
+      destructiveAction={{
+        onConfirm: action("remove confirmed"),
+        confirmTitle: "Remove this material?",
+        confirmMessage: "The listing and its variants will be deleted from the catalog.",
+      }}
+    >
+      <FormSectionLayout
+        withJumpLinks
+        title="Edit Material Listing"
+        description="Update the listing details or remove it from the catalog."
         sections={createFormSections()}
       />
     </WorkflowChrome>
@@ -81,6 +102,8 @@ function WorkflowChrome({
 }: {
   children: ReactNode;
   aiMode?: boolean;
+  completeLabel?: FocusedFormLayoutProps["completeLabel"];
+  destructiveAction?: FocusedFormLayoutProps["destructiveAction"];
   banner?: PageBannerProps;
   rightPaneTriggers?: ReturnType<typeof createRightPaneTriggers>;
 }) {

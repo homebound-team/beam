@@ -58,6 +58,7 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
     documentTitleSuffix,
     breadcrumbs,
     onCancel,
+    destructiveAction,
     rightPaneTriggers,
     banner: bannerProp,
     ...actionProps
@@ -65,8 +66,20 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
   const tid = useTestIds(props, "workflowPageLayout");
   const { slot: bannerSlot, height: bannerHeight } = usePageBannerSlot(bannerProp, tid);
   const { sm: isMobile } = useBreakpoint();
-  const { onCancelClick, navigationBlocker } = useUnsavedChangesGuard({ isDirty, allowNavigation, onCancel });
-  const actions = <WorkflowActions {...actionProps} aiMode={aiMode} onCancel={onCancelClick} />;
+  const { onCancelClick, onDestructiveActionClick, navigationBlocker } = useUnsavedChangesGuard({
+    isDirty,
+    allowNavigation,
+    onCancel,
+    destructiveAction,
+  });
+  const actions = (
+    <WorkflowActions
+      {...actionProps}
+      aiMode={aiMode}
+      onCancel={onCancelClick}
+      destructiveAction={destructiveAction && { ...destructiveAction, onConfirm: onDestructiveActionClick! }}
+    />
+  );
   const triggers = rightPaneTriggers ?? [];
   const pageTriggers = triggers.length > 0 ? <WorkflowPageRightPaneTriggers triggers={triggers} /> : undefined;
 
