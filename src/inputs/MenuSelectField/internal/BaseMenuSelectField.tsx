@@ -1,318 +1,39 @@
-import type { Key } from "@react-types/shared";
-import { type JSX, type KeyboardEvent, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ListKeyboardDelegate, mergeProps, useFilter, useFocusRing, useHover } from "react-aria";
-import { Item, type Selection, useListState } from "react-stately";
-import { HelperText } from "src/components/HelperText";
-import { Icon } from "src/components/Icon";
-import { Label } from "src/components/Label";
-import { usePresentationContext } from "src/components/PresentationContext";
-import { OriginalValue, ProposedValue } from "src/components/ProposedValue";
-import { BorderHoverChild } from "src/components/Table/components/Row";
-import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Tokens } from "src/Css";
-import { useLabelSuffix } from "src/forms/labelUtils";
+import type { JSX } from "react";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
-import { ErrorMessage } from "src/inputs/ErrorMessage";
-import { getFieldChrome, selectedValueCss } from "src/inputs/fieldChrome";
-import { useAiProposal } from "src/inputs/hooks/useAiProposal";
-import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/ComboBoxBase";
 import { AnchoredOverlay } from "src/inputs/MenuSelectField/internal/AnchoredOverlay";
 import { BottomSheet } from "src/inputs/MenuSelectField/internal/BottomSheet";
 import { MenuPanel } from "src/inputs/MenuSelectField/internal/MenuPanel";
 import { MenuSearchInput } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
-import { optionDomId, OptionList } from "src/inputs/MenuSelectField/internal/OptionList";
-import type { MenuSelectFieldBaseProps } from "src/inputs/MenuSelectField/types";
-import { type Value, valueToKey } from "src/inputs/Value";
-import type { TextFieldInternalProps } from "src/interfaces";
+import { MenuSelectTrigger } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
+import { OptionList } from "src/inputs/MenuSelectField/internal/OptionList";
+import {
+  useMenuSelectController,
+  type MenuSelectControllerProps,
+} from "src/inputs/MenuSelectField/internal/useMenuSelectController";
+import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { maybeCall } from "src/utils/helpers";
-import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 import { useTestIds } from "src/utils/useTestIds";
 
-type BaseMenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
-  value: V | undefined;
-  /** Value proposed by an AI model; puts the field in AI mode. */
-  proposedValue?: V;
-  onSelect: (value: V | undefined, opt: O | undefined) => void;
-};
-
 /** Menu select implementation. Desktop popover; small screens a bottom sheet. */
-export function BaseMenuSelectField<O, V extends Value>(props: BaseMenuSelectFieldProps<O, V>): JSX.Element {
-  const {
-    label,
-    options: optionsProp,
-    getOptionValue = defaultOptionValue as (opt: O) => V,
-    getOptionLabel = defaultOptionLabel as (opt: O) => string,
-    getOptionMenuLabel,
-    getOptionSearchText,
-    disabledOptions,
-    nothingSelectedText = "",
-    placeholder,
-    searchPlaceholder,
-    disabled,
-    readOnly,
-    required,
-    errorMsg,
-    helperText,
-    onFocus,
-    onBlur,
-    labelStyle: labelStyleProp,
-    inputStylePalette,
-    value: propValue,
-    proposedValue,
-    onSelect,
-  } = props;
-  const internalProps: TextFieldInternalProps = (props as any).internalProps ?? {};
-  const { compound = false, forceFocus = false, forceHover = false } = internalProps;
-  const isDisabled = !!disabled;
-  const isReadOnly = !!readOnly;
+export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControllerProps<O, V>): JSX.Element {
+  const { label, searchPlaceholder } = props;
+  const { triggerRef, searchRef, listRef, field: menu } = useMenuSelectController(props);
   const tid = useTestIds(props, defaultTestId(label));
   const { sm: isMobile } = useBreakpoint();
-  const { fieldProps } = usePresentationContext();
-  const labelStyle = labelStyleProp ?? fieldProps?.labelStyle ?? "above";
-  const compact = props.compact ?? fieldProps?.compact ?? false;
-  const borderless = props.borderless ?? fieldProps?.borderless ?? false;
-  const borderOnHover = props.borderOnHover ?? fieldProps?.borderOnHover ?? false;
-  const fullWidth = props.fullWidth ?? fieldProps?.fullWidth ?? false;
-  const visuallyDisabled = props.visuallyDisabled ?? fieldProps?.visuallyDisabled ?? true;
-  const errorInTooltip = props.errorInTooltip ?? fieldProps?.errorInTooltip ?? false;
-  const typeScale = fieldProps?.typeScale ?? "sm";
-  const labelSuffix = useLabelSuffix(required, isReadOnly);
-
-  const fieldId = useId();
-  const listId = `${fieldId}-listbox`;
-  const triggerId = `${fieldId}-trigger`;
-  const labelId = `${fieldId}-label`;
-  const valueId = `${fieldId}-value`;
-  const errorId = `${fieldId}-error`;
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const searchRef = useRef<HTMLInputElement | null>(null);
-  const listRef = useRef<HTMLDivElement | null>(null);
-  // Tracks field-level focus across the trigger and the portaled menu, so onFocus/onBlur fire once per visit.
-  const hasFocusRef = useRef(false);
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const didRequestOptionsRef = useRef(false);
-  const options = useMemo(
-    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, undefined, false),
-    // getOptionValue and getOptionLabel are typically inline lambdas
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [optionsProp],
-  );
-  const { hoverProps, isHovered } = useHover({});
-  const { focusProps, isFocusVisible } = useFocusRing();
-  const { contains } = useFilter({ sensitivity: "base" });
-
-  const optionsByKey = useMemo(
-    () => new Map(options.map((o) => [valueToKey(getOptionValue(o)), o])),
-    // getOptionValue is typically an inline lambda
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [options],
-  );
-  // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
-  const { effectiveValue: value, proposalProps } = useAiProposal(propValue, proposedValue, (v) => {
-    const option = optionsByKey.get(valueToKey(v));
-    return option === undefined ? undefined : getOptionLabel(option);
-  });
-  const selectedKeys = useMemo(() => new Set(value === undefined ? [] : [valueToKey(value)]), [value]);
-  const filteredOptions = useMemo(
-    () =>
-      search ? options.filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains)) : options,
-    // getOptionLabel and getOptionSearchText are typically inline lambdas
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [options, search, contains],
-  );
-  const [disabledKeys, disabledReasons] = useMemo(() => {
-    const tuples = (disabledOptions ?? []).map(disabledOptionToKeyedTuple);
-    return [tuples.map(([k]) => String(k)), Object.fromEntries(tuples.map(([k, r]) => [String(k), r]))];
-  }, [disabledOptions]);
-
-  function onSelectionChange(keys: Selection) {
-    if (keys === "all") return;
-    const [key] = [...keys];
-    // Re-selecting the current value toggles it off in react-stately; treat that as "keep it" and close.
-    if (key === undefined) {
-      close({ restoreFocus: true });
-      return;
-    }
-    const opt = optionsByKey.get(String(key));
-    proposalProps.onUserEdit?.();
-    onSelect(opt === undefined ? undefined : getOptionValue(opt), opt);
-    close({ restoreFocus: true });
-  }
-
-  const state = useListState<O>({
-    items: filteredOptions,
-    children: (o: O) => (
-      <Item key={valueToKey(getOptionValue(o))} textValue={getOptionLabel(o)}>
-        {getOptionMenuLabel ? getOptionMenuLabel(o) : getOptionLabel(o)}
-      </Item>
-    ),
-    selectionMode: "single",
-    selectedKeys,
-    disabledKeys,
-    onSelectionChange,
-  });
-  const { selectionManager } = state;
-
-  // Page keys step the collection. Measuring the DOM under-counts a virtualized list.
-  const keyboardDelegate = useMemo(
-    () =>
-      new MenuSelectKeyboardDelegate<O>({
-        collection: state.collection,
-        disabledKeys: state.disabledKeys,
-        ref: listRef,
-      }),
-    [state.collection, state.disabledKeys],
-  );
-
-  function open() {
-    if (isDisabled || isReadOnly) return;
-    setSearch("");
-    setIsOpen(true);
-    if (didRequestOptionsRef.current || Array.isArray(optionsProp)) return;
-    didRequestOptionsRef.current = true;
-    setOptionsLoading(true);
-    void optionsProp.load().finally(() => setOptionsLoading(false));
-  }
-
-  function close(opts: { restoreFocus: boolean }) {
-    setIsOpen(false);
-    setSearch("");
-    if (opts.restoreFocus) {
-      triggerRef.current?.focus({ preventScroll: true });
-    } else if (hasFocusRef.current) {
-      settleBlur();
-    }
-  }
-
-  function settleBlur() {
-    hasFocusRef.current = false;
-    maybeCall(proposalProps.onUserBlur);
-    maybeCall(onBlur);
-  }
-
-  // Menus this size and smaller skip search. The count is the list in the menu, including a not-yet-loaded `current`.
-  const showSearch = options.length > searchOptionLimit;
-
-  // Focus the search, or the list when there is no search. Leave option focus unset until a keyboard move.
-  useLayoutEffect(() => {
-    if (!isOpen) return;
-    const keyTarget = showSearch ? searchRef.current : listRef.current;
-    keyTarget?.focus({ preventScroll: true });
-    selectionManager.setFocusedKey(null);
-    selectionManager.setFocused(false);
-    // Only on open, and when search appears after a lazy load. Later selection changes shouldn't move focus.
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, showSearch]);
-
-  // Typing starts a new list, so drop any keyboard highlight until the next arrow.
-  function onSearchChange(value: string) {
-    setSearch(value);
-    selectionManager.setFocusedKey(null);
-    selectionManager.setFocused(false);
-  }
-
-  function focusKey(key: Key | null) {
-    if (key == null) return;
-    // `isFocused` is what paints the row. Set it here so open and search can leave it off.
-    selectionManager.setFocused(true);
-    selectionManager.setFocusedKey(key);
-  }
-
-  function onMenuKeyDown(e: KeyboardEvent<HTMLElement>) {
-    const current = selectionManager.focusedKey;
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        focusKey(
-          current == null
-            ? keyboardDelegate.getFirstKey()
-            : (keyboardDelegate.getKeyBelow(current) ?? keyboardDelegate.getFirstKey()),
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        focusKey(
-          current == null
-            ? keyboardDelegate.getLastKey()
-            : (keyboardDelegate.getKeyAbove(current) ?? keyboardDelegate.getLastKey()),
-        );
-        break;
-      case "PageDown":
-        e.preventDefault();
-        focusKey(current == null ? keyboardDelegate.getFirstKey() : keyboardDelegate.getKeyPageBelow(current));
-        break;
-      case "PageUp":
-        e.preventDefault();
-        focusKey(current == null ? keyboardDelegate.getLastKey() : keyboardDelegate.getKeyPageAbove(current));
-        break;
-      case "Home":
-        e.preventDefault();
-        focusKey(keyboardDelegate.getFirstKey());
-        break;
-      case "End":
-        e.preventDefault();
-        focusKey(keyboardDelegate.getLastKey());
-        break;
-      case "Enter": {
-        e.preventDefault();
-        const key = selectionManager.focusedKey;
-        if (key != null && !state.disabledKeys.has(key)) selectionManager.select(key);
-        break;
-      }
-      case "Escape":
-        e.preventDefault();
-        // Keep an enclosing Modal from also closing.
-        e.stopPropagation();
-        close({ restoreFocus: true });
-        break;
-      case "Tab":
-        // The menu is portaled to the end of <body>; tabbing out would leave the page, so return to the trigger.
-        e.preventDefault();
-        close({ restoreFocus: true });
-        break;
-      default:
-        break;
-    }
-  }
-
-  function onTriggerKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
-    // Enter and Space activate the button's click. Arrows only open.
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-      e.preventDefault();
-      open();
-    }
-  }
-
-  const focusedKey = selectionManager.focusedKey;
-  const focusedIndex = focusedKey != null ? state.collection.getItem(focusedKey)?.index : undefined;
-  const activeDescendant = isOpen && focusedIndex !== undefined ? optionDomId(listId, focusedIndex) : undefined;
-  const initialIndex = Math.max(
-    0,
-    filteredOptions.findIndex((o) => selectedKeys.has(valueToKey(getOptionValue(o)))),
-  );
-
-  const selectedOption = value === undefined ? undefined : optionsByKey.get(valueToKey(value));
-  const selectedText = selectedOption === undefined ? "" : getOptionLabel(selectedOption);
-  const displayText = selectedText || nothingSelectedText || placeholder || "";
-  const isPlaceholder = !selectedText && !nothingSelectedText && !!placeholder;
   const panel = (
     <MenuPanel
       variant={isMobile ? "sheet" : "anchored"}
       header={
-        showSearch ? (
+        menu.showSearch ? (
           <MenuSearchInput
-            value={search}
-            onChange={onSearchChange}
+            value={menu.search}
+            onChange={menu.onSearchChange}
             inputRef={searchRef}
             label={`Search ${label}`}
             placeholder={searchPlaceholder}
-            listId={listId}
-            activeDescendant={activeDescendant}
-            onKeyDown={onMenuKeyDown}
+            listId={menu.listId}
+            activeDescendant={menu.activeDescendant}
+            onKeyDown={menu.onMenuKeyDown}
             {...tid}
           />
         ) : undefined
@@ -320,191 +41,32 @@ export function BaseMenuSelectField<O, V extends Value>(props: BaseMenuSelectFie
       {...tid}
     >
       <OptionList
-        state={state}
+        state={menu.state}
         listRef={listRef}
-        id={listId}
+        id={menu.listId}
         label={label}
-        loading={optionsLoading}
-        disabledReasons={disabledReasons}
-        initialIndex={initialIndex}
-        onKeyDown={showSearch ? undefined : onMenuKeyDown}
-        activeDescendant={showSearch ? undefined : activeDescendant}
+        loading={menu.optionsLoading}
+        disabledReasons={menu.disabledReasons}
+        initialIndex={menu.initialIndex}
+        onKeyDown={menu.showSearch ? undefined : menu.onMenuKeyDown}
+        activeDescendant={menu.showSearch ? undefined : menu.activeDescendant}
         {...tid}
       />
     </MenuPanel>
   );
 
-  const showFocus = ((isFocusVisible || isOpen) && !isDisabled && !isReadOnly) || forceFocus;
-  const showHover = (isHovered && !isDisabled && !isReadOnly && !showFocus) || forceHover;
-  // A compound field draws the box and owns anything below the control.
-  const showErrorAndHelper = !compound && !isDisabled && !isReadOnly;
-  const { proposedValue: proposedText, originalValue: originalText } = proposalProps;
-  const showProposal = proposedText !== undefined;
-  // Read-only draws both halves inline; editable fields strike the original through below.
-  const originalBelow = originalText && !isReadOnly ? originalText : undefined;
-  const fieldChrome = getFieldChrome({
-    typeScale,
-    labelStyle,
-    labelLeftFieldWidth: fieldProps?.labelLeftFieldWidth,
-    compact,
-    borderless,
-    borderOnHover,
-    fullWidth,
-    compound,
-    visuallyDisabled,
-    isHovered: isHovered || forceHover,
-    showProposal,
-    inputStylePalette,
-  });
-  const fieldStateCss = {
-    ...fieldChrome.control,
-    ...(isDisabled ? fieldChrome.disabled : {}),
-    ...(showFocus ? fieldChrome.focus : {}),
-    ...(showHover ? fieldChrome.hover : {}),
-    ...(errorMsg && !isDisabled ? fieldChrome.error : {}),
-    ...Css.tal.outline0.add("appearance", "none").add("font", "inherit").if(!isDisabled).cursorPointer.$,
-  };
-
-  // Outside `showErrorAndHelper`, because a disabled field still shows what it's replacing.
-  const supporting = (
-    <>
-      {originalBelow && <OriginalValue originalValue={originalBelow} {...tid.originalValue} />}
-      {showErrorAndHelper && errorMsg && !errorInTooltip && (
-        <ErrorMessage id={errorId} errorMsg={errorMsg} {...tid.errorMsg} />
-      )}
-      {showErrorAndHelper && helperText && <HelperText helperText={helperText} {...tid.helperText} />}
-    </>
-  );
-  const hasSupporting = !!(originalBelow || (showErrorAndHelper && (errorMsg || helperText)));
-
-  const valueNode = (
-    <>
-      {labelStyle === "inline" && (
-        <span
-          id={labelId}
-          css={Css.sm.wsnw.prPx(4).color(isDisabled && visuallyDisabled ? "currentColor" : Tokens.TextLabel).$}
-        >
-          {label}:
-        </span>
-      )}
-      <span id={valueId} css={Css.df.aic.fg1.mw0.oh.$}>
-        {isReadOnly && showProposal ? (
-          <span css={Css.fg1.truncate.$}>
-            <ProposedValue original={originalText} proposed={proposedText} {...tid.proposedValue} />
-          </span>
-        ) : (
-          <>
-            <span
-              css={{
-                ...Css.fg1.truncate.color(isPlaceholder ? inputPlaceholderColor : undefined).$,
-                // A placeholder reads as hint text, so it stays at the field's regular weight.
-                ...(!isPlaceholder ? selectedValueCss(labelStyle, isReadOnly) : {}),
-                ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
-              }}
-            >
-              {displayText}
-            </span>
-          </>
-        )}
-      </span>
-      {errorInTooltip && errorMsg && showErrorAndHelper && (
-        <span css={Css.df.aic.fs0.pl1.$}>
-          <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} />
-        </span>
-      )}
-      {!isReadOnly && (
-        <span
-          css={Css.df.aic.fs0.pl1.color(isDisabled ? Tokens.FieldTextDisabled : Tokens.TextPlaceholder).$}
-          {...tid.toggle}
-        >
-          <Icon icon={isOpen ? "chevronUp" : "chevronDown"} />
-        </span>
-      )}
-    </>
-  );
-
   return (
     <>
-      <div css={fieldChrome.container}>
-        {label && labelStyle !== "inline" && (
-          <Label
-            labelProps={{
-              id: labelId,
-              htmlFor: isReadOnly ? undefined : triggerId,
-              onClick: (event) => {
-                // A native label click would also activate the button and toggle the menu shut.
-                event.preventDefault();
-                if (isDisabled || isReadOnly || isOpen) return;
-                triggerRef.current?.focus();
-                open();
-              },
-            }}
-            hidden={labelStyle === "hidden"}
-            label={label}
-            inline={labelStyle === "left"}
-            suffix={labelSuffix}
-            {...tid.label}
-          />
-        )}
-        {maybeTooltip({
-          title: resolveTooltip(disabled, undefined, readOnly),
-          placement: "top",
-          children: isReadOnly ? (
-            <div
-              css={fieldChrome.readOnly}
-              data-readonly="true"
-              data-ai-mode={showProposal ? "true" : undefined}
-              {...tid}
-            >
-              {valueNode}
-            </div>
-          ) : (
-            <button
-              {...mergeProps(hoverProps, focusProps, {
-                id: triggerId,
-                type: "button" as const,
-                disabled: isDisabled,
-                "aria-haspopup": "listbox" as const,
-                "aria-expanded": isOpen,
-                "aria-controls": listId,
-                "aria-labelledby": `${labelId} ${valueId}`,
-                "aria-invalid": errorMsg ? true : undefined,
-                "aria-errormessage": errorMsg ? errorId : undefined,
-                "data-ai-mode": showProposal ? "true" : undefined,
-                onKeyDown: onTriggerKeyDown,
-                onClick: () => (isOpen ? close({ restoreFocus: true }) : open()),
-                onFocus: () => {
-                  if (hasFocusRef.current) return;
-                  hasFocusRef.current = true;
-                  maybeCall(onFocus);
-                },
-                onBlur: () => {
-                  // Moving into the open menu keeps the field "focused"; close() settles blur otherwise.
-                  if (isOpen) return;
-                  settleBlur();
-                },
-              })}
-              ref={triggerRef}
-              className={BorderHoverChild}
-              css={fieldStateCss}
-              {...tid}
-            >
-              {valueNode}
-            </button>
-          ),
-        })}
-        {labelStyle !== "left" && supporting}
-      </div>
-      {labelStyle === "left" && hasSupporting && <div css={Css.mtPx(-8).ml("50%").$}>{supporting}</div>}
+      <MenuSelectTrigger {...props} menu={menu} triggerRef={triggerRef} />
       {isMobile ? (
-        <BottomSheet isOpen={isOpen} onClose={() => close({ restoreFocus: true })} label={label} {...tid}>
+        <BottomSheet isOpen={menu.isOpen} onClose={() => menu.close({ restoreFocus: true })} label={label} {...tid}>
           {panel}
         </BottomSheet>
       ) : (
         <AnchoredOverlay
           triggerRef={triggerRef}
-          isOpen={isOpen}
-          onClose={() => close({ restoreFocus: false })}
+          isOpen={menu.isOpen}
+          onClose={() => menu.close({ restoreFocus: false })}
           {...tid}
         >
           {panel}
@@ -512,54 +74,4 @@ export function BaseMenuSelectField<O, V extends Value>(props: BaseMenuSelectFie
       )}
     </>
   );
-}
-
-/**
- * Same gray as `input::placeholder` in `CssReset.css`. The placeholder here is a span, so that rule never reaches it.
- * TODO: Move this to tokens. https://linear.app/homebound-team/issue/DS-395/update-placeholder-text-color-to-use-color-tokens
- */
-const inputPlaceholderColor = "#9ca3af";
-
-function matchesSearch<O>(
-  option: O,
-  query: string,
-  getOptionLabel: (opt: O) => string,
-  getOptionSearchText: ((opt: O) => string | readonly string[]) | undefined,
-  contains: (text: string, substring: string) => boolean,
-): boolean {
-  if (contains(getOptionLabel(option), query)) return true;
-  const extra = getOptionSearchText?.(option);
-  const terms = typeof extra === "string" ? [extra] : extra;
-  return terms?.some((term) => contains(term, query)) ?? false;
-}
-
-/** Menus with this many options or fewer omit the search field. */
-const searchOptionLimit = 8;
-/** Rows skipped by PageUp / PageDown. The list is virtualized, so measuring the DOM under-counts. */
-const pageSize = 10;
-
-class MenuSelectKeyboardDelegate<T> extends ListKeyboardDelegate<T> {
-  override getKeyPageBelow(key: Key): Key | null {
-    return stepKeys(this, key, pageSize, "below");
-  }
-
-  override getKeyPageAbove(key: Key): Key | null {
-    return stepKeys(this, key, pageSize, "above");
-  }
-}
-
-function stepKeys<T>(
-  delegate: ListKeyboardDelegate<T>,
-  key: Key,
-  count: number,
-  direction: "below" | "above",
-): Key | null {
-  let next: Key | null = key;
-  for (let index = 0; index < count; index += 1) {
-    if (next == null) return next;
-    const candidate: Key | null = direction === "below" ? delegate.getKeyBelow(next) : delegate.getKeyAbove(next);
-    if (candidate == null) return next;
-    next = candidate;
-  }
-  return next;
 }
