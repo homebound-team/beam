@@ -102,10 +102,6 @@ function GridTableLayoutActionsComponent<
       if (!inModal) setQueryParams({ search: value || undefined }, "replaceIn");
     }
   }, 300);
-  const selectedRowCount = useComputed(
-    () => (selectionSummary && api ? api.getSelectedLeafRowCount() : 0),
-    [api, selectionSummary],
-  );
 
   const hasSearch = !!searchProps;
   const filterCount = Object.keys(filterDefs ?? {}).length;
@@ -214,16 +210,9 @@ function GridTableLayoutActionsComponent<
             />
           )}
         </div>
-        {(hasHideableColumns || withCardView || !!actions?.length || selectedRowCount > 0) && (
+        {(hasHideableColumns || withCardView || !!actions?.length || selectionSummary) && (
           <div css={Css.df.aic.gapPx(12).$}>
-            {selectedRowCount > 0 && api && (
-              <SelectionSummaryPill
-                text={`${selectedRowCount} ${pluralize(selectedRowCount, "Row")} Selected`}
-                count={selectedRowCount}
-                onClick={() => api.clearSelections()}
-                numberOnly={sm}
-              />
-            )}
+            {selectionSummary && api && <SelectionSummaryAction api={api} numberOnly={sm} />}
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}
@@ -254,3 +243,18 @@ function GridTableLayoutActionsComponent<
 // memo doesn't support generic parameters, so cast the result to the correct type
 const _GridTableLayoutActions = memo(GridTableLayoutActionsComponent) as typeof GridTableLayoutActionsComponent;
 export { _GridTableLayoutActions as GridTableLayoutActions };
+
+/** Owns the selected count, so a selection change re-renders just the pill. */
+function SelectionSummaryAction<R extends Kinded>(props: { api: GridTableApi<R>; numberOnly: boolean }) {
+  const { api, numberOnly } = props;
+  const count = useComputed(() => api.getSelectedLeafRowCount(), [api]);
+  if (count === 0) return null;
+  return (
+    <SelectionSummaryPill
+      text={`${count} ${pluralize(count, "Row")} Selected`}
+      count={count}
+      onClick={() => api.clearSelections()}
+      numberOnly={numberOnly}
+    />
+  );
+}
