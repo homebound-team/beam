@@ -1,6 +1,6 @@
 import type { FieldState } from "@homebound/form-state";
 import { useRef } from "react";
-import { mergeProps, useCheckboxGroupItem, useFocusRing, useHover, useRadio } from "react-aria";
+import { mergeProps, useCheckboxGroupItem, useFocusRing, useRadio, VisuallyHidden } from "react-aria";
 import type { CheckboxGroupState, RadioGroupState } from "react-stately";
 import { DnDGridItemHandle } from "src/components/DnDGrid/DnDGridItemHandle";
 import { useDnDGridItem } from "src/components/DnDGrid/useDnDGridItem";
@@ -8,8 +8,8 @@ import { ContentHeader } from "src/components/Headers/ContentHeader";
 import { Tag, type TagProps } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { BoundCheckboxField } from "src/forms/BoundCheckboxField";
-import { CheckboxBase } from "src/inputs/CheckboxBase";
-import { getRadioStateStyles, radioDefault, radioFocus, radioHover, radioReset } from "src/inputs/internal/radioStyles";
+import { StyledCheckbox } from "src/inputs/CheckboxBase";
+import { StyledRadio } from "src/inputs/StyledRadio";
 import { useTestIds } from "src/utils/useTestIds";
 import type { FormSectionBaseProps } from "./FormSection";
 
@@ -95,21 +95,14 @@ function FormSectionChildRadio(props: FormSectionChildControlProps<RadioGroupSta
   const ref = useRef<HTMLInputElement>(null);
   const { inputProps, isDisabled, isSelected } = useRadio({ value, "aria-label": label }, state, ref);
   const { focusProps, isFocusVisible } = useFocusRing();
-  const { hoverProps, isHovered } = useHover({ isDisabled });
   const tid = useTestIds(props);
 
   return (
-    <input
-      ref={ref}
-      css={{
-        ...radioReset,
-        ...radioDefault,
-        ...getRadioStateStyles({ isDisabled, isSelected }),
-        ...(isHovered && !isDisabled ? radioHover : {}),
-        ...(isFocusVisible ? radioFocus : {}),
-      }}
-      {...mergeProps(inputProps, focusProps, hoverProps)}
-      {...tid}
+    <StyledRadio
+      isDisabled={isDisabled}
+      isSelected={isSelected}
+      isFocusVisible={isFocusVisible}
+      inputProps={{ ...mergeProps(inputProps, focusProps), ref, ...tid }}
     />
   );
 }
@@ -117,20 +110,18 @@ function FormSectionChildRadio(props: FormSectionChildControlProps<RadioGroupSta
 /** A label-less checkbox, one per child, sharing the parent `FormSection`'s checkbox group state. */
 function FormSectionChildCheckbox(props: FormSectionChildControlProps<CheckboxGroupState>) {
   const { state, value, label } = props;
-  const ref = useRef(null);
-  const ariaProps = { isSelected: state.isSelected(value), isDisabled: state.isDisabled, isIndeterminate: false };
-  const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, ...ariaProps }, state, ref);
+  const ref = useRef<HTMLInputElement>(null);
+  const { inputProps, isDisabled, isSelected } = useCheckboxGroupItem({ value, "aria-label": label }, state, ref);
+  const { focusProps, isFocusVisible } = useFocusRing();
   const tid = useTestIds(props);
 
   return (
-    <CheckboxBase
-      ariaProps={ariaProps}
-      inputProps={inputProps}
-      isSelected={ariaProps.isSelected}
-      isDisabled={ariaProps.isDisabled}
-      label={label}
-      checkboxOnly
-      {...tid}
-    />
+    // `StyledCheckbox` is just the visual box, so the label makes clicking it toggle the hidden input
+    <label css={Css.df.cursorPointer.if(isDisabled).cursorNotAllowed.$}>
+      <VisuallyHidden>
+        <input ref={ref} {...mergeProps(inputProps, focusProps)} {...tid} />
+      </VisuallyHidden>
+      <StyledCheckbox isDisabled={isDisabled} isSelected={isSelected} isFocusVisible={isFocusVisible} />
+    </label>
   );
 }
