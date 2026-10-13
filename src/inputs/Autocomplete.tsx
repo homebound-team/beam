@@ -5,8 +5,8 @@ import { Icon } from "src/components/Icon";
 import { Popover } from "src/components/internal/Popover";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ListBox } from "src/inputs/internal/ListBox";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectOptions";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { type Value, valueToKey } from "src/inputs/Value";
 
