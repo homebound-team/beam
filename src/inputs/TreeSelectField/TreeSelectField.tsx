@@ -17,9 +17,9 @@ import { Popover } from "src/components/internal/Popover";
 import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
 import { resolveTooltip } from "src/components/Tooltip";
 import { Css } from "src/Css";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
 import {
   findOption,
   findOptions,
