@@ -1,14 +1,15 @@
 import { useLayoutEffect } from "@react-aria/utils";
 import { type MutableRefObject, useCallback } from "react";
-import { textFieldBaseMultilineTopPadding, textFieldBasePadding } from "../TextFieldBase";
+import { textFieldBasePadding } from "src/inputs/fieldChrome";
+import { textFieldBaseMultilineTopPadding } from "src/inputs/TextFieldBase";
 
-interface GrowingTextFieldProps {
+type GrowingTextFieldProps = {
   inputRef: MutableRefObject<HTMLTextAreaElement | HTMLInputElement | null>;
   inputWrapRef: MutableRefObject<HTMLDivElement | null>;
   value: number | string | readonly string[] | undefined;
   disabled?: boolean;
   maxLines?: number;
-}
+};
 
 export function useGrowingTextField({ inputRef, inputWrapRef, value, disabled, maxLines }: GrowingTextFieldProps) {
   // Get the actual line height from the rendered element
