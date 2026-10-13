@@ -110,6 +110,34 @@ describe("RightPanePanel", () => {
     // The hidden measuring copy isn't exposed as a second button
     expect(r.getAllByRole("button", { name: "Delete (3)" })).toHaveLength(1);
   });
+
+  it.each([
+    ["context", { icon: "wrench", text: "Labor" }],
+    ["status", { kind: "status", text: "Draft", type: "warning" }],
+  ] as const)("renders a %s tag", async (_, tag) => {
+    // Given a tag
+    // When rendered
+    const r = await render(
+      <RightPanePanel title="Install Doors & Trim" tag={tag}>
+        Hello
+      </RightPanePanel>,
+    );
+    // Then it renders with the panel's tag test id
+    expect(r.rightPanePanel_tag).toHaveTextContent(tag.text);
+  });
+
+  it("pins the banner outside the scrolling body", async () => {
+    // Given a banner
+    // When rendered
+    const r = await render(
+      <RightPanePanel title="Install Doors & Trim" banner="Review 6 Suggested Changes">
+        Hello
+      </RightPanePanel>,
+    );
+    // Then it sits outside the body, so it stays put while the body scrolls
+    expect(r.rightPanePanel_banner).toHaveTextContent("Review 6 Suggested Changes");
+    expect(r.rightPanePanel_body.contains(r.rightPanePanel_banner)).toBe(false);
+  });
 });
 
 function OpenPanelButton() {

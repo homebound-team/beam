@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Css, Tokens } from "src/Css";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
@@ -54,10 +55,41 @@ export function FooterVariations() {
   );
 }
 
-function PanelFrame(props: Omit<RightPanePanelProps, "children"> & { width?: number; longBody?: boolean }) {
-  const { width = 450, longBody = false, ...panelProps } = props;
+/** Side Panel header variations: optional type or status tag, banner, and a title clamped to 2 lines. */
+export function HeaderVariations() {
   return (
-    <div css={Css.w100.maxwPx(width).hPx(480).bl.bt.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
+    <div css={Css.df.fdc.gap3.$}>
+      <PanelFrame title="Install Doors & Trim" tag={{ icon: "wrench", text: "Labor" }} height={200} />
+      <PanelFrame title="Kitchen Cabinets" tag={{ kind: "status", text: "Draft", type: "warning" }} height={200} />
+      <PanelFrame title="Bulk Edit" height={160} />
+      <PanelFrame title="Changes" height={160} />
+      <PanelFrame
+        title="Install Doors & Trim"
+        tag={{ icon: "wrench", text: "Labor" }}
+        banner={
+          <AiSlimBanner
+            title="Review 6 Suggested Changes"
+            action={{ label: "Ignore All", onClick: action("ignoreAll") }}
+          />
+        }
+        height={240}
+      />
+      <PanelFrame
+        title="Install Interior Doors, Casing, Baseboard & Crown Molding Throughout the Second Floor Bedrooms"
+        tag={{ icon: "wrench", text: "Labor" }}
+        width={380}
+        height={220}
+      />
+    </div>
+  );
+}
+
+function PanelFrame(
+  props: Omit<RightPanePanelProps, "children"> & { width?: number; height?: number; longBody?: boolean },
+) {
+  const { width = 450, height = 480, longBody = false, ...panelProps } = props;
+  return (
+    <div css={Css.w100.maxwPx(width).hPx(height).bl.bt.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
       <RightPanePanel {...panelProps}>
         {zeroTo(longBody ? 30 : 3).map((i) => (
           <p key={i} css={Css.sm.color(Tokens.OnSurfaceMuted).mb1.$}>
