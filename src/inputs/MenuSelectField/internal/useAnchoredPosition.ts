@@ -2,15 +2,15 @@ import { useLayoutEffect, type RefObject } from "react";
 import { useOverlayPosition } from "react-aria";
 import { zIndices } from "src/utils/zIndices";
 
-/** Positions `overlayRef` against `triggerRef`. Parent scroll moves it; it does not close. */
+/** Positions `popoverRef` against `triggerRef`. Parent scroll moves it; it does not close. */
 export function useAnchoredPosition(
   triggerRef: RefObject<HTMLElement | null>,
-  overlayRef: RefObject<HTMLElement | null>,
+  popoverRef: RefObject<HTMLElement | null>,
   isOpen: boolean,
 ) {
   const { overlayProps, updatePosition } = useOverlayPosition({
     targetRef: triggerRef,
-    overlayRef,
+    overlayRef: popoverRef,
     isOpen,
     shouldFlip: true,
     placement: "bottom start",
@@ -26,17 +26,16 @@ export function useAnchoredPosition(
       const target = event.target;
       // A scrolling ancestor of the trigger. The menu is portaled, so scrolling the list does not match.
       if (!(target instanceof Node) || !triggerRef.current || !target.contains(triggerRef.current)) return;
-      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
       updatePosition();
     };
     window.addEventListener("scroll", onScroll, true);
     return () => window.removeEventListener("scroll", onScroll, true);
   }, [isOpen, updatePosition, triggerRef]);
 
-  // Apply menu styles to the overlay on first render
+  // Runs every render. react-aria rewrites `style.maxHeight` on each reposition, so copy it into `--menu-max-height` and match the trigger width.
   useLayoutEffect(() => {
     if (!isOpen) return;
-    applyMenuFrame(overlayRef.current, triggerRef.current);
+    applyMenuFrame(popoverRef.current, triggerRef.current);
   });
 
   return {

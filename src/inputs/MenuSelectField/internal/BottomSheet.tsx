@@ -17,7 +17,9 @@ export type BottomSheetProps = PropsWithChildren<{
 /** Mobile overlay pinned to the bottom of the visual viewport, so content stays above the on-screen keyboard. */
 export function BottomSheet(props: BottomSheetProps) {
   const { isOpen, onClose, label, children } = props;
+  // Visible-viewport box. Sized so the scrim fills the screen and the sheet sits at its bottom, above the keyboard.
   const frameRef = useRef<HTMLDivElement>(null);
+  // The dialog itself. react-aria dismisses and labels this node, not the scrim around it.
   const sheetRef = useRef<HTMLDivElement>(null);
   const contrast = useContrastScope();
   const tid = useTestIds(props, "bottomSheet");
@@ -46,7 +48,10 @@ export function BottomSheet(props: BottomSheetProps) {
   );
 }
 
-/** Keeps `frameRef` sized to the visual viewport (which shrinks under the iOS keyboard) without React renders. */
+/**
+ * Copies the visual viewport's top and height onto `frameRef` so the sheet stays in the visible area above the keyboard.
+ * `keyboard-inset` env vars can replace this once Safari supports them.
+ */
 function useVisualViewportFrame(frameRef: RefObject<HTMLDivElement | null>, isOpen: boolean): void {
   useLayoutEffect(() => {
     const frame = frameRef.current;

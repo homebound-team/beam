@@ -14,16 +14,16 @@ export type AnchoredOverlayProps = PropsWithChildren<{
 /** Portaled overlay anchored to a trigger; stays open and follows the trigger on scroll. See `docs/components.md`. */
 export function AnchoredOverlay(props: AnchoredOverlayProps) {
   const { triggerRef, isOpen, onClose, children } = props;
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "anchoredOverlay");
-  const positionProps = useAnchoredPosition(triggerRef, overlayRef, isOpen);
+  const positionProps = useAnchoredPosition(triggerRef, popoverRef, isOpen);
 
   if (!isOpen) return null;
 
   return (
     <Popover
       triggerRef={triggerRef}
-      popoverRef={overlayRef}
+      popoverRef={popoverRef}
       positionProps={{ ...positionProps, ...tid.overlay }}
       onClose={onClose}
       isOpen={isOpen}
