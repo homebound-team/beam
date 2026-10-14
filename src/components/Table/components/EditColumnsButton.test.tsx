@@ -3,7 +3,7 @@ import { EditColumnsButton } from "src/components/Table/components/EditColumnsBu
 import { GridTable } from "src/components/Table/GridTable";
 import { type GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn } from "src/components/Table/types";
-import { actionColumn, column } from "src/components/Table/utils/columns";
+import { actionColumn, column, groupColumns } from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
@@ -173,7 +173,90 @@ describe("EditColumnsButton", () => {
     expect(onTooltip).toHaveBeenCalledTimes(1);
     expect(r.query.columns_optionname).toBeNull();
   });
+
+  it("hides and shows every column that shares a name when shareColumnVisibility is set", async () => {
+    // Given two plan groups whose Cost and Price leaves share names
+    const planColumns = createSharedPlanColumns();
+    const api: MutableRefObject<GridTableApi<PlanRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<PlanRow>();
+      api.current = _api;
+      return (
+        <>
+          <EditColumnsButton columns={planColumns} shareColumnVisibility defaultOpen api={_api} />
+          <GridTable columns={planColumns} rows={[]} api={_api} />
+        </>
+      );
+    }
+    const r = await render(<Test />);
+    // Then one switch per leaf name
+    expect(r.getAllByRole("switch")).toHaveLength(2);
+    expect(r.getByText("Cost")).toBeInTheDocument();
+    expect(r.getByText("Price")).toBeInTheDocument();
+    expect(r.queryByText("The Sycamore: Cost")).toBeNull();
+    // When Cost is hidden
+    click(r.columns_optionsycamoreCost);
+    // Then both Cost columns are hidden and both Price columns stay visible
+    expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice", "magnoliaPrice"]);
+    // When Cost is turned back on
+    click(r.columns_optionsycamoreCost);
+    // Then both Cost columns are visible again
+    expect(api.current!.getVisibleColumnIds()).toEqual([
+      "sycamoreCost",
+      "sycamorePrice",
+      "magnoliaCost",
+      "magnoliaPrice",
+    ]);
+  });
+
+  it("keeps a switch per column when shareColumnVisibility is not set", async () => {
+    // Given the same plan groups without shared visibility
+    const planColumns = createSharedPlanColumns();
+    const api: MutableRefObject<GridTableApi<PlanRow> | undefined> = { current: undefined };
+    function Test() {
+      const _api = useGridTableApi<PlanRow>();
+      api.current = _api;
+      return (
+        <>
+          <EditColumnsButton columns={planColumns} defaultOpen api={_api} />
+          <GridTable columns={planColumns} rows={[]} api={_api} />
+        </>
+      );
+    }
+    const r = await render(<Test />);
+    // Then each prefixed name is its own switch
+    expect(r.getAllByRole("switch")).toHaveLength(4);
+    expect(r.getByText("The Sycamore: Cost")).toBeInTheDocument();
+    expect(r.getByText("The Magnolia: Cost")).toBeInTheDocument();
+    // When one Cost column is hidden
+    click(r.columns_optionsycamoreCost);
+    // Then the other Cost column stays visible
+    expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice", "magnoliaCost", "magnoliaPrice"]);
+  });
+
+  function createSharedPlanColumns(): GridColumn<PlanRow>[] {
+    return [
+      ...groupColumns<PlanRow>({
+        id: "sycamore",
+        header: "The Sycamore",
+        columns: [
+          { id: "sycamoreCost", name: "Cost", header: "Cost", data: () => "$1" },
+          { id: "sycamorePrice", name: "Price", header: "Price", data: () => "$2" },
+        ],
+      }),
+      ...groupColumns<PlanRow>({
+        id: "magnolia",
+        header: "The Magnolia",
+        columns: [
+          { id: "magnoliaCost", name: "Cost", header: "Cost", data: () => "$3" },
+          { id: "magnoliaPrice", name: "Price", header: "Price", data: () => "$4" },
+        ],
+      }),
+    ];
+  }
 });
 
 type Data = { name: string | undefined; value: number | undefined };
 type Row = SimpleHeaderAndData<Data>;
+type PlanData = { cost: string; price: string };
+type PlanRow = SimpleHeaderAndData<PlanData>;

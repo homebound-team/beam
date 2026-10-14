@@ -469,7 +469,7 @@ export function GridTableLayoutWithColor() {
   );
 }
 
-/** Group header spans, with Edit Columns. Hiding a leaf shrinks its group. */
+/** Group header spans, with Edit Columns. Shared leaf names use one visibility switch. */
 export function GroupedColumns() {
   const columns = useMemo(() => getGroupedColumns(), []);
   const rows = useMemo(() => [simpleGroupHeader, simpleHeader, ...getGroupedRows()], []);
@@ -481,6 +481,7 @@ export function GroupedColumns() {
   return (
     <TestProjectLayout pageTitle="Grouped columns">
       <GridTableLayoutComponent
+        shareColumnVisibility
         layoutState={layoutState}
         tableProps={{
           columns,
