@@ -28,6 +28,7 @@ export function toContent(
   alignment: GridCellAlignment,
   column: GridColumnWithId<any>,
   isExpandableHeader: boolean,
+  isGroupHeader: boolean,
   isExpandable: boolean,
   minStickyLeftOffset: number,
   isKeptSelectedRow: boolean,
@@ -105,9 +106,16 @@ export function toContent(
         tooltipEl={tooltipEl}
       />
     );
+  } else if (content && typeof content === "string" && isGroupHeader) {
+    return (
+      <>
+        <span css={Css.lineClamp2.mwminc.$}>{content}</span>
+        {tooltipEl}
+      </>
+    );
   } else if (content && typeof content === "string" && isExpandableHeader) {
     return (
-      // This is the expandable header row, but not an expandable header cell. Styling it similarly in height & alignment to match the expandable header cell.
+      // Expandable-header cells that do not expand match the expandable header cell height.
       <div css={Css.df.aic.hPx(expandableHeaderRowHeight).$}>
         <span css={Css.lineClamp2.mwminc.$}>{content}</span>
         {tooltipEl}
@@ -133,7 +141,7 @@ export function toContent(
         {tooltipEl}
       </>
     );
-  } else if (!isHeader && !isExpandableHeader && style.emptyCell && isContentEmpty(content)) {
+  } else if (!isHeader && !isExpandableHeader && !isGroupHeader && style.emptyCell && isContentEmpty(content)) {
     // If the content is empty and the user specified an `emptyCell` node, return that.
     return style.emptyCell;
   }
@@ -274,10 +282,12 @@ export function matchesFilter(maybeContent: ReactNode | GridCellContent, filter:
 
 export const HEADER = "header";
 export const TOTALS = "totals";
-/** Tables expandable columns get an extra header. */
+/** Tables with expandable columns get an extra header. */
 export const EXPANDABLE_HEADER = "expandableHeader";
+/** Tables with static column groups get a header row above `header`. */
+export const GROUP_HEADER = "groupHeader";
 export const KEPT_GROUP = "keptGroup";
-export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, KEPT_GROUP];
+export const reservedRowKinds = [HEADER, TOTALS, EXPANDABLE_HEADER, GROUP_HEADER, KEPT_GROUP];
 
 /** Loads an array from sessionStorage, if it exists, or `undefined`. */
 export function loadArrayOrUndefined(key: string) {

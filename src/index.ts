@@ -227,7 +227,7 @@ export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "./compo
 export type { GridStyle, RowStyle, RowStyles } from "./components/Table/TableStyles";
 export { createRowLookup, shouldSkipScrollTo } from "./components/Table/utils/GridRowLookup";
 export type { GridRowLookup } from "./components/Table/utils/GridRowLookup";
-export { simpleDataRows, simpleHeader } from "./components/Table/utils/simpleHelpers";
+export { simpleDataRows, simpleGroupHeader, simpleHeader } from "./components/Table/utils/simpleHelpers";
 export type { SimpleHeaderAndData } from "./components/Table/utils/simpleHelpers";
 export { TableState, TableStateContext } from "./components/Table/utils/TableState";
 export type { SelectedState, SortOn, SortState } from "./components/Table/utils/TableState";
@@ -288,6 +288,7 @@ export type { FocusedFormLayoutProps } from "./layouts/Workflow/FocusedFormLayou
 export type { RightPaneTrigger } from "./layouts/Workflow/RightPaneTriggers";
 export { StepperLayout } from "./layouts/Workflow/StepperLayout";
 export type { StepperLayoutProps, StepperLayoutStep } from "./layouts/Workflow/StepperLayout";
+export type { WorkflowDestructiveAction } from "./layouts/Workflow/WorkflowActions";
 export type { AllowNavigationArgs } from "./layouts/Workflow/useUnsavedChangesGuard";
 // ./forms
 export * from "./forms/BoundCheckboxField";
@@ -315,9 +316,13 @@ export * from "./forms/FormLines";
 export * from "./forms/StaticField";
 export * from "./forms/SubmitButton";
 export { FormSection } from "./forms/FormSection/FormSection";
-export type { FormSectionAction, FormSectionProps } from "./forms/FormSection/FormSection";
+export type { FormSectionAction, FormSectionProps, FormSectionSelection } from "./forms/FormSection/FormSection";
 export { FormSectionChild } from "./forms/FormSection/FormSectionChild";
-export type { PlainFormSectionChild, ReorderableFormSectionChild } from "./forms/FormSection/FormSectionChild";
+export type {
+  FormSectionChildSelection,
+  PlainFormSectionChild,
+  ReorderableFormSectionChild,
+} from "./forms/FormSection/FormSectionChild";
 // ./hooks
 export * from "./hooks/useBodyBackgroundColor";
 export * from "./hooks/useBreakpoint";

@@ -26,6 +26,7 @@ import {
   column,
   fieldColumn,
   generateColumnId,
+  groupColumns,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
   pinColumn,
@@ -4746,6 +4747,118 @@ describe("GridTable", () => {
         "
       `);
     });
+  });
+
+  describe("group columns", () => {
+    type GroupHeader = { id: "groupHeader"; kind: "groupHeader" };
+    type Header = { id: "header"; kind: "header" };
+    type GroupData = {
+      kind: "data";
+      data: { name: string; range: string; average: string; cost: string };
+    };
+    type GroupRow = GroupHeader | Header | GroupData;
+
+    it("spans each group across its visible leaves", async () => {
+      // Given a select column, an ungrouped column, a two-column group, and a one-column group
+      const r = await render(<GridTable columns={createGroupColumns()} rows={createGroupRows()} />);
+
+      // Then the group row spans offerings across Range and Average, and sycamore across Cost
+      expect(cell(r, 0, 0).querySelector("input")).toBeNull();
+      expect(cell(r, 0, 1)).toHaveTextContent("");
+      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 0, 3)).toHaveTextContent("The Sycamore");
+      expect(row(r, 0).childNodes).toHaveLength(4);
+      // And the column headers stay on the second row, including the select toggle
+      expect(cell(r, 1, 0).querySelector("input")).not.toBeNull();
+      expect(cell(r, 1, 1)).toHaveTextContent("Name");
+      expect(cell(r, 1, 2)).toHaveTextContent("Range");
+      expect(cell(r, 1, 3)).toHaveTextContent("Average");
+      expect(cell(r, 1, 4)).toHaveTextContent("Cost");
+      expect(cell(r, 2, 2)).toHaveTextContent("$1–$2");
+      expect(cell(r, 2, 4)).toHaveTextContent("$3");
+    });
+
+    it("shrinks a group when one leaf is hidden", async () => {
+      // Given the grouped table
+      const api: MutableRefObject<GridTableApi<GroupRow> | undefined> = { current: undefined };
+      function GroupTable() {
+        const _api = useGridTableApi<GroupRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={createGroupColumns()} rows={createGroupRows()} />;
+      }
+      const r = await render(<GroupTable />);
+
+      // When Average is hidden
+      await act(async () => {
+        api.current?.setVisibleColumns(["beamSelectColumn", "name", "range", "cost"]);
+        await wait();
+      });
+
+      // Then offerings remains over Range only
+      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 1, 2)).toHaveTextContent("Range");
+      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
+      expect(row(r, 1).childNodes).toHaveLength(4);
+    });
+
+    it("keeps the group label when the first leaf is hidden", async () => {
+      // Given the grouped table
+      const api: MutableRefObject<GridTableApi<GroupRow> | undefined> = { current: undefined };
+      function GroupTable() {
+        const _api = useGridTableApi<GroupRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={createGroupColumns()} rows={createGroupRows()} />;
+      }
+      const r = await render(<GroupTable />);
+
+      // When Range is hidden
+      await act(async () => {
+        api.current?.setVisibleColumns(["beamSelectColumn", "name", "average", "cost"]);
+        await wait();
+      });
+
+      // Then offerings is shown over Average
+      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 1, 2)).toHaveTextContent("Average");
+      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
+    });
+
+    function createGroupColumns(): GridColumn<GroupRow>[] {
+      return [
+        selectColumn<GroupRow>(),
+        column<GroupRow>({
+          id: "name",
+          groupHeader: emptyCell,
+          header: "Name",
+          data: ({ name }) => name,
+        }),
+        ...groupColumns<GroupRow>({
+          id: "offerings",
+          header: "All Product Offerings",
+          columns: [
+            { id: "range", header: "Range", data: ({ range }) => range },
+            { id: "average", header: "Average", data: ({ average }) => average },
+          ],
+        }),
+        ...groupColumns<GroupRow>({
+          id: "sycamore",
+          header: "The Sycamore",
+          columns: [{ id: "cost", header: "Cost", data: ({ cost }) => cost }],
+        }),
+      ];
+    }
+
+    function createGroupRows(): GridDataRow<GroupRow>[] {
+      return [
+        { kind: "groupHeader", id: "groupHeader", data: {} },
+        { kind: "header", id: "header", data: {} },
+        {
+          kind: "data",
+          id: "plan-1",
+          data: { name: "Plan", range: "$1–$2", average: "$1.50", cost: "$3" },
+        },
+      ];
+    }
   });
 
   it("can be tested with a human readable inlineSnapshot using tableSnapshot()", async () => {

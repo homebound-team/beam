@@ -8,7 +8,7 @@ import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
 export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
-  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit"> & {
+  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit" | "destructiveAction"> & {
     /** Create/Save is disabled. A ReactNode is shown in Beam's tooltip. */
     primaryDisabled?: WorkflowActionsProps["primaryDisabled"];
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
@@ -36,6 +36,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
     completeLabel,
     onComplete,
     onSaveAndExit,
+    destructiveAction,
     primaryDisabled,
     isDirty,
     allowNavigation,
@@ -57,6 +58,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
       allowNavigation={allowNavigation}
       onCancel={onCancel}
       onSaveAndExit={onSaveAndExit}
+      destructiveAction={destructiveAction}
       completeLabel={completeLabel}
       onComplete={onComplete}
       primaryDisabled={primaryDisabled}

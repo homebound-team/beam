@@ -7,17 +7,20 @@ import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderA
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { useModalContext } from "src/components/Modal/ModalContext";
+import { SelectionSummaryPill } from "src/components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { type TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn, Kinded } from "src/components/Table/types";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
+import { useComputed } from "src/hooks/useComputed";
 import { TextField } from "src/inputs/TextField";
 import type { Value } from "src/inputs/Value";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
+import { pluralize } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
@@ -51,6 +54,8 @@ type GridTableLayoutActionsProps<
   clearFilters?: () => void;
   searchApi?: MutableRefObject<SearchBoxApi | undefined>;
   actions?: HeaderAction[];
+  /** Shows the selection summary pill while any rows are selected. */
+  selectionSummary?: boolean;
 };
 
 function GridTableLayoutActionsComponent<
@@ -73,6 +78,7 @@ function GridTableLayoutActionsComponent<
     clearFilters,
     searchApi,
     actions,
+    selectionSummary = false,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
   // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
@@ -143,7 +149,8 @@ function GridTableLayoutActionsComponent<
     <div css={Css.df.fdc.gap1.pt3.pb2.if(view === "card").pb3.$}>
       <div
         css={{
-          ...Css.df.gap1.jcsb.$,
+          // Holds the row at the 40px button height, so a pill alone in it doesn't shift the table when it appears
+          ...Css.df.gap1.jcsb.if(selectionSummary).mhPx(40).$,
           ...(withPagePadding ? pageContentPaddingX : undefined),
         }}
         {...testId.toolbar}
@@ -203,8 +210,9 @@ function GridTableLayoutActionsComponent<
             />
           )}
         </div>
-        {(hasHideableColumns || withCardView || !!actions?.length) && (
+        {(hasHideableColumns || withCardView || !!actions?.length || selectionSummary) && (
           <div css={Css.df.aic.gapPx(12).$}>
+            {selectionSummary && api && <SelectionSummaryAction api={api} numberOnly={sm} />}
             {hasHideableColumns && view === "list" && columns && api && (
               <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
             )}
@@ -235,3 +243,18 @@ function GridTableLayoutActionsComponent<
 // memo doesn't support generic parameters, so cast the result to the correct type
 const _GridTableLayoutActions = memo(GridTableLayoutActionsComponent) as typeof GridTableLayoutActionsComponent;
 export { _GridTableLayoutActions as GridTableLayoutActions };
+
+/** Owns the selected count, so a selection change re-renders just the pill. */
+function SelectionSummaryAction<R extends Kinded>(props: { api: GridTableApi<R>; numberOnly: boolean }) {
+  const { api, numberOnly } = props;
+  const count = useComputed(() => api.getSelectedLeafRowCount(), [api]);
+  if (count === 0) return null;
+  return (
+    <SelectionSummaryPill
+      text={`${count} ${pluralize(count, "Row")} Selected`}
+      count={count}
+      onClick={() => api.clearSelections()}
+      numberOnly={numberOnly}
+    />
+  );
+}

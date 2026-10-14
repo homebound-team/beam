@@ -1,5 +1,5 @@
 import type { Key as AriaKey } from "@react-types/shared";
-import React, { type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useButton, useComboBox, useFilter, useOverlayPosition } from "react-aria";
 import { Item, useComboBoxState } from "react-stately";
 import { Popover } from "src/components/internal/Popover";
@@ -9,6 +9,12 @@ import { Css } from "src/Css";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
+import {
+  disabledOptionToKeyedTuple,
+  initializeOptions,
+  type OptionsOrLoad,
+  unsetOption,
+} from "src/inputs/internal/selectFieldHelpers";
 import { getFieldWidth } from "src/inputs/utils";
 import { keyToValue, type Value, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";
@@ -502,18 +508,6 @@ type FieldState = {
   optionsLoading: boolean;
 };
 
-/** Allows lazy-loading select fields, which is useful for pages w/lots of fields the user may not actually use. */
-export type OptionsOrLoad<O> =
-  | O[]
-  | {
-      /** The initial option(s) to show before the user interacts with the dropdown. */
-      current: O | O[] | undefined;
-      /** Fired when the user interacts with the dropdown, to load the real options. */
-      load: () => Promise<unknown>;
-      /** The full list of options, after load() has been fired. */
-      options: O[] | undefined;
-    };
-
 function getInputValue<O>(
   selectedOptions: O[],
   getOptionLabel: (o: O) => string,
@@ -540,59 +534,6 @@ function getAiDisplayValue<O>(options: O[], getOptionLabel: (o: O) => string): s
   return options.map(getOptionLabel).join(", ");
 }
 
-/** Transforms/simplifies `optionsOrLoad` into just options, with unsetLabel maybe added. */
-export function initializeOptions<O, V extends Value>(
-  optionsOrLoad: OptionsOrLoad<O>,
-  getOptionValue: (opt: O) => V,
-  getOptionLabel: (opt: O) => string,
-  unsetLabel: string | undefined,
-  autoSort: boolean,
-): O[] {
-  const result: O[] = [];
-  if (unsetLabel) {
-    result.push(unsetOption as unknown as O);
-  }
-
-  // Collect user options in a separate array so we can sort them independently
-  // while keeping special options (e.g. unsetOption) at their fixed positions
-  const userOptions: O[] = [];
-  if (Array.isArray(optionsOrLoad)) {
-    userOptions.push(...optionsOrLoad);
-  } else {
-    const { options, current } = optionsOrLoad;
-    if (options) {
-      userOptions.push(...options);
-    }
-    // Add the `current` to the list of options in the event it is not already there.
-    if (current) {
-      const toCheck = Array.isArray(current) ? current : [current];
-      toCheck.forEach((current) => {
-        const value = getOptionValue(current);
-        const found = options && options.find((o) => getOptionValue(o) === value);
-        if (!found) {
-          userOptions.push(current);
-        }
-      });
-    }
-  }
-
-  // Sort user options if autoSort is enabled
-  result.push(...(autoSort ? sortOptions(userOptions, getOptionLabel) : userOptions));
-
-  return result;
-}
-
-/** Sorts options alphabetically using getOptionLabel, case-insensitive */
-function sortOptions<O>(options: O[], getOptionLabel: (opt: O) => string): O[] {
-  return [...options].sort((a, b) => {
-    const labelA = getOptionLabel(a).toLowerCase();
-    const labelB = getOptionLabel(b).toLowerCase();
-    return labelA.localeCompare(labelB);
-  });
-}
-
-/** A marker option to automatically add an "Unset" option to the start of options. */
-export const unsetOption = {};
 const addNewOptionId = "beam_new";
 
 function isAddNewOption(o: unknown): o is { id: string; name: string } {
@@ -616,14 +557,4 @@ function getAddNewOption<O>(
   });
   if (matchesExistingOption) return undefined;
   return { id: addNewOptionId, name: `Add "${trimmedSearch}"` };
-}
-
-export function disabledOptionToKeyedTuple(
-  disabledOption: Value | { value: Value; reason: string },
-): [React.Key, string | undefined] {
-  if (typeof disabledOption === "object" && disabledOption !== null) {
-    return [valueToKey(disabledOption.value), disabledOption.reason];
-  } else {
-    return [valueToKey(disabledOption), undefined];
-  }
 }

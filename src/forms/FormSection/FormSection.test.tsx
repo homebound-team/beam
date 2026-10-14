@@ -1,13 +1,23 @@
 import { createObjectState, type ObjectConfig } from "@homebound/form-state";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { FormSection } from "src/forms/FormSection/FormSection";
-import { render } from "src/utils/rtl";
+import { click, render } from "src/utils/rtl";
 
 type OrderInput = { order?: number | null };
 const orderConfig: ObjectConfig<OrderInput> = { order: { type: "value" } };
 /** A real form-state `FieldState<number>`, so orderField tests exercise the actual integration. */
 function orderField(value: number | null) {
   return createObjectState(orderConfig, { order: value }).order;
+}
+
+type SelectionInput = { selected?: boolean | null; selectedId?: string | null; selectedIds?: string[] | null };
+const selectionConfig: ObjectConfig<SelectionInput> = {
+  selected: { type: "value" },
+  selectedId: { type: "value" },
+  selectedIds: { type: "value" },
+};
+function selectionFields(input: SelectionInput) {
+  return createObjectState(selectionConfig, input);
 }
 
 describe("FormSection", () => {
@@ -271,5 +281,98 @@ describe("FormSection", () => {
     expect(hvacOrder.value).toBe(0);
     expect(plumbingOrder.value).toBe(1);
     expect(electricalOrder.value).toBe(2);
+  });
+
+  it("renders a toggle checkbox on a child section", async () => {
+    // Given a childSection with an unchecked toggle selection
+    const { selected } = selectionFields({ selected: false });
+    const r = await render(
+      <FormSection
+        title="Whole House"
+        childSections={[{ title: "Add Washer and Dryer", selection: { mode: "toggle", field: selected } }]}
+      />,
+    );
+    // Then a checkbox labeled by the child's title renders unchecked
+    expect(r.formSection_childSection_checkbox).toHaveAttribute("aria-label", "Add Washer and Dryer");
+    expect(r.formSection_childSection_checkbox).not.toBeChecked();
+    // When the user checks it
+    click(r.formSection_childSection_checkbox);
+    // Then the field is set
+    expect(selected.value).toBe(true);
+    expect(r.formSection_childSection_checkbox).toBeChecked();
+  });
+
+  it("renders a radio on each child section for a single selection", async () => {
+    // Given a single selection preselecting "top"
+    const { selectedId } = selectionFields({ selectedId: "top" });
+    const r = await render(
+      <FormSection
+        title="Washer and Dryer"
+        selection={{ mode: "single", field: selectedId }}
+        childSections={[
+          { value: "front", title: "Front Load" },
+          { value: "top", title: "Top Load" },
+        ]}
+      />,
+    );
+    // Then the children sit in a radiogroup labeled by the section title
+    expect(r.formSection_childGroup).toHaveAttribute("role", "radiogroup");
+    expect(r.formSection_childGroup).toHaveAttribute("aria-label", "Washer and Dryer");
+    // And each child renders a radio labeled by its title, with only "top" checked
+    expect(r.formSection_childSection_radio_0).toHaveAttribute("aria-label", "Front Load");
+    expect(r.formSection_childSection_radio_0).not.toBeChecked();
+    expect(r.formSection_childSection_radio_1).toBeChecked();
+    // When the user selects "Front Load"
+    click(r.formSection_childSection_radio_0);
+    // Then the field holds that child's value, and only it is checked
+    expect(selectedId.value).toBe("front");
+    expect(r.formSection_childSection_radio_0).toBeChecked();
+    expect(r.formSection_childSection_radio_1).not.toBeChecked();
+  });
+
+  it("updates the selected radio when the field changes", async () => {
+    // Given a single selection with nothing selected
+    const { selectedId } = selectionFields({});
+    const r = await render(
+      <FormSection
+        title="Washer and Dryer"
+        selection={{ mode: "single", field: selectedId }}
+        childSections={[
+          { value: "front", title: "Front Load" },
+          { value: "top", title: "Top Load" },
+        ]}
+      />,
+    );
+    expect(r.formSection_childSection_radio_0).not.toBeChecked();
+    expect(r.formSection_childSection_radio_1).not.toBeChecked();
+    // When the field is set outside the component
+    act(() => selectedId.set("top"));
+    // Then the matching radio becomes checked
+    expect(r.formSection_childSection_radio_1).toBeChecked();
+  });
+
+  it("renders a checkbox on each child section for a multiple selection", async () => {
+    // Given a multiple selection with "washer" selected
+    const { selectedIds } = selectionFields({ selectedIds: ["washer"] });
+    const r = await render(
+      <FormSection
+        title="Included Appliances"
+        selection={{ mode: "multiple", field: selectedIds }}
+        childSections={[
+          { value: "washer", title: "Washer" },
+          { value: "dryer", title: "Dryer" },
+        ]}
+      />,
+    );
+    // Then the children sit in a group labeled by the section title, with only "washer" checked
+    expect(r.formSection_childGroup).toHaveAttribute("role", "group");
+    expect(r.formSection_childGroup).toHaveAttribute("aria-label", "Included Appliances");
+    expect(r.formSection_childSection_checkbox_0).toBeChecked();
+    expect(r.formSection_childSection_checkbox_1).not.toBeChecked();
+    // When the user checks "Dryer" and unchecks "Washer"
+    click(r.formSection_childSection_checkbox_1);
+    click(r.formSection_childSection_checkbox_0);
+    // Then the field holds only "dryer"
+    expect(selectedIds.value).toEqual(["dryer"]);
   });
 });

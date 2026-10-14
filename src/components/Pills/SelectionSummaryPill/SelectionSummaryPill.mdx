@@ -38,6 +38,20 @@ import * as SelectionSummaryPillStories from "./SelectionSummaryPill.stories";
     </tr>
     <tr>
       <td>
+        <code>count</code>
+      </td>
+      <td>
+        <code>number</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>
+        How many are selected, shown alone when <code>numberOnly</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
         <code>onClick</code>
       </td>
       <td>
@@ -59,6 +73,21 @@ import * as SelectionSummaryPillStories from "./SelectionSummaryPill.stories";
         <code>false</code>
       </td>
       <td>If a ReactNode, its contents will be displayed within a tooltip on hover.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>numberOnly</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>
+        Shows just <code>count</code> and an × instead of the text, e.g. on small screens. <code>text</code> stays the
+        accessible name.
+      </td>
     </tr>
   </tbody>
 </table>

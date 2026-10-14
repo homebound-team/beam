@@ -2,7 +2,7 @@ import type { JSX } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { disabledOptionToKeyedTuple } from "src/inputs/internal/ComboBoxBase";
+import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
 import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import type { Value } from "src/inputs/Value";

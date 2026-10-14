@@ -48,13 +48,15 @@ export type GridStyle = {
   expandableHeaderCss?: Properties;
   /** Applied to expandable header cells that are not the last table column. */
   expandableHeaderNonLastColumnCss?: Properties;
+  /** Applied to 'kind: "groupHeader"' cells. No bottom border; the outer left and right borders stay. */
+  groupHeaderCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
   /** Applied to any column that opts into `GridColumn.border`. */
   borderStyle?: Properties;
-  /** Applied to every cell in the first table-head row (expandableHeader/header/totals). */
+  /** Applied to every cell in the first table-head row (groupHeader/expandableHeader/header/totals). */
   firstRowCellCss?: Properties;
   /** Applied to the first cell in the first table-head row. */
   firstRowFirstCellCss?: Properties;
@@ -189,6 +191,12 @@ function memoizedTableStyles() {
         // Draw a 1px divider inside the cell on the right edge and bottom edge.
         // Using `inset` keeps the line inside the cell so it doesn't change layout.
         expandableHeaderNonLastColumnCss: Css.boxShadow(insetSeparatorCorner).$,
+        groupHeaderCss: Css.bgColor(Tokens.Surface)
+          .color(Tokens.OnSurface)
+          .smSb.wsn.h("auto")
+          .pxPx(12)
+          .ptPx(8)
+          .pb0.bsh0.add("borderBottomWidth", "0").$,
         cellCss: {
           ...Css.typography(cellTypography)
             .color(Tokens.OnSurface)
