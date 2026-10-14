@@ -2,7 +2,7 @@ import { Icon, type IconKey } from "src/components/Icon";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-type ContextTagProps = {
+export type ContextTagProps = {
   icon: IconKey;
   text: string;
 };
