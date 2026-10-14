@@ -34,6 +34,7 @@ import {
   getColumnBorderCss,
   getFirstOrLastCellCss,
   getJustification,
+  GROUP_HEADER,
   HEADER,
   isGridCellContent,
   KEPT_GROUP,
@@ -58,6 +59,7 @@ type RowProps<R extends Kinded> = {
   cellHighlight: boolean;
   omitRowHover: boolean;
   hasExpandableHeader: boolean;
+  hasGroupHeader: boolean;
   isFirstHeadRow: boolean;
   isFirstBodyRow: boolean;
   isLastBodyRow: boolean;
@@ -97,6 +99,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     cellHighlight,
     omitRowHover,
     hasExpandableHeader,
+    hasGroupHeader,
     isFirstHeadRow,
     isFirstBodyRow,
     isLastBodyRow,
@@ -122,12 +125,14 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const isHeader = row.kind === HEADER;
   const isTotals = row.kind === TOTALS;
   const isExpandableHeader = row.kind === EXPANDABLE_HEADER;
+  const isGroupHeader = row.kind === GROUP_HEADER;
   const isKeptGroupRow = row.kind === KEPT_GROUP;
-  const isBodyRow = !isHeader && !isTotals && !isExpandableHeader;
-  // `isFirstHeadCellRow` drives first-row cell styling; when there is no expandable header,
-  // treat either a header or a totals row as the first head row so totals-first tables
-  // receive the correct top styling.
-  const isFirstHeadCellRow = isExpandableHeader || (!hasExpandableHeader && (isHeader || isTotals));
+  const isBodyRow = !isHeader && !isTotals && !isExpandableHeader && !isGroupHeader;
+  // The top head row owns the outer border and corner radius.
+  const isFirstHeadCellRow =
+    isGroupHeader ||
+    (isExpandableHeader && !hasGroupHeader) ||
+    (!hasGroupHeader && !hasExpandableHeader && (isHeader || isTotals));
   const rowStyle = rowStyles?.[row.kind as R["kind"]];
   const RowTag = as === "table" ? "tr" : "div";
   const sortOn = tableState.sortConfig?.on;
@@ -276,19 +281,25 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             onDragOver: onDragOverDebounced,
           };
 
-          const maybeContent = applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
+          const maybeContent =
+            isGroupHeader && column.groupId
+              ? column.groupLabel
+              : applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
 
-          // Only use the `numExpandedColumns` as the `colspan` when rendering the "Expandable Header"
+          // Group spans follow the visible leaves. Expandable headers span their expanded children.
+          const groupSpan = isGroupHeader && column.groupId ? consecutiveGroupSpan(columns, columnIndex) : 1;
           currentColspan =
-            isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
-              ? maybeContent.colspan
-              : isExpandableHeader
-                ? numExpandedColumns + 1
-                : 1;
+            isGroupHeader && column.groupId
+              ? groupSpan
+              : isGridCellContent(maybeContent) && typeof maybeContent.colspan === "number"
+                ? maybeContent.colspan
+                : isExpandableHeader
+                  ? numExpandedColumns + 1
+                  : 1;
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
             (sortOn === "server" && !!column.serverSideSortKey);
-          const alignment = getAlignment(column, maybeContent);
+          const alignment = isGroupHeader ? "left" : getAlignment(column, maybeContent);
           const justificationCss = getJustification(column, maybeContent, as, alignment);
           const isExpandable =
             isFunction(column.expandColumns) ||
@@ -305,6 +316,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             alignment,
             column,
             isExpandableHeader,
+            isGroupHeader,
             isExpandable,
             minStickyLeftOffset,
             isKeptRow,
@@ -312,7 +324,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
           ensureClientSideSortValueIsSortable(
             sortOn,
-            isHeader || isTotals || isExpandableHeader,
+            isHeader || isTotals || isExpandableHeader || isGroupHeader,
             column,
             columnIndex,
             maybeContent,
@@ -346,7 +358,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           minStickyLeftOffset += maybeSticky === "left" ? parseInt(columnSizes[columnIndex].replace("px", ""), 10) : 0;
 
           const cellId = `${row.kind}_${row.id}_${column.id}`;
-          const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals;
+          const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals && !isGroupHeader;
           const isCellActive = tableState.activeCellId === cellId;
 
           // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
@@ -394,6 +406,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isExpandableHeader &&
               columnIndex + currentColspan < columns.length &&
               style.expandableHeaderNonLastColumnCss),
+            ...(isGroupHeader && style.groupHeaderCss),
+            ...(column.bgColor && Css.bgColor(column.bgColor).$),
             // Conditionally apply the right border styling for the header or totals row when using expandable tables
             // Only apply if not the last column in the table AND when this column is the last column in the group of expandable column or not expanded AND
             ...(hasExpandableHeader &&
@@ -447,7 +461,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const renderFn: RenderCellFn<any> =
             (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
               ? rowLinkRenderFn(as, currentColspan)
-              : isHeader || isTotals || isExpandableHeader
+              : isHeader || isTotals || isExpandableHeader || isGroupHeader
                 ? headerRenderFn(column, as, currentColspan)
                 : rowStyle?.onClick && wrapAction
                   ? rowClickRenderFn(as, api, currentColspan)
@@ -606,3 +620,12 @@ export const BorderHoverChild = "beam-bhc";
 export const RowHoverClass = "beam-row-hover";
 /** CSS custom property for the row hover background color applied to cells. */
 export const rowHoverBgVar = "--beam-row-hover-bg";
+
+/** How many visible columns, starting here, share this column's group id. */
+function consecutiveGroupSpan<R extends Kinded>(columns: GridColumnWithId<R>[], columnIndex: number): number {
+  const groupId = columns[columnIndex]?.groupId;
+  if (!groupId) return 1;
+  let span = 1;
+  while (columns[columnIndex + span]?.groupId === groupId) span += 1;
+  return span;
+}

@@ -33,6 +33,7 @@ import {
   dateColumn,
   dragHandleColumn,
   fieldColumn,
+  groupColumns,
   numericColumn,
   pinColumn,
   selectColumn,
@@ -2360,6 +2361,150 @@ export function ExpandableColumnsWithSetTimeout() {
   return (
     <div css={Css.df.fdc.bgGray100.p2.h("100vh").mw("fit-content").$}>
       <GridTable stickyHeader columns={columns} rows={rows} style={{ allWhite: true }} as="div" />
+    </div>
+  );
+}
+
+type GroupHeaderRow = { id: "groupHeader"; kind: "groupHeader" };
+type GroupedHeaderRow = { id: "header"; kind: "header" };
+type GroupedData = {
+  kind: "data";
+  data: {
+    name: string;
+    offeringsRange: string;
+    offeringsAverage: string;
+    sycamoreRange: string;
+    sycamoreAverage: string;
+    sycamoreCost: string;
+    magnoliaRange: string;
+    magnoliaAverage: string;
+    magnoliaCost: string;
+  };
+};
+type GroupedRow = GroupHeaderRow | GroupedHeaderRow | GroupedData;
+
+export function GroupedColumns() {
+  const rows: GridDataRow<GroupedRow>[] = useMemo(
+    () => [
+      { kind: "groupHeader", id: "groupHeader", data: {} },
+      { kind: "header", id: "header", data: {} },
+      {
+        kind: "data",
+        id: "plan-1",
+        data: {
+          name: "Add Bedroom",
+          offeringsRange: "$24,203–$37,745",
+          offeringsAverage: "$30,753",
+          sycamoreRange: "$22,100–$31,400",
+          sycamoreAverage: "$26,500",
+          sycamoreCost: "$23,846",
+          magnoliaRange: "$25,400–$36,200",
+          magnoliaAverage: "$31,100",
+          magnoliaCost: "$27,400",
+        },
+      },
+    ],
+    [],
+  );
+  const columns: GridColumn<GroupedRow>[] = useMemo(
+    () => [
+      selectColumn<GroupedRow>({ sticky: "left" }),
+      column<GroupedRow>({
+        groupHeader: emptyCell,
+        header: "Name",
+        data: ({ name }) => name,
+        w: "220px",
+        sticky: "left",
+      }),
+      ...groupColumns<GroupedRow>({
+        id: "offerings",
+        header: "All Product Offerings",
+        bgColor: Palette.Gray100,
+        columns: [
+          numericColumn<GroupedRow>({
+            id: "offerings-range",
+            name: "Range",
+            groupHeader: emptyCell,
+            header: "Range",
+            data: ({ offeringsRange }) => offeringsRange,
+            w: "180px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "offerings-average",
+            name: "Average",
+            groupHeader: emptyCell,
+            header: "Average",
+            data: ({ offeringsAverage }) => offeringsAverage,
+            w: "140px",
+          }),
+        ],
+      }),
+      ...groupColumns<GroupedRow>({
+        id: "sycamore",
+        header: "The Sycamore",
+        columns: [
+          numericColumn<GroupedRow>({
+            id: "sycamore-range",
+            name: "Range",
+            groupHeader: emptyCell,
+            header: "Range",
+            data: ({ sycamoreRange }) => sycamoreRange,
+            w: "180px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "sycamore-average",
+            name: "Average",
+            groupHeader: emptyCell,
+            header: "Average",
+            data: ({ sycamoreAverage }) => sycamoreAverage,
+            w: "140px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "sycamore-cost",
+            name: "Cost",
+            groupHeader: emptyCell,
+            header: "Cost",
+            data: ({ sycamoreCost }) => sycamoreCost,
+            w: "140px",
+          }),
+        ],
+      }),
+      ...groupColumns<GroupedRow>({
+        id: "magnolia",
+        header: "The Magnolia",
+        columns: [
+          numericColumn<GroupedRow>({
+            id: "magnolia-range",
+            name: "Range",
+            groupHeader: emptyCell,
+            header: "Range",
+            data: ({ magnoliaRange }) => magnoliaRange,
+            w: "180px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "magnolia-average",
+            name: "Average",
+            groupHeader: emptyCell,
+            header: "Average",
+            data: ({ magnoliaAverage }) => magnoliaAverage,
+            w: "140px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "magnolia-cost",
+            name: "Cost",
+            groupHeader: emptyCell,
+            header: "Cost",
+            data: ({ magnoliaCost }) => magnoliaCost,
+            w: "140px",
+          }),
+        ],
+      }),
+    ],
+    [],
+  );
+  return (
+    <div css={Css.p2.$}>
+      <GridTable columns={columns} rows={rows} style={{ allWhite: true, bordered: true }} />
     </div>
   );
 }

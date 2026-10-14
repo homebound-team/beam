@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { BeamColor } from "src/colors";
 import type { GridCellContent } from "src/components/Table/components/cell";
 import type { GridRowKind } from "src/components/Table/components/Row";
 import type { GridRowApi } from "src/components/Table/GridTableApi";
@@ -106,6 +107,12 @@ export type GridColumn<R extends Kinded> = {
   hideOnExpand?: boolean;
   /** Determines whether a column is csv-only or web-only. */
   showIn?: "csv" | "web";
+  /** Shared id for consecutive leaves that render as one group-header cell. Set by `groupColumns`. */
+  groupId?: string;
+  /** Label shown over the visible leaves of a `groupId`. Set by `groupColumns`. */
+  groupLabel?: string;
+  /** Background for every cell in this column, including the group and column headers. */
+  bgColor?: BeamColor;
   /**
    * Info icon on the `header` row and in Edit Columns.
    * A node is a hover tooltip; a function runs on click. A header cell's own `tooltip` wins.
@@ -144,6 +151,9 @@ export const nonKindGridColumnKeys = [
   "hideOnExpand",
   "showIn",
   "tooltip",
+  "groupId",
+  "groupLabel",
+  "bgColor",
 ];
 
 /**

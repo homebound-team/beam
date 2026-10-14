@@ -82,7 +82,13 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     >
       <div
         css={
-          Css.df.fdc.bgColor(Tokens.Surface).color(Tokens.OnSurface).maxwPx(326).maxhPx(512).bshBasic.onHover.bshHover.$
+          Css.df.fdc
+            .bgColor(Tokens.Surface)
+            .color(Tokens.OnSurface)
+            // As wide as the longest label, then the viewport. Truncation applies only past that cap.
+            .w("max-content")
+            .maxw("calc(100vw - 32px)")
+            .maxhPx(512).bshBasic.onHover.bshHover.$
         }
       >
         {/* Scrollable body — mh0 lets the flex child shrink so the option list scrolls internally instead of overflowing the page */}
@@ -90,7 +96,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
           {options.map((option) => (
             <Fragment key={option.value}>
               <div css={Css.df.aic.gapPx(4).mw0.pr1.$}>
-                <span css={Css.sm.truncate.mw0.$}>{option.label}</span>
+                <span css={Css.sm.mw0.$}>{option.label}</span>
                 {option.tooltip ? (
                   <ColumnTooltipIcon
                     {...tid[`tooltip_${option.value}`]}
