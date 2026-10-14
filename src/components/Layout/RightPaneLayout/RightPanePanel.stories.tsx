@@ -1,9 +1,10 @@
 import type { Meta } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Css, Tokens } from "src/Css";
 import { withBeamDecorator, zeroTo } from "src/utils/sb";
 import { action } from "storybook/actions";
-import { RightPanePanel, type RightPanePanelProps } from "./RightPanePanel";
+import { RightPaneBanner, RightPanePanel, type RightPanePanelProps } from "./RightPanePanel";
 
 export default {
   component: RightPanePanel,
@@ -85,12 +86,18 @@ export function HeaderVariations() {
 }
 
 function PanelFrame(
-  props: Omit<RightPanePanelProps, "children"> & { width?: number; height?: number; longBody?: boolean },
+  props: Omit<RightPanePanelProps, "children"> & {
+    width?: number;
+    height?: number;
+    longBody?: boolean;
+    banner?: ReactNode;
+  },
 ) {
-  const { width = 450, height = 480, longBody = false, ...panelProps } = props;
+  const { width = 450, height = 480, longBody = false, banner, ...panelProps } = props;
   return (
     <div css={Css.w100.maxwPx(width).hPx(height).bl.bt.bc(Tokens.SurfaceSeparator).bgColor(Tokens.Surface).$}>
       <RightPanePanel {...panelProps}>
+        {banner && <RightPaneBanner>{banner}</RightPaneBanner>}
         {zeroTo(longBody ? 30 : 3).map((i) => (
           <p key={i} css={Css.sm.color(Tokens.OnSurfaceMuted).mb1.$}>
             Body row {i + 1}

@@ -1,10 +1,12 @@
 import { waitFor } from "@homebound/rtl-utils";
+import { useState } from "react";
+import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Button } from "src/components/Button";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { setViewport } from "src/tests/viewport";
 import { click, clickAndWait, render } from "src/utils/rtl";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
-import { RightPanePanel } from "./RightPanePanel";
+import { RightPaneBanner, RightPanePanel } from "./RightPanePanel";
 import { useRightPaneActions } from "./useRightPane";
 
 describe("RightPanePanel", () => {
@@ -126,17 +128,20 @@ describe("RightPanePanel", () => {
     expect(r.rightPanePanel_tag).toHaveTextContent(tag.text);
   });
 
-  it("pins the banner outside the scrolling body", async () => {
-    // Given a banner
+  it("shows a banner from the panel's children under the header until the caller drops it", async () => {
+    // Given a panel whose body renders a banner while there are suggestions
     // When rendered
-    const r = await render(
-      <RightPanePanel title="Install Doors & Trim" banner="Review 6 Suggested Changes">
-        Hello
-      </RightPanePanel>,
-    );
-    // Then it sits outside the body, so it stays put while the body scrolls
+    const r = await render(<SuggestionsPanel />);
+    // Then the banner sits under the header, outside the scrolling body
     expect(r.rightPanePanel_banner).toHaveTextContent("Review 6 Suggested Changes");
-    expect(r.rightPanePanel_body.contains(r.rightPanePanel_banner)).toBe(false);
+    expect(r.rightPanePanel_body.contains(r.aiSlimBanner)).toBe(false);
+
+    // When the suggestions are ignored
+    click(r.ignoreAll);
+
+    // Then the banner goes away while the panel stays open
+    expect(r.rightPanePanel_banner).toBeEmptyDOMElement();
+    expect(r.rightPanePanel_body).toHaveTextContent("Hello");
   });
 });
 
@@ -156,5 +161,22 @@ function OpenPanelButton() {
         })
       }
     />
+  );
+}
+
+function SuggestionsPanel() {
+  const [hasSuggestions, setHasSuggestions] = useState(true);
+  return (
+    <RightPanePanel title="Install Doors & Trim">
+      {hasSuggestions && (
+        <RightPaneBanner>
+          <AiSlimBanner
+            title="Review 6 Suggested Changes"
+            action={{ label: "Ignore All", onClick: () => setHasSuggestions(false) }}
+          />
+        </RightPaneBanner>
+      )}
+      Hello
+    </RightPanePanel>
   );
 }
