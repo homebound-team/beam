@@ -4400,6 +4400,66 @@ describe("GridTable", () => {
       expect(cell(r2, 1, 2)).toHaveTextContent("trash");
     });
 
+    it("shows a column that can't be hidden when the stored visible columns leave it out", async () => {
+      // Given visible columns stored by an earlier layout with the same column ids, which left out the action column
+      sessionStorage.setItem("nameValueAction", JSON.stringify(["name"]));
+      // And hideable name and value columns, and an action column that can't be hidden
+      const api = new GridTableApiImpl<Row>();
+      const columns = [
+        column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+        column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value }),
+        actionColumn<Row>({ id: "action", header: emptyCell, data: () => "trash" }),
+      ];
+      // When the table renders
+      await render(<GridTable api={api} columns={columns} rows={rows} />);
+      // Then the hideable columns follow the stored list, but the action column is still shown
+      expect(api.getVisibleColumnIds()).toEqual(["name", "action"]);
+    });
+
+    it("keeps a column that can't be hidden visible when the visible columns leave it out", async () => {
+      // Given a hideable name column and an action column that can't be hidden
+      const api = new GridTableApiImpl<Row>();
+      const columns = [
+        column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+        actionColumn<Row>({ id: "action", header: emptyCell, data: () => "trash" }),
+      ];
+      await render(<GridTable api={api} columns={columns} rows={rows} />);
+      // When the visible columns leave out the action column
+      act(() => api.setVisibleColumns(["name"]));
+      // Then it's still visible
+      expect(api.getVisibleColumnIds()).toEqual(["name", "action"]);
+    });
+
+    it("keeps the visibility of a column that's absent when the visible columns are set", async () => {
+      // Given a hideable value column that's only added while editing
+      const api = new GridTableApiImpl<Row>();
+      function Test() {
+        const [editing, setEditing] = useState(true);
+        const columns = useMemo(
+          () => [
+            column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+            ...(editing ? [column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value })] : []),
+          ],
+          [editing],
+        );
+        return (
+          <div>
+            <button data-testid="toggle" onClick={() => setEditing((e) => !e)} />
+            <GridTable api={api} columns={columns} rows={rows} />
+          </div>
+        );
+      }
+      const r = await render(<Test />);
+      expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
+      // When editing stops, and the visible columns are set while the value column is absent
+      click(r.toggle);
+      act(() => api.setVisibleColumns(["name"]));
+      // And editing starts again
+      click(r.toggle);
+      // Then the value column is still visible
+      expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
+    });
+
     it("accepts a specified 'visibleColumnsStorageKey'", async () => {
       vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
 
