@@ -52,7 +52,6 @@ export function MenuSearchInput(props: MenuSearchInputProps) {
 
 const inputCss = {
   ...Css.fg1.mw0.outline0.bgTransparent.sm.color(Tokens.OnSurface).$,
-  // Placeholder color comes from `input::placeholder` in `CssReset.css`, same as the other inputs.
   // iOS zooms the page when a focused input is under 16px.
-  ...Css.ifSm.add("fontSize", "16px").$,
+  ...Css.ifSm.fsPx(16).$,
 };
