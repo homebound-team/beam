@@ -11,17 +11,15 @@ import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getFieldChrome, selectedValueCss } from "src/inputs/fieldChrome";
-import type {
-  MenuSelectController,
-  MenuSelectControllerProps,
-} from "src/inputs/MenuSelectField/internal/useMenuSelectController";
+import type { MenuSelectFieldState } from "src/inputs/MenuSelectField/internal/useMenuSelectField";
+import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import type { TextFieldInternalProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-type MenuSelectTriggerProps<O, V extends Value> = MenuSelectControllerProps<O, V> & {
-  menu: MenuSelectController<O, V>;
+type MenuSelectTriggerProps<O, V extends Value> = MenuSelectFieldProps<O, V> & {
+  menu: MenuSelectFieldState<O, V>;
   triggerRef: RefObject<HTMLButtonElement | null>;
 };
 
