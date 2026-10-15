@@ -132,19 +132,27 @@ describe("EditColumnsButton", () => {
   });
 
   it("keeps a non-hideable column visible when the column that adds it is toggled on, off and on", async () => {
-    // Given a delta column that can't be hidden and is only added while the hideable value column is shown
+    // Given a details column that can't be hidden and is only added while the hideable value column is shown
     const api = new GridTableApiImpl<Row>();
     function Test() {
-      const showDelta = useComputed(() => api.getVisibleColumnIds().includes("value"), []);
+      const showDetails = useComputed(() => api.getVisibleColumnIds().includes("value"), []);
       const columns = useMemo(
         () => [
           column<Row>({ id: "name", name: "Name", header: "Name", data: ({ name }) => name }),
           column<Row>({ id: "value", name: "Value", header: "Value", data: ({ value }) => value, initHidden: true }),
-          ...(showDelta
-            ? [column<Row>({ id: "delta", name: "Delta", header: "Delta", data: ({ value }) => value, canHide: false })]
+          ...(showDetails
+            ? [
+                column<Row>({
+                  id: "details",
+                  name: "Details",
+                  header: "Details",
+                  data: ({ value }) => value,
+                  canHide: false,
+                }),
+              ]
             : []),
         ],
-        [showDelta],
+        [showDetails],
       );
       return (
         <>
@@ -157,12 +165,12 @@ describe("EditColumnsButton", () => {
     expect(api.getVisibleColumnIds()).toEqual(["name"]);
     // When the value column is toggled on, off and back on
     click(r.columns_optionvalue);
-    expect(api.getVisibleColumnIds()).toEqual(["name", "value", "delta"]);
+    expect(api.getVisibleColumnIds()).toEqual(["name", "value", "details"]);
     click(r.columns_optionvalue);
     expect(api.getVisibleColumnIds()).toEqual(["name"]);
     click(r.columns_optionvalue);
-    // Then the delta column comes back visible
-    expect(api.getVisibleColumnIds()).toEqual(["name", "value", "delta"]);
+    // Then the details column comes back visible
+    expect(api.getVisibleColumnIds()).toEqual(["name", "value", "details"]);
   });
 
   it("shows an info icon for columns with a hover tooltip", async () => {

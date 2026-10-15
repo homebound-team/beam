@@ -4417,26 +4417,28 @@ describe("GridTable", () => {
     });
 
     it("keeps a column that can't be hidden visible when the visible columns leave it out", async () => {
-      // Given a hideable name column and an action column that can't be hidden
+      // Given hideable name and value columns, and an action column that can't be hidden
       const api = new GridTableApiImpl<Row>();
       const columns = [
         column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+        column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value }),
         actionColumn<Row>({ id: "action", header: emptyCell, data: () => "trash" }),
       ];
       await render(<GridTable api={api} columns={columns} rows={rows} />);
-      // When the visible columns leave out the action column
+      // When the visible columns leave out the value and action columns
       act(() => api.setVisibleColumns(["name"]));
-      // Then it's still visible
+      // Then the value column is hidden, but the action column is still visible
       expect(api.getVisibleColumnIds()).toEqual(["name", "action"]);
     });
 
     it("keeps the visibility of a column that's absent when the visible columns are set", async () => {
-      // Given a hideable value column that's only added while editing
+      // Given hideable id and name columns, and a hideable value column that's only added while editing
       const api = new GridTableApiImpl<Row>();
       function Test() {
         const [editing, setEditing] = useState(true);
         const columns = useMemo(
           () => [
+            column<Row>({ id: "id", header: () => "Id", data: (data, { row }) => row.id }),
             column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
             ...(editing ? [column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value })] : []),
           ],
@@ -4450,13 +4452,13 @@ describe("GridTable", () => {
         );
       }
       const r = await render(<Test />);
-      expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
-      // When editing stops, and the visible columns are set while the value column is absent
+      expect(api.getVisibleColumnIds()).toEqual(["id", "name", "value"]);
+      // When editing stops, and the id column is hidden while the value column is absent
       click(r.toggle);
       act(() => api.setVisibleColumns(["name"]));
       // And editing starts again
       click(r.toggle);
-      // Then the value column is still visible
+      // Then the id column stays hidden, and the value column comes back visible
       expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
     });
 
