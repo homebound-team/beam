@@ -92,6 +92,8 @@ export type GridStyle = {
     | ((level: number) => { rowIndent?: number; cellCss?: Properties; firstContentColumn?: Properties });
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: BeamColor;
+  /** Resolved `columnStriping` color. */
+  columnStripeColor?: BeamColor;
   /** Defines styles for the group row which holds the selected rows that have been filtered out */
   keptGroupRowCss?: Properties;
   /** Defines styles for the last row `keptGroup` to provide separation from the rest of the table */
@@ -126,6 +128,11 @@ export type GridStyleDef = {
   highlightOnHover?: boolean;
   /** Rounds the top corners of the first head-row cells. Defaults to true */
   roundedHeader?: boolean;
+  /**
+   * Zebra on the 2nd, 4th, 6th… content column. A leading group is striped only when a content column precedes it.
+   * Select, collapse, and gutter columns are skipped. A column `bgColor` wins.
+   */
+  columnStriping?: BeamColor;
 };
 
 // Returns a "blessed" style of GridTable
@@ -143,6 +150,7 @@ function memoizedTableStyles() {
       cellTypography = "xs" as const,
       highlightOnHover = true,
       roundedHeader = true,
+      columnStriping,
     } = props;
 
     const key = safeKeys(props)
@@ -235,6 +243,7 @@ function memoizedTableStyles() {
         pinnedRowCss: Css.bgColor(Palette.Blue50).$,
         // A compact field is 8px of its own padding and border; 4px here matches a text cell's 12px inset.
         ...(rowHeight === "flexible" ? { fieldCellCss: Css.pyPx(4).$ } : {}),
+        ...(columnStriping ? { columnStripeColor: columnStriping } : {}),
       };
     }
 
@@ -317,6 +326,7 @@ const gridStyleDefKeysRecord: Record<keyof GridStyleDef, boolean> = {
   cellTypography: true,
   highlightOnHover: true,
   roundedHeader: true,
+  columnStriping: true,
 };
 
 /** True when `style` is a GridStyleDef (empty or any def key present); otherwise a full GridStyle. */

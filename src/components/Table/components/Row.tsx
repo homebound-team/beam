@@ -70,6 +70,8 @@ type RowProps<R extends Kinded> = {
   setResizedWidth: (columnId: string, width: number, columnIndex: number) => void;
   disableColumnResizing: boolean;
   calculatePreviewWidth: (columnId: string, newWidth: number, columnIndex: number) => number;
+  /** Column ids that take `columnStriping`. Stable until the visible columns change. */
+  stripedColumnIds?: ReadonlySet<string>;
   /* Drag handlers */
   onDragStart?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
   onDragEnd?: (row: GridDataRow<R>, event: React.DragEvent<HTMLElement>) => void;
@@ -108,6 +110,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     setResizedWidth,
     disableColumnResizing = true,
     calculatePreviewWidth,
+    stripedColumnIds,
     onDragStart,
     onDragEnd,
     onDrop,
@@ -119,6 +122,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const { tableState } = useContext(TableStateContext);
   // We're wrapped in observer, so can access these without useComputeds
   const { api, visibleColumns: columns } = tableState;
+  const columnStripeColor = style.columnStripeColor;
   const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level, aiMode } = rs;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
@@ -407,6 +411,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               columnIndex + currentColspan < columns.length &&
               style.expandableHeaderNonLastColumnCss),
             ...(isGroupHeader && style.groupHeaderCss),
+            ...(columnStripeColor && stripedColumnIds?.has(column.id) && Css.bgColor(maybeCssVar(columnStripeColor)).$),
+            // A leaf background is explicit and wins over the stripe.
             ...(column.bgColor && Css.bgColor(column.bgColor).$),
             // Conditionally apply the right border styling for the header or totals row when using expandable tables
             // Only apply if not the last column in the table AND when this column is the last column in the group of expandable column or not expanded AND

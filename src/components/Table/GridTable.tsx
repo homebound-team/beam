@@ -37,7 +37,7 @@ import type {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds, withColumnGutters } from "src/components/Table/utils/columns";
+import { assignDefaultColumnIds, isContentColumn, withColumnGutters } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -375,6 +375,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return tableState.visibleColumns as GridColumnWithId<R>[];
   }, [tableState]);
 
+  // Calculate which columns should be striped, if any.
+  const stripedColumnIds = useMemo(
+    () => (style.columnStripeColor ? getStripedColumnIds(columns) : undefined),
+    [columns, style.columnStripeColor],
+  );
+
   // Initialize the sort state. This will only happen on the first render.
   // Once the `TableState.sort` is defined, it will not re-initialize.
   tableState.initSortState(props.sorting, columns);
@@ -590,6 +596,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           setResizedWidth: handleColumnResize,
           disableColumnResizing,
           calculatePreviewWidth,
+          stripedColumnIds,
         }}
       />
     );
@@ -712,6 +719,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     maybeStyle,
     columnSizes,
     columns.length,
+    stripedColumnIds,
     getCount,
     filterMaxRows,
     cardHeight,
@@ -1407,3 +1415,38 @@ function useColumnMeasureWidth(): string | undefined {
 }
 
 const CARD_MIN_WIDTH_PX = 330;
+
+/** Column ids that take `columnStriping`. The first content column, or group of content columns, stays plain (no striped background color). */
+function getStripedColumnIds(
+  columns: ReadonlyArray<{ id: string; groupId?: string; isAction?: true; isLayoutGutter?: true }>,
+): ReadonlySet<string> {
+  const ids = new Set<string>();
+  const contentColumns = columns.filter(isContentColumn);
+
+  // If we have groups, then we need to stripe the whole group, - not every column individually.
+  if (contentColumns.some((column) => column.groupId)) {
+    // A leading group is considered the first content column (non-selectable, non-collapsible column), so it stays plain (no striped background color).
+    // If a group is not the leading column, then the first group will be striped.
+    const firstGroupStripes = contentColumns.findIndex((column) => column.groupId) > 0;
+    // Keep track of the group order to determine if the group should be striped.
+    const ordinals = new Map<string, number>();
+    for (const column of contentColumns) {
+      const { groupId } = column;
+      if (!groupId) continue;
+      let ordinal = ordinals.get(groupId);
+      if (ordinal === undefined) {
+        ordinal = ordinals.size;
+        ordinals.set(groupId, ordinal);
+      }
+      const stripes = firstGroupStripes ? ordinal % 2 === 0 : ordinal % 2 === 1;
+      if (stripes) ids.add(column.id);
+    }
+    return ids;
+  }
+
+  // If we don't have groups, then we can stripe each column individually.
+  contentColumns.forEach((column, ordinal) => {
+    if (ordinal % 2 === 1) ids.add(column.id);
+  });
+  return ids;
+}

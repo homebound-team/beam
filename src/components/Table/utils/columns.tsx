@@ -1,4 +1,3 @@
-import type { BeamColor } from "src/colors";
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { PinToggle } from "src/components/Table/components/PinToggle";
@@ -19,11 +18,9 @@ import { newMethodMissingProxy } from "src/utils/useTestIds";
 export function groupColumns<T extends Kinded>(opts: {
   id: string;
   header: string;
-  /** Paints every cell in the group. A leaf's own `bgColor` wins. */
-  bgColor?: BeamColor;
   columns: Array<Omit<GridColumn<T>, "groupHeader">>;
 }): GridColumn<T>[] {
-  const { id, header, bgColor, columns } = opts;
+  const { id, header, columns } = opts;
   return columns.map(
     (column) =>
       ({
@@ -33,7 +30,6 @@ export function groupColumns<T extends Kinded>(opts: {
         groupId: id,
         groupLabel: header,
         groupHeader: header,
-        bgColor: column.bgColor ?? bgColor,
         name: prefixGroupColumnName(header, column.name),
       }) as GridColumn<T>,
   );

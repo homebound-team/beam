@@ -469,7 +469,7 @@ export function GridTableLayoutWithColor() {
   );
 }
 
-/** Group header spans, with Edit Columns. Shared leaf names use one visibility switch. */
+/** Group header spans, with Edit Columns. Shared leaf names use one visibility switch; hiding a group reflows the stripe. */
 export function GroupedColumns() {
   const columns = useMemo(() => getGroupedColumns(), []);
   const rows = useMemo(() => [simpleGroupHeader, simpleHeader, ...getGroupedRows()], []);
@@ -486,6 +486,7 @@ export function GroupedColumns() {
         tableProps={{
           columns,
           rows,
+          style: { columnStriping: Palette.Gray100 },
         }}
       />
     </TestProjectLayout>
@@ -1432,7 +1433,6 @@ function getGroupedColumns() {
     ...groupColumns<GroupedPlanRow>({
       id: "offerings",
       header: "All Product Offerings",
-      bgColor: Palette.Gray100,
       columns: [
         numericColumn<GroupedPlanRow>({
           id: "offerings-range",
