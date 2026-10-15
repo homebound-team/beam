@@ -5046,7 +5046,11 @@ describe("GridTable", () => {
       return (
         <GridTable
           api={_api}
-          columns={[nameColumn, valueColumn, { id: "extra", header: () => "Extra", data: () => "extra" }]}
+          columns={[
+            { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initHidden: false },
+            { id: "value", header: () => "Value", data: ({ value }) => value },
+            { id: "extra", header: () => "Extra", data: () => "extra" },
+          ]}
           rows={rows}
           style={{ columnStriping: Palette.Gray100 }}
         />
