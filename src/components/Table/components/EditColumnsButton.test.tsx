@@ -1,10 +1,11 @@
-import type { MutableRefObject } from "react";
+import { type MutableRefObject, useMemo } from "react";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import { GridTable } from "src/components/Table/GridTable";
-import { type GridTableApi, useGridTableApi } from "src/components/Table/GridTableApi";
+import { type GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn } from "src/components/Table/types";
 import { actionColumn, column, groupColumns } from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
+import { useComputed } from "src/hooks/useComputed";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -128,6 +129,48 @@ describe("EditColumnsButton", () => {
     click(r.columns_optionvalue);
     // Then only non-hideable columns remain visible (actions column always visible since canHide: false)
     expect(api.current!.getVisibleColumnIds()).toEqual(["actions"]);
+  });
+
+  it("keeps a non-hideable column visible when the column that adds it is toggled on, off and on", async () => {
+    // Given a details column that can't be hidden and is only added while the hideable value column is shown
+    const api = new GridTableApiImpl<Row>();
+    function Test() {
+      const showDetails = useComputed(() => api.getVisibleColumnIds().includes("value"), []);
+      const columns = useMemo(
+        () => [
+          column<Row>({ id: "name", name: "Name", header: "Name", data: ({ name }) => name }),
+          column<Row>({ id: "value", name: "Value", header: "Value", data: ({ value }) => value, initHidden: true }),
+          ...(showDetails
+            ? [
+                column<Row>({
+                  id: "details",
+                  name: "Details",
+                  header: "Details",
+                  data: ({ value }) => value,
+                  canHide: false,
+                }),
+              ]
+            : []),
+        ],
+        [showDetails],
+      );
+      return (
+        <>
+          <EditColumnsButton columns={columns} defaultOpen={true} api={api} />
+          <GridTable columns={columns} rows={[]} api={api} />
+        </>
+      );
+    }
+    const r = await render(<Test />);
+    expect(api.getVisibleColumnIds()).toEqual(["name"]);
+    // When the value column is toggled on, off and back on
+    click(r.columns_optionvalue);
+    expect(api.getVisibleColumnIds()).toEqual(["name", "value", "details"]);
+    click(r.columns_optionvalue);
+    expect(api.getVisibleColumnIds()).toEqual(["name"]);
+    click(r.columns_optionvalue);
+    // Then the details column comes back visible
+    expect(api.getVisibleColumnIds()).toEqual(["name", "value", "details"]);
   });
 
   it("shows an info icon for columns with a hover tooltip", async () => {

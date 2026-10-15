@@ -23,8 +23,9 @@ export class ColumnState<R extends Kinded> {
     column: GridColumnWithId<R>,
   ) {
     this.column = column;
+    // Columns that can't be hidden are always visible, even if the stored visible list leaves them out.
     // If the user sets `canHide: true`, we default to hidden unless they set `initHidden: false`
-    this.visible = storage.wasVisible(column.id) ?? (column.canHide ? !(column.initHidden ?? true) : true);
+    this.visible = !column.canHide || (storage.wasVisible(column.id) ?? !(column.initHidden ?? true));
     if (this.visible && (storage.wasExpanded(column.id) ?? column.initExpanded)) {
       this.expanded = true;
       // TODO: verify this eslint ignore
@@ -34,11 +35,19 @@ export class ColumnState<R extends Kinded> {
     makeAutoObservable(this, { column: observableRef }, { name: `ColumnState@${column.id}` });
   }
 
+  /**
+   * Whether this column is shown. We check `canHide` here too b/c when `props.columns` changes,
+   * `addColumn` can replace a hidden column's definition with one that can't be hidden.
+   */
+  get isVisible(): boolean {
+    return this.visible || !this.column.canHide;
+  }
+
   setVisible(visible: boolean): void {
-    const wasVisible = this.visible;
-    this.visible = visible;
+    const wasVisible = this.isVisible;
+    this.visible = visible || !this.column.canHide;
     // If an expandable header is becoming visible for the 1st time, expand it
-    if (!wasVisible && visible && this.column.initExpanded && this.children === undefined) {
+    if (!wasVisible && this.visible && this.column.initExpanded && this.children === undefined) {
       this.expanded = true;
       // TODO: verify this eslint ignore
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -74,9 +83,14 @@ export class ColumnState<R extends Kinded> {
     }
   }
 
+  /** Returns this column and all of its loaded children, whether visible and expanded or not. */
+  get selfAndChildren(): ColumnState<R>[] {
+    return [this, ...(this.children ?? []).flatMap((c) => c.selfAndChildren)];
+  }
+
   /** Returns this column, if visible, and its children, if expanded. */
   get maybeSelfAndChildren(): ColumnState<R>[] {
-    if (!this.visible) {
+    if (!this.isVisible) {
       return [];
     } else if (this.expanded && this.children) {
       // Maybe do the `hideOnExpand` thing here? Seems cute, but the Row rendering still
