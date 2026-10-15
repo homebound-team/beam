@@ -1,25 +1,17 @@
 import type { Key } from "@react-types/shared";
 import { type KeyboardEvent, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useFilter, useFocusRing, useHover } from "react-aria";
+import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectFieldHelpers";
-import { MenuSelectKeyboardDelegate } from "src/inputs/MenuSelectField/internal/menuSelectKeyboard";
 import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
-import type { MenuSelectFieldBaseProps } from "src/inputs/MenuSelectField/types";
+import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
-export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
-  value: V | undefined;
-  /** Value proposed by an AI model; puts the field in AI mode. */
-  proposedValue?: V;
-  onSelect: (value: V | undefined, opt: O | undefined) => void;
-};
-
 /** Options, search, selection, and keyboard behavior for a menu select. */
-export function useMenuSelectController<O, V extends Value>(props: MenuSelectControllerProps<O, V>) {
+export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>) {
   const {
     options: optionsProp,
     getOptionValue = defaultOptionValue as (opt: O) => V,
@@ -311,7 +303,7 @@ export function useMenuSelectController<O, V extends Value>(props: MenuSelectCon
   };
 }
 
-export type MenuSelectController<O, V extends Value> = ReturnType<typeof useMenuSelectController<O, V>>["field"];
+export type MenuSelectFieldState<O, V extends Value> = ReturnType<typeof useMenuSelectField<O, V>>["field"];
 
 function matchesSearch<O>(
   option: O,
@@ -328,3 +320,31 @@ function matchesSearch<O>(
 
 /** Menus with this many options or fewer omit the search field. */
 const searchOptionLimit = 8;
+
+/**
+ * Reuses React Aria's `ListKeyboardDelegate` for arrows, Home, and End.
+ * Page Up/Down measure rendered rows, which under-counts a virtualized list, so those step 10 keys instead.
+ */
+class MenuSelectKeyboardDelegate<T> extends ListKeyboardDelegate<T> {
+  /** Rows skipped by Page Up / Page Down. */
+  private static readonly pageSize = 10;
+
+  override getKeyPageBelow(key: Key): Key | null {
+    return this.stepKeys(key, "below");
+  }
+
+  override getKeyPageAbove(key: Key): Key | null {
+    return this.stepKeys(key, "above");
+  }
+
+  private stepKeys(key: Key, direction: "below" | "above"): Key | null {
+    let next: Key | null = key;
+    for (let index = 0; index < MenuSelectKeyboardDelegate.pageSize; index += 1) {
+      if (next == null) return next;
+      const candidate: Key | null = direction === "below" ? this.getKeyBelow(next) : this.getKeyAbove(next);
+      if (candidate == null) return next;
+      next = candidate;
+    }
+    return next;
+  }
+}

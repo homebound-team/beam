@@ -1,7 +1,10 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { MenuSelectField, type MenuSelectFieldProps } from "src/inputs/MenuSelectField/MenuSelectField";
+import { PresentationProvider } from "src/components/PresentationContext";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { groupByOptions } from "src/inputs/MenuSelectField/storyOptions";
+import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
+import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import { noop } from "src/utils/helpers";
 import { LabeledExamples, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
@@ -28,6 +31,10 @@ export function Examples() {
       exampleWidth={360}
       examples={[
         { label: "Text field", children: <TextField label="Name" value="Kitchen" onChange={noop} /> },
+        {
+          label: "Select field",
+          children: <SelectField label="Group by" options={groupByOptions()} value="cc" onSelect={noop} />,
+        },
         { label: "Label above", children: <Example label="Group by" initial="cc" /> },
         { label: "Inline label", children: <Example label="Group by" labelStyle="inline" initial="cc" /> },
         { label: "Compact", children: <Example label="Group by" compact initial="cc" /> },
@@ -42,6 +49,34 @@ export function Examples() {
         { label: "Placeholder", children: <Example label="Group by" placeholder="Select a group" /> },
       ]}
     />
+  );
+}
+
+/** Compact, borderless fields as a table cell applies them. The error stays in a tooltip. */
+export function TableCell() {
+  return (
+    <PresentationProvider
+      fieldProps={{
+        labelStyle: "hidden",
+        compact: true,
+        borderless: true,
+        borderOnHover: true,
+        typeScale: "xs",
+        errorInTooltip: true,
+      }}
+    >
+      <LabeledExamples
+        labelWidth={140}
+        exampleWidth={240}
+        examples={[
+          { label: "Text field", children: <TextField label="Name" value="Kitchen" onChange={noop} /> },
+          { label: "Menu select", children: <Example label="Group by" initial="cc" /> },
+          { label: "Error", children: <Example label="Status" initial="cc" errorMsg="Required" /> },
+          { label: "Read only text", children: <TextField label="Room" value="Kitchen" onChange={noop} readOnly /> },
+          { label: "Read only menu", children: <Example label="Trade" initial="cc" readOnly /> },
+        ]}
+      />
+    </PresentationProvider>
   );
 }
 

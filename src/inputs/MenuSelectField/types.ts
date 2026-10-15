@@ -42,3 +42,10 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   | "errorInTooltip"
   | "inputStylePalette"
 >;
+
+export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
+  value: V | undefined;
+  /** Value proposed by an AI model; puts the field in AI mode. */
+  proposedValue?: V;
+  onSelect: (value: V | undefined, opt: O | undefined) => void;
+};

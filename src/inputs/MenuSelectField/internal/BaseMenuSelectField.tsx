@@ -6,18 +6,16 @@ import { MenuPanel } from "src/inputs/MenuSelectField/internal/MenuPanel";
 import { MenuSearchInput } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
 import { MenuSelectTrigger } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
 import { OptionList } from "src/inputs/MenuSelectField/internal/OptionList";
-import {
-  useMenuSelectController,
-  type MenuSelectControllerProps,
-} from "src/inputs/MenuSelectField/internal/useMenuSelectController";
+import { useMenuSelectField } from "src/inputs/MenuSelectField/internal/useMenuSelectField";
+import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 /** Menu select implementation. Desktop popover; small screens a bottom sheet. */
-export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControllerProps<O, V>): JSX.Element {
+export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): JSX.Element {
   const { label, searchPlaceholder } = props;
-  const { triggerRef, searchRef, listRef, field: menu } = useMenuSelectController(props);
+  const { triggerRef, searchRef, listRef, field: menu } = useMenuSelectField(props);
   const tid = useTestIds(props, defaultTestId(label));
   const { sm: isMobile } = useBreakpoint();
   const panel = (

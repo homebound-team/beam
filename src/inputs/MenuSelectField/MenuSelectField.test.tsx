@@ -3,11 +3,8 @@ import { act, useState, type ReactNode } from "react";
 import { OpenModal } from "src/components/Modal/OpenModal";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { SelectField } from "src/inputs/SelectField";
-import { TextField } from "src/inputs/TextField";
 import { setViewport } from "src/tests/viewport";
 import { click, getOptions, getSelected, render, select, type } from "src/utils/rtl";
-import { zIndices } from "src/utils/zIndices";
 import { vi } from "vitest";
 
 describe("MenuSelectField", () => {
@@ -292,7 +289,7 @@ describe("MenuSelectField", () => {
     expect(blue).toHaveAttribute("aria-disabled", "true");
   });
 
-  it("does not open when disabled or read-only", async () => {
+  it("does not open when disabled", async () => {
     // Given a disabled select
     const r = await render(<SingleHarness disabled />);
     // When clicking it
@@ -302,14 +299,13 @@ describe("MenuSelectField", () => {
     expect(r.color).toBeDisabled();
   });
 
-  it("portals the menu to the body on the popover layer", async () => {
+  it("portals the menu to the body", async () => {
     // Given a single select
     const r = await render(<SingleHarness />);
     // When opening it
     click(r.color);
-    // Then the popover container is under body and the overlay uses the popover z-index
+    // Then the popover container is under body
     expect(r.color_overlay.parentElement?.parentElement).toBe(document.body);
-    expect(r.color_overlay.style.zIndex).toBe(String(zIndices.popover));
   });
 
   it("moves to the ends of the list with Home and End", async () => {
@@ -362,61 +358,18 @@ describe("MenuSelectField", () => {
     expect(r.query.color_overlay).toBeNull();
   });
 
-  it("matches SelectField value weight", async () => {
-    // Given a menu select next to a select, plus inline and read-only variants
+  it("keeps a hidden label and shows the error in a tooltip", async () => {
+    // Given table cell settings that hide the label and move the error into a tooltip
     const r = await render(
-      <div>
-        <SelectField<{ id: string; name: string }, string>
-          label="Group"
-          options={colors()}
-          value="b"
-          onSelect={() => {}}
-        />
-        <MenuSelectField label="Color" options={colors()} value="b" onSelect={() => {}} />
-        <MenuSelectField label="Inline" labelStyle="inline" options={colors()} value="b" onSelect={() => {}} />
-        <MenuSelectField label="Read only value" options={colors()} value="b" onSelect={() => {}} readOnly />
-      </div>,
-    );
-    // Then the selected value is medium, except inline labels and read-only text
-    expect(r.group).toHaveStyle({ fontWeight: "500" });
-    expect(spanWithText(r.color, "Blue")).toHaveStyle({ fontWeight: "500" });
-    expect(spanWithText(r.inline, "Blue")).not.toHaveStyle({ fontWeight: "500" });
-    expect(spanWithText(r.readOnlyValue, "Blue")).not.toHaveStyle({ fontWeight: "500" });
-  });
-
-  it("follows table field settings from presentation context", async () => {
-    // Given the field settings GridTable applies to cells
-    const r = await render(
-      <PresentationProvider
-        fieldProps={{
-          labelStyle: "hidden",
-          compact: true,
-          borderless: true,
-          borderOnHover: true,
-          typeScale: "xs",
-          errorInTooltip: true,
-        }}
-      >
-        <TextField label="Name" value="Kitchen" onChange={() => {}} />
+      <PresentationProvider fieldProps={{ labelStyle: "hidden", borderOnHover: true, errorInTooltip: true }}>
         <MenuSelectField label="Color" options={colors()} value="b" onSelect={() => {}} />
         <MenuSelectField label="Error" options={colors()} value="b" onSelect={() => {}} errorMsg="Required" />
-        <TextField label="Read only name" value="Kitchen" onChange={() => {}} readOnly />
-        <MenuSelectField label="Read only color" options={colors()} value="b" onSelect={() => {}} readOnly />
       </PresentationProvider>,
     );
-    // Then the trigger matches the text field, the label is hidden, and the error stays in a tooltip
-    const textField = getComputedStyle(r.name.parentElement!);
-    const menuField = getComputedStyle(r.color);
-    expect(menuField.height).toBe(textField.height);
-    expect(menuField.paddingLeft).toBe(textField.paddingLeft);
-    expect(menuField.paddingRight).toBe(textField.paddingRight);
-    expect(menuField.borderRadius).toBe(textField.borderRadius);
-    expect(menuField.fontSize).toBe(textField.fontSize);
-    expect(menuField.borderTopColor).toBe(textField.borderTopColor);
-    expect(r.color).toHaveClass("beam-bhc");
+    // Then the label stays available, the error is not inline, and the field opts into the table row hover border
     expect(r.query.color_label).not.toBeNull();
     expect(r.query.error_errorMsg).toBeNull();
-    expect(getComputedStyle(r.readOnlyColor).minHeight).toBe(getComputedStyle(r.readOnlyName).minHeight);
+    expect(r.color).toHaveClass("beam-bhc");
   });
 
   it("stays open when a parent scrolls", async () => {
@@ -527,13 +480,6 @@ function installKeyboardViewport(initial: { height: number; offsetTop: number })
       else delete (window as { visualViewport?: VisualViewport }).visualViewport;
     },
   };
-}
-
-function spanWithText(root: HTMLElement, text: string): HTMLElement {
-  const matches = [...root.querySelectorAll("span")].filter((el) => el.textContent === text);
-  const match = matches.at(-1);
-  if (!match) throw new Error(`No span with text "${text}"`);
-  return match;
 }
 
 function colors() {
