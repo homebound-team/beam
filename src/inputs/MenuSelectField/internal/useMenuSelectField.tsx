@@ -1,17 +1,28 @@
 import type { Key } from "@react-types/shared";
-import { type KeyboardEvent, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectFieldHelpers";
-import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
+import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
+import type { MenuSelectTriggerState } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
+import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 
+type MenuSelectFieldApi<O> = {
+  triggerRef: RefObject<HTMLButtonElement | null>;
+  trigger: MenuSelectTriggerState;
+  searchRef: RefObject<HTMLInputElement | null>;
+  search: MenuSearchState;
+  listRef: RefObject<HTMLDivElement | null>;
+  menu: MenuSelectMenu<O>;
+};
+
 /** Options, search, selection, and keyboard behavior for a menu select. */
-export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>) {
+export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): MenuSelectFieldApi<O> {
   const {
     options: optionsProp,
     getOptionValue = defaultOptionValue as (opt: O) => V,
@@ -264,46 +275,51 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
   const displayText = selectedText || nothingSelectedText || placeholder || "";
   const isPlaceholder = !selectedText && !nothingSelectedText && !!placeholder;
 
-  // Refs stay off `field`. A returned object that holds a ref is itself a ref, so reading it during render is invalid.
-  return {
-    triggerRef,
-    searchRef,
-    listRef,
-    field: {
-      isDisabled,
-      isReadOnly,
-      isOpen,
-      listId,
-      triggerId,
-      labelId,
-      valueId,
-      errorId,
-      hoverProps,
-      focusProps,
-      isFocusVisible,
-      isHovered,
-      open,
-      close,
-      onTriggerKeyDown,
-      onTriggerFocus,
-      onTriggerBlur,
-      showSearch,
-      search,
-      onSearchChange,
-      onMenuKeyDown,
-      activeDescendant,
-      state,
-      optionsLoading,
-      disabledReasons,
-      initialIndex,
-      displayText,
-      isPlaceholder,
-      proposalProps,
-    },
+  const triggerProps: MenuSelectTriggerState = {
+    isDisabled,
+    isReadOnly,
+    isOpen,
+    listId,
+    triggerId,
+    labelId,
+    valueId,
+    errorId,
+    hoverProps,
+    focusProps,
+    isFocusVisible,
+    isHovered,
+    open,
+    close,
+    onKeyDown: onTriggerKeyDown,
+    onFocus: onTriggerFocus,
+    onBlur: onTriggerBlur,
+    displayText,
+    isPlaceholder,
+    proposalProps,
   };
-}
+  const searchProps: MenuSearchState = {
+    show: showSearch,
+    value: search,
+    onChange: onSearchChange,
+    listId,
+    activeDescendant,
+    onKeyDown: onMenuKeyDown,
+  };
+  const menuProps: MenuSelectMenu<O> = {
+    isOpen,
+    close,
+    listId,
+    state,
+    loading: optionsLoading,
+    disabledReasons,
+    initialIndex,
+    onKeyDown: onMenuKeyDown,
+    activeDescendant,
+  };
 
-export type MenuSelectFieldState<O, V extends Value> = ReturnType<typeof useMenuSelectField<O, V>>["field"];
+  // Refs stay beside each group. An object that holds a ref is itself a ref, so reading it during render is invalid.
+  return { triggerRef, trigger: triggerProps, searchRef, search: searchProps, listRef, menu: menuProps };
+}
 
 function matchesSearch<O>(
   option: O,

@@ -15,23 +15,19 @@ import { useTestIds } from "src/utils/useTestIds";
 /** Menu select implementation. Desktop popover; small screens a bottom sheet. */
 export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): JSX.Element {
   const { label, searchPlaceholder } = props;
-  const { triggerRef, searchRef, listRef, field: menu } = useMenuSelectField(props);
+  const { triggerRef, trigger, searchRef, search, listRef, menu } = useMenuSelectField(props);
   const tid = useTestIds(props, defaultTestId(label));
   const { sm: isMobile } = useBreakpoint();
   const panel = (
     <MenuPanel
       variant={isMobile ? "sheet" : "anchored"}
       header={
-        menu.showSearch ? (
+        search.show ? (
           <MenuSearchInput
-            value={menu.search}
-            onChange={menu.onSearchChange}
+            search={search}
             inputRef={searchRef}
             label={`Search ${label}`}
             placeholder={searchPlaceholder}
-            listId={menu.listId}
-            activeDescendant={menu.activeDescendant}
-            onKeyDown={menu.onMenuKeyDown}
             {...tid}
           />
         ) : undefined
@@ -39,15 +35,11 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectFieldPr
       {...tid}
     >
       <OptionList
-        state={menu.state}
+        menu={menu}
         listRef={listRef}
-        id={menu.listId}
         label={label}
-        loading={menu.optionsLoading}
-        disabledReasons={menu.disabledReasons}
-        initialIndex={menu.initialIndex}
-        onKeyDown={menu.showSearch ? undefined : menu.onMenuKeyDown}
-        activeDescendant={menu.showSearch ? undefined : menu.activeDescendant}
+        onKeyDown={search.show ? undefined : menu.onKeyDown}
+        activeDescendant={search.show ? undefined : menu.activeDescendant}
         {...tid}
       />
     </MenuPanel>
@@ -55,7 +47,7 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectFieldPr
 
   return (
     <>
-      <MenuSelectTrigger {...props} menu={menu} triggerRef={triggerRef} />
+      <MenuSelectTrigger {...props} trigger={trigger} triggerRef={triggerRef} />
       {isMobile ? (
         <BottomSheet isOpen={menu.isOpen} onClose={() => menu.close({ restoreFocus: true })} label={label} {...tid}>
           {panel}

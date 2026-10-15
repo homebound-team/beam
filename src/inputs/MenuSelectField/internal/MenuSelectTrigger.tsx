@@ -1,4 +1,5 @@
-import type { JSX, RefObject } from "react";
+import type { DOMAttributes } from "@react-types/shared";
+import type { JSX, KeyboardEvent, RefObject } from "react";
 import { mergeProps } from "react-aria";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
@@ -11,15 +12,39 @@ import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getFieldChrome, selectedValueCss } from "src/inputs/fieldChrome";
-import type { MenuSelectFieldState } from "src/inputs/MenuSelectField/internal/useMenuSelectField";
+import type { AiProposalProps } from "src/inputs/hooks/useAiProposal";
 import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import type { TextFieldInternalProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
+/** Runtime state for the closed field: its button, label, and value. */
+export type MenuSelectTriggerState = {
+  isDisabled: boolean;
+  isReadOnly: boolean;
+  isOpen: boolean;
+  listId: string;
+  triggerId: string;
+  labelId: string;
+  valueId: string;
+  errorId: string;
+  hoverProps: DOMAttributes<HTMLButtonElement>;
+  focusProps: DOMAttributes<HTMLButtonElement>;
+  isFocusVisible: boolean;
+  isHovered: boolean;
+  open: () => void;
+  close: (opts: { restoreFocus: boolean }) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  displayText: string;
+  isPlaceholder: boolean;
+  proposalProps: AiProposalProps;
+};
+
 type MenuSelectTriggerProps<O, V extends Value> = MenuSelectFieldProps<O, V> & {
-  menu: MenuSelectFieldState<O, V>;
+  trigger: MenuSelectTriggerState;
   triggerRef: RefObject<HTMLButtonElement | null>;
 };
 
@@ -34,7 +59,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     readOnly,
     labelStyle: labelStyleProp,
     inputStylePalette,
-    menu,
+    trigger,
     triggerRef,
   } = props;
   const internalProps: TextFieldInternalProps = (props as any).internalProps ?? {};
@@ -49,16 +74,17 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
   const visuallyDisabled = props.visuallyDisabled ?? fieldProps?.visuallyDisabled ?? true;
   const errorInTooltip = props.errorInTooltip ?? fieldProps?.errorInTooltip ?? false;
   const typeScale = fieldProps?.typeScale ?? "sm";
-  const labelSuffix = useLabelSuffix(required, menu.isReadOnly);
+  const labelSuffix = useLabelSuffix(required, trigger.isReadOnly);
 
-  const showFocus = ((menu.isFocusVisible || menu.isOpen) && !menu.isDisabled && !menu.isReadOnly) || forceFocus;
-  const showHover = (menu.isHovered && !menu.isDisabled && !menu.isReadOnly && !showFocus) || forceHover;
+  const showFocus =
+    ((trigger.isFocusVisible || trigger.isOpen) && !trigger.isDisabled && !trigger.isReadOnly) || forceFocus;
+  const showHover = (trigger.isHovered && !trigger.isDisabled && !trigger.isReadOnly && !showFocus) || forceHover;
   // A compound field draws the box and owns anything below the control.
-  const showErrorAndHelper = !compound && !menu.isDisabled && !menu.isReadOnly;
-  const { proposedValue: proposedText, originalValue: originalText } = menu.proposalProps;
+  const showErrorAndHelper = !compound && !trigger.isDisabled && !trigger.isReadOnly;
+  const { proposedValue: proposedText, originalValue: originalText } = trigger.proposalProps;
   const showProposal = proposedText !== undefined;
   // Read-only draws both halves inline; editable fields strike the original through below.
-  const originalBelow = originalText && !menu.isReadOnly ? originalText : undefined;
+  const originalBelow = originalText && !trigger.isReadOnly ? originalText : undefined;
   const fieldChrome = getFieldChrome({
     typeScale,
     labelStyle,
@@ -69,17 +95,17 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     fullWidth,
     compound,
     visuallyDisabled,
-    isHovered: menu.isHovered || forceHover,
+    isHovered: trigger.isHovered || forceHover,
     showProposal,
     inputStylePalette,
   });
   const fieldStateCss = {
     ...fieldChrome.control,
-    ...(menu.isDisabled ? fieldChrome.disabled : {}),
+    ...(trigger.isDisabled ? fieldChrome.disabled : {}),
     ...(showFocus ? fieldChrome.focus : {}),
     ...(showHover ? fieldChrome.hover : {}),
-    ...(errorMsg && !menu.isDisabled ? fieldChrome.error : {}),
-    ...Css.tal.outline0.add("appearance", "none").add("font", "inherit").if(!menu.isDisabled).cursorPointer.$,
+    ...(errorMsg && !trigger.isDisabled ? fieldChrome.error : {}),
+    ...Css.tal.outline0.add("appearance", "none").add("font", "inherit").if(!trigger.isDisabled).cursorPointer.$,
   };
 
   // Outside `showErrorAndHelper`, because a disabled field still shows what it's replacing.
@@ -87,7 +113,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     <>
       {originalBelow && <OriginalValue originalValue={originalBelow} {...tid.originalValue} />}
       {showErrorAndHelper && errorMsg && !errorInTooltip && (
-        <ErrorMessage id={menu.errorId} errorMsg={errorMsg} {...tid.errorMsg} />
+        <ErrorMessage id={trigger.errorId} errorMsg={errorMsg} {...tid.errorMsg} />
       )}
       {showErrorAndHelper && helperText && <HelperText helperText={helperText} {...tid.helperText} />}
     </>
@@ -98,27 +124,27 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     <>
       {labelStyle === "inline" && (
         <span
-          id={menu.labelId}
-          css={Css.sm.wsnw.prPx(4).color(menu.isDisabled && visuallyDisabled ? "currentColor" : Tokens.TextLabel).$}
+          id={trigger.labelId}
+          css={Css.sm.wsnw.prPx(4).color(trigger.isDisabled && visuallyDisabled ? "currentColor" : Tokens.TextLabel).$}
         >
           {label}:
         </span>
       )}
-      <span id={menu.valueId} css={Css.df.aic.fg1.mw0.oh.$}>
-        {menu.isReadOnly && showProposal ? (
+      <span id={trigger.valueId} css={Css.df.aic.fg1.mw0.oh.$}>
+        {trigger.isReadOnly && showProposal ? (
           <span css={Css.fg1.truncate.$}>
             <ProposedValue original={originalText} proposed={proposedText} {...tid.proposedValue} />
           </span>
         ) : (
           <span
             css={{
-              ...Css.fg1.truncate.color(menu.isPlaceholder ? inputPlaceholderColor : undefined).$,
+              ...Css.fg1.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
               // A placeholder reads as hint text, so it stays at the field's regular weight.
-              ...(!menu.isPlaceholder ? selectedValueCss(labelStyle, menu.isReadOnly) : {}),
+              ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
               ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
             }}
           >
-            {menu.displayText}
+            {trigger.displayText}
           </span>
         )}
       </span>
@@ -127,12 +153,12 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
           <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} />
         </span>
       )}
-      {!menu.isReadOnly && (
+      {!trigger.isReadOnly && (
         <span
-          css={Css.df.aic.fs0.pl1.color(menu.isDisabled ? Tokens.FieldTextDisabled : Tokens.TextPlaceholder).$}
+          css={Css.df.aic.fs0.pl1.color(trigger.isDisabled ? Tokens.FieldTextDisabled : Tokens.TextPlaceholder).$}
           {...tid.toggle}
         >
-          <Icon icon={menu.isOpen ? "chevronUp" : "chevronDown"} />
+          <Icon icon={trigger.isOpen ? "chevronUp" : "chevronDown"} />
         </span>
       )}
     </>
@@ -144,14 +170,14 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
         {label && labelStyle !== "inline" && (
           <Label
             labelProps={{
-              id: menu.labelId,
-              htmlFor: menu.isReadOnly ? undefined : menu.triggerId,
+              id: trigger.labelId,
+              htmlFor: trigger.isReadOnly ? undefined : trigger.triggerId,
               onClick: (event) => {
                 // A native label click would also activate the button and toggle the menu shut.
                 event.preventDefault();
-                if (menu.isDisabled || menu.isReadOnly || menu.isOpen) return;
+                if (trigger.isDisabled || trigger.isReadOnly || trigger.isOpen) return;
                 triggerRef.current?.focus();
-                menu.open();
+                trigger.open();
               },
             }}
             hidden={labelStyle === "hidden"}
@@ -164,7 +190,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
         {maybeTooltip({
           title: resolveTooltip(disabled, undefined, readOnly),
           placement: "top",
-          children: menu.isReadOnly ? (
+          children: trigger.isReadOnly ? (
             <div
               css={fieldChrome.readOnly}
               data-readonly="true"
@@ -175,21 +201,21 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
             </div>
           ) : (
             <button
-              {...mergeProps(menu.hoverProps, menu.focusProps, {
-                id: menu.triggerId,
+              {...mergeProps(trigger.hoverProps, trigger.focusProps, {
+                id: trigger.triggerId,
                 type: "button" as const,
-                disabled: menu.isDisabled,
+                disabled: trigger.isDisabled,
                 "aria-haspopup": "listbox" as const,
-                "aria-expanded": menu.isOpen,
-                "aria-controls": menu.listId,
-                "aria-labelledby": `${menu.labelId} ${menu.valueId}`,
+                "aria-expanded": trigger.isOpen,
+                "aria-controls": trigger.listId,
+                "aria-labelledby": `${trigger.labelId} ${trigger.valueId}`,
                 "aria-invalid": errorMsg ? true : undefined,
-                "aria-errormessage": errorMsg ? menu.errorId : undefined,
+                "aria-errormessage": errorMsg ? trigger.errorId : undefined,
                 "data-ai-mode": showProposal ? "true" : undefined,
-                onKeyDown: menu.onTriggerKeyDown,
-                onClick: () => (menu.isOpen ? menu.close({ restoreFocus: true }) : menu.open()),
-                onFocus: menu.onTriggerFocus,
-                onBlur: menu.onTriggerBlur,
+                onKeyDown: trigger.onKeyDown,
+                onClick: () => (trigger.isOpen ? trigger.close({ restoreFocus: true }) : trigger.open()),
+                onFocus: trigger.onFocus,
+                onBlur: trigger.onBlur,
               })}
               ref={triggerRef}
               className={BorderHoverChild}
