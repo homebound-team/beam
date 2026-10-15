@@ -4462,6 +4462,35 @@ describe("GridTable", () => {
       expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
     });
 
+    it("shows a hidden column when it changes to a column that can't be hidden", async () => {
+      // Given hideable name and value columns, where the value column can't be hidden while editing
+      const api = new GridTableApiImpl<Row>();
+      function Test() {
+        const [editing, setEditing] = useState(false);
+        const columns = useMemo(
+          () => [
+            column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+            column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value, canHide: !editing }),
+          ],
+          [editing],
+        );
+        return (
+          <div>
+            <button data-testid="toggle" onClick={() => setEditing((e) => !e)} />
+            <GridTable api={api} columns={columns} rows={rows} />
+          </div>
+        );
+      }
+      const r = await render(<Test />);
+      // And the value column is hidden
+      act(() => api.setVisibleColumns(["name"]));
+      expect(api.getVisibleColumnIds()).toEqual(["name"]);
+      // When editing starts, so the value column can't be hidden
+      click(r.toggle);
+      // Then the value column is shown
+      expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
+    });
+
     it("accepts a specified 'visibleColumnsStorageKey'", async () => {
       vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
 
