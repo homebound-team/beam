@@ -53,6 +53,8 @@ export type GridTableLayoutProps<
   /** Shows "N Rows Selected · Clear" before the columns selector; Clear deselects every row. */
   selectionSummary?: boolean;
   hideEditColumns?: boolean;
+  /** When set, columns that share a name use one Edit Columns switch. */
+  shareColumnVisibility?: boolean;
   totalCount?: number;
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
   withCardView?: boolean;
@@ -102,6 +104,7 @@ function GridTableLayoutComponent<
     actions,
     selectionSummary = false,
     hideEditColumns = false,
+    shareColumnVisibility = false,
     withCardView,
     defaultView = "list",
     emptyFallback: layoutEmptyFallback,
@@ -177,6 +180,7 @@ function GridTableLayoutComponent<
       searchProps={filterSearchProps}
       hasHideableColumns={hasHideableColumns}
       columns={columns}
+      shareColumnVisibility={shareColumnVisibility}
       api={api}
       withCardView={withCardView}
       view={view}
