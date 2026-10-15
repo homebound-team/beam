@@ -3,8 +3,7 @@ import type { PresentationFieldProps } from "src/components/PresentationContext"
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import type { Value } from "src/inputs/Value";
 
-/** Common menu select presentation and option props. */
-export type MenuSelectFieldBaseProps<O, V extends Value> = {
+export type MenuSelectFieldProps<O, V extends Value> = {
   label: string;
   /** The full list, or the selected option plus a loader fired the first time the menu opens. */
   options: OptionsOrLoad<O>;
@@ -41,11 +40,9 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   | "visuallyDisabled"
   | "errorInTooltip"
   | "inputStylePalette"
->;
-
-export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
-  value: V | undefined;
-  /** Value proposed by an AI model; puts the field in AI mode. */
-  proposedValue?: V;
-  onSelect: (value: V | undefined, opt: O | undefined) => void;
-};
+> & {
+    value: V | undefined;
+    /** Value proposed by an AI model; puts the field in AI mode. */
+    proposedValue?: V;
+    onSelect: (value: V | undefined, opt: O | undefined) => void;
+  };

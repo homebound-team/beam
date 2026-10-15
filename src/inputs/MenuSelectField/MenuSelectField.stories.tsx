@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { groupByOptions } from "src/inputs/MenuSelectField/storyOptions";
+import { groupByOptions } from "src/inputs/MenuSelectField/storyHelpers";
 import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";

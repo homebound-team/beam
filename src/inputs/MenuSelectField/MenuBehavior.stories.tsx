@@ -5,7 +5,7 @@ import { ModalBody, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 import { Css } from "src/Css";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { optionItems } from "src/inputs/MenuSelectField/storyOptions";
+import { optionItems } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
 import { waitFor, within } from "storybook/test";
 

@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
 import { Css } from "src/Css";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { groupByOptions } from "src/inputs/MenuSelectField/storyOptions";
+import { groupByOptions } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
 import { within } from "storybook/test";
 
