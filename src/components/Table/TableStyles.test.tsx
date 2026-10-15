@@ -1,4 +1,4 @@
-import { Css } from "src/Css";
+import { Css, Palette } from "src/Css";
 import {
   defaultStyle,
   getTableStyles,
@@ -75,11 +75,19 @@ describe("isGridStyleDef", () => {
     expect(isGridStyleDef({})).toBe(true);
     expect(isGridStyleDef({ grouped: true })).toBe(true);
     expect(isGridStyleDef({ allWhite: true, roundedHeader: false })).toBe(true);
+    expect(isGridStyleDef({ columnStriping: Palette.Gray100 })).toBe(true);
   });
 
   it("treats pure GridStyle objects as not GridStyleDef", () => {
     // Given a style with only GridStyle CSS keys
     const style: GridStyle = { cellCss: Css.bgWhite.$, rowHoverColor: "none" };
+    // Then it is not a GridStyleDef
+    expect(isGridStyleDef(style)).toBe(false);
+  });
+
+  it("treats a resolved style with a stripe color as not GridStyleDef", () => {
+    // Given a style resolved from a def that sets column striping
+    const style = getTableStyles({ columnStriping: Palette.Gray100 });
     // Then it is not a GridStyleDef
     expect(isGridStyleDef(style)).toBe(false);
   });
