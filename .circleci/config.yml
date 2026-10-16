@@ -31,7 +31,8 @@ workflows:
             - dockerhub
       - publish:
           context:
-            - npm-publish
+            - npm-trusted-publish
+            - npm-readonly
             - github
             - dockerhub
           requires:
@@ -85,8 +86,15 @@ jobs:
     docker:
       - <<: *node-image
     steps:
-      - bootstrap
-      - run: yarn semantic-release
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          include-branch-in-cache-key: false
+      - run:
+          name: Release
+          command: |
+            export NPM_ID_TOKEN=$(circleci run oidc get --claims '{"aud":"npm:registry.npmjs.org"}')
+            yarn semantic-release
 
   chromatic:
     resource_class: "xlarge"
