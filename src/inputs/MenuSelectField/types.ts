@@ -3,7 +3,8 @@ import type { PresentationFieldProps } from "src/components/PresentationContext"
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import type { Value } from "src/inputs/Value";
 
-export type MenuSelectFieldProps<O, V extends Value> = {
+/** Props shared by `MenuSelectField` and `MenuMultiSelectField`. */
+export type MenuSelectFieldBaseProps<O, V extends Value> = {
   label: string;
   /** The full list, or the selected option plus a loader fired the first time the menu opens. */
   options: OptionsOrLoad<O>;
@@ -40,9 +41,20 @@ export type MenuSelectFieldProps<O, V extends Value> = {
   | "visuallyDisabled"
   | "errorInTooltip"
   | "inputStylePalette"
-> & {
-    value: V | undefined;
-    /** Value proposed by an AI model; puts the field in AI mode. */
-    proposedValue?: V;
-    onSelect: (value: V | undefined, opt: O | undefined) => void;
-  };
+>;
+
+export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
+  value: V | undefined;
+  /** Value proposed by an AI model; puts the field in AI mode. */
+  proposedValue?: V;
+  onSelect: (value: V | undefined, opt: O | undefined) => void;
+};
+
+/** Selection contract the single and multi fields both pass into the shared menu. */
+export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
+  selectionMode: "single" | "multiple";
+  values: V[];
+  /** Values proposed by an AI model; puts the field in AI mode. */
+  proposedValues?: V[];
+  onCommit: (values: V[], opts: O[]) => void;
+};
