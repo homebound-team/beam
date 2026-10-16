@@ -1,11 +1,15 @@
+import { type ObjectConfig, useFormState } from "@homebound/form-state";
 import { waitFor } from "@homebound/rtl-utils";
 import { useState } from "react";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { Button } from "src/components/Button";
+import { BoundTextField } from "src/forms/BoundTextField";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
+import { StepperLayout } from "src/layouts/Workflow/StepperLayout";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render } from "src/utils/rtl";
+import { click, clickAndWait, render, type, withRouter } from "src/utils/rtl";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
+import { RightPaneLayout } from "./RightPaneLayout";
 import { RightPaneBanner, RightPanePanel } from "./RightPanePanel";
 import { useRightPaneActions } from "./useRightPane";
 
@@ -143,6 +147,138 @@ describe("RightPanePanel", () => {
     expect(r.rightPanePanel_banner).toBeEmptyDOMElement();
     expect(r.rightPanePanel_body).toHaveTextContent("Hello");
   });
+
+  describe("isDirty", () => {
+    it("closes a clean pane without asking", async () => {
+      // Given an open pane without edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+
+      // When closing
+      click(r.rightPanePanel_close);
+
+      // Then it closes without asking
+      expect(r.query.discardChanges).toBeNull();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it.each([
+      ["the X", "rightPanePanel_close"],
+      ["a caller's closeRightPane", "cancel"],
+    ])("asks before %s closes a dirty pane", async (_, closeTestId) => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When closing
+      click(r.getByTestId(closeTestId));
+
+      // Then it asks and stays open until the user discards
+      expect(r.discardChanges).toBeInTheDocument();
+      expect(r.rightPaneContent).toBeInTheDocument();
+      click(r.discardChanges);
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it("keeps a dirty pane and its edits when the user continues editing", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When closing, then choosing to continue editing
+      click(r.rightPanePanel_close);
+      click(r.continueEditing);
+
+      // Then the pane stays open with its edits
+      expect(r.query.discardChanges).toBeNull();
+      expect(r.notes).toHaveValue("edits");
+    });
+
+    it("asks before swapping a dirty pane to content with another key", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When opening other content
+      click(r.openB);
+
+      // Then it asks, and only swaps once the user discards
+      expect(r.rightPanePanel_header).toHaveTextContent("A");
+      click(r.discardChanges);
+      expect(r.rightPanePanel_header).toHaveTextContent("B");
+      expect(r.notes).toHaveValue("");
+    });
+
+    it("updates a dirty pane in place when the content keeps its type and key", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When re-opening the same panel with new props, i.e. a bulk edit gaining a row
+      click(r.updateA);
+
+      // Then it doesn't ask, and the edits survive
+      expect(r.query.discardChanges).toBeNull();
+      expect(r.rightPanePanel_header).toHaveTextContent("A (2)");
+      expect(r.notes).toHaveValue("edits");
+    });
+
+    it("closes a dirty pane without asking when the caller reverts its edits first", async () => {
+      // Given an open pane with unsaved edits
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When deleting the shown item, which reverts and closes in one handler
+      click(r.rightPanePanel_delete);
+
+      // Then it closes without asking
+      expect(r.query.discardChanges).toBeNull();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it("asks before a StepperLayout step change closes a dirty pane", async () => {
+      // Given a stepper whose first step has a pane with unsaved edits
+      const r = await render(<GuardedStepper />, withRouter());
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When changing steps, then choosing to continue editing
+      click(r.header_stepperTabs_tab_stepTwo);
+      click(r.continueEditing);
+
+      // Then it stays on the step with its edits
+      expect(r.query.stepTwoBody).toBeNull();
+      expect(r.notes).toHaveValue("edits");
+
+      // And when changing steps and discarding, the step changes and the pane closes
+      click(r.header_stepperTabs_tab_stepTwo);
+      click(r.discardChanges);
+      expect(r.stepTwoBody).toBeInTheDocument();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it.each(["documentScroll", "rightPaneLayout"] as const)(
+      "closes a dirty pane without asking when its %s host unmounts",
+      async (host) => {
+        // Given a pane with unsaved edits
+        const r = await render(<GuardedPane host={host} />);
+        await clickAndWait(r.openA);
+        type(r.notes, "edits");
+
+        // When the page hosting it goes away
+        await clickAndWait(r.leavePage);
+
+        // Then it closes without asking
+        expect(r.query.discardChanges).toBeNull();
+        expect(r.query.rightPaneContent).toBeNull();
+      },
+    );
+  });
 });
 
 function OpenPanelButton() {
@@ -164,6 +300,80 @@ function OpenPanelButton() {
   );
 }
 
+/** A pane host plus the buttons a caller would use to swap, update, or close its content. */
+function GuardedPane(props: { host?: "documentScroll" | "rightPaneLayout" }) {
+  const { host = "documentScroll" } = props;
+  const { openRightPane, closeRightPane } = useRightPaneActions();
+  const [showHost, setShowHost] = useState(true);
+  return (
+    <DocumentScrollLayoutProvider>
+      {showHost &&
+        (host === "documentScroll" ? (
+          <DocumentScrollOverlayRightPaneLayout>
+            <div>Main</div>
+          </DocumentScrollOverlayRightPaneLayout>
+        ) : (
+          <RightPaneLayout>
+            <div>Main</div>
+          </RightPaneLayout>
+        ))}
+      <Button label="Open A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A" /> })} />
+      <Button label="Update A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A (2)" /> })} />
+      <Button label="Open B" onClick={() => openRightPane({ content: <DraftPanel key="b" title="B" /> })} />
+      <Button label="Cancel" onClick={() => closeRightPane()} />
+      <Button label="Leave Page" onClick={() => setShowHost(false)} />
+    </DocumentScrollLayoutProvider>
+  );
+}
+
+/** A stepper whose first step hosts the pane, like a step body with `withRightPane`. */
+function GuardedStepper() {
+  return (
+    <StepperLayout
+      title="Workflow"
+      onCancel={() => {}}
+      completeLabel="Save"
+      onComplete={() => {}}
+      steps={[
+        {
+          label: "Step One",
+          content: (
+            <DocumentScrollOverlayRightPaneLayout>
+              <OpenDraftButton />
+            </DocumentScrollOverlayRightPaneLayout>
+          ),
+        },
+        { label: "Step Two", content: <div data-testid="stepTwoBody" /> },
+      ]}
+    />
+  );
+}
+
+function OpenDraftButton() {
+  const { openRightPane } = useRightPaneActions();
+  return <Button label="Open A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A" /> })} />;
+}
+
+function DraftPanel(props: { title: string }) {
+  const { title } = props;
+  const { closeRightPane } = useRightPaneActions();
+  const formState = useFormState({ config: draftConfig });
+  return (
+    <RightPanePanel
+      title={title}
+      isDirty={() => formState.dirty}
+      deleteAction={{
+        onClick: () => {
+          formState.revertChanges();
+          closeRightPane();
+        },
+      }}
+    >
+      <BoundTextField field={formState.notes} />
+    </RightPanePanel>
+  );
+}
+
 function SuggestionsPanel() {
   const [hasSuggestions, setHasSuggestions] = useState(true);
   return (
@@ -180,3 +390,6 @@ function SuggestionsPanel() {
     </RightPanePanel>
   );
 }
+
+// A const, not a factory: form-state rebuilds the form when its config changes identity
+const draftConfig: ObjectConfig<{ notes?: string | null }> = { notes: { type: "value" } };
