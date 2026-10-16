@@ -1,20 +1,16 @@
 import { useCallback, useRef } from "react";
-import { useRightPaneOpenActions } from "./useRightPane";
+import { hideRightPane } from "./rightPaneStore";
 
 /** Closes the pane when the layout root unmounts. */
 export function useDocumentScrollRightPaneAnchorRef() {
-  const { closePane } = useRightPaneOpenActions();
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const setRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (!node && ref.current) {
-        closePane({ force: true });
-      }
-      ref.current = node;
-    },
-    [closePane],
-  );
+  const setRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node && ref.current) {
+      hideRightPane();
+    }
+    ref.current = node;
+  }, []);
 
   return { ref, setRef };
 }

@@ -1,10 +1,12 @@
+import { type ObjectConfig, useFormState } from "@homebound/form-state";
 import { waitFor } from "@homebound/rtl-utils";
 import { useState } from "react";
 import { Button } from "src/components/Button";
-import { TextField } from "src/inputs/TextField";
+import { BoundTextField } from "src/forms/BoundTextField";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
+import { StepperLayout } from "src/layouts/Workflow/StepperLayout";
 import { setViewport } from "src/tests/viewport";
-import { click, clickAndWait, render, type } from "src/utils/rtl";
+import { click, clickAndWait, render, type, withRouter } from "src/utils/rtl";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
 import { RightPaneLayout } from "./RightPaneLayout";
 import { RightPanePanel } from "./RightPanePanel";
@@ -142,7 +144,7 @@ describe("RightPanePanel", () => {
 
       // Then it asks and stays open until the user discards
       expect(r.discardChanges).toBeInTheDocument();
-      expect(r.rightPanePanel_header).toHaveTextContent("A");
+      expect(r.rightPaneContent).toBeInTheDocument();
       click(r.discardChanges);
       await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
     });
@@ -193,17 +195,38 @@ describe("RightPanePanel", () => {
       expect(r.notes).toHaveValue("edits");
     });
 
-    it("closes a dirty pane without asking when forced", async () => {
+    it("closes a dirty pane without asking when the caller reverts its edits first", async () => {
       // Given an open pane with unsaved edits
       const r = await render(<GuardedPane />);
       await clickAndWait(r.openA);
       type(r.notes, "edits");
 
-      // When force-closing, i.e. after deleting the shown item
-      click(r.forceClose);
+      // When deleting the shown item, which reverts and closes in one handler
+      click(r.rightPanePanel_delete);
 
       // Then it closes without asking
       expect(r.query.discardChanges).toBeNull();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it("asks before a StepperLayout step change closes a dirty pane", async () => {
+      // Given a stepper whose first step has a pane with unsaved edits
+      const r = await render(<GuardedStepper />, withRouter());
+      await clickAndWait(r.openA);
+      type(r.notes, "edits");
+
+      // When changing steps, then choosing to continue editing
+      click(r.header_stepperTabs_tab_stepTwo);
+      click(r.continueEditing);
+
+      // Then it stays on the step with its edits
+      expect(r.query.stepTwoBody).toBeNull();
+      expect(r.notes).toHaveValue("edits");
+
+      // And when changing steps and discarding, the step changes and the pane closes
+      click(r.header_stepperTabs_tab_stepTwo);
+      click(r.discardChanges);
+      expect(r.stepTwoBody).toBeInTheDocument();
       await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
     });
 
@@ -266,18 +289,58 @@ function GuardedPane(props: { host?: "documentScroll" | "rightPaneLayout" }) {
       <Button label="Update A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A (2)" /> })} />
       <Button label="Open B" onClick={() => openRightPane({ content: <DraftPanel key="b" title="B" /> })} />
       <Button label="Cancel" onClick={() => closeRightPane()} />
-      <Button label="Force Close" onClick={() => closeRightPane({ force: true })} />
       <Button label="Leave Page" onClick={() => setShowHost(false)} />
     </DocumentScrollLayoutProvider>
   );
 }
 
+/** A stepper whose first step hosts the pane, like a step body with `withRightPane`. */
+function GuardedStepper() {
+  return (
+    <StepperLayout
+      title="Workflow"
+      onCancel={() => {}}
+      completeLabel="Save"
+      onComplete={() => {}}
+      steps={[
+        {
+          label: "Step One",
+          content: (
+            <DocumentScrollOverlayRightPaneLayout>
+              <OpenDraftButton />
+            </DocumentScrollOverlayRightPaneLayout>
+          ),
+        },
+        { label: "Step Two", content: <div data-testid="stepTwoBody" /> },
+      ]}
+    />
+  );
+}
+
+function OpenDraftButton() {
+  const { openRightPane } = useRightPaneActions();
+  return <Button label="Open A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A" /> })} />;
+}
+
 function DraftPanel(props: { title: string }) {
   const { title } = props;
-  const [notes, setNotes] = useState<string>();
+  const { closeRightPane } = useRightPaneActions();
+  const formState = useFormState({ config: draftConfig });
   return (
-    <RightPanePanel title={title} isDirty={() => !!notes}>
-      <TextField label="Notes" value={notes} onChange={setNotes} />
+    <RightPanePanel
+      title={title}
+      isDirty={() => formState.dirty}
+      deleteAction={{
+        onClick: () => {
+          formState.revertChanges();
+          closeRightPane();
+        },
+      }}
+    >
+      <BoundTextField field={formState.notes} />
     </RightPanePanel>
   );
 }
+
+// A const, not a factory: form-state rebuilds the form when its config changes identity
+const draftConfig: ObjectConfig<{ notes?: string | null }> = { notes: { type: "value" } };

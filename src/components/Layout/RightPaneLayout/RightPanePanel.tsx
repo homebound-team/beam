@@ -3,7 +3,7 @@ import { Button } from "src/components/Button";
 import { IconButton } from "src/components/IconButton";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { type DeleteActionProps, MaybeDeleteAction } from "src/components/Layout/RightPaneLayout/internal/DeleteAction";
-import { setRightPaneConfirmDiscard } from "src/components/Layout/RightPaneLayout/internal/rightPaneConfirmDiscard";
+import { setRightPaneConfirmDiscard } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
 import { useModal } from "src/components/Modal/useModal";
 import { Css, Tokens } from "src/Css";
@@ -31,6 +31,7 @@ export function RightPanePanel(props: RightPanePanelProps) {
   const { closeRightPane } = useRightPaneActions();
   const { openModal } = useModal();
 
+  // Only registers the check; closeRightPane and openRightPane call it directly
   useEffect(() => {
     if (!isDirty) return;
     return setRightPaneConfirmDiscard((proceed) => {

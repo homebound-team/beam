@@ -393,7 +393,7 @@ function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
     <RightPanePanel
       title={name}
       deleteAction={{ onClick: action("delete"), count: 5 }}
-      secondaryAction={{ label: "Cancel", onClick: () => closeRightPane() }}
+      secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
       primaryAction={{ label: "Save", onClick: action("save") }}
     >
       <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>

@@ -1,3 +1,4 @@
+import { type ObjectConfig, useFormState } from "@homebound/form-state";
 import type { Meta } from "@storybook/react-vite";
 import { isValidElement, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
@@ -11,6 +12,7 @@ import { column, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TabContent, type TabWithContent } from "src/components/Tabs";
 import { Css, Tokens } from "src/Css";
+import { BoundSelectField } from "src/forms/BoundSelectField";
 import { useComputed } from "src/hooks/useComputed";
 import { SelectField } from "src/inputs/SelectField";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
@@ -96,7 +98,7 @@ export function WithTabs() {
 
 /**
  * `RightPanePanel`'s `isDirty` guard: click a book to edit it, or check books to bulk edit them. With edits, closing or
- * switching panels asks first; checking more books mid bulk edit (same key) and Delete (`force`) don't.
+ * switching panels asks first; checking more books mid bulk edit (same key) and Delete, which reverts first, don't.
  */
 export function UnsavedChangesGuard() {
   const [books, setBooks] = useState(createBooks);
@@ -253,6 +255,7 @@ type Format = "Hardcover" | "Paperback";
 type Status = "Draft" | "Published";
 type Book = { id: string; title: string; author: string; format: Format; status: Status };
 type BookChanges = Partial<Pick<Book, "format" | "status">>;
+type BookForm = { format?: Format | null; status?: Status | null };
 type BookTableRow = SimpleHeaderAndData<Book>;
 
 function BookPanel(props: {
@@ -262,30 +265,38 @@ function BookPanel(props: {
 }) {
   const { book, onSave, onDelete } = props;
   const { closeRightPane } = useRightPaneActions();
-  const [saved, setSaved] = useState<BookChanges>({ format: book.format, status: book.status });
-  const [draft, setDraft] = useState(saved);
-  const isDirty = draft.format !== saved.format || draft.status !== saved.status;
+  const formState = useFormState({ config: bookConfig, init: { input: book, map: toBookForm } });
+  const isDirty = useComputed(() => formState.dirty, [formState]);
   return (
     <RightPanePanel
       title={book.title}
-      isDirty={() => isDirty}
+      isDirty={() => formState.dirty}
       deleteAction={{
         onClick: () => {
           onDelete(book.id);
-          closeRightPane({ force: true });
+          // The book is gone, so drop its edits instead of asking to discard them
+          formState.revertChanges();
+          closeRightPane();
         },
       }}
-      secondaryAction={{ label: "Cancel", onClick: () => closeRightPane() }}
+      secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
       primaryAction={{
         label: "Save",
         disabled: !isDirty,
         onClick: () => {
-          onSave([book.id], draft);
-          setSaved(draft);
+          const changes = {
+            format: formState.format.value ?? book.format,
+            status: formState.status.value ?? book.status,
+          };
+          onSave([book.id], changes);
+          formState.update({ ...book, ...changes });
         },
       }}
     >
-      <BookFields changes={draft} onChange={setDraft} />
+      <div css={Css.df.fdc.gap3.$}>
+        <BoundSelectField field={formState.format} options={toOptions<Format>(["Hardcover", "Paperback"])} />
+        <BoundSelectField field={formState.status} options={toOptions<Status>(["Draft", "Published"])} />
+      </div>
     </RightPanePanel>
   );
 }
@@ -369,6 +380,13 @@ function createBooks(): Book[] {
       status: "Draft",
     },
   ];
+}
+
+// A const, not a factory: form-state rebuilds the form when its config changes identity
+const bookConfig: ObjectConfig<BookForm> = { format: { type: "value" }, status: { type: "value" } };
+
+function toBookForm(book: Book): BookForm {
+  return { format: book.format, status: book.status };
 }
 
 function toOptions<V extends string>(values: V[]): { id: V; name: V }[] {
