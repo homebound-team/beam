@@ -7,14 +7,22 @@ import { MenuSearchInput } from "src/inputs/MenuSelectField/internal/MenuSearchI
 import { MenuSelectTrigger } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
 import { OptionList } from "src/inputs/MenuSelectField/internal/OptionList";
 import { useMenuSelectField } from "src/inputs/MenuSelectField/internal/useMenuSelectField";
-import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
+import type { MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-/** Menu select implementation. Desktop popover; small screens a bottom sheet. */
-export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): JSX.Element {
-  const { label, searchPlaceholder } = props;
+/** Shared menu for `MenuSelectField` and `MenuMultiSelectField`. Desktop popover; small screens a bottom sheet. */
+export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControllerProps<O, V>): JSX.Element {
+  const {
+    label,
+    searchPlaceholder,
+    selectionMode: _selectionMode,
+    values: _values,
+    proposedValues: _proposedValues,
+    onCommit: _onCommit,
+    ...fieldProps
+  } = props;
   const { triggerRef, trigger, searchRef, search, listRef, menu } = useMenuSelectField(props);
   const tid = useTestIds(props, defaultTestId(label));
   const { sm: isMobile } = useBreakpoint();
@@ -47,7 +55,7 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectFieldPr
 
   return (
     <>
-      <MenuSelectTrigger {...props} trigger={trigger} triggerRef={triggerRef} />
+      <MenuSelectTrigger {...fieldProps} label={label} trigger={trigger} triggerRef={triggerRef} />
       {isMobile ? (
         <BottomSheet isOpen={menu.isOpen} onClose={() => menu.close({ restoreFocus: true })} label={label} {...tid}>
           {panel}

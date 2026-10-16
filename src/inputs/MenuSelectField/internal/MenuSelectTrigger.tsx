@@ -1,19 +1,20 @@
 import type { DOMAttributes } from "@react-types/shared";
 import type { JSX, KeyboardEvent, RefObject } from "react";
 import { mergeProps } from "react-aria";
+import { CountBadge } from "src/components/CountBadge";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { OriginalValue, ProposedValue } from "src/components/ProposedValue";
 import { BorderHoverChild } from "src/components/Table/components/Row";
-import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
+import { maybeTooltip, resolveTooltip, Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getFieldChrome, selectedValueCss } from "src/inputs/fieldChrome";
 import type { AiProposalProps } from "src/inputs/hooks/useAiProposal";
-import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
+import type { MenuSelectFieldBaseProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import type { TextFieldInternalProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -40,10 +41,12 @@ export type MenuSelectTriggerState = {
   onBlur: () => void;
   displayText: string;
   isPlaceholder: boolean;
+  /** Selected option labels for the multi-select count badge. Empty for a single select. */
+  selectedLabels: { key: string; label: string }[];
   proposalProps: AiProposalProps;
 };
 
-type MenuSelectTriggerProps<O, V extends Value> = MenuSelectFieldProps<O, V> & {
+type MenuSelectTriggerProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
   trigger: MenuSelectTriggerState;
   triggerRef: RefObject<HTMLButtonElement | null>;
 };
@@ -136,16 +139,25 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
             <ProposedValue original={originalText} proposed={proposedText} {...tid.proposedValue} />
           </span>
         ) : (
-          <span
-            css={{
-              ...Css.fg1.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
-              // A placeholder reads as hint text, so it stays at the field's regular weight.
-              ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
-              ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
-            }}
-          >
-            {trigger.displayText}
-          </span>
+          <>
+            {trigger.selectedLabels.length > 0 && (
+              <Tooltip title={<SelectedLabels labels={trigger.selectedLabels} />}>
+                <span css={Css.df.aic.fs0.mr1.$}>
+                  <CountBadge count={trigger.selectedLabels.length} {...tid.count} />
+                </span>
+              </Tooltip>
+            )}
+            <span
+              css={{
+                ...Css.fg1.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
+                // A placeholder reads as hint text, so it stays at the field's regular weight.
+                ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
+                ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
+              }}
+            >
+              {trigger.displayText}
+            </span>
+          </>
         )}
       </span>
       {errorInTooltip && errorMsg && showErrorAndHelper && (
@@ -238,3 +250,13 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
  * TODO: Move this to tokens. https://linear.app/homebound-team/issue/DS-395/update-placeholder-text-color-to-use-color-tokens
  */
 const inputPlaceholderColor = "#9ca3af";
+
+function SelectedLabels({ labels }: { labels: { key: string; label: string }[] }) {
+  return (
+    <ul css={Css.m0.pl2.$}>
+      {labels.map(({ key, label }) => (
+        <li key={key}>{label}</li>
+      ))}
+    </ul>
+  );
+}
