@@ -297,6 +297,8 @@ export * from "./forms/BoundChipSelectField";
 export * from "./forms/BoundDateField";
 export * from "./forms/BoundDateRangeField";
 export * from "./forms/BoundForm";
+export * from "./forms/BoundMenuMultiSelectField";
+export * from "./forms/BoundMenuSelectField";
 export * from "./forms/BoundMultiLineSelectField";
 export * from "./forms/BoundMultiSelectCardGroupField";
 export * from "./forms/BoundMultiSelectField";
