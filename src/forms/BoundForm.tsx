@@ -13,6 +13,8 @@ import { BoundCheckboxGroupField, type BoundCheckboxGroupFieldProps } from "./Bo
 import { BoundDateField, type BoundDateFieldProps } from "./BoundDateField";
 import { BoundDateRangeField, type BoundDateRangeFieldProps } from "./BoundDateRangeField";
 import { isListFieldRow, ListField, type ListFieldConfig, type ListFieldKey } from "./BoundListField";
+import { BoundMenuMultiSelectField, type BoundMenuMultiSelectFieldProps } from "./BoundMenuMultiSelectField";
+import { BoundMenuSelectField, type BoundMenuSelectFieldProps } from "./BoundMenuSelectField";
 import { BoundMultiLineSelectField, type BoundMultiLineSelectFieldProps } from "./BoundMultiLineSelectField";
 import {
   BoundMultiSelectCardGroupField,
@@ -163,6 +165,22 @@ function isCustomReactNodeKey(key: string | number | symbol): key is CustomReact
 type KeysToOmit = "field";
 
 // Potential TODO: add type overloads for the different HasIdIsh/HasNameIsh combinations, maybe there's a generic way to introspect those types?
+export function boundMenuSelectField<O, V extends Value>(props: Omit<BoundMenuSelectFieldProps<O, V>, KeysToOmit>) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundMenuSelectField field={field} {...props} />,
+    minWidth: "200px",
+  });
+}
+
+export function boundMenuMultiSelectField<O, V extends Value>(
+  props: Omit<BoundMenuMultiSelectFieldProps<O, V>, KeysToOmit>,
+) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundMenuMultiSelectField field={field} {...props} />,
+    minWidth: "200px",
+  });
+}
+
 export function boundSelectField<O, V extends Value>(props: Omit<BoundSelectFieldProps<O, V>, KeysToOmit>) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundSelectField field={field} {...props} />,
