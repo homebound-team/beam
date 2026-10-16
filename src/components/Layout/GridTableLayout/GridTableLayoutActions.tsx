@@ -47,6 +47,8 @@ type GridTableLayoutActionsProps<
   searchProps?: SearchBoxProps;
   hasHideableColumns?: boolean;
   columns?: GridColumn<R>[];
+  /** When set, columns that share a name use one Edit Columns switch. */
+  shareColumnVisibility?: boolean;
   api?: GridTableApi<R>;
   withCardView?: boolean;
   view?: TableView;
@@ -71,6 +73,7 @@ function GridTableLayoutActionsComponent<
     searchProps,
     hasHideableColumns,
     columns,
+    shareColumnVisibility,
     api,
     withCardView,
     view,
@@ -214,7 +217,12 @@ function GridTableLayoutActionsComponent<
           <div css={Css.df.aic.gapPx(12).$}>
             {selectionSummary && api && <SelectionSummaryAction api={api} numberOnly={sm} />}
             {hasHideableColumns && view === "list" && columns && api && (
-              <EditColumnsButton columns={columns} api={api} tooltip="Display columns" />
+              <EditColumnsButton
+                columns={columns}
+                api={api}
+                shareColumnVisibility={shareColumnVisibility}
+                tooltip="Display columns"
+              />
             )}
             {withCardView && view !== undefined && setView && <ViewToggleButton view={view} onChange={setView} />}
             {!!actions?.length && <HeaderActions actions={actions} {...testId.actions} />}

@@ -48,13 +48,15 @@ export type GridStyle = {
   expandableHeaderCss?: Properties;
   /** Applied to expandable header cells that are not the last table column. */
   expandableHeaderNonLastColumnCss?: Properties;
+  /** Applied to 'kind: "groupHeader"' cells. No bottom border; the outer left and right borders stay. */
+  groupHeaderCss?: Properties;
   /** Applied to the first cell of all rows, i.e. for table-wide padding or left-side borders. */
   firstCellCss?: Properties;
   /** Applied to the last cell of all rows, i.e. for table-wide padding or right-side borders. */
   lastCellCss?: Properties;
   /** Applied to any column that opts into `GridColumn.border`. */
   borderStyle?: Properties;
-  /** Applied to every cell in the first table-head row (expandableHeader/header/totals). */
+  /** Applied to every cell in the first table-head row (groupHeader/expandableHeader/header/totals). */
   firstRowCellCss?: Properties;
   /** Applied to the first cell in the first table-head row. */
   firstRowFirstCellCss?: Properties;
@@ -90,6 +92,8 @@ export type GridStyle = {
     | ((level: number) => { rowIndent?: number; cellCss?: Properties; firstContentColumn?: Properties });
   /** Allows for customization of the background color used to denote an "active" row */
   activeBgColor?: BeamColor;
+  /** Resolved `columnStriping` color. */
+  columnStripeColor?: BeamColor;
   /** Defines styles for the group row which holds the selected rows that have been filtered out */
   keptGroupRowCss?: Properties;
   /** Defines styles for the last row `keptGroup` to provide separation from the rest of the table */
@@ -124,6 +128,11 @@ export type GridStyleDef = {
   highlightOnHover?: boolean;
   /** Rounds the top corners of the first head-row cells. Defaults to true */
   roundedHeader?: boolean;
+  /**
+   * Zebra on the 2nd, 4th, 6th… content column. A leading group is striped only when a content column precedes it.
+   * Select, collapse, and gutter columns are skipped. A column `bgColor` wins.
+   */
+  columnStriping?: BeamColor;
 };
 
 // Returns a "blessed" style of GridTable
@@ -141,6 +150,7 @@ function memoizedTableStyles() {
       cellTypography = "xs" as const,
       highlightOnHover = true,
       roundedHeader = true,
+      columnStriping,
     } = props;
 
     const key = safeKeys(props)
@@ -189,6 +199,12 @@ function memoizedTableStyles() {
         // Draw a 1px divider inside the cell on the right edge and bottom edge.
         // Using `inset` keeps the line inside the cell so it doesn't change layout.
         expandableHeaderNonLastColumnCss: Css.boxShadow(insetSeparatorCorner).$,
+        groupHeaderCss: Css.bgColor(Tokens.Surface)
+          .color(Tokens.OnSurface)
+          .smSb.wsn.h("auto")
+          .pxPx(12)
+          .ptPx(8)
+          .pb0.bsh0.add("borderBottomWidth", "0").$,
         cellCss: {
           ...Css.typography(cellTypography)
             .color(Tokens.OnSurface)
@@ -227,6 +243,7 @@ function memoizedTableStyles() {
         pinnedRowCss: Css.bgColor(Palette.Blue50).$,
         // A compact field is 8px of its own padding and border; 4px here matches a text cell's 12px inset.
         ...(rowHeight === "flexible" ? { fieldCellCss: Css.pyPx(4).$ } : {}),
+        ...(columnStriping ? { columnStripeColor: columnStriping } : {}),
       };
     }
 
@@ -309,6 +326,7 @@ const gridStyleDefKeysRecord: Record<keyof GridStyleDef, boolean> = {
   cellTypography: true,
   highlightOnHover: true,
   roundedHeader: true,
+  columnStriping: true,
 };
 
 /** True when `style` is a GridStyleDef (empty or any def key present); otherwise a full GridStyle. */

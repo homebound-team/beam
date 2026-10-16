@@ -1,4 +1,4 @@
-import { initializeOptions, type OptionsOrLoad } from "src/inputs/internal/ComboBoxBase";
+import { initializeOptions, type OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { flattenOptions, type NestedOption, type NestedOptionsOrLoad } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 

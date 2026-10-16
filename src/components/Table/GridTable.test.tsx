@@ -26,6 +26,7 @@ import {
   column,
   fieldColumn,
   generateColumnId,
+  groupColumns,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
   pinColumn,
@@ -4399,6 +4400,97 @@ describe("GridTable", () => {
       expect(cell(r2, 1, 2)).toHaveTextContent("trash");
     });
 
+    it("shows a column that can't be hidden when the stored visible columns leave it out", async () => {
+      // Given visible columns stored by an earlier layout with the same column ids, which left out the action column
+      sessionStorage.setItem("nameValueAction", JSON.stringify(["name"]));
+      // And hideable name and value columns, and an action column that can't be hidden
+      const api = new GridTableApiImpl<Row>();
+      const columns = [
+        column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+        column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value }),
+        actionColumn<Row>({ id: "action", header: emptyCell, data: () => "trash" }),
+      ];
+      // When the table renders
+      await render(<GridTable api={api} columns={columns} rows={rows} />);
+      // Then the hideable columns follow the stored list, but the action column is still shown
+      expect(api.getVisibleColumnIds()).toEqual(["name", "action"]);
+    });
+
+    it("keeps a column that can't be hidden visible when the visible columns leave it out", async () => {
+      // Given hideable name and value columns, and an action column that can't be hidden
+      const api = new GridTableApiImpl<Row>();
+      const columns = [
+        column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+        column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value }),
+        actionColumn<Row>({ id: "action", header: emptyCell, data: () => "trash" }),
+      ];
+      await render(<GridTable api={api} columns={columns} rows={rows} />);
+      // When the visible columns leave out the value and action columns
+      act(() => api.setVisibleColumns(["name"]));
+      // Then the value column is hidden, but the action column is still visible
+      expect(api.getVisibleColumnIds()).toEqual(["name", "action"]);
+    });
+
+    it("keeps the visibility of a column that's absent when the visible columns are set", async () => {
+      // Given hideable id and name columns, and a hideable value column that's only added while editing
+      const api = new GridTableApiImpl<Row>();
+      function Test() {
+        const [editing, setEditing] = useState(true);
+        const columns = useMemo(
+          () => [
+            column<Row>({ id: "id", header: () => "Id", data: (data, { row }) => row.id }),
+            column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+            ...(editing ? [column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value })] : []),
+          ],
+          [editing],
+        );
+        return (
+          <div>
+            <button data-testid="toggle" onClick={() => setEditing((e) => !e)} />
+            <GridTable api={api} columns={columns} rows={rows} />
+          </div>
+        );
+      }
+      const r = await render(<Test />);
+      expect(api.getVisibleColumnIds()).toEqual(["id", "name", "value"]);
+      // When editing stops, and the id column is hidden while the value column is absent
+      click(r.toggle);
+      act(() => api.setVisibleColumns(["name"]));
+      // And editing starts again
+      click(r.toggle);
+      // Then the id column stays hidden, and the value column comes back visible
+      expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
+    });
+
+    it("shows a hidden column when it changes to a column that can't be hidden", async () => {
+      // Given hideable name and value columns, where the value column can't be hidden while editing
+      const api = new GridTableApiImpl<Row>();
+      function Test() {
+        const [editing, setEditing] = useState(false);
+        const columns = useMemo(
+          () => [
+            column<Row>({ id: "name", header: () => "Name", data: ({ name }) => name }),
+            column<Row>({ id: "value", header: () => "Value", data: ({ value }) => value, canHide: !editing }),
+          ],
+          [editing],
+        );
+        return (
+          <div>
+            <button data-testid="toggle" onClick={() => setEditing((e) => !e)} />
+            <GridTable api={api} columns={columns} rows={rows} />
+          </div>
+        );
+      }
+      const r = await render(<Test />);
+      // And the value column is hidden
+      act(() => api.setVisibleColumns(["name"]));
+      expect(api.getVisibleColumnIds()).toEqual(["name"]);
+      // When editing starts, so the value column can't be hidden
+      click(r.toggle);
+      // Then the value column is shown
+      expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
+    });
+
     it("accepts a specified 'visibleColumnsStorageKey'", async () => {
       vi.spyOn(Object.getPrototypeOf(window.sessionStorage), "setItem");
 
@@ -4746,6 +4838,235 @@ describe("GridTable", () => {
         "
       `);
     });
+  });
+
+  describe("group columns", () => {
+    type GroupHeader = { id: "groupHeader"; kind: "groupHeader" };
+    type Header = { id: "header"; kind: "header" };
+    type GroupData = {
+      kind: "data";
+      data: { name: string; range: string; average: string; cost: string };
+    };
+    type GroupRow = GroupHeader | Header | GroupData;
+
+    it("spans each group across its visible leaves", async () => {
+      // Given a select column, an ungrouped column, a two-column group, and a one-column group
+      const r = await render(<GridTable columns={createGroupColumns()} rows={createGroupRows()} />);
+
+      // Then the group row spans offerings across Range and Average, and sycamore across Cost
+      expect(cell(r, 0, 0).querySelector("input")).toBeNull();
+      expect(cell(r, 0, 1)).toHaveTextContent("");
+      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 0, 3)).toHaveTextContent("The Sycamore");
+      expect(row(r, 0).childNodes).toHaveLength(4);
+      // And the column headers stay on the second row, including the select toggle
+      expect(cell(r, 1, 0).querySelector("input")).not.toBeNull();
+      expect(cell(r, 1, 1)).toHaveTextContent("Name");
+      expect(cell(r, 1, 2)).toHaveTextContent("Range");
+      expect(cell(r, 1, 3)).toHaveTextContent("Average");
+      expect(cell(r, 1, 4)).toHaveTextContent("Cost");
+      expect(cell(r, 2, 2)).toHaveTextContent("$1–$2");
+      expect(cell(r, 2, 4)).toHaveTextContent("$3");
+    });
+
+    it("shrinks a group when one leaf is hidden", async () => {
+      // Given the grouped table
+      const api: MutableRefObject<GridTableApi<GroupRow> | undefined> = { current: undefined };
+      function GroupTable() {
+        const _api = useGridTableApi<GroupRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={createGroupColumns()} rows={createGroupRows()} />;
+      }
+      const r = await render(<GroupTable />);
+
+      // When Average is hidden
+      await act(async () => {
+        api.current?.setVisibleColumns(["beamSelectColumn", "name", "range", "cost"]);
+      });
+
+      // Then offerings remains over Range only
+      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 1, 2)).toHaveTextContent("Range");
+      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
+      expect(row(r, 1).childNodes).toHaveLength(4);
+    });
+
+    it("keeps the group label when the first leaf is hidden", async () => {
+      // Given the grouped table
+      const api: MutableRefObject<GridTableApi<GroupRow> | undefined> = { current: undefined };
+      function GroupTable() {
+        const _api = useGridTableApi<GroupRow>();
+        api.current = _api;
+        return <GridTable api={_api} columns={createGroupColumns()} rows={createGroupRows()} />;
+      }
+      const r = await render(<GroupTable />);
+
+      // When Range is hidden
+      await act(async () => {
+        api.current?.setVisibleColumns(["beamSelectColumn", "name", "average", "cost"]);
+      });
+
+      // Then offerings is shown over Average
+      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 1, 2)).toHaveTextContent("Average");
+      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
+    });
+
+    it("reflows the stripe when a whole group is hidden", async () => {
+      // Given three groups, with the first and third striped
+      const api: MutableRefObject<GridTableApi<GroupRow> | undefined> = { current: undefined };
+      const groupStripe = { backgroundColor: Palette.Gray100 };
+      function GroupTable() {
+        const _api = useGridTableApi<GroupRow>();
+        api.current = _api;
+        return (
+          <GridTable
+            api={_api}
+            columns={createStripeColumns()}
+            rows={createGroupRows()}
+            style={{ columnStriping: Palette.Gray100 }}
+          />
+        );
+      }
+      const r = await render(<GroupTable />);
+
+      // When the striped first group is hidden
+      await act(async () => {
+        api.current?.setVisibleColumns(["beamSelectColumn", "name", "notes", "cost", "price"]);
+      });
+
+      // Then Sycamore is the first remaining group and still follows Name, so it keeps the stripe
+      expect(cell(r, 0, 3)).toHaveTextContent("The Sycamore");
+      expect(cell(r, 0, 3)).toHaveStyle(groupStripe);
+      expect(cell(r, 1, 3)).toHaveStyle(groupStripe);
+      expect(cell(r, 2, 3)).toHaveStyle(groupStripe);
+      expect(cell(r, 0, 4)).toHaveTextContent("The Magnolia");
+      expect(cell(r, 0, 4)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 1, 4)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 2, 4)).not.toHaveStyle(groupStripe);
+    });
+
+    it("stripes leftover columns once every group is hidden", async () => {
+      // Given a grouped table using column striping
+      const api: MutableRefObject<GridTableApi<GroupRow> | undefined> = { current: undefined };
+      function GroupTable() {
+        const _api = useGridTableApi<GroupRow>();
+        api.current = _api;
+        return (
+          <GridTable
+            api={_api}
+            columns={createStripeColumns()}
+            rows={createGroupRows()}
+            style={{ columnStriping: Palette.Gray100 }}
+          />
+        );
+      }
+      const groupStripe = { backgroundColor: Palette.Gray100 };
+      const r = await render(<GroupTable />);
+
+      // When every group is hidden, leaving select, name, and notes
+      await act(async () => {
+        api.current?.setVisibleColumns(["beamSelectColumn", "name", "notes"]);
+      });
+
+      // Then select is ignored, name is the first content column, and notes takes the stripe
+      expect(cell(r, 2, 0)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 2, 1)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 2, 2)).toHaveStyle(groupStripe);
+    });
+
+    function createGroupColumns(): GridColumn<GroupRow>[] {
+      return [
+        selectColumn<GroupRow>(),
+        column<GroupRow>({
+          id: "name",
+          groupHeader: emptyCell,
+          header: "Name",
+          data: ({ name }) => name,
+        }),
+        ...groupColumns<GroupRow>({
+          id: "offerings",
+          header: "All Product Offerings",
+          columns: [
+            { id: "range", header: "Range", data: ({ range }) => range },
+            { id: "average", header: "Average", data: ({ average }) => average },
+          ],
+        }),
+        ...groupColumns<GroupRow>({
+          id: "sycamore",
+          header: "The Sycamore",
+          columns: [{ id: "cost", header: "Cost", data: ({ cost }) => cost }],
+        }),
+      ];
+    }
+
+    function createStripeColumns(): GridColumn<GroupRow>[] {
+      const [select, name, range, average, cost] = createGroupColumns();
+      return [
+        select,
+        name,
+        range,
+        average,
+        column<GroupRow>({
+          id: "notes",
+          groupHeader: emptyCell,
+          header: "Notes",
+          data: () => "note",
+        }),
+        cost,
+        ...groupColumns<GroupRow>({
+          id: "magnolia",
+          header: "The Magnolia",
+          columns: [{ id: "price", header: "Price", data: () => "$4" }],
+        }),
+      ];
+    }
+
+    function createGroupRows(): GridDataRow<GroupRow>[] {
+      return [
+        { kind: "groupHeader", id: "groupHeader", data: {} },
+        { kind: "header", id: "header", data: {} },
+        {
+          kind: "data",
+          id: "plan-1",
+          data: { name: "Plan", range: "$1–$2", average: "$1.50", cost: "$3" },
+        },
+      ];
+    }
+  });
+
+  it("reflows column stripes when a column is hidden", async () => {
+    // Given three content columns, with the first left plain
+    const columnStripe = { backgroundColor: Palette.Gray100 };
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+
+    function StripeTable() {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return (
+        <GridTable
+          api={_api}
+          columns={[
+            { id: "name", header: () => "Name", data: ({ name }) => name, canHide: true, initHidden: false },
+            { id: "value", header: () => "Value", data: ({ value }) => value },
+            { id: "extra", header: () => "Extra", data: () => "extra" },
+          ]}
+          rows={rows}
+          style={{ columnStriping: Palette.Gray100 }}
+        />
+      );
+    }
+    const r = await render(<StripeTable />);
+
+    // When the first column is hidden
+    await act(async () => {
+      api.current?.setVisibleColumns(["value", "extra"]);
+    });
+
+    // Then value is the first content column, so extra takes the stripe
+    expect(cell(r, 1, 0)).toHaveTextContent("1");
+    expect(cell(r, 1, 0)).not.toHaveStyle(columnStripe);
+    expect(cell(r, 1, 1)).toHaveStyle(columnStripe);
   });
 
   it("can be tested with a human readable inlineSnapshot using tableSnapshot()", async () => {

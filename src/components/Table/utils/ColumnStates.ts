@@ -72,10 +72,13 @@ export class ColumnStates<R extends Kinded> {
       .filter((cs) => (showIn === "csv" ? isContentColumn(cs.column) : true));
   }
 
+  /**
+   * Shows the current columns in `ids` and hides the others. Columns that can't be hidden, like layout gutters, stay shown.
+   * Columns not currently in the table keep their visibility, so a column that's temporarily removed comes back as it was.
+   */
   setVisibleColumns(ids: string[]): void {
-    for (const cs of this.map.values()) {
-      // Handle layout gutters separately as they are not part of the props.columns (gutter columns are automatically added by the table when necessary)
-      cs.setVisible(cs.column.isLayoutGutter ? true : ids.includes(cs.column.id));
+    for (const cs of this.columns.flatMap((c) => c.selfAndChildren)) {
+      cs.setVisible(ids.includes(cs.column.id));
     }
   }
 

@@ -1,6 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { observable } from "mobx";
-import { Fragment, type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type JSX, type ReactNode } from "react";
 import { Button } from "src/components/Button";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
@@ -33,6 +33,7 @@ import {
   dateColumn,
   dragHandleColumn,
   fieldColumn,
+  groupColumns,
   numericColumn,
   pinColumn,
   selectColumn,
@@ -49,7 +50,7 @@ import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { noop } from "src/utils/helpers";
-import { newStory, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
+import { LabeledExamples, newStory, withBeamDecorator, withRouter, zeroTo, type LabeledExample } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 
@@ -2364,6 +2365,157 @@ export function ExpandableColumnsWithSetTimeout() {
   );
 }
 
+type GroupHeaderRow = { id: "groupHeader"; kind: "groupHeader" };
+type GroupedHeaderRow = { id: "header"; kind: "header" };
+type GroupedData = {
+  kind: "data";
+  data: {
+    name: string;
+    offeringsRange: string;
+    offeringsAverage: string;
+    sycamoreRange: string;
+    sycamoreAverage: string;
+    sycamoreCost: string;
+    magnoliaRange: string;
+    magnoliaAverage: string;
+    magnoliaCost: string;
+  };
+};
+type GroupedRow = GroupHeaderRow | GroupedHeaderRow | GroupedData;
+
+export function GroupedColumns() {
+  const rows: GridDataRow<GroupedRow>[] = useMemo(
+    () => [
+      { kind: "groupHeader", id: "groupHeader", data: {} },
+      { kind: "header", id: "header", data: {} },
+      {
+        kind: "data",
+        id: "plan-1",
+        data: {
+          name: "Add Bedroom",
+          offeringsRange: "$24,203–$37,745",
+          offeringsAverage: "$30,753",
+          sycamoreRange: "$22,100–$31,400",
+          sycamoreAverage: "$26,500",
+          sycamoreCost: "$23,846",
+          magnoliaRange: "$25,400–$36,200",
+          magnoliaAverage: "$31,100",
+          magnoliaCost: "$27,400",
+        },
+      },
+    ],
+    [],
+  );
+  const columns: GridColumn<GroupedRow>[] = useMemo(
+    () => [
+      selectColumn<GroupedRow>({ sticky: "left" }),
+      column<GroupedRow>({
+        groupHeader: emptyCell,
+        header: "Name",
+        data: ({ name }) => name,
+        w: "220px",
+        sticky: "left",
+      }),
+      ...groupColumns<GroupedRow>({
+        id: "offerings",
+        header: "All Product Offerings",
+        columns: [
+          numericColumn<GroupedRow>({
+            id: "offerings-range",
+            name: "Range",
+            groupHeader: emptyCell,
+            header: "Range",
+            data: ({ offeringsRange }) => offeringsRange,
+            w: "180px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "offerings-average",
+            name: "Average",
+            groupHeader: emptyCell,
+            header: "Average",
+            data: ({ offeringsAverage }) => offeringsAverage,
+            w: "140px",
+          }),
+        ],
+      }),
+      ...groupColumns<GroupedRow>({
+        id: "sycamore",
+        header: "The Sycamore",
+        columns: [
+          numericColumn<GroupedRow>({
+            id: "sycamore-range",
+            name: "Range",
+            groupHeader: emptyCell,
+            header: "Range",
+            data: ({ sycamoreRange }) => sycamoreRange,
+            w: "180px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "sycamore-average",
+            name: "Average",
+            groupHeader: emptyCell,
+            header: "Average",
+            data: ({ sycamoreAverage }) => sycamoreAverage,
+            w: "140px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "sycamore-cost",
+            name: "Cost",
+            groupHeader: emptyCell,
+            header: "Cost",
+            data: ({ sycamoreCost }) => sycamoreCost,
+            w: "140px",
+          }),
+        ],
+      }),
+      ...groupColumns<GroupedRow>({
+        id: "magnolia",
+        header: "The Magnolia",
+        columns: [
+          numericColumn<GroupedRow>({
+            id: "magnolia-range",
+            name: "Range",
+            groupHeader: emptyCell,
+            header: "Range",
+            data: ({ magnoliaRange }) => magnoliaRange,
+            w: "180px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "magnolia-average",
+            name: "Average",
+            groupHeader: emptyCell,
+            header: "Average",
+            data: ({ magnoliaAverage }) => magnoliaAverage,
+            w: "140px",
+          }),
+          numericColumn<GroupedRow>({
+            id: "magnolia-cost",
+            name: "Cost",
+            groupHeader: emptyCell,
+            header: "Cost",
+            data: ({ magnoliaCost }) => magnoliaCost,
+            w: "140px",
+          }),
+        ],
+      }),
+    ],
+    [],
+  );
+  return (
+    <div css={Css.p2.$}>
+      <GridTable
+        columns={columns}
+        rows={rows}
+        style={{ allWhite: true, bordered: true, columnStriping: Palette.Gray100 }}
+      />
+    </div>
+  );
+}
+
+export function ColumnStriping() {
+  return <LabeledExamples direction="column" examples={columnStripingExamples()} />;
+}
+
 type SimpleExpandableRow = ExpandHeader | Header | { id: string; kind: "data"; data: Data };
 export function Tooltips() {
   const primitiveColumn: GridColumn<SimpleExpandableRow> = {
@@ -3904,4 +4056,116 @@ function createCompanionWideRows(): GridDataRow<CompanionOptionRow>[] {
     },
     ...extra,
   ];
+}
+
+type StripeRow =
+  | { kind: "groupHeader"; id: string; data: Record<string, never> }
+  | { kind: "header"; id: string; data: Record<string, never> }
+  | { kind: "data"; id: string; data: { name: string } };
+
+function columnStripingExamples(): LabeledExample[] {
+  return [
+    {
+      label: "Columns",
+      children: (
+        <StripeTable
+          columns={[
+            stripeColumn("name", "Name", "Add Bedroom"),
+            // This column would take the stripe, but an explicit column background wins.
+            stripeColumn("value", "Value (color override)", "$30,753", { bgColor: Palette.Blue100 }),
+            stripeColumn("project", "Project", "Sycamore"),
+            stripeColumn("status", "Status", "Active"),
+            stripeColumn("notes", "Notes", "Ready"),
+          ]}
+        />
+      ),
+    },
+    {
+      label: "Leading group",
+      children: <StripeTable grouped columns={stripeGroups()} />,
+    },
+    {
+      label: "Column before the first group",
+      children: (
+        <StripeTable
+          grouped
+          columns={[
+            stripeColumn("name", "Name", "Add Bedroom"),
+            ...stripeGroup("offerings", "Offerings"),
+            ...stripeGroup("sycamore", "Sycamore"),
+            ...stripeGroup("magnolia", "Magnolia"),
+          ]}
+        />
+      ),
+    },
+    {
+      label: "Select, collapse, and gutters before a group",
+      children: (
+        <StripeTable
+          grouped
+          columnGutter
+          columns={[collapseColumn<StripeRow>(), selectColumn<StripeRow>(), ...stripeGroups()]}
+        />
+      ),
+    },
+    {
+      label: "Content column after select and gutters",
+      children: (
+        <StripeTable
+          grouped
+          columnGutter
+          columns={[
+            collapseColumn<StripeRow>(),
+            selectColumn<StripeRow>(),
+            stripeColumn("name", "Name", "Add Bedroom"),
+            ...stripeGroups(),
+          ]}
+        />
+      ),
+    },
+  ];
+}
+
+function StripeTable(props: { columns: GridColumn<StripeRow>[]; grouped?: boolean; columnGutter?: boolean }) {
+  const rows: GridDataRow<StripeRow>[] = [
+    ...(props.grouped ? [{ kind: "groupHeader" as const, id: "groupHeader", data: {} }] : []),
+    { kind: "header" as const, id: "header", data: {} },
+    { kind: "data" as const, id: "1", data: { name: "Add Bedroom" } },
+  ];
+  return (
+    <GridTable
+      columns={props.columns}
+      rows={rows}
+      columnGutter={props.columnGutter}
+      style={{ allWhite: true, bordered: true, columnStriping: Palette.Gray100 }}
+    />
+  );
+}
+
+function stripeColumn(
+  id: string,
+  header: string,
+  value: string,
+  extra?: Pick<GridColumn<StripeRow>, "bgColor">,
+): GridColumn<StripeRow> {
+  return column({ id, header, groupHeader: emptyCell, data: () => value, w: "140px", ...extra });
+}
+
+function stripeGroups(): GridColumn<StripeRow>[] {
+  return [
+    ...stripeGroup("offerings", "Offerings"),
+    ...stripeGroup("sycamore", "Sycamore"),
+    ...stripeGroup("magnolia", "Magnolia"),
+  ];
+}
+
+function stripeGroup(id: string, header: string): GridColumn<StripeRow>[] {
+  return groupColumns({
+    id,
+    header,
+    columns: [
+      { id: `${id}-range`, name: "Range", header: "Range", data: () => "$24,203", w: "120px" },
+      { id: `${id}-average`, name: "Average", header: "Average", data: () => "$30,753", w: "120px" },
+    ],
+  });
 }

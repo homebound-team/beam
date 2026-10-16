@@ -234,7 +234,7 @@ export { cardStyle, condensedStyle, defaultStyle, getTableStyles } from "./compo
 export type { GridStyle, RowStyle, RowStyles } from "./components/Table/TableStyles";
 export { createRowLookup, shouldSkipScrollTo } from "./components/Table/utils/GridRowLookup";
 export type { GridRowLookup } from "./components/Table/utils/GridRowLookup";
-export { simpleDataRows, simpleHeader } from "./components/Table/utils/simpleHelpers";
+export { simpleDataRows, simpleGroupHeader, simpleHeader } from "./components/Table/utils/simpleHelpers";
 export type { SimpleHeaderAndData } from "./components/Table/utils/simpleHelpers";
 export { TableState, TableStateContext } from "./components/Table/utils/TableState";
 export type { SelectedState, SortOn, SortState } from "./components/Table/utils/TableState";

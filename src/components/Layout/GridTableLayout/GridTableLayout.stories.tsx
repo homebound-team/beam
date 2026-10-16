@@ -15,10 +15,11 @@ import {
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import { collapseColumn, column, groupColumns, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { simpleHeader } from "src/components/Table/utils/simpleHelpers";
-import { Css } from "src/Css";
+import { simpleGroupHeader, simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { emptyCell } from "src/components/Table/utils/utils";
+import { Css, Palette } from "src/Css";
 import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
@@ -462,6 +463,30 @@ export function GridTableLayoutWithColor() {
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
           visibleColumnsStorageKey: storageKey,
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+/** Group header spans, with Edit Columns. Shared leaf names use one visibility switch; hiding a group reflows the stripe. */
+export function GroupedColumns() {
+  const columns = useMemo(() => getGroupedColumns(), []);
+  const rows = useMemo(() => [simpleGroupHeader, simpleHeader, ...getGroupedRows()], []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedColumns: { storageKey: "grid-table-layout-grouped-columns-2" },
+  });
+
+  return (
+    <TestProjectLayout pageTitle="Grouped columns">
+      <GridTableLayoutComponent
+        shareColumnVisibility
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows,
+          style: { columnStriping: Palette.Gray100 },
         }}
       />
     </TestProjectLayout>
@@ -1373,6 +1398,169 @@ function makeSelectedRows(): GridDataRow<Row>[] {
       id: "p2",
       data: { name: "parent 2", value: 200, status: "inactive", priority: 2 },
       children: [{ kind: "data", id: "p2c1", data: { name: "child p2c1", value: 100, status: "active", priority: 3 } }],
+    },
+  ];
+}
+
+type GroupedPlan = {
+  name: string;
+  offeringsRange: string;
+  offeringsAverage: string;
+  sycamoreRange: string;
+  sycamoreAverage: string;
+  sycamoreCost: string;
+  magnoliaRange: string;
+  magnoliaAverage: string;
+  magnoliaCost: string;
+};
+type GroupedPlanRow =
+  | { kind: "groupHeader"; id: string; data: undefined }
+  | { kind: "header"; id: string; data: undefined }
+  | { kind: "data"; id: string; data: GroupedPlan };
+
+function getGroupedColumns() {
+  return [
+    selectColumn<GroupedPlanRow>({ name: "Select", canHide: false, sticky: "left" }),
+    column<GroupedPlanRow>({
+      id: "name",
+      name: "Name",
+      groupHeader: emptyCell,
+      header: "Name",
+      data: ({ name }) => name,
+      mw: "220px",
+      sticky: "left",
+    }),
+    ...groupColumns<GroupedPlanRow>({
+      id: "offerings",
+      header: "All Product Offerings",
+      columns: [
+        numericColumn<GroupedPlanRow>({
+          id: "offerings-range",
+          name: "Range",
+          groupHeader: emptyCell,
+          header: "Range",
+          data: ({ offeringsRange }) => offeringsRange,
+          mw: "160px",
+        }),
+        numericColumn<GroupedPlanRow>({
+          id: "offerings-average",
+          name: "Average",
+          groupHeader: emptyCell,
+          header: "Average",
+          data: ({ offeringsAverage }) => offeringsAverage,
+          mw: "120px",
+        }),
+      ],
+    }),
+    ...groupColumns<GroupedPlanRow>({
+      id: "sycamore",
+      header: "The Sycamore",
+      columns: [
+        numericColumn<GroupedPlanRow>({
+          id: "sycamore-range",
+          name: "Range",
+          groupHeader: emptyCell,
+          header: "Range",
+          data: ({ sycamoreRange }) => sycamoreRange,
+          mw: "160px",
+        }),
+        numericColumn<GroupedPlanRow>({
+          id: "sycamore-average",
+          name: "Average",
+          groupHeader: emptyCell,
+          header: "Average",
+          data: ({ sycamoreAverage }) => sycamoreAverage,
+          mw: "120px",
+        }),
+        numericColumn<GroupedPlanRow>({
+          id: "sycamore-cost",
+          name: "Cost",
+          groupHeader: emptyCell,
+          header: "Cost",
+          data: ({ sycamoreCost }) => sycamoreCost,
+          mw: "120px",
+        }),
+      ],
+    }),
+    ...groupColumns<GroupedPlanRow>({
+      id: "magnolia",
+      header: "The Magnolia",
+      columns: [
+        numericColumn<GroupedPlanRow>({
+          id: "magnolia-range",
+          name: "Range",
+          groupHeader: emptyCell,
+          header: "Range",
+          data: ({ magnoliaRange }) => magnoliaRange,
+          mw: "160px",
+        }),
+        numericColumn<GroupedPlanRow>({
+          id: "magnolia-average",
+          name: "Average",
+          groupHeader: emptyCell,
+          header: "Average",
+          data: ({ magnoliaAverage }) => magnoliaAverage,
+          mw: "120px",
+        }),
+        numericColumn<GroupedPlanRow>({
+          id: "magnolia-cost",
+          name: "Cost",
+          groupHeader: emptyCell,
+          header: "Cost",
+          data: ({ magnoliaCost }) => magnoliaCost,
+          mw: "120px",
+        }),
+      ],
+    }),
+  ];
+}
+
+function getGroupedRows(): GridDataRow<GroupedPlanRow>[] {
+  return [
+    {
+      kind: "data",
+      id: "plan-1",
+      data: {
+        name: "Add Bedroom",
+        offeringsRange: "$24,203–$37,745",
+        offeringsAverage: "$30,753",
+        sycamoreRange: "$22,100–$31,400",
+        sycamoreAverage: "$26,500",
+        sycamoreCost: "$23,846",
+        magnoliaRange: "$25,400–$36,200",
+        magnoliaAverage: "$31,100",
+        magnoliaCost: "$27,400",
+      },
+    },
+    {
+      kind: "data",
+      id: "plan-2",
+      data: {
+        name: "Add Bath",
+        offeringsRange: "$8,120–$14,400",
+        offeringsAverage: "$11,260",
+        sycamoreRange: "$7,800–$12,600",
+        sycamoreAverage: "$10,140",
+        sycamoreCost: "$9,480",
+        magnoliaRange: "$8,900–$15,200",
+        magnoliaAverage: "$12,050",
+        magnoliaCost: "$10,880",
+      },
+    },
+    {
+      kind: "data",
+      id: "plan-3",
+      data: {
+        name: "Finish Basement",
+        offeringsRange: "$18,500–$29,100",
+        offeringsAverage: "$23,800",
+        sycamoreRange: "$17,200–$26,400",
+        sycamoreAverage: "$21,900",
+        sycamoreCost: "$21,150",
+        magnoliaRange: "$19,600–$30,800",
+        magnoliaAverage: "$25,200",
+        magnoliaCost: "$22,640",
+      },
     },
   ];
 }
