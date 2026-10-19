@@ -9,18 +9,28 @@ import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { menuRowHeight, OptionRow } from "src/inputs/MenuSelectField/internal/OptionRow";
 import { useTestIds } from "src/utils/useTestIds";
 
-export type OptionListProps<O> = {
-  state: ListState<O>;
-  listRef: RefObject<HTMLDivElement | null>;
+/** The open menu: its list, and the overlay open state around it. */
+export type MenuSelectMenu<O> = {
+  isOpen: boolean;
+  close: (opts: { restoreFocus: boolean }) => void;
   /** DOM id of the listbox; the trigger and search input point at it. */
-  id: string;
-  label: string;
+  listId: string;
+  state: ListState<O>;
+  /** Shows a loading row while a lazy option list is in flight. */
+  loading: boolean;
   disabledReasons: Record<string, string | undefined>;
   /** Row scrolled into view on mount, e.g. the first selected option. */
-  initialIndex?: number;
-  /** Shows a loading row while a lazy option list is in flight. */
-  loading?: boolean;
-  /** Keyboard handler for a menu with no search field. Replaces the listbox's own key handling. */
+  initialIndex: number;
+  onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
+  /** DOM id of the option that has virtual focus. */
+  activeDescendant?: string;
+};
+
+export type OptionListProps<O> = {
+  menu: MenuSelectMenu<O>;
+  listRef: RefObject<HTMLDivElement | null>;
+  label: string;
+  /** Keyboard handler when this list holds focus. Omitted when the search input does. */
   onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
   /** Option id for `aria-activedescendant` when this listbox holds keyboard focus. */
   activeDescendant?: string;
@@ -28,17 +38,8 @@ export type OptionListProps<O> = {
 
 /** Virtualized listbox with virtual focus. DOM focus stays on the search field, or on this list when there is no search. */
 export function OptionList<O>(props: OptionListProps<O>) {
-  const {
-    state,
-    listRef,
-    id,
-    label,
-    disabledReasons,
-    initialIndex = 0,
-    loading = false,
-    onKeyDown,
-    activeDescendant,
-  } = props;
+  const { menu, listRef, label, onKeyDown, activeDescendant } = props;
+  const { state, listId: id, disabledReasons, initialIndex, loading } = menu;
   const tid = useTestIds(props, "optionList");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const { listBoxProps } = useListBox(

@@ -342,6 +342,8 @@ export * from "./inputs/CheckboxGroup";
 export * from "./inputs/ChipSelectField";
 export * from "./inputs/DateFields/utils";
 export * from "./inputs/ErrorMessage";
+export * from "./inputs/MenuSelectField/MenuSelectField";
+export type { MenuSelectFieldProps } from "./inputs/MenuSelectField/types";
 export * from "./inputs/MultiLineSelectField";
 export * from "./inputs/MultiSelectField";
 export * from "./inputs/NumberField";
