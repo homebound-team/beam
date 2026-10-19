@@ -5,6 +5,7 @@ import type { ListState } from "react-stately";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
+import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type OptionRowProps<O> = {
@@ -15,9 +16,18 @@ export type OptionRowProps<O> = {
   disabledReason?: string;
 };
 
-/** Option label with a trailing check when selected. */
-export function OptionRow<O>(props: OptionRowProps<O>) {
-  const { item, state, id, disabledReason } = props;
+/** Single-select option: label with a trailing check when selected. */
+export function SingleOptionRow<O>(props: OptionRowProps<O>) {
+  return <BaseOptionRow {...props} variant="check" />;
+}
+
+/** Multi-select option: leading checkbox, same look as TreeSelectField rows. */
+export function MultiOptionRow<O>(props: OptionRowProps<O>) {
+  return <BaseOptionRow {...props} variant="checkbox" />;
+}
+
+function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "checkbox" }) {
+  const { item, state, id, disabledReason, variant } = props;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
   const { hoverProps, isHovered } = useHover({});
@@ -46,8 +56,9 @@ export function OptionRow<O>(props: OptionRowProps<O>) {
         }}
         {...tid.option}
       >
+        {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
         <span css={Css.truncate.fg1.mw0.$}>{item.rendered}</span>
-        {isSelected && (
+        {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
           </span>

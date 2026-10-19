@@ -7,7 +7,7 @@ import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/intern
 import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
 import type { MenuSelectTriggerState } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
 import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
-import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
+import type { MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
@@ -22,7 +22,7 @@ type MenuSelectFieldApi<O> = {
 };
 
 /** Menu select state: options, search, selection, and keyboard behavior. Own hook instead of React Stately's, because the trigger is a button that opens a searchable menu. */
-export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): MenuSelectFieldApi<O> {
+export function useMenuSelectField<O, V extends Value>(props: MenuSelectControllerProps<O, V>): MenuSelectFieldApi<O> {
   const {
     options: optionsProp,
     getOptionValue = defaultOptionValue as (opt: O) => V,
@@ -36,10 +36,12 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
     readOnly,
     onFocus,
     onBlur,
-    value: propValue,
-    proposedValue,
-    onSelect,
+    selectionMode,
+    values: propValues,
+    proposedValues,
+    onCommit,
   } = props;
+  const multiple = selectionMode === "multiple";
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
@@ -76,11 +78,15 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
     [options],
   );
   // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
-  const { effectiveValue: value, proposalProps } = useAiProposal(propValue, proposedValue, (v) => {
-    const option = optionsByKey.get(valueToKey(v));
-    return option === undefined ? undefined : getOptionLabel(option);
-  });
-  const selectedKeys = useMemo(() => new Set(value === undefined ? [] : [valueToKey(value)]), [value]);
+  const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
+    labelsFor(vs, options, getOptionValue, getOptionLabel).join(", "),
+  );
+  const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
+  const selectedKeys = useMemo(() => new Set(values.map(valueToKey)), [values]);
+  const selectedOptions = useMemo(
+    () => values.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
+    [values, optionsByKey],
+  );
   const filteredOptions = useMemo(
     () =>
       search ? options.filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains)) : options,
@@ -95,16 +101,30 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
 
   function onSelectionChange(keys: Selection) {
     if (keys === "all") return;
-    const [key] = [...keys];
-    // Re-selecting the current value toggles it off in react-stately; treat that as "keep it" and close.
-    if (key === undefined) {
+    if (!multiple) {
+      const [key] = [...keys];
+      // Re-selecting the current value toggles it off in react-stately; treat that as "keep it" and close.
+      if (key === undefined) {
+        close({ restoreFocus: true });
+        return;
+      }
+      const opt = optionsByKey.get(String(key));
+      proposalProps.onUserEdit?.();
+      onCommit(opt === undefined ? [] : [getOptionValue(opt)], opt === undefined ? [] : [opt]);
       close({ restoreFocus: true });
       return;
     }
-    const opt = optionsByKey.get(String(key));
+    // `keys` still holds selections the search hides; react-stately only toggles the pressed key.
+    const next = values.filter((v) => keys.has(valueToKey(v)));
+    for (const k of keys) {
+      const opt = optionsByKey.get(String(k));
+      if (opt !== undefined && !selectedKeys.has(String(k))) next.push(getOptionValue(opt));
+    }
     proposalProps.onUserEdit?.();
-    onSelect(opt === undefined ? undefined : getOptionValue(opt), opt);
-    close({ restoreFocus: true });
+    onCommit(
+      next,
+      next.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
+    );
   }
 
   const state = useListState<O>({
@@ -114,7 +134,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
         {getOptionMenuLabel ? getOptionMenuLabel(o) : getOptionLabel(o)}
       </Item>
     ),
-    selectionMode: "single",
+    selectionMode: multiple ? "multiple" : "single",
     selectedKeys,
     disabledKeys,
     onSelectionChange,
@@ -270,10 +290,13 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
     filteredOptions.findIndex((o) => selectedKeys.has(valueToKey(getOptionValue(o)))),
   );
 
-  const selectedOption = value === undefined ? undefined : optionsByKey.get(valueToKey(value));
-  const selectedText = selectedOption === undefined ? "" : getOptionLabel(selectedOption);
-  const displayText = selectedText || nothingSelectedText || placeholder || "";
-  const isPlaceholder = !selectedText && !nothingSelectedText && !!placeholder;
+  const selectedText = !multiple && selectedOptions[0] !== undefined ? getOptionLabel(selectedOptions[0]) : "";
+  // Multi with a selection shows only the count badge; an empty field shows nothing-selected text, then the placeholder.
+  const displayText = selectedText || (values.length > 0 ? "" : nothingSelectedText || placeholder || "");
+  const isPlaceholder = !selectedText && values.length === 0 && !nothingSelectedText && !!placeholder;
+  const selectedLabels = multiple
+    ? selectedOptions.map((o) => ({ key: valueToKey(getOptionValue(o)), label: getOptionLabel(o) }))
+    : [];
 
   const triggerProps: MenuSelectTriggerState = {
     isDisabled,
@@ -295,6 +318,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
     onBlur: onTriggerBlur,
     displayText,
     isPlaceholder,
+    selectedLabels,
     proposalProps,
   };
   const searchProps: MenuSearchState = {
@@ -313,12 +337,24 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldPro
     loading: optionsLoading,
     disabledReasons,
     initialIndex,
+    rowVariant: multiple ? "checkbox" : "check",
     onKeyDown: onMenuKeyDown,
     activeDescendant,
   };
 
   // Refs stay beside each group. An object that holds a ref is itself a ref, so reading it during render is invalid.
   return { triggerRef, trigger: triggerProps, searchRef, search: searchProps, listRef, menu: menuProps };
+}
+
+/** Labels in option-list order, so a reordered selection still reads as the same value. */
+function labelsFor<O, V extends Value>(
+  values: readonly V[],
+  options: readonly O[],
+  getOptionValue: (opt: O) => V,
+  getOptionLabel: (opt: O) => string,
+): string[] {
+  const keys = new Set(values.map(valueToKey));
+  return options.filter((option) => keys.has(valueToKey(getOptionValue(option)))).map(getOptionLabel);
 }
 
 function matchesSearch<O>(
