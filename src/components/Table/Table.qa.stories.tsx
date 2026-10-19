@@ -24,6 +24,8 @@ import { emptyCell } from "src/components/Table/utils/utils";
 import { Tag } from "src/components/Tag";
 import { Css, Palette } from "src/Css";
 import { BoundDateField } from "src/forms/BoundDateField";
+import { BoundMenuMultiSelectField } from "src/forms/BoundMenuMultiSelectField";
+import { BoundMenuSelectField } from "src/forms/BoundMenuSelectField";
 import { BoundMultiSelectField } from "src/forms/BoundMultiSelectField";
 import { BoundNumberField } from "src/forms/BoundNumberField";
 import { BoundSelectField } from "src/forms/BoundSelectField";
@@ -1018,6 +1020,30 @@ function inputFieldColumns(getFormState: (author: AuthorInput) => ObjectState<Au
         content: () => {
           const os = getFormState(data);
           return <BoundMultiSelectField field={os.favoriteShapes} options={shapes} {...applyStateProps(row.id)} />;
+        },
+      }),
+    }),
+    fieldColumn<InputFieldRows>({
+      header: "Favorite Sport (Menu)",
+      data: (data, { row }) => ({
+        content: () => {
+          const os = getFormState(data);
+          return (
+            <BoundMenuSelectField
+              field={os.favoriteSport}
+              options={sports.filter((s) => s.id)}
+              {...applyStateProps(row.id)}
+            />
+          );
+        },
+      }),
+    }),
+    fieldColumn<InputFieldRows>({
+      header: "Favorite Shapes (Menu)",
+      data: (data, { row }) => ({
+        content: () => {
+          const os = getFormState(data);
+          return <BoundMenuMultiSelectField field={os.favoriteShapes} options={shapes} {...applyStateProps(row.id)} />;
         },
       }),
     }),
