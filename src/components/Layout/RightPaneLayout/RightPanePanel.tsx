@@ -22,7 +22,7 @@ export type RightPanePanelProps = {
   children: ReactNode;
   /** Type or status tag on the close-button row; the title moves to its own row below. */
   tag?: RightPaneTag;
-  /** When it returns true, closing the pane or swapping in other content asks to discard changes first. */
+  /** When it returns true, closing the pane or opening content with another type or `key` asks to discard changes first. */
   isDirty?: () => boolean;
   /** When false, omit the built-in close control (caller provides their own). Default true. */
   withClose?: boolean;
