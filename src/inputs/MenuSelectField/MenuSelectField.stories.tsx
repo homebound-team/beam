@@ -15,7 +15,7 @@ export default {
   decorators: [withBeamDecorator, withDimensions()],
   parameters: {
     layout: "fullscreen",
-    chromatic: { modes: viewportModes("desktop", "mobile1") },
+    chromatic: { modes: viewportModes("desktop") },
     design: {
       type: "figma",
       url: "https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2828-5144",

@@ -1,10 +1,9 @@
 import type { Meta } from "@storybook/react-vite";
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 import { Css } from "src/Css";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { groupByOptions } from "src/inputs/MenuSelectField/storyHelpers";
+import { FieldFrame, groupByOptions, open } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
-import { within } from "storybook/test";
 
 export default {
   title: "Inputs/Select Fields (new)/Menu Behavior/Single Selection",
@@ -72,18 +71,4 @@ function SingleField(props: { initial?: string }) {
       <MenuSelectField label="Group by" options={groupByOptions()} value={value} onSelect={setValue} />
     </FieldFrame>
   );
-}
-
-function FieldFrame(props: { children: ReactNode }) {
-  return (
-    <div css={Css.p2.$}>
-      <div css={Css.wPx(320).$}>{props.children}</div>
-    </div>
-  );
-}
-
-function open(testId: string) {
-  return ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    within(canvasElement).getByTestId(testId).click();
-  };
 }

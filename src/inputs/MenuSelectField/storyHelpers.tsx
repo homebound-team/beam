@@ -1,3 +1,7 @@
+import type { ReactNode } from "react";
+import { Css } from "src/Css";
+import { within } from "storybook/test";
+
 export function groupByOptions() {
   return [
     { id: "cc", name: "Cost Code" },
@@ -29,4 +33,26 @@ export function optionItems() {
     { id: "o13", name: "Every Day Entry 111", code: "LOC111" },
     { id: "o14", name: "Foyer 102", code: "LOC102" },
   ];
+}
+
+type FieldFrameProps = {
+  children: ReactNode;
+  /** Pin the field to the bottom of the viewport so the menu opens upward. */
+  pin?: "end";
+};
+
+/** Padded frame for menu stories. */
+export function FieldFrame(props: FieldFrameProps) {
+  return (
+    <div css={Css.p2.if(props.pin === "end").df.fdc.h("100vh").jcfe.$}>
+      <div css={Css.wPx(320).$}>{props.children}</div>
+    </div>
+  );
+}
+
+/** Storybook play that opens a menu by its test id. */
+export function open(testId: string) {
+  return ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    within(canvasElement).getByTestId(testId).click();
+  };
 }

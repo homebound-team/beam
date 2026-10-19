@@ -228,7 +228,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
         })}
         {labelStyle !== "left" && supporting}
       </div>
-      {labelStyle === "left" && hasSupporting && <div css={Css.mtPx(-8).ml("50%").$}>{supporting}</div>}
+      {labelStyle === "left" && hasSupporting && <div css={Css.mt(-1).ml("50%").$}>{supporting}</div>}
     </>
   );
 }

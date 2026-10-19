@@ -1,11 +1,10 @@
 import type { Meta } from "@storybook/react-vite";
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "src/components/Button";
 import { ModalBody, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
-import { Css } from "src/Css";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { optionItems } from "src/inputs/MenuSelectField/storyHelpers";
+import { FieldFrame, open, optionItems } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
 import { waitFor, within } from "storybook/test";
 
@@ -97,18 +96,4 @@ function ModalSelect() {
       </ModalBody>
     </>
   );
-}
-
-function FieldFrame(props: { children: ReactNode; pin?: "end" }) {
-  return (
-    <div css={Css.df.fdc.p2.if(props.pin === "end").h("100vh").jcfe.$}>
-      <div css={Css.wPx(320).$}>{props.children}</div>
-    </div>
-  );
-}
-
-function open(testId: string) {
-  return ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    within(canvasElement).getByTestId(testId).click();
-  };
 }

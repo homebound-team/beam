@@ -335,7 +335,7 @@ function matchesSearch<O>(
 }
 
 /** Menus with this many options or fewer omit the search field. */
-const searchOptionLimit = 8;
+export const searchOptionLimit = 8;
 
 /**
  * Reuses React Aria's `ListKeyboardDelegate` for arrows, Home, and End.
