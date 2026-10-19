@@ -17,12 +17,12 @@ export type OptionRowProps<O> = {
 };
 
 /** Single-select option: label with a trailing check when selected. */
-export function OptionRow<O>(props: OptionRowProps<O>) {
+export function SingleOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="check" />;
 }
 
 /** Multi-select option: leading checkbox, same look as TreeSelectField rows. */
-export function CheckboxOptionRow<O>(props: OptionRowProps<O>) {
+export function MultiOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="checkbox" />;
 }
 

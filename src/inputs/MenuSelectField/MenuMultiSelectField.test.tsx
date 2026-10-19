@@ -51,6 +51,25 @@ describe("MenuMultiSelectField", () => {
     );
   });
 
+  it("keeps hidden selections when deselecting while filtered", async () => {
+    // Given Red and Blue selected
+    const onSelect = vi.fn();
+    const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} onSelectSpy={onSelect} />);
+    click(r.color);
+    // When filtering Red out and deselecting Blue
+    type(r.color_search, "blu");
+    select(r.color, "Blue");
+    // Then only Red remains
+    expect(onSelect).toHaveBeenLastCalledWith(["r"], [{ id: "r", name: "Red" }]);
+  });
+
+  it("treats a reordered proposal as unchanged", async () => {
+    // Given the same colors on record and proposed, in opposite orders
+    const r = await render(<MultiHarness initial={["b", "r"]} proposedValues={["r", "b"]} />);
+    // Then nothing is struck through
+    expect(r.query.color_originalValue).toBeNull();
+  });
+
   it("keeps focus in the list when pressing an option", async () => {
     // Given an open multi select with no search field
     const r = await render(<MultiHarness />);

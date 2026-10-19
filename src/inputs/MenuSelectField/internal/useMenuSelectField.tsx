@@ -79,7 +79,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   );
   // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
   const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
-    labelsFor(vs, optionsByKey, getOptionLabel).join(", "),
+    labelsFor(vs, options, getOptionValue, getOptionLabel).join(", "),
   );
   const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
   const selectedKeys = useMemo(() => new Set(values.map(valueToKey)), [values]);
@@ -114,12 +114,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       close({ restoreFocus: true });
       return;
     }
-    // Filtering hides options but must not drop their selection, so merge against the visible set.
-    const visible = new Set(filteredOptions.map((o) => valueToKey(getOptionValue(o))));
-    const next = values.filter((v) => {
-      const k = valueToKey(v);
-      return !visible.has(k) || keys.has(k);
-    });
+    // `keys` still holds selections the search hides; react-stately only toggles the pressed key.
+    const next = values.filter((v) => keys.has(valueToKey(v)));
     for (const k of keys) {
       const opt = optionsByKey.get(String(k));
       if (opt !== undefined && !selectedKeys.has(String(k))) next.push(getOptionValue(opt));
@@ -350,15 +346,15 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   return { triggerRef, trigger: triggerProps, searchRef, search: searchProps, listRef, menu: menuProps };
 }
 
+/** Labels in option-list order, so a reordered selection still reads as the same value. */
 function labelsFor<O, V extends Value>(
-  values: V[],
-  optionsByKey: Map<string, O>,
+  values: readonly V[],
+  options: readonly O[],
+  getOptionValue: (opt: O) => V,
   getOptionLabel: (opt: O) => string,
 ): string[] {
-  return values
-    .map((v) => optionsByKey.get(valueToKey(v)))
-    .filter((o): o is O => o !== undefined)
-    .map(getOptionLabel);
+  const keys = new Set(values.map(valueToKey));
+  return options.filter((option) => keys.has(valueToKey(getOptionValue(option)))).map(getOptionLabel);
 }
 
 function matchesSearch<O>(

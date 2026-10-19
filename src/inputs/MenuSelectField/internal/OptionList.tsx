@@ -6,7 +6,7 @@ import type { ListState } from "react-stately";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Css, Tokens } from "src/Css";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
-import { CheckboxOptionRow, menuRowHeight, OptionRow } from "src/inputs/MenuSelectField/internal/OptionRow";
+import { menuRowHeight, MultiOptionRow, SingleOptionRow } from "src/inputs/MenuSelectField/internal/OptionRow";
 import { useTestIds } from "src/utils/useTestIds";
 
 /** The open menu: its list, and the overlay open state around it. */
@@ -21,7 +21,7 @@ export type MenuSelectMenu<O> = {
   disabledReasons: Record<string, string | undefined>;
   /** Row scrolled into view on mount, e.g. the first selected option. */
   initialIndex: number;
-  /** Trailing check for one value; a leading checkbox when several can be toggled. */
+  /** `"check"` draws a trailing check for one value. `"checkbox"` draws a leading checkbox when several can be toggled. */
   rowVariant: "check" | "checkbox";
   onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
   /** DOM id of the option that has virtual focus. */
@@ -85,7 +85,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
     setScrollTop(scroller, Math.min(initialTop * menuRowHeight, maxTop));
   }, [listRef, syncScroll, initialTop, initialCount]);
 
-  const Row = rowVariant === "checkbox" ? CheckboxOptionRow : OptionRow;
+  const Row = rowVariant === "checkbox" ? MultiOptionRow : SingleOptionRow;
   // Tests render every row (jsdom has no layout); remount when the count changes so filtering is reflected.
   const isTest = process.env.NODE_ENV === "test";
 
