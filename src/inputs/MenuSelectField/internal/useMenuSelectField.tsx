@@ -21,7 +21,7 @@ type MenuSelectFieldApi<O> = {
   menu: MenuSelectMenu<O>;
 };
 
-/** Options, search, selection, and keyboard behavior for a menu select. */
+/** Menu select state: options, search, selection, and keyboard behavior. Own hook instead of React Stately's, because the trigger is a button that opens a searchable menu. */
 export function useMenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): MenuSelectFieldApi<O> {
   const {
     options: optionsProp,

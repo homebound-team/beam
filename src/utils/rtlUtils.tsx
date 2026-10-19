@@ -403,7 +403,7 @@ function findListBox(select: HTMLElement): HTMLElement {
   return document.getElementById(listboxId) || fail("listbox not found");
 }
 
-function assertListBoxInput(select: HTMLElement): void {
+function assertListBoxInput(select: HTMLElement): select is HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement {
   if (isSelectElement(select)) {
     throw new Error("Beam getOptions helper does not support <select> elements");
   }
@@ -413,6 +413,7 @@ function assertListBoxInput(select: HTMLElement): void {
       `Expected element to be INPUT, TEXTAREA, or BUTTON, but got ${select.nodeName}. This field may be read-only. In that case we cannot get the list of options`,
     );
   }
+  return true;
 }
 
 function isSelectElement(element: HTMLElement): element is HTMLSelectElement {
