@@ -21,6 +21,6 @@ Remaining work:
 
 ## Usage
 
-Use `MenuSelectField` when a filter accepts one value and `MenuMultiSelectField` when it accepts several values. Menus with more than eight options keep search inside the menu, so the closed filter stays compact.
+Use `MenuSelectField` when a filter accepts one value and `MenuMultiSelectField` when it accepts several values. Menus longer than `searchOptionLimit` keep search inside the menu, so the closed filter stays compact.
 
 These fields share their trigger chrome, searchable menu, option rows, desktop popover, and mobile bottom sheet. `options` can be the full list, or `{ current, load, options }` so a long filter list loads the first time the menu opens. Pass `proposedValue` (single) or `proposedValues` (multi) for AI mode, matching the other fields. Use the child pages and their Examples stories for the closed field. Open-menu behavior is under Menu Behavior. Single Selection and Multi Selection each show how a row looks. Lazy loading, flipping upward, and opening inside a modal are shared, since those do not depend on how a row is drawn.
