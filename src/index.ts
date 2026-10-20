@@ -65,7 +65,14 @@ export * from "./components/Layout/PreventBrowserScroll";
 export * from "./components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 export * from "./components/Layout/RightPaneLayout/RightPaneLayout";
 export * from "./components/Layout/RightPaneLayout/RightPanePanel";
-export * from "./components/Layout/RightPaneLayout/rightPaneStore";
+// Named, so the store's internal helpers stay out of Beam's API
+export {
+  resetRightPaneStore,
+  rightPaneContentStore,
+  rightPaneOpenActions,
+  rightPaneOpenStore,
+} from "./components/Layout/RightPaneLayout/rightPaneStore";
+export type { OpenRightPaneOpts, RightPaneOpenActions } from "./components/Layout/RightPaneLayout/rightPaneStore";
 export * from "./components/Layout/RightPaneLayout/useRightPane";
 export * from "./components/Layout/RightPaneLayout/withRightPane";
 export * from "./components/Layout/ScrollableContent";

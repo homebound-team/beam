@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
-import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { closeRightPaneThen } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
 import type { StepperTabsStep } from "src/components/StepperTabs/StepperTabs";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -63,7 +63,6 @@ export function StepperLayout(props: StepperLayoutProps) {
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(stepTabs, defaultStep));
   const tid = useTestIds(props, "stepperLayout");
-  const { closeRightPane } = useRightPaneActions();
 
   const currentIndex = hasStep(stepTabs, currentStep) ? stepTabs.findIndex((step) => step.value === currentStep) : 0;
   const isFirstStep = currentIndex <= 0;
@@ -72,8 +71,7 @@ export function StepperLayout(props: StepperLayoutProps) {
 
   function goToStep(value: string) {
     if (value === currentStep) return;
-    closeRightPane();
-    setCurrentStep(value);
+    closeRightPaneThen(() => setCurrentStep(value));
   }
 
   return (
