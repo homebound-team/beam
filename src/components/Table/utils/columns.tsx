@@ -67,21 +67,22 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
   return { clientSideSort: false, ...columnDef, align: "center", isAction: true, wrapAction: false };
 }
 
+/** Stable ids for the select and collapse columns. These aren't layout columns. */
+export const beamSelectColumnId = "beamSelectColumn";
+export const beamCollapseColumnId = "beamCollapseColumn";
+
 /**
  * Provides default styling for a GridColumn containing a checkbox.
  *
- * We allow either no `columnDef` at all, or a partial column def (i.e. to say a Totals row should
- * not have a `SelectToggle`, b/c we can provide the default behavior a `SelectToggle` for basically
- * all rows.
+ * We allow either no `columnDef` or a partial one (i.e. totals shouldn't show a `SelectToggle`).
+ * This column isn't laid out — the checkbox is drawn in the first content cell, so `w` is ignored.
  */
 export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
   const base = {
     ...nonKindDefaults(),
-    id: "beamSelectColumn",
+    id: beamSelectColumnId,
     clientSideSort: false,
     align: "center",
-    // Defining `w: 40px` to accommodate for the `16px` wide checkbox and `12px` of padding on either side.
-    w: "40px",
     wrapAction: false,
     isAction: true,
     // Select Column should not display the select toggle for group, expandable, or totals header rows.
@@ -102,18 +103,15 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
 /**
  * Provides default styling for a GridColumn containing a collapse icon.
  *
- * We allow either no `columnDef` at all, or a partial column def (i.e. to say a Totals row should
- * not have a `CollapseToggle`, b/c we can provide the default behavior a `CollapseToggle` for basically
- * all rows.
+ * We allow either no `columnDef` or a partial one (i.e. totals shouldn't show a `CollapseToggle`).
+ * This column isn't laid out — the chevron is drawn in the first content cell, so `w` is ignored.
  */
 export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
   const base = {
     ...nonKindDefaults(),
-    id: "beamCollapseColumn",
+    id: beamCollapseColumnId,
     clientSideSort: false,
     align: "center",
-    // Defining `w: 38px` based on the designs
-    w: "38px",
     wrapAction: false,
     isAction: true,
     // Collapse Column should not display the collapse toggle for group, expandable, or totals header rows.
@@ -124,8 +122,8 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
   };
   // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Collapse... `
   return newMethodMissingProxy(base, (key) => {
-    return (data: any, { row, level }: { row: GridDataRow<any>; level: number }) => ({
-      content: <CollapseToggle row={row} compact={level > 0} />,
+    return (data: any, { row }: { row: GridDataRow<any> }) => ({
+      content: <CollapseToggle row={row} />,
     });
   }) as any;
 }
@@ -170,6 +168,49 @@ export const layoutGutterRightColumnId = "beamLayoutGutterRight";
 /** True for columns that display row data (not action controls or layout gutters). */
 export function isContentColumn(column: Pick<GridColumn<Kinded>, "isAction" | "isLayoutGutter">): boolean {
   return !column.isAction && !column.isLayoutGutter;
+}
+
+/** Select and collapse stay in the column API, but we don't give them a layout slot. Each row draws them in the first content cell. */
+export function isRowControlColumn(column: { id: string }): boolean {
+  return column.id === beamSelectColumnId || column.id === beamCollapseColumnId;
+}
+
+/** Collapse, then select, no matter the order they were declared in. */
+export function rowControlColumns<T extends Kinded>(columns: readonly GridColumnWithId<T>[]): GridColumnWithId<T>[] {
+  const collapse = columns.find((column) => column.id === beamCollapseColumnId);
+  const select = columns.find((column) => column.id === beamSelectColumnId);
+  return [collapse, select].filter((column): column is GridColumnWithId<T> => !!column);
+}
+
+/** Collapse toggle (28px button) plus the 8px gap before the next item. */
+const collapseControlPx = 36;
+/** Select checkbox (16px) plus the 8px gap before the label. */
+const selectControlPx = 24;
+
+/** Extra width so the chevron and checkbox don't eat the label. */
+export function firstContentControlPx(columns: readonly { id?: string }[]): number {
+  return columns.reduce((width, column) => {
+    if (column.id === beamCollapseColumnId) return width + collapseControlPx;
+    if (column.id === beamSelectColumnId) return width + selectControlPx;
+    return width;
+  }, 0);
+}
+
+/**
+ * Drops select and collapse from the laid-out columns.
+ * If one of them was sticky, pin the first content column instead (unless that column is already sticky).
+ */
+export function toLayoutColumns<T extends Kinded>(columns: readonly GridColumnWithId<T>[]): GridColumnWithId<T>[] {
+  const controlSticky = columns.find((column) => isRowControlColumn(column) && column.sticky)?.sticky;
+  const layout = columns.filter((column) => !isRowControlColumn(column));
+  if (!controlSticky) return layout;
+
+  const index = layout.findIndex((column) => isContentColumn(column));
+  if (index < 0 || layout[index].sticky) return layout;
+
+  const next = layout.slice();
+  next[index] = { ...layout[index], sticky: controlSticky };
+  return next;
 }
 
 /** Empty fixed-width column inset for document-scroll table layouts. */
@@ -301,6 +342,8 @@ export function calcColumnSizes<R extends Kinded>(
   tableMinWidthPx: number = 0,
   expandedColumnIds: string[],
   resizedWidths?: ResizedWidths,
+  /** Width of the in-cell collapse toggle and select checkbox, unless that column was resized. */
+  controlPx: number = 0,
 ): string[] {
   // For both default columns (1fr) as well as `w: 4fr` columns, we translate the width into an expression that looks like:
   // calc((100% - allOtherPercent - allOtherPx) * ((myFr / totalFr))`
@@ -310,6 +353,10 @@ export function calcColumnSizes<R extends Kinded>(
   // Unfortunately, something about having our header & body rows in separate divs (which is controlled
   // by react-virtuoso), even if they have the same width, for some reason `fr` units between the two
   // will resolve every slightly differently, where as this approach they will match exactly.
+  const firstContentIndex = columns.findIndex((column) => isContentColumn(column));
+  const firstContentId = firstContentIndex >= 0 ? columns[firstContentIndex].id : undefined;
+  // A resized width is the whole cell, controls included, so don't add the control width again.
+  const controlBonus = firstContentId !== undefined && resizedWidths?.[firstContentId] === undefined ? controlPx : 0;
   const { claimedPercentages, claimedPixels, totalFr } = columns.reduce(
     (acc, { id, w: _w, expandedWidth }) => {
       // Use resized width if available, otherwise use expanded width or original width
@@ -335,7 +382,8 @@ export function calcColumnSizes<R extends Kinded>(
         throw new Error("Beam Table column width definition only supports px, percentage, or fr units");
       }
     },
-    { claimedPercentages: 0, claimedPixels: 0, totalFr: 0 },
+    // Count the control width in the claimed pixels so fr columns shrink, then add it onto the first content column once sizes are resolved.
+    { claimedPercentages: 0, claimedPixels: controlBonus, totalFr: 0 },
   );
 
   // In the event a column defines a fractional unit (fr) as the `w` value and a `mw` value in pixels,
@@ -404,7 +452,19 @@ export function calcColumnSizes<R extends Kinded>(
     }
   });
 
+  if (controlBonus > 0 && firstContentIndex >= 0) {
+    sizes[firstContentIndex] = withControlWidth(sizes[firstContentIndex], controlBonus);
+  }
+
   return sizes;
+}
+
+/** Adds the collapse/select width onto a resolved column size. */
+function withControlWidth(size: string, controlPx: number): string {
+  if (size.endsWith("px")) {
+    return `${parseFloat(size) + controlPx}px`;
+  }
+  return `calc(${size} + ${controlPx}px)`;
 }
 
 export type ColumnLayoutResult = {
@@ -421,23 +481,24 @@ export function calcColumnLayout<R extends Kinded>(
   expandedColumnIds: string[],
   resizedWidths: ResizedWidths | undefined,
   columnsMayExceedMeasure: boolean,
+  controlPx: number = 0,
 ): ColumnLayoutResult {
   if (probeWidth === undefined) {
     return {
-      columnSizes: calcColumnSizes(columns, undefined, tableMinWidthPx, expandedColumnIds, resizedWidths),
+      columnSizes: calcColumnSizes(columns, undefined, tableMinWidthPx, expandedColumnIds, resizedWidths, controlPx),
       contentWidth: undefined,
     };
   }
 
   if (!columnsMayExceedMeasure) {
     return {
-      columnSizes: calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths),
+      columnSizes: calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths, controlPx),
       contentWidth: probeWidth,
     };
   }
 
   // Pass 1: size columns assuming the row width equals the measured container (probe).
-  let columnSizes = calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths);
+  let columnSizes = calcColumnSizes(columns, probeWidth, tableMinWidthPx, expandedColumnIds, resizedWidths, controlPx);
 
   // Literal % columns and mw floors can require a row wider than the probe.
   const contentWidth = resolveTableContentWidth(probeWidth, columnSizes, tableMinWidthPx) ?? probeWidth;
@@ -445,7 +506,7 @@ export function calcColumnLayout<R extends Kinded>(
   // Re-run fr→px at the content width when expansion is meaningful; literal % columns stay as-is.
   // Skip re-run when expansion is ≤1px (rounding noise from % resolution at the probe).
   if (contentWidth > probeWidth + 1) {
-    columnSizes = calcColumnSizes(columns, contentWidth, tableMinWidthPx, expandedColumnIds, resizedWidths);
+    columnSizes = calcColumnSizes(columns, contentWidth, tableMinWidthPx, expandedColumnIds, resizedWidths, controlPx);
   }
 
   return { columnSizes, contentWidth };

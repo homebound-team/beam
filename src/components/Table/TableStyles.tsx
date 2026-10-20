@@ -166,12 +166,12 @@ function memoizedTableStyles() {
             ...Css.xsSb.mhPx(56).color(Tokens.OnSurfaceMuted).bgColor(Tokens.SurfaceHover).boxShadow(insetSeparator).$,
             ...(allWhite && Css.bgColor(Tokens.Surface).$),
           },
-          firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.color(Tokens.OnSurface).$) },
+          // Hierarchy type and indent are applied per row. All-white group rows keep a primary label color.
+          ...(allWhite ? { firstContentColumn: Css.color(Tokens.OnSurface).$ } : {}),
         },
-        2: { firstContentColumn: Css.xs.pl3.$ },
-        // Add 12 more pixels of padding for each level of nesting
-        3: { firstContentColumn: Css.xs.plPx(36).$ },
       };
+      // Without a collapse column we still indent the first child level (pl3).
+      // If there is a collapse column, the 28px hierarchy indent replaces this.
       const defaultLevels = { 1: { firstContentColumn: Css.xs.pl3.$ } };
 
       cache[key] = {
@@ -256,6 +256,45 @@ export const getTableStyles = memoizedTableStyles();
 export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
 export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("pageBreakInside", "avoid").$;
+
+/**
+ * Extra left inset per nested level when the table has a collapse column.
+ * Level 0 stays at the cell's 12px padding.
+ */
+export const hierarchyIndentPx = 28;
+/** Horizontal padding on table cells (`pxPx(12)`). Indent is added on top of this. */
+const tableCellPaddingXPx = 12;
+/** A nested row with no chevron needs to sit past the parent's toggle: 24px, plus the 8px gap. */
+const hierarchyLeafPaddingPx = 32;
+
+/** Padding-left for a nested first content cell, or undefined at level 0 with no reserved gap. */
+export function hierarchyIndentPaddingPx(level: number, reserveLeafPadding = false): number | undefined {
+  const leafPadding = reserveLeafPadding ? hierarchyLeafPaddingPx : 0;
+  if (level <= 0 && leafPadding === 0) return undefined;
+  return tableCellPaddingXPx + hierarchyIndentPx * Math.max(level, 0) + leafPadding;
+}
+
+/**
+ * First-content type and indent for a body row.
+ * Level 0 is small semibold when the row has children or it is a grouped level-0 row.
+ * Deeper rows are extra-small semibold only when that row has children.
+ */
+export function hierarchyFirstContentCss(opts: {
+  level: number;
+  hasChildren: boolean;
+  groupedLevel: boolean;
+  skipIndent: boolean;
+}): Properties | undefined {
+  const { level, hasChildren, groupedLevel, skipIndent } = opts;
+  const semibold = level === 0 ? hasChildren || groupedLevel : level > 0 && hasChildren;
+  // A nested leaf doesn't have a chevron, so pad it past where the parent's toggle sits.
+  const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level, level > 0 && !hasChildren);
+  if (!semibold && paddingLeft === undefined) return undefined;
+  return {
+    ...(semibold ? (level === 0 ? Css.smSb.$ : Css.xsSb.$) : {}),
+    ...(paddingLeft !== undefined ? Css.plPx(paddingLeft).$ : {}),
+  };
+}
 
 /** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */
 export const loadingTableCss = Css.o50.pen.$;

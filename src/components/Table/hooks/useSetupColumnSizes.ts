@@ -33,6 +33,8 @@ export function useSetupColumnSizes<R extends Kinded>(
   visibleColumnsStorageKey: string | undefined,
   disableColumnResizing: boolean,
   columnsMayExceedMeasure: boolean,
+  /** Width of in-cell collapse toggles and select checkboxes added to the first content column. */
+  controlPx: number = 0,
 ): {
   columnSizes: string[];
   /** Container width from the resize probe (unchanged when content expands). */
@@ -44,9 +46,14 @@ export function useSetupColumnSizes<R extends Kinded>(
   setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
   resetColumnWidths: () => void;
 } {
-  // Call useColumnResizing to manage column width state and persistence
+  // Widths saved before the checkbox and chevron moved into the cell didn't include them, so those tables
+  // get a new key and size from the column defs again.
+  const widthStorageKey =
+    visibleColumnsStorageKey && controlPx > 0
+      ? `${visibleColumnsStorageKey}__inCellControls`
+      : visibleColumnsStorageKey;
   const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
-    disableColumnResizing ? undefined : visibleColumnsStorageKey,
+    disableColumnResizing ? undefined : widthStorageKey,
   );
 
   // Calculate the column sizes immediately rather than via the `debounce` method.
@@ -57,8 +64,15 @@ export function useSetupColumnSizes<R extends Kinded>(
   const [contentWidth, setContentWidth] = useState<number | undefined>();
   const [columnSizes, setColumnSizes] = useState<string[]>(
     () =>
-      calcColumnLayout(columns, undefined, style.minWidthPx, expandedColumnIds, resizedWidths, columnsMayExceedMeasure)
-        .columnSizes,
+      calcColumnLayout(
+        columns,
+        undefined,
+        style.minWidthPx,
+        expandedColumnIds,
+        resizedWidths,
+        columnsMayExceedMeasure,
+        controlPx,
+      ).columnSizes,
   );
   // Track previous table width to detect container resize
   const prevTableWidthRef = useRef<number | undefined>(tableWidth);
@@ -72,12 +86,13 @@ export function useSetupColumnSizes<R extends Kinded>(
         expandedColumnIds,
         resizedWidths,
         columnsMayExceedMeasure,
+        controlPx,
       );
       setTableWidth(probeWidth);
       setContentWidth(layout.contentWidth);
       setColumnSizes(layout.columnSizes);
     },
-    [columns, style.minWidthPx, expandedColumnIds, resizedWidths, columnsMayExceedMeasure],
+    [columns, style.minWidthPx, expandedColumnIds, resizedWidths, columnsMayExceedMeasure, controlPx],
   );
 
   // Scale resized column widths when container width changes

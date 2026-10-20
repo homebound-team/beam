@@ -423,7 +423,8 @@ export function GridTableLayoutWithColor() {
   });
 
   useEffect(() => {
-    const columnWidthsKey = `columnWidths_${storageKey}`;
+    // This table has select and collapse, so its widths are stored under the in-cell controls key.
+    const columnWidthsKey = `columnWidths_${storageKey}__inCellControls`;
     if (!sessionStorage.getItem(columnWidthsKey)) {
       sessionStorage.setItem(
         columnWidthsKey,

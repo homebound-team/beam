@@ -6,8 +6,15 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { HEADER, KEPT_GROUP } from "src/components/Table/utils/utils";
 import { useComputed } from "src/hooks/useComputed";
 
-export interface GridTableCollapseToggleProps extends Pick<IconButtonProps, "compact"> {
+export type GridTableCollapseToggleProps = {
   row: GridDataRow<any>;
+} & Pick<IconButtonProps, "compact">;
+
+/** Header, kept-group, and parent rows show a chevron. Leaves do not. */
+export function showsCollapseToggle(row: GridDataRow<any>, isKeptSelectedRow = false): boolean {
+  if (isKeptSelectedRow) return false;
+  if (row.kind === HEADER || row.kind === KEPT_GROUP) return true;
+  return !!row.children?.length;
 }
 
 /** Provides a chevron icons to collapse/un-collapse for parent/child tables. */
@@ -19,18 +26,12 @@ export function CollapseToggle(props: GridTableCollapseToggleProps) {
   const iconKey = isCollapsed ? "chevronRight" : "chevronDown";
   const headerIconKey = isCollapsed ? "chevronsRight" : "chevronsDown";
 
-  // If we're not a header and not the selected group row, only render a toggle if we have child rows to actually collapse
-  const isHeader = row.kind === HEADER;
-  const isKeptGroup = row.kind === KEPT_GROUP;
-  const hasChildren = row.children ? row.children.length > 0 : false;
-  if (!isHeader && !isKeptGroup && !hasChildren) {
-    return null;
-  }
+  if (!showsCollapseToggle(row)) return null;
 
   return (
     <IconButton
       onClick={() => tableState.toggleCollapsed(row.id)}
-      icon={isHeader ? headerIconKey : iconKey}
+      icon={row.kind === HEADER ? headerIconKey : iconKey}
       compact={compact}
     />
   );

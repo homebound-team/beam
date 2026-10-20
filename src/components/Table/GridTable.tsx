@@ -37,7 +37,14 @@ import type {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds, isContentColumn, withColumnGutters } from "src/components/Table/utils/columns";
+import {
+  assignDefaultColumnIds,
+  firstContentControlPx,
+  isContentColumn,
+  rowControlColumns,
+  toLayoutColumns,
+  withColumnGutters,
+} from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -375,10 +382,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return tableState.visibleColumns as GridColumnWithId<R>[];
   }, [tableState]);
 
+  const layoutColumns = useMemo(() => toLayoutColumns(columns), [columns]);
+  // Collapse toggles and select checkboxes are drawn in the first content cell, not as their own columns.
+  const controlColumns = useMemo(() => rowControlColumns(columns), [columns]);
+  const controlWidthPx = useMemo(() => firstContentControlPx(controlColumns), [controlColumns]);
+
   // Calculate which columns should be striped, if any.
   const stripedColumnIds = useMemo(
-    () => (style.columnStripeColor ? getStripedColumnIds(columns) : undefined),
-    [columns, style.columnStripeColor],
+    () => (style.columnStripeColor ? getStripedColumnIds(layoutColumns) : undefined),
+    [layoutColumns, style.columnStripeColor],
   );
 
   // Initialize the sort state. This will only happen on the first render.
@@ -396,12 +408,13 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { columnSizes, tableWidth, contentWidth, resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } =
     useSetupColumnSizes(
       style,
-      columns,
+      layoutColumns,
       resizeTarget ?? resizeRef,
       expandedColumnIds,
       visibleColumnsStorageKey,
       disableColumnResizing,
       columnsMayExceedMeasure,
+      controlWidthPx,
     );
 
   // Store resetColumnWidths on the API instance so it can be called from EditColumnsButton
@@ -411,7 +424,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Handle column resize logic with proportional distribution
   const { handleColumnResize, calculatePreviewWidth } = useColumnResizeHandlers(
-    columns,
+    layoutColumns,
     columnSizes,
     tableWidth,
     setResizedWidth,
@@ -582,6 +595,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           rs,
           style,
           rowStyles,
+          columns: layoutColumns,
+          controlColumns,
           columnSizes,
           getCount,
           cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
@@ -617,7 +632,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           style={style}
           columnSizes={columnSizes}
           rowId={rs.row.id}
-          colSpan={columns.length}
+          colSpan={layoutColumns.length}
           isFirstBodyRow={isFirstBodyRow}
           isLastBodyRow={isLastBodyRow}
           position={resolved.position}
@@ -718,6 +733,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     rowStyles,
     maybeStyle,
     columnSizes,
+    layoutColumns,
+    controlColumns,
     columns.length,
     stripedColumnIds,
     getCount,
@@ -806,7 +823,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           <VirtualGridTableView
             style={tableStyle}
             id={id}
-            columns={columns}
+            columns={layoutColumns}
             visibleDataRows={visibleDataRows}
             keptSelectedRows={keptSelectedRows}
             pinnedRows={pinnedRows}
@@ -825,7 +842,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           renders[_as as Exclude<RenderAs, "card" | "virtual">](
             tableStyle,
             id,
-            columns,
+            layoutColumns,
             visibleDataRows,
             keptSelectedRows,
             pinnedRows,

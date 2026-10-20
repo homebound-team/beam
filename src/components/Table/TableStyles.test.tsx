@@ -2,6 +2,8 @@ import { Css, Palette } from "src/Css";
 import {
   defaultStyle,
   getTableStyles,
+  hierarchyFirstContentCss,
+  hierarchyIndentPaddingPx,
   isGridStyleDef,
   resolveStyles,
   type GridStyle,
@@ -65,6 +67,70 @@ describe("GridStyleDef", () => {
     expect(rounded.firstRowLastCellCss).toBeDefined();
     expect(square.firstRowFirstCellCss).toBeUndefined();
     expect(square.firstRowLastCellCss).toBeUndefined();
+  });
+
+  it("indents nested rows by one chevron when collapse is on, and semibolds only parent rows", () => {
+    // Given hierarchy styling for parents and leaves
+    const values = (css: unknown): string[] => {
+      const found: string[] = [];
+      const visit = (value: unknown) => {
+        if (typeof value === "string") found.push(value);
+        else if (Array.isArray(value)) value.forEach(visit);
+        else if (value && typeof value === "object") Object.values(value).forEach(visit);
+      };
+      visit(css);
+      return found;
+    };
+
+    // Then level 0 is small semibold with no extra indent
+    expect(
+      values(hierarchyFirstContentCss({ level: 0, hasChildren: true, groupedLevel: false, skipIndent: false })),
+    ).toEqual(expect.arrayContaining(["smSb", "fz_14px"]));
+    // And a grouped level-0 row is small semibold even without children
+    expect(
+      values(hierarchyFirstContentCss({ level: 0, hasChildren: false, groupedLevel: true, skipIndent: false })),
+    ).toEqual(expect.arrayContaining(["smSb"]));
+    // And a flat row is unchanged
+    expect(
+      hierarchyFirstContentCss({ level: 0, hasChildren: false, groupedLevel: false, skipIndent: false }),
+    ).toBeUndefined();
+    // And a nested parent is extra-small semibold, indented 28px past the 12px cell padding
+    expect(
+      values(hierarchyFirstContentCss({ level: 1, hasChildren: true, groupedLevel: false, skipIndent: false })).join(
+        " ",
+      ),
+    ).toMatch(/xsSb/);
+    expect(
+      values(hierarchyFirstContentCss({ level: 1, hasChildren: true, groupedLevel: false, skipIndent: false })).join(
+        " ",
+      ),
+    ).toMatch(/40px/);
+    // And a two-level leaf stays regular, indented 28px plus 32px for the missing chevron and gap
+    expect(
+      values(hierarchyFirstContentCss({ level: 1, hasChildren: false, groupedLevel: false, skipIndent: false })).join(
+        " ",
+      ),
+    ).toMatch(/72px/);
+    expect(
+      values(hierarchyFirstContentCss({ level: 1, hasChildren: false, groupedLevel: false, skipIndent: false })),
+    ).not.toEqual(expect.arrayContaining(["xsSb"]));
+    // And the next level steps another chevron
+    expect(hierarchyIndentPaddingPx(2)).toBe(68);
+    expect(hierarchyIndentPaddingPx(0)).toBeUndefined();
+    // And rows without chevrons, including card rows, do not add cell padding
+    expect(
+      hierarchyFirstContentCss({ level: 2, hasChildren: false, groupedLevel: false, skipIndent: true }),
+    ).toBeUndefined();
+    expect(
+      values(hierarchyFirstContentCss({ level: 2, hasChildren: true, groupedLevel: false, skipIndent: true })).join(
+        " ",
+      ),
+    ).toMatch(/xsSb/);
+    expect(
+      values(hierarchyFirstContentCss({ level: 2, hasChildren: true, groupedLevel: false, skipIndent: true })).join(
+        " ",
+      ),
+    ).not.toMatch(/68px/);
   });
 });
 

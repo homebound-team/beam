@@ -3,16 +3,24 @@ import React, { type ReactElement, useCallback, useContext, useRef } from "react
 import { mergeProps } from "react-aria";
 import {
   defaultRenderFn,
+  type GridCellContent,
   headerRenderFn,
   type RenderCellFn,
   rowClickRenderFn,
   rowLinkRenderFn,
+  withRowControls,
 } from "src/components/Table/components/cell";
+import { showsCollapseToggle } from "src/components/Table/components/CollapseToggle";
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
 import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { type GridStyle, type RowStyles, tableRowPrintBreakCss } from "src/components/Table/TableStyles";
+import {
+  type GridStyle,
+  hierarchyFirstContentCss,
+  type RowStyles,
+  tableRowPrintBreakCss,
+} from "src/components/Table/TableStyles";
 import type {
   DiscriminateUnion,
   FixedSort,
@@ -22,13 +30,14 @@ import type {
   MaybeFn,
   RenderAs,
 } from "src/components/Table/types";
-import { isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
+import { beamCollapseColumnId, isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
 import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   applyRowFn,
   type DragData,
+  emptyCell,
   EXPANDABLE_HEADER,
   getAlignment,
   getColumnBorderCss,
@@ -54,6 +63,10 @@ type RowProps<R extends Kinded> = {
   rs: RowState<R>;
   style: GridStyle;
   rowStyles: RowStyles<R> | undefined;
+  /** Laid-out columns. Collapse toggles and select checkboxes are omitted so sizes match these columns. */
+  columns: GridColumnWithId<R>[];
+  /** Collapse toggle and select checkbox, when those columns are visible. Rendered in the first content cell. */
+  controlColumns: GridColumnWithId<R>[];
   columnSizes: string[];
   getCount: (id: string) => object;
   cellHighlight: boolean;
@@ -96,6 +109,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     rs,
     style,
     rowStyles,
+    columns,
+    controlColumns,
     columnSizes,
     getCount,
     cellHighlight,
@@ -121,7 +136,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
   const { tableState } = useContext(TableStateContext);
   // We're wrapped in observer, so can access these without useComputeds
-  const { api, visibleColumns: columns } = tableState;
+  const { api } = tableState;
   const columnStripeColor = style.columnStripeColor;
   const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level, aiMode } = rs;
 
@@ -152,6 +167,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const rowStyleCellCss = maybeApplyFunction(row as any, rowStyle?.cellCss);
   const levelStyle = style.levels && (typeof style.levels === "function" ? style.levels(level) : style.levels[level]);
   const levelIndent = levelStyle?.rowIndent;
+  // True for the whole table once we have a collapse column. Leaves don't render a chevron, but they still need the indent.
+  const collapseIndent = controlColumns.some((column) => column.id === beamCollapseColumnId);
 
   const containerCss = {
     ...Css.add("transition", "padding 0.25s ease-in-out").$,
@@ -250,8 +267,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const { wrapAction = true } = column;
 
           const isFirstContentColumn = isContentColumn(column) && !foundFirstContentColumn;
+          // Flag the column itself. Headers don't apply the first-content styles, so if we flagged those we'd mark every header cell.
+          foundFirstContentColumn ||= isFirstContentColumn;
           const applyFirstContentColumnStyles = !isHeader && isFirstContentColumn;
-          foundFirstContentColumn ||= applyFirstContentColumnStyles;
 
           // When using the variation of the table with an EXPANDABLE_HEADER, then our HEADER and TOTAL rows have special border styling
           // Keep track of the when we get to the last expanded column so we can apply this styling properly.
@@ -323,8 +341,44 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isGroupHeader,
             isExpandable,
             minStickyLeftOffset,
-            isKeptRow,
           );
+
+          const controlNodes =
+            isFirstContentColumn && controlColumns.length > 0
+              ? controlColumns.flatMap((controlColumn) => {
+                  // Don't wrap an empty chevron — the span would still take the 8px gap.
+                  if (controlColumn.id === beamCollapseColumnId && !showsCollapseToggle(row, isKeptRow)) return [];
+                  const maybeControl = applyRowFn(controlColumn, row, rowApi, level, isExpanded, dragData);
+                  if (isOmittedControl(maybeControl)) return [];
+                  return [
+                    <span
+                      key={controlColumn.id}
+                      // One line tall, so the control centers on the first line when the label wraps.
+                      css={Css.fs0.df.aic.h("1lh").mh0.$}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      {toContent(
+                        maybeControl,
+                        isHeader,
+                        false,
+                        false,
+                        style,
+                        as,
+                        "left",
+                        controlColumn,
+                        isExpandableHeader,
+                        isGroupHeader,
+                        false,
+                        minStickyLeftOffset,
+                      )}
+                    </span>,
+                  ];
+                })
+              : [];
+          // Keep the collapse toggle and checkbox outside a row link so they do not navigate.
+          const contentRowLink =
+            controlNodes.length > 0 && wrapAction && rowStyle?.rowLink ? rowStyle.rowLink(row as any) : undefined;
+          const renderedContent = withRowControls(content, controlNodes, alignment, contentRowLink);
 
           ensureClientSideSortValueIsSortable(
             sortOn,
@@ -425,6 +479,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isBodyRow && levelStyle?.cellCss),
             // Level specific styling for the first content column
             ...(applyFirstContentColumnStyles && levelStyle?.firstContentColumn),
+            // pl3 above is only for tables without a chevron. Hierarchy padding replaces it when we have a collapse column.
+            // Grouped level 0 has cellCss even with no children. Cards indent the whole row, so don't also pad the cell.
+            ...(isBodyRow &&
+              applyFirstContentColumnStyles &&
+              hierarchyFirstContentCss({
+                level,
+                hasChildren: !!row.children?.length,
+                groupedLevel: level === 0 && !!levelStyle?.cellCss,
+                skipIndent: levelIndent !== undefined || !collapseIndent,
+              })),
             // Apply any declarative column border styling after header/body defaults.
             ...getColumnBorderCss(column.border, style),
             // The specific cell's css (if any from GridCellContent)
@@ -464,8 +528,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const cellOnClick = applyCellHighlight ? () => api.setActiveCellId(cellId) : undefined;
           const tooltip = isGridCellContent(maybeContent) ? maybeContent.tooltip : undefined;
 
-          const renderFn: RenderCellFn<any> =
-            (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
+          // The link only wraps the label (so the checkbox and chevron don't navigate), so this cell can't also be the link.
+          const renderFn: RenderCellFn<any> = contentRowLink
+            ? isHeader || isTotals || isExpandableHeader || isGroupHeader
+              ? headerRenderFn(column, as, currentColspan)
+              : defaultRenderFn(as, currentColspan)
+            : (rowStyle?.renderCell || rowStyle?.rowLink) && wrapAction
               ? rowLinkRenderFn(as, currentColspan)
               : isHeader || isTotals || isExpandableHeader || isGroupHeader
                 ? headerRenderFn(column, as, currentColspan)
@@ -473,7 +541,16 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   ? rowClickRenderFn(as, api, currentColspan)
                   : defaultRenderFn(as, currentColspan);
 
-          const cellElement = renderFn(columnIndex, cellCss, content, row, rowStyle, undefined, cellOnClick, tooltip);
+          const cellElement = renderFn(
+            columnIndex,
+            cellCss,
+            renderedContent,
+            row,
+            rowStyle,
+            undefined,
+            cellOnClick,
+            tooltip,
+          );
 
           // Add resize handle for header rows when resizing is enabled
           // Only add handle on the right border (not for the last column)
@@ -634,4 +711,16 @@ function consecutiveGroupSpan<R extends Kinded>(columns: GridColumnWithId<R>[], 
   let span = 1;
   while (columns[columnIndex + span]?.groupId === groupId) span += 1;
   return span;
+}
+
+/** Skip a blank collapse or select renderer (totals, expandable header, group header) so we don't leave a gap. */
+function isOmittedControl(maybeContent: React.ReactNode | GridCellContent): boolean {
+  if (maybeContent == null || maybeContent === false || maybeContent === "") return true;
+  if (maybeContent === emptyCell) return true;
+  if (isGridCellContent(maybeContent)) {
+    const content = maybeContent.content;
+    if (content == null || content === false || content === "") return true;
+    if (content === emptyCell.content) return true;
+  }
+  return false;
 }

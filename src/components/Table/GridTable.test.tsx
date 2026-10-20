@@ -25,6 +25,7 @@ import {
   collapseColumn,
   column,
   fieldColumn,
+  firstContentControlPx,
   generateColumnId,
   groupColumns,
   layoutGutterLeftColumnId,
@@ -32,6 +33,7 @@ import {
   pinColumn,
   selectColumn,
   sumColumnSizesPx,
+  toLayoutColumns,
   withColumnGutters,
 } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
@@ -114,6 +116,8 @@ const nestedColumns: GridColumn<NestedRow>[] = [
     parent: (data, { row }) => <Collapse id={row.id} />,
     child: (data, { row }) => (row.children?.length > 0 ? <Collapse id={row.id} /> : ""),
     grandChild: () => "",
+    // The chevron stays its own column. The select checkbox renders in the Name cell.
+    isAction: true,
   },
   selectColumn<NestedRow>({
     totals: emptyCell,
@@ -1712,15 +1716,24 @@ describe("GridTable", () => {
     });
 
     it("expands content width when fr mw mins and % columns exceed measured table width", () => {
-      // Given columns whose mw mins and % widths exceed a narrow probe width
+      // Given columns whose mw mins and % widths exceed a narrow probe width.
+      // Select and collapse aren't layout columns; their width is added onto the name column.
       const columns = getExpandTestColumns();
       const tableWidth = 643;
 
       // When the row may be wider than the probe
-      const { contentWidth } = calcColumnLayout(columns, tableWidth, undefined, [], undefined, true);
+      const { contentWidth } = calcColumnLayout(
+        toLayoutColumns(columns),
+        tableWidth,
+        undefined,
+        [],
+        undefined,
+        true,
+        firstContentControlPx(columns),
+      );
 
       // Then the resolved content width expands beyond the probe
-      expect(contentWidth).toBe(698);
+      expect(contentWidth).toBe(675);
     });
 
     it("does not floor content width at the probe when fixed columns sum narrower", () => {
@@ -1743,14 +1756,25 @@ describe("GridTable", () => {
     it("does not expand content width on the legacy column layout path", () => {
       // Given columns that would expand when the row may exceed the probe
       const columns = getLegacyGateColumns();
+      const layout = toLayoutColumns(columns);
       const tableWidth = 643;
 
       // When the row must fit the probe
-      const legacy = calcColumnLayout(columns, tableWidth, undefined, [], undefined, false);
+      const legacy = calcColumnLayout(
+        layout,
+        tableWidth,
+        undefined,
+        [],
+        undefined,
+        false,
+        firstContentControlPx(columns),
+      );
 
       // Then content width stays at the probe and column sizes match a single calcColumnSizes pass
       expect(legacy.contentWidth).toBe(643);
-      expect(legacy.columnSizes).toEqual(calcColumnSizes(columns, tableWidth, undefined, [], undefined));
+      expect(legacy.columnSizes).toEqual(
+        calcColumnSizes(layout, tableWidth, undefined, [], undefined, firstContentControlPx(columns)),
+      );
     });
 
     it("sums column widths to probe width when layout gutters are injected", () => {
@@ -2190,11 +2214,11 @@ describe("GridTable", () => {
     // When we filter by 'foo'
     const r = await render(<GridTable filter="foo" columns={nestedColumns} rows={rows} />);
     // Then we show the header
-    expect(cell(r, 0, 2)).toHaveTextContent("Name");
+    expect(cell(r, 0, 1)).toHaveTextContent("Name");
     // And the parent that had a child that matched
-    expect(cell(r, 1, 2)).toHaveTextContent("p1");
+    expect(cell(r, 1, 1)).toHaveTextContent("p1");
     // And the child that matched
-    expect(cell(r, 2, 2)).toHaveTextContent("foo");
+    expect(cell(r, 2, 1)).toHaveTextContent("foo");
     // And that's it
     expect(row(r, 3)).toBeUndefined();
   });
@@ -2222,12 +2246,12 @@ describe("GridTable", () => {
     const r = await render(<GridTable filter="parent 1" columns={nestedColumns} rows={rows} />);
 
     // Then we show the header
-    expect(cell(r, 0, 2)).toHaveTextContent("Name");
+    expect(cell(r, 0, 1)).toHaveTextContent("Name");
     // And the parent that matched the filter
-    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
     // And the children of the matched parent
-    expect(cell(r, 2, 2)).toHaveTextContent("filter child p1c1");
-    expect(cell(r, 3, 2)).toHaveTextContent("filter child p1c2");
+    expect(cell(r, 2, 1)).toHaveTextContent("filter child p1c1");
+    expect(cell(r, 3, 1)).toHaveTextContent("filter child p1c2");
     // And that's it
     expect(row(r, 4)).toBeUndefined();
   });
@@ -2247,13 +2271,13 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
     // When the parent is collapsed
     click(cell(r, 0, 0).children[0] as any);
     // Then only the parent row is still shown
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
     expect(row(r, 1)).toBeUndefined();
   });
 
@@ -2272,15 +2296,15 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
     click(cell(r, 1, 0).children[0] as any);
     // Then the parent and child rows are still shown
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
     // But not the grandchild
     expect(row(r, 2)).toBeUndefined();
     // Only the child row re-renders because it becomes the last visible body row
@@ -2304,9 +2328,9 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
     // And all three rows are initially rendered
-    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 1)).toHaveTextContent("grandchild p1c1g1");
 
     // When we collapse all
     click(cell(r, 0, 0).children[0] as any);
@@ -2318,9 +2342,9 @@ describe("GridTable", () => {
     // And when we re-open all
     click(cell(r, 0, 0).children[0] as any);
     // Then all rows are shown
-    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 1)).toHaveTextContent("grandchild p1c1g1");
   });
 
   it("can collapse using api", async () => {
@@ -2346,15 +2370,15 @@ describe("GridTable", () => {
 
     const r = await render(<Test />);
     // And all three rows are initially rendered
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
     act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
     // Then the parent and child rows are still shown
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
     // But not the grandchild
     expect(row(r, 2)).toBeUndefined();
     // Only the child row re-renders because it becomes the last visible body row
@@ -2385,9 +2409,9 @@ describe("GridTable", () => {
 
     const r = await render(<Test />);
     // And all three rows are initially rendered
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 1)).toHaveTextContent("grandchild p1c1g1");
     expectRenderedRows("p1", "p1c1", "p1c1g1");
     // When the child is collapsed
     act(() => api.current!.toggleCollapsedRow(rows[0].children![0].id));
@@ -2415,8 +2439,8 @@ describe("GridTable", () => {
       return <GridTable<NestedRow> api={_api} columns={nestedColumns} rows={rows} />;
     }
     const r = await render(<Test />);
-    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
+    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
     // Then the API get can get rows back
     expect(api.current!.getVisibleRows()).toEqual([rows[0], rows[1], rows[1].children?.[0]]);
     // And it can also return kinds
@@ -2447,22 +2471,22 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
     // And both child rows are initially rendered
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c2");
     // Then we show the number of children
-    expect(cell(r, 0, 3)).toHaveTextContent("2");
+    expect(cell(r, 0, 2)).toHaveTextContent("2");
     // When the 1st child is filtered out
     await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="p1c2" />);
     // Then the parent and child row are still shown
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c2");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c2");
     // And the parent knows the number of visible children
-    expect(cell(r, 0, 3)).toHaveTextContent("1");
+    expect(cell(r, 0, 2)).toHaveTextContent("1");
     // And when the parent matches the filter
     await r.rerender(<GridTable<NestedRow> columns={columns} rows={rows} filter="parent" />);
     // Then the parent knows both children are shown again
-    expect(cell(r, 0, 3)).toHaveTextContent("2");
+    expect(cell(r, 0, 2)).toHaveTextContent("2");
   });
 
   it("can access selected child rows", async () => {
@@ -2489,15 +2513,15 @@ describe("GridTable", () => {
     ];
     const r = await render(<GridTable<NestedRow> columns={columns} rows={rows} />);
     // And both child rows are initially rendered
-    expect(cell(r, 0, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 1, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c2");
+    expect(cell(r, 0, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 1, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c2");
     // Then we show no children are selected
-    expect(cell(r, 0, 3)).toHaveTextContent("0");
+    expect(cell(r, 0, 2)).toHaveTextContent("0");
     // When we select the 1st child
     click(r.select_1);
     // Then the parent renders the number of selected children
-    expect(cell(r, 0, 3)).toHaveTextContent("1");
+    expect(cell(r, 0, 2)).toHaveTextContent("1");
   });
 
   it("persists collapse", async () => {
@@ -2635,12 +2659,12 @@ describe("GridTable", () => {
 
     const r = await render(<Test />);
     // And all three rows are initially rendered
-    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 3, 2)).toHaveTextContent("grandchild p1c1g1");
+    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 1)).toHaveTextContent("grandchild p1c1g1");
 
     // When we select all
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then all rows are shown as selected
     expect(cellAnd(r, 0, 1, "select")).toBeChecked();
     expect(cellAnd(r, 1, 1, "select")).toBeChecked();
@@ -2653,7 +2677,7 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRows("child")).toEqual([rows[1].children![0]]);
 
     // And when we unselect all
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then all rows are shown as unselected
     expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
     expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
@@ -2686,12 +2710,12 @@ describe("GridTable", () => {
     const r = await render(<Test />);
 
     // And all three rows are initially rendered
-    expect(cell(r, 1, 2)).toHaveTextContent("parent 1");
-    expect(cell(r, 2, 2)).toHaveTextContent("child p1c1");
-    expect(cell(r, 3, 2)).toHaveTextContent("child p1c2");
+    expect(cell(r, 1, 1)).toHaveTextContent("parent 1");
+    expect(cell(r, 2, 1)).toHaveTextContent("child p1c1");
+    expect(cell(r, 3, 1)).toHaveTextContent("child p1c2");
 
     // When we select all
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then the 'All', Parent, and 1st child rows are shown as selected
     expect(cellAnd(r, 0, 1, "select")).toBeChecked();
     expect(cellAnd(r, 1, 1, "select")).toBeChecked();
@@ -2703,7 +2727,7 @@ describe("GridTable", () => {
     expect(api.current!.getSelectedRowIds("child")).toEqual(["p1c1"]);
 
     // And when we unselect all
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then all rows are shown as unselected
     expect(cellAnd(r, 0, 1, "select")).not.toBeChecked();
     expect(cellAnd(r, 1, 1, "select")).not.toBeChecked();
@@ -2737,11 +2761,11 @@ describe("GridTable", () => {
     }
     const r = await render(<Test />);
     // When we select all
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then all rows are shown as selected
     expect(actions).toEqual(["parent parent 1 true", "child child p1c1 true"]);
     // And when we unselect all
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then they are unselected
     expect(actions).toEqual([
       "parent parent 1 true",
@@ -2782,7 +2806,7 @@ describe("GridTable", () => {
     // Then selected computed sees the new value
     expect(r.selectedNames.textContent).toEqual("foo2");
     // And the table value is updated as expected
-    expect(cell(r, 1, 1)).toHaveTextContent("foo2");
+    expect(cell(r, 1, 0)).toHaveTextContent("foo2");
   });
 
   it("getSelectedRows doesn't fire if data has not changed", async () => {
@@ -2920,7 +2944,7 @@ describe("GridTable", () => {
     const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
 
     // And selecting all rows
-    click(cell(r, 0, 1).children[0] as any);
+    click(cellAnd(r, 0, 1, "select"));
     // Then every row should be returned.
     expect(api.current!.getSelectedRows()).toEqual([
       rows[1],
@@ -3066,7 +3090,7 @@ describe("GridTable", () => {
     const r = await render(<TestFilterAndSelect api={api} rows={rows} />);
 
     // And selecting one of the child rows
-    click(cell(r, 3, 1).children[0] as any);
+    click(cellAnd(r, 3, 1, "select"));
 
     // Then the Header and Parent rows should have the `indeterminate` checked value
     expect(cellAnd(r, 0, 1, "select")).toHaveAttribute("data-indeterminate", "true");
@@ -3876,13 +3900,13 @@ describe("GridTable", () => {
 
     // Then expect "parent 1" to be collapsed
     expect(cell(r, 1, 0).textContent).toBe("+");
-    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    expect(cell(r, 1, 1).textContent).toBe("parent 1");
     // And "parent 2" to be expanded
     expect(cell(r, 2, 0).textContent).toBe("-");
-    expect(cell(r, 2, 2).textContent).toBe("parent 2");
+    expect(cell(r, 2, 1).textContent).toBe("parent 2");
     // And "child p2c1" to be collapsed
     expect(cell(r, 3, 0).textContent).toBe("+");
-    expect(cell(r, 3, 2).textContent).toBe("child p2c1");
+    expect(cell(r, 3, 1).textContent).toBe("child p2c1");
   });
 
   it("respects initCollapsed on rows if persistCollapse is set but not yet stored", async () => {
@@ -3901,7 +3925,7 @@ describe("GridTable", () => {
 
     // Then expect "parent 1" to be collapsed based on the GridDataRow property
     expect(cell(r, 1, 0).textContent).toBe("+");
-    expect(cell(r, 1, 2).textContent).toBe("parent 1");
+    expect(cell(r, 1, 1).textContent).toBe("parent 1");
 
     // And the local storage value is initially set with the current state
     expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p1"]');
@@ -3925,8 +3949,8 @@ describe("GridTable", () => {
 
     // Then expect "parent 1" to not be collapsed
     expect(cell(r, 1, 0).textContent).toBe("-");
-    expect(cell(r, 1, 2).textContent).toBe("parent 1");
-    expect(cell(r, 2, 2).textContent).toBe("child p1c1");
+    expect(cell(r, 1, 1).textContent).toBe("parent 1");
+    expect(cell(r, 2, 1).textContent).toBe("child p1c1");
   });
 
   it("can update table with new rows with initCollapsed set and updates sessionStorage with new values", async () => {
@@ -4157,30 +4181,30 @@ describe("GridTable", () => {
 
     expect(tableSnapshot(r)).toMatchInlineSnapshot(`
       "
-      | on |              |
-      | -- | ------------ |
-      | on | Howard Stark |
-      | on | Tony Stark   |
-      | on | Morgan Stark |
-      | on | Odin         |
-      | on | Thor         |
+      | on              |
+      | --------------- |
+      | on Howard Stark |
+      | on Tony Stark   |
+      | on Morgan Stark |
+      | on Odin         |
+      | on Thor         |
       "
     `);
 
     // Then all rows are shown as selected
-    expect(cell(r, 1, 1)).toHaveTextContent("Howard Stark");
+    expect(cell(r, 1, 0)).toHaveTextContent("Howard Stark");
     expect(cellAnd(r, 1, 0, "select")).toBeChecked();
 
-    expect(cell(r, 2, 1)).toHaveTextContent("Tony Stark");
+    expect(cell(r, 2, 0)).toHaveTextContent("Tony Stark");
     expect(cellAnd(r, 2, 0, "select")).not.toBeChecked();
 
-    expect(cell(r, 3, 1)).toHaveTextContent("Morgan Stark");
+    expect(cell(r, 3, 0)).toHaveTextContent("Morgan Stark");
     expect(cellAnd(r, 3, 0, "select")).toBeChecked();
 
-    expect(cell(r, 4, 1)).toHaveTextContent("Odin");
+    expect(cell(r, 4, 0)).toHaveTextContent("Odin");
     expect(cellAnd(r, 4, 0, "select")).not.toBeChecked();
 
-    expect(cell(r, 5, 1)).toHaveTextContent("Thor");
+    expect(cell(r, 5, 0)).toHaveTextContent("Thor");
     expect(cellAnd(r, 5, 0, "select")).toBeChecked();
 
     // And they can no longer be fetched by the api
@@ -4853,20 +4877,20 @@ describe("GridTable", () => {
       // Given a select column, an ungrouped column, a two-column group, and a one-column group
       const r = await render(<GridTable columns={createGroupColumns()} rows={createGroupRows()} />);
 
-      // Then the group row spans offerings across Range and Average, and sycamore across Cost
-      expect(cell(r, 0, 0).querySelector("input")).toBeNull();
-      expect(cell(r, 0, 1)).toHaveTextContent("");
-      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
-      expect(cell(r, 0, 3)).toHaveTextContent("The Sycamore");
-      expect(row(r, 0).childNodes).toHaveLength(4);
-      // And the column headers stay on the second row, including the select toggle
+      // Then the group row spans offerings across Range and Average, and sycamore across Cost.
+      // The select checkbox renders in the Name cell, so it is not its own cell.
+      expect(cell(r, 0, 0)).toHaveTextContent("");
+      expect(cell(r, 0, 1)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 0, 2)).toHaveTextContent("The Sycamore");
+      expect(row(r, 0).childNodes).toHaveLength(3);
+      // And the column headers stay on the second row, with the select toggle in Name
       expect(cell(r, 1, 0).querySelector("input")).not.toBeNull();
-      expect(cell(r, 1, 1)).toHaveTextContent("Name");
-      expect(cell(r, 1, 2)).toHaveTextContent("Range");
-      expect(cell(r, 1, 3)).toHaveTextContent("Average");
-      expect(cell(r, 1, 4)).toHaveTextContent("Cost");
-      expect(cell(r, 2, 2)).toHaveTextContent("$1–$2");
-      expect(cell(r, 2, 4)).toHaveTextContent("$3");
+      expect(cell(r, 1, 0)).toHaveTextContent("Name");
+      expect(cell(r, 1, 1)).toHaveTextContent("Range");
+      expect(cell(r, 1, 2)).toHaveTextContent("Average");
+      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
+      expect(cell(r, 2, 1)).toHaveTextContent("$1–$2");
+      expect(cell(r, 2, 3)).toHaveTextContent("$3");
     });
 
     it("shrinks a group when one leaf is hidden", async () => {
@@ -4885,10 +4909,10 @@ describe("GridTable", () => {
       });
 
       // Then offerings remains over Range only
-      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
-      expect(cell(r, 1, 2)).toHaveTextContent("Range");
-      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
-      expect(row(r, 1).childNodes).toHaveLength(4);
+      expect(cell(r, 0, 1)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 1, 1)).toHaveTextContent("Range");
+      expect(cell(r, 1, 2)).toHaveTextContent("Cost");
+      expect(row(r, 1).childNodes).toHaveLength(3);
     });
 
     it("keeps the group label when the first leaf is hidden", async () => {
@@ -4907,9 +4931,9 @@ describe("GridTable", () => {
       });
 
       // Then offerings is shown over Average
-      expect(cell(r, 0, 2)).toHaveTextContent("All Product Offerings");
-      expect(cell(r, 1, 2)).toHaveTextContent("Average");
-      expect(cell(r, 1, 3)).toHaveTextContent("Cost");
+      expect(cell(r, 0, 1)).toHaveTextContent("All Product Offerings");
+      expect(cell(r, 1, 1)).toHaveTextContent("Average");
+      expect(cell(r, 1, 2)).toHaveTextContent("Cost");
     });
 
     it("reflows the stripe when a whole group is hidden", async () => {
@@ -4936,14 +4960,14 @@ describe("GridTable", () => {
       });
 
       // Then Sycamore is the first remaining group and still follows Name, so it keeps the stripe
-      expect(cell(r, 0, 3)).toHaveTextContent("The Sycamore");
-      expect(cell(r, 0, 3)).toHaveStyle(groupStripe);
-      expect(cell(r, 1, 3)).toHaveStyle(groupStripe);
-      expect(cell(r, 2, 3)).toHaveStyle(groupStripe);
-      expect(cell(r, 0, 4)).toHaveTextContent("The Magnolia");
-      expect(cell(r, 0, 4)).not.toHaveStyle(groupStripe);
-      expect(cell(r, 1, 4)).not.toHaveStyle(groupStripe);
-      expect(cell(r, 2, 4)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 0, 2)).toHaveTextContent("The Sycamore");
+      expect(cell(r, 0, 2)).toHaveStyle(groupStripe);
+      expect(cell(r, 1, 2)).toHaveStyle(groupStripe);
+      expect(cell(r, 2, 2)).toHaveStyle(groupStripe);
+      expect(cell(r, 0, 3)).toHaveTextContent("The Magnolia");
+      expect(cell(r, 0, 3)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 1, 3)).not.toHaveStyle(groupStripe);
+      expect(cell(r, 2, 3)).not.toHaveStyle(groupStripe);
     });
 
     it("stripes leftover columns once every group is hidden", async () => {
@@ -4969,10 +4993,9 @@ describe("GridTable", () => {
         api.current?.setVisibleColumns(["beamSelectColumn", "name", "notes"]);
       });
 
-      // Then select is ignored, name is the first content column, and notes takes the stripe
+      // Then the checkbox lives in Name, which stays unstriped, and notes takes the stripe
       expect(cell(r, 2, 0)).not.toHaveStyle(groupStripe);
-      expect(cell(r, 2, 1)).not.toHaveStyle(groupStripe);
-      expect(cell(r, 2, 2)).toHaveStyle(groupStripe);
+      expect(cell(r, 2, 1)).toHaveStyle(groupStripe);
     });
 
     function createGroupColumns(): GridColumn<GroupRow>[] {
@@ -5373,9 +5396,9 @@ describe("GridTable", () => {
       // Then the hidden selected group row is removed
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
-        | on | Name | Value |
-        | -- | ---- | ----- |
-        | on | bar  | 2     |
+        | on Name | Value |
+        | ------- | ----- |
+        | on bar  | 2     |
         "
       `);
     });
@@ -5459,12 +5482,12 @@ describe("GridTable", () => {
       // Then the kept group will contain `p2`, but not `p1`.
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
-        | -                                     | on | Name |
-        | ------------------------------------- | -- | ---- |
+        | -                                     | on Name |
+        | ------------------------------------- | ------- |
         | 3 selected rows hidden due to filters |
-        | -                                     | on | c1   |
-        | -                                     | on | p2   |
-        | -                                     | on | c2   |
+        | -                                     | on c1   |
+        | -                                     | on p2   |
+        | -                                     | on c2   |
         | No rows found.                        |
         "
       `);
@@ -5483,10 +5506,10 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("1 selected row hidden due to filters");
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
-        | on                                   | Name | Value |
-        | ------------------------------------ | ---- | ----- |
+        | on Name                              | Value |
+        | ------------------------------------ | ----- |
         | 1 selected row hidden due to filters |
-        | on                                   | bar  | 2     |
+        | on bar                               | 2     |
         "
       `);
       // Then the header is fully selected
@@ -5496,9 +5519,9 @@ describe("GridTable", () => {
       // Then the kept selected group is hidden
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
-        | on | Name | Value |
-        | -- | ---- | ----- |
-        | on | bar  | 2     |
+        | on Name | Value |
+        | ------- | ----- |
+        | on bar  | 2     |
         "
       `);
     });
@@ -5533,10 +5556,10 @@ describe("GridTable", () => {
       // The table has two rows and a header
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
-        | on | Name | Value |
-        | -- | ---- | ----- |
-        | on | foo  | 1     |
-        | on | bar  | 2     |
+        | on Name | Value |
+        | ------- | ----- |
+        | on foo  | 1     |
+        | on bar  | 2     |
         "
       `);
       // When selecting a row
@@ -5546,9 +5569,9 @@ describe("GridTable", () => {
       // Then it is removed from the table
       expect(tableSnapshot(r)).toMatchInlineSnapshot(`
         "
-        | on | Name | Value |
-        | -- | ---- | ----- |
-        | on | bar  | 2     |
+        | on Name | Value |
+        | ------- | ----- |
+        | on bar  | 2     |
         "
       `);
     });
@@ -5776,6 +5799,100 @@ describe("GridTable", () => {
     const r = await render(<GridTable columns={columns} rows={[simpleHeader]} />);
     // Then those headers have no info icon
     expect(r.query.columnTooltip).toBeNull();
+  });
+
+  it("renders the select checkbox and collapse toggle in the first content cell", async () => {
+    // Given a nested table with both controls
+    type NestRow =
+      | { kind: "header"; id: string; data: undefined }
+      | { kind: "totals"; id: string; data: undefined }
+      | { kind: "data"; id: string; data: { name: string; value: string } };
+    const columns: GridColumn<NestRow>[] = [
+      selectColumn<NestRow>(),
+      collapseColumn<NestRow>(),
+      { id: "name", header: "Project", data: ({ name }) => name, totals: () => "Total", align: "right" },
+      { id: "value", header: "Elevation", data: ({ value }) => value, totals: () => "1" },
+    ];
+    const rows: GridDataRow<NestRow>[] = [
+      { kind: "header", id: "header", data: undefined },
+      { kind: "totals", id: "totals", data: undefined },
+      {
+        kind: "data",
+        id: "market",
+        data: { name: "Market A", value: "Text cell" },
+        children: [
+          {
+            kind: "data",
+            id: "parent",
+            data: { name: "Parent", value: "Text cell" },
+            children: [{ kind: "data", id: "child", data: { name: "Child1", value: "Text cell" } }],
+          },
+        ],
+      },
+    ];
+
+    // When the table renders
+    const r = await render(<GridTable columns={columns} rows={rows} />);
+
+    // Then the controls share the project cell, collapse before select, and the value column is the only other cell
+    expect(cell(r, 2, 0).parentElement!.childNodes).toHaveLength(2);
+    const headerCell = cell(r, 0, 0);
+    expect(headerCell).toHaveTextContent("Project");
+    expect(headerCell.querySelector("[data-testid='chevronsDown']")).toBeTruthy();
+    expect(headerCell.querySelector("[data-testid='select']")).toBeTruthy();
+    const headerIds = [...headerCell.querySelectorAll("[data-testid]")].map((el) => el.getAttribute("data-testid"));
+    expect(headerIds.indexOf("chevronsDown")).toBeLessThan(headerIds.indexOf("select"));
+    expect(cell(r, 0, 1).querySelector("[data-testid='select']")).toBeNull();
+
+    // And totals omit both controls
+    const totalsCell = cell(r, 1, 0);
+    expect(totalsCell).toHaveTextContent("Total");
+    expect(totalsCell.querySelector("[data-testid='select']")).toBeNull();
+    expect(totalsCell.querySelector("[data-testid='chevronDown']")).toBeNull();
+
+    // And a parent is small semibold with no extra indent, a nested parent is extra-small semibold, and a leaf stays regular
+    const marketCell = cell(r, 2, 0);
+    expect(marketCell).toHaveTextContent("Market A");
+    expect(marketCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
+    expect(marketCell).toHaveStyle({ fontWeight: "600", fontSize: "14px", paddingLeft: "12px" });
+    expect(marketCell.firstElementChild).toHaveStyle({ justifyContent: "flex-end" });
+
+    const parentCell = cell(r, 3, 0);
+    expect(parentCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
+    expect(parentCell).toHaveStyle({ fontWeight: "600", fontSize: "12px", paddingLeft: "40px" });
+
+    const childCell = cell(r, 4, 0);
+    expect(childCell).toHaveTextContent("Child1");
+    expect(childCell.querySelector("[data-testid='chevronDown']")).toBeNull();
+    expect(childCell.querySelector("[data-testid='select']")).toBeTruthy();
+    expect(childCell).toHaveStyle({ fontWeight: "400", fontSize: "12px", paddingLeft: "100px" });
+  });
+
+  it("indents nested rows when there is no collapse column", async () => {
+    // Given a nested table with checkboxes and no chevrons
+    type NestRow =
+      { kind: "header"; id: string; data: undefined } | { kind: "data"; id: string; data: { name: string } };
+    const columns: GridColumn<NestRow>[] = [
+      selectColumn<NestRow>(),
+      { id: "name", header: "Project", data: ({ name }) => name },
+    ];
+    const rows: GridDataRow<NestRow>[] = [
+      { kind: "header", id: "header", data: undefined },
+      {
+        kind: "data",
+        id: "parent",
+        data: { name: "Parent" },
+        children: [{ kind: "data", id: "child", data: { name: "Child" } }],
+      },
+    ];
+
+    // When the table renders
+    const r = await render(<GridTable columns={columns} rows={rows} />);
+
+    // Then the parent stays at the cell padding and the child gets the default nested indent
+    expect(cell(r, 1, 0)).toHaveStyle({ paddingLeft: "12px" });
+    expect(cell(r, 2, 0)).toHaveStyle({ paddingLeft: "calc(var(--t-spacing) * 3)" });
+    expect(cell(r, 2, 0).querySelector("[data-testid='chevronDown']")).toBeNull();
   });
 });
 

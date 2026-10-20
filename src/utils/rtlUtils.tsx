@@ -132,19 +132,24 @@ function toMarkupTableString(tableRows: (string | null)[][], hasExpandableHeader
   return `\n${rowsWithPaddingAndDividers.join("\n")}\n`;
 }
 
-/** Prefer showing a `value` from a mocked input vs. the combined text content from an inputs markup */
+/**
+ * Prefer a form control's `value` over its markup. When the control shares a cell with other
+ * content (a select checkbox or collapse toggle in the same cell as a label), keep that content after the value.
+ */
 function getTextFromTableCellNode(node: ChildNode) {
   if (node.nodeType === Node.ELEMENT_NODE) {
     const element = node as HTMLElement;
-
-    const maybeInput = element.getElementsByTagName("input")[0];
-    if (maybeInput) return maybeInput.value;
-
-    const maybeTextarea = element.getElementsByTagName("textarea")[0];
-    if (maybeTextarea) return maybeTextarea.value;
-
-    const maybeSelect = element.getElementsByTagName("select")[0];
-    if (maybeSelect) return maybeSelect.value;
+    const control = element.querySelector("input, textarea, select") as
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null;
+    if (control) {
+      const rest = element.cloneNode(true) as HTMLElement;
+      rest.querySelectorAll("input, textarea, select").forEach((el) => {
+        const label = el.closest("label");
+        (label ?? el).remove();
+      });
+      const text = (rest.textContent ?? "").replace(/\s+/g, " ").trim();
+      return text ? `${control.value} ${text}` : control.value;
+    }
   }
 
   return node.textContent;
