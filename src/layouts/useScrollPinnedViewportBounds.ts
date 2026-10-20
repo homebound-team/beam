@@ -2,16 +2,15 @@ import { type RefObject, useCallback, useLayoutEffect, useRef, useState } from "
 
 export type ScrollPinnedViewportBounds = {
   topPx: number;
-  heightPx: number;
   /** True once pinned, i.e. `topPx` tracks the sticky chrome instead of the scrolling anchor. */
   isPinned: boolean;
 };
 
 /**
- * Viewport top/height for a fixed overlay that follows an in-flow anchor, then pins below sticky chrome.
+ * Viewport top for a fixed overlay that follows an in-flow anchor, then pins below sticky chrome.
  *
  * i.e. the overlay pane tracks the layout root (`anchorRef`) as the page scrolls; once that box hits
- * `getPinTopPx` (navbar + page header + table actions), `top` stays there and height is the rest of the viewport.
+ * `getPinTopPx` (navbar + page header + table actions), `top` stays there.
  *
  * ```
  * [banner / nav / header]  ← pin top
@@ -36,12 +35,7 @@ export function useScrollPinnedViewportBounds(
     const pinTopPx = getPinTopPxRef.current(el);
     const isPinned = rect.top <= pinTopPx + 1;
     const topPx = isPinned ? pinTopPx : Math.round(rect.top);
-    const heightPx = Math.max(0, Math.round(window.innerHeight - topPx));
-    setBounds((prev) =>
-      prev?.topPx === topPx && prev?.heightPx === heightPx && prev?.isPinned === isPinned
-        ? prev
-        : { topPx, heightPx, isPinned },
-    );
+    setBounds((prev) => (prev?.topPx === topPx && prev?.isPinned === isPinned ? prev : { topPx, isPinned }));
   }, [anchorRef]);
 
   useLayoutEffect(() => {

@@ -1,11 +1,12 @@
 import { type ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { Icon } from "src/components/Icon";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
-import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
+import { RightPaneBanner, RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import type { GridStyleDef } from "src/components/Table/TableStyles";
 import { collapseColumn, column, numericColumn, selectColumn } from "src/components/Table/utils/columns";
@@ -392,10 +393,17 @@ function GridTableLayoutRightPaneDetail({ name }: { name: string }) {
   return (
     <RightPanePanel
       title={name}
+      tag={{ icon: "wrench", text: "Labor" }}
       deleteAction={{ onClick: action("delete"), count: 5 }}
       secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
       primaryAction={{ label: "Save", onClick: action("save") }}
     >
+      <RightPaneBanner>
+        <AiSlimBanner
+          title="Review 6 Suggested Changes"
+          action={{ label: "Ignore All", onClick: action("ignoreAll") }}
+        />
+      </RightPaneBanner>
       <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>
         Independent pane scroll. On desktop, table columns stay reachable via horizontal document scroll; on mobile the
         pane is a full-bleed overlay below the environment banner.
