@@ -89,10 +89,8 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     // When the pane is opened
     await clickAndWait(r.openPaneBtn);
 
-    // Then top / height ease, so hiding or revealing the page header does not jump the pane
-    expect(r.rightPaneContent).toHaveStyle({
-      transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-    });
+    // Then top eases, so hiding or revealing the page header does not jump the pane
+    expect(r.rightPaneContent).toHaveStyle({ transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1)" });
   });
 
   it("does not ease the pane offset while it still follows the anchor", async () => {
@@ -123,9 +121,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
       // Then it sits at the anchor with no transition, so it cannot lag behind the scroll
       expect(r.rightPaneContent).toHaveStyle({ top: "200px" });
-      expect(r.rightPaneContent).not.toHaveStyle({
-        transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-      });
+      expect(r.rightPaneContent).not.toHaveStyle({ transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1)" });
     } finally {
       rectSpy.mockRestore();
     }

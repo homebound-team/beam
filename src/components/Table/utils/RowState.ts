@@ -155,10 +155,22 @@ export class RowState<R extends Kinded> {
 
   /** This row's share of `TableState.selectedLeafRowCount`, see `GridDataRow.childrenCount`. */
   get selectedLeafRowCount(): number {
-    if (this.isReservedKind || !this.selected) return 0;
-    // Loaded children count themselves; a lazy group's placeholder child isn't selectable
+    if (this.isReservedKind) return 0;
+    const { childrenCount } = this.row;
+    // A checked row with a `childrenCount` stands for that many rows, whether or not they've loaded
+    if (childrenCount !== undefined && this.isSelected) return this.isCountedByParent ? 0 : childrenCount;
+    if (!this.selected) return 0;
+    // A partly checked parent's loaded children count themselves; a lazy group's placeholder child isn't selectable
     if (this.children?.some((c) => c.row.selectable !== false)) return 0;
-    return this.row.childrenCount ?? 1;
+    return this.isCountedByParent ? 0 : 1;
+  }
+
+  /** Whether a checked ancestor's `childrenCount` already includes this row. */
+  private get isCountedByParent(): boolean {
+    const { parent } = this;
+    // A row the page dropped keeps its old `parent`, but no longer belongs to it
+    if (!parent || this.removed) return false;
+    return (parent.row.childrenCount !== undefined && parent.isSelected) || parent.isCountedByParent;
   }
 
   /** The UI state for checked/unchecked + "partially checked" for parents. */
