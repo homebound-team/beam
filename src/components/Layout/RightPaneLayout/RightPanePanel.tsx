@@ -5,7 +5,7 @@ import { ContextTag, type ContextTagProps } from "src/components/ContextTag";
 import { IconButton } from "src/components/IconButton";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { type DeleteActionProps, MaybeDeleteAction } from "src/components/Layout/RightPaneLayout/internal/DeleteAction";
-import { setRightPaneConfirmDiscard } from "src/components/Layout/RightPaneLayout/rightPaneStore";
+import { setRightPaneDiscardPrompt } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
 import { useModal } from "src/components/Modal/useModal";
 import { Tag, type TagProps } from "src/components/Tag";
@@ -44,7 +44,7 @@ export function RightPanePanel(props: RightPanePanelProps) {
   // Only registers the check; closeRightPane and openRightPane call it directly
   useEffect(() => {
     if (!isDirty) return;
-    return setRightPaneConfirmDiscard((proceed) => {
+    return setRightPaneDiscardPrompt((proceed) => {
       if (!isDirty()) return proceed();
       openModal({ content: <ConfirmCloseModal title="Discard unsaved changes?" onClose={proceed} /> });
     });

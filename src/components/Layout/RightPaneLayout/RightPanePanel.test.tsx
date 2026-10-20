@@ -8,6 +8,7 @@ import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutCo
 import { StepperLayout } from "src/layouts/Workflow/StepperLayout";
 import { setViewport } from "src/tests/viewport";
 import { click, clickAndWait, render, type, withRouter } from "src/utils/rtl";
+import { vi } from "vitest";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
 import { RightPaneLayout } from "./RightPaneLayout";
 import { RightPaneBanner, RightPanePanel } from "./RightPanePanel";
@@ -227,6 +228,34 @@ describe("RightPanePanel", () => {
       expect(r.notes).toHaveValue("edits");
     });
 
+    it("warns in development when unkeyed content of the same type opens over a guarded panel", async () => {
+      // Given a guarded panel opened without a key
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openUnkeyedA);
+
+      // When opening another item without a key
+      click(r.openUnkeyedB);
+
+      // Then it warns to key the content, since it can't tell the items apart to ask
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Key pane content per item"));
+      warn.mockRestore();
+    });
+
+    it("doesn't warn when keyed content updates a guarded panel in place", async () => {
+      // Given a guarded panel opened with a key
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const r = await render(<GuardedPane />);
+      await clickAndWait(r.openA);
+
+      // When re-opening it with the same key
+      click(r.updateA);
+
+      // Then nothing warns
+      expect(warn).not.toHaveBeenCalled();
+      warn.mockRestore();
+    });
+
     it("closes a dirty pane without asking when the caller reverts its edits first", async () => {
       // Given an open pane with unsaved edits
       const r = await render(<GuardedPane />);
@@ -320,6 +349,8 @@ function GuardedPane(props: { host?: "documentScroll" | "rightPaneLayout" }) {
       <Button label="Open A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A" /> })} />
       <Button label="Update A" onClick={() => openRightPane({ content: <DraftPanel key="a" title="A (2)" /> })} />
       <Button label="Open B" onClick={() => openRightPane({ content: <DraftPanel key="b" title="B" /> })} />
+      <Button label="Open Unkeyed A" onClick={() => openRightPane({ content: <DraftPanel title="A" /> })} />
+      <Button label="Open Unkeyed B" onClick={() => openRightPane({ content: <DraftPanel title="B" /> })} />
       <Button label="Cancel" onClick={() => closeRightPane()} />
       <Button label="Leave Page" onClick={() => setShowHost(false)} />
     </DocumentScrollLayoutProvider>

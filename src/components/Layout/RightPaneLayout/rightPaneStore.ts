@@ -14,7 +14,7 @@ export type RightPaneOpenActions = {
 let isOpen = false;
 let content: ReactNode | undefined;
 /** Set by the open `RightPanePanel`'s `isDirty`; runs `proceed` now or once the user discards. */
-let confirmDiscard: ((proceed: VoidFunction) => void) | undefined;
+let discardPrompt: ((proceed: VoidFunction) => void) | undefined;
 const openListeners = new Set<() => void>();
 const contentListeners = new Set<() => void>();
 
@@ -46,8 +46,17 @@ function notifyContentListeners() {
 
 function openInPane(opts: OpenRightPaneOpts) {
   // Same type + key updates the panel in place, so only a remount loses its edits
-  if (isOpen && wouldRemount(content, opts.content)) return ask(() => showInPane(opts));
+  if (isOpen && wouldRemount(content, opts.content)) return confirmDiscard(() => showInPane(opts));
+  if (isOpen && discardPrompt) warnIfUnkeyed(opts.content);
   showInPane(opts);
+}
+
+/** Unkeyed items of one panel type look like the same panel, so the guard can't ask between them. */
+function warnIfUnkeyed(next: ReactNode) {
+  if (process.env.NODE_ENV === "production" || !isValidElement(next) || next.key !== null) return;
+  console.warn(
+    "[openRightPane] Opened unkeyed content of the same type over a panel with `isDirty`, so it didn't ask and that panel's edits carry over. Key pane content per item, e.g. `<Panel key={id} />`.",
+  );
 }
 
 function showInPane(opts: OpenRightPaneOpts) {
@@ -59,11 +68,11 @@ function showInPane(opts: OpenRightPaneOpts) {
 }
 
 function closePane() {
-  if (isOpen) ask(hideRightPane);
+  if (isOpen) confirmDiscard(hideRightPane);
 }
 
-function ask(proceed: VoidFunction) {
-  if (confirmDiscard) confirmDiscard(proceed);
+function confirmDiscard(proceed: VoidFunction) {
+  if (discardPrompt) discardPrompt(proceed);
   else proceed();
 }
 
@@ -84,18 +93,18 @@ export const rightPaneOpenActions: RightPaneOpenActions = {
 };
 
 /** Internal: the open `RightPanePanel` registers its discard prompt; returns its unregister. */
-export function setRightPaneConfirmDiscard(fn: (proceed: VoidFunction) => void): VoidFunction {
-  confirmDiscard = fn;
+export function setRightPaneDiscardPrompt(fn: (proceed: VoidFunction) => void): VoidFunction {
+  discardPrompt = fn;
   return () => {
     // Don't clear a check that a swapped-in panel already set
-    if (confirmDiscard === fn) confirmDiscard = undefined;
+    if (discardPrompt === fn) discardPrompt = undefined;
   };
 }
 
 /** Internal: closes the pane, then runs `next`; asks first if the open panel is dirty. */
 export function closeRightPaneThen(next: VoidFunction): void {
   if (!isOpen) return next();
-  ask(() => {
+  confirmDiscard(() => {
     hideRightPane();
     next();
   });
@@ -112,7 +121,7 @@ export function hideRightPane(): void {
 export function resetRightPaneStore() {
   isOpen = false;
   content = undefined;
-  confirmDiscard = undefined;
+  discardPrompt = undefined;
   notifyOpenListeners();
   notifyContentListeners();
 }
