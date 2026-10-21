@@ -113,6 +113,15 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
     };
   }, [showFooter]);
 
+  // Scroll back to the top when the user moves to another step (not on first render).
+  const currentStep = stepperTabs?.currentStep;
+  const prevStepRef = useRef(currentStep);
+  useLayoutEffect(() => {
+    if (prevStepRef.current === currentStep) return;
+    prevStepRef.current = currentStep;
+    window.scrollTo({ top: 0, left: 0 });
+  }, [currentStep]);
+
   return (
     <DocumentScrollLayoutProvider>
       <div css={Css.df.fdc.w100.$} style={style} {...tid}>
