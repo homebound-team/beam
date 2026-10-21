@@ -5823,6 +5823,11 @@ describe("GridTable", () => {
         children: [
           {
             kind: "data",
+            id: "leaf",
+            data: { name: "Leaf", value: "Text cell" },
+          },
+          {
+            kind: "data",
             id: "parent",
             data: { name: "Parent", value: "Text cell" },
             children: [{ kind: "data", id: "child", data: { name: "Child1", value: "Text cell" } }],
@@ -5849,6 +5854,7 @@ describe("GridTable", () => {
     expect(totalsCell).toHaveTextContent("Total");
     expect(totalsCell.querySelector("[data-testid='select']")).toBeNull();
     expect(totalsCell.querySelector("[data-testid='chevronDown']")).toBeNull();
+    expect(totalsCell.querySelector("[aria-hidden='true']")).toBeNull();
 
     // And a parent is small semibold with no extra indent, a nested parent is extra-small semibold, and a leaf stays regular
     const marketCell = cell(r, 2, 0);
@@ -5857,15 +5863,63 @@ describe("GridTable", () => {
     expect(marketCell).toHaveStyle({ fontWeight: "600", fontSize: "14px", paddingLeft: "12px" });
     expect(marketCell.firstElementChild).toHaveStyle({ justifyContent: "flex-end" });
 
-    const parentCell = cell(r, 3, 0);
+    const parentCell = cell(r, 4, 0);
     expect(parentCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
     expect(parentCell).toHaveStyle({ fontWeight: "600", fontSize: "12px", paddingLeft: "40px" });
 
-    const childCell = cell(r, 4, 0);
+    // A sibling with no children keeps the chevron's width, so its checkbox lines up with the parent's
+    const leafCell = cell(r, 3, 0);
+    expect(leafCell).toHaveTextContent("Leaf");
+    expect(leafCell.querySelector("[data-testid='chevronDown']")).toBeNull();
+    expect(leafCell.querySelector("[data-testid='select']")).toBeTruthy();
+    expect(leafCell).toHaveStyle({ paddingLeft: "40px" });
+    expect(leafCell.querySelector("[aria-hidden='true']")).toHaveStyle({ width: "28px" });
+
+    const childCell = cell(r, 5, 0);
     expect(childCell).toHaveTextContent("Child1");
     expect(childCell.querySelector("[data-testid='chevronDown']")).toBeNull();
     expect(childCell.querySelector("[data-testid='select']")).toBeTruthy();
-    expect(childCell).toHaveStyle({ fontWeight: "400", fontSize: "12px", paddingLeft: "100px" });
+    expect(childCell).toHaveStyle({ fontWeight: "400", fontSize: "12px", paddingLeft: "68px" });
+  });
+
+  it("reserves the chevron width when a collapsible row has no children", async () => {
+    // Given a nested table with chevrons and no checkboxes
+    type NestRow =
+      { kind: "header"; id: string; data: undefined } | { kind: "data"; id: string; data: { name: string } };
+    const columns: GridColumn<NestRow>[] = [
+      collapseColumn<NestRow>(),
+      { id: "name", header: "Project", data: ({ name }) => name },
+    ];
+    const rows: GridDataRow<NestRow>[] = [
+      { kind: "header", id: "header", data: undefined },
+      {
+        kind: "data",
+        id: "grandparent",
+        data: { name: "Grandparent" },
+        children: [
+          { kind: "data", id: "leaf", data: { name: "Parent, no children" } },
+          {
+            kind: "data",
+            id: "parent",
+            data: { name: "Parent with children" },
+            children: [{ kind: "data", id: "child", data: { name: "Child 1" } }],
+          },
+        ],
+      },
+    ];
+
+    // When the table renders
+    const r = await render(<GridTable columns={columns} rows={rows} />);
+
+    // Then a childless row holds the chevron's width, so its label starts where the sibling's label does
+    const leafCell = cell(r, 2, 0);
+    const parentCell = cell(r, 3, 0);
+    expect(leafCell.querySelector("[data-testid='chevronDown']")).toBeNull();
+    expect(leafCell.querySelector("[data-testid='select']")).toBeNull();
+    expect(parentCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
+    expect(leafCell).toHaveStyle({ paddingLeft: "40px" });
+    expect(parentCell).toHaveStyle({ paddingLeft: "40px" });
+    expect(leafCell.querySelector("[aria-hidden='true']")).toHaveStyle({ width: "28px" });
   });
 
   it("indents nested rows when there is no collapse column", async () => {

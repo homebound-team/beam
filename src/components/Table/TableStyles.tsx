@@ -264,14 +264,11 @@ export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("page
 export const hierarchyIndentPx = 28;
 /** Horizontal padding on table cells (`pxPx(12)`). Indent is added on top of this. */
 const tableCellPaddingXPx = 12;
-/** A nested row with no chevron needs to sit past the parent's toggle: 24px, plus the 8px gap. */
-const hierarchyLeafPaddingPx = 32;
 
-/** Padding-left for a nested first content cell, or undefined at level 0 with no reserved gap. */
-export function hierarchyIndentPaddingPx(level: number, reserveLeafPadding = false): number | undefined {
-  const leafPadding = reserveLeafPadding ? hierarchyLeafPaddingPx : 0;
-  if (level <= 0 && leafPadding === 0) return undefined;
-  return tableCellPaddingXPx + hierarchyIndentPx * Math.max(level, 0) + leafPadding;
+/** Padding-left for a nested first content cell, or undefined at level 0. */
+export function hierarchyIndentPaddingPx(level: number): number | undefined {
+  if (level <= 0) return undefined;
+  return tableCellPaddingXPx + hierarchyIndentPx * level;
 }
 
 /**
@@ -287,8 +284,8 @@ export function hierarchyFirstContentCss(opts: {
 }): Properties | undefined {
   const { level, hasChildren, groupedLevel, skipIndent } = opts;
   const semibold = level === 0 ? hasChildren || groupedLevel : level > 0 && hasChildren;
-  // A nested leaf doesn't have a chevron, so pad it past where the parent's toggle sits.
-  const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level, level > 0 && !hasChildren);
+  // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
+  const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
   if (!semibold && paddingLeft === undefined) return undefined;
   return {
     ...(semibold ? (level === 0 ? Css.smSb.$ : Css.xsSb.$) : {}),

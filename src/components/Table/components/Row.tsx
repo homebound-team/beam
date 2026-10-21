@@ -30,7 +30,12 @@ import type {
   MaybeFn,
   RenderAs,
 } from "src/components/Table/types";
-import { beamCollapseColumnId, isContentColumn, parseWidthToPx } from "src/components/Table/utils/columns";
+import {
+  beamCollapseColumnId,
+  collapseTogglePx,
+  isContentColumn,
+  parseWidthToPx,
+} from "src/components/Table/utils/columns";
 import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -346,10 +351,18 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const controlNodes =
             isFirstContentColumn && controlColumns.length > 0
               ? controlColumns.flatMap((controlColumn) => {
-                  // Don't wrap an empty chevron — the span would still take the 8px gap.
-                  if (controlColumn.id === beamCollapseColumnId && !showsCollapseToggle(row, isKeptRow)) return [];
                   const maybeControl = applyRowFn(controlColumn, row, rowApi, level, isExpanded, dragData);
                   if (isOmittedControl(maybeControl)) return [];
+                  // A row with no children doesn't get a chevron, but we still hold its width so the checkbox lines up.
+                  if (controlColumn.id === beamCollapseColumnId && !showsCollapseToggle(row, isKeptRow)) {
+                    return [
+                      <span
+                        key={controlColumn.id}
+                        aria-hidden
+                        css={Css.fs0.df.aic.h("1lh").mh0.wPx(collapseTogglePx).$}
+                      />,
+                    ];
+                  }
                   return [
                     <span
                       key={controlColumn.id}

@@ -2009,39 +2009,37 @@ export function SelectableChildrenRows() {
             {
               kind: "parent",
               id: "1",
-              data: "Howard Stark",
+              data: "Grandparent",
               initSelected: true,
               inferSelectedState: false,
               children: [
                 {
                   kind: "child" as const,
                   id: "2",
-                  data: "Tony Stark",
+                  data: "Parent, no children",
+                  initSelected: false,
+                  inferSelectedState: false,
+                },
+                {
+                  kind: "child" as const,
+                  id: "3",
+                  data: "Parent with children",
                   initSelected: false,
                   inferSelectedState: false,
                   children: [
                     {
                       kind: "grandChild" as const,
-                      id: "5",
-                      data: "Morgan Stark",
+                      id: "4",
+                      data: "Child 1",
                       initSelected: true,
                     },
+                    {
+                      kind: "grandChild" as const,
+                      id: "5",
+                      data: "Child 2",
+                      initSelected: false,
+                    },
                   ],
-                },
-              ],
-            },
-            {
-              kind: "parent",
-              id: "3",
-              data: "Odin",
-              initSelected: false,
-              inferSelectedState: false,
-              children: [
-                {
-                  kind: "child" as const,
-                  id: "4",
-                  data: "Thor",
-                  initSelected: true,
                 },
               ],
             },
@@ -2049,6 +2047,48 @@ export function SelectableChildrenRows() {
         }
       />
     </>
+  );
+}
+
+export function CollapsibleRows() {
+  type ParentRow = { kind: "parent"; id: string; data: string };
+  type ChildRow = { kind: "child"; id: string; data: string };
+  type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+  type Row = ParentRow | ChildRow | GrandChildRow;
+
+  const nameCol: GridColumn<Row> = {
+    parent: (name) => name,
+    child: (name) => name,
+    grandChild: (name) => name,
+    mw: "160px",
+  };
+
+  return (
+    <GridTable
+      columns={[collapseColumn<Row>(), nameCol]}
+      rows={
+        [
+          simpleHeader,
+          {
+            kind: "parent",
+            id: "1",
+            data: "Grandparent",
+            children: [
+              { kind: "child" as const, id: "2", data: "Parent, no children" },
+              {
+                kind: "child" as const,
+                id: "3",
+                data: "Parent with children",
+                children: [
+                  { kind: "grandChild" as const, id: "4", data: "Child 1" },
+                  { kind: "grandChild" as const, id: "5", data: "Child 2" },
+                ],
+              },
+            ],
+          },
+        ] as GridDataRow<Row>[]
+      }
+    />
   );
 }
 

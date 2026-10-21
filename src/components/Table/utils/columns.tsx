@@ -182,8 +182,10 @@ export function rowControlColumns<T extends Kinded>(columns: readonly GridColumn
   return [collapse, select].filter((column): column is GridColumnWithId<T> => !!column);
 }
 
-/** Collapse toggle (28px button) plus the 8px gap before the next item. */
-const collapseControlPx = 36;
+/** Width of the collapse button. A row without a chevron reserves this so the checkbox stays in column. */
+export const collapseTogglePx = 28;
+/** Collapse toggle plus the 8px gap before the next item. */
+const collapseControlPx = collapseTogglePx + 8;
 /** Select checkbox (16px) plus the 8px gap before the label. */
 const selectControlPx = 24;
 

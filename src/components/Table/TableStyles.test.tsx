@@ -105,12 +105,12 @@ describe("GridStyleDef", () => {
         " ",
       ),
     ).toMatch(/40px/);
-    // And a two-level leaf stays regular, indented 28px plus 32px for the missing chevron and gap
+    // And a nested leaf stays regular, with the same indent as a parent. The missing chevron is a spacer in the cell.
     expect(
       values(hierarchyFirstContentCss({ level: 1, hasChildren: false, groupedLevel: false, skipIndent: false })).join(
         " ",
       ),
-    ).toMatch(/72px/);
+    ).toMatch(/40px/);
     expect(
       values(hierarchyFirstContentCss({ level: 1, hasChildren: false, groupedLevel: false, skipIndent: false })),
     ).not.toEqual(expect.arrayContaining(["xsSb"]));
