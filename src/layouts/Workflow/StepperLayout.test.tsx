@@ -314,6 +314,21 @@ describe("StepperLayout", () => {
     expect(r.query.stepTwoBody).not.toBeInTheDocument();
   });
 
+  it("scrolls to the top when the step changes, but not on mount", async () => {
+    // Given a StepperLayout on its first step
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    const r = await render(<StepperLayout {...baseProps()} />, withRouter());
+    // Then mounting does not scroll
+    expect(scrollTo).not.toHaveBeenCalled();
+
+    // When Continue moves to the next step
+    await clickAndWait(r.continue);
+
+    // Then the new step starts at the top
+    expect(r.stepTwoBody).toBeInTheDocument();
+    expect(scrollTo).toHaveBeenCalledExactlyOnceWith({ top: 0, left: 0 });
+  });
+
   it("disables Continue without a tooltip when primaryDisabled is true", async () => {
     // Given a first step with primaryDisabled true
     const r = await render(
