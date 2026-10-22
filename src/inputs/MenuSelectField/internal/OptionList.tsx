@@ -1,12 +1,18 @@
 import { getInteractionModality } from "@react-aria/interactions";
-import type { Node } from "@react-types/shared";
 import { type KeyboardEvent, type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import type { ListState } from "react-stately";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Css, Tokens } from "src/Css";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
-import { menuRowHeight, MultiOptionRow, SingleOptionRow } from "src/inputs/MenuSelectField/internal/OptionRow";
+import {
+  menuRowHeight,
+  MultiOptionRow,
+  SingleOptionRow,
+  TreeOptionRow,
+  type TreeRowState,
+} from "src/inputs/MenuSelectField/internal/OptionRow";
+import type { MenuCollectionItem } from "src/inputs/MenuSelectField/types";
 import { useTestIds } from "src/utils/useTestIds";
 
 /** The open menu: its list, and the overlay open state around it. */
@@ -15,14 +21,16 @@ export type MenuSelectMenu<O> = {
   close: (opts: { restoreFocus: boolean }) => void;
   /** DOM id of the listbox; the trigger and search input point at it. */
   listId: string;
-  state: ListState<O>;
+  state: ListState<MenuCollectionItem<O>>;
   /** Shows a loading row while a lazy option list is in flight. */
   loading: boolean;
   disabledReasons: Record<string, string | undefined>;
   /** Row scrolled into view on mount, e.g. the first selected option. */
   initialIndex: number;
-  /** `"check"` draws a trailing check for one value. `"checkbox"` draws a leading checkbox when several can be toggled. */
-  rowVariant: "check" | "checkbox";
+  /** `"check"` draws a trailing check for one value. `"checkbox"` draws a leading checkbox when several can be toggled. `"tree"` adds depth and expansion. */
+  rowVariant: "check" | "checkbox" | "tree";
+  /** Tree state for each visible row, keyed by option key. Only set for `"tree"`. */
+  tree?: { rows: Map<string, TreeRowState>; setExpanded: (key: string, expanded: boolean) => void };
   onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
   /** DOM id of the option that has virtual focus. */
   activeDescendant?: string;
@@ -41,9 +49,11 @@ export type OptionListProps<O> = {
 /** Virtualized listbox with virtual focus. DOM focus stays on the search field, or on this list when there is no search. */
 export function OptionList<O>(props: OptionListProps<O>) {
   const { menu, listRef, label, onKeyDown, activeDescendant } = props;
-  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant } = menu;
+  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree } = menu;
   const tid = useTestIds(props, "optionList");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
+  // Tree labels wrap, so rows vary in height. Size the list to what Virtuoso measured.
+  const [measuredHeight, setMeasuredHeight] = useState<number | undefined>();
   const { listBoxProps } = useListBox(
     {
       id,
@@ -57,7 +67,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
     state,
     listRef,
   );
-  const items = [...state.collection] as Node<O>[];
+  const items = [...state.collection];
   const focusedKey = state.selectionManager.focusedKey;
 
   // Only follow keyboard focus; scrolling on pointer focus recycles rows mid-press and drops the click.
@@ -74,7 +84,9 @@ export function OptionList<O>(props: OptionListProps<O>) {
     initialTop: Math.max(0, Math.min(initialIndex, items.length - 1)),
     initialCount: items.length,
   }));
-  const syncScroll = initialTop + initialRenderCount <= maxSyncRenderCount;
+  const isTree = rowVariant === "tree" && tree !== undefined;
+  // Wrapped tree rows make `index * menuRowHeight` land mid-row, so a scrolled tree waits for Virtuoso to measure.
+  const syncScroll = (!isTree || initialTop === 0) && initialTop + initialRenderCount <= maxSyncRenderCount;
   useLayoutEffect(() => {
     // Virtuoso's root is the scroller; its `scrollerRef` callback fires too late for the first paint.
     const scroller = listRef.current?.firstElementChild;
@@ -108,13 +120,15 @@ export function OptionList<O>(props: OptionListProps<O>) {
               key={isTest ? items.length : "virtuoso"}
               ref={virtuosoRef}
               style={{
-                height: items.length * menuRowHeight,
+                height: (isTree ? measuredHeight : undefined) ?? items.length * menuRowHeight,
                 flexShrink: 1,
                 minHeight: 0,
                 overscrollBehavior: "contain",
               }}
               totalCount={items.length}
-              fixedItemHeight={menuRowHeight}
+              {...(isTree
+                ? { defaultItemHeight: menuRowHeight, totalListHeightChanged: setMeasuredHeight }
+                : { fixedItemHeight: menuRowHeight })}
               computeItemKey={(index) => String(items[index]?.key ?? index)}
               {...(isTest
                 ? { initialItemCount: items.length }
@@ -123,13 +137,28 @@ export function OptionList<O>(props: OptionListProps<O>) {
                   : { initialTopMostItemIndex: initialTop })}
               itemContent={(index) => {
                 const item = items[index];
-                if (!item) return null;
+                const entry = item?.value;
+                if (!item || !entry) return null;
+                const row = isTree ? tree?.rows.get(String(item.key)) : undefined;
+                if (row && tree) {
+                  return (
+                    <TreeOptionRow
+                      item={item}
+                      state={state}
+                      id={optionDomId(id, index)}
+                      disabledReason={disabledReasons[entry.valueKey]}
+                      row={row}
+                      onExpandedChange={(expanded) => tree.setExpanded(String(item.key), expanded)}
+                      {...tid}
+                    />
+                  );
+                }
                 return (
                   <Row
                     item={item}
                     state={state}
                     id={optionDomId(id, index)}
-                    disabledReason={disabledReasons[String(item.key)]}
+                    disabledReason={disabledReasons[entry.valueKey]}
                     {...tid}
                   />
                 );

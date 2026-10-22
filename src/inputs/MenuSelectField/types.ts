@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
+import type { TreeSelectionDisplay } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 
-/** Props shared by `MenuSelectField` and `MenuMultiSelectField`. */
+/** Props shared by `MenuSelectField`, `MenuMultiSelectField`, and `MenuTreeSelectField`. */
 export type MenuSelectFieldBaseProps<O, V extends Value> = {
   label: string;
   /** The full list, or the selected option plus a loader fired the first time the menu opens. */
@@ -50,11 +51,29 @@ export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<
   onSelect: (value: V | undefined, opt: O | undefined) => void;
 };
 
-/** Selection contract the single and multi fields both pass into the shared menu. */
+/** Selection contract the single, multi, and tree fields pass into the shared menu. */
 export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
   selectionMode: "single" | "multiple";
   values: V[];
   /** Values proposed by an AI model; puts the field in AI mode. */
   proposedValues?: V[];
+  /** For a tree, receives every selected value, including cascaded parents and children. */
   onCommit: (values: V[], opts: O[]) => void;
+  /** Makes `options` the roots of a tree, with expandable parents and cascading selection. Multiple selection only. */
+  tree?: MenuSelectTreeConfig<O>;
+};
+
+export type MenuSelectTreeConfig<O> = {
+  getChildren: (opt: O) => readonly O[] | undefined;
+  /** Which selections the closed field counts. */
+  display: TreeSelectionDisplay;
+  /** Groups start open. Otherwise only groups holding a selection start open. */
+  defaultExpanded: boolean;
+};
+
+/** One row in the menu list. Flat rows use the value as `key`. A tree row's key is its path, so the same value can show up twice. */
+export type MenuCollectionItem<O> = {
+  key: string;
+  valueKey: string;
+  option: O;
 };
