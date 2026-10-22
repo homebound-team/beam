@@ -68,10 +68,6 @@ type RowProps<R extends Kinded> = {
   rs: RowState<R>;
   style: GridStyle;
   rowStyles: RowStyles<R> | undefined;
-  /** Laid-out columns. Collapse toggles and select checkboxes are omitted so sizes match these columns. */
-  columns: GridColumnWithId<R>[];
-  /** Collapse toggle and select checkbox, when those columns are visible. Rendered in the first content cell. */
-  controlColumns: GridColumnWithId<R>[];
   columnSizes: string[];
   getCount: (id: string) => object;
   cellHighlight: boolean;
@@ -114,8 +110,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     rs,
     style,
     rowStyles,
-    columns,
-    controlColumns,
     columnSizes,
     getCount,
     cellHighlight,
@@ -142,6 +136,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const { tableState } = useContext(TableStateContext);
   // We're wrapped in observer, so can access these without useComputeds
   const { api } = tableState;
+  const columns = tableState.layoutColumns;
+  const controlColumns = tableState.controlColumns;
   const columnStripeColor = style.columnStripeColor;
   const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level, aiMode } = rs;
 
@@ -173,7 +169,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const levelStyle = style.levels && (typeof style.levels === "function" ? style.levels(level) : style.levels[level]);
   const levelIndent = levelStyle?.rowIndent;
   // True for the whole table once we have a collapse column. Leaves don't render a chevron, but they still need the indent.
-  const collapseIndent = controlColumns.some((column) => column.id === beamCollapseColumnId);
+  const hasCollapseColumn = controlColumns.some((column) => column.id === beamCollapseColumnId);
 
   const containerCss = {
     ...Css.add("transition", "padding 0.25s ease-in-out").$,
@@ -352,7 +348,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isFirstContentColumn && controlColumns.length > 0
               ? controlColumns.flatMap((controlColumn) => {
                   const maybeControl = applyRowFn(controlColumn, row, rowApi, level, isExpanded, dragData);
-                  if (isOmittedControl(maybeControl)) return [];
+                  if (isEmptyContent(maybeControl)) return [];
                   // A row with no children doesn't get a chevron, but we still hold its width so the checkbox lines up.
                   if (controlColumn.id === beamCollapseColumnId && !showsCollapseToggle(row, isKeptRow)) {
                     return [
@@ -500,7 +496,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 level,
                 hasChildren: !!row.children?.length,
                 groupedLevel: level === 0 && !!levelStyle?.cellCss,
-                skipIndent: levelIndent !== undefined || !collapseIndent,
+                skipIndent: levelIndent !== undefined || !hasCollapseColumn,
+                maxLevel: tableState.maxNestingLevel,
               })),
             // Apply any declarative column border styling after header/body defaults.
             ...getColumnBorderCss(column.border, style),
@@ -726,8 +723,8 @@ function consecutiveGroupSpan<R extends Kinded>(columns: GridColumnWithId<R>[], 
   return span;
 }
 
-/** Skip a blank collapse or select renderer (totals, expandable header, group header) so we don't leave a gap. */
-function isOmittedControl(maybeContent: React.ReactNode | GridCellContent): boolean {
+/** True when a collapse or select renderer is blank (totals, expandable header, group header), so we don't leave a gap. */
+function isEmptyContent(maybeContent: React.ReactNode | GridCellContent): boolean {
   if (maybeContent == null || maybeContent === false || maybeContent === "") return true;
   if (maybeContent === emptyCell) return true;
   if (isGridCellContent(maybeContent)) {

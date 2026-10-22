@@ -102,6 +102,25 @@ export class RowStates<R extends Kinded> {
     }
   }
 
+  /** Deepest data-row level. Level 0 is a top-level body row. */
+  maxNestingLevel(): number {
+    let max = 0;
+    const visit = (rows: RowState<R>[] | undefined, level: number) => {
+      if (!rows) return;
+      for (const rs of rows) {
+        // Header, totals, and the kept group are not hierarchy levels.
+        if (reservedRowKinds.includes(rs.kind)) {
+          visit(rs.children, level);
+          continue;
+        }
+        if (level > max) max = level;
+        visit(rs.children, level + 1);
+      }
+    };
+    visit(this.topRows, 0);
+    return max;
+  }
+
   /** Fully delete `ids`, so they don't show up in kept rows anymore. */
   delete(ids: string[]) {
     for (const id of ids) {

@@ -6,6 +6,9 @@ import type { GridColumnWithId, Kinded } from "src/components/Table/types";
 import { calcColumnLayout } from "src/components/Table/utils/columns";
 import { useDebouncedCallback } from "use-debounce";
 
+/** Bump when a saved column width means something new. v2: the width includes the in-cell checkbox and chevron. */
+export const columnWidthKeyVersion = 2;
+
 /**
  * Calculates an array of sizes for each of our columns.
  *
@@ -46,11 +49,11 @@ export function useSetupColumnSizes<R extends Kinded>(
   setResizedWidths: (widths: ResizedWidths | ((prev: ResizedWidths) => ResizedWidths)) => void;
   resetColumnWidths: () => void;
 } {
-  // Widths saved before the checkbox and chevron moved into the cell didn't include them, so those tables
-  // get a new key and size from the column defs again.
+  // Saved widths are the whole cell. v2 is the bump for when the checkbox and chevron moved into the cell,
+  // so those tables size from the column defs again instead of reusing a width that didn't include them.
   const widthStorageKey =
     visibleColumnsStorageKey && controlPx > 0
-      ? `${visibleColumnsStorageKey}__inCellControls`
+      ? `${visibleColumnsStorageKey}__v${columnWidthKeyVersion}`
       : visibleColumnsStorageKey;
   const { resizedWidths, setResizedWidth, setResizedWidths, resetColumnWidths } = useColumnResizing(
     disableColumnResizing ? undefined : widthStorageKey,

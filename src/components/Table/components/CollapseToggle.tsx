@@ -26,6 +26,7 @@ export function CollapseToggle(props: GridTableCollapseToggleProps) {
   const iconKey = isCollapsed ? "chevronRight" : "chevronDown";
   const headerIconKey = isCollapsed ? "chevronsRight" : "chevronsDown";
 
+  // If we're not a header and not the selected group row, only render a toggle if we have child rows to actually collapse.
   if (!showsCollapseToggle(row)) return null;
 
   return (

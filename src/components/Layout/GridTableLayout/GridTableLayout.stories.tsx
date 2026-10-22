@@ -15,6 +15,7 @@ import {
   cardTitleSlot,
 } from "src/components/Table/cardSlots";
 import type { GridDataRow } from "src/components/Table/components/Row";
+import { columnWidthKeyVersion } from "src/components/Table/hooks/useSetupColumnSizes";
 import { collapseColumn, column, groupColumns, numericColumn, selectColumn } from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleGroupHeader, simpleHeader } from "src/components/Table/utils/simpleHelpers";
@@ -423,8 +424,8 @@ export function GridTableLayoutWithColor() {
   });
 
   useEffect(() => {
-    // This table has select and collapse, so its widths are stored under the in-cell controls key.
-    const columnWidthsKey = `columnWidths_${storageKey}__inCellControls`;
+    // This table has select and collapse, so its widths are stored under the v2 key.
+    const columnWidthsKey = `columnWidths_${storageKey}__v${columnWidthKeyVersion}`;
     if (!sessionStorage.getItem(columnWidthsKey)) {
       sessionStorage.setItem(
         columnWidthsKey,

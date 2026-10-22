@@ -37,14 +37,7 @@ import type {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import {
-  assignDefaultColumnIds,
-  firstContentControlPx,
-  isContentColumn,
-  rowControlColumns,
-  toLayoutColumns,
-  withColumnGutters,
-} from "src/components/Table/utils/columns";
+import { assignDefaultColumnIds, isContentColumn, withColumnGutters } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -382,10 +375,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     return tableState.visibleColumns as GridColumnWithId<R>[];
   }, [tableState]);
 
-  const layoutColumns = useMemo(() => toLayoutColumns(columns), [columns]);
-  // Collapse toggles and select checkboxes are drawn in the first content cell, not as their own columns.
-  const controlColumns = useMemo(() => rowControlColumns(columns), [columns]);
-  const controlWidthPx = useMemo(() => firstContentControlPx(controlColumns), [controlColumns]);
+  const layoutColumns = useComputed(() => tableState.layoutColumns, [tableState]);
+  const controlWidthPx = useComputed(() => tableState.controlWidthPx, [tableState]);
 
   // Calculate which columns should be striped, if any.
   const stripedColumnIds = useMemo(
@@ -595,8 +586,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           rs,
           style,
           rowStyles,
-          columns: layoutColumns,
-          controlColumns,
           columnSizes,
           getCount,
           cellHighlight: "cellHighlight" in maybeStyle && maybeStyle.cellHighlight === true,
@@ -734,7 +723,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     maybeStyle,
     columnSizes,
     layoutColumns,
-    controlColumns,
     columns.length,
     stripedColumnIds,
     getCount,

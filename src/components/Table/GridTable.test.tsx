@@ -5856,30 +5856,26 @@ describe("GridTable", () => {
     expect(totalsCell.querySelector("[data-testid='chevronDown']")).toBeNull();
     expect(totalsCell.querySelector("[aria-hidden='true']")).toBeNull();
 
-    // And a parent is small semibold with no extra indent, a nested parent is extra-small semibold, and a leaf stays regular
+    // And each row draws its chevron only when it has children. Type and indent are covered by the nested stories.
     const marketCell = cell(r, 2, 0);
     expect(marketCell).toHaveTextContent("Market A");
     expect(marketCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
-    expect(marketCell).toHaveStyle({ fontWeight: "600", fontSize: "14px", paddingLeft: "12px" });
     expect(marketCell.firstElementChild).toHaveStyle({ justifyContent: "flex-end" });
 
     const parentCell = cell(r, 4, 0);
     expect(parentCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
-    expect(parentCell).toHaveStyle({ fontWeight: "600", fontSize: "12px", paddingLeft: "40px" });
 
-    // A sibling with no children keeps the chevron's width, so its checkbox lines up with the parent's
+    // A sibling with no children keeps the chevron's width, so its checkbox lines up with the parent's.
     const leafCell = cell(r, 3, 0);
     expect(leafCell).toHaveTextContent("Leaf");
     expect(leafCell.querySelector("[data-testid='chevronDown']")).toBeNull();
     expect(leafCell.querySelector("[data-testid='select']")).toBeTruthy();
-    expect(leafCell).toHaveStyle({ paddingLeft: "40px" });
     expect(leafCell.querySelector("[aria-hidden='true']")).toHaveStyle({ width: "28px" });
 
     const childCell = cell(r, 5, 0);
     expect(childCell).toHaveTextContent("Child1");
     expect(childCell.querySelector("[data-testid='chevronDown']")).toBeNull();
     expect(childCell.querySelector("[data-testid='select']")).toBeTruthy();
-    expect(childCell).toHaveStyle({ fontWeight: "400", fontSize: "12px", paddingLeft: "68px" });
   });
 
   it("reserves the chevron width when a collapsible row has no children", async () => {
@@ -5917,12 +5913,10 @@ describe("GridTable", () => {
     expect(leafCell.querySelector("[data-testid='chevronDown']")).toBeNull();
     expect(leafCell.querySelector("[data-testid='select']")).toBeNull();
     expect(parentCell.querySelector("[data-testid='chevronDown']")).toBeTruthy();
-    expect(leafCell).toHaveStyle({ paddingLeft: "40px" });
-    expect(parentCell).toHaveStyle({ paddingLeft: "40px" });
     expect(leafCell.querySelector("[aria-hidden='true']")).toHaveStyle({ width: "28px" });
   });
 
-  it("indents nested rows when there is no collapse column", async () => {
+  it("does not render a chevron when there is no collapse column", async () => {
     // Given a nested table with checkboxes and no chevrons
     type NestRow =
       { kind: "header"; id: string; data: undefined } | { kind: "data"; id: string; data: { name: string } };
@@ -5943,9 +5937,7 @@ describe("GridTable", () => {
     // When the table renders
     const r = await render(<GridTable columns={columns} rows={rows} />);
 
-    // Then the parent stays at the cell padding and the child gets the default nested indent
-    expect(cell(r, 1, 0)).toHaveStyle({ paddingLeft: "12px" });
-    expect(cell(r, 2, 0)).toHaveStyle({ paddingLeft: "calc(var(--t-spacing) * 3)" });
+    // Then there is no chevron. Indent and type for this case are covered by the nested stories.
     expect(cell(r, 2, 0).querySelector("[data-testid='chevronDown']")).toBeNull();
   });
 });

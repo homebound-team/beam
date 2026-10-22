@@ -273,17 +273,18 @@ export function hierarchyIndentPaddingPx(level: number): number | undefined {
 
 /**
  * First-content type and indent for a body row.
- * Level 0 is small semibold when the row has children or it is a grouped level-0 row.
- * Deeper rows are extra-small semibold only when that row has children.
+ * Level 0 is small semibold. Levels above the deepest are extra-small semibold. Only the deepest stays regular.
  */
 export function hierarchyFirstContentCss(opts: {
   level: number;
   hasChildren: boolean;
   groupedLevel: boolean;
   skipIndent: boolean;
+  /** Deepest data-row level in the table. `0` when every body row is top-level. */
+  maxLevel: number;
 }): Properties | undefined {
-  const { level, hasChildren, groupedLevel, skipIndent } = opts;
-  const semibold = level === 0 ? hasChildren || groupedLevel : level > 0 && hasChildren;
+  const { level, hasChildren, groupedLevel, skipIndent, maxLevel } = opts;
+  const semibold = level === 0 ? hasChildren || groupedLevel : level > 0 && level < maxLevel;
   // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
   const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
   if (!semibold && paddingLeft === undefined) return undefined;
