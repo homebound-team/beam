@@ -67,6 +67,8 @@ export type MenuSelectTreeConfig<O> = {
   getChildren: (opt: O) => readonly O[] | undefined;
   /** Which selections the closed field counts. */
   display: TreeSelectionDisplay;
+  /** Groups start open. Otherwise only groups holding a selection start open. */
+  defaultExpanded: boolean;
 };
 
 /** One row in the menu list. Flat rows use the value as `key`. A tree row's key is its path, so the same value can show up twice. */
