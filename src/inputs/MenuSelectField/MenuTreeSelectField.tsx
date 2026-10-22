@@ -17,16 +17,18 @@ export type MenuTreeSelectFieldProps<O, V extends Value> = MenuSelectFieldBasePr
   onSelect: (response: TreeSelectResponse<O, V>) => void;
   /** Which selections the closed field counts. @default all */
   selectionDisplay?: TreeSelectionDisplay;
+  /** Start with every group open. Otherwise only groups holding a selection start open. @default false */
+  defaultExpanded?: boolean;
 };
 
 /** Multi select over nested options, with expandable groups and cascading selection. See `MenuTreeSelectField.mdx`. */
 export function MenuTreeSelectField<O, V extends Value>(props: MenuTreeSelectFieldProps<O, V>): JSX.Element {
-  const { onSelect, selectionDisplay = "all", ...rest } = props;
+  const { onSelect, selectionDisplay = "all", defaultExpanded = false, ...rest } = props;
   return (
     <BaseMenuSelectField
       {...rest}
       selectionMode="multiple"
-      tree={{ getChildren: getNestedChildren, display: selectionDisplay }}
+      tree={{ getChildren: getNestedChildren, display: selectionDisplay, defaultExpanded }}
       onCommit={(values, opts) => onSelect(treeSelectResponse(values, opts))}
     />
   );

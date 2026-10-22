@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MenuTreeSelectField } from "src/inputs/MenuSelectField/MenuTreeSelectField";
 import { FieldFrame, open, optionTreeItems, optionTreeLabel } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
-import { userEvent, waitFor, within } from "storybook/test";
+import { userEvent, within } from "storybook/test";
 
 export default {
   title: "Inputs/Select Fields (new)/Menu Behavior/Tree Selection",
@@ -24,16 +24,8 @@ export const Menu = newStory(() => <TreeField initial={["spkr-109", "o8", "o9"]}
 /** Every group collapsed when nothing nested is selected. */
 export const Collapsed = newStory(() => <TreeField initial={["o8"]} />, { play: open("options") });
 
-/** A fully selected parent, and a deeper group expanded from its chevron. */
-export const Expanded = newStory(() => <TreeField initial={["bath"]} />, {
-  play: async (context) => {
-    open("options")(context);
-    const body = within(document.body);
-    await waitFor(() => body.getByTestId("options_expand_din"));
-    await userEvent.click(body.getByTestId("options_expand_din"));
-    await userEvent.click(await body.findByTestId("options_expand_din-l"));
-  },
-});
+/** Every group starts open. */
+export const Expanded = newStory(() => <TreeField defaultExpanded />, { play: open("options") });
 
 /** Searching a code that isn't in the name still finds the group, and keeps its children. */
 export const Search = newStory(() => <TreeField />, {
@@ -55,7 +47,11 @@ export const DisabledOptions = newStory(
   { play: open("options") },
 );
 
-function TreeField(props: { initial?: string[]; disabledOptions?: (string | { value: string; reason: string })[] }) {
+function TreeField(props: {
+  initial?: string[];
+  defaultExpanded?: boolean;
+  disabledOptions?: (string | { value: string; reason: string })[];
+}) {
   const [values, setValues] = useState(props.initial ?? []);
   return (
     <FieldFrame>
@@ -67,6 +63,7 @@ function TreeField(props: { initial?: string[]; disabledOptions?: (string | { va
         getOptionMenuLabel={optionTreeLabel}
         getOptionSearchText={(option) => option.code ?? []}
         disabledOptions={props.disabledOptions}
+        defaultExpanded={props.defaultExpanded}
       />
     </FieldFrame>
   );

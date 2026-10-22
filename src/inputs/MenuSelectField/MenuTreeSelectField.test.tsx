@@ -15,6 +15,18 @@ describe("MenuTreeSelectField", () => {
     expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "Golf"]);
   });
 
+  it("starts with every group open when defaultExpanded", async () => {
+    // Given a tree that starts expanded
+    const r = await render(<TreeHarness defaultExpanded />);
+    // When opening it
+    click(r.sports);
+    // Then each group's children show
+    expect(getOptions(r.sports)).toEqual(["Baseball", "MLB", "MiLB", "Basketball", "NBA", "WNBA", "Golf"]);
+    // And a chevron can still collapse its group
+    click(r.sports_expand_baseball);
+    expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
+  });
+
   it("expands the groups that hold a selection", async () => {
     // Given a nested option selected
     const r = await render(<TreeHarness initial={["nba"]} />);
@@ -242,6 +254,7 @@ type TreeHarnessProps = {
   disabledOptions?: string[];
   selectionDisplay?: TreeSelectionDisplay;
   proposedValues?: string[];
+  defaultExpanded?: boolean;
 };
 
 function TreeHarness(props: TreeHarnessProps) {

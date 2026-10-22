@@ -8,7 +8,7 @@ import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSe
 import type { MenuSelectTriggerState } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
 import {
   buildMenuTree,
-  expandedForSelection,
+  initialExpandedKeys,
   type MenuTree,
   type MenuTreeNode,
   normalizeTreeSelection,
@@ -55,6 +55,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   } = props;
   const multiple = selectionMode === "multiple";
   const getChildren = tree?.getChildren;
+  const defaultExpanded = tree?.defaultExpanded ?? false;
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
@@ -139,9 +140,9 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     [menuTree, selectedKeys, values, optionsByKey],
   );
 
-  // Tree groups start collapsed, except those holding a selection; searching expands every match.
+  // Groups start collapsed, unless `defaultExpanded` or they hold a selection. Searching expands every match.
   const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(() =>
-    menuTree ? expandedForSelection(menuTree, selectedKeys) : new Set(),
+    menuTree ? initialExpandedKeys(menuTree, selectedKeys, defaultExpanded) : new Set(),
   );
   const [searchCollapsedKeys, setSearchCollapsedKeys] = useState<ReadonlySet<string>>(() => new Set());
   const isExpanded = (key: string) => (search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
@@ -256,7 +257,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     if (isDisabled || isReadOnly) return;
     setSearch("");
     if (menuTree) {
-      setExpandedKeys(expandedForSelection(menuTree, selectedKeys));
+      setExpandedKeys(initialExpandedKeys(menuTree, selectedKeys, defaultExpanded));
       setSearchCollapsedKeys(new Set());
     }
     setIsOpen(true);

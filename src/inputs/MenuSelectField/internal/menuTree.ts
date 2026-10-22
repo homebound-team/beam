@@ -119,6 +119,20 @@ export function partiallySelectedKeys<O>(tree: MenuTree<O>, selected: ReadonlySe
   return partial;
 }
 
+/** Groups to open with the menu. Every group when `defaultExpanded`, otherwise just the ones holding a selection. */
+export function initialExpandedKeys<O>(
+  tree: MenuTree<O>,
+  selected: ReadonlySet<string>,
+  defaultExpanded: boolean,
+): Set<string> {
+  if (!defaultExpanded) return expandedForSelection(tree, selected);
+  const expanded = new Set<string>();
+  for (const key of tree.order) {
+    if (tree.nodes.get(key)!.childKeys.length > 0) expanded.add(key);
+  }
+  return expanded;
+}
+
 /** Parents to expand on open, so that every selected occurrence is visible. Everything else starts collapsed. */
 export function expandedForSelection<O>(tree: MenuTree<O>, selected: ReadonlySet<string>): Set<string> {
   const expanded = new Set<string>();
