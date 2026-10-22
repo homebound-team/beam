@@ -219,14 +219,15 @@ function memoizedTableStyles() {
         lastCellCss: bordered ? Css.br.bc(Tokens.SurfaceSeparator).$ : undefined,
         borderStyle: Css.bc(Tokens.SurfaceSeparator).$,
         firstRowCellCss: bordered ? Css.bt.bc(Tokens.SurfaceSeparator).$ : undefined,
-        firstRowFirstCellCss: roundedHeader ? Css.borderRadius("8px 0 0 0 ").$ : undefined,
-        firstRowLastCellCss: roundedHeader ? Css.borderRadius("0 8px 0 0").$ : undefined,
+        // One corner each. A single column is both the first and last cell, and the shorthand would replace the other side.
+        firstRowFirstCellCss: roundedHeader ? Css.add("borderTopLeftRadius", "8px").$ : undefined,
+        firstRowLastCellCss: roundedHeader ? Css.add("borderTopRightRadius", "8px").$ : undefined,
         // Keep `betweenRowsCss` on all body rows, but on the final body row
         // remove the inset shadow and, when bordered, replace it with a true bottom border.
         lastRowCellCss: bordered ? Css.bsh0.bb.bc(Tokens.SurfaceSeparator).$ : Css.bsh0.$,
         // Only apply bottom corner radii to the final body-row cells when using `bordered`.
-        lastRowFirstCellCss: bordered ? Css.borderRadius("0 0 0 8px").$ : undefined,
-        lastRowLastCellCss: bordered ? Css.borderRadius("0 0 8px 0").$ : undefined,
+        lastRowFirstCellCss: bordered ? Css.add("borderBottomLeftRadius", "8px").$ : undefined,
+        lastRowLastCellCss: bordered ? Css.add("borderBottomRightRadius", "8px").$ : undefined,
         presentationSettings: {
           borderless: true,
           typeScale: "xs",
@@ -273,25 +274,31 @@ export function hierarchyIndentPaddingPx(level: number): number | undefined {
 
 /**
  * First-content type and indent for a body row.
- * Level 0 is small semibold. Levels above the deepest are extra-small semibold. Only the deepest stays regular.
+ * Type comes from how deep the table goes, so every row at a level matches.
+ * One level stays regular. Two levels are small semibold, then regular.
+ * Three or more are small semibold, extra-small semibold in between, then regular.
  */
 export function hierarchyFirstContentCss(opts: {
   level: number;
-  hasChildren: boolean;
-  groupedLevel: boolean;
   skipIndent: boolean;
-  /** Deepest data-row level in the table. `0` when every body row is top-level. */
+  /** Deepest data-row level in the table. `0` when the table has a single level. */
   maxLevel: number;
 }): Properties | undefined {
-  const { level, hasChildren, groupedLevel, skipIndent, maxLevel } = opts;
-  const semibold = level === 0 ? hasChildren || groupedLevel : level > 0 && level < maxLevel;
+  const { level, skipIndent, maxLevel } = opts;
   // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
   const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
-  if (!semibold && paddingLeft === undefined) return undefined;
+  const type = hierarchyLevelType(level, maxLevel);
+  if (!type && paddingLeft === undefined) return undefined;
   return {
-    ...(semibold ? (level === 0 ? Css.smSb.$ : Css.xsSb.$) : {}),
+    ...(type ?? {}),
     ...(paddingLeft !== undefined ? Css.plPx(paddingLeft).$ : {}),
   };
+}
+
+/** Type for one level. The deepest level of the table is regular, including a table that only has that level. */
+function hierarchyLevelType(level: number, maxLevel: number): Properties | undefined {
+  if (level >= maxLevel) return undefined;
+  return level === 0 ? Css.smSb.$ : Css.xsSb.$;
 }
 
 /** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */

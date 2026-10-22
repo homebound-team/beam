@@ -33,7 +33,7 @@ export class TableState<R extends Kinded> {
   private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
   private rows: GridDataRow<R>[] = [];
-  /** Deepest nested data row. `0` when every body row is top-level. */
+  /** Deepest data-row level, set with the rows. `0` when the table has a single level. Every row's type is chosen from this. */
   maxNestingLevel = 0;
   // The current list of columns, basically a useRef.current. Only ref reactive.
   public columns: GridColumnWithId<R>[] = [];
@@ -158,7 +158,7 @@ export class TableState<R extends Kinded> {
   setRows(rows: GridDataRow<R>[]): void {
     this.rowStates.setRows(rows);
     this.rows = rows;
-    this.maxNestingLevel = this.rowStates.maxNestingLevel();
+    this.maxNestingLevel = this.rowStates.maxNestingLevel;
   }
 
   setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {

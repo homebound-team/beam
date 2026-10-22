@@ -489,13 +489,11 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             // Level specific styling for the first content column
             ...(applyFirstContentColumnStyles && levelStyle?.firstContentColumn),
             // pl3 above is only for tables without a chevron. Hierarchy padding replaces it when we have a collapse column.
-            // Grouped level 0 has cellCss even with no children. Cards indent the whole row, so don't also pad the cell.
+            // Cards indent the whole row, so don't also pad the cell.
             ...(isBodyRow &&
               applyFirstContentColumnStyles &&
               hierarchyFirstContentCss({
                 level,
-                hasChildren: !!row.children?.length,
-                groupedLevel: level === 0 && !!levelStyle?.cellCss,
                 skipIndent: levelIndent !== undefined || !hasCollapseColumn,
                 maxLevel: tableState.maxNestingLevel,
               })),

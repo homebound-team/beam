@@ -2092,6 +2092,21 @@ export function CollapsibleRows() {
   );
 }
 
+export function HierarchyTypeStrategy() {
+  return (
+    <div css={Css.df.fdc.gap3.p3.$}>
+      {([1, 2, 3, 4] as const).map((levels) => (
+        <section key={levels} css={Css.df.fdc.gap1.$}>
+          <h2 css={Css.smSb.$}>
+            {levels} {levels === 1 ? "level" : "levels"}
+          </h2>
+          <HierarchyTypeTable levels={levels} />
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export function MixedSelectableChildrenRows() {
   type ParentRow = { kind: "parent"; id: string; data: string };
   type ChildRow = { kind: "child"; id: string; data: string };
@@ -4208,4 +4223,37 @@ function stripeGroup(id: string, header: string): GridColumn<StripeRow>[] {
       { id: `${id}-average`, name: "Average", header: "Average", data: () => "$30,753", w: "120px" },
     ],
   });
+}
+
+type HierarchyTypeRow = SimpleHeaderAndData<{ name: string }>;
+
+function HierarchyTypeTable({ levels }: { levels: 1 | 2 | 3 | 4 }) {
+  const nameColumn: GridColumn<HierarchyTypeRow> = {
+    header: "Name",
+    data: ({ name }) => name,
+    mw: "240px",
+  };
+  return (
+    <GridTable
+      columns={[collapseColumn<HierarchyTypeRow>(), selectColumn<HierarchyTypeRow>(), nameColumn]}
+      rows={[simpleHeader, ...createHierarchyTypeRows(levels)]}
+      style={{ allWhite: true, bordered: true, roundedHeader: true }}
+    />
+  );
+}
+
+function createHierarchyTypeRows(levels: 1 | 2 | 3 | 4): GridDataRow<HierarchyTypeRow>[] {
+  const typeAt = (level: number) => (level === levels - 1 ? "Lowest" : level === 0 ? "Highest" : "Middle");
+  const leafAt = (level: number): GridDataRow<HierarchyTypeRow> => ({
+    kind: "data",
+    id: `${levels}-${level}-leaf`,
+    data: { name: `${typeAt(level)} level — no children` },
+  });
+  const branchAt = (level: number): GridDataRow<HierarchyTypeRow> => ({
+    kind: "data",
+    id: `${levels}-${level}-branch`,
+    data: { name: `${typeAt(level)} level${level === levels - 1 ? "" : " — with children"}` },
+    ...(level < levels - 1 ? { children: [leafAt(level + 1), branchAt(level + 1)] } : {}),
+  });
+  return [leafAt(0), branchAt(0)];
 }
