@@ -18,7 +18,7 @@ import { Css, type Properties, Tokens } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** If a column def return just string text for a given row, apply some default styling. */
-export function toContent(
+export function toContent<R extends Kinded>(
   maybeContent: ReactNode | GridCellContent,
   isHeader: boolean,
   canSortColumn: boolean,
@@ -26,18 +26,12 @@ export function toContent(
   style: GridStyle,
   as: RenderAs,
   alignment: GridCellAlignment,
-  column: GridColumnWithId<any>,
+  column: GridColumnWithId<R>,
   isExpandableHeader: boolean,
   isGroupHeader: boolean,
   isExpandable: boolean,
   minStickyLeftOffset: number,
-  isKeptSelectedRow: boolean,
 ): ReactNode {
-  // Rows within the kept selection group cannot be collapsed
-  if (isKeptSelectedRow && column.id === "beamCollapseColumn") {
-    return <></>;
-  }
-
   let content = isGridCellContent(maybeContent) ? maybeContent.content : maybeContent;
   if (typeof content === "function") {
     // Actually create the JSX by calling `content()` here (which should be as late as
@@ -231,16 +225,16 @@ const alignmentToTextAlign: Record<GridCellAlignment, Properties["textAlign"]> =
   right: "right",
 };
 
-export function getAlignment(
-  column: GridColumnWithId<any>,
+export function getAlignment<R extends Kinded>(
+  column: GridColumnWithId<R>,
   maybeContent: ReactNode | GridCellContent,
 ): GridCellAlignment {
   return (isGridCellContent(maybeContent) && maybeContent.alignment) || column.align || "left";
 }
 
 // For alignment, use: 1) cell def, else 2) column def, else 3) left.
-export function getJustification(
-  column: GridColumnWithId<any>,
+export function getJustification<R extends Kinded>(
+  column: GridColumnWithId<R>,
   maybeContent: ReactNode | GridCellContent,
   as: RenderAs,
   alignment: GridCellAlignment,

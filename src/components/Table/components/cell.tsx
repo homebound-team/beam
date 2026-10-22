@@ -80,12 +80,40 @@ export const defaultRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<an
     );
   };
 
+/** Puts the collapse toggle and select checkbox in front of the cell content, and follows that cell's alignment. */
+export function withRowControls(
+  content: ReactNode,
+  controls: ReactNode[],
+  alignment: GridCellAlignment,
+  rowLink?: string,
+): ReactNode {
+  if (controls.length === 0) return content;
+  const justify = alignment === "center" ? "center" : alignment === "right" ? "flex-end" : "flex-start";
+  const body = rowLink ? (
+    <Link to={rowLink} css={Css.tdn.color("unset").df.aifs.mw0.fs1.$} className={navLink}>
+      {content}
+    </Link>
+  ) : (
+    <span css={Css.df.aifs.mw0.fs1.$}>{content}</span>
+  );
+  return (
+    <div css={Css.df.aifs.gap1.w100.mw0.jc(justify).$}>
+      {controls}
+      {body}
+    </div>
+  );
+}
+
 /**
  * Sets up the `GridContext` so that header cells can access the current sort settings.
  * Used for the Header, Totals, and Expanded Header row's cells.
  * */
-export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSpan: number) => RenderCellFn<any> =
-  (column, as, colSpan) => (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
+export function headerRenderFn<R extends Kinded>(
+  column: GridColumnWithId<R>,
+  as: RenderAs,
+  colSpan: number,
+): RenderCellFn<any> {
+  return (key, css, content, row, rowStyle, classNames: string | undefined, onClick, tooltip) => {
     const Cell = as === "table" ? "th" : "div";
     return (
       <Cell key={key} css={{ ...css }} className={classNames} {...(as === "table" && { colSpan })}>
@@ -93,6 +121,7 @@ export const headerRenderFn: (column: GridColumnWithId<any>, as: RenderAs, colSp
       </Cell>
     );
   };
+}
 
 /** Renders a cell element when a row link is in play. */
 export const rowLinkRenderFn: (as: RenderAs, colSpan: number) => RenderCellFn<any> =

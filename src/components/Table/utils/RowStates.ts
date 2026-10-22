@@ -21,6 +21,8 @@ export class RowStates<R extends Kinded> {
   private keptGroupRow: RowState<R>;
   /** The first level of rows, i.e. not the header (or kept group), but the totals + top-level children. */
   private topRows: RowState<R>[] = [];
+  /** Deepest data-row level from the latest `setRows`. `0` when every body row is top-level. */
+  maxNestingLevel = 0;
 
   constructor(table: TableState<R>) {
     this.table = table;
@@ -54,8 +56,10 @@ export class RowStates<R extends Kinded> {
     const seenIds = new Set<string>();
     // Keep track of existing rows, so we can mark any that are missing as removed
     const maybeKept = new Set(this.map.values());
+    // Header, totals, and the kept group are not hierarchy levels, so they pass their own level down.
+    let maxNestingLevel = 0;
 
-    function addRowAndChildren(parent: RowState<R> | undefined, row: GridDataRow<R>): RowState<R> {
+    function addRowAndChildren(parent: RowState<R> | undefined, row: GridDataRow<R>, level: number): RowState<R> {
       // This should really be kind+id, but nearly all of our existing API uses just ids,
       // b/c we assume our ids are tagged/unique across parent/child kinds anyway. So go
       // ahead and enforce "row.id must be unique across kinds" b/c pragmatically that is
@@ -78,7 +82,9 @@ export class RowStates<R extends Kinded> {
         state.removed = false;
         maybeKept.delete(state);
       }
-      state.children = row.children?.map((child) => addRowAndChildren(state, child));
+      const reserved = reservedRowKinds.includes(row.kind);
+      if (!reserved && level > maxNestingLevel) maxNestingLevel = level;
+      state.children = row.children?.map((child) => addRowAndChildren(state, child, reserved ? level : level + 1));
       return state;
     }
 
@@ -87,7 +93,8 @@ export class RowStates<R extends Kinded> {
     const headerRow = rows.find((r) => r.kind === HEADER);
     this.header.row = headerRow || (missingHeader as GridDataRow<R>);
     // Add the top-level rows
-    this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(this.header, row));
+    this.topRows = rows.filter((row) => row !== headerRow).map((row) => addRowAndChildren(this.header, row, 0));
+    this.maxNestingLevel = maxNestingLevel;
     // Always add the keptGroupRow, and we'll use keptGroupRow.isMatched=true/false to keep it
     // from messing up "header is all selected" if its hidden/when there are no kept rows.
     this.header.children = [this.keptGroupRow, ...this.topRows];
