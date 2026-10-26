@@ -804,7 +804,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           />
         ) : _as === "virtual" ? (
           <VirtualGridTableView
-            style={tableStyle}
+            // Pass the base style so the virtual list keeps its identity, and the measured width on its own
+            style={style}
+            minWidthPx={tableStyle.minWidthPx}
             id={id}
             columns={columns}
             visibleDataRows={visibleDataRows}
@@ -1019,6 +1021,8 @@ function renderTable<R extends Kinded>(
 
 type VirtualGridTableViewProps<R extends Kinded = Kinded> = {
   style: GridStyle;
+  /** The table's min width, which can change as the page resizes. Kept out of `style` so it doesn't remount the rows. */
+  minWidthPx: number | undefined;
   id: string;
   columns: GridColumnWithId<R>[];
   visibleDataRows: ReactElement[];
@@ -1058,6 +1062,7 @@ type VirtualGridTableViewProps<R extends Kinded = Kinded> = {
  */
 function VirtualGridTableView<R extends Kinded>({
   style,
+  minWidthPx,
   id,
   columns,
   visibleDataRows,
@@ -1109,7 +1114,8 @@ function VirtualGridTableView<R extends Kinded>({
           css={Css.transitionTop.$}
           style={{
             ...props.style,
-            ...(style.minWidthPx !== undefined ? { minWidth: style.minWidthPx } : {}),
+            // Read from a CSS variable so a width change doesn't recreate this component and remount every row
+            minWidth: `var(${virtualTableMinWidthVar}, auto)`,
             zIndex: zIndices.tableStickyHeader,
             top: stickyTableHeaderOffset(stickyOffset),
           }}
@@ -1135,6 +1141,8 @@ function VirtualGridTableView<R extends Kinded>({
     [columns, fetchMoreInProgress, id, stickyOffset, style, xss],
   );
 
+  const loadingProps: { className?: string; style?: React.CSSProperties } = loading ? Css.props(loadingTableCss) : {};
+
   // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
   const virtuosoKey = !!validatedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
   return (
@@ -1145,7 +1153,11 @@ function VirtualGridTableView<R extends Kinded>({
       ref={virtuosoRef}
       // Virtuoso owns its root element, so dim via its className/style props; routing this through
       // the `List` component would change its identity and remount (and scroll-jump) the whole list.
-      {...(loading ? Css.props(loadingTableCss) : {})}
+      {...loadingProps}
+      style={{
+        ...loadingProps.style,
+        ...(minWidthPx !== undefined ? { [virtualTableMinWidthVar]: `${minWidthPx}px` } : {}),
+      }}
       {...(customScrollParent ? { customScrollParent } : {})}
       {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
       components={components}
@@ -1378,6 +1390,9 @@ function CardView({
  * different "component" per the given set of props (solely to capture as
  * params that we can't pass through react-virtuoso's API as props).
  */
+/** Holds the virtual table's min width. Set on Virtuoso's root so `TopItemList` can read it without being recreated. */
+const virtualTableMinWidthVar = "--beam-virtual-table-min-width";
+
 const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
   (gs, _columns, id, xss) => {
     return React.forwardRef(function VirtualRoot({ style, children }, ref) {
