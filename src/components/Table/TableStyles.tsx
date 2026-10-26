@@ -166,12 +166,12 @@ function memoizedTableStyles() {
             ...Css.xsSb.mhPx(56).color(Tokens.OnSurfaceMuted).bgColor(Tokens.SurfaceHover).boxShadow(insetSeparator).$,
             ...(allWhite && Css.bgColor(Tokens.Surface).$),
           },
-          firstContentColumn: { ...Css.sm.$, ...(allWhite && Css.smSb.color(Tokens.OnSurface).$) },
+          // Hierarchy type and indent are applied per row. All-white group rows keep a primary label color.
+          ...(allWhite ? { firstContentColumn: Css.color(Tokens.OnSurface).$ } : {}),
         },
-        2: { firstContentColumn: Css.xs.pl3.$ },
-        // Add 12 more pixels of padding for each level of nesting
-        3: { firstContentColumn: Css.xs.plPx(36).$ },
       };
+      // Without a collapse column we still indent the first child level (pl3).
+      // If there is a collapse column, the 28px hierarchy indent replaces this.
       const defaultLevels = { 1: { firstContentColumn: Css.xs.pl3.$ } };
 
       cache[key] = {
@@ -219,14 +219,15 @@ function memoizedTableStyles() {
         lastCellCss: bordered ? Css.br.bc(Tokens.SurfaceSeparator).$ : undefined,
         borderStyle: Css.bc(Tokens.SurfaceSeparator).$,
         firstRowCellCss: bordered ? Css.bt.bc(Tokens.SurfaceSeparator).$ : undefined,
-        firstRowFirstCellCss: roundedHeader ? Css.borderRadius("8px 0 0 0 ").$ : undefined,
-        firstRowLastCellCss: roundedHeader ? Css.borderRadius("0 8px 0 0").$ : undefined,
+        // One corner each. A single column is both the first and last cell, and the shorthand would replace the other side.
+        firstRowFirstCellCss: roundedHeader ? Css.add("borderTopLeftRadius", "8px").$ : undefined,
+        firstRowLastCellCss: roundedHeader ? Css.add("borderTopRightRadius", "8px").$ : undefined,
         // Keep `betweenRowsCss` on all body rows, but on the final body row
         // remove the inset shadow and, when bordered, replace it with a true bottom border.
         lastRowCellCss: bordered ? Css.bsh0.bb.bc(Tokens.SurfaceSeparator).$ : Css.bsh0.$,
         // Only apply bottom corner radii to the final body-row cells when using `bordered`.
-        lastRowFirstCellCss: bordered ? Css.borderRadius("0 0 0 8px").$ : undefined,
-        lastRowLastCellCss: bordered ? Css.borderRadius("0 0 8px 0").$ : undefined,
+        lastRowFirstCellCss: bordered ? Css.add("borderBottomLeftRadius", "8px").$ : undefined,
+        lastRowLastCellCss: bordered ? Css.add("borderBottomRightRadius", "8px").$ : undefined,
         presentationSettings: {
           borderless: true,
           typeScale: "xs",
@@ -256,6 +257,49 @@ export const getTableStyles = memoizedTableStyles();
 export const totalsRowHeight = 40;
 export const expandableHeaderRowHeight = 40;
 export const tableRowPrintBreakCss = Css.add("pageBreakAfter", "auto").add("pageBreakInside", "avoid").$;
+
+/**
+ * Extra left inset per nested level when the table has a collapse column.
+ * Level 0 stays at the cell's 12px padding.
+ */
+export const hierarchyIndentPx = 28;
+/** Horizontal padding on table cells (`pxPx(12)`). Indent is added on top of this. */
+const tableCellPaddingXPx = 12;
+
+/** Padding-left for a nested first content cell, or undefined at level 0. */
+export function hierarchyIndentPaddingPx(level: number): number | undefined {
+  if (level <= 0) return undefined;
+  return tableCellPaddingXPx + hierarchyIndentPx * level;
+}
+
+/**
+ * First-content type and indent for a body row.
+ * Type comes from how deep the table goes, so every row at a level matches.
+ * One level stays regular. Two levels are small semibold, then regular.
+ * Three or more are small semibold, extra-small semibold in between, then regular.
+ */
+export function hierarchyFirstContentCss(opts: {
+  level: number;
+  skipIndent: boolean;
+  /** Deepest data-row level in the table. `0` when the table has a single level. */
+  maxLevel: number;
+}): Properties | undefined {
+  const { level, skipIndent, maxLevel } = opts;
+  // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
+  const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
+  const type = hierarchyLevelType(level, maxLevel);
+  if (!type && paddingLeft === undefined) return undefined;
+  return {
+    ...(type ?? {}),
+    ...(paddingLeft !== undefined ? Css.plPx(paddingLeft).$ : {}),
+  };
+}
+
+/** Type for one level. The deepest level of the table is regular, including a table that only has that level. */
+function hierarchyLevelType(level: number, maxLevel: number): Properties | undefined {
+  if (level >= maxLevel) return undefined;
+  return level === 0 ? Css.smSb.$ : Css.xsSb.$;
+}
 
 /** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */
 export const loadingTableCss = Css.o50.pen.$;

@@ -601,6 +601,43 @@ describe("GridTableLayout", () => {
       expect(r.selectionSummaryPill).toHaveTextContent("14 Rows SelectedClear");
     });
 
+    it("counts a partly loaded row's childrenCount once it's checked", async () => {
+      // Given a group of 12 rows with only 2 loaded, ahead of a placeholder for the rest
+      const r = await render(
+        <GridTableLayoutComponent<any, GroupedRow, any, any>
+          selectionSummary
+          tableProps={{
+            columns: getGroupedColumns(),
+            rows: [
+              simpleHeader,
+              {
+                kind: "group",
+                id: "g1",
+                data: { name: "Framing" },
+                childrenCount: 12,
+                children: [
+                  { kind: "data", id: "1", data: { name: "Alpha", value: 10 } },
+                  { kind: "data", id: "2", data: { name: "Beta", value: 20 } },
+                  { kind: "data", id: "g1-loading", data: { name: "Loading", value: 0 }, selectable: false },
+                ],
+              },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+
+      // When checking one of its loaded rows
+      click(r.select_2);
+      // Then the partly checked group counts only that row
+      expect(r.selectionSummaryPill).toHaveTextContent("1 Row SelectedClear");
+
+      // And when checking its other loaded row, which checks the group
+      click(r.select_3);
+      // Then the group counts as all 12, without its loaded rows counting again
+      expect(r.selectionSummaryPill).toHaveTextContent("12 Rows SelectedClear");
+    });
+
     it("keeps counting a selected row after it leaves the rows", async () => {
       // Given a selected row
       const columns = [selectColumn<Row>(), ...getColumns()];

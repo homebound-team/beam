@@ -1,10 +1,13 @@
-import { createContext, type ReactNode, useContext, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "src/components/Button";
 import { ContextTag, type ContextTagProps } from "src/components/ContextTag";
 import { IconButton } from "src/components/IconButton";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { type DeleteActionProps, MaybeDeleteAction } from "src/components/Layout/RightPaneLayout/internal/DeleteAction";
+import { setRightPaneDiscardPrompt } from "src/components/Layout/RightPaneLayout/rightPaneStore";
+import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
+import { useModal } from "src/components/Modal/useModal";
 import { Tag, type TagProps } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { fail } from "src/utils/helpers";
@@ -19,6 +22,8 @@ export type RightPanePanelProps = {
   children: ReactNode;
   /** Type or status tag on the close-button row; the title moves to its own row below. */
   tag?: RightPaneTag;
+  /** When it returns true, closing the pane or opening content with another type or `key` asks to discard changes first. */
+  isDirty?: () => boolean;
   /** When false, omit the built-in close control (caller provides their own). Default true. */
   withClose?: boolean;
   /** Variant defaults to primary */
@@ -30,10 +35,20 @@ export type RightPanePanelProps = {
 
 /** Pane body chrome: title row, close control, scrollable children, and an optional footer. See `docs/layouts.md`. */
 export function RightPanePanel(props: RightPanePanelProps) {
-  const { title, children, tag, withClose = true, primaryAction, secondaryAction, deleteAction } = props;
+  const { title, children, tag, isDirty, withClose = true, primaryAction, secondaryAction, deleteAction } = props;
   const tid = useTestIds(props, "rightPanePanel");
   const { closeRightPane } = useRightPaneActions();
   const [bannerSlot, setBannerSlot] = useState<HTMLDivElement | null>(null);
+  const { openModal } = useModal();
+
+  // Only registers the check; closeRightPane and openRightPane call it directly
+  useEffect(() => {
+    if (!isDirty) return;
+    return setRightPaneDiscardPrompt((proceed) => {
+      if (!isDirty()) return proceed();
+      openModal({ content: <ConfirmCloseModal title="Discard unsaved changes?" onClose={proceed} /> });
+    });
+  }, [isDirty, openModal]);
 
   const tagEl = tag && (tag.kind === "status" ? <Tag {...tag} {...tid.tag} /> : <ContextTag {...tag} {...tid.tag} />);
   const titleEl = (

@@ -65,11 +65,8 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
     stickyTableHeaderOffsetPx,
   );
 
-  const paneStyle: CSSProperties | undefined = mobile
-    ? { top: bannerHeightPx }
-    : paneBounds
-      ? { top: paneBounds.topPx, height: paneBounds.heightPx, maxHeight: paneBounds.heightPx }
-      : undefined;
+  // Only `top`; `bottom0` sizes the pane, since a `window.innerHeight` height runs under a horizontal scrollbar.
+  const paneStyle: CSSProperties = { top: mobile ? bannerHeightPx : paneBounds?.topPx };
 
   const pane = (
     <AnimatePresence>
@@ -82,19 +79,14 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
           css={
             mobile
               ? Css.fixed.right0.bottom0.left0.oya.bgColor(Tokens.Surface).z(zIndices.rightPaneMobile).$
-              : Css.fixed.right0.oya
+              : Css.fixed.right0.bottom0.oya
                   .w(paneWidthCss)
                   .bgColor(Tokens.Surface)
                   .z(zIndices.rightPane)
                   .bl.bc(Tokens.SurfaceSeparator)
                   // Pinned, `top` only moves when the chrome above hides or reveals, so ease with it the
                   // way sticky chrome does. Unpinned it tracks the anchor every scroll and must not lag.
-                  .if(!!paneBounds?.isPinned)
-                  // Copy Css.transitionTop + Css.transitionHeight / truss-motion `normal` + `standard`.
-                  .add(
-                    "transition",
-                    "top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-                  ).$
+                  .if(!!paneBounds?.isPinned).transitionTop.$
           }
           style={paneStyle}
           initial={{ x: slideX }}

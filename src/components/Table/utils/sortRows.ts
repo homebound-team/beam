@@ -111,10 +111,10 @@ function sortValue(value: ReactNode | GridCellContent, caseSensitive: boolean): 
   return normalizeSortValue(maybeFn, caseSensitive);
 }
 
-export function ensureClientSideSortValueIsSortable(
+export function ensureClientSideSortValueIsSortable<R extends Kinded>(
   sortOn: SortOn,
   isHeader: boolean,
-  column: GridColumnWithId<any>,
+  column: GridColumnWithId<R>,
   idx: number,
   maybeContent: ReactNode | GridCellContent,
 ): void {

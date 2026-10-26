@@ -23,7 +23,7 @@ import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { ModalProvider } from "./ModalContext";
 
-export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl";
+export type ModalSize = "sm" | "md" | "lg" | "xl" | "xxl" | "3xl";
 
 export type ModalProps = {
   /**
@@ -304,6 +304,7 @@ const widths: Record<ModalSize, number> = {
   lg: 640,
   xl: 800,
   xxl: 900,
+  "3xl": 1180,
 };
 
 const defaultMinHeight = 204;

@@ -4,6 +4,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
+import { firstContentControlPx, rowControlColumns, toLayoutColumns } from "src/components/Table/utils/columns";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import type { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
@@ -32,6 +33,8 @@ export class TableState<R extends Kinded> {
   private persistCollapse: string | undefined;
   // The current list of rows, basically a useRef.current. Only shallow reactive.
   private rows: GridDataRow<R>[] = [];
+  /** Deepest data-row level, set with the rows. `0` when the table has a single level. Every row's type is chosen from this. */
+  maxNestingLevel = 0;
   // The current list of columns, basically a useRef.current. Only ref reactive.
   public columns: GridColumnWithId<R>[] = [];
   public readonly api: GridTableApi<R>;
@@ -155,6 +158,7 @@ export class TableState<R extends Kinded> {
   setRows(rows: GridDataRow<R>[]): void {
     this.rowStates.setRows(rows);
     this.rows = rows;
+    this.maxNestingLevel = this.rowStates.maxNestingLevel;
   }
 
   setColumns(columns: GridColumnWithId<R>[], visibleColumnsStorageKey: string | undefined): void {
@@ -177,9 +181,24 @@ export class TableState<R extends Kinded> {
     return this.rowStates.visibleRows;
   }
 
-  /** Returns visible columns, i.e. those that are visible + any expanded children. */
+  /** Visible columns, including any expanded children. */
   get visibleColumns(): GridColumnWithId<R>[] {
     return this.columnStates.allVisibleColumns("web").map((cs) => cs.column);
+  }
+
+  /** Visible columns that take a layout slot. Select and collapse are left out. */
+  get layoutColumns(): GridColumnWithId<R>[] {
+    return toLayoutColumns(this.visibleColumns);
+  }
+
+  /** Select and collapse, when those columns are visible. Drawn in the first content cell. */
+  get controlColumns(): GridColumnWithId<R>[] {
+    return rowControlColumns(this.visibleColumns);
+  }
+
+  /** Extra width the first content column needs for the in-cell checkbox and chevron. */
+  get controlWidthPx(): number {
+    return firstContentControlPx(this.controlColumns);
   }
 
   /** Returns visible columns, i.e. those that are visible + any expanded children. */

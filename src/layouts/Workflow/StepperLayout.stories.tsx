@@ -194,6 +194,35 @@ export function WithBanner() {
   );
 }
 
+/** Steps taller than the viewport — scroll to the bottom, then Continue / Back / click a tab; the new step should start at the top. */
+export function WithTallSteps() {
+  const tallSections = (prefix: string) =>
+    ["Setup", "Options", "Pricing", "Schedule", "Notes"].map((title) => ({
+      title: `${prefix} ${title}`,
+      fields: <PlaceholderFields count={8} />,
+    }));
+  return (
+    <WorkflowChrome>
+      <StepperLayout
+        title="Add or Modify Options"
+        onCancel={action("cancel clicked")}
+        completeLabel="Save"
+        onComplete={action("complete clicked")}
+        steps={["Select Options", "Review Impact", "Confirm"].map((label) => ({
+          label,
+          content: (
+            <FormSectionLayout
+              title={label}
+              description="Scroll to the bottom, then change steps."
+              sections={tallSections(label)}
+            />
+          ),
+        }))}
+      />
+    </WorkflowChrome>
+  );
+}
+
 function WorkflowChrome({ children }: { children: ReactNode }) {
   return <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>{children}</EnvironmentBannerLayout>;
 }

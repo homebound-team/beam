@@ -2009,39 +2009,37 @@ export function SelectableChildrenRows() {
             {
               kind: "parent",
               id: "1",
-              data: "Howard Stark",
+              data: "Grandparent",
               initSelected: true,
               inferSelectedState: false,
               children: [
                 {
                   kind: "child" as const,
                   id: "2",
-                  data: "Tony Stark",
+                  data: "Parent, no children",
+                  initSelected: false,
+                  inferSelectedState: false,
+                },
+                {
+                  kind: "child" as const,
+                  id: "3",
+                  data: "Parent with children",
                   initSelected: false,
                   inferSelectedState: false,
                   children: [
                     {
                       kind: "grandChild" as const,
-                      id: "5",
-                      data: "Morgan Stark",
+                      id: "4",
+                      data: "Child 1",
                       initSelected: true,
                     },
+                    {
+                      kind: "grandChild" as const,
+                      id: "5",
+                      data: "Child 2",
+                      initSelected: false,
+                    },
                   ],
-                },
-              ],
-            },
-            {
-              kind: "parent",
-              id: "3",
-              data: "Odin",
-              initSelected: false,
-              inferSelectedState: false,
-              children: [
-                {
-                  kind: "child" as const,
-                  id: "4",
-                  data: "Thor",
-                  initSelected: true,
                 },
               ],
             },
@@ -2049,6 +2047,63 @@ export function SelectableChildrenRows() {
         }
       />
     </>
+  );
+}
+
+export function CollapsibleRows() {
+  type ParentRow = { kind: "parent"; id: string; data: string };
+  type ChildRow = { kind: "child"; id: string; data: string };
+  type GrandChildRow = { kind: "grandChild"; id: string; data: string };
+  type Row = ParentRow | ChildRow | GrandChildRow;
+
+  const nameCol: GridColumn<Row> = {
+    parent: (name) => name,
+    child: (name) => name,
+    grandChild: (name) => name,
+    mw: "160px",
+  };
+
+  return (
+    <GridTable
+      columns={[collapseColumn<Row>(), nameCol]}
+      rows={
+        [
+          simpleHeader,
+          {
+            kind: "parent",
+            id: "1",
+            data: "Grandparent",
+            children: [
+              { kind: "child" as const, id: "2", data: "Parent, no children" },
+              {
+                kind: "child" as const,
+                id: "3",
+                data: "Parent with children",
+                children: [
+                  { kind: "grandChild" as const, id: "4", data: "Child 1" },
+                  { kind: "grandChild" as const, id: "5", data: "Child 2" },
+                ],
+              },
+            ],
+          },
+        ] as GridDataRow<Row>[]
+      }
+    />
+  );
+}
+
+export function HierarchyTypeStrategy() {
+  return (
+    <div css={Css.df.fdc.gap3.p3.$}>
+      {([1, 2, 3, 4] as const).map((levels) => (
+        <section key={levels} css={Css.df.fdc.gap1.$}>
+          <h2 css={Css.smSb.$}>
+            {levels} {levels === 1 ? "level" : "levels"}
+          </h2>
+          <HierarchyTypeTable levels={levels} />
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -4168,4 +4223,37 @@ function stripeGroup(id: string, header: string): GridColumn<StripeRow>[] {
       { id: `${id}-average`, name: "Average", header: "Average", data: () => "$30,753", w: "120px" },
     ],
   });
+}
+
+type HierarchyTypeRow = SimpleHeaderAndData<{ name: string }>;
+
+function HierarchyTypeTable({ levels }: { levels: 1 | 2 | 3 | 4 }) {
+  const nameColumn: GridColumn<HierarchyTypeRow> = {
+    header: "Name",
+    data: ({ name }) => name,
+    mw: "240px",
+  };
+  return (
+    <GridTable
+      columns={[collapseColumn<HierarchyTypeRow>(), selectColumn<HierarchyTypeRow>(), nameColumn]}
+      rows={[simpleHeader, ...createHierarchyTypeRows(levels)]}
+      style={{ allWhite: true, bordered: true, roundedHeader: true }}
+    />
+  );
+}
+
+function createHierarchyTypeRows(levels: 1 | 2 | 3 | 4): GridDataRow<HierarchyTypeRow>[] {
+  const typeAt = (level: number) => (level === levels - 1 ? "Lowest" : level === 0 ? "Highest" : "Middle");
+  const leafAt = (level: number): GridDataRow<HierarchyTypeRow> => ({
+    kind: "data",
+    id: `${levels}-${level}-leaf`,
+    data: { name: `${typeAt(level)} level — no children` },
+  });
+  const branchAt = (level: number): GridDataRow<HierarchyTypeRow> => ({
+    kind: "data",
+    id: `${levels}-${level}-branch`,
+    data: { name: `${typeAt(level)} level${level === levels - 1 ? "" : " — with children"}` },
+    ...(level < levels - 1 ? { children: [leafAt(level + 1), branchAt(level + 1)] } : {}),
+  });
+  return [leafAt(0), branchAt(0)];
 }
