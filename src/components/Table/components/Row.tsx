@@ -428,6 +428,13 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const applyCellHighlight = cellHighlight && !!column.id && !isHeader && !isTotals && !isGroupHeader;
           const isCellActive = tableState.activeCellId === cellId;
 
+          const isFieldCell = column.isField || (isGridCellContent(maybeContent) && !!maybeContent.field);
+          // An `aiMode` row styles its text cells by default; the cell's own `aiMode` wins either way.
+          const cellAiMode =
+            isGridCellContent(maybeContent) && maybeContent.aiMode !== undefined
+              ? maybeContent.aiMode
+              : aiMode && !reservedRowKinds.includes(row.kind) && !isFieldCell;
+
           // Note that it seems expensive to calc a per-cell class name/CSS-in-JS output,
           // vs. setting global/table-wide CSS like `style.cellCss` on the root grid div with
           // a few descendent selectors. However, that approach means the root grid-applied
@@ -507,9 +514,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale
               ? Css.typography(maybeContent.typeScale).$
               : {}),
-            ...(isBodyRow &&
-              (column.isField || (isGridCellContent(maybeContent) && maybeContent.field)) &&
-              style.fieldCellCss),
+            // AI text treatment, before the cell's `css` so callers can still override it
+            ...(cellAiMode && Css.fw6.color(Tokens.AiFieldFg).$),
+            ...(isBodyRow && isFieldCell && style.fieldCellCss),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
@@ -695,7 +702,10 @@ export type GridDataRow<R extends Kinded> = {
   draggable?: boolean;
   /** Image src for the row, to be used for card view */
   imgSrc?: string;
-  /** Paints the row with `Tokens.AiFieldBg`. Use `() => boolean` to read MobX without rebuilding `rows`. */
+  /**
+   * Paints the row with `Tokens.AiFieldBg` and its non-field cells' text with the AI treatment (see `GridCellContent.aiMode`).
+   * Use `() => boolean` to read MobX without rebuilding `rows`.
+   */
   aiMode?: MaybeFn<boolean>;
   /**
    * Full-width content with this row. Use `() => …` to read MobX without rebuilding `rows`; return `undefined` to hide.

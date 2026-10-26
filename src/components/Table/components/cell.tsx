@@ -41,6 +41,11 @@ export type GridCellContent = {
   tooltip?: ReactNode;
   /** Set by `fieldCell`. Flexible body rows use 4px vertical padding. */
   field?: true;
+  /**
+   * Styles the cell's text with the AI treatment (`Tokens.AiFieldFg`, semibold).
+   * Defaults to `true` for non-field cells in a `GridDataRow.aiMode` row; pass `false` to opt a cell out.
+   */
+  aiMode?: boolean;
 };
 
 /** Marks a cell as hosting a field. Flexible rows use 4px vertical padding so the field lines up with text cells. */

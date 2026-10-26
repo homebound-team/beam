@@ -1799,7 +1799,7 @@ export function CompanionRowsReactive() {
   );
 }
 
-/** Mixed `aiMode` rows; Accept flips MobX so the functions re-evaluate without rebuilding `rows`. */
+/** Mixed `aiMode` rows (Value opts out of the AI text via `GridCellContent.aiMode`); Accept flips MobX so the functions re-evaluate without rebuilding `rows`. */
 export function AiModeRows() {
   const pending = useMemo(() => observable({ first: true, third: true }), []);
   const rows = useMemo<GridDataRow<Row>[]>(
@@ -1812,7 +1812,12 @@ export function AiModeRows() {
     [pending],
   );
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name, w: "200px" };
-  const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value, w: "200px" };
+  // Opts out of the row's AI text treatment, so only the background shows.
+  const valueColumn: GridColumn<Row> = {
+    header: "Value",
+    data: ({ value }) => ({ content: value, aiMode: false }),
+    w: "200px",
+  };
   return (
     <div css={Css.df.fdc.gap2.$}>
       <div>
