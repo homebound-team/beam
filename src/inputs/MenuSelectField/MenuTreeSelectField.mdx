@@ -21,9 +21,13 @@ Use `MenuTreeSelectField` when a filter accepts several values from nested optio
 - `leaf` — only selected options without children.
 - `root` — only the highest selected options, so a fully selected group reports just its parent.
 
-Selecting a parent selects its enabled children, and selecting every child selects the parent. A partly selected parent shows a mixed checkbox. `values` can hold any of the three shapes; a parent's value stands for its whole subtree. The same value may sit under more than one parent, and selecting it selects every copy. The response lists each value once. `selectionDisplay` picks which selections the closed field's count badge and tooltip include, and defaults to `all`.
+Selecting a parent selects its enabled children, and selecting every child selects the parent. A partly selected parent shows an indeterminate checkbox.
+`values` can hold any of the three shapes; A parent `id` in the `values` array assumes all of its descendants are also selected, whether they are included in `values` or not.
+The same value may sit under more than one parent, and selecting it selects every copy.
 
-The menu is one flat, virtualized list. Groups start collapsed, except groups holding a selection, so every selected option is visible when the menu opens. `defaultExpanded` starts every group open instead. The chevron is the only pointer control that expands a group; the checkbox and label select. With a row highlighted, Right Arrow expands a group and then steps into it, and Left Arrow collapses a group or steps out to its parent. Searching shows each match with its ancestors and descendants. Labels wrap instead of truncating.
+`selectionDisplay` picks which selections the closed field's count badge and tooltip include, and defaults to `all`.
+
+Groups start collapsed, except groups holding a selection, so every selected option is visible when the menu opens. `defaultExpanded` starts every group open instead. With a row highlighted, Right Arrow expands a group and then steps into it, and Left Arrow collapses a group or steps out to its parent. Searching shows each match with its ancestors and descendants. Labels wrap instead of truncating.
 
 Plug into `@homebound/form-state` with `BoundMenuTreeSelectField`, which stores `all.values` unless `onSelect` is passed.
 

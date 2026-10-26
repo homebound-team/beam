@@ -38,11 +38,11 @@ export function MenuTreeSelectField<O, V extends Value>(props: MenuTreeSelectFie
 function treeSelectResponse<O, V extends Value>(values: V[], opts: NestedOption<O>[]): TreeSelectResponse<O, V> {
   const valueOf = new Map(opts.map((option, index) => [option, values[index]]));
   const buckets = bucketTreeSelection(opts, (option) => option.children);
-  const pack = (nodes: NestedOption<O>[]) => ({
-    values: nodes.map((node) => valueOf.get(node)!),
-    options: nodes,
+  const withValues = (options: NestedOption<O>[]) => ({
+    values: options.map((option) => valueOf.get(option)!),
+    options,
   });
-  return { all: pack(buckets.all), leaf: pack(buckets.leaf), root: pack(buckets.root) };
+  return { all: withValues(buckets.all), leaf: withValues(buckets.leaf), root: withValues(buckets.root) };
 }
 
 function getNestedChildren<O>(option: NestedOption<O>): readonly NestedOption<O>[] | undefined {

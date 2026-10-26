@@ -46,9 +46,9 @@ describe("MenuTreeSelectField", () => {
     select(r.sports, "Basketball");
     // Then the response covers the parent and its children
     expect(onSelect).toHaveBeenLastCalledWith({
-      all: { values: ["basketball", "nba", "wnba"], options: [basketball(), nba(), wnba()] },
-      leaf: { values: ["nba", "wnba"], options: [nba(), wnba()] },
-      root: { values: ["basketball"], options: [basketball()] },
+      all: { values: ["basketball", "nba", "wnba"], options: [basketball, nba, wnba] },
+      leaf: { values: ["nba", "wnba"], options: [nba, wnba] },
+      root: { values: ["basketball"], options: [basketball] },
     });
     // And the badge counts every selected option
     expect(r.sports_count).toHaveTextContent("3");
@@ -73,9 +73,9 @@ describe("MenuTreeSelectField", () => {
     select(r.sports, "NBA");
     // Then only the other child remains
     expect(onSelect).toHaveBeenLastCalledWith({
-      all: { values: ["wnba"], options: [wnba()] },
-      leaf: { values: ["wnba"], options: [wnba()] },
-      root: { values: ["wnba"], options: [wnba()] },
+      all: { values: ["wnba"], options: [wnba] },
+      leaf: { values: ["wnba"], options: [wnba] },
+      root: { values: ["wnba"], options: [wnba] },
     });
   });
 
@@ -283,17 +283,11 @@ function checkboxOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label:
   return option?.querySelector("[data-checked]") ?? null;
 }
 
-function nba(): NestedOption<Sport> {
-  return { id: "nba", name: "NBA" };
-}
+const nba: NestedOption<Sport> = { id: "nba", name: "NBA" };
 
-function wnba(): NestedOption<Sport> {
-  return { id: "wnba", name: "WNBA" };
-}
+const wnba: NestedOption<Sport> = { id: "wnba", name: "WNBA" };
 
-function basketball(): NestedOption<Sport> {
-  return { id: "basketball", name: "Basketball", children: [nba(), wnba()] };
-}
+const basketball: NestedOption<Sport> = { id: "basketball", name: "Basketball", children: [nba, wnba] };
 
 function sports(): NestedOption<Sport>[] {
   return [
@@ -305,7 +299,7 @@ function sports(): NestedOption<Sport>[] {
         { id: "milb", name: "MiLB" },
       ],
     },
-    basketball(),
+    basketball,
     { id: "golf", name: "Golf" },
   ];
 }
