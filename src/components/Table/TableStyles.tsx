@@ -206,14 +206,9 @@ function memoizedTableStyles() {
           .ptPx(8)
           .pb0.bsh0.add("borderBottomWidth", "0").$,
         cellCss: {
-          ...Css.typography(cellTypography)
-            .color(Tokens.OnSurface)
-            .bgColor(Tokens.Surface)
-            .ai(alignItems)
-            .pxPx(12)
-            .boxShadow(insetSeparator).$,
+          ...Css.typography(cellTypography).color(Tokens.OnSurface).ai(alignItems).pxPx(12).boxShadow(insetSeparator).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? Css.onHover.bgColor(Tokens.SurfaceHover).$ : {}),
+          ...Css.bgColor(Tokens.Surface).if(cellHighlight).onHover.bgColor(Tokens.SurfaceHover).$,
         },
         firstCellCss: bordered ? Css.bl.bc(Tokens.SurfaceSeparator).$ : undefined,
         lastCellCss: bordered ? Css.br.bc(Tokens.SurfaceSeparator).$ : undefined,
