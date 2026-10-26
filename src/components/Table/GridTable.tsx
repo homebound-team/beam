@@ -1140,8 +1140,8 @@ function VirtualGridTableView<R extends Kinded>({
     [columns, fetchMoreInProgress, id, stickyOffset, style, xss],
   );
 
-  // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
-  const virtuosoKey = !!validatedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
+  // Remount Virtuoso when rows first arrive so it picks up the saved scroll position.
+  const virtuosoKey = visibleDataRows.length > 0 ? "with-data" : "virtuoso";
   return (
     <Virtuoso
       useWindowScroll={inDocumentScrollLayout && !customScrollParent}
@@ -1297,7 +1297,8 @@ function CardView({
       ? savedScrollIndex
       : undefined;
 
-  const virtuosoKey = !!validatedScrollIndex && cardRows.length > 0 ? "with-data" : "virtuoso";
+  // Remount VirtuosoGrid when cards first arrive so it picks up the saved scroll position.
+  const virtuosoKey = cardRows.length > 0 ? "with-data" : "virtuoso";
 
   // VirtuosoGrid requires layout measurement; in jsdom fall back to a plain div so tests can render cards.
   if (runningInJest) {
