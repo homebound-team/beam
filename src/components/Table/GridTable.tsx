@@ -1152,7 +1152,8 @@ function VirtualGridTableView<R extends Kinded>({
       // Virtuoso owns its root element, so dim via its className/style props; routing this through
       // the `List` component would change its identity and remount (and scroll-jump) the whole list.
       {...(loading ? Css.props(loadingTableCss) : {})}
-      // Set the CSS variable so our children can read the min width without remounting
+      // Pass the min width to `TopItemList` as a CSS variable. Putting it in `components` would recreate
+      // `TopItemList` on each width change and remount every row.
       style={
         minWidthPx !== undefined ? ({ [virtualTableMinWidthVar]: `${minWidthPx}px` } as React.CSSProperties) : undefined
       }
