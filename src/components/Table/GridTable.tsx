@@ -1141,8 +1141,6 @@ function VirtualGridTableView<R extends Kinded>({
     [columns, fetchMoreInProgress, id, stickyOffset, style, xss],
   );
 
-  const loadingProps: { className?: string; style?: React.CSSProperties } = loading ? Css.props(loadingTableCss) : {};
-
   // Use a key to force Virtuoso to remount when data first loads (if we have a saved scroll position).
   const virtuosoKey = !!validatedScrollIndex && visibleDataRows.length > 0 ? "with-data" : "virtuoso";
   return (
@@ -1153,11 +1151,11 @@ function VirtualGridTableView<R extends Kinded>({
       ref={virtuosoRef}
       // Virtuoso owns its root element, so dim via its className/style props; routing this through
       // the `List` component would change its identity and remount (and scroll-jump) the whole list.
-      {...loadingProps}
-      style={{
-        ...loadingProps.style,
-        ...(minWidthPx !== undefined ? { [virtualTableMinWidthVar]: `${minWidthPx}px` } : {}),
-      }}
+      {...(loading ? Css.props(loadingTableCss) : {})}
+      // Set the CSS variable so our children can read the min width without remounting
+      style={
+        minWidthPx !== undefined ? ({ [virtualTableMinWidthVar]: `${minWidthPx}px` } as React.CSSProperties) : undefined
+      }
       {...(customScrollParent ? { customScrollParent } : {})}
       {...(validatedScrollIndex !== undefined ? { initialTopMostItemIndex: validatedScrollIndex } : {})}
       components={components}
@@ -1376,6 +1374,9 @@ function CardView({
   );
 }
 
+/** Holds the virtual table's min width. Set on Virtuoso's root so `TopItemList` can read it without being recreated. */
+const virtualTableMinWidthVar = "--beam-virtual-table-min-width";
+
 /**
  * A table might render two of these components to represent two virtual lists.
  * This generally happens when `topItemCount` prop is used and React-Virtuoso
@@ -1390,9 +1391,6 @@ function CardView({
  * different "component" per the given set of props (solely to capture as
  * params that we can't pass through react-virtuoso's API as props).
  */
-/** Holds the virtual table's min width. Set on Virtuoso's root so `TopItemList` can read it without being recreated. */
-const virtualTableMinWidthVar = "--beam-virtual-table-min-width";
-
 const VirtualRoot = memoizeOne<(gs: GridStyle, columns: GridColumn<any>[], id: string, xss: any) => Components["List"]>(
   (gs, _columns, id, xss) => {
     return React.forwardRef(function VirtualRoot({ style, children }, ref) {
