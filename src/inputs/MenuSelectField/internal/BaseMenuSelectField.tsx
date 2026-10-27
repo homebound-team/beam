@@ -12,7 +12,7 @@ import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
-/** Shared menu for `MenuSelectField` and `MenuMultiSelectField`. Desktop popover; small screens a bottom sheet. */
+/** Shared menu for `MenuSelectField`, `MenuMultiSelectField`, and `MenuTreeSelectField`. Desktop popover; small screens a bottom sheet. */
 export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControllerProps<O, V>): JSX.Element {
   const {
     label,
@@ -21,6 +21,7 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControl
     values: _values,
     proposedValues: _proposedValues,
     onCommit: _onCommit,
+    tree: _tree,
     ...fieldProps
   } = props;
   const { triggerRef, trigger, searchRef, search, listRef, menu } = useMenuSelectField(props);

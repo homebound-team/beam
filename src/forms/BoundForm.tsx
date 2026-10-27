@@ -15,6 +15,7 @@ import { BoundDateRangeField, type BoundDateRangeFieldProps } from "./BoundDateR
 import { isListFieldRow, ListField, type ListFieldConfig, type ListFieldKey } from "./BoundListField";
 import { BoundMenuMultiSelectField, type BoundMenuMultiSelectFieldProps } from "./BoundMenuMultiSelectField";
 import { BoundMenuSelectField, type BoundMenuSelectFieldProps } from "./BoundMenuSelectField";
+import { BoundMenuTreeSelectField, type BoundMenuTreeSelectFieldProps } from "./BoundMenuTreeSelectField";
 import { BoundMultiLineSelectField, type BoundMultiLineSelectFieldProps } from "./BoundMultiLineSelectField";
 import {
   BoundMultiSelectCardGroupField,
@@ -177,6 +178,15 @@ export function boundMenuMultiSelectField<O, V extends Value>(
 ) {
   return (field: FieldState<any>): BoundFieldInputFnReturn => ({
     component: <BoundMenuMultiSelectField field={field} {...props} />,
+    minWidth: "200px",
+  });
+}
+
+export function boundMenuTreeSelectField<O, V extends Value>(
+  props: Omit<BoundMenuTreeSelectFieldProps<O, V>, KeysToOmit>,
+) {
+  return (field: FieldState<any>): BoundFieldInputFnReturn => ({
+    component: <BoundMenuTreeSelectField field={field} {...props} />,
     minWidth: "200px",
   });
 }
