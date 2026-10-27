@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
-import type { TreeSelectionDisplay } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 
 /** Props shared by `MenuSelectField`, `MenuMultiSelectField`, and `MenuTreeSelectField`. */
@@ -62,6 +61,9 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
   /** Makes `options` the roots of a tree, with expandable parents and cascading selection. Multiple selection only. */
   tree?: MenuSelectTreeConfig<O>;
 };
+
+/** Which selected options to surface: every one, only leaves, or only the highest selected ancestors. */
+export type TreeSelectionDisplay = "all" | "leaf" | "root";
 
 export type MenuSelectTreeConfig<O> = {
   getChildren: (opt: O) => readonly O[] | undefined;

@@ -20,6 +20,7 @@ import { Css } from "src/Css";
 import { ComboBoxInput } from "src/inputs/internal/ComboBoxInput";
 import { ListBox } from "src/inputs/internal/ListBox";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
+import { visibleNestedRows } from "src/inputs/MenuSelectField/internal/nestedRows";
 import {
   findOption,
   findOptions,
@@ -29,7 +30,6 @@ import {
   type NestedOptionsOrLoad,
   type TreeFieldState,
   type TreeSelectResponse,
-  visibleNestedRows,
 } from "src/inputs/TreeSelectField/utils";
 import { getFieldWidth } from "src/inputs/utils";
 import type { Value } from "src/inputs/Value";

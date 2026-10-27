@@ -1,7 +1,9 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuTreeSelectField } from "src/inputs/MenuSelectField/MenuTreeSelectField";
-import type { NestedOption, TreeSelectionDisplay, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
+import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
+import type { TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
+import type { NestedOption, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
 import { click, getOptions, getSelected, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -132,17 +134,17 @@ describe("MenuTreeSelectField", () => {
     click(r.sports);
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowDown" });
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowDown" });
-    expect(activeOption(r.sports_listbox)).toMatch(/-option-1$/);
+    expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 1));
     // When pressing ArrowRight
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowRight" });
     // Then the group expands and focus stays on it
     expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
-    expect(activeOption(r.sports_listbox)).toMatch(/-option-1$/);
+    expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 1));
     // And ArrowRight again steps into the first child, ArrowLeft steps back out
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowRight" });
-    expect(activeOption(r.sports_listbox)).toMatch(/-option-2$/);
+    expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 2));
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowLeft" });
-    expect(activeOption(r.sports_listbox)).toMatch(/-option-1$/);
+    expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 1));
     // And ArrowLeft on the group collapses it
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowLeft" });
     expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "Golf"]);
@@ -155,11 +157,11 @@ describe("MenuTreeSelectField", () => {
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowDown" });
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowDown" });
     fireEvent.keyDown(r.sports_listbox, { key: "ArrowDown" });
-    expect(activeOption(r.sports_listbox)).toMatch(/-option-2$/);
+    expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 2));
     // When collapsing its group from the chevron
     click(r.sports_expand_basketball);
     // Then focus is on the group
-    expect(activeOption(r.sports_listbox)).toMatch(/-option-1$/);
+    expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 1));
   });
 
   it("shows matches with their ancestors and descendants while searching", async () => {

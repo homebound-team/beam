@@ -75,7 +75,7 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
         {...tid.option}
       >
         {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
-        <span css={Css.truncate.fg1.mw0.$}>{item.rendered}</span>
+        <span css={Css.fg1.mw0.$}>{item.rendered}</span>
         {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
@@ -128,7 +128,7 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
             <span css={Css.df.fs0.mtPx(2).$}>
               <StyledCheckbox isSelected={isSelected} isIndeterminate={row.isIndeterminate} isDisabled={isDisabled} />
             </span>
-            <span css={Css.fg1.mw0.wbbw.$}>{item.rendered}</span>
+            <span css={Css.fg1.mw0.$}>{item.rendered}</span>
           </div>
         ),
       })}
@@ -151,14 +151,14 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
     </div>
   );
 }
-/** Row height in px. Flat lists rely on it being fixed; tree rows grow when a label wraps. */
+/** Minimum row height in px. Rows grow when a label wraps. */
 export const menuRowHeight = 40;
 
 const rowPaddingX = 16;
 /** Puts a child's checkbox roughly under its parent's label. */
 const treeIndent = 28;
 
-const rowCss = Css.df.aic.gap1.px2.hPx(menuRowHeight).outline0.cursorPointer.sm.color(Tokens.OnSurface).$;
+const rowCss = Css.df.aic.gap1.px2.mhPx(menuRowHeight).outline0.cursorPointer.sm.color(Tokens.OnSurface).$;
 const treeRowCss = Css.df.aifs.gap1.prPx(rowPaddingX).pyPx(10).mhPx(menuRowHeight).sm.color(Tokens.OnSurface).$;
 const treeOptionCss = Css.df.aifs.gap1.fg1.mw0.outline0.cursorPointer.$;
 const chevronCss = Css.df.aic.jcc.fs0.hPx(20).bgTransparent.color(Tokens.OnSurfaceMuted).cursorPointer.$;

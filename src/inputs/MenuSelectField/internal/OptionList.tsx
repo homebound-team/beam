@@ -1,5 +1,5 @@
 import { getInteractionModality } from "@react-aria/interactions";
-import { type KeyboardEvent, type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type KeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import type { ListState } from "react-stately";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
@@ -52,7 +52,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
   const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree } = menu;
   const tid = useTestIds(props, "optionList");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
-  // Tree labels wrap, so rows vary in height. Size the list to what Virtuoso measured.
+  // Labels wrap, so rows vary in height. Size the list to what Virtuoso measured.
   const [measuredHeight, setMeasuredHeight] = useState<number | undefined>();
   const { listBoxProps } = useListBox(
     {
@@ -77,27 +77,12 @@ export function OptionList<O>(props: OptionListProps<O>) {
     if (index !== undefined) virtuosoRef.current?.scrollIntoView({ index, behavior: "auto" });
   }, [focusedKey, state.collection]);
 
-  // Rows are rendered synchronously for the first paint; otherwise the panel paints empty (or at the wrong
-  // offset) until Virtuoso measures. Deep targets in long lists use Virtuoso's initial index, which paints
-  // blank for a few frames but never the wrong rows.
-  const [{ initialTop, initialCount }] = useState(() => ({
-    initialTop: Math.max(0, Math.min(initialIndex, items.length - 1)),
-    initialCount: items.length,
-  }));
-  const isTree = rowVariant === "tree" && tree !== undefined;
-  // Wrapped tree rows make `index * menuRowHeight` land mid-row, so a scrolled tree waits for Virtuoso to measure.
-  const syncScroll = (!isTree || initialTop === 0) && initialTop + initialRenderCount <= maxSyncRenderCount;
-  useLayoutEffect(() => {
-    // Virtuoso's root is the scroller; its `scrollerRef` callback fires too late for the first paint.
-    const scroller = listRef.current?.firstElementChild;
-    if (!syncScroll || !scroller) return;
-    // Clamp ourselves; Virtuoso's first-pass content height is inflated, so the browser won't.
-    const maxTop = Math.max(0, initialCount * menuRowHeight - scroller.clientHeight);
-    // Assigned outside this component so the immutability lint does not treat the scroller as a prop.
-    setScrollTop(scroller, Math.min(initialTop * menuRowHeight, maxTop));
-  }, [listRef, syncScroll, initialTop, initialCount]);
+  // Rows are rendered synchronously for the first paint; otherwise the panel paints empty until Virtuoso
+  // measures. A scrolled list starts at Virtuoso's initial index: `index * menuRowHeight` lands mid-row once a label wraps.
+  const [initialTop] = useState(() => Math.max(0, Math.min(initialIndex, items.length - 1)));
 
   const Row = rowVariant === "checkbox" ? MultiOptionRow : SingleOptionRow;
+  const isTree = rowVariant === "tree" && tree !== undefined;
   // Tests render every row (jsdom has no layout); remount when the count changes so filtering is reflected.
   const isTest = process.env.NODE_ENV === "test";
 
@@ -120,34 +105,33 @@ export function OptionList<O>(props: OptionListProps<O>) {
               key={isTest ? items.length : "virtuoso"}
               ref={virtuosoRef}
               style={{
-                height: (isTree ? measuredHeight : undefined) ?? items.length * menuRowHeight,
+                height: measuredHeight ?? items.length * menuRowHeight,
                 flexShrink: 1,
                 minHeight: 0,
                 overscrollBehavior: "contain",
               }}
               totalCount={items.length}
-              {...(isTree
-                ? { defaultItemHeight: menuRowHeight, totalListHeightChanged: setMeasuredHeight }
-                : { fixedItemHeight: menuRowHeight })}
+              defaultItemHeight={menuRowHeight}
+              totalListHeightChanged={setMeasuredHeight}
               computeItemKey={(index) => String(items[index]?.key ?? index)}
               {...(isTest
                 ? { initialItemCount: items.length }
-                : syncScroll
-                  ? { initialItemCount: Math.min(items.length, initialTop + initialRenderCount) }
+                : initialTop === 0
+                  ? { initialItemCount: Math.min(items.length, initialRenderCount) }
                   : { initialTopMostItemIndex: initialTop })}
               itemContent={(index) => {
                 const item = items[index];
                 const entry = item?.value;
                 if (!item || !entry) return null;
-                const row = isTree ? tree?.rows.get(String(item.key)) : undefined;
-                if (row && tree) {
+                const treeRow = isTree ? tree?.rows.get(String(item.key)) : undefined;
+                if (treeRow && tree) {
                   return (
                     <TreeOptionRow
                       item={item}
                       state={state}
                       id={optionDomId(id, index)}
                       disabledReason={disabledReasons[entry.valueKey]}
-                      row={row}
+                      row={treeRow}
                       onExpandedChange={(expanded) => tree.setExpanded(String(item.key), expanded)}
                       {...tid}
                     />
@@ -177,12 +161,7 @@ export function optionDomId(listId: string, index: number): string {
   return `${listId}-option-${index}`;
 }
 
-function setScrollTop(el: Element, top: number): void {
-  el.scrollTop = top;
-}
-
 // Enough rows to fill the tallest anchored panel (512px / 40px).
 const initialRenderCount = 13;
-const maxSyncRenderCount = 60;
 
 const emptyCss = Css.df.aic.px2.hPx(menuRowHeight).sm.color(Tokens.OnSurfaceMuted).$;

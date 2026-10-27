@@ -16,9 +16,9 @@ import {
   selectedTreeOptions,
   toggleTreeSelection,
 } from "src/inputs/MenuSelectField/internal/menuTree";
+import { bucketTreeSelection, visibleNestedRows } from "src/inputs/MenuSelectField/internal/nestedRows";
 import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
-import { bucketTreeSelection, visibleNestedRows } from "src/inputs/TreeSelectField/utils";
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
@@ -93,7 +93,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     [options, getChildren],
   );
   const allOptions = useMemo(
-    () => (menuTree ? menuTree.order.map((k) => menuTree.nodes.get(k)!.option) : options),
+    () => (menuTree ? menuTree.orderedKeys.map((k) => menuTree.nodes.get(k)!.option) : options),
     [menuTree, options],
   );
   const optionsByKey = useMemo(
@@ -123,13 +123,15 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const selectedRowKeys = useMemo(
     () =>
       menuTree
-        ? new Set(menuTree.order.filter((key) => selectedKeys.has(menuTree.nodes.get(key)!.valueKey)))
+        ? new Set(menuTree.orderedKeys.filter((key) => selectedKeys.has(menuTree.nodes.get(key)!.valueKey)))
         : selectedKeys,
     [menuTree, selectedKeys],
   );
   const disabledRowKeys = useMemo(
     () =>
-      menuTree ? menuTree.order.filter((key) => disabledKeySet.has(menuTree.nodes.get(key)!.valueKey)) : disabledKeys,
+      menuTree
+        ? menuTree.orderedKeys.filter((key) => disabledKeySet.has(menuTree.nodes.get(key)!.valueKey))
+        : disabledKeys,
     [menuTree, disabledKeySet, disabledKeys],
   );
   const selectedOptions = useMemo(
@@ -535,7 +537,9 @@ function labelsFor<O, V extends Value>(
 }
 
 function rootNodes<O>(tree: MenuTree<O>): MenuTreeNode<O>[] {
-  return tree.order.filter((key) => tree.nodes.get(key)!.parentKey === undefined).map((key) => tree.nodes.get(key)!);
+  return tree.orderedKeys
+    .filter((key) => tree.nodes.get(key)!.parentKey === undefined)
+    .map((key) => tree.nodes.get(key)!);
 }
 
 function childNodes<O>(tree: MenuTree<O>, node: MenuTreeNode<O>): MenuTreeNode<O>[] {

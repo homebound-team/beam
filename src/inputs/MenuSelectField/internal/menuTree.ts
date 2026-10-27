@@ -9,10 +9,10 @@ export type MenuTreeNode<O> = {
   childKeys: string[];
 };
 
-/** Occurrences keyed by their unique path. `order` is a pre-order walk, i.e. the order rows render in. */
+/** Occurrences keyed by their unique path. `orderedKeys` is a pre-order walk, i.e. the order rows render in. */
 export type MenuTree<O> = {
   nodes: Map<string, MenuTreeNode<O>>;
-  order: string[];
+  orderedKeys: string[];
 };
 
 /** Indexes every occurrence in `roots`. A repeated value stays, once under each parent. */
@@ -22,18 +22,18 @@ export function buildMenuTree<O>(
   getChildren: (opt: O) => readonly O[] | undefined,
 ): MenuTree<O> {
   const nodes = new Map<string, MenuTreeNode<O>>();
-  const order: string[] = [];
+  const orderedKeys: string[] = [];
   function visit(option: O, parentKey: string | undefined): string {
     const valueKey = getKey(option);
     const key = occurrenceKey(parentKey, valueKey, nodes);
     const node: MenuTreeNode<O> = { key, valueKey, option, parentKey, childKeys: [] };
     nodes.set(key, node);
-    order.push(key);
+    orderedKeys.push(key);
     for (const child of getChildren(option) ?? []) node.childKeys.push(visit(child, key));
     return key;
   }
   roots.forEach((root) => visit(root, undefined));
-  return { nodes, order };
+  return { nodes, orderedKeys };
 }
 
 /** `parent/value` for a repeated value, then `parent/value#2` if that path is taken too. */
@@ -70,7 +70,7 @@ export function normalizeTreeSelection<O>(
     }
   }
   // Reverse pre-order visits children before their parents.
-  for (const key of [...tree.order].reverse()) {
+  for (const key of [...tree.orderedKeys].reverse()) {
     const node = tree.nodes.get(key)!;
     if (isFullySelected(tree, node, selected, disabledKeys)) selected.add(node.valueKey);
   }
@@ -111,7 +111,7 @@ export function toggleTreeSelection<O>(
 /** Occurrence keys of parents with some, but not all, of their descendants selected. */
 export function partiallySelectedKeys<O>(tree: MenuTree<O>, selected: ReadonlySet<string>): Set<string> {
   const partial = new Set<string>();
-  for (const key of tree.order) {
+  for (const key of tree.orderedKeys) {
     const node = tree.nodes.get(key)!;
     if (node.childKeys.length === 0 || selected.has(node.valueKey)) continue;
     if (descendantValueKeys(tree, node).some((valueKey) => selected.has(valueKey))) partial.add(key);
@@ -127,7 +127,7 @@ export function initialExpandedKeys<O>(
 ): Set<string> {
   if (!defaultExpanded) return expandedForSelection(tree, selected);
   const expanded = new Set<string>();
-  for (const key of tree.order) {
+  for (const key of tree.orderedKeys) {
     if (tree.nodes.get(key)!.childKeys.length > 0) expanded.add(key);
   }
   return expanded;
@@ -136,7 +136,7 @@ export function initialExpandedKeys<O>(
 /** Parents to expand on open, so that every selected occurrence is visible. Everything else starts collapsed. */
 export function expandedForSelection<O>(tree: MenuTree<O>, selected: ReadonlySet<string>): Set<string> {
   const expanded = new Set<string>();
-  for (const key of tree.order) {
+  for (const key of tree.orderedKeys) {
     const node = tree.nodes.get(key)!;
     if (!selected.has(node.valueKey)) continue;
     let parentKey = node.parentKey;
@@ -152,7 +152,7 @@ export function expandedForSelection<O>(tree: MenuTree<O>, selected: ReadonlySet
 export function selectedTreeOptions<O>(tree: MenuTree<O>, selected: ReadonlySet<string>): O[] {
   const seen = new Set<string>();
   const options: O[] = [];
-  for (const key of tree.order) {
+  for (const key of tree.orderedKeys) {
     const node = tree.nodes.get(key)!;
     if (!selected.has(node.valueKey) || seen.has(node.valueKey)) continue;
     seen.add(node.valueKey);
@@ -176,7 +176,7 @@ function isFullySelected<O>(
 }
 
 function nodesWithValue<O>(tree: MenuTree<O>, valueKey: string): MenuTreeNode<O>[] {
-  return tree.order.map((key) => tree.nodes.get(key)!).filter((node) => node.valueKey === valueKey);
+  return tree.orderedKeys.map((key) => tree.nodes.get(key)!).filter((node) => node.valueKey === valueKey);
 }
 
 function descendantValueKeys<O>(tree: MenuTree<O>, node: MenuTreeNode<O>): string[] {

@@ -1,12 +1,8 @@
 import type { JSX } from "react";
 import { BaseMenuSelectField } from "src/inputs/MenuSelectField/internal/BaseMenuSelectField";
-import type { MenuSelectFieldBaseProps } from "src/inputs/MenuSelectField/types";
-import {
-  bucketTreeSelection,
-  type NestedOption,
-  type TreeSelectionDisplay,
-  type TreeSelectResponse,
-} from "src/inputs/TreeSelectField/utils";
+import { bucketTreeSelection } from "src/inputs/MenuSelectField/internal/nestedRows";
+import type { MenuSelectFieldBaseProps, TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
+import type { NestedOption, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 
 export type MenuTreeSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<NestedOption<O>, V> & {
