@@ -71,7 +71,7 @@ export function CardBody(props: CardBodyProps) {
         </div>
       </div>
       {hasDetails && (
-        <div css={Css.df.fdc.gap2.mt("auto").$}>
+        <div css={Css.df.fdc.gap2.$}>
           {data.length > 0 && (
             <dl css={Css.df.gap2.sm.$}>
               <div css={Css.df.fdc.fg1.fb2.mw0.$}>
