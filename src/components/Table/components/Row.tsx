@@ -507,6 +507,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.typeScale
               ? Css.typography(maybeContent.typeScale).$
               : {}),
+            // AI text treatment, before the cell's `css` so callers can still override it
+            ...(isGridCellContent(maybeContent) && maybeContent.aiMode && Css.fw6.color(Tokens.AiFieldFg).$),
             ...(isBodyRow &&
               (column.isField || (isGridCellContent(maybeContent) && maybeContent.field)) &&
               style.fieldCellCss),

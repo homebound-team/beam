@@ -434,6 +434,31 @@ describe("GridTable", () => {
       // Then the wash is gone
       expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
     });
+
+    it("styles a GridCellContent.aiMode cell's text with the AI treatment", async () => {
+      // Given a column that only marks the first row's cell as aiMode
+      const aiNameColumn: GridColumn<Row> = {
+        header: "Name",
+        data: ({ name }, { row }) => ({ content: name, aiMode: row.id === "1" }),
+      };
+      // When rendered
+      const r = await render(<GridTable columns={[aiNameColumn]} rows={rows} />);
+      // Then only that cell is purple and semibold
+      expect(cell(r, 1, 0)).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg), fontWeight: "600" });
+      expect(cell(r, 2, 0)).not.toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
+    });
+
+    it("lets GridCellContent.css override the aiMode text color", async () => {
+      // Given an aiMode cell that also passes its own color
+      const aiNameColumn: GridColumn<Row> = {
+        header: "Name",
+        data: ({ name }) => ({ content: name, aiMode: true, css: Css.red500.$ }),
+      };
+      // When rendered
+      const r = await render(<GridTable columns={[aiNameColumn]} rows={rows} />);
+      // Then the caller's css wins
+      expect(cell(r, 1, 0)).toHaveStyle({ color: Palette.Red500 });
+    });
   });
 
   it("can draw left and right borders on specific columns", async () => {
