@@ -52,11 +52,8 @@ function OverviewBody() {
         <SkeletonCard />
         <SkeletonCard />
       </div>
-      <GridTableLayoutExample
-        storageKey="layouts-overview-page"
-        numNestedRows={1}
-        style={{ bordered: true, roundedHeader: true }}
-      />
+      {/* No explicit style: CenteredLayout's inset default supplies the full border and rounded header. */}
+      <GridTableLayoutExample storageKey="layouts-overview-page" numNestedRows={1} />
     </div>
   );
 }

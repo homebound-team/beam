@@ -27,6 +27,7 @@ import { useComputed } from "src/hooks/useComputed";
 import { useGroupBy } from "src/hooks/useGroupBy";
 import { usePersistedFilter, type UsePersistedFilterProps } from "src/hooks/usePersistedFilter";
 import { useSessionStorage } from "src/hooks/useSessionStorage";
+import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useTestIds } from "src/utils/useTestIds";
 
 // GridTableLayout-specific query props extend the shared base with display extras.
@@ -114,6 +115,7 @@ function GridTableLayoutComponent<
 
   const tid = useTestIds(props);
   const host = useGridTableLayoutHost();
+  const insetHandled = useContentInsetHandled();
   const includeColumnGutters = host.kind === "document-scroll" || host.kind === "modal";
   const columns = tableProps.columns;
 
@@ -193,8 +195,8 @@ function GridTableLayoutComponent<
   );
 
   const cardAs = view === "card" ? ("card" as const) : undefined;
-  // White is the layout default. Remaining default styles may get applied via GridTable
-  const tableStyle = useMemo(() => getDefaultStyle(tableProps.style), [tableProps.style]);
+  // White with a top border is the layout default. Remaining default styles may get applied via GridTable
+  const tableStyle = useMemo(() => getDefaultStyle(tableProps.style, insetHandled), [tableProps.style, insetHandled]);
 
   const tableBody = (
     <>
@@ -243,10 +245,13 @@ function GridTableLayoutComponent<
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
 
-/** Layout tables are white. A full `GridStyle` is left unchanged; a def can still set `allWhite: false`. */
-function getDefaultStyle(style: GridStyle | GridStyleDef | undefined): GridStyle | GridStyleDef {
+/**
+ * Layout tables are white with a top border. A full `GridStyle` is left unchanged; a def can still override either.
+ * An inset shell already borders the whole table, so the top-only border is skipped there.
+ */
+function getDefaultStyle(style: GridStyle | GridStyleDef | undefined, insetHandled: boolean): GridStyle | GridStyleDef {
   if (style !== undefined && !isGridStyleDef(style)) return style;
-  return { allWhite: true, ...style };
+  return { allWhite: true, ...(!insetHandled && { bordered: "top" as const }), ...style };
 }
 
 // Force columns to have a name and id property for all our table layouts
