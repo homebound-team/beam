@@ -23,6 +23,110 @@ describe("MenuMultiSelectField", () => {
     expect(r.color_count).toHaveTextContent("2");
   });
 
+  it("shows selected options as pills above the search", async () => {
+    // Given a multi select with two values and a long enough list to search
+    const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} />);
+    // When opening it
+    click(r.color);
+    // Then the selection is a single-line carousel above the search field
+    const pills = r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent);
+    expect(pills).toEqual(["Red", "Blue"]);
+    expect(r.color_menuPanel.firstElementChild).toBe(r.color_selections);
+    expect(r.color_selections.nextElementSibling).toContainElement(r.color_search);
+    expect(r.color_selections_carousel).toBeInTheDocument();
+    expect(r.color_selections_toggle).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("hides the pill row when nothing is selected", async () => {
+    // Given a multi select with nothing selected
+    const r = await render(<MultiHarness options={manyColors()} />);
+    // When opening it
+    click(r.color);
+    // Then there is no pill row
+    expect(r.query.color_selections).toBeNull();
+  });
+
+  it("removes a selection when its pill is clicked", async () => {
+    // Given Red and Blue selected
+    const onSelect = vi.fn();
+    const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} onSelectSpy={onSelect} />);
+    click(r.color);
+    // When clicking the Red pill
+    click(r.getAllByTestId("color_selections_pill")[0]);
+    // Then Red is removed and the menu stays open
+    expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
+    expect(r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent)).toEqual(["Blue"]);
+    expect(r.color_overlay).toBeInTheDocument();
+  });
+
+  it("keeps every selected pill while search hides some options", async () => {
+    // Given Red and Blue selected
+    const onSelect = vi.fn();
+    const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} onSelectSpy={onSelect} />);
+    click(r.color);
+    // When search hides Red
+    type(r.color_search, "blu");
+    // Then both pills remain, and clicking Red still clears it
+    expect(r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent)).toEqual(["Red", "Blue"]);
+    click(r.getAllByTestId("color_selections_pill")[0]);
+    expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
+  });
+
+  it("does not remove a disabled selection from its pill", async () => {
+    // Given Red selected and disabled, with a reason
+    const onSelect = vi.fn();
+    const r = await render(
+      <MultiHarness
+        initial={["r", "b"]}
+        options={manyColors()}
+        disabledOptions={[{ value: "r", reason: "Required" }]}
+        onSelectSpy={onSelect}
+      />,
+    );
+    click(r.color);
+    // When clicking the Red pill
+    const red = r.getAllByTestId("color_selections_pill")[0];
+    click(red);
+    // Then Red stays selected, and the pill shows why
+    expect(red).toBeDisabled();
+    expect(red.parentElement).toHaveAttribute("title", "Required");
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent)).toEqual(["Red", "Blue"]);
+  });
+
+  it("wraps the pills and caps the row when expanded", async () => {
+    // Given an open menu with a selection
+    const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} />);
+    click(r.color);
+    // When expanding the pill row
+    click(r.color_selections_toggle);
+    // Then the carousel is gone and the pills wrap
+    expect(r.color_selections_toggle).toHaveAttribute("aria-expanded", "true");
+    expect(r.query.color_selections_carousel).toBeNull();
+    expect(r.color_selections_options).toBeInTheDocument();
+    // When collapsing it
+    click(r.color_selections_toggle);
+    // Then the pills are a single carousel line again
+    expect(r.color_selections_carousel).toBeInTheDocument();
+    expect(r.query.color_selections_options).toBeNull();
+  });
+
+  it("keeps the menu at the field width when pills are selected", async () => {
+    // Given a narrow field with several selected options
+    const restore = mockFieldWidth(120);
+    try {
+      const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} />);
+      // When the menu opens
+      click(r.color);
+      // Then the menu still matches that field, and the 320px floor is the minimum
+      expect(r.color_overlay.style.getPropertyValue("--menu-field-width")).toBe("120px");
+      expect(r.color_overlay.style.width).toBe("max(320px, var(--menu-field-width, 0px))");
+      expect(r.color_overlay.style.minWidth).toBe("320px");
+    } finally {
+      restore();
+    }
+  });
+
   it("does not render chips", async () => {
     // Given a multi select with selections
     const r = await render(<MultiHarness initial={["r", "b"]} />);
@@ -100,7 +204,15 @@ type HarnessProps = {
   options?: Color[];
   initial?: string[];
   proposedValues?: string[];
+  disabledOptions?: (string | { value: string; reason: string })[];
 };
+
+function mockFieldWidth(fieldWidth: number) {
+  const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.getAttribute("data-testid") === "color" ? fieldWidth : 0;
+  });
+  return () => width.mockRestore();
+}
 
 function MultiHarness(props: HarnessProps) {
   const { onSelectSpy, initial = [], options = colors(), proposedValues, ...others } = props;
