@@ -66,6 +66,26 @@ describe("GridStyleDef", () => {
     expect(square.firstRowFirstCellCss).toBeUndefined();
     expect(square.firstRowLastCellCss).toBeUndefined();
   });
+
+  it("borders only the first head row when bordered is top", () => {
+    // Given a top-only bordered style
+    const top = getTableStyles({ bordered: "top" });
+    // Then the first head row has a top border
+    expect(top.firstRowCellCss).toBeDefined();
+    // And the sides and last row are not bordered
+    expect(top.firstCellCss).toBeUndefined();
+    expect(top.lastCellCss).toBeUndefined();
+    expect(top.lastRowFirstCellCss).toBeUndefined();
+  });
+
+  it("treats boolean bordered as shorthand for all and none", () => {
+    // Given boolean and string bordered values
+    // Then true matches all and false matches none
+    expect(getTableStyles({ bordered: true })).toEqual(getTableStyles({ bordered: "all" }));
+    expect(getTableStyles({ bordered: false })).toEqual(getTableStyles({ bordered: "none" }));
+    expect(getTableStyles({ bordered: "all" }).firstCellCss).toBeDefined();
+    expect(getTableStyles({ bordered: "none" }).firstRowCellCss).toBeUndefined();
+  });
 });
 
 describe("isGridStyleDef", () => {

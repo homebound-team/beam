@@ -9,7 +9,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { type GridSortConfig, GridTable, type GridTableProps } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
-import { getTableStyles } from "src/components/Table/TableStyles";
+import { getTableStyles, type GridStyleDef } from "src/components/Table/TableStyles";
 import type { GridColumn } from "src/components/Table/types";
 import {
   collapseColumn,
@@ -44,7 +44,7 @@ type TableStoryProps = {
   nestingDepth?: number;
   // Applies Group row styles
   grouped?: boolean;
-  bordered?: boolean;
+  bordered?: GridStyleDef["bordered"];
   allWhite?: boolean;
   rowHover?: boolean;
   rowHeight?: "fixed" | "flexible";
@@ -87,7 +87,7 @@ export default {
   args: {
     nestingDepth: 1,
     grouped: false,
-    bordered: false,
+    bordered: "none",
     allWhite: false,
     rowHover: true,
     rowHeight: "flexible",
@@ -98,7 +98,7 @@ export default {
   argTypes: {
     nestingDepth: { name: "Nesting Depth", options: [1, 2, 3, 4], control: { type: "select" } },
     grouped: { name: "Group styles", control: { type: "boolean" }, if: { arg: "nestingDepth", neq: 1 } },
-    bordered: { name: "Bordered", control: { type: "boolean" } },
+    bordered: { name: "Bordered", control: { type: "select" }, options: ["none", "top", "all"] },
     allWhite: { name: "All White", control: { type: "boolean" } },
     vAlign: { name: "Vertical Alignment", options: ["center", "top", "bottom"], control: { type: "select" } },
     rowHover: { name: "Row Hover styles", control: { type: "boolean" } },
