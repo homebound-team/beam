@@ -435,50 +435,7 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).not.toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
     });
 
-    it("styles an aiMode row's text cells with the AI treatment by default", async () => {
-      // Given one data row with aiMode and one without
-      const rows: GridDataRow<Row>[] = [
-        simpleHeader,
-        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: true },
-        { kind: "data", id: "2", data: { name: "bar", value: 2 } },
-      ];
-      // When rendered
-      const r = await render(<GridTable columns={columns} rows={rows} />);
-      // Then the aiMode row's text is purple and semibold
-      expect(cell(r, 1, 0)).toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg), fontWeight: "600" });
-      // And the sibling and header are not
-      expect(cell(r, 2, 0)).not.toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
-      expect(cell(r, 0, 0)).not.toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
-    });
-
-    it("skips field cells in an aiMode row", async () => {
-      // Given an aiMode row with a field column
-      const fieldColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => fieldCell(name) };
-      const rows: GridDataRow<Row>[] = [
-        simpleHeader,
-        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: true },
-      ];
-      // When rendered
-      const r = await render(<GridTable columns={[fieldColumn]} rows={rows} />);
-      // Then the field cell keeps its normal text color
-      expect(cell(r, 1, 0)).not.toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
-    });
-
-    it("lets a cell opt out of an aiMode row's text treatment", async () => {
-      // Given an aiMode row whose cell sets aiMode false
-      const optOutColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => ({ content: name, aiMode: false }) };
-      const rows: GridDataRow<Row>[] = [
-        simpleHeader,
-        { kind: "data", id: "1", data: { name: "foo", value: 1 }, aiMode: true },
-      ];
-      // When rendered
-      const r = await render(<GridTable columns={[optOutColumn]} rows={rows} />);
-      // Then the cell's text is not purple, but the row still has the AI background
-      expect(cell(r, 1, 0)).not.toHaveStyle({ color: maybeCssVar(Tokens.AiFieldFg) });
-      expect(cell(r, 1, 0)).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.AiFieldBg) });
-    });
-
-    it("lets a cell opt into the AI text treatment outside an aiMode row", async () => {
+    it("styles a GridCellContent.aiMode cell's text with the AI treatment", async () => {
       // Given a column that only marks the first row's cell as aiMode
       const aiNameColumn: GridColumn<Row> = {
         header: "Name",
