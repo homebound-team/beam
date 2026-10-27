@@ -71,9 +71,12 @@ export type MenuSelectTreeConfig<O> = {
   defaultExpanded: boolean;
 };
 
-/** One row in the menu list. Flat rows use the value as `key`. A tree row's key is its path, so the same value can show up twice. */
-export type MenuCollectionItem<O> = {
+/** A rendered menu row. `key` identifies the row and `valueKey` identifies the option, so one option can show up more than once. */
+export type MenuOptionItem<O> = {
+  /** Unique in the list. A flat list will use its "stringified" value as the key. Nested lists could have the same value under multiple groups.
+   * For instance, a single option under two different groups gets one path per tag, e.g. `"rough-in/task-1"` and `"electrical/task-1"`. */
   key: string;
+  /** Result of `valueToKey(value)`. In a flat list, `valueKey === key`. In a nested list, `valueKey` may be repeated. Selected under one path will select under all paths. */
   valueKey: string;
   option: O;
 };

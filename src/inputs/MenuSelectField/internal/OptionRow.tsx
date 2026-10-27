@@ -6,12 +6,12 @@ import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
-import type { MenuCollectionItem } from "src/inputs/MenuSelectField/types";
+import type { MenuOptionItem } from "src/inputs/MenuSelectField/types";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type OptionRowProps<O> = {
-  item: Node<MenuCollectionItem<O>>;
-  state: ListState<MenuCollectionItem<O>>;
+  item: Node<MenuOptionItem<O>>;
+  state: ListState<MenuOptionItem<O>>;
   /** DOM id, referenced by the search input's `aria-activedescendant`. */
   id: string;
   disabledReason?: string;
@@ -53,6 +53,7 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
     ref,
   );
   const highlighted = !isDisabled && (isHovered || isFocused);
+  // `Node.value` from React Stately is `T | null`.
   if (!entry) return null;
 
   return maybeTooltip({
@@ -98,6 +99,7 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
     ref,
   );
   const highlighted = !isDisabled && (isHovered || isFocused);
+  // `Node.value` from React Stately is `T | null`.
   if (!entry) return null;
 
   return (

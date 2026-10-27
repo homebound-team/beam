@@ -12,7 +12,7 @@ import {
   TreeOptionRow,
   type TreeRowState,
 } from "src/inputs/MenuSelectField/internal/OptionRow";
-import type { MenuCollectionItem } from "src/inputs/MenuSelectField/types";
+import type { MenuOptionItem } from "src/inputs/MenuSelectField/types";
 import { useTestIds } from "src/utils/useTestIds";
 
 /** The open menu: its list, and the overlay open state around it. */
@@ -21,7 +21,7 @@ export type MenuSelectMenu<O> = {
   close: (opts: { restoreFocus: boolean }) => void;
   /** DOM id of the listbox; the trigger and search input point at it. */
   listId: string;
-  state: ListState<MenuCollectionItem<O>>;
+  state: ListState<MenuOptionItem<O>>;
   /** Shows a loading row while a lazy option list is in flight. */
   loading: boolean;
   disabledReasons: Record<string, string | undefined>;

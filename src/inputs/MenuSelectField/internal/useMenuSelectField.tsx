@@ -17,7 +17,7 @@ import {
   toggleTreeSelection,
 } from "src/inputs/MenuSelectField/internal/menuTree";
 import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
-import type { MenuCollectionItem, MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
+import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
 import { bucketTreeSelection, visibleNestedRows } from "src/inputs/TreeSelectField/utils";
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
@@ -217,7 +217,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     );
   }
 
-  const collectionItems = useMemo((): MenuCollectionItem<O>[] => {
+  const collectionItems = useMemo((): MenuOptionItem<O>[] => {
     if (treeRows) {
       return treeRows.map(({ node }) => ({ key: node.key, valueKey: node.valueKey, option: node.option }));
     }
@@ -229,7 +229,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [treeRows, filteredOptions]);
 
-  const state = useListState<MenuCollectionItem<O>>({
+  const state = useListState<MenuOptionItem<O>>({
     items: collectionItems,
     children: (item) => (
       <Item key={item.key} textValue={getOptionLabel(item.option)}>
@@ -245,7 +245,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   const keyboardDelegate = useMemo(
     () =>
-      new MenuSelectKeyboardDelegate<MenuCollectionItem<O>>({
+      new MenuSelectKeyboardDelegate<MenuOptionItem<O>>({
         collection: state.collection,
         disabledKeys: state.disabledKeys,
         ref: listRef,
@@ -323,6 +323,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   /** Right expands a group, then steps into it. Left collapses a group, then steps out to its parent. */
   function onTreeArrow(e: KeyboardEvent<HTMLElement>, current: Key | null) {
     const node = menuTree && current != null ? menuTree.nodes.get(String(current)) : undefined;
+    // With no row highlighted, the search input keeps its caret keys.
     if (!node) return;
     const hasChildren = node.childKeys.length > 0;
     const expanded = hasChildren && isExpanded(node.key);
@@ -346,7 +347,6 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     switch (e.key) {
       case "ArrowRight":
       case "ArrowLeft":
-        // With no row highlighted, the search input keeps its caret keys.
         onTreeArrow(e, current);
         break;
       case "ArrowDown":

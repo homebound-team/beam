@@ -36,15 +36,16 @@ export function MenuTreeSelectField<O, V extends Value>(props: MenuTreeSelectFie
 
 /** `values` and `opts` are every selected node, aligned and in tree order. */
 function treeSelectResponse<O, V extends Value>(values: V[], opts: NestedOption<O>[]): TreeSelectResponse<O, V> {
-  const valueOf = new Map(opts.map((option, index) => [option, values[index]]));
+  const valuesByOption = new Map(opts.map((option, index) => [option, values[index]]));
   const buckets = bucketTreeSelection(opts, (option) => option.children);
   const withValues = (options: NestedOption<O>[]) => ({
-    values: options.map((option) => valueOf.get(option)!),
+    values: options.map((option) => valuesByOption.get(option)!),
     options,
   });
   return { all: withValues(buckets.all), leaf: withValues(buckets.leaf), root: withValues(buckets.root) };
 }
 
+// module level function for a stable identity for the menu index.
 function getNestedChildren<O>(option: NestedOption<O>): readonly NestedOption<O>[] | undefined {
   return option.children;
 }

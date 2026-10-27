@@ -61,8 +61,11 @@ describe("MenuTreeSelectField", () => {
     // When selecting its sibling
     select(r.sports, "WNBA");
     // Then the parent is selected too
-    expect(onSelect.mock.lastCall?.[0].all.values).toEqual(["basketball", "nba", "wnba"]);
-    expect(onSelect.mock.lastCall?.[0].root.values).toEqual(["basketball"]);
+    expect(onSelect).toHaveBeenLastCalledWith({
+      all: { values: ["basketball", "nba", "wnba"], options: [basketball, nba, wnba] },
+      leaf: { values: ["nba", "wnba"], options: [nba, wnba] },
+      root: { values: ["basketball"], options: [basketball] },
+    });
   });
 
   it("deselects the parent when a child is deselected", async () => {
