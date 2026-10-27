@@ -1,0 +1,34 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { Tag } from "src/components/Tag";
+import * as MenuTreeSelectFieldStories from "./MenuTreeSelectField.stories";
+
+<Meta of={MenuTreeSelectFieldStories} parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Menu tree select <span className="sbdocs-status sb-unstyled"><Tag text="Work in progress" type="update" /></span>
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2828-4332">
+    <img src="FigmaLogo.png" alt="" />
+    Menu tree select
+  </a>
+</p>
+
+## Usage
+
+Use `MenuTreeSelectField` when a filter accepts several values from nested options. Each option may have `children`. It takes `values` and calls `onSelect({ all, leaf, root })`, the same response as `TreeSelectField`:
+
+- `all` — every selected option, including parents whose children are all selected.
+- `leaf` — only selected options without children.
+- `root` — only the highest selected options, so a fully selected group reports just its parent.
+
+Selecting a parent selects its enabled children, and selecting every child selects the parent. A partly selected parent shows an indeterminate checkbox.
+`values` can hold any of the three shapes; A parent `id` in the `values` array assumes all of its descendants are also selected, whether they are included in `values` or not.
+The same value may sit under more than one parent, and selecting it selects every copy.
+
+`selectionDisplay` picks which selections the closed field's count badge and tooltip include, and defaults to `all`.
+
+Groups start collapsed, except groups holding a selection, so every selected option is visible when the menu opens. `defaultExpanded` starts every group open instead. With a row highlighted, Right Arrow expands a group and then steps into it, and Left Arrow collapses a group or steps out to its parent. Searching shows each match with its ancestors and descendants. Labels wrap instead of truncating.
+
+Plug into `@homebound/form-state` with `BoundMenuTreeSelectField`, which stores `all.values` unless `onSelect` is passed.
+
+See [Select fields (new)](?path=/docs/inputs-select-fields-new--docs) for shared implementation details and remaining work.

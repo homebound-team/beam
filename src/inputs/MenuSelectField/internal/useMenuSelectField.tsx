@@ -6,8 +6,19 @@ import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectFieldHelpers";
 import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
 import type { MenuSelectTriggerState } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
+import {
+  buildMenuTree,
+  initialExpandedKeys,
+  type MenuTree,
+  type MenuTreeNode,
+  normalizeTreeSelection,
+  partiallySelectedKeys,
+  selectedTreeOptions,
+  toggleTreeSelection,
+} from "src/inputs/MenuSelectField/internal/menuTree";
+import { bucketTreeSelection, visibleNestedRows } from "src/inputs/MenuSelectField/internal/nestedRows";
 import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
-import type { MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
+import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
@@ -40,8 +51,11 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     values: propValues,
     proposedValues,
     onCommit,
+    tree,
   } = props;
   const multiple = selectionMode === "multiple";
+  const getChildren = tree?.getChildren;
+  const defaultExpanded = tree?.defaultExpanded ?? false;
   const isDisabled = !!disabled;
   const isReadOnly = !!readOnly;
 
@@ -71,36 +85,114 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const { focusProps, isFocusVisible } = useFocusRing();
   const { contains } = useFilter({ sensitivity: "base" });
 
-  const optionsByKey = useMemo(
-    () => new Map(options.map((o) => [valueToKey(getOptionValue(o)), o])),
+  // For a tree, `options` are the roots; `allOptions` is every node in render order.
+  const menuTree = useMemo(
+    () => (getChildren ? buildMenuTree(options, (o) => valueToKey(getOptionValue(o)), getChildren) : undefined),
     // getOptionValue is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [options],
+    [options, getChildren],
   );
-  // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
-  const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
-    labelsFor(vs, options, getOptionValue, getOptionLabel).join(", "),
+  const allOptions = useMemo(
+    () => (menuTree ? menuTree.orderedKeys.map((k) => menuTree.nodes.get(k)!.option) : options),
+    [menuTree, options],
   );
-  const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
-  const selectedKeys = useMemo(() => new Set(values.map(valueToKey)), [values]);
-  const selectedOptions = useMemo(
-    () => values.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
-    [values, optionsByKey],
-  );
-  const filteredOptions = useMemo(
-    () =>
-      search ? options.filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains)) : options,
-    // getOptionLabel and getOptionSearchText are typically inline lambdas
+  const optionsByKey = useMemo(
+    () => new Map(allOptions.map((o) => [valueToKey(getOptionValue(o)), o])),
+    // getOptionValue is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [options, search, contains],
+    [allOptions],
   );
   const [disabledKeys, disabledReasons] = useMemo(() => {
     const tuples = (disabledOptions ?? []).map(disabledOptionToKeyedTuple);
     return [tuples.map(([k]) => String(k)), Object.fromEntries(tuples.map(([k, r]) => [String(k), r]))];
   }, [disabledOptions]);
+  const disabledKeySet = useMemo(() => new Set(disabledKeys), [disabledKeys]);
+  // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
+  const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
+    labelsFor(vs, allOptions, getOptionValue, getOptionLabel).join(", "),
+  );
+  const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
+  const selectedKeys = useMemo(
+    () =>
+      menuTree
+        ? normalizeTreeSelection(menuTree, values.map(valueToKey), disabledKeySet)
+        : new Set(values.map(valueToKey)),
+    [menuTree, values, disabledKeySet],
+  );
+  // The list keys each copy, so a repeated value can render under every parent. Selection itself stays by value.
+  const selectedRowKeys = useMemo(
+    () =>
+      menuTree
+        ? new Set(menuTree.orderedKeys.filter((key) => selectedKeys.has(menuTree.nodes.get(key)!.valueKey)))
+        : selectedKeys,
+    [menuTree, selectedKeys],
+  );
+  const disabledRowKeys = useMemo(
+    () =>
+      menuTree
+        ? menuTree.orderedKeys.filter((key) => disabledKeySet.has(menuTree.nodes.get(key)!.valueKey))
+        : disabledKeys,
+    [menuTree, disabledKeySet, disabledKeys],
+  );
+  const selectedOptions = useMemo(
+    () =>
+      menuTree
+        ? selectedTreeOptions(menuTree, selectedKeys)
+        : values.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
+    [menuTree, selectedKeys, values, optionsByKey],
+  );
+
+  // Groups start collapsed, unless `defaultExpanded` or they hold a selection. Searching expands every match.
+  const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(() =>
+    menuTree ? initialExpandedKeys(menuTree, selectedKeys, defaultExpanded) : new Set(),
+  );
+  const [searchCollapsedKeys, setSearchCollapsedKeys] = useState<ReadonlySet<string>>(() => new Set());
+  const isExpanded = (key: string) => (search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
+
+  const treeRows = useMemo(() => {
+    if (!menuTree) return undefined;
+    const roots = rootNodes(menuTree);
+    const matchKeys = search
+      ? new Set(
+          allOptions
+            .filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains))
+            .map((o) => valueToKey(getOptionValue(o))),
+        )
+      : undefined;
+    return visibleNestedRows(
+      roots,
+      (node) => childNodes(menuTree, node),
+      (node) => isExpanded(node.key),
+      matchKeys ? (node) => matchKeys.has(node.valueKey) : undefined,
+    );
+    // isExpanded reads the two key sets below; the option callbacks are typically inline lambdas
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuTree, allOptions, search, contains, expandedKeys, searchCollapsedKeys]);
+  const filteredOptions = useMemo(
+    () =>
+      menuTree || !search
+        ? options
+        : options.filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains)),
+    // getOptionLabel and getOptionSearchText are typically inline lambdas
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [menuTree, options, search, contains],
+  );
 
   function onSelectionChange(keys: Selection) {
     if (keys === "all") return;
+    if (menuTree) {
+      // react-stately toggles one row. That row's value selects or clears every copy.
+      const added = [...keys].map(String).find((key) => !selectedRowKeys.has(key));
+      const removed = [...selectedRowKeys].find((key) => !keys.has(key));
+      const key = added ?? removed;
+      const valueKey = key === undefined ? undefined : menuTree.nodes.get(key)?.valueKey;
+      if (valueKey === undefined) return;
+      const next = toggleTreeSelection(menuTree, selectedKeys, valueKey, added !== undefined, disabledKeySet);
+      const nextOptions = selectedTreeOptions(menuTree, next);
+      proposalProps.onUserEdit?.();
+      onCommit(nextOptions.map(getOptionValue), nextOptions);
+      return;
+    }
     if (!multiple) {
       const [key] = [...keys];
       // Re-selecting the current value toggles it off in react-stately; treat that as "keep it" and close.
@@ -127,23 +219,35 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     );
   }
 
-  const state = useListState<O>({
-    items: filteredOptions,
-    children: (o: O) => (
-      <Item key={valueToKey(getOptionValue(o))} textValue={getOptionLabel(o)}>
-        {getOptionMenuLabel ? getOptionMenuLabel(o) : getOptionLabel(o)}
+  const collectionItems = useMemo((): MenuOptionItem<O>[] => {
+    if (treeRows) {
+      return treeRows.map(({ node }) => ({ key: node.key, valueKey: node.valueKey, option: node.option }));
+    }
+    return filteredOptions.map((option) => {
+      const valueKey = valueToKey(getOptionValue(option));
+      return { key: valueKey, valueKey, option };
+    });
+    // getOptionValue is typically an inline lambda
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [treeRows, filteredOptions]);
+
+  const state = useListState<MenuOptionItem<O>>({
+    items: collectionItems,
+    children: (item) => (
+      <Item key={item.key} textValue={getOptionLabel(item.option)}>
+        {getOptionMenuLabel ? getOptionMenuLabel(item.option) : getOptionLabel(item.option)}
       </Item>
     ),
     selectionMode: multiple ? "multiple" : "single",
-    selectedKeys,
-    disabledKeys,
+    selectedKeys: selectedRowKeys,
+    disabledKeys: disabledRowKeys,
     onSelectionChange,
   });
   const { selectionManager } = state;
 
   const keyboardDelegate = useMemo(
     () =>
-      new MenuSelectKeyboardDelegate<O>({
+      new MenuSelectKeyboardDelegate<MenuOptionItem<O>>({
         collection: state.collection,
         disabledKeys: state.disabledKeys,
         ref: listRef,
@@ -154,6 +258,10 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   function open() {
     if (isDisabled || isReadOnly) return;
     setSearch("");
+    if (menuTree) {
+      setExpandedKeys(initialExpandedKeys(menuTree, selectedKeys, defaultExpanded));
+      setSearchCollapsedKeys(new Set());
+    }
     setIsOpen(true);
     if (didRequestOptionsRef.current || Array.isArray(optionsProp)) return;
     didRequestOptionsRef.current = true;
@@ -178,7 +286,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   }
 
   // Menus this size and smaller skip search. The count is the list in the menu, including a not-yet-loaded `current`.
-  const showSearch = options.length > searchOptionLimit;
+  const showSearch = allOptions.length > searchOptionLimit;
 
   // Focus the search, or the list when there is no search. Leave option focus unset until a keyboard move.
   useLayoutEffect(() => {
@@ -194,6 +302,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   // Typing starts a new list, so drop any keyboard highlight until the next arrow.
   function onSearchChange(value: string) {
     setSearch(value);
+    setSearchCollapsedKeys(new Set());
     selectionManager.setFocusedKey(null);
     selectionManager.setFocused(false);
   }
@@ -205,9 +314,43 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     selectionManager.setFocusedKey(key);
   }
 
+  function setTreeExpanded(key: string, expand: boolean) {
+    if (search) setSearchCollapsedKeys((prev) => withKey(prev, key, !expand));
+    else setExpandedKeys((prev) => withKey(prev, key, expand));
+    // Collapsing would hide a focused descendant, so focus moves up to the group.
+    const focused = selectionManager.focusedKey;
+    if (!expand && menuTree && focused != null && isDescendant(menuTree, String(focused), key)) focusKey(key);
+  }
+
+  /** Right expands a group, then steps into it. Left collapses a group, then steps out to its parent. */
+  function onTreeArrow(e: KeyboardEvent<HTMLElement>, current: Key | null) {
+    const node = menuTree && current != null ? menuTree.nodes.get(String(current)) : undefined;
+    // With no row highlighted, the search input keeps its caret keys.
+    if (!node) return;
+    const hasChildren = node.childKeys.length > 0;
+    const expanded = hasChildren && isExpanded(node.key);
+    if (e.key === "ArrowRight" && hasChildren) {
+      e.preventDefault();
+      if (expanded) focusKey(state.collection.getKeyAfter(node.key));
+      else setTreeExpanded(node.key, true);
+    } else if (e.key === "ArrowLeft") {
+      if (expanded) {
+        e.preventDefault();
+        setTreeExpanded(node.key, false);
+      } else if (node.parentKey !== undefined) {
+        e.preventDefault();
+        focusKey(node.parentKey);
+      }
+    }
+  }
+
   function onMenuKeyDown(e: KeyboardEvent<HTMLElement>) {
     const current = selectionManager.focusedKey;
     switch (e.key) {
+      case "ArrowRight":
+      case "ArrowLeft":
+        onTreeArrow(e, current);
+        break;
       case "ArrowDown":
         e.preventDefault();
         focusKey(
@@ -287,16 +430,42 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const activeDescendant = isOpen && focusedIndex !== undefined ? optionDomId(listId, focusedIndex) : undefined;
   const initialIndex = Math.max(
     0,
-    filteredOptions.findIndex((o) => selectedKeys.has(valueToKey(getOptionValue(o)))),
+    treeRows
+      ? treeRows.findIndex(({ node }) => selectedKeys.has(node.valueKey))
+      : filteredOptions.findIndex((o) => selectedKeys.has(valueToKey(getOptionValue(o)))),
   );
 
   const selectedText = !multiple && selectedOptions[0] !== undefined ? getOptionLabel(selectedOptions[0]) : "";
+  const hasSelection = menuTree ? selectedKeys.size > 0 : values.length > 0;
   // Multi with a selection shows only the count badge; an empty field shows nothing-selected text, then the placeholder.
-  const displayText = selectedText || (values.length > 0 ? "" : nothingSelectedText || placeholder || "");
-  const isPlaceholder = !selectedText && values.length === 0 && !nothingSelectedText && !!placeholder;
-  const selectedLabels = multiple
-    ? selectedOptions.map((o) => ({ key: valueToKey(getOptionValue(o)), label: getOptionLabel(o) }))
-    : [];
+  const displayText = selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
+  const isPlaceholder = !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
+  const selectedLabels =
+    menuTree && tree && getChildren
+      ? bucketTreeSelection(selectedOptions, getChildren)[tree.display].map((option) => ({
+          key: valueToKey(getOptionValue(option)),
+          label: getOptionLabel(option),
+        }))
+      : multiple
+        ? selectedOptions.map((o) => ({ key: valueToKey(getOptionValue(o)), label: getOptionLabel(o) }))
+        : [];
+  const partialKeys = useMemo(
+    () => (menuTree ? partiallySelectedKeys(menuTree, selectedKeys) : undefined),
+    [menuTree, selectedKeys],
+  );
+  const treeRowStates = treeRows
+    ? new Map(
+        treeRows.map(({ node, level }) => [
+          node.key,
+          {
+            level,
+            hasChildren: node.childKeys.length > 0,
+            isExpanded: node.childKeys.length > 0 && isExpanded(node.key),
+            isIndeterminate: !!partialKeys?.has(node.key),
+          },
+        ]),
+      )
+    : undefined;
 
   const triggerProps: MenuSelectTriggerState = {
     isDisabled,
@@ -337,7 +506,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     loading: optionsLoading,
     disabledReasons,
     initialIndex,
-    rowVariant: multiple ? "checkbox" : "check",
+    rowVariant: treeRowStates ? "tree" : multiple ? "checkbox" : "check",
+    tree: treeRowStates ? { rows: treeRowStates, setExpanded: setTreeExpanded } : undefined,
     onKeyDown: onMenuKeyDown,
     activeDescendant,
   };
@@ -354,7 +524,42 @@ function labelsFor<O, V extends Value>(
   getOptionLabel: (opt: O) => string,
 ): string[] {
   const keys = new Set(values.map(valueToKey));
-  return options.filter((option) => keys.has(valueToKey(getOptionValue(option)))).map(getOptionLabel);
+  const seen = new Set<string>();
+  const labels: string[] = [];
+  for (const option of options) {
+    const key = valueToKey(getOptionValue(option));
+    // A tree can list one value under several parents. The proposal names it once.
+    if (!keys.has(key) || seen.has(key)) continue;
+    seen.add(key);
+    labels.push(getOptionLabel(option));
+  }
+  return labels;
+}
+
+function rootNodes<O>(tree: MenuTree<O>): MenuTreeNode<O>[] {
+  return tree.orderedKeys
+    .filter((key) => tree.nodes.get(key)!.parentKey === undefined)
+    .map((key) => tree.nodes.get(key)!);
+}
+
+function childNodes<O>(tree: MenuTree<O>, node: MenuTreeNode<O>): MenuTreeNode<O>[] {
+  return node.childKeys.map((key) => tree.nodes.get(key)!);
+}
+
+function withKey(keys: ReadonlySet<string>, key: string, include: boolean): ReadonlySet<string> {
+  const next = new Set(keys);
+  if (include) next.add(key);
+  else next.delete(key);
+  return next;
+}
+
+function isDescendant<O>(tree: MenuTree<O>, key: string, ancestorKey: string): boolean {
+  let parentKey = tree.nodes.get(key)?.parentKey;
+  while (parentKey !== undefined) {
+    if (parentKey === ancestorKey) return true;
+    parentKey = tree.nodes.get(parentKey)?.parentKey;
+  }
+  return false;
 }
 
 function matchesSearch<O>(

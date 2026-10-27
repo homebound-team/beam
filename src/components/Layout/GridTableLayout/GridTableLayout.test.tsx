@@ -29,7 +29,7 @@ import {
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
 import { noop } from "src/utils/helpers";
-import { click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
+import { cell, click, clickAndWait, render, tableSnapshot, typeAndWait, withRouter } from "src/utils/rtl";
 import { vi } from "vitest";
 import {
   GridTableLayout as GridTableLayoutComponent,
@@ -1218,6 +1218,19 @@ describe("GridTableLayout", () => {
         "
       `);
     });
+  });
+
+  it("lets a style def opt out of the top border", async () => {
+    // Given a GridTableLayout whose style def turns off the top border
+    const r = await render(
+      <TestWrapper
+        layoutStateProps={{}}
+        tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()], style: { bordered: "none" } }}
+      />,
+      withRouter(),
+    );
+    // Then the header cells have no top border
+    expect(cell(r, 0, 0)).not.toHaveStyle({ borderTopWidth: "1px" });
   });
 
   it("passes infiniteScroll prop to the underlying table", async () => {

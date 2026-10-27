@@ -116,8 +116,11 @@ export type GridStyleDef = {
   cellHighlight?: boolean;
   /** Applies a white background to the whole table, including header and group rows. */
   allWhite?: boolean;
-  /** Whether to apply a border around the whole table */
-  bordered?: boolean;
+  /**
+   * Which outer table borders to draw. `"all"` borders the whole table, `"top"` only the first head row.
+   * `true` / `false` are shorthand for `"all"` / `"none"`. Defaults to `"none"`.
+   */
+  bordered?: boolean | "all" | "top" | "none";
   /** Whether to show a hover effect on clickable rows (those with rowLink/onClick). Defaults to true */
   rowHover?: boolean;
   /** Vertical alignment of body cell content (not headers). Defaults to `top` for flexible rows and `center` for fixed rows. */
@@ -159,6 +162,8 @@ function memoizedTableStyles() {
       .join("|");
 
     if (!cache[key]) {
+      const borderAll = bordered === true || bordered === "all";
+      const borderTop = borderAll || bordered === "top";
       const alignItems = vAlign === "center" ? "center" : vAlign === "top" ? "flex-start" : "flex-end";
       const groupedLevels = {
         0: {
@@ -179,7 +184,7 @@ function memoizedTableStyles() {
         firstRowMessageCss: {
           ...Css.tac.py3.$,
           ...(allWhite && Css.bgColor(Tokens.Surface).$),
-          ...(bordered && Css.bl.br.bc(Tokens.SurfaceSeparator).$),
+          ...(borderAll && Css.bl.br.bc(Tokens.SurfaceSeparator).$),
         },
         headerCellCss: {
           // We want to support headers having two lines of wrapped text, and could add a `lineClamp2` here, but
@@ -206,28 +211,23 @@ function memoizedTableStyles() {
           .ptPx(8)
           .pb0.bsh0.add("borderBottomWidth", "0").$,
         cellCss: {
-          ...Css.typography(cellTypography)
-            .color(Tokens.OnSurface)
-            .bgColor(Tokens.Surface)
-            .ai(alignItems)
-            .pxPx(12)
-            .boxShadow(insetSeparator).$,
+          ...Css.typography(cellTypography).color(Tokens.OnSurface).ai(alignItems).pxPx(12).boxShadow(insetSeparator).$,
           ...(rowHeight === "flexible" ? Css.pyPx(12).$ : Css.wsnw.hPx(inlineEditing ? 48 : 36).$),
-          ...(cellHighlight ? Css.onHover.bgColor(Tokens.SurfaceHover).$ : {}),
+          ...Css.bgColor(Tokens.Surface).if(cellHighlight).onHover.bgColor(Tokens.SurfaceHover).$,
         },
-        firstCellCss: bordered ? Css.bl.bc(Tokens.SurfaceSeparator).$ : undefined,
-        lastCellCss: bordered ? Css.br.bc(Tokens.SurfaceSeparator).$ : undefined,
+        firstCellCss: borderAll ? Css.bl.bc(Tokens.SurfaceSeparator).$ : undefined,
+        lastCellCss: borderAll ? Css.br.bc(Tokens.SurfaceSeparator).$ : undefined,
         borderStyle: Css.bc(Tokens.SurfaceSeparator).$,
-        firstRowCellCss: bordered ? Css.bt.bc(Tokens.SurfaceSeparator).$ : undefined,
+        firstRowCellCss: borderTop ? Css.bt.bc(Tokens.SurfaceSeparator).$ : undefined,
         // One corner each. A single column is both the first and last cell, and the shorthand would replace the other side.
         firstRowFirstCellCss: roundedHeader ? Css.add("borderTopLeftRadius", "8px").$ : undefined,
         firstRowLastCellCss: roundedHeader ? Css.add("borderTopRightRadius", "8px").$ : undefined,
         // Keep `betweenRowsCss` on all body rows, but on the final body row
-        // remove the inset shadow and, when bordered, replace it with a true bottom border.
-        lastRowCellCss: bordered ? Css.bsh0.bb.bc(Tokens.SurfaceSeparator).$ : Css.bsh0.$,
-        // Only apply bottom corner radii to the final body-row cells when using `bordered`.
-        lastRowFirstCellCss: bordered ? Css.add("borderBottomLeftRadius", "8px").$ : undefined,
-        lastRowLastCellCss: bordered ? Css.add("borderBottomRightRadius", "8px").$ : undefined,
+        // remove the inset shadow and, when fully bordered, replace it with a true bottom border.
+        lastRowCellCss: borderAll ? Css.bsh0.bb.bc(Tokens.SurfaceSeparator).$ : Css.bsh0.$,
+        // Only apply bottom corner radii to the final body-row cells when fully bordered.
+        lastRowFirstCellCss: borderAll ? Css.add("borderBottomLeftRadius", "8px").$ : undefined,
+        lastRowLastCellCss: borderAll ? Css.add("borderBottomRightRadius", "8px").$ : undefined,
         presentationSettings: {
           borderless: true,
           typeScale: "xs",
