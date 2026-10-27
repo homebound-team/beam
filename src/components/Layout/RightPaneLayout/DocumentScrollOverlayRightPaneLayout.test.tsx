@@ -1,3 +1,4 @@
+import { act } from "@testing-library/react";
 import { Button } from "src/components/Button";
 import { environmentBannerSizePx } from "src/components/EnvironmentBanner/EnvironmentBanner";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
@@ -5,6 +6,7 @@ import { EnvironmentBannerLayoutHeightProvider } from "src/layouts/EnvironmentBa
 import {
   beamFloatingRightOffsetVar,
   beamLayoutViewportWidthVar,
+  beamPageHeaderLayoutHeightVar,
   beamRightPaneContentMinVar,
   beamRightPaneWidthVar,
   beamSideNavLayoutWidthVar,
@@ -50,11 +52,12 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     // When the pane is opened
     await clickAndWait(r.openPaneBtn);
 
-    // Then the fixed overlay pane renders; spacer matches the pane; content floor is published (main stays fit-content)
+    // Then the fixed overlay pane renders, its top border continuing the table's; spacer matches the pane; content
+    // floor is published (main stays fit-content)
     expect(r.rightPaneContent).toBeInTheDocument();
     expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: expectedWidth });
     expect(r.documentScrollRightPaneLayout_main).toHaveStyle({ minWidth: "fit-content" });
-    expect(r.rightPaneContent).toHaveStyle({ position: "fixed" });
+    expect(r.rightPaneContent).toHaveStyle({ position: "fixed", borderTopStyle: "solid", borderTopWidth: "1px" });
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(expectedWidth);
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneContentMinVar)).toBe(
       `${minDocumentScrollContentWidthPx}px`,
@@ -91,6 +94,28 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
     // Then top eases, so hiding or revealing the page header does not jump the pane
     expect(r.rightPaneContent).toHaveStyle({ transition: "top 200ms cubic-bezier(0.4, 0, 0.2, 1)" });
+  });
+
+  it("re-pins when the chrome above writes its height after the scroll that hid it", async () => {
+    // Given a pane pinned under a 72px page header. jsdom doesn't inherit custom properties, so the var goes on the
+    // layout root the pane reads it from, rather than on `PageHeaderLayout` above it
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+          <div>Main content</div>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+    r.documentScrollRightPaneLayout.style.setProperty(beamPageHeaderLayoutHeightVar, "72px");
+    await clickAndWait(r.openPaneBtn);
+    expect(r.rightPaneContent).toHaveStyle({ top: "72px" });
+
+    // When the header hides, which clears its height var on the render after that scroll, so no scroll event follows
+    await act(async () => r.documentScrollRightPaneLayout.style.removeProperty(beamPageHeaderLayoutHeightVar));
+
+    // Then the pane moves up with it, rather than leaving a gap until the next scroll
+    expect(r.rightPaneContent).toHaveStyle({ top: "0px" });
   });
 
   it("does not ease the pane offset while it still follows the anchor", async () => {
