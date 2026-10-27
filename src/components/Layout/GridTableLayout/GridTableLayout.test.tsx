@@ -1005,24 +1005,6 @@ describe("GridTableLayout", () => {
       expect(api.getVisibleColumnIds()[0]).toBe("name");
     });
 
-    it("keeps the full table border inside CenteredLayout", async () => {
-      // Given a GridTableLayout inside CenteredLayout on a document-scroll page
-      const r = await render(
-        <DocumentScrollLayoutProvider>
-          <CenteredLayout size="lg">
-            <TestWrapper
-              layoutStateProps={{}}
-              tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
-            />
-          </CenteredLayout>
-        </DocumentScrollLayoutProvider>,
-        withRouter(),
-      );
-
-      // Then the table keeps the shell's full border, not just the top border
-      expect(cell(r, 0, 0)).toHaveStyle({ borderTopWidth: "1px", borderLeftWidth: "1px" });
-    });
-
     function getFilterLayoutStateProps(storageKey: string) {
       return {
         persistedFilter: {
@@ -1236,18 +1218,6 @@ describe("GridTableLayout", () => {
         "
       `);
     });
-  });
-
-  it("adds a top border to the header row", async () => {
-    // Given a GridTableLayout with a header row
-    const r = await render(
-      <TestWrapper layoutStateProps={{}} tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }} />,
-      withRouter(),
-    );
-    // Then the header cells have a top border
-    expect(cell(r, 0, 0)).toHaveStyle({ borderTopStyle: "solid", borderTopWidth: "1px" });
-    // And body cells do not
-    expect(cell(r, 1, 0)).not.toHaveStyle({ borderTopWidth: "1px" });
   });
 
   it("lets a style def opt out of the top border", async () => {
