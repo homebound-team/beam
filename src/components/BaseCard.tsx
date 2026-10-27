@@ -72,8 +72,8 @@ export function BaseCard(props: BaseCardProps) {
           </div>
         )}
       </div>
-      {/* `fg1` has to carry through to the body so a fixed-height card can still bottom-anchor its
-          last section. The footer supplies its own top space, so skip `pb3` when one follows. */}
+      {/* `fg1` lets the body take a fixed-height card's spare room, so it collects below the content
+          rather than between sections. The footer supplies its own top space, so skip `pb3` when one follows. */}
       <div css={Css.df.fdc.fg1.mw0.px3.pt2.if(!footer).pb3.$}>{children}</div>
     </>
   );
