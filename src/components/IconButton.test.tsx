@@ -31,6 +31,14 @@ describe("IconButton", () => {
     expect(r.firstElement.firstElementChild!.getAttribute("data-testid")).toEqual("page1_remove");
   });
 
+  it("can stay out of the tab order", async () => {
+    // Given a button excluded from tab
+    const r = await render(<IconButton icon="trash" excludeFromTabOrder aria-expanded={false} onClick={noop} />);
+    // Then it is not a tab stop, and still exposes whether it is expanded
+    expect(r.trash).toHaveAttribute("tabIndex", "-1");
+    expect(r.trash).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("fires onClick method", async () => {
     const onClick = vi.fn();
     const r = await render(<IconButton icon="trash" onClick={onClick} />);
