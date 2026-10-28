@@ -92,7 +92,8 @@ describe("TreeFilter", () => {
 
   it("resolves labels from current when tree options are not loaded yet", () => {
     // Given a treeFilter with lazy options and current set to the selection
-    const filter = treeFilter({
+    // `current` is an array, so pin the option type. Otherwise it can also be read as one nested option.
+    const filter = treeFilter<HasIdAndName, string>({
       options: {
         current: [{ id: "child", name: "Child Region" }],
         load: async () => {},
