@@ -11,6 +11,8 @@ export type ButtonGroupProps = {
   /** Disables all buttons in ButtonGroup */
   disabled?: boolean;
   size?: ButtonGroupSize;
+  /** Stretches the group to its container, splitting the width evenly between the buttons. */
+  fullWidth?: boolean;
 };
 
 export type ButtonGroupButton = {
@@ -28,11 +30,11 @@ export type ButtonGroupButton = {
 };
 
 export function ButtonGroup(props: ButtonGroupProps) {
-  const { buttons, disabled = false, size = "sm" } = props;
+  const { buttons, disabled = false, size = "sm", fullWidth = false } = props;
   const tid = useTestIds(props, "buttonGroup");
   return (
     // Adding `line-height: 0` prevent inheriting line-heights that might throw off sizing within the button group.
-    <div {...tid} css={{ ...Css.df.lh(0).$, ...sizeStyles[size] }}>
+    <div {...tid} css={{ ...Css.df.lh(0).if(fullWidth).w100.$, ...sizeStyles[size] }}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton
@@ -42,6 +44,7 @@ export function ButtonGroup(props: ButtonGroupProps) {
           size={size}
           isFirst={i === 0}
           isLast={i === buttons.length - 1}
+          fullWidth={fullWidth}
           {...tid}
         />
       ))}
@@ -53,6 +56,7 @@ type GroupButtonProps = {
   size: ButtonGroupSize;
   isFirst: boolean;
   isLast: boolean;
+  fullWidth: boolean;
 } & ButtonGroupButton;
 
 function GroupButton(props: GroupButtonProps) {
@@ -68,6 +72,7 @@ function GroupButton(props: GroupButtonProps) {
     tooltip,
     isFirst,
     isLast,
+    fullWidth,
     ...otherProps
   } = props;
   const ariaProps = { onPress, isDisabled: !!disabled, ...otherProps };
@@ -78,7 +83,7 @@ function GroupButton(props: GroupButtonProps) {
   const tid = useTestIds(props);
 
   return (
-    <span css={getButtonStyles(isFirst, isLast)}>
+    <span css={{ ...getButtonStyles(isFirst, isLast), ...Css.if(fullWidth).fg1.fb0.$ }}>
       {maybeTooltip({
         title: resolveTooltip(disabled, tooltip),
         placement: "top",
@@ -89,8 +94,9 @@ function GroupButton(props: GroupButtonProps) {
             {...focusProps}
             {...hoverProps}
             css={{
-              ...Css.buttonBase.px2.br0.h100.onDisabled
-                .color(Tokens.TextDisabled)
+              ...Css.buttonBase.px2.br0.h100
+                .if(fullWidth)
+                .w100.jcc.end.onDisabled.color(Tokens.TextDisabled)
                 .cursorNotAllowed.bc(Tokens.FieldBorderDefault).$,
               ...(isFocusVisible ? defaultFocusRingStyles : {}),
               ...(active ? activeStyles : {}),

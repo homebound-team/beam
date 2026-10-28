@@ -1022,11 +1022,11 @@ describe("GridTableLayout", () => {
 
   describe("filters", () => {
     it("removes the filter value when a pill is clicked", async () => {
-      // Given multiple filters so controls nest behind the Filter toggle (pills show when closed)
+      // Given three filters so controls nest behind the Filter toggle (pills show when closed)
       const storageKey = "pill-click-test";
       sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
 
-      type ChipFilter = { needsRevision?: boolean; status?: string[] };
+      type ChipFilter = { needsRevision?: boolean; status?: string[]; archived?: boolean };
       let capturedFilter: ChipFilter = {};
 
       function FilterChipWrapper() {
@@ -1043,6 +1043,7 @@ describe("GridTableLayout", () => {
                 getOptionValue: (o) => o.value,
                 label: "Status",
               }),
+              archived: checkboxFilter({ label: "Archived" }),
             },
             storageKey: storageKey,
           },

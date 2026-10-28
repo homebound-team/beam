@@ -4,6 +4,10 @@ import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import type { FilterDefs } from "src/components/Filters/types";
 import { ModalProvider } from "src/components/Modal/ModalContext";
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import type { GridColumn } from "src/components/Table/types";
+import { column } from "src/components/Table/utils/columns";
+import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { setViewport } from "src/tests/viewport";
 import { noop } from "src/utils/helpers";
 import { click, render, withRouter } from "src/utils/rtl";
@@ -106,8 +110,31 @@ describe("GridTableLayoutActions", () => {
       expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
     });
 
-    it("shows the Filter button when groupBy and filters are nested", async () => {
-      // Given groupBy plus filters on desktop
+    it("renders two filters inline, with Clear once one is active", async () => {
+      // Given two filters, one active, on desktop
+      const clearFilters = vi.fn();
+      const r = await render(
+        <GridTableLayoutActions
+          filterDefs={createTwoFilterDefs()}
+          filter={{ needsRevision: true }}
+          setFilter={vi.fn()}
+          clearFilters={clearFilters}
+        />,
+        withRouter(),
+      );
+      // Then both filters are inline and there's no Filter button or pills
+      expect(r.filter_needsRevision).toBeInTheDocument();
+      expect(r.filter_status).toBeInTheDocument();
+      expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
+      expect(r.query.filter_pill_needsRevision).toBeNull();
+      // When Clear is clicked
+      click(r.filter_clearBtn);
+      // Then clearFilters is called
+      expect(clearFilters).toHaveBeenCalled();
+    });
+
+    it("renders one filter and groupBy inline, with groupBy to the right", async () => {
+      // Given one filter plus groupBy on desktop
       const r = await render(
         <GridTableLayoutActions
           filterDefs={createSingleFilterDefs()}
@@ -124,14 +151,66 @@ describe("GridTableLayoutActions", () => {
         />,
         withRouter(),
       );
-      // Then the Filter toggle is shown and controls are not inline until opened
-      expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
+      // Then both are inline, filter first, with no Filter button
+      expect(r.filter_needsRevision.compareDocumentPosition(r.groupBy)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
+    });
+
+    it("condenses filters behind the Filter button past two controls, keeping groupBy inline", async () => {
+      // Given two filters plus groupBy on desktop
+      const r = await render(
+        <GridTableLayoutActions
+          filterDefs={createTwoFilterDefs()}
+          filter={{}}
+          setFilter={vi.fn()}
+          groupBy={{
+            value: "none",
+            setValue: vi.fn(),
+            options: [
+              { id: "none", name: "None" },
+              { id: "status", name: "Status" },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+      // Then the filters are behind the Filter button and groupBy stays inline after it
       expect(r.query.filter_needsRevision).toBeNull();
-      expect(r.query.groupBy).toBeNull();
+      expect(r.gridTableLayoutActions_filterButton.compareDocumentPosition(r.groupBy)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
 
       // When the Filter button is clicked
       click(r.gridTableLayoutActions_filterButton);
-      // Then groupBy and the filter are nested in the open panel
+      // Then the panel holds the filters, not a second groupBy
+      expect(r.filter_needsRevision).toBeInTheDocument();
+      expect(r.getAllByTestId("groupBy")).toHaveLength(1);
+    });
+
+    it("nests groupBy with the filters on mobile", async () => {
+      // Given one filter plus groupBy on mobile
+      setViewport("sm");
+      const r = await render(
+        <GridTableLayoutActions
+          filterDefs={createSingleFilterDefs()}
+          filter={{}}
+          setFilter={vi.fn()}
+          groupBy={{
+            value: "none",
+            setValue: vi.fn(),
+            options: [
+              { id: "none", name: "None" },
+              { id: "status", name: "Status" },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+      // Then neither is inline
+      expect(r.query.groupBy).toBeNull();
+      // When the filter icon is tapped
+      click(r.gridTableLayoutActions_filterSmallButton);
+      // Then both show in the panel
       expect(r.groupBy).toBeInTheDocument();
       expect(r.filter_needsRevision).toBeInTheDocument();
     });
@@ -144,7 +223,7 @@ describe("GridTableLayoutActions", () => {
     });
 
     it("opens the filter panel on filter button click and closes it on a second click", async () => {
-      // Given multiple filters with an active filter on desktop
+      // Given three filters (too many to inline) with an active filter on desktop
       function Wrapper() {
         const [filter, setFilter] = useState<MultiFilter>({ needsRevision: true });
         return <GridTableLayoutActions filterDefs={createMultiFilterDefs()} filter={filter} setFilter={setFilter} />;
@@ -182,7 +261,7 @@ describe("GridTableLayoutActions", () => {
     });
 
     it("calls clearFilters when Clear is clicked in an open panel", async () => {
-      // Given multiple filters with an active filter on desktop
+      // Given three filters (too many to inline) with an active filter on desktop
       const clearFilters = vi.fn();
       const r = await render(
         <GridTableLayoutActions
@@ -266,8 +345,123 @@ describe("actions", () => {
   });
 });
 
+describe("viewModeToggle", () => {
+  it("orders the toggle before the columns selector, and actions last", async () => {
+    // Given a view mode toggle, hideable columns, the card view toggle, and an action menu
+    const r = await render(
+      <GridTableLayoutActions
+        viewModeToggle={viewModeButtons}
+        hasHideableColumns
+        columns={columns}
+        api={new GridTableApiImpl<Row>()}
+        withCardView
+        view="list"
+        setView={noop}
+        actions={[
+          {
+            kind: "menu",
+            trigger: { icon: "verticalDots", variant: "outline" },
+            items: [{ label: "Action", onClick: noop }],
+          },
+        ]}
+      />,
+      withRouter(),
+    );
+    // Then the order is: view mode toggle, columns, view, actions
+    expect(r.gridTableLayoutActions_viewModeToggle.compareDocumentPosition(r.columns)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(r.columns.compareDocumentPosition(r.viewToggleButton)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(r.viewToggleButton.compareDocumentPosition(r.verticalDots)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("moves the toggle to the top of the columns menu on mobile", async () => {
+    // Given a view mode toggle and hideable columns on mobile
+    setViewport("sm");
+    const r = await render(
+      <GridTableLayoutActions
+        viewModeToggle={viewModeButtons}
+        hasHideableColumns
+        columns={columns}
+        api={new GridTableApiImpl<Row>()}
+        view="list"
+        setView={noop}
+      />,
+      withRouter(),
+    );
+    // Then the toggle isn't in the toolbar
+    expect(r.query.gridTableLayoutActions_viewModeToggle).toBeNull();
+    // When opening the columns menu
+    click(r.columns);
+    // Then the toggle heads it
+    expect(r.columns_header_cost).toBeInTheDocument();
+  });
+
+  it("keeps the toggle in the toolbar on mobile when it's the only item on the right", async () => {
+    // Given just a view mode toggle on mobile
+    setViewport("sm");
+    const r = await render(<GridTableLayoutActions viewModeToggle={viewModeButtons} />, withRouter());
+    // Then it shows in the toolbar
+    expect(r.gridTableLayoutActions_viewModeToggle_cost).toBeInTheDocument();
+  });
+});
+
+describe("compact format", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("uses the mobile format on desktop when the slots are within 40px of each other", async () => {
+    // Given a laid-out desktop toolbar whose slots touch (0px apart)
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(600);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(new DOMRect(300, 0, 0, 40));
+    // When rendering with search, filters, and an action on the right
+    const r = await render(
+      <GridTableLayoutActions
+        searchProps={{ onSearch: vi.fn() }}
+        filterDefs={createMultiFilterDefs()}
+        filter={{}}
+        setFilter={vi.fn()}
+        actions={[{ label: "Add", onClick: noop }]}
+      />,
+      withRouter(),
+    );
+    // Then search and filter collapse to their icon toggles
+    expect(r.gridTableLayoutActions_searchButton).toBeInTheDocument();
+    expect(r.gridTableLayoutActions_filterSmallButton).toBeInTheDocument();
+    expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
+  });
+
+  it("keeps the desktop format when there's nothing on the right", async () => {
+    // Given a laid-out desktop toolbar where the left slot nearly fills the row
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(600);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(new DOMRect(300, 0, 0, 40));
+    // When rendering with only search and filters
+    const r = await render(
+      <GridTableLayoutActions
+        searchProps={{ onSearch: vi.fn() }}
+        filterDefs={createMultiFilterDefs()}
+        filter={{}}
+        setFilter={vi.fn()}
+      />,
+      withRouter(),
+    );
+    // Then they stay in their desktop format
+    expect(r.query.gridTableLayoutActions_searchButton).toBeNull();
+    expect(r.gridTableLayoutActions_filterButton).toBeInTheDocument();
+  });
+});
+
+type Row = SimpleHeaderAndData<{ name: string }>;
+const columns: GridColumn<Row>[] = [
+  column<Row>({ id: "name", name: "Name", header: "Name", data: (row) => row.name, canHide: true }),
+];
+
+const viewModeButtons = [
+  { text: "Cost", active: true, onClick: noop },
+  { text: "Price", onClick: noop },
+];
+
 type SingleFilter = { needsRevision?: boolean };
-type MultiFilter = { needsRevision?: boolean; status?: string[] };
+type MultiFilter = { needsRevision?: boolean; status?: string[]; archived?: boolean };
 
 function createSingleFilterDefs(): FilterDefs<SingleFilter> {
   return {
@@ -280,7 +474,8 @@ function SearchLocation() {
   return <div data-testid="locationSearch">{search}</div>;
 }
 
-function createMultiFilterDefs(): FilterDefs<MultiFilter> {
+/** Two filters: few enough to show inline on desktop. */
+function createTwoFilterDefs(): FilterDefs<MultiFilter> {
   return {
     needsRevision: checkboxFilter({ label: "Needs Revision" }),
     status: multiFilter({
@@ -293,4 +488,9 @@ function createMultiFilterDefs(): FilterDefs<MultiFilter> {
       label: "Status",
     }),
   };
+}
+
+/** Three filters: more than fit inline, so they condense behind the Filter button. */
+function createMultiFilterDefs(): FilterDefs<MultiFilter> {
+  return { ...createTwoFilterDefs(), archived: checkboxFilter({ label: "Archived" }) };
 }

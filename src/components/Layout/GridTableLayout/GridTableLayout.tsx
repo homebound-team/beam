@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "src/components/Button";
+import type { ButtonGroupButton } from "src/components/ButtonGroup";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import {
@@ -51,6 +52,11 @@ export type GridTableLayoutProps<
   emptyFallback?: string;
   /** Inline buttons, icon buttons, and an optional overflow menu (`kind: "menu"`). */
   actions?: HeaderAction[];
+  /**
+   * A button group that switches between the table's views, e.g. Cost / Price. Mark the current view `active`.
+   * Sits before the columns selector; in the mobile format it moves to the top of the columns menu, if there is one.
+   */
+  viewModeToggle?: ButtonGroupButton[];
   /** Shows "N Rows Selected · Clear" before the columns selector; Clear deselects every row. */
   selectionSummary?: boolean;
   hideEditColumns?: boolean;
@@ -103,6 +109,7 @@ function GridTableLayoutComponent<
     tableProps,
     layoutState,
     actions,
+    viewModeToggle,
     selectionSummary = false,
     hideEditColumns = false,
     shareColumnVisibility = false,
@@ -138,6 +145,7 @@ function GridTableLayoutComponent<
     hasHideableColumns ||
     withCardView ||
     actions?.length ||
+    viewModeToggle?.length ||
     // Rendered before anything's selected, so the pill doesn't shift the table
     selectionSummary
   );
@@ -190,6 +198,7 @@ function GridTableLayoutComponent<
       clearFilters={clearFilters}
       searchApi={searchApiRef}
       actions={actions}
+      viewModeToggle={viewModeToggle}
       selectionSummary={selectionSummary}
     />
   );

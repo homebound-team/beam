@@ -1,14 +1,18 @@
 import type { Meta } from "@storybook/react-vite";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import type { FilterDefs } from "src/components/Filters/types";
-import { GridTableApiImpl } from "src/components/Table/GridTableApi";
+import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
+import { GridTableApiImpl } from "src/components/Table/GridTableApi";
 import type { GridColumn } from "src/components/Table/types";
-import { column } from "src/components/Table/utils/columns";
-import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
-import { withBeamDecorator, withRouter } from "src/utils/sb";
+import { column, selectColumn } from "src/components/Table/utils/columns";
+import { type SimpleHeaderAndData, simpleHeader } from "src/components/Table/utils/simpleHelpers";
+import { Css } from "src/Css";
+import { newStory, viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
+import { GridTableLayout, useGridTableLayoutState } from "./GridTableLayout";
 import { GridTableLayoutActions } from "./GridTableLayoutActions";
 
 type Data = { name: string; tag: string };
@@ -134,9 +138,134 @@ export function WithActions() {
   );
 }
 
+type ResponsiveDisplayArgs = {
+  hasSearch: boolean;
+  filterCount: number;
+  hasGroupBy: boolean;
+  hasViewModeToggle: boolean;
+  hasRowSelection: boolean;
+  hasEditColumns: boolean;
+  hasListCardView: boolean;
+  hasOverflowActions: boolean;
+};
+
+/**
+ * Inside a container too narrow for the full controls, the toolbar switches to its mobile format once
+ * its left and right slots get within 40px of each other. Drag the bottom-right corner to resize, and use
+ * the controls to try different combinations.
+ */
+export const ResponsiveDisplay = newStory(
+  (args: ResponsiveDisplayArgs) => {
+    const {
+      hasSearch,
+      filterCount,
+      hasGroupBy,
+      hasViewModeToggle,
+      hasRowSelection,
+      hasEditColumns,
+      hasListCardView,
+      hasOverflowActions,
+    } = args;
+    const [viewMode, setViewMode] = useState<ViewMode>("cost");
+    const responsiveFilterDefs = useMemo(
+      () => Object.fromEntries(Object.entries(responsiveFilters).slice(0, filterCount)) as FilterDefs<ResponsiveFilter>,
+      [filterCount],
+    );
+    const layoutState = useGridTableLayoutState<ResponsiveFilter>({
+      persistedFilter: filterCount
+        ? { filterDefs: responsiveFilterDefs, storageKey: `table-actions-responsive-${filterCount}` }
+        : undefined,
+      search: hasSearch ? "client" : undefined,
+      groupBy: hasGroupBy ? { none: "None", tag: "Tag" } : undefined,
+    });
+    const tableColumns = useMemo(
+      () => (hasRowSelection ? [selectColumn<Row>(), ...columns] : columns),
+      [hasRowSelection],
+    );
+
+    return (
+      <div css={Css.w("600px").maxw("100%").hPx(360).add("resize", "horizontal").oa.ba.bcGray300.px2.$}>
+        <GridTableLayout
+          layoutState={layoutState}
+          selectionSummary={hasRowSelection}
+          hideEditColumns={!hasEditColumns}
+          withCardView={hasListCardView}
+          viewModeToggle={hasViewModeToggle ? viewModeButtons(viewMode, setViewMode) : undefined}
+          actions={hasOverflowActions ? [overflowMenu] : undefined}
+          tableProps={{ columns: tableColumns, rows: responsiveRows }}
+        />
+      </div>
+    );
+  },
+  {
+    args: {
+      hasSearch: true,
+      filterCount: 2,
+      hasGroupBy: false,
+      hasViewModeToggle: true,
+      hasRowSelection: true,
+      hasEditColumns: true,
+      hasListCardView: true,
+      hasOverflowActions: true,
+    },
+    // Explicit controls, since `newStory` hides the render's args from Storybook's control inference
+    argTypes: {
+      hasSearch: { control: "boolean" },
+      filterCount: { control: { type: "range", min: 0, max: 3, step: 1 } },
+      hasGroupBy: { control: "boolean" },
+      hasViewModeToggle: { control: "boolean" },
+      hasRowSelection: { control: "boolean" },
+      hasEditColumns: { control: "boolean" },
+      hasListCardView: { control: "boolean" },
+      hasOverflowActions: { control: "boolean" },
+    },
+  },
+);
+
+type ResponsiveFilter = { needsRevision?: boolean; status?: string[]; archived?: boolean };
+const responsiveFilters: FilterDefs<ResponsiveFilter> = {
+  ...filterDefs,
+  archived: checkboxFilter({ label: "Archived" }),
+};
+
+const responsiveRows: GridDataRow<Row>[] = [
+  simpleHeader,
+  { kind: "data", id: "1", data: { name: "Kitchen", tag: "Interior" }, initSelected: true },
+  { kind: "data", id: "2", data: { name: "Garage", tag: "Exterior" }, initSelected: true },
+  { kind: "data", id: "3", data: { name: "Patio", tag: "Exterior" } },
+];
+
+const overflowMenu: HeaderAction = {
+  kind: "menu",
+  tooltip: "More actions",
+  trigger: { icon: "verticalDots", variant: "outline" },
+  items: [
+    { label: "Export", onClick: () => {} },
+    { label: "Archive", onClick: () => {} },
+  ],
+};
+
+/** On mobile, the toggle moves to the top of the columns menu; it stays in the toolbar only when it's the sole item there. */
+export function WithViewModeToggle() {
+  const [viewMode, setViewMode] = useState<ViewMode>("cost");
+  return (
+    <GridTableLayoutActions
+      viewModeToggle={viewModeButtons(viewMode, setViewMode)}
+      hasHideableColumns
+      columns={columns}
+      api={api}
+      view="list"
+      setView={() => {}}
+    />
+  );
+}
+
+WithViewModeToggle.parameters = { chromatic: { modes: viewportModes("desktop", "mobile1") } };
+
 export function AllFeatures() {
   const [filter, setFilter] = useState<TestFilter>({ status: ["active"] });
   const [view, setView] = useState<TableView>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>("cost");
   return (
     <GridTableLayoutActions
       searchProps={{ onSearch: () => {} }}
@@ -149,8 +278,8 @@ export function AllFeatures() {
       withCardView
       view={view}
       setView={setView}
+      viewModeToggle={viewModeButtons(viewMode, setViewMode)}
       actions={[
-        { label: "Add", onClick: () => {} },
         {
           kind: "menu",
           tooltip: "More actions",
@@ -164,6 +293,15 @@ export function AllFeatures() {
       ]}
     />
   );
+}
+
+type ViewMode = "cost" | "price";
+
+function viewModeButtons(viewMode: ViewMode, setViewMode: (mode: ViewMode) => void) {
+  return [
+    { text: "Cost", active: viewMode === "cost", onClick: () => setViewMode("cost") },
+    { text: "Price", active: viewMode === "price", onClick: () => setViewMode("price") },
+  ];
 }
 
 function createGroupByOptions() {

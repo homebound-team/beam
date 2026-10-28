@@ -1,5 +1,6 @@
 import { memo, type MutableRefObject, useMemo, useState } from "react";
 import { Button } from "src/components/Button";
+import { ButtonGroup, type ButtonGroupButton } from "src/components/ButtonGroup";
 import { CountBadge } from "src/components/CountBadge";
 import type { FilterDefs, FilterImpls } from "src/components/Filters/types";
 import { filterTestIdPrefix } from "src/components/Filters/utils";
@@ -20,12 +21,13 @@ import type { Value } from "src/inputs/Value";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useDocumentScrollLayout } from "src/layouts/DocumentScrollLayoutContext";
 import { pageContentPaddingX } from "src/layouts/layoutSpacing";
-import { pluralize } from "src/utils/helpers";
+import { maybeCall, pluralize } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { useDebouncedCallback } from "use-debounce";
 import { StringParam, useQueryParams } from "use-query-params";
 import { buildFilterControls, buildFilterImpls, FilterPanel, getFilterPills } from "./FilterPanel";
 import { GroupByField, type GroupByFieldProps } from "./GroupByField";
+import { useToolbarCompact } from "./useToolbarCompact";
 
 export type SearchBoxProps = {
   onSearch: (filter: string) => void;
@@ -56,6 +58,7 @@ type GridTableLayoutActionsProps<
   clearFilters?: () => void;
   searchApi?: MutableRefObject<SearchBoxApi | undefined>;
   actions?: HeaderAction[];
+  viewModeToggle?: ButtonGroupButton[];
   /** Shows the selection summary pill while any rows are selected. */
   selectionSummary?: boolean;
 };
@@ -81,13 +84,25 @@ function GridTableLayoutActionsComponent<
     clearFilters,
     searchApi,
     actions,
+    viewModeToggle,
     selectionSummary = false,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
   // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
   const filterTid = useTestIds({}, filterTestIdPrefix);
 
-  const { sm } = useBreakpoint();
+  const showEditColumns = !!(hasHideableColumns && view === "list" && columns && api);
+  const hasRightItems =
+    (selectionSummary && !!api) ||
+    !!viewModeToggle?.length ||
+    showEditColumns ||
+    (!!withCardView && view !== undefined && !!setView) ||
+    !!actions?.length;
+  const { sm: smBreakpoint } = useBreakpoint();
+  // Below `sm`, or once the slots are within 40px of each other, use the mobile format.
+  // Without a right slot there's no gap to measure, so the 40px rule doesn't apply.
+  const { rowRef, leftRef, rightRef, compact } = useToolbarCompact(!smBreakpoint && hasRightItems);
+  const sm = smBreakpoint || compact;
   const { inModal } = useModalContext();
   const inDocumentScrollLayout = useDocumentScrollLayout();
   const insetHandled = useContentInsetHandled();
@@ -111,14 +126,20 @@ function GridTableLayoutActionsComponent<
   const hasGroupBy = !!groupBy;
   const controlCount = filterCount + (hasGroupBy ? 1 : 0);
   const hasFilterControls = controlCount > 0;
-  // One control only — nothing to nest behind a toggle; show it inline in the toolbar on desktop.
-  const showInlineControl = !inModal && !sm && controlCount === 1 && (hasGroupBy || !!(filter && setFilter));
+  // On desktop, at most two controls follow search: Group By stays inline, and the filters show inline only
+  // while they fit alongside it. Otherwise they condense behind the Filter button. Mobile/modals nest everything.
+  const canInline = !inModal && !sm;
+  const groupByInline = canInline && hasGroupBy;
+  const filtersInline = canInline && filterCount > 0 && controlCount <= 2 && !!(filter && setFilter);
+  const showFilterPanel = (filterCount > 0 && !filtersInline) || (hasGroupBy && !groupByInline);
   const filterImpls = useMemo(() => (filterDefs ? buildFilterImpls(filterDefs) : ({} as FilterImpls<F>)), [filterDefs]);
   // Matches the pills in the collapsed filter panel: one per selected value, not one per filter.
   const activeFilterCount = useMemo(
     () => (filter ? getFilterPills(filterImpls, filter).length : 0),
     [filter, filterImpls],
   );
+  // In the mobile format the toggle moves to the top of the columns menu, unless there's no columns menu to hold it
+  const viewModeToggleInColumnsMenu = !!viewModeToggle?.length && sm && showEditColumns;
 
   const searchTextField = (
     <TextField
@@ -151,6 +172,7 @@ function GridTableLayoutActionsComponent<
   return (
     <div css={Css.df.fdc.gap1.pt3.pb2.if(view === "card").pb3.$}>
       <div
+        ref={rowRef}
         css={{
           // Holds the row at the 40px button height, so a pill alone in it doesn't shift the table when it appears
           ...Css.df.gap1.jcsb.if(selectionSummary).mhPx(40).$,
@@ -158,7 +180,7 @@ function GridTableLayoutActionsComponent<
         }}
         {...testId.toolbar}
       >
-        <div css={Css.df.gapPx(12).aic.$}>
+        <div ref={leftRef} css={Css.df.fs0.gapPx(12).aic.$}>
           {/* Large screen: 244px inline search field */}
           {!sm && hasSearch && <div css={Css.wPx(244).$}>{searchTextField}</div>}
 
@@ -186,16 +208,9 @@ function GridTableLayoutActionsComponent<
             />
           )}
 
-          {/* Desktop: single control inline in place of the Filter toggle */}
-          {showInlineControl &&
-            (groupBy ? (
-              <GroupByField {...groupBy} />
-            ) : (
-              filter && setFilter && buildFilterControls(filterImpls, filter, setFilter, filterTid)
-            ))}
-
-          {/* Large screen: Filter button when controls are nested (or inline isn't possible) */}
-          {!sm && hasFilterControls && !showInlineControl && (
+          {/* Desktop: filters inline when they fit, else the Filter button */}
+          {filtersInline && filter && setFilter && buildFilterControls(filterImpls, filter, setFilter, filterTid)}
+          {!sm && showFilterPanel && (
             <Button
               label="Filter"
               icon="filter"
@@ -212,19 +227,35 @@ function GridTableLayoutActionsComponent<
               {...testId.filterButton}
             />
           )}
+
+          {/* Desktop: Group By sits to the right of the filters */}
+          {groupByInline && groupBy && <GroupByField {...groupBy} />}
+
+          {/* Inline filters have no panel to clear them from */}
+          {filtersInline && activeFilterCount > 0 && (
+            <Button label="Clear" variant="tertiary" onClick={() => maybeCall(clearFilters)} {...filterTid.clearBtn} />
+          )}
         </div>
-        {(hasHideableColumns || withCardView || !!actions?.length || selectionSummary) && (
-          <div css={Css.df.aic.gapPx(12).$}>
+        {/* Order: selection, view mode, columns, view, actions */}
+        {hasRightItems && (
+          <div ref={rightRef} css={Css.df.fs0.aic.gapPx(12).$}>
             {selectionSummary && api && <SelectionSummaryAction api={api} numberOnly={sm} />}
-            {hasHideableColumns && view === "list" && columns && api && (
+            {!!viewModeToggle?.length && !viewModeToggleInColumnsMenu && (
+              <ButtonGroup size="md" buttons={viewModeToggle} {...testId.viewModeToggle} />
+            )}
+            {showEditColumns && columns && api && (
               <EditColumnsButton
                 columns={columns}
                 api={api}
                 shareColumnVisibility={shareColumnVisibility}
                 tooltip="Display columns"
+                compact={sm}
+                viewToggle={viewModeToggleInColumnsMenu ? { buttons: viewModeToggle } : undefined}
               />
             )}
-            {withCardView && view !== undefined && setView && <ViewToggleButton view={view} onChange={setView} />}
+            {withCardView && view !== undefined && setView && (
+              <ViewToggleButton view={view} onChange={setView} compact={sm} />
+            )}
             {!!actions?.length && <HeaderActions actions={actions} {...testId.actions} />}
           </div>
         )}
@@ -233,11 +264,11 @@ function GridTableLayoutActionsComponent<
       {/* Search row — spans full width below TableActions (including under right-side buttons) */}
       {sm && showSearch && <div css={withPagePadding ? pageContentPaddingX : undefined}>{searchTextField}</div>}
 
-      {/* Combined filter panel — omitted when the single control is already inline in the toolbar */}
-      {hasFilterControls && !showInlineControl && (
+      {/* Filter panel for whatever isn't inline in the toolbar */}
+      {showFilterPanel && (
         <FilterPanel
           isOpen={showFilters}
-          groupBy={groupBy}
+          groupBy={groupByInline ? undefined : groupBy}
           filterImpls={filterImpls}
           filter={filter}
           setFilter={setFilter}
