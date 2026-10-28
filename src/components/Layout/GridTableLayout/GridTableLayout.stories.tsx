@@ -21,6 +21,7 @@ import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpe
 import { simpleGroupHeader, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { emptyCell } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
+import { AiTableIllustration } from "src/illustrations/AiTableIllustration";
 import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
@@ -404,6 +405,39 @@ export function EmptyStateWithIllustration() {
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
           emptyState: { title: "No documents found", illustration: <DocumentUploadIllustration /> },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function EmptyStateWithAiIllustration() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-empty-state-ai-illustration",
+    },
+    search: "client",
+  });
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Takeoffs" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader],
+          emptyState: {
+            title: "No takeoff lines yet",
+            illustration: <AiTableIllustration />,
+            description:
+              "Takeoff lines will appear here after you upload construction documents and Blueprint AI generates the results.",
+            actions: <Button label="Go to Overview" variant="secondary" onClick={noop} />,
+          },
         }}
       />
     </TestProjectLayout>
