@@ -51,11 +51,18 @@ export function useScrollPinnedViewportBounds(
     syncBounds();
     window.addEventListener("scroll", syncBounds, { passive: true });
     window.addEventListener("resize", syncBounds);
+    // Chrome writes the pin offset's vars onto the anchor's ancestors when it re-renders, which lands after the scroll
+    // that hid or revealed it, so also re-sync on those style changes
+    const styleObserver = new MutationObserver(syncBounds);
+    for (let node = anchorRef.current; node; node = node.parentElement) {
+      styleObserver.observe(node, { attributes: true, attributeFilter: ["style"] });
+    }
     return () => {
       window.removeEventListener("scroll", syncBounds);
       window.removeEventListener("resize", syncBounds);
+      styleObserver.disconnect();
     };
-  }, [enabled, syncBounds]);
+  }, [enabled, syncBounds, anchorRef]);
 
   return bounds;
 }
