@@ -65,33 +65,29 @@ export const CustomLabel = newStory(
   { play: open("groupBy") },
 );
 
-/** Selected options sit on one line above search, and scroll sideways when they overflow. */
-export const SelectedPills = newStory(() => <CommunityField initial={["o1", "o2", "o3", "o4", "o5", "o6"]} />, {
-  play: open("community"),
-});
-
 /** Expanding the row wraps every pill. The row scrolls once it reaches 40% of the menu. */
-export const SelectedPillsExpanded = newStory(() => <CommunityField initial={["o1", "o2", "o3", "o4", "o5", "o6"]} />, {
-  play: async (context) => {
-    open("community")(context);
-    await userEvent.click(await within(document.body).findByTestId("community_selections_toggle"));
+export const SelectedPillsExpanded = newStory(
+  () => {
+    const [values, setValues] = useState(["o1", "o2", "o3", "o4", "o5", "o6"]);
+    return (
+      <FieldFrame>
+        <MenuMultiSelectField label="Community" options={optionItems()} values={values} onSelect={setValues} />
+      </FieldFrame>
+    );
   },
-});
+  {
+    play: async (context) => {
+      open("community")(context);
+      await userEvent.click(await within(document.body).findByTestId("community_selections_toggle"));
+    },
+  },
+);
 
 function MultiField(props: { initial?: string[] }) {
   const [values, setValues] = useState(props.initial ?? []);
   return (
     <FieldFrame>
       <MenuMultiSelectField label="Group by" options={groupByOptions()} values={values} onSelect={setValues} />
-    </FieldFrame>
-  );
-}
-
-function CommunityField(props: { initial?: string[] }) {
-  const [values, setValues] = useState(props.initial ?? []);
-  return (
-    <FieldFrame>
-      <MenuMultiSelectField label="Community" options={optionItems()} values={values} onSelect={setValues} />
     </FieldFrame>
   );
 }

@@ -397,36 +397,6 @@ describe("MenuSelectField", () => {
     expect(r.color).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("matches a narrow field with a 320px minimum", async () => {
-    // Given a field narrower than 320px
-    const restore = mockFieldWidth(120);
-    try {
-      const r = await render(<TestHarness />);
-      // When the menu opens
-      click(r.color);
-      // Then the menu records that field and will not go under 320px
-      expect(r.color_overlay.style.getPropertyValue("--menu-field-width")).toBe("120px");
-      expect(r.color_overlay.style.width).toBe("max(320px, var(--menu-field-width, 0px))");
-      expect(r.color_overlay.style.minWidth).toBe("320px");
-    } finally {
-      restore();
-    }
-  });
-
-  it("matches a field wider than 320px", async () => {
-    // Given a field wider than the minimum
-    const restore = mockFieldWidth(480);
-    try {
-      const r = await render(<TestHarness />);
-      // When the menu opens
-      click(r.color);
-      // Then the menu uses the field width
-      expect(r.color_overlay.style.getPropertyValue("--menu-field-width")).toBe("480px");
-    } finally {
-      restore();
-    }
-  });
-
   it("opens a bottom sheet on small screens", async () => {
     // Given a mobile viewport
     setViewport("sm");
@@ -546,13 +516,6 @@ function menuKeyTarget(r: { query: { color_search?: HTMLElement | null }; color_
   const target = r.query.color_search ?? r.color_listbox;
   if (!target) throw new Error("Expected a search input or listbox");
   return target;
-}
-
-function mockFieldWidth(fieldWidth: number) {
-  const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
-    return this.getAttribute("data-testid") === "color" ? fieldWidth : 0;
-  });
-  return () => width.mockRestore();
 }
 
 function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: string }) {

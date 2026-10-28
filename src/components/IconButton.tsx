@@ -37,6 +37,10 @@ export type IconButtonProps = {
   download?: boolean;
   /** Provides label for screen readers - Will become a required soon */
   label?: string;
+  /** Leaves the button out of the tab order. Pointer and assistive tech can still use it. */
+  excludeFromTabOrder?: boolean;
+  /** Sets `aria-expanded` when the button shows or hides additional content. */
+  "aria-expanded"?: boolean;
   /**
    * By default the `label` is also surfaced as a hover tooltip. Set this to keep the `aria-label`
    * for screen readers without showing the tooltip. An explicit `tooltip` or disabled reason still shows.
@@ -71,10 +75,19 @@ export function IconButton(props: IconButtonProps) {
     forceFocusStyles = false,
     label,
     preventTooltip = false,
+    excludeFromTabOrder,
+    "aria-expanded": ariaExpanded,
     __storyState,
   } = props;
   const isDisabled = !!disabled;
-  const ariaProps = { onPress, isDisabled, autoFocus, ...menuTriggerProps };
+  const ariaProps = {
+    onPress,
+    isDisabled,
+    autoFocus,
+    excludeFromTabOrder,
+    "aria-expanded": ariaExpanded,
+    ...menuTriggerProps,
+  };
   const ref = useGetRef(buttonRef);
   const { buttonProps, isPressed: isPressedFromEvents } = useButton(
     {

@@ -38,6 +38,7 @@ export function useAnchoredPosition(
     applyMenuFrame(popoverRef.current, triggerRef.current);
   });
 
+  // A window resize does not re-render, so the effect above would miss a field that changed width.
   useLayoutEffect(() => {
     if (!isOpen) return;
     const onResize = () => applyMenuFrame(popoverRef.current, triggerRef.current);
@@ -50,7 +51,7 @@ export function useAnchoredPosition(
     style: {
       ...overlayProps.style,
       zIndex: zIndices.popover,
-      width: `max(${menuMinWidth}px, var(--menu-field-width, 0px))`,
+      width: `max(${menuMinWidth}px, var(${menuFieldWidthVar}, 0px))`,
       minWidth: `${menuMinWidth}px`,
     },
   };
@@ -64,6 +65,8 @@ const viewportPadding = 8;
 const menuMaxHeight = 512;
 /** The menu is never narrower than this, even when the field is. */
 const menuMinWidth = 320;
+/** Field width copied onto the overlay so the menu can match it. */
+const menuFieldWidthVar = "--menu-field-width";
 
 /** Copies the menu's max height and the field width the menu matches. */
 function applyMenuFrame(overlay: HTMLElement | null, trigger: HTMLElement | null): void {
@@ -74,7 +77,7 @@ function applyMenuFrame(overlay: HTMLElement | null, trigger: HTMLElement | null
   }
   if (!trigger) return;
   const fieldWidth = `${trigger.offsetWidth}px`;
-  if (overlay.style.getPropertyValue("--menu-field-width") !== fieldWidth) {
-    overlay.style.setProperty("--menu-field-width", fieldWidth);
+  if (overlay.style.getPropertyValue(menuFieldWidthVar) !== fieldWidth) {
+    overlay.style.setProperty(menuFieldWidthVar, fieldWidth);
   }
 }

@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
+import { MenuSelectedPills, type MenuSelectedPillsProps } from "src/inputs/MenuSelectField/internal/MenuSelectedPills";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type MenuPanelProps = {
-  /** Pinned above the header, e.g. selected-option pills. Draws its own separator. */
-  selections?: ReactNode;
+  /** Selected options, shown as pills above the header. */
+  selections?: MenuSelectedPillsProps;
   /** Pinned above the scrolling body, e.g. a search input. */
   header?: ReactNode;
   children: ReactNode;
@@ -18,7 +19,7 @@ export function MenuPanel(props: MenuPanelProps) {
   const tid = useTestIds(props, "menuPanel");
   return (
     <div css={{ ...panelCss, ...(variant === "anchored" ? anchoredCss : {}) }} {...tid.menuPanel}>
-      {selections}
+      {selections && <MenuSelectedPills {...selections} {...tid.selections} />}
       {header && <div css={Css.fs0.bb.bc(Tokens.SurfaceSeparator).$}>{header}</div>}
       <div css={Css.df.fdc.fg1.mh0.$}>{children}</div>
     </div>

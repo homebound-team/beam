@@ -31,7 +31,7 @@ type MenuSelectFieldApi<O> = {
   search: MenuSearchState;
   listRef: RefObject<HTMLDivElement | null>;
   menu: MenuSelectMenu<O>;
-  /** Current multi-select values, so the menu can list them as pills. Empty for a single select. */
+  /** Pills for the open menu. A tree lists its `selectionDisplay` bucket, the same options as the count badge. Empty for a single select. */
   selections: { options: MenuSelectedOption[]; onDeselect: (key: string) => void };
 };
 
@@ -474,11 +474,12 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     if (!multiple || disabledKeys.includes(key)) return;
     proposalProps.onUserEdit?.();
     if (menuTree) {
-      const next = toggleTreeSelection(menuTree, selectedKeys, key, false, disabledKeySet);
-      const nextOptions = selectedTreeOptions(menuTree, next);
-      onCommit(nextOptions.map(getOptionValue), nextOptions);
+      const toggledKeys = toggleTreeSelection(menuTree, selectedKeys, key, false, disabledKeySet);
+      const toggledOptions = selectedTreeOptions(menuTree, toggledKeys);
+      onCommit(toggledOptions.map(getOptionValue), toggledOptions);
       return;
     }
+    // Flat multi select. A tree removes the value through `toggleTreeSelection` above.
     const next = values.filter((value) => valueToKey(value) !== key);
     onCommit(
       next,

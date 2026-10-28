@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Carousel } from "src/components/Carousel";
-import { Icon } from "src/components/Icon";
+import { useResizeObserver } from "@react-aria/utils";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { IconButton } from "src/components/IconButton";
 import { FilterPill } from "src/components/Pills/FilterPill/FilterPill";
-import { Css, Tokens } from "src/Css";
+import { Css, increment, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type MenuSelectedOption = {
@@ -17,11 +17,26 @@ export type MenuSelectedPillsProps = {
   onDeselect: (key: string) => void;
 };
 
-/** Selected options above a menu's search. One scrolling line, or wrapped and capped at 40% of the menu. */
+/** Selected options above a menu's search. One line, or wrapped and capped at 40% of the menu. */
 export function MenuSelectedPills(props: MenuSelectedPillsProps) {
   const { options, onDeselect } = props;
   const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  // State-based ref so the observer re-subscribes when the collapsed line mounts again.
+  const [line, setLine] = useState<HTMLDivElement | null>(null);
+  const lineRef = useMemo(() => ({ current: line }), [line]);
   const tid = useTestIds(props, "selections");
+
+  const measureOverflow = useCallback(() => {
+    if (!line) return;
+    setOverflows(line.scrollWidth > line.clientWidth + 1);
+  }, [line]);
+
+  useLayoutEffect(() => {
+    measureOverflow();
+  }, [measureOverflow, options]);
+  useResizeObserver({ ref: lineRef, onResize: measureOverflow });
+
   if (options.length === 0) return null;
 
   const pills = options.map((option) => (
@@ -43,43 +58,45 @@ export function MenuSelectedPills(props: MenuSelectedPillsProps) {
       // Pointer-only. Keep DOM focus on the search input or list.
       onMouseDown={(event) => event.preventDefault()}
       css={
-        Css.df.gap1.px2
-          .pyPx(12)
-          .bb.bc(Tokens.SurfaceSeparator)
-          .fs0.wPx(0)
-          .mw100.if(expanded)
-          .aifs.maxh(expandedMaxHeight).oxh.oya.overscrollContain.mh0.else.aic.end.$
+        Css.df.gap1.px2.py1.bb.bc(Tokens.SurfaceSeparator).fs0.if(expanded).aifs.maxh(expandedMaxHeight).oxh.oya
+          .overscrollContain.mh0.else.aic.$
       }
       {...tid}
     >
       {expanded ? (
-        <div css={Css.df.fww.gapPx(8).fg1.mw0.add("alignContent", "flex-start").$} {...tid.options}>
+        <div css={Css.df.fww.gap1.fg1.ptPx(1.5).mw0.add("alignContent", "flex-start").$} {...tid.options}>
           {pills}
         </div>
       ) : (
-        <div css={Css.fg1.mw0.$}>
-          <Carousel chevronInc={2} {...tid.carousel}>
-            {pills}
-          </Carousel>
+        <div ref={setLine} css={Css.fg1.mw0.df.gap1.oh.if(overflows).add("maskImage", overflowMask).$} {...tid.line}>
+          {pills.map((pill) => (
+            // Wrapping each pill with a `fs0` so they don't all truncate themselves super small to fit this one line.
+            <div key={pill.key} css={Css.fs0.$}>
+              {pill}
+            </div>
+          ))}
         </div>
       )}
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-expanded={expanded}
-        aria-label={expanded ? "Collapse selected options" : "Expand selected options"}
-        onClick={() => setExpanded((open) => !open)}
-        css={
-          Css.df.aic.jcc.fs0.p0.bn.bgTransparent.cursorPointer.color(Tokens.OnSurface).outline0.if(expanded).sticky.top0
-            .end.onFocusVisible.bshFocus.$
-        }
-        {...tid.toggle}
-      >
-        <Icon icon={expanded ? "collapse" : "expand"} inc={2} />
-      </button>
+      {(overflows || expanded) && (
+        <div css={Css.df.fs0.sticky.top0.$}>
+          <IconButton
+            compact
+            excludeFromTabOrder
+            icon={expanded ? "collapse" : "expand"}
+            aria-expanded={expanded}
+            label={expanded ? "Collapse selected options" : "Expand selected options"}
+            preventTooltip
+            onClick={() => setExpanded((open) => !open)}
+            {...tid.toggle}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 /** Expanded pills scroll once they pass this share of `--menu-max-height`. */
 const expandedMaxHeight = "calc(var(--menu-max-height, 512px) * 0.4)";
+
+/** Fade the clipped end of the line. Masking the pills works on any background, same as the carousel. */
+const overflowMask = `linear-gradient(90deg, black calc(100% - ${increment(3)}px), transparent calc(100% - ${increment(1)}px), transparent 100%)`;

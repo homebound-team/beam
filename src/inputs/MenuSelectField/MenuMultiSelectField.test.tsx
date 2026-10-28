@@ -28,13 +28,11 @@ describe("MenuMultiSelectField", () => {
     const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} />);
     // When opening it
     click(r.color);
-    // Then the selection is a single-line carousel above the search field
-    const pills = r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent);
-    expect(pills).toEqual(["Red", "Blue"]);
-    expect(r.color_menuPanel.firstElementChild).toBe(r.color_selections);
-    expect(r.color_selections.nextElementSibling).toContainElement(r.color_search);
-    expect(r.color_selections_carousel).toBeInTheDocument();
-    expect(r.color_selections_toggle).toHaveAttribute("aria-expanded", "false");
+    // Then both selected options are listed
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.color_selections_pill_1).toHaveTextContent("Blue");
+    // And the row fits, so there is no expand control
+    expect(r.query.color_selections_toggle).toBeNull();
   });
 
   it("hides the pill row when nothing is selected", async () => {
@@ -52,10 +50,11 @@ describe("MenuMultiSelectField", () => {
     const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} onSelectSpy={onSelect} />);
     click(r.color);
     // When clicking the Red pill
-    click(r.getAllByTestId("color_selections_pill")[0]);
+    click(r.color_selections_pill_0);
     // Then Red is removed and the menu stays open
     expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
-    expect(r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent)).toEqual(["Blue"]);
+    expect(r.color_selections_pill_0).toHaveTextContent("Blue");
+    expect(r.query.color_selections_pill_1).toBeNull();
     expect(r.color_overlay).toBeInTheDocument();
   });
 
@@ -67,8 +66,9 @@ describe("MenuMultiSelectField", () => {
     // When search hides Red
     type(r.color_search, "blu");
     // Then both pills remain, and clicking Red still clears it
-    expect(r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent)).toEqual(["Red", "Blue"]);
-    click(r.getAllByTestId("color_selections_pill")[0]);
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.color_selections_pill_1).toHaveTextContent("Blue");
+    click(r.color_selections_pill_0);
     expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
   });
 
@@ -85,43 +85,34 @@ describe("MenuMultiSelectField", () => {
     );
     click(r.color);
     // When clicking the Red pill
-    const red = r.getAllByTestId("color_selections_pill")[0];
+    const red = r.color_selections_pill_0;
     click(red);
     // Then Red stays selected, and the pill shows why
     expect(red).toBeDisabled();
     expect(red.parentElement).toHaveAttribute("title", "Required");
     expect(onSelect).not.toHaveBeenCalled();
-    expect(r.getAllByTestId("color_selections_pill").map((pill) => pill.textContent)).toEqual(["Red", "Blue"]);
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.color_selections_pill_1).toHaveTextContent("Blue");
   });
 
   it("wraps the pills and caps the row when expanded", async () => {
-    // Given an open menu with a selection
-    const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} />);
-    click(r.color);
-    // When expanding the pill row
-    click(r.color_selections_toggle);
-    // Then the carousel is gone and the pills wrap
-    expect(r.color_selections_toggle).toHaveAttribute("aria-expanded", "true");
-    expect(r.query.color_selections_carousel).toBeNull();
-    expect(r.color_selections_options).toBeInTheDocument();
-    // When collapsing it
-    click(r.color_selections_toggle);
-    // Then the pills are a single carousel line again
-    expect(r.color_selections_carousel).toBeInTheDocument();
-    expect(r.query.color_selections_options).toBeNull();
-  });
-
-  it("keeps the menu at the field width when pills are selected", async () => {
-    // Given a narrow field with several selected options
-    const restore = mockFieldWidth(120);
+    // Given an open menu whose pills overflow the row
+    const restore = mockSelectionsLineOverflow("color_selections_line");
     try {
       const r = await render(<MultiHarness initial={["r", "b"]} options={manyColors()} />);
-      // When the menu opens
       click(r.color);
-      // Then the menu still matches that field, and the 320px floor is the minimum
-      expect(r.color_overlay.style.getPropertyValue("--menu-field-width")).toBe("120px");
-      expect(r.color_overlay.style.width).toBe("max(320px, var(--menu-field-width, 0px))");
-      expect(r.color_overlay.style.minWidth).toBe("320px");
+      // Then the clipped line fades, and the expand control is shown
+      expect(r.color_selections_line.style.getPropertyValue("--maskImage")).toContain("linear-gradient");
+      // When expanding the pill row
+      click(r.color_selections_toggle);
+      // Then the pills wrap
+      expect(r.color_selections_toggle).toHaveAttribute("aria-expanded", "true");
+      expect(r.color_selections_options).toBeInTheDocument();
+      // When collapsing it
+      click(r.color_selections_toggle);
+      // Then the pills are a single line again
+      expect(r.color_selections_pill_0).toBeInTheDocument();
+      expect(r.query.color_selections_options).toBeNull();
     } finally {
       restore();
     }
@@ -207,13 +198,6 @@ type HarnessProps = {
   disabledOptions?: (string | { value: string; reason: string })[];
 };
 
-function mockFieldWidth(fieldWidth: number) {
-  const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
-    return this.getAttribute("data-testid") === "color" ? fieldWidth : 0;
-  });
-  return () => width.mockRestore();
-}
-
 function MultiHarness(props: HarnessProps) {
   const { onSelectSpy, initial = [], options = colors(), proposedValues, ...others } = props;
   const [values, setValues] = useState<string[]>(initial);
@@ -239,6 +223,22 @@ function colors(): Color[] {
     { id: "k", name: "Black" },
     { id: "g", name: "Green" },
   ];
+}
+
+/** jsdom has no layout, so report the collapsed pill line as wider than its box. */
+function mockSelectionsLineOverflow(testId: string) {
+  const proto = HTMLElement.prototype;
+  const descriptor = Object.getOwnPropertyDescriptor(proto, "scrollWidth");
+  Object.defineProperty(proto, "scrollWidth", {
+    configurable: true,
+    get() {
+      return (this as HTMLElement).dataset.testid === testId ? 400 : (descriptor?.get?.call(this) ?? 0);
+    },
+  });
+  return () => {
+    if (descriptor) Object.defineProperty(proto, "scrollWidth", descriptor);
+    else delete (proto as { scrollWidth?: number }).scrollWidth;
+  };
 }
 
 function manyColors(): Color[] {

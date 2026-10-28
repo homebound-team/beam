@@ -4,7 +4,6 @@ import { AnchoredOverlay } from "src/inputs/MenuSelectField/internal/AnchoredOve
 import { BottomSheet } from "src/inputs/MenuSelectField/internal/BottomSheet";
 import { MenuPanel } from "src/inputs/MenuSelectField/internal/MenuPanel";
 import { MenuSearchInput } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
-import { MenuSelectedPills } from "src/inputs/MenuSelectField/internal/MenuSelectedPills";
 import { MenuSelectTrigger } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
 import { OptionList } from "src/inputs/MenuSelectField/internal/OptionList";
 import { useMenuSelectField } from "src/inputs/MenuSelectField/internal/useMenuSelectField";
@@ -31,11 +30,7 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControl
   const panel = (
     <MenuPanel
       variant={isMobile ? "sheet" : "anchored"}
-      selections={
-        selections.options.length > 0 ? (
-          <MenuSelectedPills options={selections.options} onDeselect={selections.onDeselect} {...tid.selections} />
-        ) : undefined
-      }
+      selections={selections}
       header={
         search.show ? (
           <MenuSearchInput
