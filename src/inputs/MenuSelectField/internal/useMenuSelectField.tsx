@@ -5,6 +5,7 @@ import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectFieldHelpers";
 import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
+import type { MenuSelectedOption } from "src/inputs/MenuSelectField/internal/MenuSelectedPills";
 import type { MenuSelectTriggerState } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
 import {
   buildMenuTree,
@@ -30,6 +31,8 @@ type MenuSelectFieldApi<O> = {
   search: MenuSearchState;
   listRef: RefObject<HTMLDivElement | null>;
   menu: MenuSelectMenu<O>;
+  /** Pills for the open menu. A tree lists its `selectionDisplay` bucket, the same options as the count badge. Empty for a single select. */
+  selections: { options: MenuSelectedOption[]; onDeselect: (key: string) => void };
 };
 
 /** Menu select state: options, search, selection, and keyboard behavior. Own hook instead of React Stately's, because the trigger is a button that opens a searchable menu. */
@@ -467,6 +470,23 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       )
     : undefined;
 
+  function deselect(key: string) {
+    if (!multiple || disabledKeys.includes(key)) return;
+    proposalProps.onUserEdit?.();
+    if (menuTree) {
+      const toggledKeys = toggleTreeSelection(menuTree, selectedKeys, key, false, disabledKeySet);
+      const toggledOptions = selectedTreeOptions(menuTree, toggledKeys);
+      onCommit(toggledOptions.map(getOptionValue), toggledOptions);
+      return;
+    }
+    // Flat multi select. A tree removes the value through `toggleTreeSelection` above.
+    const next = values.filter((value) => valueToKey(value) !== key);
+    onCommit(
+      next,
+      next.map((value) => optionsByKey.get(valueToKey(value))).filter((option): option is O => option !== undefined),
+    );
+  }
+
   const triggerProps: MenuSelectTriggerState = {
     isDisabled,
     isReadOnly,
@@ -513,7 +533,22 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   };
 
   // Refs stay beside each group. An object that holds a ref is itself a ref, so reading it during render is invalid.
-  return { triggerRef, trigger: triggerProps, searchRef, search: searchProps, listRef, menu: menuProps };
+  return {
+    triggerRef,
+    trigger: triggerProps,
+    searchRef,
+    search: searchProps,
+    listRef,
+    menu: menuProps,
+    selections: {
+      options: selectedLabels.map(({ key, label }) => ({
+        key,
+        label,
+        disabled: disabledKeys.includes(key) ? (disabledReasons[key] ?? true) : false,
+      })),
+      onDeselect: deselect,
+    },
+  };
 }
 
 /** Labels in option-list order, so a reordered selection still reads as the same value. */

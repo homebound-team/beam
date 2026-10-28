@@ -17,6 +17,8 @@ import * as MenuMultiSelectFieldStories from "./MenuMultiSelectField.stories";
 
 Use `MenuMultiSelectField` when a filter accepts several values. It takes `values` and calls `onSelect(values, options)`. Each row has a checkbox, the menu stays open while options are toggled, and the closed field shows a count badge. A menu longer than `searchOptionLimit` includes a search field. A selection hidden by the current search stays selected.
 
+The open menu lists the current selection as pills above the search field. The pills stay on one line and scroll sideways inside the menu; expand them to wrap, up to 40% of the menu height, with the row scrolling on its own. Click a pill to clear that option. The menu stays as wide as the field.
+
 Plug into `@homebound/form-state` with `BoundMenuMultiSelectField`.
 
 See [Select fields (new)](?path=/docs/inputs-select-fields-new--docs) for shared implementation details and remaining work.
