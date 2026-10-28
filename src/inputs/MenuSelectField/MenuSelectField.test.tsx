@@ -4,7 +4,7 @@ import { OpenModal } from "src/components/Modal/OpenModal";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { setViewport } from "src/tests/viewport";
-import { click, getOptions, getSelected, render, select, type } from "src/utils/rtl";
+import { click, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuSelectField", () => {
@@ -46,6 +46,52 @@ describe("MenuSelectField", () => {
     type(r.color_search, "bl");
     // Then only matching options remain
     expect(getOptions(r.color)).toEqual(["Blue", "Black"]);
+  });
+
+  it("shows search on a short list when the caller handles it", async () => {
+    // Given a short list with onSearch
+    const onSearch = vi.fn();
+    const r = await render(<SearchField onSearch={onSearch} />);
+    // When opening and closing without typing
+    click(r.color);
+    expect(r.color_search).toBeInTheDocument();
+    click(r.color);
+    // Then nothing is queried
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+
+  it("shows the options the caller returns for a search", async () => {
+    // Given a short list whose matches come from the caller
+    const onSearch = vi.fn();
+    const r = await render(<SearchField onSearch={onSearch} />);
+    click(r.color);
+    // When searching for text that is not in the current labels
+    type(r.color_search, "oak");
+    // Then the current page stays until the caller answers
+    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+    await wait();
+    // Then the caller is asked, and their option is shown even though its label does not contain the text
+    expect(onSearch).toHaveBeenCalledWith("oak");
+    expect(getOptions(r.color)).toEqual(["123 Main"]);
+    // When the search is cleared
+    type(r.color_search, "");
+    await wait();
+    // Then the caller is asked for the unfiltered page
+    expect(onSearch).toHaveBeenLastCalledWith("");
+    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+  });
+
+  it("asks for the unfiltered page when a search menu closes", async () => {
+    // Given a search that has been sent
+    const onSearch = vi.fn();
+    const r = await render(<SearchField onSearch={onSearch} />);
+    click(r.color);
+    type(r.color_search, "oak");
+    await wait();
+    // When the menu closes
+    click(r.color);
+    // Then the caller is asked for the first page
+    expect(onSearch).toHaveBeenLastCalledWith("");
   });
 
   it("loads options the first time the menu opens", async () => {
@@ -516,6 +562,22 @@ function menuKeyTarget(r: { query: { color_search?: HTMLElement | null }; color_
   const target = r.query.color_search ?? r.color_listbox;
   if (!target) throw new Error("Expected a search input or listbox");
   return target;
+}
+
+function SearchField(props: { onSearch: (search: string) => void }) {
+  const [options, setOptions] = useState(colors());
+  return (
+    <MenuSelectField
+      label="Color"
+      value={undefined}
+      options={options}
+      onSelect={() => {}}
+      onSearch={(text) => {
+        props.onSearch(text);
+        setOptions(text ? [{ id: "addr", name: "123 Main" }] : colors());
+      }}
+    />
+  );
 }
 
 function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: string }) {

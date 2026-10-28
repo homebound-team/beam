@@ -36,8 +36,10 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
     vertical: boolean,
   ): JSX.Element {
     const { getOptionValue, getOptionLabel } = optionReaders(this.props);
+    // A short static list in the modal uses chips. `onSearch` keeps the menu, so a short result page can still search.
     if (
       inModal &&
+      !this.props.onSearch &&
       Array.isArray(this.props.options) &&
       this.props.options.length > 0 &&
       this.props.options.length <= 8

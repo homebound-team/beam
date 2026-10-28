@@ -3,7 +3,7 @@ import { BaseMenuSelectField } from "src/inputs/MenuSelectField/internal/BaseMen
 import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 
-/** Select whose trigger shows the value and opens a menu. Search is included when the list is longer than `searchOptionLimit`. See `MenuSelectField.mdx`. */
+/** Select whose trigger shows the value and opens a menu. Search is included when the list is longer than `searchOptionLimit`, or when `onSearch` is set. See `MenuSelectField.mdx`. */
 export function MenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): JSX.Element {
   const { value, proposedValue, onSelect, ...rest } = props;
   const values = useMemo(() => (value === undefined ? [] : [value]), [value]);

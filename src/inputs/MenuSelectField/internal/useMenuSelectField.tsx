@@ -1,5 +1,14 @@
 import type { Key } from "@react-types/shared";
-import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  type KeyboardEvent,
+  type RefObject,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
@@ -23,6 +32,7 @@ import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuS
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
+import { useDebounce } from "use-debounce";
 
 type MenuSelectFieldApi<O> = {
   triggerRef: RefObject<HTMLButtonElement | null>;
@@ -43,6 +53,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     getOptionLabel = defaultOptionLabel as (opt: O) => string,
     getOptionMenuLabel,
     getOptionSearchText,
+    onSearch,
     disabledOptions,
     nothingSelectedText = "",
     placeholder,
@@ -57,6 +68,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     tree,
   } = props;
   const multiple = selectionMode === "multiple";
+  // `onSearch` means the caller fetches matches. The menu lists `options` as given.
+  const serverSearch = onSearch !== undefined;
   const getChildren = tree?.getChildren;
   const defaultExpanded = tree?.defaultExpanded ?? false;
   const isDisabled = !!disabled;
@@ -73,6 +86,9 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const listRef = useRef<HTMLDivElement | null>(null);
   // Tracks field-level focus across the trigger and the portaled menu, so onFocus/onBlur fire once per visit.
   const hasFocusRef = useRef(false);
+  const menuHasOpenedRef = useRef(false);
+  // Last text sent to `onSearch`, so opening and a repeated debounce do not query again.
+  const notifiedSearchRef = useRef<string | undefined>(undefined);
 
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -150,18 +166,19 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     menuTree ? initialExpandedKeys(menuTree, selectedKeys, defaultExpanded) : new Set(),
   );
   const [searchCollapsedKeys, setSearchCollapsedKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const isExpanded = (key: string) => (search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
+  const isExpanded = (key: string) => (!serverSearch && search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
 
   const treeRows = useMemo(() => {
     if (!menuTree) return undefined;
     const roots = rootNodes(menuTree);
-    const matchKeys = search
-      ? new Set(
-          allOptions
-            .filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains))
-            .map((o) => valueToKey(getOptionValue(o))),
-        )
-      : undefined;
+    const matchKeys =
+      search && !serverSearch
+        ? new Set(
+            allOptions
+              .filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains))
+              .map((o) => valueToKey(getOptionValue(o))),
+          )
+        : undefined;
     return visibleNestedRows(
       roots,
       (node) => childNodes(menuTree, node),
@@ -170,15 +187,15 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     );
     // isExpanded reads the two key sets below; the option callbacks are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuTree, allOptions, search, contains, expandedKeys, searchCollapsedKeys]);
+  }, [menuTree, allOptions, search, serverSearch, contains, expandedKeys, searchCollapsedKeys]);
   const filteredOptions = useMemo(
     () =>
-      menuTree || !search
+      menuTree || !search || serverSearch
         ? options
         : options.filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains)),
     // getOptionLabel and getOptionSearchText are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [menuTree, options, search, contains],
+    [menuTree, options, search, serverSearch, contains],
   );
 
   function onSelectionChange(keys: Selection) {
@@ -260,6 +277,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   function open() {
     if (isDisabled || isReadOnly) return;
+    menuHasOpenedRef.current = true;
     setSearch("");
     if (menuTree) {
       setExpandedKeys(initialExpandedKeys(menuTree, selectedKeys, defaultExpanded));
@@ -288,8 +306,24 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     maybeCall(onBlur);
   }
 
-  // Menus this size and smaller skip search. The count is the list in the menu, including a not-yet-loaded `current`.
-  const showSearch = allOptions.length > searchOptionLimit;
+  // Short menus skip search, unless `onSearch` refetches. The count includes a not-yet-loaded `current`.
+  const showSearch = serverSearch || allOptions.length > searchOptionLimit;
+  const [debouncedSearch] = useDebounce(search, searchNotifyDelay);
+  useEffect(() => {
+    if (!onSearch || !menuHasOpenedRef.current) return;
+    if (!isOpen) {
+      if (notifiedSearchRef.current) {
+        notifiedSearchRef.current = "";
+        onSearch("");
+      }
+      return;
+    }
+    if (debouncedSearch === notifiedSearchRef.current) return;
+    // Opening starts from an empty box. Wait until the user types, then tell the caller when they clear it.
+    if (debouncedSearch === "" && notifiedSearchRef.current === undefined) return;
+    notifiedSearchRef.current = debouncedSearch;
+    onSearch(debouncedSearch);
+  }, [onSearch, debouncedSearch, isOpen]);
 
   // Focus the search, or the list when there is no search. Leave option focus unset until a keyboard move.
   useLayoutEffect(() => {
@@ -610,8 +644,11 @@ function matchesSearch<O>(
   return terms?.some((term) => contains(term, query)) ?? false;
 }
 
-/** Menus with this many options or fewer omit the search field. */
+/** Menus with this many options or fewer omit the search field, unless `onSearch` is set. */
 export const searchOptionLimit = 8;
+
+/** Wait before telling `onSearch`, matching the old select field. */
+const searchNotifyDelay = 300;
 
 /**
  * Reuses React Aria's `ListKeyboardDelegate` for arrows, Home, and End.
