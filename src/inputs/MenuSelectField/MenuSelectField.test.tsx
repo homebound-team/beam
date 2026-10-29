@@ -245,6 +245,142 @@ describe("MenuSelectField", () => {
     expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
   });
 
+  describe("unsetLabel", () => {
+    it("puts the unsetLabel row first and selects it when the value is empty", async () => {
+      // Given unsetLabel and no value
+      const r = await render(<TestHarness unsetLabel="None" />);
+      // Then the trigger shows that label, and the row is first and selected
+      expect(r.color).toHaveTextContent("None");
+      expect(getSelected(r.color)).toBe("None");
+      expect(getOptions(r.color)).toEqual(["None", "Black", "Blue", "Green", "Red"]);
+    });
+
+    it("keeps unsetLabel first when autoSort is off", async () => {
+      // Given caller order and a label that would sort into the list
+      const r = await render(
+        <TestHarness
+          unsetLabel="None"
+          autoSort={false}
+          options={[
+            { id: "z", name: "Zebra" },
+            { id: "a", name: "Aardvark" },
+          ]}
+        />,
+      );
+      // Then None stays first and the rest keep the given order
+      expect(getOptions(r.color)).toEqual(["None", "Zebra", "Aardvark"]);
+    });
+
+    it("commits undefined when the unset row is selected", async () => {
+      // Given a selected color and an unset row
+      const onSelect = vi.fn();
+      const r = await render(<TestHarness initial="b" unsetLabel="None" onSelectSpy={onSelect} />);
+      // When selecting the unset row
+      select(r.color, "None");
+      // Then the field clears
+      expect(onSelect).toHaveBeenCalledWith(undefined, undefined);
+      expect(r.color).toHaveTextContent("None");
+    });
+
+    it("lets getOptionMenuLabel replace the unset row", async () => {
+      // Given a custom menu row for the unset option
+      const r = await render(
+        <TestHarness
+          unsetLabel="None"
+          getOptionMenuLabel={(_color, isUnsetOpt) => (isUnsetOpt ? "Unset Label" : _color.name)}
+        />,
+      );
+      // Then the closed field keeps unsetLabel
+      expect(r.color).toHaveTextContent("None");
+      // When the menu opens
+      click(r.color);
+      // Then the row content is the custom label, and its accessible name stays unsetLabel
+      const row = r.color_listbox.querySelector("[data-label='None']");
+      expect(row).toHaveTextContent("Unset Label");
+    });
+
+    it("shows unsetLabel before lazy options load", async () => {
+      // Given a list that has not loaded
+      let finishLoad = () => {};
+      function LazyField() {
+        const [loaded, setLoaded] = useState<Color[] | undefined>();
+        return (
+          <MenuSelectField
+            label="Color"
+            value={undefined}
+            unsetLabel="None"
+            onSelect={() => {}}
+            options={{
+              current: undefined,
+              load: () =>
+                new Promise<void>((resolve) => {
+                  finishLoad = () => {
+                    setLoaded(colors());
+                    resolve();
+                  };
+                }),
+              options: loaded,
+            }}
+          />
+        );
+      }
+      const r = await render(<LazyField />);
+      expect(r.color).toHaveTextContent("None");
+      // When the menu opens
+      click(r.color);
+      // Then only the unset row is listed until the load finishes
+      expect(getOptions(r.color)).toEqual(["None"]);
+      await act(async () => {
+        finishLoad();
+      });
+      expect(getOptions(r.color)).toEqual(["None", "Black", "Blue", "Green", "Red"]);
+    });
+
+    it("hides unsetLabel when the search does not match it", async () => {
+      // Given a searchable list with an unset row
+      const r = await render(<TestHarness options={manyColors()} unsetLabel="None" />);
+      click(r.color);
+      // When the query matches nothing
+      type(r.color_search, "zzz");
+      // Then the unset row is filtered out with the rest
+      expect(r.color_empty).toHaveTextContent("No results");
+    });
+
+    it("keeps unsetLabel when the search matches it", async () => {
+      // Given a searchable list with an unset row
+      const r = await render(<TestHarness options={manyColors()} unsetLabel="None" />);
+      click(r.color);
+      // When the query matches the unset label
+      type(r.color_search, "non");
+      // Then the unset row remains
+      expect(getOptions(r.color)).toEqual(["None"]);
+    });
+
+    it("keeps the unset row when onSearch replaces the list", async () => {
+      // Given a server-filtered list
+      function Field() {
+        const [options, setOptions] = useState(colors());
+        return (
+          <MenuSelectField
+            label="Color"
+            unsetLabel="All"
+            value={undefined}
+            options={options}
+            onSelect={() => {}}
+            onSearch={(text) => setOptions(text ? [{ id: "addr", name: "123 Main" }] : colors())}
+          />
+        );
+      }
+      const r = await render(<Field />);
+      click(r.color);
+      // When the caller replaces the options
+      type(r.color_search, "oak");
+      await wait();
+      // Then the unsetLabel row stays above the matches
+      expect(getOptions(r.color)).toEqual(["All", "123 Main"]);
+    });
+  });
+
   it("shows an empty row when nothing matches", async () => {
     // Given an open single select with enough options to search
     const r = await render(<TestHarness options={manyColors()} />);
@@ -517,10 +653,11 @@ type Color = { id: string; name: string };
 type HarnessProps = {
   onSelectSpy?: (...args: unknown[]) => void;
   nothingSelectedText?: string;
+  unsetLabel?: string;
   disabled?: boolean;
   readOnly?: boolean;
   disabledOptions?: { value: string; reason: string }[];
-  getOptionMenuLabel?: (color: Color) => ReactNode;
+  getOptionMenuLabel?: (color: Color, isUnsetOpt?: boolean) => ReactNode;
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
   autoSort?: boolean;

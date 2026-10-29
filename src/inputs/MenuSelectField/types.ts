@@ -12,8 +12,8 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   getOptionValue?: (opt: O) => V;
   /** String used in the trigger and the option's accessible name. Defaults to `option.name`. */
   getOptionLabel?: (opt: O) => string;
-  /** Custom content for the menu row. Falls back to `getOptionLabel`. */
-  getOptionMenuLabel?: (opt: O) => ReactNode;
+  /** Custom content for the menu row. Falls back to `getOptionLabel`. `isUnsetOpt` is true for the `unsetLabel` row. */
+  getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => ReactNode;
   /** Extra text the menu search matches, in addition to `getOptionLabel`. */
   getOptionSearchText?: (opt: O) => string | readonly string[];
   /** Sort options by `getOptionLabel`. On by default. `MenuTreeSelectField` defaults this to false. */
@@ -52,6 +52,8 @@ export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<
   /** Value proposed by an AI model; puts the field in AI mode. */
   proposedValue?: V;
   onSelect: (value: V | undefined, opt: O | undefined) => void;
+  /** `unsetLabel` row that clears the field. Stays first when options are sorted. Unlike `nothingSelectedText`, it is a selectable option. */
+  unsetLabel?: string;
 };
 
 /** Selection contract the single, multi, and tree fields pass into the shared menu. */
@@ -62,6 +64,8 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
   proposedValues?: V[];
   /** For a tree, receives every selected value, including cascaded parents and children. */
   onCommit: (values: V[], opts: O[]) => void;
+  /** Single select only. `unsetLabel` row that commits `undefined`. */
+  unsetLabel?: string;
   /** Makes `options` the roots of a tree, with expandable parents and cascading selection. Multiple selection only. */
   tree?: MenuSelectTreeConfig<O>;
 };

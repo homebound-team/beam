@@ -26,7 +26,7 @@ describe("SingleSelectFilter", () => {
     expect(r.filter_value).toHaveTextContent(`{}`);
   });
 
-  it("shows nothigSelectedText when no value is selected", async () => {
+  it("shows nothingSelectedText when no value is selected", async () => {
     const r = await render(<TestFilters defs={{ stageSingle: stageFilterWithNothingSelectedText }} />);
     expect(r.filter_stageSingle).toHaveTextContent("All Stages");
   });
