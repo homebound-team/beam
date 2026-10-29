@@ -129,7 +129,7 @@ export function UnsavedChangesGuard() {
   return (
     <TablePageChrome title="Books">
       <GridTableLayout
-        withRightPane={380}
+        withRightPane
         hideEditColumns
         tableProps={{
           api,

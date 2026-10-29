@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { GridTableLayoutHost } from "src/components/Layout/GridTableLayout/GridTableLayoutHost";
 import type { GridTableLayoutHost as GridTableLayoutHostValue } from "src/components/Layout/GridTableLayout/useGridTableLayoutHost";
-import type { ResolvedWithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { useScrollViewportWidth, useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { render } from "src/utils/rtl";
 import { useTestIds } from "src/utils/useTestIds";
@@ -27,7 +26,7 @@ describe("GridTableLayoutHost", () => {
     // Given a document-scroll host with actions and a right pane
     // When the host renders
     const r = await render(
-      <HostHarness host={{ kind: "document-scroll" }} actions={<ActionsProbe />} rightPane={{ width: 280 }}>
+      <HostHarness host={{ kind: "document-scroll" }} actions={<ActionsProbe />} rightPane>
         <TableBodyProbe />
       </HostHarness>,
     );
@@ -41,7 +40,7 @@ describe("GridTableLayoutHost", () => {
 type HostHarnessProps = {
   host: GridTableLayoutHostValue;
   actions?: ReactNode;
-  rightPane?: ResolvedWithRightPane;
+  rightPane?: boolean;
   children: ReactNode;
 };
 

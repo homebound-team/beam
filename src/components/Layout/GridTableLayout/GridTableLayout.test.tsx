@@ -3,6 +3,7 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { defaultDocumentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { ModalProvider } from "src/components/Modal/ModalContext";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
@@ -863,7 +864,7 @@ describe("GridTableLayout", () => {
           <OpenPaneButton />
           <TestWrapper
             hideEditColumns
-            withRightPane={280}
+            withRightPane
             layoutStateProps={{}}
             tableProps={{
               columns: getColumns(),
@@ -885,12 +886,14 @@ describe("GridTableLayout", () => {
 
       // Then the pane renders in flow after the table column
       expect(r.rightPaneContent).toBeInTheDocument();
-      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: documentScrollRightPaneWidthCss(280) });
+      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({
+        width: documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
+      });
       expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
-        documentScrollRightPaneWidthCss(280),
+        documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
       );
       expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
-        documentScrollRightPaneWidthCss(280),
+        documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
       );
     });
 

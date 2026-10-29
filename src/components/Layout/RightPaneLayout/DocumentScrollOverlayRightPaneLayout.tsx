@@ -17,15 +17,10 @@ import { defaultDocumentScrollRightPaneWidth, minDocumentScrollContentWidthPx } 
 
 export type DocumentScrollOverlayRightPaneLayoutProps = {
   children: ReactNode;
-  /** Width (px) of the detail pane opened via `useRightPane`. */
-  paneWidth?: number;
 };
 
 /** Full-width main + fixed overlay pane on desktop; full-bleed pane on `sm`. */
-export function DocumentScrollOverlayRightPaneLayout({
-  children,
-  paneWidth = defaultDocumentScrollRightPaneWidth,
-}: DocumentScrollOverlayRightPaneLayoutProps) {
+export function DocumentScrollOverlayRightPaneLayout({ children }: DocumentScrollOverlayRightPaneLayoutProps) {
   const nestedInLayout = useContext(NestedRightPaneLayoutContext);
   const { sm } = useBreakpoint();
   const tid = useTestIds({}, "documentScrollRightPaneLayout");
@@ -47,7 +42,7 @@ export function DocumentScrollOverlayRightPaneLayout({
       {sm ? (
         <>
           {children}
-          <DocumentScrollRightPane paneWidth={paneWidth} mobile={true} />
+          <DocumentScrollRightPane paneWidth={defaultDocumentScrollRightPaneWidth} mobile={true} />
         </>
       ) : (
         <>
@@ -63,7 +58,7 @@ export function DocumentScrollOverlayRightPaneLayout({
               {...tid.spacer}
             />
           </div>
-          <DocumentScrollOverlayRightPaneHost anchorRef={anchorRef.ref} spacerRef={spacerRef} paneWidth={paneWidth} />
+          <DocumentScrollOverlayRightPaneHost anchorRef={anchorRef.ref} spacerRef={spacerRef} />
         </>
       )}
     </DocumentScrollRightPaneLayoutRoot>
@@ -73,13 +68,12 @@ export function DocumentScrollOverlayRightPaneLayout({
 type DocumentScrollOverlayRightPaneHostProps = {
   anchorRef: RefObject<HTMLDivElement | null>;
   spacerRef: RefObject<HTMLDivElement | null>;
-  paneWidth: number;
 };
 /** Subscribes to pane open/close here so the layout shell and `{children}` stay stable; syncs width vars/spacer and mounts the overlay pane. */
 function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPaneHostProps) {
-  const { anchorRef, spacerRef, paneWidth } = props;
+  const { anchorRef, spacerRef } = props;
   const { isRightPaneOpen } = useRightPaneOpenState();
-  const paneWidthCss = documentScrollRightPaneWidthCss(paneWidth);
+  const paneWidthCss = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
   const [keepOverlayChrome, setKeepOverlayChrome] = useState(isRightPaneOpen);
 
   // Keep width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
@@ -117,5 +111,7 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
     };
   }, [anchorRef, keepOverlayChrome, paneWidthCss]);
 
-  return <DocumentScrollRightPane paneWidth={paneWidth} mobile={false} anchorRef={anchorRef} />;
+  return (
+    <DocumentScrollRightPane paneWidth={defaultDocumentScrollRightPaneWidth} mobile={false} anchorRef={anchorRef} />
+  );
 }

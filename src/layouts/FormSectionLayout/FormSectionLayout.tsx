@@ -3,7 +3,7 @@ import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
-import { resolveWithRightPaneOptions, type WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
+import type { WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { Css } from "src/Css";
 import { FormSection, type FormSectionProps } from "src/forms/FormSection/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
@@ -65,7 +65,6 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
   } = props;
   const tid = useTestIds(props, "formSectionLayout");
   const { sm: isMobile } = useBreakpoint();
-  const rightPane = resolveWithRightPaneOptions(withRightPane);
   /** Anchor for the form title when `includeTitleJumpLink` is on — avoids colliding with section ids. */
   const formSectionLayoutTitleId = "formSectionLayoutTitle";
 
@@ -131,9 +130,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
     <div css={Css.mb4.$}>{form}</div>
   );
 
-  if (!rightPane) return body;
+  if (!withRightPane) return body;
 
-  return (
-    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>{body}</DocumentScrollOverlayRightPaneLayout>
-  );
+  return <DocumentScrollOverlayRightPaneLayout>{body}</DocumentScrollOverlayRightPaneLayout>;
 }

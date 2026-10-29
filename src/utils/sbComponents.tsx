@@ -246,13 +246,7 @@ export function GridTableLayoutExample({
     [columns, openRightPane, rows, style, withRightPane],
   );
 
-  return (
-    <GridTableLayout
-      layoutState={layoutState}
-      withRightPane={withRightPane ? 400 : undefined}
-      tableProps={tableProps}
-    />
-  );
+  return <GridTableLayout layoutState={layoutState} withRightPane={withRightPane} tableProps={tableProps} />;
 }
 
 function rowDetailName(row: GridDataRow<GridTableLayoutRow>): string {

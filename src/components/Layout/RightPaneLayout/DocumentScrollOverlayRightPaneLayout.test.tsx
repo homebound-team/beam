@@ -17,7 +17,7 @@ import { clickAndWait, render } from "src/utils/rtl";
 import { vi } from "vitest";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
 import { useRightPaneActions } from "./useRightPane";
-import { minDocumentScrollContentWidthPx } from "./withRightPane";
+import { defaultDocumentScrollRightPaneWidth, minDocumentScrollContentWidthPx } from "./withRightPane";
 
 describe("DocumentScrollOverlayRightPaneLayout", () => {
   afterEach(() => {
@@ -27,10 +27,10 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
   it("publishes scoped pane width and a root floating right offset when open", async () => {
     // Given a document-scroll right pane layout on desktop
-    const expectedWidth = documentScrollRightPaneWidthCss(320);
+    const expectedWidth = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
         </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
@@ -82,7 +82,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     // Given a document-scroll right pane layout whose anchor is already under the sticky chrome
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
         </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
@@ -101,7 +101,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     // layout root the pane reads it from, rather than on `PageHeaderLayout` above it
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
         </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
@@ -134,7 +134,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     try {
       const r = await render(
         <DocumentScrollLayoutProvider>
-          <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+          <DocumentScrollOverlayRightPaneLayout>
             <div>Main content</div>
           </DocumentScrollOverlayRightPaneLayout>
           <OpenCloseButtons />
@@ -158,7 +158,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     const r = await render(
       <EnvironmentBannerLayoutHeightProvider value={environmentBannerSizePx}>
         <DocumentScrollLayoutProvider>
-          <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
+          <DocumentScrollOverlayRightPaneLayout>
             <div>Main content</div>
           </DocumentScrollOverlayRightPaneLayout>
           <OpenCloseButtons />
@@ -216,8 +216,8 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollOverlayRightPaneLayout paneWidth={320}>
-          <DocumentScrollOverlayRightPaneLayout paneWidth={200}>
+        <DocumentScrollOverlayRightPaneLayout>
+          <DocumentScrollOverlayRightPaneLayout>
             <div>Main content</div>
           </DocumentScrollOverlayRightPaneLayout>
         </DocumentScrollOverlayRightPaneLayout>
@@ -234,10 +234,10 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
   it("still inserts a pane-width spacer when the remaining viewport is under 480px", async () => {
     // Given a tight chrome (viewport − side nav leaves less than the content floor beside the pane)
-    const expectedWidth = documentScrollRightPaneWidthCss(450);
+    const expectedWidth = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
     const r = await render(
       <DocumentScrollLayoutProvider>
-        <DocumentScrollOverlayRightPaneLayout paneWidth={450}>
+        <DocumentScrollOverlayRightPaneLayout>
           <div>Main content</div>
         </DocumentScrollOverlayRightPaneLayout>
         <OpenCloseButtons />
