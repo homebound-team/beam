@@ -1,14 +1,5 @@
 import type { Key } from "@react-types/shared";
-import {
-  type KeyboardEvent,
-  type RefObject,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
@@ -32,7 +23,7 @@ import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuS
 import { type Value, valueToKey } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
-import { useDebounce } from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
 
 type MenuSelectFieldApi<O> = {
   triggerRef: RefObject<HTMLButtonElement | null>;
@@ -86,9 +77,18 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const listRef = useRef<HTMLDivElement | null>(null);
   // Tracks field-level focus across the trigger and the portaled menu, so onFocus/onBlur fire once per visit.
   const hasFocusRef = useRef(false);
-  const menuHasOpenedRef = useRef(false);
-  // Last text sent to `onSearch`, so opening and a repeated debounce do not query again.
-  const notifiedSearchRef = useRef<string | undefined>(undefined);
+  // Last text passed to `onSearch`. `undefined` means the caller has not been queried, so opening does not send `""`.
+  const sentSearchRef = useRef<string | undefined>(undefined);
+  // Calls `onSearch` after `onSearchDelay` of quiet typing. The helper keeps the latest callback.
+  const debouncedOnSearch = useDebouncedCallback((value: string) => {
+    // Avoid calling `onSearch` if it hasn't changed.
+    // This can happen when someone types, the query goes out, then they edit and end up back on the same text before the next delay elapses. The second timer fires with the same string, and this return keeps it from querying again.
+    if (!onSearch || value === sentSearchRef.current) return;
+    // Typing and deleting before the delay elapses never queried, so skip the empty text.
+    if (value === "" && sentSearchRef.current === undefined) return;
+    sentSearchRef.current = value;
+    onSearch(value);
+  }, onSearchDelay);
 
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -277,7 +277,6 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   function open() {
     if (isDisabled || isReadOnly) return;
-    menuHasOpenedRef.current = true;
     setSearch("");
     if (menuTree) {
       setExpandedKeys(initialExpandedKeys(menuTree, selectedKeys, defaultExpanded));
@@ -291,8 +290,14 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   }
 
   function close(opts: { restoreFocus: boolean }) {
+    debouncedOnSearch.cancel();
     setIsOpen(false);
     setSearch("");
+    // A search already sent has to be reset now. A pending keystroke was cancelled above.
+    if (onSearch && sentSearchRef.current) {
+      sentSearchRef.current = "";
+      onSearch("");
+    }
     if (opts.restoreFocus) {
       triggerRef.current?.focus({ preventScroll: true });
     } else if (hasFocusRef.current) {
@@ -308,22 +313,6 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   // Short menus skip search, unless `onSearch` refetches. The count includes a not-yet-loaded `current`.
   const showSearch = serverSearch || allOptions.length > searchOptionLimit;
-  const [debouncedSearch] = useDebounce(search, searchNotifyDelay);
-  useEffect(() => {
-    if (!onSearch || !menuHasOpenedRef.current) return;
-    if (!isOpen) {
-      if (notifiedSearchRef.current) {
-        notifiedSearchRef.current = "";
-        onSearch("");
-      }
-      return;
-    }
-    if (debouncedSearch === notifiedSearchRef.current) return;
-    // Opening starts from an empty box. Wait until the user types, then tell the caller when they clear it.
-    if (debouncedSearch === "" && notifiedSearchRef.current === undefined) return;
-    notifiedSearchRef.current = debouncedSearch;
-    onSearch(debouncedSearch);
-  }, [onSearch, debouncedSearch, isOpen]);
 
   // Focus the search, or the list when there is no search. Leave option focus unset until a keyboard move.
   useLayoutEffect(() => {
@@ -342,6 +331,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     setSearchCollapsedKeys(new Set());
     selectionManager.setFocusedKey(null);
     selectionManager.setFocused(false);
+    if (onSearch) debouncedOnSearch(value);
   }
 
   function focusKey(key: Key | null) {
@@ -647,8 +637,8 @@ function matchesSearch<O>(
 /** Menus with this many options or fewer omit the search field, unless `onSearch` is set. */
 export const searchOptionLimit = 8;
 
-/** Wait before telling `onSearch`, matching the old select field. */
-const searchNotifyDelay = 300;
+/** Wait before calling `onSearch`, matching the old select field. */
+const onSearchDelay = 300;
 
 /**
  * Reuses React Aria's `ListKeyboardDelegate` for arrows, Home, and End.
