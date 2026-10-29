@@ -45,7 +45,7 @@ describe("MenuSelectField", () => {
     // When searching
     type(r.color_search, "bl");
     // Then only matching options remain
-    expect(getOptions(r.color)).toEqual(["Blue", "Black"]);
+    expect(getOptions(r.color)).toEqual(["Black", "Blue"]);
   });
 
   it("shows search on a short list when the caller handles it", async () => {
@@ -68,7 +68,7 @@ describe("MenuSelectField", () => {
     // When searching for text that is not in the current labels
     type(r.color_search, "oak");
     // Then the current page stays until the caller answers
-    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
     await wait();
     // Then the caller is asked, and their option is shown even though its label does not contain the text
     expect(onSearch).toHaveBeenCalledWith("oak");
@@ -78,7 +78,7 @@ describe("MenuSelectField", () => {
     await wait();
     // Then the caller is asked for the unfiltered page
     expect(onSearch).toHaveBeenLastCalledWith("");
-    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
   });
 
   it("asks for the unfiltered page when a search menu closes", async () => {
@@ -135,7 +135,7 @@ describe("MenuSelectField", () => {
     await act(async () => {
       finishLoad();
     });
-    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
     expect(r.query.loadingDots).toBeNull();
   });
 
@@ -227,6 +227,24 @@ describe("MenuSelectField", () => {
     expect(r.color_option.querySelector("em")).toHaveTextContent("b");
   });
 
+  it("sorts options alphabetically", async () => {
+    // Given options that are not in alphabetical order
+    const r = await render(<TestHarness />);
+    // When the menu opens
+    click(r.color);
+    // Then they are sorted by label
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+  });
+
+  it("keeps the given order when autoSort is false", async () => {
+    // Given autoSort turned off
+    const r = await render(<TestHarness autoSort={false} />);
+    // When the menu opens
+    click(r.color);
+    // Then the caller order is kept
+    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+  });
+
   it("shows an empty row when nothing matches", async () => {
     // Given an open single select with enough options to search
     const r = await render(<TestHarness options={manyColors()} />);
@@ -304,7 +322,7 @@ describe("MenuSelectField", () => {
     expect(menuKeyTarget(r).getAttribute("aria-activedescendant")).toMatch(/-option-0$/);
     fireEvent.keyDown(menuKeyTarget(r), { key: "Enter" });
     // Then the first option is selected
-    expect(onSelect).toHaveBeenCalledWith("r", { id: "r", name: "Red" });
+    expect(onSelect).toHaveBeenCalledWith("k", { id: "k", name: "Black" });
   });
 
   it("opens from the trigger with ArrowDown", async () => {
@@ -337,7 +355,7 @@ describe("MenuSelectField", () => {
     fireEvent.keyDown(menuKeyTarget(r), { key: "ArrowDown" });
     fireEvent.keyDown(menuKeyTarget(r), { key: "Enter" });
     // Then the disabled option is skipped
-    expect(onSelect).toHaveBeenCalledWith("k", { id: "k", name: "Black" });
+    expect(onSelect).toHaveBeenCalledWith("g", { id: "g", name: "Green" });
     // And the disabled option is marked disabled
     click(r.color);
     const blue = r.getAllByTestId("color_option").find((o) => o.dataset.label === "Blue");
@@ -505,6 +523,7 @@ type HarnessProps = {
   getOptionMenuLabel?: (color: Color) => ReactNode;
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
+  autoSort?: boolean;
 };
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
