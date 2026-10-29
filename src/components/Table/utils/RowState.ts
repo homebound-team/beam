@@ -93,6 +93,11 @@ export class RowState<R extends Kinded> {
         tableFn && tableFn(this.row.data as any, isSelected, { row, api: states.table.api });
       },
     );
+    // Only direct pin changes fire `onPin`; children hoisted with a pinned parent don't change `pinned`.
+    reaction(
+      () => this.pinned,
+      (pinned) => states.table.onPin?.(this.row, pinned, states.table.api),
+    );
   }
 
   /** Returns a stable-ish row identity that will only change if our `data` changes. */
@@ -252,6 +257,12 @@ export class RowState<R extends Kinded> {
   /** Toggle this row's runtime pin. */
   togglePinned(): void {
     this.pinned = !this.pinned;
+  }
+
+  /** Whether a parent/grandparent is pinned, so this row hoists along with it. */
+  get hasPinnedAncestor(): boolean {
+    // Reserved rows (i.e. the header) are never pinned, even if `api.pinRow("header")` was called.
+    return !!this.parent && ((this.parent.pinned && !this.parent.isReservedKind) || this.parent.hasPinnedAncestor);
   }
 
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */

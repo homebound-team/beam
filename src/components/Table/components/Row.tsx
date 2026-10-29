@@ -14,10 +14,12 @@ import { showsCollapseToggle } from "src/components/Table/components/CollapseTog
 import { ColumnResizeHandle } from "src/components/Table/components/ColumnResizeHandle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import { KeptGroupRow } from "src/components/Table/components/KeptGroupRow";
+import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
 import {
   type GridStyle,
   hierarchyFirstContentCss,
+  hierarchyIndentPx,
   type RowStyles,
   tableRowPrintBreakCss,
 } from "src/components/Table/TableStyles";
@@ -35,6 +37,7 @@ import {
   collapseTogglePx,
   isContentColumn,
   parseWidthToPx,
+  pinTogglePx,
 } from "src/components/Table/utils/columns";
 import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
@@ -56,7 +59,7 @@ import {
   toContent,
   TOTALS,
 } from "src/components/Table/utils/utils";
-import { Css, maybeCssVar, Palette, type Properties, Tokens } from "src/Css";
+import { Css, marker, maybeCssVar, Palette, type Properties, Tokens } from "src/Css";
 import { beamRightPaneWidthVar, beamSideNavLayoutWidthVar } from "src/layouts/layoutVars";
 import type { AnyObject } from "src/types";
 import { isFunction } from "src/utils/helpers";
@@ -170,6 +173,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const levelIndent = levelStyle?.rowIndent;
   // True for the whole table once we have a collapse column. Leaves don't render a chevron, but they still need the indent.
   const hasCollapseColumn = controlColumns.some((column) => column.id === beamCollapseColumnId);
+  const { isPinningEnabled } = tableState;
+  const skipHierarchyIndent = levelIndent !== undefined || !hasCollapseColumn;
+  // The pin sits at the far left of the cell, so the hierarchy indent moves from the cell's padding to after the pin
+  const pinIndentPx = isBodyRow && !skipHierarchyIndent && level > 0 ? hierarchyIndentPx * level : 0;
 
   const containerCss = {
     ...Css.add("transition", "padding 0.25s ease-in-out").$,
@@ -198,6 +205,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
     ...(isLastBodyRow && style.lastRowCss),
     // Apply `cursorPointer` to the row if it has a link or `onClick` value.
     ...(hasRowAction && Css.onHover.cursorPointer.$),
+    // Lets the pin toggle reveal itself while the row is hovered
+    ...(isPinningEnabled && Css.marker.$),
     ...maybeApplyFunction(row as any, rowStyle?.rowCss),
     // Row hover paints cells via Row.css.ts (`.beam-row-hover:hover > *`); set the var via Css.style
     // (React CSSProperties rejects custom props without a cast).
@@ -344,7 +353,21 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             minStickyLeftOffset,
           );
 
-          const controlNodes =
+          const pinNode =
+            isFirstContentColumn && isPinningEnabled ? (
+              <span
+                key="beamPin"
+                // Rows without a pin (i.e. the header) still hold its width so everything after it lines up
+                css={{
+                  ...Css.fs0.df.aic.h("1lh").mh0.wPx(pinTogglePx).mrPx(pinIndentPx).$,
+                  ...(!pinned && !rs.hasPinnedAncestor && revealPinOnRowHoverCss),
+                }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                {tableState.isRowPinnable(row.id) && <PinToggle rowId={row.id} />}
+              </span>
+            ) : undefined;
+          const columnControlNodes =
             isFirstContentColumn && controlColumns.length > 0
               ? controlColumns.flatMap((controlColumn) => {
                   const maybeControl = applyRowFn(controlColumn, row, rowApi, level, isExpanded, dragData);
@@ -384,7 +407,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                   ];
                 })
               : [];
-          // Keep the collapse toggle and checkbox outside a row link so they do not navigate.
+          const controlNodes = pinNode ? [pinNode, ...columnControlNodes] : columnControlNodes;
+          // Keep the pin, collapse toggle, and checkbox outside a row link so they do not navigate.
           const contentRowLink =
             controlNodes.length > 0 && wrapAction && rowStyle?.rowLink ? rowStyle.rowLink(row as any) : undefined;
           const renderedContent = withRowControls(content, controlNodes, alignment, contentRowLink);
@@ -494,7 +518,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               applyFirstContentColumnStyles &&
               hierarchyFirstContentCss({
                 level,
-                skipIndent: levelIndent !== undefined || !hasCollapseColumn,
+                skipIndent: skipHierarchyIndent,
+                indentAfterPin: isPinningEnabled,
                 maxLevel: tableState.maxNestingLevel,
               })),
             // Apply any declarative column border styling after header/body defaults.
@@ -677,7 +702,7 @@ export type GridDataRow<R extends Kinded> = {
    * By default, fixed-sorted rows are always shown/not filtered out; providing the
    * `filter: true` property allows them to be hidden while filtering. This is the
    * in-group ordering override, distinct from the runtime sticky "pin to top" feature
-   * (`api.pinRow` / `pinColumn`).
+   * (`api.pinRow` / `GridTableProps.rowPinning`).
    */
   fixedSort?: "first" | "last" | FixedSort;
   data: unknown;
@@ -687,6 +712,8 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether to pin this row to the top on initial load. Ignored on subsequent re-renders (like `initSelected`). */
   initPinned?: boolean;
+  /** Whether this row gets a `GridTableProps.rowPinning` toggle; overrides `rowPinning.exclude`. Reserved kinds never do. */
+  pinnable?: boolean;
   /** Whether row can be selected */
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */
@@ -708,6 +735,10 @@ export type GridDataRow<R extends Kinded> = {
 // Used by TextFieldBase to set a border when the row is being hovered over
 export const BorderHoverParent = "beam-bhp";
 export const BorderHoverChild = "beam-bhc";
+
+/** Hides an unpinned row's pin until the row is hovered or the pin is focused; always shown on touch-sized screens. */
+const revealPinOnRowHoverCss = Css.o0.when(marker, "ancestor", ":hover").o100.end.onFocusWithin.o100.end.ifMdAndDown
+  .o100.$;
 
 /** Class paired with `rowHoverBgVar` in Row.css.ts for cell hover fill. */
 export const RowHoverClass = "beam-row-hover";

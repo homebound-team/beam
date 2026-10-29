@@ -17,13 +17,16 @@ type PinToggleProps = {
 export function PinToggle({ rowId }: PinToggleProps) {
   const { tableState } = useContext(TableStateContext);
   const isPinned = useComputed(() => tableState.isPinnedRow(rowId), [tableState, rowId]);
+  // A child of a pinned parent moves with it, so it can't be unpinned on its own
+  const isPinnedViaParent = useComputed(() => tableState.isPinnedViaParent(rowId), [tableState, rowId]);
   const tid = useTestIds({}, "pin");
   return (
     <IconButton
       {...tid[rowId]}
       icon="pin"
-      color={isPinned ? Tokens.Primary : undefined}
+      color={isPinned || isPinnedViaParent ? Tokens.Primary : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
+      disabled={isPinnedViaParent ? "Pinned with parent" : undefined}
       onClick={() => tableState.togglePinned(rowId)}
     />
   );

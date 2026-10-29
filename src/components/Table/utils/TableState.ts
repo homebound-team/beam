@@ -1,7 +1,7 @@
 import { makeAutoObservable, observableRef, reaction } from "mobx";
 import React from "react";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
+import type { GridSortConfig, OnRowSelect, RowPinningConfig } from "src/components/Table/GridTable";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { firstContentControlPx, rowControlColumns, toLayoutColumns } from "src/components/Table/utils/columns";
@@ -59,6 +59,12 @@ export class TableState<R extends Kinded> {
   // The server-side `onSort` callback, if any.
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
   onRowSelect: OnRowSelect<any> | undefined = undefined;
+  /** Whether `GridTableProps.rowPinning` is on, so rows draw a pin toggle. */
+  isPinningEnabled = false;
+  // Kinds from `rowPinning.exclude`, only ref-observed so an inline array doesn't re-render every row
+  private pinExcludedKinds: readonly string[] = [];
+  /** `rowPinning.onPin`; not observable, like `onRowSelect`. */
+  onPin: RowPinningConfig<R>["onPin"] = undefined;
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -72,6 +78,8 @@ export class TableState<R extends Kinded> {
       rows: observableRef,
       columns: observableRef,
       search: observableRef,
+      pinExcludedKinds: observableRef,
+      onPin: false,
     } as any);
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
     reaction(
@@ -196,9 +204,9 @@ export class TableState<R extends Kinded> {
     return rowControlColumns(this.visibleColumns);
   }
 
-  /** Extra width the first content column needs for the in-cell checkbox and chevron. */
+  /** Extra width the first content column needs for the in-cell pin, checkbox, and chevron. */
   get controlWidthPx(): number {
-    return firstContentControlPx(this.controlColumns);
+    return firstContentControlPx(this.controlColumns, this.isPinningEnabled);
   }
 
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
@@ -283,14 +291,36 @@ export class TableState<R extends Kinded> {
     this.rowStates.toggleCollapsed(id);
   }
 
-  /** Returns rows pinned to the top, as RowStates for rendering. */
+  /** Returns rows directly pinned to the top. */
   get pinnedRows(): RowState<R>[] {
     return this.rowStates.pinnedRows;
+  }
+
+  /** Returns the rows for the pinned section, i.e. pinned rows plus the children that hoist with them. */
+  get pinnedSectionRows(): RowState<R>[] {
+    return this.rowStates.pinnedSectionRows;
+  }
+
+  setRowPinning(enabled: boolean, excludedKinds: readonly string[]): void {
+    this.isPinningEnabled = enabled;
+    if (excludedKinds.join() !== this.pinExcludedKinds.join()) this.pinExcludedKinds = excludedKinds;
+  }
+
+  /** Whether the row gets a pin toggle: `row.pinnable` wins over `rowPinning.exclude`. Reserved rows never do. */
+  isRowPinnable(id: string): boolean {
+    const rs = this.rowStates.get(id);
+    if (!this.isPinningEnabled || rs.isReservedKind) return false;
+    return rs.row.pinnable ?? !this.pinExcludedKinds.includes(rs.kind);
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders
   isPinnedRow(id: string): boolean {
     return this.rowStates.get(id).pinned;
+  }
+
+  // Should be called in an Observer/useComputed to trigger re-renders
+  isPinnedViaParent(id: string): boolean {
+    return this.rowStates.get(id).hasPinnedAncestor;
   }
 
   pinRow(id: string): void {
