@@ -83,7 +83,8 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
                   .w(paneWidthCss)
                   .bgColor(Tokens.Surface)
                   .z(zIndices.rightPane)
-                  .bl.bc(Tokens.SurfaceSeparator)
+                  // The top border continues the layout table's, which the pane sits level with
+                  .bl.bt.bc(Tokens.SurfaceSeparator)
                   // Pinned, `top` only moves when the chrome above hides or reveals, so ease with it the
                   // way sticky chrome does. Unpinned it tracks the anchor every scroll and must not lag.
                   .if(!!paneBounds?.isPinned).transitionTop.$

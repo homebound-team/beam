@@ -2,8 +2,9 @@ import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
-import { FieldFrame, groupByOptions, open } from "src/inputs/MenuSelectField/storyHelpers";
+import { FieldFrame, groupByOptions, open, optionItems } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
+import { userEvent, within } from "storybook/test";
 
 export default {
   title: "Inputs/Select Fields (new)/Menu Behavior/Multi Selection",
@@ -62,6 +63,24 @@ export const CustomLabel = newStory(
     );
   },
   { play: open("groupBy") },
+);
+
+/** Expanding the row wraps every pill. The row scrolls once it reaches 40% of the menu. */
+export const SelectedPillsExpanded = newStory(
+  () => {
+    const [values, setValues] = useState(["o1", "o2", "o3", "o4", "o5", "o6"]);
+    return (
+      <FieldFrame>
+        <MenuMultiSelectField label="Community" options={optionItems()} values={values} onSelect={setValues} />
+      </FieldFrame>
+    );
+  },
+  {
+    play: async (context) => {
+      open("community")(context);
+      await userEvent.click(await within(document.body).findByTestId("community_selections_toggle"));
+    },
+  },
 );
 
 function MultiField(props: { initial?: string[] }) {

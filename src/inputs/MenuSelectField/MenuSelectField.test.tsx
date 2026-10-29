@@ -204,6 +204,15 @@ describe("MenuSelectField", () => {
     expect(document.activeElement).toBe(r.color);
   });
 
+  it("does not show selected pills", async () => {
+    // Given a single select with a value
+    const r = await render(<TestHarness initial="b" />);
+    // When opening it
+    click(r.color);
+    // Then the menu has no selected-pill row
+    expect(r.query.color_selections).toBeNull();
+  });
+
   it("closes when re-selecting the current value", async () => {
     // Given a single select with a value
     const onSelect = vi.fn();
@@ -397,6 +406,7 @@ describe("MenuSelectField", () => {
     // Then it renders as a sheet with the list focused
     expect(r.color_sheet).toBeInTheDocument();
     expect(r.query.color_overlay).toBeNull();
+    expect(r.color_sheet.style.width).toBe("");
     expect(document.activeElement).toBe(r.color_listbox);
     // And Done closes it
     click(r.color_sheetDone);
