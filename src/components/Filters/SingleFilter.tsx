@@ -1,6 +1,7 @@
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
+import { initializeOptions } from "src/inputs/internal/selectFieldHelpers";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import type { MenuSelectFieldProps } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
@@ -32,16 +33,22 @@ class SingleFilter<O, V extends Value> extends BaseFilter<V, SingleFilterProps<O
     inModal: boolean,
     vertical: boolean,
   ) {
-    const { label, defaultValue, options: maybeOptions, nothingSelectedText, ...props } = this.props;
+    const { label, defaultValue, options: maybeOptions, nothingSelectedText, autoSort, ...props } = this.props;
     const { getOptionValue, getOptionLabel } = optionReaders(this.props);
     const unsetText = nothingSelectedText ?? "All";
-    const options = Array.isArray(maybeOptions)
-      ? [allOption as O, ...maybeOptions]
-      : { ...maybeOptions, current: maybeOptions.current };
+    // A static list is sorted here so All stays pinned. The field would sort All into the list.
+    const isStaticList = Array.isArray(maybeOptions);
+    const options = isStaticList
+      ? [
+          allOption as O,
+          ...initializeOptions(maybeOptions, getOptionValue, getOptionLabel, undefined, autoSort ?? true),
+        ]
+      : maybeOptions;
 
     return (
       <MenuSelectField<O, V>
         {...props}
+        autoSort={isStaticList ? false : autoSort}
         options={options}
         getOptionValue={(option) => (option === allOption ? (undefined as V) : getOptionValue(option))}
         getOptionLabel={(option) => (option === allOption ? unsetText : getOptionLabel(option))}
