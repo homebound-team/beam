@@ -1,6 +1,9 @@
 import { Button } from "src/components/Button";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
-import { minDocumentScrollContentWidthPx } from "src/components/Layout/RightPaneLayout/withRightPane";
+import {
+  documentScrollRightPaneWidth,
+  minDocumentScrollContentWidthPx,
+} from "src/components/Layout/RightPaneLayout/withRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { jumpLinksRailReservation, jumpLinksRailWidthPx } from "src/layouts/FormSectionLayout/JumpLinksRail";
 import {
@@ -304,11 +307,11 @@ describe("FormSectionLayout", () => {
 
   it("inserts a pane-width spacer when the pane is open", async () => {
     // Given withRightPane on typical jsdom chrome
-    const expectedWidth = documentScrollRightPaneWidthCss(280);
+    const expectedWidth = documentScrollRightPaneWidthCss(documentScrollRightPaneWidth);
     const r = await render(
       <FormSectionLayout
         withJumpLinks
-        withRightPane={280}
+        withRightPane
         title="Link Design Package"
         sections={[
           { title: "Setup", fields: <OpenPaneButton /> },
@@ -333,7 +336,7 @@ describe("FormSectionLayout", () => {
     const r = await render(
       <FormSectionLayout
         withJumpLinks
-        withRightPane={280}
+        withRightPane
         title="Link Design Package"
         sections={[
           { title: "Setup", fields: <OpenPaneButton /> },

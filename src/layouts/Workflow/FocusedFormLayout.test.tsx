@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import {
   beamFloatingRightOffsetVar,
@@ -254,7 +255,7 @@ describe("FocusedFormLayout", () => {
           children: (
             <FormSectionLayout
               withJumpLinks
-              withRightPane={280}
+              withRightPane
               title="Link Design Package"
               sections={[
                 { title: "Setup", fields: <OpenPaneButton /> },
@@ -276,7 +277,7 @@ describe("FocusedFormLayout", () => {
       width: documentScrollChromeWidth(),
     });
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
-      documentScrollRightPaneWidthCss(280),
+      documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
     );
   });
 });

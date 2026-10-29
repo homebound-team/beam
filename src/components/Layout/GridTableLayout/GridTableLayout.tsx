@@ -16,7 +16,6 @@ import {
   type GridTablePropsWithRows,
   isGridTableProps,
 } from "src/components/Layout/layoutTypes";
-import { resolveWithRightPaneOptions, type WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -67,10 +66,10 @@ export type GridTableLayoutProps<
   withCardView?: boolean;
   defaultView?: TableView;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`).
+   * Opt into the document-scroll detail pane (`useRightPane`). Width is fixed at 448px.
    * Only applies inside a document-scroll layout; hosts the pane around the table body only.
    */
-  withRightPane?: WithRightPane;
+  withRightPane?: boolean;
 };
 
 /**
@@ -118,7 +117,6 @@ function GridTableLayoutComponent<
     emptyFallback: layoutEmptyFallback,
     withRightPane,
   } = props;
-  const rightPane = resolveWithRightPaneOptions(withRightPane);
 
   const tid = useTestIds(props);
   const host = useGridTableLayoutHost();
@@ -243,7 +241,7 @@ function GridTableLayoutComponent<
     <GridTableLayoutHost
       host={host}
       actions={showTableActions ? tableActionsEl : undefined}
-      rightPane={rightPane}
+      rightPane={withRightPane}
       isVirtualized={isVirtualized}
       testIds={tid}
     >

@@ -2,7 +2,6 @@ import { useResizeObserver } from "@react-aria/utils";
 import { type ReactNode, type RefObject, useCallback, useLayoutEffect, useRef } from "react";
 import type { GridTableLayoutHost as GridTableLayoutHostValue } from "src/components/Layout/GridTableLayout/useGridTableLayoutHost";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
-import type { ResolvedWithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { ScrollableContent, VirtualizedScrollParentProvider } from "src/components/Layout/ScrollableContent";
 import { ModalFullBleed } from "src/components/Modal/ModalFullBleed";
 import { modalBodyPaddingX } from "src/components/Modal/modalStyles";
@@ -22,7 +21,7 @@ import { zIndices } from "src/utils/zIndices";
 type GridTableLayoutHostProps = {
   host: GridTableLayoutHostValue;
   actions?: ReactNode;
-  rightPane?: ResolvedWithRightPane;
+  rightPane?: boolean;
   isVirtualized: boolean;
   testIds: TestIds;
   children: ReactNode;
@@ -78,10 +77,10 @@ function ModalHost(props: HostProps & { host: Extract<GridTableLayoutHostValue, 
   );
 }
 
-function DocumentScrollHost(props: HostProps & { rightPane?: ResolvedWithRightPane }) {
+function DocumentScrollHost(props: HostProps & { rightPane?: boolean }) {
   const { actions, rightPane, tableWrapperRef, tableActionsRef, testIds, children } = props;
   const tableBody = rightPane ? (
-    <DocumentScrollOverlayRightPaneLayout paneWidth={rightPane.width}>
+    <DocumentScrollOverlayRightPaneLayout>
       {/* Content floor while the pane is open — tables are not a CenteredLayout shell. */}
       <div css={Css.mw(documentScrollRightPaneContentMinCss()).$}>{children}</div>
     </DocumentScrollOverlayRightPaneLayout>
