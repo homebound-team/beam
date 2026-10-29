@@ -1,8 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
-import type { ReactNode } from "react";
 import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
-import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
 import { Css, Tokens } from "src/Css";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
@@ -48,7 +46,6 @@ export function WithRightPaneTriggers() {
 export function WithDestructiveAction() {
   return (
     <WorkflowChrome
-      completeLabel="Save"
       destructiveAction={{
         onConfirm: action("remove confirmed"),
         confirmTitle: "Remove this material?",
@@ -96,23 +93,12 @@ export function AiMode() {
 }
 AiMode.storyName = "AI Mode";
 
-function WorkflowChrome({
-  children,
-  ...props
-}: {
-  children: ReactNode;
-  aiMode?: boolean;
-  completeLabel?: FocusedFormLayoutProps["completeLabel"];
-  destructiveAction?: FocusedFormLayoutProps["destructiveAction"];
-  banner?: PageBannerProps;
-  rightPaneTriggers?: ReturnType<typeof createRightPaneTriggers>;
-}) {
+function WorkflowChrome({ children, ...props }: Partial<FocusedFormLayoutProps>) {
   return (
     <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>
       <FocusedFormLayout
         title="Create Design Package"
         onCancel={action("cancel clicked")}
-        completeLabel="Create"
         onComplete={action("complete clicked")}
         {...props}
       >
