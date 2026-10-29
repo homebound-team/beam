@@ -1404,7 +1404,7 @@ describe("GridTableLayout", () => {
     // When the consolidated filter panel is opened
     click(r.gridTableLayoutActions_filterButton);
     // Then group by starts at the first option instead of the page param
-    expect(r.groupBy).toHaveValue("None");
+    expect(r.groupBy).toHaveTextContent("None");
   });
 });
 

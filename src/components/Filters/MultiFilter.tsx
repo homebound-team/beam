@@ -3,14 +3,14 @@ import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveOptionSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
-import { MultiSelectField, type MultiSelectFieldProps } from "src/inputs/MultiSelectField";
+import { MenuMultiSelectField, type MenuMultiSelectFieldProps } from "src/inputs/MenuSelectField/MenuMultiSelectField";
 import { ToggleChipGroup } from "src/inputs/ToggleChipGroup";
 import type { Value } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import type { TestIds } from "src/utils/useTestIds";
 
 export type MultiFilterProps<O, V extends Value> = Omit<
-  MultiSelectFieldProps<O, V>,
+  MenuMultiSelectFieldProps<O, V>,
   "values" | "onSelect" | "label"
 > & {
   defaultValue?: V[];
@@ -23,7 +23,8 @@ export function multiFilter<O, V extends Value>(props: MultiFilterProps<O, V>): 
 
 class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O, V>> implements Filter<V[]> {
   formatSelectedFilterLabel(value: SelectedFilterLabelValue<V[]>): string | undefined {
-    const { options, getOptionValue, getOptionLabel } = this.props;
+    const { options } = this.props;
+    const { getOptionValue, getOptionLabel } = optionReaders(this.props);
     return resolveOptionSelectedFilterLabel(options, getOptionValue, getOptionLabel, value);
   }
 
@@ -34,8 +35,11 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
     inModal: boolean,
     vertical: boolean,
   ): JSX.Element {
+    const { getOptionValue, getOptionLabel } = optionReaders(this.props);
+    // A short static list in the modal uses chips. `onSearch` keeps the menu, so a short result page can still search.
     if (
       inModal &&
+      !this.props.onSearch &&
       Array.isArray(this.props.options) &&
       this.props.options.length > 0 &&
       this.props.options.length <= 8
@@ -46,13 +50,13 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
       return (
         <ToggleChipGroup
           label={this.label}
-          options={this.props.options.map((o: O) => {
-            const value = this.props.getOptionValue(o);
-            const disabled = value && disabledKeys.includes(value.toString());
-            const disabledReason = disabled ? disabledOptionsWithReasons[value.toString()] : undefined;
+          options={this.props.options.map((option: O) => {
+            const optionValue = getOptionValue(option);
+            const disabled = optionValue && disabledKeys.includes(optionValue.toString());
+            const disabledReason = disabled ? disabledOptionsWithReasons[optionValue.toString()] : undefined;
             return {
-              label: this.props.getOptionLabel(o),
-              value: value as string,
+              label: getOptionLabel(option),
+              value: optionValue as string,
               disabled: disabledReason ?? disabled,
             };
           })}
@@ -68,12 +72,11 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
 
     const { defaultValue, nothingSelectedText, ...props } = this.props;
     return (
-      <MultiSelectField<O, V>
+      <MenuMultiSelectField<O, V>
         {...props}
         label={this.label}
         values={value || []}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
-        sizeToContent={!inModal && !vertical}
         onSelect={(values) => {
           setValue(values.length === 0 ? undefined : values);
         }}
@@ -82,4 +85,11 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
       />
     );
   }
+}
+
+function optionReaders<O, V extends Value>(props: MultiFilterProps<O, V>) {
+  return {
+    getOptionValue: props.getOptionValue ?? ((option: O) => (option as { id: V }).id),
+    getOptionLabel: props.getOptionLabel ?? ((option: O) => (option as { name: string }).name),
+  };
 }
