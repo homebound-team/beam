@@ -3,7 +3,7 @@ import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, us
 import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
-import { disabledOptionToKeyedTuple, initializeOptions } from "src/inputs/internal/selectFieldHelpers";
+import { disabledOptionToKeyedTuple, initializeOptions, unsetOption } from "src/inputs/internal/selectFieldHelpers";
 import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
 import type { MenuSelectedOption } from "src/inputs/MenuSelectField/internal/MenuSelectedPills";
 import type { MenuSelectTriggerState } from "src/inputs/MenuSelectField/internal/MenuSelectTrigger";
@@ -40,10 +40,11 @@ type MenuSelectFieldApi<O> = {
 export function useMenuSelectField<O, V extends Value>(props: MenuSelectControllerProps<O, V>): MenuSelectFieldApi<O> {
   const {
     options: optionsProp,
-    getOptionValue = defaultOptionValue as (opt: O) => V,
-    getOptionLabel = defaultOptionLabel as (opt: O) => string,
+    getOptionValue: propGetOptionValue = defaultOptionValue as (opt: O) => V,
+    getOptionLabel: propGetOptionLabel = defaultOptionLabel as (opt: O) => string,
     getOptionMenuLabel,
     getOptionSearchText,
+    unsetLabel,
     autoSort = true,
     onSearch,
     disabledOptions,
@@ -95,11 +96,16 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const [search, setSearch] = useState("");
   const [optionsLoading, setOptionsLoading] = useState(false);
   const didRequestOptionsRef = useRef(false);
+  // The sentinel has no id. Read it here so caller callbacks never see it.
+  const getOptionLabel = (option: O) =>
+    unsetLabel && option === unsetOption ? unsetLabel : propGetOptionLabel(option);
+  const getOptionValue = (option: O) =>
+    unsetLabel && option === unsetOption ? (undefined as V) : propGetOptionValue(option);
   const options = useMemo(
-    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, undefined, autoSort),
+    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, unsetLabel, autoSort),
     // getOptionValue and getOptionLabel are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [optionsProp, autoSort],
+    [optionsProp, autoSort, unsetLabel],
   );
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
@@ -193,10 +199,14 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     () =>
       menuTree || !search || serverSearch
         ? options
-        : options.filter((o) => matchesSearch(o, search, getOptionLabel, getOptionSearchText, contains)),
+        : options.filter((option) =>
+            unsetLabel && option === unsetOption
+              ? contains(getOptionLabel(option), search)
+              : matchesSearch(option, search, getOptionLabel, getOptionSearchText, contains),
+          ),
     // getOptionLabel and getOptionSearchText are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [menuTree, options, search, serverSearch, contains],
+    [menuTree, options, search, serverSearch, contains, unsetLabel],
   );
 
   function onSelectionChange(keys: Selection) {
@@ -256,7 +266,9 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     items: collectionItems,
     children: (item) => (
       <Item key={item.key} textValue={getOptionLabel(item.option)}>
-        {getOptionMenuLabel ? getOptionMenuLabel(item.option) : getOptionLabel(item.option)}
+        {getOptionMenuLabel
+          ? getOptionMenuLabel(item.option, Boolean(unsetLabel) && item.option === unsetOption)
+          : getOptionLabel(item.option)}
       </Item>
     ),
     selectionMode: multiple ? "multiple" : "single",
