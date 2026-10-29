@@ -138,6 +138,14 @@ export type OnRowSelect<R extends Kinded> = {
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
 };
 
+/** Options for `GridTableProps.rowPinning`. */
+export type RowPinningConfig<R extends Kinded> = {
+  /** Row kinds that don't get a pin toggle. Reserved kinds (header, totals, etc.) never do. Use `row.pinnable` per row. */
+  exclude?: R["kind"][];
+  /** Called when a row is pinned/unpinned (via its toggle or the `api`); not for children that move with a pinned parent. */
+  onPin?: (row: GridDataRow<R>, pinned: boolean, api: GridTableApi<R>) => void;
+};
+
 type DragEventType = React.DragEvent<HTMLElement>;
 
 export type OnRowDragEvent<R extends Kinded> = (draggedRow: GridDataRow<R>, event: DragEventType) => void;
@@ -228,6 +236,12 @@ export type GridTableProps<R extends Kinded, X> = {
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
   /**
+   * Shows a pin toggle (on row hover) at the start of each row's first content cell.
+   *
+   * Pinned rows stick to the top of the table, and a pinned parent brings its children with it.
+   */
+  rowPinning?: boolean | RowPinningConfig<R>;
+  /**
    * Custom prefix rows for any CSV output, i.e. a header like "Report X as of date Y with filter Z".
    *
    * We except the `string[][]` to be an array of cells, and `copyToClipboard` and `downloadToCsv` will drop them into
@@ -291,6 +305,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleColumnsStorageKey,
     infiniteScroll,
     onRowSelect,
+    rowPinning,
     onRowDrop: droppedCallback,
     csvPrefixRows,
     disableColumnResizing = false,
@@ -352,6 +367,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { tableState } = api;
 
   tableState.onRowSelect = onRowSelect;
+  const pinConfig = typeof rowPinning === "object" ? rowPinning : undefined;
+  tableState.onPin = pinConfig?.onPin;
 
   // Use a single useEffect to push props into the TableState observable, that
   // way we avoid React warnings when the observable mutations cause downstream
@@ -370,6 +387,14 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     });
     tableStateSyncedFromPropsRef.current = true;
   }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
+
+  // Kept out of the effect above so an inline `rowPinning={{ ... }}` doesn't re-run `setRows` each render.
+  // `setRowPinning` ignores an `exclude` with the same kinds, so this is cheap when the array is new each render.
+  const pinningEnabled = !!rowPinning;
+  const pinExcludedKinds = pinConfig?.exclude;
+  useEffect(() => {
+    tableState.setRowPinning(pinningEnabled, pinExcludedKinds ?? []);
+  }, [tableState, pinningEnabled, pinExcludedKinds]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
@@ -555,9 +580,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     let visibleDataRows: ReactElement[] = [];
 
     // The pinned section (built below) renders these rows joined to the sticky head block, so exclude
-    // them from their normal body position. Source the exclusion from `pinnedRows` so the body de-dup
-    // and the pinned section can never disagree.
-    const pinnedRowStates = tableState.pinnedRows;
+    // them (and the children that move with a pinned parent) from their normal body position. Source the
+    // exclusion from `pinnedSectionRows` so the body de-dup and the pinned section can never disagree.
+    const pinnedRowStates = tableState.pinnedSectionRows;
     const pinnedIds = new Set(pinnedRowStates.map((rs) => rs.row.id));
     const visibleRows = tableState.visibleRows.filter((rs) => !pinnedIds.has(rs.row.id));
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);

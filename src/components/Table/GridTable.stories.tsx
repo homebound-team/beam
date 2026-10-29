@@ -35,7 +35,6 @@ import {
   fieldColumn,
   groupColumns,
   numericColumn,
-  pinColumn,
   selectColumn,
 } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
@@ -583,7 +582,7 @@ export function StickyHeader() {
   );
 }
 
-/** Interactive row pinning via `pinColumn`, including companions that hoist with their parent when pinned. */
+/** Interactive row pinning via `rowPinning`, including companions that hoist with their parent when pinned. */
 export function InteractiveRowPinning() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
@@ -591,7 +590,8 @@ export function InteractiveRowPinning() {
     <div css={Css.vh100.$}>
       some other top of page content
       <GridTable
-        columns={[pinColumn<Row>(), nameColumn, valueColumn]}
+        columns={[nameColumn, valueColumn]}
+        rowPinning
         stickyHeader
         rows={[
           simpleHeader,
@@ -600,7 +600,7 @@ export function InteractiveRowPinning() {
             id: `${i}`,
             data: { name: `row ${i}`, value: i },
             // Pre-pin a couple rows so the sticky pinned section (and its separator) shows in the snapshot;
-            // any row can be pinned/unpinned via the pin column.
+            // any row can be pinned/unpinned via its (hover-revealed) pin.
             ...(i === 3 || i === 8 ? { initPinned: true } : {}),
             // Row 8: pre-pinned trailing companion (also has a PinToggle in companion content).
             ...(i === 8
@@ -625,7 +625,8 @@ export function InteractiveRowPinningVirtual() {
     <div css={Css.vh100.$}>
       <GridTable
         as="virtual"
-        columns={[pinColumn<Row>(), nameColumn, valueColumn]}
+        columns={[nameColumn, valueColumn]}
+        rowPinning
         stickyHeader
         rows={[
           simpleHeader,
@@ -648,43 +649,16 @@ export function InteractiveRowPinningVirtual() {
 }
 
 /**
- * Demonstrates a "pin the whole group" button living inside a groupBy/parent row.
- *
- * The parent row shows its own info plus a pin toggle; clicking it cascades `api.pinRow` to the
- * parent *and* its child(ren) (`row.children`), so the group hoists into the sticky pinned section as a unit.
- * This is the recommended pattern when you want a control other than `pinColumn`.
+ * `rowPinning` on a nested table: pinning a parent brings its children with it (their pins show pinned and disabled).
+ * `exclude` hides the pin on `add` rows, and Group 5 opts out with `pinnable: false`.
  */
 export function InteractiveGroupRowPinning() {
   const nameColumn: GridColumn<NestedRow> = {
     header: () => "Name",
-    parent: (data, { row, api }) => {
-      // Pin the parent + all of its children together. `isPinned` is read here (inside the
-      // observer-wrapped Row), so the button's active state stays reactive.
-      //
-      // NOTE: this cascades manually. If this "pin the whole group" pattern shows up across several
-      // tables, we could add a library convenience instead — e.g. `api.pinRow(id, { withChildren: true })`
-      // (and a matching `unpinRow`) that pins the row's subtree — so callers don't repeat this.
-      const ids = [row.id, ...(row.children ?? []).map((c) => c.id)];
-      const isPinned = api.isPinnedRow(row.id);
-      return {
-        content: (
-          <div css={Css.df.aic.jcsb.w100.$}>
-            <span css={Css.xsSb.$}>{data.name}</span>
-            <IconButton
-              icon="pin"
-              color={isPinned ? Palette.Blue600 : undefined}
-              label={isPinned ? "Unpin group" : "Pin group"}
-              onClick={() => ids.forEach((id) => (isPinned ? api.unpinRow(id) : api.pinRow(id)))}
-            />
-          </div>
-        ),
-        value: data.name,
-      };
-    },
-    child: (data) => ({ content: <div css={Css.ml2.$}>{data.name}</div>, value: data.name }),
-    // Unused kinds in this story, but GridColumn<NestedRow> requires a handler for every kind.
+    parent: (data) => data.name,
+    child: (data) => data.name,
     grandChild: (data) => data.name,
-    add: () => "",
+    add: () => "Add item",
   };
 
   const rows: GridDataRow<NestedRow>[] = [
@@ -692,16 +666,18 @@ export function InteractiveGroupRowPinning() {
     ...zeroTo(40).map((i) => ({
       kind: "parent" as const,
       id: `g${i}`,
-      data: { name: `Group ${i}` },
-      // Pre-pin one whole group (parent + child) so the pinned section shows in the snapshot.
-      ...(i === 2 ? { initPinned: true } : {}),
+      data: { name: i === 5 ? `Group ${i} (not pinnable)` : `Group ${i}` },
+      // Pre-pin one whole group so the pinned section shows in the snapshot.
+      initPinned: i === 2,
+      ...(i === 5 ? { pinnable: false } : {}),
       children: [
         {
           kind: "child" as const,
           id: `g${i}c1`,
           data: { name: `Group ${i} — detail row` },
-          ...(i === 2 ? { initPinned: true } : {}),
+          children: [{ kind: "grandChild" as const, id: `g${i}c1g1`, data: { name: `Group ${i} — sub detail` } }],
         },
+        { kind: "add" as const, id: `g${i}add`, data: undefined },
       ],
     })),
   ];
@@ -709,7 +685,12 @@ export function InteractiveGroupRowPinning() {
   return (
     <div css={Css.vh100.$}>
       some other top of page content
-      <GridTable columns={[nameColumn]} stickyHeader rows={rows} />
+      <GridTable
+        columns={[collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nameColumn]}
+        rowPinning={{ exclude: ["add"], onPin: (row, pinned) => action("onPin")(row.id, pinned) }}
+        stickyHeader
+        rows={rows}
+      />
     </div>
   );
 }

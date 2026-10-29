@@ -281,12 +281,20 @@ export function hierarchyIndentPaddingPx(level: number): number | undefined {
 export function hierarchyFirstContentCss(opts: {
   level: number;
   skipIndent: boolean;
+  /** The row pin draws the indent after itself, so the cell keeps its base padding (overriding the default level `pl3`). */
+  indentAfterPin?: boolean;
   /** Deepest data-row level in the table. `0` when the table has a single level. */
   maxLevel: number;
 }): Properties | undefined {
-  const { level, skipIndent, maxLevel } = opts;
+  const { level, skipIndent, indentAfterPin, maxLevel } = opts;
   // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
-  const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
+  const paddingLeft = skipIndent
+    ? undefined
+    : indentAfterPin
+      ? level > 0
+        ? tableCellPaddingXPx
+        : undefined
+      : hierarchyIndentPaddingPx(level);
   const type = hierarchyLevelType(level, maxLevel);
   if (!type && paddingLeft === undefined) return undefined;
   return {
