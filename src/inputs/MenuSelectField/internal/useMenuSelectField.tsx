@@ -44,6 +44,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     getOptionLabel = defaultOptionLabel as (opt: O) => string,
     getOptionMenuLabel,
     getOptionSearchText,
+    autoSort = true,
     onSearch,
     disabledOptions,
     nothingSelectedText = "",
@@ -95,10 +96,10 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const [optionsLoading, setOptionsLoading] = useState(false);
   const didRequestOptionsRef = useRef(false);
   const options = useMemo(
-    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, undefined, false),
+    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, undefined, autoSort),
     // getOptionValue and getOptionLabel are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [optionsProp],
+    [optionsProp, autoSort],
   );
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
