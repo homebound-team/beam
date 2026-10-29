@@ -1,6 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
-import type { WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { ContentInsetProvider } from "src/layouts/ContentInsetContext";
@@ -20,10 +19,10 @@ export type CenteredLayoutProps = {
   size: CenteredLayoutSize;
   children?: ReactNode;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`).
+   * Opt into the document-scroll detail pane (`useRightPane`). Width is fixed at 448px.
    * Do not also nest another document-scroll right-pane layout (e.g. `FormSectionLayout withRightPane`).
    */
-  withRightPane?: WithRightPane;
+  withRightPane?: boolean;
 };
 
 /** Centered body-width shell. Nest inside page-header / stepper layout children — see `docs/layouts.md`. */

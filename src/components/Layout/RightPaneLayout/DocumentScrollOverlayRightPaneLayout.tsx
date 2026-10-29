@@ -13,7 +13,7 @@ import { DocumentScrollRightPaneLayoutRoot, NestedRightPaneLayoutContext } from 
 import { useDocumentScrollRightPaneAnchorRef } from "./useDocumentScrollRightPaneAnchorRef";
 import { useRightPaneOpenState } from "./useRightPane";
 import { waitForRightPaneExit } from "./waitForRightPaneExit";
-import { defaultDocumentScrollRightPaneWidth, minDocumentScrollContentWidthPx } from "./withRightPane";
+import { documentScrollRightPaneWidth, minDocumentScrollContentWidthPx } from "./withRightPane";
 
 export type DocumentScrollOverlayRightPaneLayoutProps = {
   children: ReactNode;
@@ -42,7 +42,7 @@ export function DocumentScrollOverlayRightPaneLayout({ children }: DocumentScrol
       {sm ? (
         <>
           {children}
-          <DocumentScrollRightPane paneWidth={defaultDocumentScrollRightPaneWidth} mobile={true} />
+          <DocumentScrollRightPane paneWidth={documentScrollRightPaneWidth} mobile={true} />
         </>
       ) : (
         <>
@@ -73,7 +73,7 @@ type DocumentScrollOverlayRightPaneHostProps = {
 function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPaneHostProps) {
   const { anchorRef, spacerRef } = props;
   const { isRightPaneOpen } = useRightPaneOpenState();
-  const paneWidthCss = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
+  const paneWidthCss = documentScrollRightPaneWidthCss(documentScrollRightPaneWidth);
   const [keepOverlayChrome, setKeepOverlayChrome] = useState(isRightPaneOpen);
 
   // Keep width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
@@ -111,7 +111,5 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
     };
   }, [anchorRef, keepOverlayChrome, paneWidthCss]);
 
-  return (
-    <DocumentScrollRightPane paneWidth={defaultDocumentScrollRightPaneWidth} mobile={false} anchorRef={anchorRef} />
-  );
+  return <DocumentScrollRightPane paneWidth={documentScrollRightPaneWidth} mobile={false} anchorRef={anchorRef} />;
 }

@@ -3,7 +3,6 @@ import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
-import type { WithRightPane } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { Css } from "src/Css";
 import { FormSection, type FormSectionProps } from "src/forms/FormSection/FormSection";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
@@ -40,10 +39,10 @@ export type FormSectionLayoutProps = {
   /** When true with `withJumpLinks`, prepend the form `title` as the first rail link. */
   includeTitleJumpLink?: boolean;
   /**
-   * Opt into the document-scroll detail pane (`useRightPane`).
+   * Opt into the document-scroll detail pane (`useRightPane`). Width is fixed at 448px.
    * Hosts JumpLinks + form — do not also set `withRightPane` on the inner `CenteredLayout`.
    */
-  withRightPane?: WithRightPane;
+  withRightPane?: boolean;
 };
 
 /**

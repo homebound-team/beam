@@ -17,7 +17,7 @@ import { clickAndWait, render } from "src/utils/rtl";
 import { vi } from "vitest";
 import { DocumentScrollOverlayRightPaneLayout } from "./DocumentScrollOverlayRightPaneLayout";
 import { useRightPaneActions } from "./useRightPane";
-import { defaultDocumentScrollRightPaneWidth, minDocumentScrollContentWidthPx } from "./withRightPane";
+import { documentScrollRightPaneWidth, minDocumentScrollContentWidthPx } from "./withRightPane";
 
 describe("DocumentScrollOverlayRightPaneLayout", () => {
   afterEach(() => {
@@ -27,7 +27,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
   it("publishes scoped pane width and a root floating right offset when open", async () => {
     // Given a document-scroll right pane layout on desktop
-    const expectedWidth = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
+    const expectedWidth = documentScrollRightPaneWidthCss(documentScrollRightPaneWidth);
     const r = await render(
       <DocumentScrollLayoutProvider>
         <DocumentScrollOverlayRightPaneLayout>
@@ -234,7 +234,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
   it("still inserts a pane-width spacer when the remaining viewport is under 480px", async () => {
     // Given a tight chrome (viewport − side nav leaves less than the content floor beside the pane)
-    const expectedWidth = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
+    const expectedWidth = documentScrollRightPaneWidthCss(documentScrollRightPaneWidth);
     const r = await render(
       <DocumentScrollLayoutProvider>
         <DocumentScrollOverlayRightPaneLayout>

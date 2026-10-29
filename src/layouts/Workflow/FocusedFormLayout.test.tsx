@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "src/components/Button";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
-import { defaultDocumentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
+import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import {
   beamFloatingRightOffsetVar,
@@ -277,7 +277,7 @@ describe("FocusedFormLayout", () => {
       width: documentScrollChromeWidth(),
     });
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
-      documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
+      documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
     );
   });
 });

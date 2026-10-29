@@ -1,7 +1,7 @@
 import { Button } from "src/components/Button";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import {
-  defaultDocumentScrollRightPaneWidth,
+  documentScrollRightPaneWidth,
   minDocumentScrollContentWidthPx,
 } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
@@ -307,7 +307,7 @@ describe("FormSectionLayout", () => {
 
   it("inserts a pane-width spacer when the pane is open", async () => {
     // Given withRightPane on typical jsdom chrome
-    const expectedWidth = documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth);
+    const expectedWidth = documentScrollRightPaneWidthCss(documentScrollRightPaneWidth);
     const r = await render(
       <FormSectionLayout
         withJumpLinks

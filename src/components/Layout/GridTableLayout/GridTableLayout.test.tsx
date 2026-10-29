@@ -3,7 +3,7 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
-import { defaultDocumentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
+import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { ModalProvider } from "src/components/Modal/ModalContext";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
@@ -887,13 +887,13 @@ describe("GridTableLayout", () => {
       // Then the pane renders in flow after the table column
       expect(r.rightPaneContent).toBeInTheDocument();
       expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({
-        width: documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
+        width: documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
       });
       expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
-        documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
+        documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
       );
       expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
-        documentScrollRightPaneWidthCss(defaultDocumentScrollRightPaneWidth),
+        documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
       );
     });
 
