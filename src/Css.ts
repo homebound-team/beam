@@ -311,9 +311,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get bcBlack() {
     return this.add("borderColor", "rgba(0, 0, 0, 1)");
   }
-  /** Sets `borderColor: "rgba(255, 253, 253, 1)"`. */
+  /** Sets `borderColor: "rgba(250, 250, 250, 1)"`. */
   get bcGray50() {
-    return this.add("borderColor", "rgba(255, 253, 253, 1)");
+    return this.add("borderColor", "rgba(250, 250, 250, 1)");
   }
   /** Sets `borderColor: "rgba(247, 245, 245, 1)"`. */
   get bcGray100() {
@@ -2286,9 +2286,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get black() {
     return this.add("color", "rgba(0, 0, 0, 1)");
   }
-  /** Sets `color: "rgba(255, 253, 253, 1)"`. */
+  /** Sets `color: "rgba(250, 250, 250, 1)"`. */
   get gray50() {
-    return this.add("color", "rgba(255, 253, 253, 1)");
+    return this.add("color", "rgba(250, 250, 250, 1)");
   }
   /** Sets `color: "rgba(247, 245, 245, 1)"`. */
   get gray100() {
@@ -2582,9 +2582,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get bgBlack() {
     return this.add("backgroundColor", "rgba(0, 0, 0, 1)");
   }
-  /** Sets `backgroundColor: "rgba(255, 253, 253, 1)"`. */
+  /** Sets `backgroundColor: "rgba(250, 250, 250, 1)"`. */
   get bgGray50() {
-    return this.add("backgroundColor", "rgba(255, 253, 253, 1)");
+    return this.add("backgroundColor", "rgba(250, 250, 250, 1)");
   }
   /** Sets `backgroundColor: "rgba(247, 245, 245, 1)"`. */
   get bgGray100() {
@@ -2878,9 +2878,9 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get fBlack() {
     return this.add("fill", "rgba(0, 0, 0, 1)");
   }
-  /** Sets `fill: "rgba(255, 253, 253, 1)"`. */
+  /** Sets `fill: "rgba(250, 250, 250, 1)"`. */
   get fGray50() {
-    return this.add("fill", "rgba(255, 253, 253, 1)");
+    return this.add("fill", "rgba(250, 250, 250, 1)");
   }
   /** Sets `fill: "rgba(247, 245, 245, 1)"`. */
   get fGray100() {
@@ -4947,7 +4947,7 @@ export enum Palette {
   White = "rgba(255, 255, 255, 1)",
   Transparent = "rgba(0,0,0,0)",
   Black = "rgba(0, 0, 0, 1)",
-  Gray50 = "rgba(255, 253, 253, 1)",
+  Gray50 = "rgba(250, 250, 250, 1)",
   Gray100 = "rgba(247, 245, 245, 1)",
   Gray200 = "rgba(236, 235, 235, 1)",
   Gray300 = "rgba(221, 220, 220, 1)",
