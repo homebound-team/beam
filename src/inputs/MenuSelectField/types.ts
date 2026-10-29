@@ -16,6 +16,8 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   getOptionMenuLabel?: (opt: O) => ReactNode;
   /** Extra text the menu search matches, in addition to `getOptionLabel`. */
   getOptionSearchText?: (opt: O) => string | readonly string[];
+  /** Debounced menu search text. The caller replaces `options` and should keep the current selection in that list. Closing calls this with `""`. */
+  onSearch?: (search: string) => void;
   disabledOptions?: (V | { value: V; reason: string })[];
   /** Shown in the field when nothing is selected, e.g. "All". */
   nothingSelectedText?: string;

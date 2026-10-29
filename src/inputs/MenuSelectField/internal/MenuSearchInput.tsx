@@ -3,7 +3,7 @@ import { Icon } from "src/components/Icon";
 import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
-/** Search field for an open menu. Present only when the option list is long enough to search. */
+/** Search field for an open menu. Present when the list is long enough to search, or when `onSearch` is set. */
 export type MenuSearchState = {
   show: boolean;
   value: string;

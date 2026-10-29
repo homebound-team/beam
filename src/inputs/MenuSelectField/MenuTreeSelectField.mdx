@@ -27,7 +27,7 @@ The same value may sit under more than one parent, and selecting it selects ever
 
 `selectionDisplay` picks which selections the count badge, tooltip, and open-menu pills include, and defaults to `all`.
 
-Groups start collapsed, except groups holding a selection, so every selected option is visible when the menu opens. `defaultExpanded` starts every group open instead. With a row highlighted, Right Arrow expands a group and then steps into it, and Left Arrow collapses a group or steps out to its parent. Searching shows each match with its ancestors and descendants. Labels wrap instead of truncating.
+Groups start collapsed, except groups holding a selection, so every selected option is visible when the menu opens. `defaultExpanded` starts every group open instead. With a row highlighted, Right Arrow expands a group and then steps into it, and Left Arrow collapses a group or steps out to its parent. Searching shows each match with its ancestors and descendants. With `onSearch`, the menu lists the options the caller returns. Labels wrap instead of truncating.
 
 Plug into `@homebound/form-state` with `BoundMenuTreeSelectField`, which stores `all.values` unless `onSelect` is passed.
 
