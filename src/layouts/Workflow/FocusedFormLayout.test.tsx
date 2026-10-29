@@ -110,6 +110,27 @@ describe("FocusedFormLayout", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
+  it("renders a non-standard completion label and calls onComplete when it is clicked", async () => {
+    // Given a focused form with an agreed one-off completion label and a standard label
+    const onComplete = vi.fn();
+    const r = await render(
+      <FocusedFormLayout
+        {...baseProps({ completeLabel: "Publish", nonStandardCompleteLabel: "Send to trade", onComplete })}
+      />,
+      withRouter(),
+    );
+
+    // Then the one-off label is the completion button
+    expect(r.sendToTrade).toHaveTextContent("Send to trade");
+    expect(r.query.publish).toBeNull();
+
+    // When it is clicked
+    click(r.sendToTrade);
+
+    // Then onComplete is called
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
   it("renders the destructive button before Save and runs it only after confirming", async () => {
     // Given an edit form with a destructive action using the default label and copy
     const onConfirm = vi.fn();
@@ -149,7 +170,6 @@ describe("FocusedFormLayout", () => {
     const r = await render(
       <FocusedFormLayout
         {...baseProps({
-          completeLabel: "Save",
           isDirty: () => true,
           destructiveAction: {
             label: "Delete",
@@ -311,7 +331,6 @@ function MaterialListingPage() {
     <FocusedFormLayout
       title="Kwikset Square Halifax Lever"
       onCancel={() => {}}
-      completeLabel="Save"
       onComplete={() => {}}
       isDirty={() => dirty}
       allowNavigation={({ nextLocation }) => nextLocation.pathname.startsWith(`/material-catalog/${listingId}/`)}

@@ -8,14 +8,17 @@ import type { WorkflowActionsProps } from "./WorkflowActions";
 import { WorkflowPageLayout } from "./WorkflowPageLayout";
 
 export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
-  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit" | "destructiveAction"> & {
-    /** Create/Save is disabled. A ReactNode is shown in Beam's tooltip. */
+  Pick<
+    WorkflowActionsProps,
+    "onCancel" | "onComplete" | "onSaveAndExit" | "destructiveAction" | "completeLabel" | "nonStandardCompleteLabel"
+  > & {
+    /** Create/Save/Publish is disabled. A ReactNode is shown in Beam's tooltip. */
     primaryDisabled?: WorkflowActionsProps["primaryDisabled"];
     /** Read on Cancel / leave — a callback so flipping dirty does not re-render. */
     isDirty?: () => boolean;
     /** Consulted only while dirty — return true to allow a route change that stays on this form. */
     allowNavigation?: (args: AllowNavigationArgs) => boolean;
-    /** Full-bleed AI wash on the body and the `ai` Create/Save variant. Pair with body `aiMode` (e.g. FormSectionLayout). */
+    /** Full-bleed AI wash on the body and the `ai` Create/Save/Publish variant. Pair with body `aiMode` (e.g. FormSectionLayout). */
     aiMode?: boolean;
     /** Icon triggers that open the document-scroll right pane. Hosts the pane — do not also set `withRightPane` on the body. */
     rightPaneTriggers?: RightPaneTrigger[];
@@ -33,7 +36,6 @@ export type FocusedFormLayoutProps = Pick<BaseHeaderProps, "title" | "documentTi
 export function FocusedFormLayout(props: FocusedFormLayoutProps) {
   const {
     onCancel,
-    completeLabel,
     onComplete,
     onSaveAndExit,
     destructiveAction,
@@ -44,14 +46,20 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
     rightPaneTriggers,
     banner,
     children,
-    ...headerProps
+    title,
+    documentTitleSuffix,
+    breadcrumbs,
+    completeLabel,
+    nonStandardCompleteLabel,
   } = props;
   const tid = useTestIds(props, "focusedFormLayout");
 
   return (
     <WorkflowPageLayout
       {...tid}
-      {...headerProps}
+      title={title}
+      documentTitleSuffix={documentTitleSuffix}
+      breadcrumbs={breadcrumbs}
       banner={banner}
       aiMode={aiMode}
       isDirty={isDirty}
@@ -60,6 +68,7 @@ export function FocusedFormLayout(props: FocusedFormLayoutProps) {
       onSaveAndExit={onSaveAndExit}
       destructiveAction={destructiveAction}
       completeLabel={completeLabel}
+      nonStandardCompleteLabel={nonStandardCompleteLabel}
       onComplete={onComplete}
       primaryDisabled={primaryDisabled}
       rightPaneTriggers={rightPaneTriggers}
