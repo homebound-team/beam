@@ -1,9 +1,6 @@
 import { useResizeObserver } from "@react-aria/utils";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
-/** Below this gap between the left and right slots, the toolbar switches to its compact (mobile) format. */
-export const toolbarMinSlotGapPx = 40;
-
 /**
  * Tracks whether a two-slot toolbar should use its compact format: when the gap between its left and
  * right slots would be under `toolbarMinSlotGapPx`.
@@ -50,3 +47,6 @@ export function useToolbarCompact(enabled: boolean) {
 
   return { rowRef, leftRef, rightRef, compact };
 }
+
+/** Below this gap between the left and right slots, the toolbar switches to its compact (mobile) format. */
+export const toolbarMinSlotGapPx = 40;
