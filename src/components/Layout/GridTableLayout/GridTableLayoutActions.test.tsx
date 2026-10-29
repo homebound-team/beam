@@ -10,7 +10,7 @@ import { column } from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { setViewport } from "src/tests/viewport";
 import { noop } from "src/utils/helpers";
-import { click, render, withRouter } from "src/utils/rtl";
+import { click, render, select, withRouter } from "src/utils/rtl";
 import { typeAndWait } from "src/utils/rtlUtils";
 import { vi } from "vitest";
 import { GridTableLayoutActions } from "./GridTableLayoutActions";
@@ -88,6 +88,28 @@ describe("GridTableLayoutActions", () => {
       expect(r.query.gridTableLayoutActions_filterButton).toBeNull();
       expect(r.query.filter_pill_needsRevision).toBeNull();
       expect(r.query.filter_clearBtn).toBeNull();
+    });
+
+    it("calls setValue when a group by option is selected", async () => {
+      // Given groupBy inline on desktop
+      const setValue = vi.fn();
+      const r = await render(
+        <GridTableLayoutActions
+          groupBy={{
+            value: "none",
+            setValue,
+            options: [
+              { id: "none", name: "None" },
+              { id: "status", name: "Status" },
+            ],
+          }}
+        />,
+        withRouter(),
+      );
+      // When Status is selected
+      select(r.groupBy, "Status");
+      // Then setValue receives the option id
+      expect(setValue).toHaveBeenCalledWith("status");
     });
 
     it("renders groupBy inline on desktop when there are no filters", async () => {

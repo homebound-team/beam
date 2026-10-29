@@ -2,20 +2,20 @@ import type { JSX } from "react";
 import { BaseFilter } from "src/components/Filters/BaseFilter";
 import { resolveTreeSelectedFilterLabel } from "src/components/Filters/selectedFilterLabelUtils";
 import type { Filter, SelectedFilterLabelValue } from "src/components/Filters/types";
-import { TreeSelectField, type TreeSelectFieldProps } from "src/inputs/TreeSelectField/TreeSelectField";
-import type { TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
+import { MenuTreeSelectField, type MenuTreeSelectFieldProps } from "src/inputs/MenuSelectField/MenuTreeSelectField";
+import type { TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import type { TestIds } from "src/utils/useTestIds";
 
-export type TreeFilterProps<O, V extends Value> = Omit<TreeSelectFieldProps<O, V>, "values" | "onSelect" | "label"> & {
+export type TreeFilterProps<O, V extends Value> = Omit<
+  MenuTreeSelectFieldProps<O, V>,
+  "values" | "onSelect" | "label" | "selectionDisplay"
+> & {
   defaultValue?: V[];
   label?: string;
-  /** Defines which of the tree values to use in the filter - "root", "leaf", or "all"
-   * @default "root" */
-  filterBy?: TreeFilterBy;
+  /** Which selected values the filter stores: `"root"`, `"leaf"`, or `"all"`. @default "root" */
+  filterBy?: TreeSelectionDisplay;
 };
-
-type TreeFilterBy = keyof TreeSelectResponse<any, any>;
 
 export function treeFilter<O, V extends Value>(props: TreeFilterProps<O, V>): (key: string) => Filter<V[]> {
   return (key) => new TreeFilter(key, props);
@@ -23,7 +23,8 @@ export function treeFilter<O, V extends Value>(props: TreeFilterProps<O, V>): (k
 
 class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, V>> implements Filter<V[]> {
   formatSelectedFilterLabel(value: SelectedFilterLabelValue<V[]>): string | undefined {
-    const { options, getOptionValue, getOptionLabel } = this.props;
+    const { options } = this.props;
+    const { getOptionValue, getOptionLabel } = optionReaders(this.props);
     return resolveTreeSelectedFilterLabel(options, getOptionValue, getOptionLabel, value);
   }
 
@@ -34,16 +35,17 @@ class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, 
     inModal: boolean,
     vertical: boolean,
   ): JSX.Element {
-    const { defaultValue, nothingSelectedText, filterBy = "root", ...props } = this.props;
+    const { defaultValue, nothingSelectedText, filterBy = "root", defaultExpanded, ...props } = this.props;
     return (
-      <TreeSelectField<O, V>
+      <MenuTreeSelectField<O, V>
         {...props}
         label={this.label}
-        values={value}
+        values={value ?? []}
         labelStyle={inModal ? "hidden" : !inModal && !vertical ? "inline" : "above"}
-        sizeToContent={!inModal && !vertical}
-        onSelect={(options) => {
-          const values = options[filterBy].values;
+        selectionDisplay={filterBy}
+        defaultExpanded={defaultExpanded}
+        onSelect={(response) => {
+          const values = response[filterBy].values;
           setValue(values.length === 0 ? undefined : values);
         }}
         nothingSelectedText={nothingSelectedText ?? "All"}
@@ -51,4 +53,11 @@ class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, 
       />
     );
   }
+}
+
+function optionReaders<O, V extends Value>(props: TreeFilterProps<O, V>) {
+  return {
+    getOptionValue: props.getOptionValue ?? ((option: O) => (option as { id: V }).id),
+    getOptionLabel: props.getOptionLabel ?? ((option: O) => (option as { name: string }).name),
+  };
 }
