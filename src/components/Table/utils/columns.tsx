@@ -1,6 +1,5 @@
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
-import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
 import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
@@ -128,40 +127,6 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
   }) as any;
 }
 
-/**
- * Provides a GridColumn containing a {@link PinToggle} to pin/unpin rows to the top at runtime.
- *
- * Like `selectColumn`/`collapseColumn`, this accepts no `columnDef` or a partial one. The toggle is
- * rendered for data rows by default; header/totals/expandableHeader get an `emptyCell` since there's
- * no "pin all" concept and reserved rows aren't pinnable.
- *
- * Note: pinning a parent row hoists only that row into the sticky pinned section — its children stay in place.
- */
-export function pinColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
-  const base = {
-    ...nonKindDefaults(),
-    id: "beamPinColumn",
-    clientSideSort: false,
-    align: "center",
-    // 40px to accommodate the pin IconButton + padding, matching selectColumn.
-    w: "40px",
-    wrapAction: false,
-    isAction: true,
-    header: emptyCell,
-    expandableHeader: emptyCell,
-    groupHeader: emptyCell,
-    totals: emptyCell,
-    // Use any of the user's per-row kind methods if they have them.
-    ...columnDef,
-  };
-  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Pin... `
-  return newMethodMissingProxy(base, (key) => {
-    return (data: any, { row }: { row: GridDataRow<any> }) => ({
-      content: <PinToggle rowId={row.id} />,
-    });
-  }) as any;
-}
-
 export const layoutGutterLeftColumnId = "beamLayoutGutterLeft";
 export const layoutGutterRightColumnId = "beamLayoutGutterRight";
 
@@ -188,14 +153,21 @@ export const collapseTogglePx = 28;
 const collapseControlPx = collapseTogglePx + 8;
 /** Select checkbox (16px) plus the 8px gap before the label. */
 const selectControlPx = 24;
+/** Width of the `rowPinning` pin button. Rows without a pin reserve this so everything after it stays in column. */
+export const pinTogglePx = 28;
+/** Pin toggle plus the 8px gap before the next item. */
+const pinControlPx = pinTogglePx + 8;
 
-/** Extra width so the chevron and checkbox don't eat the label. */
-export function firstContentControlPx(columns: readonly { id?: string }[]): number {
-  return columns.reduce((width, column) => {
-    if (column.id === beamCollapseColumnId) return width + collapseControlPx;
-    if (column.id === beamSelectColumnId) return width + selectControlPx;
-    return width;
-  }, 0);
+/** Extra width so the pin, chevron, and checkbox don't eat the label. */
+export function firstContentControlPx(columns: readonly { id?: string }[], hasPinControl = false): number {
+  return columns.reduce(
+    (width, column) => {
+      if (column.id === beamCollapseColumnId) return width + collapseControlPx;
+      if (column.id === beamSelectColumnId) return width + selectControlPx;
+      return width;
+    },
+    hasPinControl ? pinControlPx : 0,
+  );
 }
 
 /**

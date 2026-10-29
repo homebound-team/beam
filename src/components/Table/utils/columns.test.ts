@@ -72,6 +72,13 @@ describe("columns", () => {
     expect(sizes).toEqual(["280px", "100px"]);
   });
 
+  it("adds the row pin width when row pinning is on", () => {
+    // Given the collapse toggle and the select checkbox, with row pinning on
+    const width = firstContentControlPx([collapseColumn(), selectColumn()], true);
+    // Then the pin (36px) is added to the chevron (36px) and the checkbox (24px)
+    expect(width).toBe(96);
+  });
+
   it("keeps a resized first content column at the dragged width", () => {
     // Given a name column the user has already resized
     const columns = [{ id: "name", w: "220px" }, { id: "value" }] as GridColumnWithId<any>[];

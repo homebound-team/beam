@@ -30,7 +30,6 @@ import {
   groupColumns,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
-  pinColumn,
   selectColumn,
   sumColumnSizesPx,
   toLayoutColumns,
@@ -1297,24 +1296,184 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("bar");
     });
 
-    it("renders pinColumn toggles on data rows (not the header) and toggles on click", async () => {
+    it("renders rowPinning toggles on data rows (not the header) and toggles on click", async () => {
+      // Given a table with rowPinning turned on
       const api = new GridTableApiImpl<Row>();
-      const r = await render(
-        <GridTable<Row> api={api} columns={[pinColumn<Row>(), nameColumn, valueColumn]} rows={pinRows} />,
-      );
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} rowPinning />);
 
-      // The header has no pin toggle (emptyCell), but each data row has a row-scoped one
+      // Then the header has no pin toggle, but each data row has a row-scoped one
       expect(r.query.pin_header).toBeNull();
       expect(r.query.pin_1).toBeTruthy();
+      // And the pin sits in the first content cell
+      expect(cell(r, 1, 0)).toContainElement(r.pin_1);
 
-      // When we click row 1's toggle, it pins + hoists to the top
+      // When we click row 1's toggle
       click(r.pin_1);
+      // Then it pins + hoists to the top
       expect(api.getPinnedRowIds()).toEqual(["1"]);
-      expect(cell(r, 1, 1)).toHaveTextContent("foo");
+      expect(cell(r, 1, 1)).toHaveTextContent("1");
 
       // And clicking again unpins (the testid is row-scoped, so it stays stable despite the move)
       click(r.pin_1);
       expect(api.getPinnedRowIds()).toEqual([]);
+    });
+
+    it("does not render pin toggles without rowPinning", async () => {
+      // Given a table without rowPinning
+      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={pinRows} />);
+      // Then no row has a pin toggle
+      expect(r.query.pin_1).toBeNull();
+    });
+
+    it("skips excluded kinds unless the row sets pinnable", async () => {
+      // Given rowPinning excludes the `data` kind, but row 2 opts back in and row 3 is explicitly not pinnable
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn]}
+          rowPinning={{ exclude: ["data"] }}
+          rows={[
+            simpleHeader,
+            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
+            { kind: "data", id: "2", pinnable: true, data: { name: "bar", value: 2 } },
+            { kind: "data", id: "3", pinnable: false, data: { name: "zaz", value: 3 } },
+          ]}
+        />,
+      );
+      // Then only row 2 gets a pin toggle
+      expect(r.query.pin_1).toBeNull();
+      expect(r.query.pin_2).toBeTruthy();
+      expect(r.query.pin_3).toBeNull();
+    });
+
+    it("fires onPin for directly pinned rows, from the toggle or the api", async () => {
+      // Given a table with an onPin callback
+      const onPin = vi.fn();
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} rowPinning={{ onPin }} />,
+      );
+      // When row 1 is pinned via its toggle
+      click(r.pin_1);
+      // Then onPin is called with the row
+      expect(onPin).toHaveBeenCalledWith(expect.objectContaining({ id: "1" }), true, api);
+      // And when row 1 is unpinned via the api
+      act(() => api.unpinRow("1"));
+      // Then onPin is called again
+      expect(onPin).toHaveBeenLastCalledWith(expect.objectContaining({ id: "1" }), false, api);
+      expect(onPin).toHaveBeenCalledTimes(2);
+    });
+
+    it("stops showing a pinned row once it's dropped from rows", async () => {
+      // Given row 2 is pinned
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
+      act(() => api.pinRow("2"));
+      // When the page drops row 2 from its rows
+      await r.rerender(
+        <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows.filter((r) => r.id !== "2")} />,
+      );
+      // Then it's no longer shown or reported as pinned
+      expect(api.getPinnedRowIds()).toEqual([]);
+      expect(cell(r, 1, 0)).toHaveTextContent("foo");
+      expect(cell(r, 2, 0)).toHaveTextContent("zaz");
+    });
+
+    describe("with nested rows", () => {
+      const nestedNameColumn: GridColumn<NestedRow> = {
+        header: () => "Name",
+        totals: emptyCell,
+        parent: (data) => data.name,
+        child: (data) => data.name,
+        grandChild: (data) => data.name,
+      };
+      const nestedRows: GridDataRow<NestedRow>[] = [
+        { kind: "header", id: "header", data: undefined },
+        {
+          kind: "parent",
+          id: "p1",
+          data: { name: "parent 1" },
+          children: [
+            {
+              kind: "child",
+              id: "p1c1",
+              data: { name: "child p1c1" },
+              children: [{ kind: "grandChild", id: "p1c1g1", data: { name: "grandchild p1c1g1" } }],
+            },
+          ],
+        },
+        { kind: "parent", id: "p2", data: { name: "parent 2" } },
+      ];
+
+      it("brings a pinned parent's children with it", async () => {
+        // Given a nested table with rowPinning
+        const api = new GridTableApiImpl<NestedRow>();
+        const r = await render(
+          <GridTable<NestedRow>
+            api={api}
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            rows={nestedRows}
+            rowPinning
+          />,
+        );
+        // When parent 1 is pinned
+        click(r.pin_p1);
+        // Then its whole subtree shows in the pinned section, and parent 2 stays in the body
+        expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
+        expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
+        expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
+        expect(cell(r, 4, 0)).toHaveTextContent("parent 2");
+        expect(row(r, 5)).toBeUndefined();
+        // And only the parent is reported as pinned
+        expect(api.getPinnedRowIds()).toEqual(["p1"]);
+        // And the children's pins can't be toggled on their own
+        expect(r.pin_p1c1).toBeDisabled();
+        expect(r.pin_p1c1g1).toBeDisabled();
+
+        // When parent 1 is unpinned
+        click(r.pin_p1);
+        // Then its children go back to the body with it
+        expect(api.getPinnedRowIds()).toEqual([]);
+        expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
+        expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
+        expect(r.pin_p1c1).not.toBeDisabled();
+      });
+
+      it("collapses a pinned parent's children in the pinned section", async () => {
+        // Given parent 1 is pinned
+        const api = new GridTableApiImpl<NestedRow>();
+        const r = await render(
+          <GridTable<NestedRow>
+            api={api}
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            rows={nestedRows}
+            rowPinning
+          />,
+        );
+        click(r.pin_p1);
+        // When it's collapsed
+        act(() => api.toggleCollapsedRow("p1"));
+        // Then its children are hidden, and parent 2 follows it in the body
+        expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
+        expect(cell(r, 2, 0)).toHaveTextContent("parent 2");
+        expect(row(r, 3)).toBeUndefined();
+      });
+
+      it("doesn't fire onPin for children that move with a pinned parent", async () => {
+        // Given a nested table with an onPin callback
+        const onPin = vi.fn();
+        const r = await render(
+          <GridTable<NestedRow>
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            rows={nestedRows}
+            rowPinning={{ onPin }}
+          />,
+        );
+        // When parent 1 is pinned
+        click(r.pin_p1);
+        // Then onPin fires once, for the parent only
+        expect(onPin).toHaveBeenCalledTimes(1);
+        expect(onPin).toHaveBeenCalledWith(expect.objectContaining({ id: "p1" }), true, expect.anything());
+      });
     });
 
     it("does not hoist (or hide) a reserved row when it is pinned", async () => {

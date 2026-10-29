@@ -69,7 +69,7 @@ export type GridTableApi<R extends Kinded> = {
   unpinRow(id: string): void;
   /** Toggles a row's runtime pinned state. */
   togglePinnedRow(id: string): void;
-  /** Returns the ids of currently pinned rows. */
+  /** Returns the ids of currently pinned rows, not including children shown with a pinned parent. */
   getPinnedRowIds(): string[];
 
   /** Sets the internal state of 'activeRowId' */
