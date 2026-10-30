@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { IconButton } from "src/components/IconButton";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Tokens } from "src/Css";
+import { Palette, Tokens } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -27,6 +27,8 @@ export function PinToggle({ rowId }: PinToggleProps) {
       color={isPinned || isPinnedViaParent ? Tokens.Primary : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
       disabled={isPinnedViaParent ? "Pinned with parent" : undefined}
+      // Show the pinned row fill through, not the default grey disabled background
+      bgColor={isPinnedViaParent ? Palette.Transparent : undefined}
       onClick={() => tableState.togglePinned(rowId)}
     />
   );

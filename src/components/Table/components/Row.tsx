@@ -143,6 +143,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const controlColumns = tableState.controlColumns;
   const columnStripeColor = style.columnStripeColor;
   const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level, aiMode } = rs;
+  // Children hoisted with a pinned parent sit in the pinned section too, so they look pinned
+  const showsPinned = pinned || rs.hasPinnedAncestor;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === HEADER;
@@ -360,7 +362,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 // Rows without a pin (i.e. the header) still hold its width so everything after it lines up
                 css={{
                   ...Css.fs0.df.aic.h("1lh").mh0.wPx(pinTogglePx).mrPx(pinIndentPx).$,
-                  ...(!pinned && !rs.hasPinnedAncestor && revealPinOnRowHoverCss),
+                  ...(!showsPinned && revealPinOnRowHoverCss),
                 }}
                 onClick={(event) => event.stopPropagation()}
               >
@@ -541,8 +543,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
             ...(isLastKeptRow && style.keptLastRowCss),
-            // Apply the blue highlight to every runtime-pinned row's cells (wins over `isActive`)
-            ...(pinned && style.pinnedRowCss),
+            // Apply the blue highlight to every pinned row's cells, including a pinned parent's children (wins over `isActive`)
+            ...(showsPinned && style.pinnedRowCss),
             // AI wash wins over pinned/active; reserved kinds never get it.
             ...(aiMode && !reservedRowKinds.includes(row.kind) && Css.bgColor(Tokens.AiFieldBg).$),
             // Apply cell highlight styles to active cell and hover

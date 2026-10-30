@@ -126,6 +126,24 @@ export function Loading() {
   );
 }
 
+/** Pinned rows (and a pinned parent's children) with client-side search, to see how pins react to filtered rows. */
+export function WithRowPinning() {
+  const columns = useMemo(() => getColumns(false), []);
+  // Pre-pin one parent so the pinned section shows in the snapshot
+  const rows = useMemo(
+    () => [simpleHeader, ...makeNestedRows(3).map((row) => (row.id === "p1" ? { ...row, initPinned: true } : row))],
+    [],
+  );
+  const layoutState = useGridTableLayoutState({ search: "client" });
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with row pinning" />
+      <GridTableLayoutComponent layoutState={layoutState} tableProps={{ columns, rows, rowPinning: true }} />
+    </TestProjectLayout>
+  );
+}
+
 export function WithSelectionSummary() {
   const columns = useMemo(() => getColumns(false), []);
   const rows = useMemo(() => [simpleHeader, ...makeSelectedRows()], []);
