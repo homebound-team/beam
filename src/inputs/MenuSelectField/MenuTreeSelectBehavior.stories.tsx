@@ -27,6 +27,11 @@ export const Collapsed = newStory(() => <TreeField initial={["o8", "o9"]} />, { 
 /** Every group starts open. */
 export const Expanded = newStory(() => <TreeField defaultExpanded />, { play: open("options") });
 
+/** Dotted values sit in front of unchecked boxes, and a group holding one opens like a group holding a selection. */
+export const Mixed = newStory(() => <TreeField initial={["o2", "spkr-109"]} mixedValues={["o1", "o7", "bath-205"]} />, {
+  play: open("options"),
+});
+
 /** Searching a code that isn't in the name still finds the group, and keeps its children. */
 export const Search = newStory(() => <TreeField />, {
   play: async (context) => {
@@ -51,6 +56,7 @@ function TreeField(props: {
   initial?: string[];
   defaultExpanded?: boolean;
   disabledOptions?: (string | { value: string; reason: string })[];
+  mixedValues?: string[];
 }) {
   const [values, setValues] = useState(props.initial ?? []);
   return (
@@ -64,6 +70,7 @@ function TreeField(props: {
         getOptionSearchText={(option) => option.code ?? []}
         disabledOptions={props.disabledOptions}
         defaultExpanded={props.defaultExpanded}
+        mixedValues={props.mixedValues}
       />
     </FieldFrame>
   );

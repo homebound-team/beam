@@ -1,10 +1,11 @@
 import { getInteractionModality } from "@react-aria/interactions";
-import { type KeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import type { ListState } from "react-stately";
-import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
+import { type Components, Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Css, Tokens } from "src/Css";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
+import { MixedLegend, mixedLegendHeight } from "src/inputs/MenuSelectField/internal/MixedLegend";
 import {
   menuRowHeight,
   MultiOptionRow,
@@ -31,6 +32,8 @@ export type MenuSelectMenu<O> = {
   rowVariant: "check" | "checkbox" | "tree";
   /** Tree state for each visible row, keyed by option key. Only set for `"tree"`. */
   tree?: { rows: Map<string, TreeRowState>; setExpanded: (key: string, expanded: boolean) => void };
+  /** Dotted value keys, and the DOM id of the legend that explains them. Only set when some value is dotted. */
+  mixed?: { keys: ReadonlySet<string>; legendId: string };
   onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
   /** DOM id of the option that has virtual focus. */
   activeDescendant?: string;
@@ -49,7 +52,7 @@ export type OptionListProps<O> = {
 /** Virtualized listbox with virtual focus. DOM focus stays on the search field, or on this list when there is no search. */
 export function OptionList<O>(props: OptionListProps<O>) {
   const { menu, listRef, label, onKeyDown, activeDescendant } = props;
-  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree } = menu;
+  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree, mixed } = menu;
   const tid = useTestIds(props, "optionList");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   // Labels wrap, so rows vary in height. Size the list to what Virtuoso measured.
@@ -105,7 +108,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
               key={isTest ? items.length : "virtuoso"}
               ref={virtuosoRef}
               style={{
-                height: measuredHeight ?? items.length * menuRowHeight,
+                height: measuredHeight ?? items.length * menuRowHeight + (mixed ? mixedLegendHeight : 0),
                 flexShrink: 1,
                 minHeight: 0,
                 overscrollBehavior: "contain",
@@ -113,6 +116,8 @@ export function OptionList<O>(props: OptionListProps<O>) {
               totalCount={items.length}
               defaultItemHeight={menuRowHeight}
               totalListHeightChanged={setMeasuredHeight}
+              components={listComponents}
+              context={{ header: mixed && <MixedLegend id={mixed.legendId} {...tid.mixedLegend} /> }}
               computeItemKey={(index) => String(items[index]?.key ?? index)}
               {...(isTest
                 ? { initialItemCount: items.length }
@@ -124,6 +129,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
                 const entry = item?.value;
                 if (!item || !entry) return null;
                 const treeRow = isTree ? tree?.rows.get(String(item.key)) : undefined;
+                const mixedLegendId = mixed?.keys.has(entry.valueKey) ? mixed.legendId : undefined;
                 if (treeRow && tree) {
                   return (
                     <TreeOptionRow
@@ -131,6 +137,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
                       state={state}
                       id={optionDomId(id, index)}
                       disabledReason={disabledReasons[entry.valueKey]}
+                      mixedLegendId={mixedLegendId}
                       row={treeRow}
                       onExpandedChange={(expanded) => tree.setExpanded(String(item.key), expanded)}
                       {...tid}
@@ -143,6 +150,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
                     state={state}
                     id={optionDomId(id, index)}
                     disabledReason={disabledReasons[entry.valueKey]}
+                    mixedLegendId={mixedLegendId}
                     {...tid}
                   />
                 );
@@ -163,5 +171,14 @@ export function optionDomId(listId: string, index: number): string {
 
 // Enough rows to fill the tallest anchored panel (512px / 40px).
 const initialRenderCount = 13;
+
+type ListContext = { header: ReactNode };
+
+function ListHeader({ context }: { context: ListContext }) {
+  return <>{context.header}</>;
+}
+
+// Module level, so Virtuoso keeps one header across renders.
+const listComponents: Components<unknown, ListContext> = { Header: ListHeader };
 
 const emptyCss = Css.df.aic.px2.hPx(menuRowHeight).sm.color(Tokens.OnSurfaceMuted).$;

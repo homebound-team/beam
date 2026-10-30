@@ -277,6 +277,44 @@ describe("MenuSelectField", () => {
     expect(r.query.color_selections).toBeNull();
   });
 
+  it("reads Mixed and dots each mixed value when nothing is selected", async () => {
+    // Given no value, and records holding Blue or Green
+    const r = await render(<TestHarness nothingSelectedText="All" mixedValues={["b", "g"]} />);
+    // Then the field reads Mixed, counting both values
+    expect(r.color).toHaveTextContent("Mixed");
+    expect(r.color).not.toHaveTextContent("All");
+    expect(r.color_count).toHaveTextContent("2");
+    // And when opened, the legend explains the dotted rows
+    click(r.color);
+    expect(r.color_mixedLegend).toBeInTheDocument();
+    expect(optionOf(r, "Blue")).toHaveAccessibleDescription(mixedDescription);
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription(mixedDescription);
+    expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
+  });
+
+  it("shows the picked value and keeps dots on the other mixed values", async () => {
+    // Given Blue picked, and records holding Blue or Green
+    const r = await render(<TestHarness initial="b" mixedValues={["b", "g"]} />);
+    // Then the field shows Blue without a count
+    expect(r.color).toHaveTextContent("Blue");
+    expect(r.query.color_count).toBeNull();
+    // And when opened, Blue is checked rather than dotted, while Green keeps its dot
+    click(r.color);
+    expect(optionOf(r, "Blue")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "Blue")).not.toHaveAccessibleDescription();
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription(mixedDescription);
+  });
+
+  it("has no legend without mixed values", async () => {
+    // Given a single select without mixedValues
+    const r = await render(<TestHarness />);
+    // When opening it
+    click(r.color);
+    // Then there's no legend and no row is described
+    expect(r.query.color_mixedLegend).toBeNull();
+    r.getAllByTestId("color_option").forEach((option) => expect(option).not.toHaveAccessibleDescription());
+  });
+
   it("closes when re-selecting the current value", async () => {
     // Given a single select with a value
     const onSelect = vi.fn();
@@ -524,7 +562,14 @@ type HarnessProps = {
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
   autoSort?: boolean;
+  mixedValues?: string[];
 };
+
+const mixedDescription = /Mixed\s*Selected rows have different values\./;
+
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);
+}
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
   const originalInnerHeight = Object.getOwnPropertyDescriptor(window, "innerHeight");

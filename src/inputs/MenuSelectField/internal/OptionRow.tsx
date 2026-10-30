@@ -6,6 +6,7 @@ import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
+import { MixedDot } from "src/inputs/MenuSelectField/internal/MixedLegend";
 import type { MenuOptionItem } from "src/inputs/MenuSelectField/types";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -15,6 +16,8 @@ export type OptionRowProps<O> = {
   /** DOM id, referenced by the search input's `aria-activedescendant`. */
   id: string;
   disabledReason?: string;
+  /** Set when the value is dotted. The legend's DOM id, used as the row's `aria-describedby`. */
+  mixedLegendId?: string;
 };
 
 /** Per-row tree state the list passes to `TreeOptionRow`. */
@@ -42,7 +45,7 @@ export function MultiOptionRow<O>(props: OptionRowProps<O>) {
 }
 
 function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "checkbox" }) {
-  const { item, state, id, disabledReason, variant } = props;
+  const { item, state, id, disabledReason, mixedLegendId, variant } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -64,6 +67,7 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
         {...mergeProps(optionProps, hoverProps)}
         // Our own id (stable per index) so the search input can point at it.
         id={id}
+        aria-describedby={mixedLegendId}
         data-key={entry.valueKey}
         data-label={item.textValue}
         ref={ref}
@@ -75,10 +79,17 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
         {...tid.option}
       >
         {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
+        {variant === "checkbox" && mixedLegendId && <MixedDot />}
         <span css={Css.fg1.mw0.$}>{item.rendered}</span>
         {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
+          </span>
+        )}
+        {variant === "check" && mixedLegendId && (
+          // Centered in the check icon's 24px box.
+          <span css={Css.df.aic.jcc.fs0.sqPx(24).$}>
+            <MixedDot />
           </span>
         )}
       </div>
@@ -88,7 +99,7 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
 
 /** Tree option: indented by depth, with a checkbox, a wrapping label, and a chevron that expands its children. */
 export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
-  const { item, state, id, disabledReason, row, onExpandedChange } = props;
+  const { item, state, id, disabledReason, mixedLegendId, row, onExpandedChange } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -119,6 +130,7 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
             {...optionProps}
             // Our own id (stable per index) so the search input can point at it.
             id={id}
+            aria-describedby={mixedLegendId}
             data-key={entry.valueKey}
             data-label={item.textValue}
             ref={ref}
@@ -128,6 +140,11 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
             <span css={Css.df.fs0.mtPx(2).$}>
               <StyledCheckbox isSelected={isSelected} isIndeterminate={row.isIndeterminate} isDisabled={isDisabled} />
             </span>
+            {mixedLegendId && (
+              <span css={Css.df.fs0.mtPx(7).$}>
+                <MixedDot />
+              </span>
+            )}
             <span css={Css.fg1.mw0.$}>{item.rendered}</span>
           </div>
         ),

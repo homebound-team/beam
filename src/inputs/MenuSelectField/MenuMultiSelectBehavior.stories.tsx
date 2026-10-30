@@ -22,6 +22,11 @@ export default {
 /** A checkbox on each row. The menu stays open while options are toggled. */
 export const Menu = newStory(() => <MultiField initial={["cc", "room"]} />, { play: open("groupBy") });
 
+/** Every record holds Cost Code; some hold Level or Room, so those get a dot in front of the label. */
+export const Mixed = newStory(() => <MultiField initial={["cc"]} mixedValues={["cc", "level", "room"]} />, {
+  play: open("groupBy"),
+});
+
 /** Disabled rows, including one with a reason. */
 export const DisabledOptions = newStory(
   () => {
@@ -83,11 +88,17 @@ export const SelectedPillsExpanded = newStory(
   },
 );
 
-function MultiField(props: { initial?: string[] }) {
+function MultiField(props: { initial?: string[]; mixedValues?: string[] }) {
   const [values, setValues] = useState(props.initial ?? []);
   return (
     <FieldFrame>
-      <MenuMultiSelectField label="Group by" options={groupByOptions()} values={values} onSelect={setValues} />
+      <MenuMultiSelectField
+        label="Group by"
+        options={groupByOptions()}
+        values={values}
+        onSelect={setValues}
+        mixedValues={props.mixedValues}
+      />
     </FieldFrame>
   );
 }

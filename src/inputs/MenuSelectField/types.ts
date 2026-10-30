@@ -21,6 +21,8 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   /** Debounced menu search text. The caller replaces `options` and should keep the current selection in that list. Closing calls this with `""`. */
   onSearch?: (search: string) => void;
   disabledOptions?: (V | { value: V; reason: string })[];
+  /** Values some, but not all, of the edited records hold. Ones not in `value(s)` get a dot, and the field reads "Mixed". */
+  mixedValues?: V[];
   /** Shown in the field when nothing is selected, e.g. "All". */
   nothingSelectedText?: string;
   placeholder?: string;
