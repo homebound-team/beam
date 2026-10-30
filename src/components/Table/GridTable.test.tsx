@@ -1299,7 +1299,9 @@ describe("GridTable", () => {
     it("renders rowPinning toggles on data rows (not the header) and toggles on click", async () => {
       // Given a table with rowPinning turned on
       const api = new GridTableApiImpl<Row>();
-      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} rowPinning />);
+      const r = await render(
+        <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} rowPinning />,
+      );
 
       // Then the header has no pin toggle, but each data row has a row-scoped one
       expect(r.query.pin_header).toBeNull();
