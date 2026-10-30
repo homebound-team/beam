@@ -52,6 +52,11 @@ export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<
   /** Value proposed by an AI model; puts the field in AI mode. */
   proposedValue?: V;
   onSelect: (value: V | undefined, opt: O | undefined) => void;
+  /**
+   * When set, `options` are the roots of a hierarchy. The menu lists every node, indented, with no chevrons.
+   * The closed field shows the path to the selection, joined with ` > `.
+   */
+  getChildren?: (opt: O) => readonly O[] | undefined;
 };
 
 /** Selection contract the single, multi, and tree fields pass into the shared menu. */
@@ -64,6 +69,12 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
   onCommit: (values: V[], opts: O[]) => void;
   /** Makes `options` the roots of a tree, with expandable parents and cascading selection. Multiple selection only. */
   tree?: MenuSelectTreeConfig<O>;
+  /** Single select over a hierarchy: every node stays visible, and the trigger shows the path. */
+  hierarchy?: MenuSelectHierarchyConfig<O>;
+};
+
+export type MenuSelectHierarchyConfig<O> = {
+  getChildren: (opt: O) => readonly O[] | undefined;
 };
 
 /** Which selected options to surface: every one, only leaves, or only the highest selected ancestors. */

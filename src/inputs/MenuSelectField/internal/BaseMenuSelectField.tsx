@@ -22,6 +22,7 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControl
     proposedValues: _proposedValues,
     onCommit: _onCommit,
     tree: _tree,
+    hierarchy: _hierarchy,
     ...fieldProps
   } = props;
   const { triggerRef, trigger, searchRef, search, listRef, menu, selections } = useMenuSelectField(props);

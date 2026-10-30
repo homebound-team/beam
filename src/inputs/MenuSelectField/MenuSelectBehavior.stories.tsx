@@ -40,6 +40,25 @@ export const DisabledOptions = newStory(
   { play: open("groupBy") },
 );
 
+/** A nested list with no chevrons. The trigger shows the path, and the selected row has a check. */
+export const Hierarchy = newStory(
+  () => {
+    const [value, setValue] = useState<string | undefined>("drench");
+    return (
+      <FieldFrame>
+        <MenuSelectField
+          label="Location"
+          options={locationTree()}
+          getChildren={(option) => option.children}
+          value={value}
+          onSelect={setValue}
+        />
+      </FieldFrame>
+    );
+  },
+  { play: open("location") },
+);
+
 /** `getOptionMenuLabel` replaces the row. The closed field still shows the option name. */
 export const CustomLabel = newStory(
   () => {
@@ -71,4 +90,25 @@ function SingleField(props: { initial?: string }) {
       <MenuSelectField label="Group by" options={groupByOptions()} value={value} onSelect={setValue} />
     </FieldFrame>
   );
+}
+
+type LocationOption = { id: string; name: string; children?: LocationOption[] };
+
+function locationTree(): LocationOption[] {
+  return [
+    {
+      id: "bath-207",
+      name: "Bath 207",
+      children: [
+        {
+          id: "walls",
+          name: "Walls",
+          children: [
+            { id: "drench", name: "Drench" },
+            { id: "tile", name: "Tile" },
+          ],
+        },
+      ],
+    },
+  ];
 }

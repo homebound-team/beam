@@ -510,6 +510,51 @@ describe("MenuSelectField", () => {
       keyboard.restore();
     }
   });
+
+  it("shows a hierarchy as a path, with a check and no chevrons", async () => {
+    // Given a single select whose options nest
+    const onSelect = vi.fn();
+    const r = await render(<HierarchyField onSelect={onSelect} value="drench" />);
+
+    // Then the trigger shows the path to the selection
+    expect(r.location).toHaveTextContent("Bath 207 > Walls > Drench");
+
+    // When the menu opens
+    click(r.location);
+
+    // Then every node is listed, parents are semibold, and the leaf has a check
+    expect(getOptions(r.location)).toEqual(["Bath 207", "Walls", "Drench", "Tile"]);
+    const walls = optionByLabel(r.location_listbox, "Walls");
+    const drench = optionByLabel(r.location_listbox, "Drench");
+    expect(walls).toHaveStyle({ paddingLeft: "44px" });
+    expect(drench).toHaveStyle({ paddingLeft: "72px" });
+    expect(labelOf(walls)).toHaveStyle({ fontWeight: "600" });
+    expect(labelOf(drench)).toHaveStyle({ fontWeight: "400" });
+    expect(drench.querySelector("[data-icon='check']")).toBeTruthy();
+    expect(drench.querySelector("[data-checked]")).toBeNull();
+    expect(drench.querySelector("button")).toBeNull();
+    expect(walls.querySelector("[data-icon='check']")).toBeNull();
+
+    // When a parent is chosen
+    select(r.location, "Walls");
+
+    // Then that value commits, the menu closes, and the path stops at the parent
+    expect(onSelect).toHaveBeenCalledWith("walls", expect.objectContaining({ id: "walls", name: "Walls" }));
+    expect(r.location).toHaveAttribute("aria-expanded", "false");
+    expect(r.location).toHaveTextContent("Bath 207 > Walls");
+  });
+
+  it("keeps ancestors visible when a hierarchy search matches a leaf", async () => {
+    // Given an open hierarchy long enough to search
+    const r = await render(<HierarchyField value={undefined} options={deepLocationTree()} />);
+    click(r.location);
+
+    // When searching for a leaf
+    type(r.location_search, "drench");
+
+    // Then the match stays with its ancestors, and an unmatched sibling drops out
+    expect(getOptions(r.location)).toEqual(["Bath 207", "Walls", "Drench"]);
+  });
 });
 
 type Color = { id: string; name: string };
@@ -614,4 +659,82 @@ function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: s
       {...others}
     />
   );
+}
+
+type Location = { id: string; name: string; children?: Location[] };
+
+function HierarchyField(props: {
+  value: string | undefined;
+  onSelect?: (value: string | undefined, option: Location | undefined) => void;
+  options?: Location[];
+}) {
+  const [value, setValue] = useState(props.value);
+  return (
+    <MenuSelectField
+      label="Location"
+      options={props.options ?? locationTree()}
+      getChildren={(option) => option.children}
+      value={value}
+      onSelect={(next, option) => {
+        props.onSelect?.(next, option);
+        setValue(next);
+      }}
+    />
+  );
+}
+
+function locationTree(): Location[] {
+  return [
+    {
+      id: "bath-207",
+      name: "Bath 207",
+      children: [
+        {
+          id: "walls",
+          name: "Walls",
+          children: [
+            { id: "drench", name: "Drench" },
+            { id: "tile", name: "Tile" },
+          ],
+        },
+      ],
+    },
+  ];
+}
+
+function deepLocationTree(): Location[] {
+  return [
+    {
+      id: "bath-207",
+      name: "Bath 207",
+      children: [
+        {
+          id: "walls",
+          name: "Walls",
+          children: [
+            { id: "drench", name: "Drench" },
+            { id: "tile", name: "Tile" },
+          ],
+        },
+        { id: "floor", name: "Floor" },
+        { id: "ceiling", name: "Ceiling" },
+        { id: "door", name: "Door" },
+        { id: "window", name: "Window" },
+        { id: "trim", name: "Trim" },
+        { id: "paint", name: "Paint" },
+      ],
+    },
+  ];
+}
+
+function optionByLabel(listbox: HTMLElement, label: string): HTMLElement {
+  const option = listbox.querySelector<HTMLElement>(`[data-label="${label}"]`);
+  if (!option) throw new Error(`Missing option ${label}`);
+  return option;
+}
+
+function labelOf(option: HTMLElement): HTMLElement {
+  const label = option.querySelector("span");
+  if (!label) throw new Error("Missing option label");
+  return label;
 }

@@ -1,15 +1,17 @@
 import { getInteractionModality } from "@react-aria/interactions";
-import { type KeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from "react";
 import { useListBox } from "react-aria";
 import type { ListState } from "react-stately";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Css, Tokens } from "src/Css";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import {
+  HierarchyOptionRow,
   menuRowHeight,
   MultiOptionRow,
   SingleOptionRow,
   TreeOptionRow,
+  type HierarchyRowState,
   type TreeRowState,
 } from "src/inputs/MenuSelectField/internal/OptionRow";
 import type { MenuOptionItem } from "src/inputs/MenuSelectField/types";
@@ -27,10 +29,12 @@ export type MenuSelectMenu<O> = {
   disabledReasons: Record<string, string | undefined>;
   /** Row scrolled into view on mount, e.g. the first selected option. */
   initialIndex: number;
-  /** `"check"` draws a trailing check for one value. `"checkbox"` draws a leading checkbox when several can be toggled. `"tree"` adds depth and expansion. */
-  rowVariant: "check" | "checkbox" | "tree";
+  /** `"check"` draws a trailing check for one value. `"checkbox"` draws a leading checkbox when several can be toggled. `"tree"` adds depth and expansion. `"hierarchy"` indents a single-select path. */
+  rowVariant: "check" | "checkbox" | "tree" | "hierarchy";
   /** Tree state for each visible row, keyed by option key. Only set for `"tree"`. */
   tree?: { rows: Map<string, TreeRowState>; setExpanded: (key: string, expanded: boolean) => void };
+  /** Hierarchy state for each visible row, keyed by option key. Only set for `"hierarchy"`. */
+  hierarchy?: { rows: Map<string, HierarchyRowState> };
   onKeyDown: (e: KeyboardEvent<HTMLElement>) => void;
   /** DOM id of the option that has virtual focus. */
   activeDescendant?: string;
@@ -49,7 +53,7 @@ export type OptionListProps<O> = {
 /** Virtualized listbox with virtual focus. DOM focus stays on the search field, or on this list when there is no search. */
 export function OptionList<O>(props: OptionListProps<O>) {
   const { menu, listRef, label, onKeyDown, activeDescendant } = props;
-  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree } = menu;
+  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree, hierarchy } = menu;
   const tid = useTestIds(props, "optionList");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   // Labels wrap, so rows vary in height. Size the list to what Virtuoso measured.
@@ -123,6 +127,19 @@ export function OptionList<O>(props: OptionListProps<O>) {
                 const item = items[index];
                 const entry = item?.value;
                 if (!item || !entry) return null;
+                const hierarchyRow = rowVariant === "hierarchy" ? hierarchy?.rows.get(String(item.key)) : undefined;
+                if (hierarchyRow) {
+                  return (
+                    <HierarchyOptionRow
+                      item={item}
+                      state={state}
+                      id={optionDomId(id, index)}
+                      disabledReason={disabledReasons[entry.valueKey]}
+                      row={hierarchyRow}
+                      {...tid}
+                    />
+                  );
+                }
                 const treeRow = isTree ? tree?.rows.get(String(item.key)) : undefined;
                 if (treeRow && tree) {
                   return (

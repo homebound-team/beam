@@ -4,7 +4,7 @@ import { mergeProps, useHover, useOption } from "react-aria";
 import type { ListState } from "react-stately";
 import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
-import { Css, Tokens } from "src/Css";
+import { Css, type Properties, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
 import type { MenuOptionItem } from "src/inputs/MenuSelectField/types";
 import { useTestIds } from "src/utils/useTestIds";
@@ -31,6 +31,25 @@ type TreeOptionRowProps<O> = OptionRowProps<O> & {
   onExpandedChange: (expanded: boolean) => void;
 };
 
+/** Per-row hierarchy state for a single-select path. */
+export type HierarchyRowState = {
+  level: number;
+  hasChildren: boolean;
+};
+
+/** Single-select hierarchy row: indented, semibold when it has children, with a trailing check. */
+export function HierarchyOptionRow<O>(props: OptionRowProps<O> & { row: HierarchyRowState }) {
+  const { row, ...rest } = props;
+  return (
+    <BaseOptionRow
+      {...rest}
+      variant="check"
+      indent={rowPaddingX + row.level * treeIndent}
+      labelCss={row.hasChildren ? Css.smSb.$ : Css.sm.$}
+    />
+  );
+}
+
 /** Single-select option: label with a trailing check when selected. */
 export function SingleOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="check" />;
@@ -41,8 +60,10 @@ export function MultiOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="checkbox" />;
 }
 
-function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "checkbox" }) {
-  const { item, state, id, disabledReason, variant } = props;
+function BaseOptionRow<O>(
+  props: OptionRowProps<O> & { variant: "check" | "checkbox"; indent?: number; labelCss?: Properties },
+) {
+  const { item, state, id, disabledReason, variant, indent, labelCss } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -69,13 +90,14 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
         ref={ref}
         css={{
           ...rowCss,
+          ...(indent !== undefined ? Css.plPx(indent).$ : {}),
           ...(highlighted ? Css.bgColor(Tokens.SurfaceRaisedHover).$ : {}),
           ...(isDisabled ? Css.cursorNotAllowed.color(Tokens.TextDisabled).$ : {}),
         }}
         {...tid.option}
       >
         {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
-        <span css={Css.fg1.mw0.$}>{item.rendered}</span>
+        <span css={{ ...Css.fg1.mw0.$, ...labelCss }}>{item.rendered}</span>
         {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
