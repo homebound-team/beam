@@ -28,9 +28,8 @@ export type MenuSelectMenu<O> = {
   disabledReasons: Record<string, string | undefined>;
   /** Row scrolled into view on mount, e.g. the first selected option. */
   initialIndex: number;
-  /** `"check"` draws a trailing check for one value. `"checkbox"` draws a leading checkbox when several can be toggled. `"tree"` adds depth and expansion. */
-  rowVariant: "check" | "checkbox" | "tree";
-  /** Tree state for each visible row, keyed by option key. Only set for `"tree"`. */
+  selectionMode: "single" | "multiple";
+  /** Tree state for each visible row, keyed by option key. Only set when `options` are a tree. */
   tree?: { rows: Map<string, TreeRowState>; setExpanded: (key: string, expanded: boolean) => void };
   /** Dotted value keys, and the DOM id of the legend that explains them. Only set when some value is dotted. */
   mixed?: { keys: ReadonlySet<string>; legendId: string };
@@ -52,7 +51,7 @@ export type OptionListProps<O> = {
 /** Virtualized listbox with virtual focus. DOM focus stays on the search field, or on this list when there is no search. */
 export function OptionList<O>(props: OptionListProps<O>) {
   const { menu, listRef, label, onKeyDown, activeDescendant } = props;
-  const { state, listId: id, disabledReasons, initialIndex, loading, rowVariant, tree, mixed } = menu;
+  const { state, listId: id, disabledReasons, initialIndex, loading, selectionMode, tree, mixed } = menu;
   const tid = useTestIds(props, "optionList");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   // Labels wrap, so rows vary in height. Size the list to what Virtuoso measured.
@@ -84,8 +83,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
   // measures. A scrolled list starts at Virtuoso's initial index: `index * menuRowHeight` lands mid-row once a label wraps.
   const [initialTop] = useState(() => Math.max(0, Math.min(initialIndex, items.length - 1)));
 
-  const Row = rowVariant === "checkbox" ? MultiOptionRow : SingleOptionRow;
-  const isTree = rowVariant === "tree" && tree !== undefined;
+  const Row = selectionMode === "multiple" ? MultiOptionRow : SingleOptionRow;
   // Tests render every row (jsdom has no layout); remount when the count changes so filtering is reflected.
   const isTest = process.env.NODE_ENV === "test";
 
@@ -128,7 +126,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
                 const item = items[index];
                 const entry = item?.value;
                 if (!item || !entry) return null;
-                const treeRow = isTree ? tree?.rows.get(String(item.key)) : undefined;
+                const treeRow = tree?.rows.get(String(item.key));
                 const mixedLegendId = mixed?.keys.has(entry.valueKey) ? mixed.legendId : undefined;
                 if (treeRow && tree) {
                   return (
@@ -139,6 +137,7 @@ export function OptionList<O>(props: OptionListProps<O>) {
                       disabledReason={disabledReasons[entry.valueKey]}
                       mixedLegendId={mixedLegendId}
                       row={treeRow}
+                      selectionMode={selectionMode}
                       onExpandedChange={(expanded) => tree.setExpanded(String(item.key), expanded)}
                       {...tid}
                     />

@@ -104,11 +104,12 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     unsetLabel && option === unsetOption ? unsetLabel : propGetOptionLabel(option);
   const getOptionValue = (option: O) =>
     unsetLabel && option === unsetOption ? (undefined as V) : propGetOptionValue(option);
+  // `getChildren` is set only for a tree. A flat menu leaves it off, so a nested `current` stays listed and the trigger can show its label.
   const options = useMemo(
-    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, unsetLabel, autoSort),
+    () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, unsetLabel, autoSort, getChildren),
     // getOptionValue and getOptionLabel are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [optionsProp, autoSort, unsetLabel],
+    [optionsProp, autoSort, unsetLabel, getChildren],
   );
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
@@ -121,6 +122,9 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [options, getChildren],
   );
+  // A single-select hierarchy lists every node and shows the path. A multi-select hierarchy expands groups and cascades.
+  const isSingleSelectTree = !multiple && menuTree !== undefined;
+  const isMultiSelectTree = multiple && menuTree !== undefined;
   const allOptions = useMemo(
     () => (menuTree ? menuTree.orderedKeys.map((k) => menuTree.nodes.get(k)!.option) : options),
     [menuTree, options],
@@ -137,16 +141,22 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   }, [disabledOptions]);
   const disabledKeySet = useMemo(() => new Set(disabledKeys), [disabledKeys]);
   // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
+  // A single-select hierarchy labels its one value with the path (`Bath 207 > Walls > Drench`).
+  // `", "` joins several proposed values for a multi select. A single select has one value, so the comma is unused.
   const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
-    labelsFor(vs, allOptions, getOptionValue, getOptionLabel).join(", "),
+    labelsFor(vs, allOptions, getOptionValue, (option) =>
+      isSingleSelectTree && menuTree
+        ? (optionPathLabel(menuTree, valueToKey(getOptionValue(option)), getOptionLabel) ?? getOptionLabel(option))
+        : getOptionLabel(option),
+    ).join(", "),
   );
   const values = useMemo(() => effectiveValue ?? [], [effectiveValue]);
   const selectedKeys = useMemo(
     () =>
-      menuTree
+      isMultiSelectTree && menuTree
         ? normalizeTreeSelection(menuTree, values.map(valueToKey), disabledKeySet)
         : new Set(values.map(valueToKey)),
-    [menuTree, values, disabledKeySet],
+    [isMultiSelectTree, menuTree, values, disabledKeySet],
   );
   // The list keys each copy, so a repeated value can render under every parent. Selection itself stays by value.
   const selectedRowKeys = useMemo(
@@ -209,12 +219,13 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     return visibleNestedRows(
       roots,
       (node) => childNodes(menuTree, node),
-      (node) => isExpanded(node.key),
+      // A single-select hierarchy has no chevrons, so every node stays visible.
+      isMultiSelectTree ? (node) => isExpanded(node.key) : () => true,
       matchKeys ? (node) => matchKeys.has(node.valueKey) : undefined,
     );
     // isExpanded reads the two key sets below; the option callbacks are typically inline lambdas
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuTree, allOptions, search, serverSearch, contains, expandedKeys, searchCollapsedKeys]);
+  }, [menuTree, isMultiSelectTree, allOptions, search, serverSearch, contains, expandedKeys, searchCollapsedKeys]);
   const filteredOptions = useMemo(
     () =>
       menuTree || !search || serverSearch
@@ -231,7 +242,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   function onSelectionChange(keys: Selection) {
     if (keys === "all") return;
-    if (menuTree) {
+    if (isMultiSelectTree && menuTree) {
       // react-stately toggles one row. That row's value selects or clears every copy.
       const added = [...keys].map(String).find((key) => !selectedRowKeys.has(key));
       const removed = [...selectedRowKeys].find((key) => !keys.has(key));
@@ -250,7 +261,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
         close({ restoreFocus: true });
         return;
       }
-      const opt = optionsByKey.get(String(key));
+      const opt =
+        isSingleSelectTree && menuTree ? menuTree.nodes.get(String(key))?.option : optionsByKey.get(String(key));
       proposalProps.onUserEdit?.();
       onCommit(opt === undefined ? [] : [getOptionValue(opt)], opt === undefined ? [] : [opt]);
       close({ restoreFocus: true });
@@ -413,7 +425,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     switch (e.key) {
       case "ArrowRight":
       case "ArrowLeft":
-        onTreeArrow(e, current);
+        if (isMultiSelectTree) onTreeArrow(e, current);
         break;
       case "ArrowDown":
         e.preventDefault();
@@ -499,7 +511,14 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       : filteredOptions.findIndex((o) => revealKeys.has(valueToKey(getOptionValue(o)))),
   );
 
-  const selectedText = !multiple && selectedOptions[0] !== undefined ? getOptionLabel(selectedOptions[0]) : "";
+  // Same path as the proposal. The option's own name shows until the loaded list includes its parents.
+  const selectedText =
+    !multiple && selectedOptions[0] !== undefined
+      ? isSingleSelectTree && menuTree
+        ? (optionPathLabel(menuTree, valueToKey(getOptionValue(selectedOptions[0])), getOptionLabel) ??
+          getOptionLabel(selectedOptions[0]))
+        : getOptionLabel(selectedOptions[0])
+      : "";
   const hasSelection = menuTree ? selectedKeys.size > 0 : values.length > 0;
   // A single select's pick wins over "Mixed"; the other mixed values keep their dots.
   const isMixed = dottedKeys.size > 0 && (multiple || !hasSelection);
@@ -509,7 +528,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     : selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
   const isPlaceholder = !isMixed && !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
   const selectedLabels =
-    menuTree && tree && getChildren
+    isMultiSelectTree && getChildren && tree?.display
       ? bucketTreeSelection(selectedOptions, getChildren)[tree.display].map((option) => ({
           key: valueToKey(getOptionValue(option)),
           label: getOptionLabel(option),
@@ -525,8 +544,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
         .map(([key, option]) => ({ key, label: getOptionLabel(option) }))
     : selectedLabels;
   const partialKeys = useMemo(
-    () => (menuTree ? partiallySelectedKeys(menuTree, selectedKeys) : undefined),
-    [menuTree, selectedKeys],
+    () => (isMultiSelectTree && menuTree ? partiallySelectedKeys(menuTree, selectedKeys) : undefined),
+    [isMultiSelectTree, menuTree, selectedKeys],
   );
   const treeRowStates = treeRows
     ? new Map(
@@ -535,8 +554,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
           {
             level,
             hasChildren: node.childKeys.length > 0,
-            isExpanded: node.childKeys.length > 0 && isExpanded(node.key),
-            isIndeterminate: !!partialKeys?.has(node.key),
+            isExpanded: isMultiSelectTree ? node.childKeys.length > 0 && isExpanded(node.key) : true,
+            isIndeterminate: isMultiSelectTree && !!partialKeys?.has(node.key),
           },
         ]),
       )
@@ -545,7 +564,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   function deselect(key: string) {
     if (!multiple || disabledKeys.includes(key)) return;
     proposalProps.onUserEdit?.();
-    if (menuTree) {
+    if (isMultiSelectTree && menuTree) {
       const toggledKeys = toggleTreeSelection(menuTree, selectedKeys, key, false, disabledKeySet);
       commitTree(toggledKeys, key);
       return;
@@ -629,7 +648,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     loading: optionsLoading,
     disabledReasons,
     initialIndex,
-    rowVariant: treeRowStates ? "tree" : multiple ? "checkbox" : "check",
+    selectionMode,
     tree: treeRowStates ? { rows: treeRowStates, setExpanded: setTreeExpanded } : undefined,
     mixed: dottedKeys.size > 0 ? { keys: dottedKeys, legendId } : undefined,
     onKeyDown: onMenuKeyDown,
@@ -733,6 +752,23 @@ function labelsFor<O, V extends Value>(
     labels.push(getOptionLabel(option));
   }
   return labels;
+}
+
+/** Path from the root to `valueKey`, joined with ` > `. Callers put each value under one parent; the first match is the path. */
+function optionPathLabel<O>(
+  tree: MenuTree<O>,
+  valueKey: string,
+  getOptionLabel: (opt: O) => string,
+): string | undefined {
+  const node = tree.orderedKeys.map((key) => tree.nodes.get(key)!).find((entry) => entry.valueKey === valueKey);
+  if (!node) return undefined;
+  const labels: string[] = [];
+  let current: MenuTreeNode<O> | undefined = node;
+  while (current) {
+    labels.unshift(getOptionLabel(current.option));
+    current = current.parentKey === undefined ? undefined : tree.nodes.get(current.parentKey);
+  }
+  return labels.join(" > ");
 }
 
 function rootNodes<O>(tree: MenuTree<O>): MenuTreeNode<O>[] {
