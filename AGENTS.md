@@ -2,6 +2,12 @@
 
 This file is the **source of truth** for agent-oriented conventions in this repo. Cursor rules under [`.cursor/rules/`](.cursor/rules/) only route you here — they do not duplicate guidance, so practices stay in one place.
 
+## Smallest change
+
+Fix the reported behavior at the call site when that is enough. A wrapper or an existing style is the change when it restores the behavior. Leave shared APIs, layout measurement, and new tests alone unless that call site cannot express the fix.
+
+`MenuSelectField` is `w100`. In the table toolbar that made Group By fill free space. Wrapping that one `<GroupByField>` in a `div` keeps it content-sized. A `sizeToContent` prop, a growing search field, and compact-mode measurement were a larger change than the bug. `WithGroupByOnly` in [`GridTableLayoutActions.stories.tsx`](src/components/Layout/GridTableLayout/GridTableLayoutActions.stories.tsx) already shows the toolbar, so that story is the check.
+
 ## Imports
 
 Use the `src/` path alias (e.g. `import { Css } from "src/Css"`), not relative paths like `../../utils/...`. This applies repo-wide — components, hooks, tests, and stories.
