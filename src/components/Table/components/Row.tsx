@@ -499,7 +499,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               hierarchyFirstContentCss({
                 level,
                 skipIndent: levelIndent !== undefined || !hasCollapseColumn,
-                maxLevel: tableState.maxNestingLevel,
+                hasChildren: !!row.children?.length,
               })),
             // Apply any declarative column border styling after header/body defaults.
             ...getColumnBorderCss(column.border, style),
