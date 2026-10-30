@@ -275,6 +275,8 @@ export class RowState<R extends Kinded> {
       // Headers, totals, etc., do not need keeping
       !this.isReservedKind &&
       !this.isParent &&
+      // Pinned rows (and a pinned parent's children) already show in the pinned section
+      !((this.pinned || this.hasPinnedAncestor) && !this.removed) &&
       (!this.isMatched || this.removed === "soft")
     );
   }
@@ -325,7 +327,11 @@ export class RowState<R extends Kinded> {
           // Reserved rows are always visible, even though they're not considered matched.
           // ...except for the kept group: its `isMatched` will become true whenever it has
           // any kept row children, as they will cause its hasDirectlyMatchedChildren to be true.
-          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isAlwaysVisible,
+          // A pinned parent shows despite the filter, so its whole subtree does too.
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) ||
+          rs.isMatched ||
+          rs.isAlwaysVisible ||
+          rs.hasPinnedAncestor,
       ) ?? []
     );
   }

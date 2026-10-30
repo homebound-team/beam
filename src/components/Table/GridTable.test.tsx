@@ -1460,6 +1460,50 @@ describe("GridTable", () => {
         expect(row(r, 3)).toBeUndefined();
       });
 
+      it("keeps a pinned parent's children while searching", async () => {
+        // Given parent 1 is pinned
+        const r = await render(
+          <GridTable<NestedRow>
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            rows={nestedRows}
+            rowPinning
+          />,
+        );
+        click(r.pin_p1);
+        // When searching for something only parent 2 matches
+        await r.rerender(
+          <GridTable<NestedRow>
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            rows={nestedRows}
+            rowPinning
+            filter="parent 2"
+          />,
+        );
+        // Then parent 1 still shows its whole subtree, followed by parent 2
+        expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
+        expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
+        expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
+        expect(cell(r, 4, 0)).toHaveTextContent("parent 2");
+        expect(row(r, 5)).toBeUndefined();
+      });
+
+      it("doesn't also keep a selected child of a pinned parent while searching", async () => {
+        // Given parent 1 is pinned and its grandchild is selected
+        const api = new GridTableApiImpl<NestedRow>();
+        const columns = [collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nestedNameColumn];
+        const r = await render(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} rowPinning />);
+        click(r.pin_p1);
+        act(() => api.selectRow("p1c1g1"));
+        // When searching for something only parent 2 matches
+        await r.rerender(
+          <GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} rowPinning filter="parent 2" />,
+        );
+        // Then the grandchild shows under its pinned parent
+        expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
+        // And isn't also counted as hidden by the search
+        expect(r.queryByText(/hidden due to filters/)).toBeNull();
+      });
+
       it("doesn't fire onPin for children that move with a pinned parent", async () => {
         // Given a nested table with an onPin callback
         const onPin = vi.fn();

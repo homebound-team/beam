@@ -23,7 +23,11 @@ export function PinToggle({ rowId }: PinToggleProps) {
   return (
     <IconButton
       {...tid[rowId]}
-      icon="pin"
+      icon={isPinned || isPinnedViaParent ? "pinFilled" : "pin"}
+      // 18x18 glyph, per design
+      inc={2.25}
+      pressedIcon="pinFilled"
+      pressedColor={Tokens.Primary}
       color={isPinned || isPinnedViaParent ? Tokens.Primary : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
       disabled={isPinnedViaParent ? "Pinned with parent" : undefined}
