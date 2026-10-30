@@ -285,10 +285,10 @@ export function hierarchyFirstContentCss(opts: {
   const { level, skipIndent, hasChildren } = opts;
   // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
   const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
-  const type = hierarchyLevelType(level, hasChildren);
-  if (!type && paddingLeft === undefined) return undefined;
+  const typeStyle = hierarchyLevelType(level, hasChildren);
+  if (!typeStyle && paddingLeft === undefined) return undefined;
   return {
-    ...(type ?? {}),
+    ...(typeStyle ?? {}),
     ...(paddingLeft !== undefined ? Css.plPx(paddingLeft).$ : {}),
   };
 }
