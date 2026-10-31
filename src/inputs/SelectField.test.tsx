@@ -235,7 +235,7 @@ describe("SelectFieldTest", () => {
 
     // Then expect the disabled option to be wrapped in the tooltip text
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
-    expect(r.getByTestId("age_options_option_2_tooltip")).toHaveAttribute("title", "Example Tooltip");
+    expect(r.age_options_option_tooltip).toHaveAttribute("title", "Example Tooltip");
 
     // And when clicking on that option
     click(optionTwo);

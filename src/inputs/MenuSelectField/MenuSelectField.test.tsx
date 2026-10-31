@@ -828,7 +828,7 @@ describe("MenuSelectField", () => {
     expect(r.productColor_tooltip).toHaveAttribute("title", "Managed by catalog");
   });
 
-  it("scopes disabled options by their key and the field prefix", async () => {
+  it("scopes repeated disabled-option tooltips to the field prefix", async () => {
     // Given two disabled options with different reasons
     const r = await render(
       <MenuSelectField
@@ -845,9 +845,9 @@ describe("MenuSelectField", () => {
     );
     // When opening the menu
     click(r.productColor);
-    // Then each option's tooltip can be selected without traversing the DOM
-    expect(r.productColor_option_b_tooltip).toHaveAttribute("title", "Out of stock");
-    expect(r.productColor_option_g_tooltip).toHaveAttribute("title", "Discontinued");
+    // Then rtl-utils can select each repeated tooltip by index
+    expect(r.productColor_option_tooltip_0).toHaveAttribute("title", "Out of stock");
+    expect(r.productColor_option_tooltip_1).toHaveAttribute("title", "Discontinued");
   });
 });
 

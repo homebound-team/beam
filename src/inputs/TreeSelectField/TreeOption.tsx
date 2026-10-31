@@ -67,7 +67,7 @@ export function TreeOption<O>(props: TreeOptionProps<O>) {
   };
 
   return maybeTooltip({
-    ...tid[`${item.key}_tooltip`],
+    ...tid.option_tooltip,
     title: !isGroup ? disabledReason : undefined,
     placement: "right",
     children: (

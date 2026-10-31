@@ -92,7 +92,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
             return (
               <Option
                 key={item.key}
-                {...tid[`option_${item.key}`]}
+                {...tid.option}
                 item={item}
                 state={state}
                 // Only send scrollToIndex functionality forward if we are not auto-scrolling on focus.

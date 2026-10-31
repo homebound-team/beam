@@ -342,7 +342,7 @@ describe("MenuTreeSelectField", () => {
     expect(r.sports_count).toHaveTextContent("3");
   });
 
-  it("scopes a disabled tree option to its field and key", async () => {
+  it("scopes a disabled tree option tooltip to the field prefix", async () => {
     // Given a tree select with a disabled leaf and an explicit prefix
     const r = await render(
       <MenuTreeSelectField
@@ -358,7 +358,7 @@ describe("MenuTreeSelectField", () => {
     // When opening the tree
     click(r.leagues);
     // Then the leaf tooltip is directly addressable
-    expect(r.getByTestId("leagues_option_basketball/nba_tooltip")).toHaveAttribute("title", "No access");
+    expect(r.leagues_option_tooltip).toHaveAttribute("title", "No access");
   });
 });
 

@@ -280,13 +280,13 @@ describe("MenuMultiSelectField", () => {
     expect(r.productColors_count_tooltip).toBeInTheDocument();
   });
 
-  it("scopes disabled checkbox options to the field and option key", async () => {
+  it("scopes disabled checkbox option tooltips to the field prefix", async () => {
     // Given a multi-select with a disabled option
     const r = await render(<MultiHarness disabledOptions={[{ value: "b", reason: "Out of stock" }]} />);
     // When opening it
     click(r.color);
-    // Then the option tooltip uses its stable key
-    expect(r.color_option_b_tooltip).toHaveAttribute("title", "Out of stock");
+    // Then the option tooltip uses the field prefix
+    expect(r.color_option_tooltip).toHaveAttribute("title", "Out of stock");
   });
 });
 

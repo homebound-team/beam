@@ -46,7 +46,6 @@ function BaseOptionRow<O>(
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
-  const optionTid = useTestIds(tid[`option_${item.key}`]);
   const { hoverProps, isHovered } = useHover({});
   const { optionProps, isDisabled, isFocused, isSelected } = useOption(
     { key: item.key, shouldSelectOnPressUp: true, shouldFocusOnHover: false },
@@ -58,7 +57,7 @@ function BaseOptionRow<O>(
   if (!entry) return null;
 
   return maybeTooltip({
-    ...optionTid.tooltip,
+    ...tid.option_tooltip,
     title: disabledReason,
     placement: "top",
     children: (
@@ -129,7 +128,6 @@ function MultiTreeOptionRow<O>(props: TreeOptionRowProps<O>) {
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
-  const optionTid = useTestIds(tid[`option_${item.key}`]);
   const { hoverProps, isHovered } = useHover({});
   const { optionProps, isDisabled, isFocused, isSelected } = useOption(
     { key: item.key, shouldSelectOnPressUp: true, shouldFocusOnHover: false },
@@ -150,7 +148,7 @@ function MultiTreeOptionRow<O>(props: TreeOptionRowProps<O>) {
       }}
     >
       {maybeTooltip({
-        ...optionTid.tooltip,
+        ...tid.option_tooltip,
         title: disabledReason,
         placement: "top",
         children: (

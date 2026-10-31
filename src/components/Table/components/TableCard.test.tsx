@@ -304,7 +304,7 @@ describe("TableCardView", () => {
     expect(onClick).toHaveBeenCalled();
   });
 
-  it("scopes thumbnail tooltips by the card prefix and thumbnail id", async () => {
+  it("scopes repeated thumbnail tooltips to the card prefix", async () => {
     // Given a card with two thumbnail tooltips
     // When rendered with an explicit prefix
     const r = await render(
@@ -324,8 +324,8 @@ describe("TableCardView", () => {
       />,
       { at: { url: "/" } },
     );
-    // Then each tooltip is addressable without relying on thumbnail order
-    expect(r.productCard_carousel_item_mv1_tooltip).toHaveAttribute("title", "Polished Chrome");
-    expect(r.productCard_carousel_item_mv2_tooltip).toHaveAttribute("title", "Matte Black");
+    // Then rtl-utils can select each repeated tooltip by index
+    expect(r.productCard_carousel_item_tooltip_0).toHaveAttribute("title", "Polished Chrome");
+    expect(r.productCard_carousel_item_tooltip_1).toHaveAttribute("title", "Matte Black");
   });
 });

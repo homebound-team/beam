@@ -44,7 +44,7 @@ export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
                 item={item}
                 state={state}
                 disabledReason={disabledOptionsWithReasons[item.key]}
-                {...tid[`option_${item.key}`]}
+                {...tid.option}
               />
             ))
           ) : (

@@ -112,7 +112,7 @@ describe("TreeSelectField", () => {
     // When opening the menu
     click(r.favoriteLeague);
     // Then the disabled option is wrapped in the tooltip text
-    expect(r.favoriteLeague_options_nba_tooltip).toHaveAttribute("title", "Example Tooltip");
+    expect(r.favoriteLeague_options_option_tooltip).toHaveAttribute("title", "Example Tooltip");
   });
 
   it("renders readonly", async () => {

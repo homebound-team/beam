@@ -81,6 +81,8 @@ function GroupButton(props: GroupButtonProps) {
   const { isFocusVisible, focusProps } = useFocusRing();
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props);
+  // Extend the group prefix with this button's text (or icon/fallback), then scope its tooltip to that button ID.
+  // I.e. "Save" produces buttonGroup_save for the button and buttonGroup_save_tooltip for its tooltip.
   const buttonTid = useTestIds(tid[defaultTestId((typeof text === "string" && text) || icon || "button")]);
 
   return (
