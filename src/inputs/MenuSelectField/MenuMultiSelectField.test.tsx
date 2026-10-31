@@ -280,13 +280,21 @@ describe("MenuMultiSelectField", () => {
     expect(r.productColors_count_tooltip).toBeInTheDocument();
   });
 
-  it("scopes disabled checkbox option tooltips to the field prefix", async () => {
-    // Given a multi-select with a disabled option
-    const r = await render(<MultiHarness disabledOptions={[{ value: "b", reason: "Out of stock" }]} />);
+  it("supports indexed tooltips for multiple disabled checkbox options", async () => {
+    // Given Red and Black enabled, and Blue and Green disabled
+    const r = await render(
+      <MultiHarness
+        disabledOptions={[
+          { value: "b", reason: "Out of stock" },
+          { value: "g", reason: "Discontinued" },
+        ]}
+      />,
+    );
     // When opening it
     click(r.color);
-    // Then the option tooltip uses the field prefix
-    expect(r.color_option_tooltip).toHaveAttribute("title", "Out of stock");
+    // Then the suffix indexes tooltip wrappers, not the full option list
+    expect(r.color_option_tooltip_0).toHaveAttribute("title", "Out of stock");
+    expect(r.color_option_tooltip_1).toHaveAttribute("title", "Discontinued");
   });
 });
 
