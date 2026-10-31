@@ -81,10 +81,12 @@ function GroupButton(props: GroupButtonProps) {
   const { isFocusVisible, focusProps } = useFocusRing();
   const { hoverProps, isHovered } = useHover(ariaProps);
   const tid = useTestIds(props);
+  const buttonTid = useTestIds(tid[defaultTestId((typeof text === "string" && text) || icon || "button")]);
 
   return (
     <span css={{ ...getButtonStyles(isFirst, isLast), ...Css.if(fullWidth).fg1.fb0.$ }}>
       {maybeTooltip({
+        ...buttonTid.tooltip,
         title: resolveTooltip(disabled, tooltip),
         placement: "top",
         children: (
@@ -103,7 +105,7 @@ function GroupButton(props: GroupButtonProps) {
               ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
               ...(icon ? iconStyles[size] : {}),
             }}
-            {...tid[defaultTestId((typeof text === "string" && text) || icon || "button")]}
+            {...buttonTid}
           >
             {icon && (
               <Icon xss={Css.if(!!text).mrPx(4).$} icon={icon} color={disabled ? undefined : iconColor} inc={iconInc} />

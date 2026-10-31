@@ -303,4 +303,29 @@ describe("TableCardView", () => {
     click(r.tableCardView_action);
     expect(onClick).toHaveBeenCalled();
   });
+
+  it("scopes thumbnail tooltips by the card prefix and thumbnail id", async () => {
+    // Given a card with two thumbnail tooltips
+    // When rendered with an explicit prefix
+    const r = await render(
+      <TableCardView
+        imgSrc="product.jpg"
+        title="Showerhead"
+        data={[]}
+        data-testid="productCard"
+        interactiveFooter={{
+          kind: "carousel",
+          title: "Colors",
+          thumbnails: [
+            { id: "mv:1", imgUrl: "chrome.png", label: "Polished Chrome", to: "/mv/1" },
+            { id: "mv:2", imgUrl: "black.png", label: "Matte Black", to: "/mv/2" },
+          ],
+        }}
+      />,
+      { at: { url: "/" } },
+    );
+    // Then each tooltip is addressable without relying on thumbnail order
+    expect(r.productCard_carousel_item_mv1_tooltip).toHaveAttribute("title", "Polished Chrome");
+    expect(r.productCard_carousel_item_mv2_tooltip).toHaveAttribute("title", "Matte Black");
+  });
 });

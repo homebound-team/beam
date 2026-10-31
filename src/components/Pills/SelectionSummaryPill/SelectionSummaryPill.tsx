@@ -27,6 +27,7 @@ export function SelectionSummaryPill(props: SelectionSummaryPillProps) {
   const isHovered = __storyState?.hovered ?? isHoveredFromEvents;
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: resolveTooltip(disabled),
     placement: "top",
     children: (

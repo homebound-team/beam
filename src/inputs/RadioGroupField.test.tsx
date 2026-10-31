@@ -30,7 +30,7 @@ describe("RadioGroupField", () => {
         options={[{ value: "a", label: "Asiago" }]}
       />,
     );
-    expect(r.favoriteCheese_label_0_tooltip).toHaveAttribute("title", "What this field is for");
+    expect(r.favoriteCheese_label_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("should disable only first option", async () => {
@@ -61,9 +61,7 @@ describe("RadioGroupField", () => {
         ]}
       />,
     );
-    const tooltip = r.container.querySelector(`[data-testid="tooltip"]`)!;
-    expect(tooltip).toBeInTheDocument();
-    expect(tooltip).toHaveAttribute("title", "some reason");
+    expect(r.favoriteCheese_a_tooltip).toHaveAttribute("title", "some reason");
   });
 
   it("shows the required suffix on the label when required", async () => {
@@ -176,10 +174,9 @@ describe("RadioGroupField", () => {
       // Then the disabled option's input is disabled
       expect(r.finish_gold).toBeDisabled();
       // And the tooltips show the label for enabled options, and the reason for the disabled one
-      const titles = Array.from(r.container.querySelectorAll(`[data-testid="tooltip"]`)).map((t) =>
-        t.getAttribute("title"),
-      );
-      expect(titles).toEqual(["Chrome", "Matte Black", "Out of stock"]);
+      expect(r.finish_chrome_tooltip).toHaveAttribute("title", "Chrome");
+      expect(r.finish_black_tooltip).toHaveAttribute("title", "Matte Black");
+      expect(r.finish_gold_tooltip).toHaveAttribute("title", "Out of stock");
     });
 
     it("doesn't show a disabled option as selected", async () => {

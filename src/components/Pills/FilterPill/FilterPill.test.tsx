@@ -33,7 +33,7 @@ describe("FilterPill", () => {
     expect(r.filterPill).toBeDisabled();
     expect(r.filterPill_x).toBeInTheDocument();
     expect(onClick).not.toHaveBeenCalled();
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.filterPill_tooltip).toBeNull();
   });
 
   it("shows the disabled reason in a tooltip", async () => {
@@ -42,7 +42,7 @@ describe("FilterPill", () => {
     const r = await render(<FilterPill text="Status" onClick={onClick} disabled="Required" />);
     // Then the pill is disabled and the reason is on the tooltip
     expect(r.filterPill).toBeDisabled();
-    expect(r.tooltip).toHaveAttribute("title", "Required");
+    expect(r.filterPill_tooltip).toHaveAttribute("title", "Required");
     // When the pill is clicked
     click(r.filterPill);
     // Then onClick is not called

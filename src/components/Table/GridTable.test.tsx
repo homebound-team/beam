@@ -6151,7 +6151,7 @@ describe("GridTable", () => {
       />,
     );
     // Then only the header shows the icon
-    expect(r.columnTooltip).toHaveAttribute("title", "What name means");
+    expect(r.columnTooltip_tooltip).toHaveAttribute("title", "What name means");
   });
 
   it("calls the column tooltip on click", async () => {
@@ -6219,7 +6219,7 @@ describe("GridTable", () => {
       />,
     );
     // Then only the cell tooltip is shown
-    expect(r.tooltip).toHaveAttribute("title", "From the cell");
+    expect(r.infoCircle_tooltip).toHaveAttribute("title", "From the cell");
     expect(r.query.columnTooltip).toBeNull();
   });
 

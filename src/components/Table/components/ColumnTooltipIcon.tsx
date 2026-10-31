@@ -34,7 +34,7 @@ export function ColumnTooltipIcon(props: ColumnTooltipIconProps) {
   }
 
   return (
-    <Tooltip title={tooltip} placement="top" {...tid}>
+    <Tooltip title={tooltip} placement="top" {...tid.tooltip}>
       {icon}
     </Tooltip>
   );

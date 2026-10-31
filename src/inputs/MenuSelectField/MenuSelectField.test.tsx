@@ -800,6 +800,55 @@ describe("MenuSelectField", () => {
       "Slab Backsplash",
     ]);
   });
+
+  it("scopes a disabled reason to the label-derived test id", async () => {
+    // Given a disabled menu select
+    // When rendered without an explicit prefix
+    const r = await render(
+      <MenuSelectField label="Color" options={colors()} value="b" onSelect={() => {}} disabled="Archived" />,
+    );
+    // Then its reason is on the scoped trigger tooltip
+    expect(r.color_tooltip).toHaveAttribute("title", "Archived");
+  });
+
+  it("scopes a read-only reason to an explicit test id", async () => {
+    // Given a read-only menu select with an explicit prefix
+    // When rendered
+    const r = await render(
+      <MenuSelectField
+        label="Color"
+        options={colors()}
+        value="b"
+        onSelect={() => {}}
+        readOnly="Managed by catalog"
+        data-testid="productColor"
+      />,
+    );
+    // Then its reason uses that prefix
+    expect(r.productColor_tooltip).toHaveAttribute("title", "Managed by catalog");
+  });
+
+  it("scopes disabled options by their key and the field prefix", async () => {
+    // Given two disabled options with different reasons
+    const r = await render(
+      <MenuSelectField
+        label="Color"
+        options={colors()}
+        value="r"
+        onSelect={() => {}}
+        disabledOptions={[
+          { value: "b", reason: "Out of stock" },
+          { value: "g", reason: "Discontinued" },
+        ]}
+        data-testid="productColor"
+      />,
+    );
+    // When opening the menu
+    click(r.productColor);
+    // Then each option's tooltip can be selected without traversing the DOM
+    expect(r.productColor_option_b_tooltip).toHaveAttribute("title", "Out of stock");
+    expect(r.productColor_option_g_tooltip).toHaveAttribute("title", "Discontinued");
+  });
 });
 
 type Color = { id: string; name: string };

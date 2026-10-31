@@ -18,6 +18,7 @@ import {
 import { getFieldWidth } from "src/inputs/utils";
 import { keyToValue, type Value, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";
+import { useTestIds } from "src/utils/useTestIds";
 import { useDebounce } from "use-debounce";
 
 /** Base props for either `SelectField` or `MultiSelectField`. */
@@ -446,6 +447,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
   };
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
+  const tid = useTestIds(props, props.label);
 
   return (
     <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
@@ -483,6 +485,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
         >
           <ListBox
             {...listBoxProps}
+            {...tid.options}
             positionProps={positionProps}
             state={state}
             listBoxRef={listBoxRef}

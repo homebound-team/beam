@@ -19,7 +19,7 @@ export const ChipTypes: Record<ChipType, ChipType> = {
   info: "info",
 };
 
-export interface ChipProps<X> {
+export type ChipProps<X> = {
   text: ReactNode;
   title?: ReactNode;
   xss?: X;
@@ -27,7 +27,7 @@ export interface ChipProps<X> {
   type?: ChipType;
   compact?: boolean;
   icon?: IconKey;
-}
+};
 
 /** Kinda like a chip, but read-only, so no `onClick` or `hover`. */
 export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X>>(props: ChipProps<X>) {
@@ -45,6 +45,7 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
   );
 
   return maybeTooltip({
+    ...tid.tooltip,
     title,
     placement: "bottom",
     children: (

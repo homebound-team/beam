@@ -236,8 +236,9 @@ type ThumbnailProps = {
 
 function Thumbnail(props: ThumbnailProps) {
   const { item, tid } = props;
+  const thumbnailTid = useTestIds(tid);
   return (
-    <Tooltip title={item.label} placement="top">
+    <Tooltip title={item.label} placement="top" {...thumbnailTid[`${item.id}_tooltip`]}>
       <Link
         to={item.to}
         aria-label={item.label}

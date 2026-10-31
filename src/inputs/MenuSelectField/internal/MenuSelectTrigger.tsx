@@ -126,7 +126,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
   const hasSupporting = !!(originalBelow || (showErrorAndHelper && (errorMsg || helperText)));
 
   const countBadge = trigger.badgeLabels.length > 0 && (
-    <Tooltip title={<SelectedLabels labels={trigger.badgeLabels} />}>
+    <Tooltip title={<SelectedLabels labels={trigger.badgeLabels} />} {...tid.count_tooltip}>
       <span css={Css.df.aic.fs0.if(trigger.isMixed).ml1.else.mr1.$}>
         <CountBadge count={trigger.badgeLabels.length} {...tid.count} />
       </span>
@@ -169,7 +169,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
       </span>
       {errorInTooltip && errorMsg && showErrorAndHelper && (
         <span css={Css.df.aic.fs0.pl1.$}>
-          <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} />
+          <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} {...tid.error} />
         </span>
       )}
       {!trigger.isReadOnly && (
@@ -207,6 +207,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
           />
         )}
         {maybeTooltip({
+          ...tid.tooltip,
           title: resolveTooltip(disabled, undefined, readOnly),
           placement: "top",
           children: trigger.isReadOnly ? (

@@ -3,6 +3,7 @@ import React, { type AriaAttributes, type ReactNode } from "react";
 import type { BeamColor } from "src/colors";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, increment, type Margin, Palette, Tokens, type Xss } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type IconProps = {
   /** The name of an icon */
@@ -20,8 +21,10 @@ export type IconProps = {
 
 export const Icon = React.memo((props: IconProps) => {
   const { icon, inc = 3, color = "currentColor", bgColor, xss, tooltip, ...other } = props;
+  const tid = useTestIds(props, icon);
   const size = increment(inc);
   return maybeTooltip({
+    ...tid.tooltip,
     title: tooltip,
     placement: "top",
     children: (

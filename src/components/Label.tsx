@@ -1,7 +1,9 @@
 import React, { type LabelHTMLAttributes, type ReactNode } from "react";
 import { VisuallyHidden } from "react-aria";
 import { Icon } from "src/components/Icon";
+import { maybeTooltip } from "src/components/Tooltip";
 import { Css, type Font, type Only, Tokens, type Xss } from "src/Css";
+import { useTestIds } from "src/utils/useTestIds";
 
 type LabelXss = Font | "color";
 
@@ -22,6 +24,7 @@ type LabelProps<X> = {
 /** An internal helper component for rendering form labels. */
 function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) {
   const { labelProps, label, hidden, suffix, tooltip, inline, xss, ...others } = props;
+  const tid = useTestIds(props, label);
   const labelEl = (
     <label
       {...labelProps}
@@ -38,7 +41,12 @@ function LabelComponent<X extends Only<Xss<LabelXss>, X>>(props: LabelProps<X>) 
       {suffix && ` ${suffix}`}
       {tooltip && (
         <span css={Css.fs0.$}>
-          <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.TextLabel} />
+          {maybeTooltip({
+            ...tid.tooltip,
+            title: tooltip,
+            placement: "top",
+            children: <Icon icon="infoCircle" inc={2} color={Tokens.TextLabel} />,
+          })}
         </span>
       )}
     </label>

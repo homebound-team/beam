@@ -56,7 +56,7 @@ export function EnvironmentBanner(props: EnvironmentBannerProps) {
           >
             {message}
             <span css={Css.fs0.$} {...tid.info}>
-              <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.OnPrimary} />
+              <Icon icon="infoCircle" tooltip={tooltip} inc={2} color={Tokens.OnPrimary} {...tid.infoIcon} />
             </span>
           </span>
         </span>

@@ -79,6 +79,7 @@ export function Switch(props: SwitchProps) {
       {labelStyle !== "inline" && labelStyle !== "hidden" && (
         <div>
           <Label
+            {...tid.label}
             label={label}
             tooltip={tooltip}
             xss={{
@@ -126,6 +127,7 @@ export function Switch(props: SwitchProps) {
         match the height of the icon for horizontal alignment */}
       {labelStyle === "inline" && (
         <Label
+          {...tid.label}
           label={label}
           tooltip={tooltip}
           inline

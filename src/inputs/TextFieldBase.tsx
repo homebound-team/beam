@@ -245,6 +245,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
           />
         )}
         {maybeTooltip({
+          ...tid.tooltip,
           title: tooltipLocation === "field" ? tooltip : undefined,
           placement: "top",
           children: inputProps.readOnly ? (
@@ -369,7 +370,7 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               )}
               {errorInTooltip && errorMsg && !hideErrorMessage && (
                 <span css={Css.df.aic.asc.pl1.fs0.$}>
-                  <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} />
+                  <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} {...tid.error} />
                 </span>
               )}
               {endAdornment && <span css={Css.df.aic.asc.pl1.fs0.$}>{endAdornment}</span>}

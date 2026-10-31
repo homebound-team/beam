@@ -97,7 +97,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
             <Heading css={titleCss} {...tid.title}>
               {title}
             </Heading>
-            {tooltip && <Icon icon="infoCircle" tooltip={tooltip} inc={2} />}
+            {tooltip && <Icon icon="infoCircle" tooltip={tooltip} inc={2} {...tid.info} />}
           </div>
         ) : (
           descriptionEl

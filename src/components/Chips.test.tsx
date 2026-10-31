@@ -12,7 +12,7 @@ describe("Chips", () => {
 
     expect(r.chip_0.textContent).toBe("123");
     expect(r.chip_1.textContent).toBe("abc");
-    expect(r.tooltip).toHaveAttribute("title", "tooltip");
+    expect(r.chip_tooltip).toHaveAttribute("title", "tooltip");
     expect(r.chip_0).toHaveStyle({ minHeight: "24px" });
   });
 

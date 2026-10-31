@@ -24,6 +24,7 @@ export function FilterPill(props: FilterPillProps) {
   const ink = isDisabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900;
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: resolveTooltip(disabled),
     placement: "top",
     children: (

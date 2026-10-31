@@ -32,7 +32,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
   const isAiStar = icon === "aiStar";
   const isStrikethrough = type === "strikethrough";
   const { background, iconColor, typography, padding } = getVariantStyles(variant, type);
-  const tid = useTestIds(otherProps);
+  const tid = useTestIds(otherProps, "tag");
   const [showTooltip, setShowTooltip] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   useResizeObserver({
@@ -47,6 +47,7 @@ export function Tag<X extends Only<Xss<TagXss>, X>>(props: TagProps<X>) {
   const tooltipTitle = !preventTooltip ? (isIconOnly ? text : showTooltip ? text : undefined) : undefined;
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: tooltipTitle,
     children: (
       <span

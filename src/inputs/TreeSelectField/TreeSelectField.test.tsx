@@ -111,10 +111,8 @@ describe("TreeSelectField", () => {
 
     // When opening the menu
     click(r.favoriteLeague);
-    const nbaOption = r.getByRole("option", { name: "NBA" });
-
     // Then the disabled option is wrapped in the tooltip text
-    expect(nbaOption.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Example Tooltip");
+    expect(r.favoriteLeague_options_nba_tooltip).toHaveAttribute("title", "Example Tooltip");
   });
 
   it("renders readonly", async () => {
@@ -246,8 +244,8 @@ describe("TreeSelectField", () => {
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "true");
     expect(r.getByRole("option", { name: "NFL" })).toHaveAttribute("aria-selected", "true");
     // And the parent options checkboxes are in the indeterminate state
-    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
-    expect(r.treeOption_football_checkbox).toHaveAttribute("data-checked", "mixed");
+    expect(r.favoriteLeague_options_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
+    expect(r.favoriteLeague_options_football_checkbox).toHaveAttribute("data-checked", "mixed");
   });
 
   it("renders the selected chip list above the open options", async () => {
@@ -326,7 +324,7 @@ describe("TreeSelectField", () => {
     // Then the selected options are checked
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "true");
     // And the parent option's checkbox is in the indeterminate state
-    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
+    expect(r.favoriteLeague_options_basketball_checkbox).toHaveAttribute("data-checked", "mixed");
   });
 
   it("can collapse and expand options", async () => {
@@ -346,20 +344,20 @@ describe("TreeSelectField", () => {
     // Then the child options are visible
     expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
     // And the expand/collapse button has the correct icon
-    expect(r.treeOption_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleDown");
+    expect(r.favoriteLeague_options_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleDown");
     // When collapsing the parent option
-    click(r.treeOption_collapseToggle_baseball);
+    click(r.favoriteLeague_options_collapseToggle_baseball);
     // Then the child options are no longer visible
     expect(r.queryByRole("option", { name: "MLB" })).toBeFalsy();
     // And the expand/collapse button has the correct icon
-    expect(r.treeOption_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleRight");
+    expect(r.favoriteLeague_options_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleRight");
 
     // When expanding the parent option
-    click(r.treeOption_collapseToggle_baseball);
+    click(r.favoriteLeague_options_collapseToggle_baseball);
     // Then the child options are visible
     expect(r.getByRole("option", { name: "MLB" })).toBeVisible();
     // And the expand/collapse button has the correct icon again
-    expect(r.treeOption_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleDown");
+    expect(r.favoriteLeague_options_collapseToggle_baseball.firstChild).toHaveAttribute("data-icon", "triangleDown");
   });
 
   it("can initially render with all options initially collapsed", async () => {
@@ -433,20 +431,20 @@ describe("TreeSelectField", () => {
     // When opening the options
     click(r.favoriteLeague);
     // And selecting the parent option
-    click(r.treeOption_basketball_checkbox);
+    click(r.favoriteLeague_options_basketball_checkbox);
     // Then all children are selected
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "true");
     expect(r.getByRole("option", { name: "WNBA" })).toHaveAttribute("aria-selected", "true");
     // And the parent option's checkbox is in the checked state
-    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "true");
+    expect(r.favoriteLeague_options_basketball_checkbox).toHaveAttribute("data-checked", "true");
 
     // When deselecting the parent option
-    click(r.treeOption_basketball_checkbox);
+    click(r.favoriteLeague_options_basketball_checkbox);
     // Then all children are deselected
     expect(r.getByRole("option", { name: "NBA" })).toHaveAttribute("aria-selected", "false");
     expect(r.getByRole("option", { name: "WNBA" })).toHaveAttribute("aria-selected", "false");
     // And the parent option's checkbox is in the unchecked state
-    expect(r.treeOption_basketball_checkbox).toHaveAttribute("data-checked", "false");
+    expect(r.favoriteLeague_options_basketball_checkbox).toHaveAttribute("data-checked", "false");
   });
 
   it("can filter options", async () => {
@@ -540,7 +538,7 @@ describe("TreeSelectField", () => {
       "XFL",
     ]);
     // When we collapse the parent option
-    click(r.treeOption_collapseToggle_basketball);
+    click(r.favoriteLeague_options_collapseToggle_basketball);
     // And typing in the filter input
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
     // Then the options that match the filter are visible, even though their parent was collapsed
@@ -564,10 +562,10 @@ describe("TreeSelectField", () => {
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
     expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
     // Then its parent can still be collapsed
-    click(r.treeOption_collapseToggle_basketball);
+    click(r.favoriteLeague_options_collapseToggle_basketball);
     expect(getOptionLabels(r)).toEqual(["Basketball"]);
     // And expanded again
-    click(r.treeOption_collapseToggle_basketball);
+    click(r.favoriteLeague_options_collapseToggle_basketball);
     expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
   });
 
@@ -584,7 +582,7 @@ describe("TreeSelectField", () => {
       />,
     );
     click(r.favoriteLeague);
-    click(r.treeOption_collapseToggle_baseball);
+    click(r.favoriteLeague_options_collapseToggle_baseball);
     const collapsed = ["Baseball", "Basketball", "NBA", "WNBA", "Football", "NFL", "XFL"];
     expect(getOptionLabels(r)).toEqual(collapsed);
     // When filtering and then clearing the filter
@@ -610,14 +608,14 @@ describe("TreeSelectField", () => {
     click(r.favoriteLeague);
     fireEvent.input(r.favoriteLeague, { target: { value: "nba" } });
     // When selecting one of the matched options
-    click(r.treeOption_nba_checkbox);
+    click(r.favoriteLeague_options_nba_checkbox);
     // Then it is selected, and the filter + filtered options are left as-is
-    expect(r.treeOption_nba_checkbox).toHaveAttribute("data-checked", "true");
+    expect(r.favoriteLeague_options_nba_checkbox).toHaveAttribute("data-checked", "true");
     expect(r.favoriteLeague).toHaveValue("nba");
     expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
     // And when unselecting it, i.e. clearing the last selection, the filter is still kept
-    click(r.treeOption_nba_checkbox);
-    expect(r.treeOption_nba_checkbox).toHaveAttribute("data-checked", "false");
+    click(r.favoriteLeague_options_nba_checkbox);
+    expect(r.favoriteLeague_options_nba_checkbox).toHaveAttribute("data-checked", "false");
     expect(r.favoriteLeague).toHaveValue("nba");
     expect(getOptionLabels(r)).toEqual(["Basketball", "NBA", "WNBA"]);
   });
@@ -756,7 +754,7 @@ describe("TreeSelectField", () => {
     click(r.favoriteLeague);
 
     // Then the group option renders without a checkbox
-    expect(r.query.treeOption_basketball_checkbox).not.toBeInTheDocument();
+    expect(r.query.favoriteLeague_options_basketball_checkbox).not.toBeInTheDocument();
 
     // And clicking the row does not select it
     click(r.getByRole("option", { name: "Basketball" }));

@@ -7,6 +7,7 @@ import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { Option } from "src/inputs/internal/Option";
 import { TreeOption } from "src/inputs/TreeSelectField/TreeOption";
 import { isLeveledNode, type LeveledOption } from "src/inputs/TreeSelectField/utils";
+import { useTestIds } from "src/utils/useTestIds";
 
 type VirtualizedOptionsProps<O> = {
   state: ListState<O>;
@@ -23,6 +24,7 @@ type VirtualizedOptionsProps<O> = {
 // Displays ListBox options in a virtualized container for performance reasons
 export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
   const { state, items, onListHeightChange, scrollOnFocus, loading, disabledOptionsWithReasons, isTree } = props;
+  const tid = useTestIds(props, "listBox");
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const focusedKey = state.selectionManager.focusedKey;
   const focusedItem = focusedKey != null ? state.collection.getItem(focusedKey) : null;
@@ -78,6 +80,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
             return (
               <TreeOption
                 key={item.key}
+                {...tid}
                 item={item}
                 state={state}
                 // scrollToIndex={scrollOnFocus ? undefined : virtuosoRef.current?.scrollToIndex}
@@ -89,6 +92,7 @@ export function VirtualizedOptions<O>(props: VirtualizedOptionsProps<O>) {
             return (
               <Option
                 key={item.key}
+                {...tid[`option_${item.key}`]}
                 item={item}
                 state={state}
                 // Only send scrollToIndex functionality forward if we are not auto-scrolling on focus.
