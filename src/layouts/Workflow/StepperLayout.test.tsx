@@ -364,7 +364,7 @@ describe("StepperLayout", () => {
 
     // Then Continue is disabled and there is no tooltip
     expect(r.continue).toBeDisabled();
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.continue_tooltip).toBeNull();
   });
 
   it("shows a Beam tooltip on disabled Continue when primaryDisabled is a reason", async () => {
@@ -378,14 +378,14 @@ describe("StepperLayout", () => {
 
     // Then Continue is disabled and wrapped in Beam's tooltip
     expect(r.continue).toBeDisabled();
-    expect(r.tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
+    expect(r.continue_tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
 
     // When primaryDisabled is omitted
     r.rerender(<StepperLayout {...baseProps({ steps: makeSteps() })} />);
 
     // Then Continue is enabled and the tooltip is gone
     expect(r.continue).not.toBeDisabled();
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.continue_tooltip).toBeNull();
   });
 
   it("shows a Beam tooltip on disabled Complete when primaryDisabled is a reason", async () => {
@@ -402,7 +402,7 @@ describe("StepperLayout", () => {
 
     // Then Save is disabled and wrapped in Beam's tooltip
     expect(r.save).toBeDisabled();
-    expect(r.tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
+    expect(r.save_tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
   });
 });
 

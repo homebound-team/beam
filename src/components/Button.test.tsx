@@ -161,4 +161,44 @@ describe("Button", () => {
     // Then the scheme fill is not applied
     expect(r.primary).not.toHaveStyle({ backgroundColor: Palette.Green50 });
   });
+
+  it("scopes the tooltip to the label-derived test id", async () => {
+    // Given a label with spaces and punctuation
+    // When rendered with a tooltip
+    const r = await render(<Button label="Add & Select Product" tooltip="Choose a product" onClick={noop} />);
+    // Then the tooltip uses the resolved button prefix
+    expect(r.addSelectProduct_tooltip).toHaveAttribute("title", "Choose a product");
+  });
+
+  it("scopes a link tooltip to an explicit test id", async () => {
+    // Given a link button with an explicit test id
+    // When rendered with a tooltip
+    const r = await render(
+      <Button label="Save Product" data-testid="saveProduct" tooltip="Save changes" onClick="/products" />,
+      {},
+    );
+    // Then the tooltip uses the explicit button prefix
+    expect(r.saveProduct_tooltip).toHaveAttribute("title", "Save changes");
+  });
+
+  it("scopes the disabled reason to the label-derived test id", async () => {
+    // Given a disabled reason that takes precedence over the normal tooltip
+    // When rendered
+    const r = await render(
+      <Button label="Add & Select Product" disabled="Archived" tooltip="Choose a product" onClick={noop} />,
+    );
+    // Then the scoped tooltip exposes the disabled reason
+    expect(r.addSelectProduct_tooltip).toHaveAttribute("title", "Archived");
+  });
+
+  it("scopes a disabled link reason to an explicit test id", async () => {
+    // Given a disabled link button with an explicit test id
+    // When rendered
+    const r = await render(
+      <Button label="Save Product" data-testid="saveProduct" disabled="Archived" onClick="/products" />,
+      {},
+    );
+    // Then the scoped tooltip exposes the disabled reason
+    expect(r.saveProduct_tooltip).toHaveAttribute("title", "Archived");
+  });
 });

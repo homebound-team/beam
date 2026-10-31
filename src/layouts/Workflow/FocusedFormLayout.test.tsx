@@ -66,7 +66,7 @@ describe("FocusedFormLayout", () => {
 
     // Then Create is disabled and there is no tooltip
     expect(r.create).toBeDisabled();
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.create_tooltip).toBeNull();
   });
 
   it("shows a Beam tooltip on disabled Create when primaryDisabled is a reason", async () => {
@@ -78,14 +78,14 @@ describe("FocusedFormLayout", () => {
 
     // Then Create is disabled and wrapped in Beam's tooltip
     expect(r.create).toBeDisabled();
-    expect(r.tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
+    expect(r.create_tooltip).toHaveAttribute("title", "Fill all required fields to continue.");
 
     // When primaryDisabled is omitted
     r.rerender(<FocusedFormLayout {...baseProps()} />);
 
     // Then Create is enabled and the tooltip is gone
     expect(r.create).not.toBeDisabled();
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.create_tooltip).toBeNull();
   });
 
   it("renders Cancel and Create without Continue", async () => {
