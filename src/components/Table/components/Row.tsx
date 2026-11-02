@@ -355,11 +355,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             minStickyLeftOffset,
           );
 
+          // The header never has a pin, so it doesn't save room for one; its controls sit at the far left (per Figma)
           const pinNode =
-            isFirstContentColumn && isPinningEnabled ? (
+            isFirstContentColumn && isPinningEnabled && !isHeader ? (
               <span
                 key="beamPin"
-                // Rows without a pin (i.e. the header) still hold its width so everything after it lines up
+                // Body rows without a pin (i.e. excluded kinds) still hold its width so everything after it lines up
                 css={{
                   ...Css.fs0.df.aic.h("1lh").mh0.wPx(pinTogglePx).mrPx(pinIndentPx).$,
                   ...(!showsPinned && revealPinOnRowHoverCss),
