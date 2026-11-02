@@ -164,11 +164,11 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
         : values.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
     [menuTree, selectedKeys, values, optionsByKey],
   );
-  // Mixed values the selection doesn't already cover, in menu order. These rows get the dot.
-  const dottedKeys = useMemo(() => {
-    const mixedKeys = new Set(mixedValues?.map(valueToKey));
-    return new Set([...optionsByKey.keys()].filter((key) => mixedKeys.has(key) && !selectedKeys.has(key)));
-  }, [mixedValues, optionsByKey, selectedKeys]);
+  // Mixed values the selection doesn't already cover. These rows get the dot.
+  const dottedKeys = useMemo(
+    () => new Set(mixedValues?.map(valueToKey).filter((key) => optionsByKey.has(key) && !selectedKeys.has(key))),
+    [mixedValues, optionsByKey, selectedKeys],
+  );
   // Rows the menu opens onto: groups holding one start expanded, and the list starts at the first.
   const revealKeys = useMemo(() => new Set([...selectedKeys, ...dottedKeys]), [selectedKeys, dottedKeys]);
 
@@ -476,7 +476,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const selectedText = !multiple && selectedOptions[0] !== undefined ? getOptionLabel(selectedOptions[0]) : "";
   const hasSelection = menuTree ? selectedKeys.size > 0 : values.length > 0;
   // A single select's pick wins over "Mixed"; the other mixed values keep their dots.
-  const isMixed = dottedKeys.size > 0 && (multiple || !selectedText);
+  const isMixed = dottedKeys.size > 0 && (multiple || !hasSelection);
   // Multi with a selection shows only the count badge; an empty field shows nothing-selected text, then the placeholder.
   const displayText = isMixed
     ? mixedLabel

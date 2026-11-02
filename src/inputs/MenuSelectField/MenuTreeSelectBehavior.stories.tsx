@@ -27,7 +27,7 @@ export const Collapsed = newStory(() => <TreeField initial={["o8", "o9"]} />, { 
 /** Every group starts open. */
 export const Expanded = newStory(() => <TreeField defaultExpanded />, { play: open("options") });
 
-/** Dotted values sit in front of unchecked boxes, and a group holding one opens like a group holding a selection. */
+/** Dots sit between an unchecked box and its label, and a group holding one opens like a group holding a selection. */
 export const Mixed = newStory(() => <TreeField initial={["o2", "spkr-109"]} mixedValues={["o1", "o7", "bath-205"]} />, {
   play: open("options"),
 });

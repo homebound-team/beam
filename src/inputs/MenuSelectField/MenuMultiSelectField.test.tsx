@@ -50,7 +50,7 @@ describe("MenuMultiSelectField", () => {
     const r = await render(<MultiHarness mixedValues={["r"]} onSelectSpy={onSelect} />);
     click(r.color);
     expect(optionOf(r, "Red")).toHaveAttribute("aria-selected", "false");
-    expect(optionOf(r, "Red")).toHaveAccessibleDescription(mixedDescription);
+    expect(optionOf(r, "Red")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
     // When checking Red
     select(r.color, "Red");
     // Then it's selected and loses its dot
@@ -60,14 +60,14 @@ describe("MenuMultiSelectField", () => {
     // And when unchecking it, it's dotted again
     select(r.color, "Red");
     expect(onSelect).toHaveBeenLastCalledWith([], []);
-    expect(optionOf(r, "Red")).toHaveAccessibleDescription(mixedDescription);
+    expect(optionOf(r, "Red")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
   });
 
   it("counts dotted values in the badge but not in the pills", async () => {
-    // Given Red selected, and records holding Red, Blue, or Green
-    const r = await render(<MultiHarness initial={["r"]} mixedValues={["r", "b", "g"]} />);
+    // Given every record holds Red, and some hold Blue or Green
+    const r = await render(<MultiHarness initial={["r"]} mixedValues={["b", "g"]} />);
     // Then the field reads Mixed, counting Red plus the dotted Blue and Green
-    expect(r.color).toHaveTextContent("Mixed");
+    expect(r.color).toHaveTextContent(/^Mixed3$/);
     expect(r.color_count).toHaveTextContent("3");
     // And when opened, only Red is a pill, since only a selection can be removed
     click(r.color);
@@ -229,8 +229,6 @@ type HarnessProps = {
   disabledOptions?: (string | { value: string; reason: string })[];
   mixedValues?: string[];
 };
-
-const mixedDescription = /Mixed\s*Selected rows have different values\./;
 
 function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
   return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);

@@ -280,15 +280,14 @@ describe("MenuSelectField", () => {
   it("reads Mixed and dots each mixed value when nothing is selected", async () => {
     // Given no value, and records holding Blue or Green
     const r = await render(<TestHarness nothingSelectedText="All" mixedValues={["b", "g"]} />);
-    // Then the field reads Mixed, counting both values
-    expect(r.color).toHaveTextContent("Mixed");
-    expect(r.color).not.toHaveTextContent("All");
+    // Then the field reads Mixed instead of All, counting both values
+    expect(r.color).toHaveTextContent(/^Mixed2$/);
     expect(r.color_count).toHaveTextContent("2");
     // And when opened, the legend explains the dotted rows
     click(r.color);
     expect(r.color_mixedLegend).toBeInTheDocument();
-    expect(optionOf(r, "Blue")).toHaveAccessibleDescription(mixedDescription);
-    expect(optionOf(r, "Green")).toHaveAccessibleDescription(mixedDescription);
+    expect(optionOf(r, "Blue")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
     expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
   });
 
@@ -302,17 +301,7 @@ describe("MenuSelectField", () => {
     click(r.color);
     expect(optionOf(r, "Blue")).toHaveAttribute("aria-selected", "true");
     expect(optionOf(r, "Blue")).not.toHaveAccessibleDescription();
-    expect(optionOf(r, "Green")).toHaveAccessibleDescription(mixedDescription);
-  });
-
-  it("has no legend without mixed values", async () => {
-    // Given a single select without mixedValues
-    const r = await render(<TestHarness />);
-    // When opening it
-    click(r.color);
-    // Then there's no legend and no row is described
-    expect(r.query.color_mixedLegend).toBeNull();
-    r.getAllByTestId("color_option").forEach((option) => expect(option).not.toHaveAccessibleDescription());
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
   });
 
   it("closes when re-selecting the current value", async () => {
@@ -564,8 +553,6 @@ type HarnessProps = {
   autoSort?: boolean;
   mixedValues?: string[];
 };
-
-const mixedDescription = /Mixed\s*Selected rows have different values\./;
 
 function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
   return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);

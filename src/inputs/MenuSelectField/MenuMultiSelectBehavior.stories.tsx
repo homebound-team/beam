@@ -23,7 +23,7 @@ export default {
 export const Menu = newStory(() => <MultiField initial={["cc", "room"]} />, { play: open("groupBy") });
 
 /** Every record holds Cost Code; some hold Level or Room, so those get a dot in front of the label. */
-export const Mixed = newStory(() => <MultiField initial={["cc"]} mixedValues={["cc", "level", "room"]} />, {
+export const Mixed = newStory(() => <MultiField initial={["cc"]} mixedValues={["level", "room"]} />, {
   play: open("groupBy"),
 });
 

@@ -41,7 +41,7 @@ export type MenuSelectTriggerState = {
   onBlur: () => void;
   displayText: string;
   isPlaceholder: boolean;
-  /** Shows "Mixed", with the count badge after it. */
+  /** The text reads "Mixed", so the count badge follows it. */
   isMixed: boolean;
   /** Labels the count badge counts and its tooltip lists. Empty for a single select unless it's mixed. */
   badgeLabels: { key: string; label: string }[];
@@ -153,9 +153,9 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
             {!trigger.isMixed && countBadge}
             <span
               css={{
-                ...Css.truncate
-                  .if(!trigger.isMixed)
-                  .fg1.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
+                // While mixed, the text doesn't grow, so the badge sits right after "Mixed".
+                ...Css.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).if(!trigger.isMixed)
+                  .fg1.$,
                 // A placeholder reads as hint text, so it stays at the field's regular weight.
                 ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
                 ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),

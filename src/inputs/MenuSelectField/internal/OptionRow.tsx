@@ -141,6 +141,7 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
               <StyledCheckbox isSelected={isSelected} isIndeterminate={row.isIndeterminate} isDisabled={isDisabled} />
             </span>
             {mixedLegendId && (
+              // Centers the 6px dot on the label's 20px first line.
               <span css={Css.df.fs0.mtPx(7).$}>
                 <MixedDot />
               </span>
