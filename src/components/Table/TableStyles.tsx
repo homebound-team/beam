@@ -274,31 +274,29 @@ export function hierarchyIndentPaddingPx(level: number): number | undefined {
 
 /**
  * First-content type and indent for a body row.
- * Type comes from how deep the table goes, so every row at a level matches.
- * One level stays regular. Two levels are small semibold, then regular.
- * Three or more are small semibold, extra-small semibold in between, then regular.
+ * Parents are semibold: small at level 0, extra-small deeper. Childless top-level rows keep the cell's default type.
  */
 export function hierarchyFirstContentCss(opts: {
   level: number;
   skipIndent: boolean;
-  /** Deepest data-row level in the table. `0` when the table has a single level. */
-  maxLevel: number;
+  /** True when this row has child rows. */
+  hasChildren: boolean;
 }): Properties | undefined {
-  const { level, skipIndent, maxLevel } = opts;
+  const { level, skipIndent, hasChildren } = opts;
   // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
   const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
-  const type = hierarchyLevelType(level, maxLevel);
-  if (!type && paddingLeft === undefined) return undefined;
+  const typeStyle = hierarchyLevelType(level, hasChildren);
+  if (!typeStyle && paddingLeft === undefined) return undefined;
   return {
-    ...(type ?? {}),
+    ...(typeStyle ?? {}),
     ...(paddingLeft !== undefined ? Css.plPx(paddingLeft).$ : {}),
   };
 }
 
-/** Type for one level. The deepest level of the table is regular, including a table that only has that level. */
-function hierarchyLevelType(level: number, maxLevel: number): Properties | undefined {
-  if (level >= maxLevel) return undefined;
-  return level === 0 ? Css.smSb.$ : Css.xsSb.$;
+/** Semibold only when the row has children. Deeper childless rows are extra-small; top-level ones stay default. */
+function hierarchyLevelType(level: number, hasChildren: boolean): Properties | undefined {
+  if (level === 0) return hasChildren ? Css.smSb.$ : undefined;
+  return hasChildren ? Css.xsSb.$ : Css.xs.$;
 }
 
 /** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */

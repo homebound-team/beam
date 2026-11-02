@@ -229,7 +229,12 @@ function GridTableLayoutActionsComponent<
           )}
 
           {/* Desktop: Group By sits to the right of the filters */}
-          {groupByInline && groupBy && <GroupByField {...groupBy} />}
+          {groupByInline && groupBy && (
+            // Wrapping in a div to prevent the GroupByField from growing unnecessarily. The MenuSelectField has a `w100` width, which caused it to take up more space than necessary on this row.
+            <div>
+              <GroupByField {...groupBy} />
+            </div>
+          )}
 
           {/* Inline filters have no panel to clear them from */}
           {filtersInline && activeFilterCount > 0 && (
