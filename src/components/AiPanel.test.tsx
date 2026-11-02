@@ -1,4 +1,5 @@
 import { AiCard, AiPanel } from "src";
+import { documentScrollContentLeft, documentScrollContentWidth } from "src/layouts/layoutVars";
 import { render } from "src/utils/rtl";
 
 describe("AiPanel", () => {
@@ -69,9 +70,15 @@ describe("AiCard", () => {
     expect(r.aiCard_card).toHaveTextContent("Upload");
   });
 
-  it("fills its parent by default", async () => {
+  it("stays within the viewport chrome width", async () => {
+    // Given a full-width card
     const r = await render(<AiCard />);
-    expect(r.aiCard_column).toHaveStyle({ width: "100%" });
+    // Then layoutContainer keeps it at the chrome width instead of stretching with a wide parent
+    expect(r.aiCard_column).toHaveStyle({
+      width: `min(100%, ${documentScrollContentWidth()})`,
+      left: documentScrollContentLeft(),
+      position: "sticky",
+    });
   });
 
   it("shrinks and centers when not fullWidth", async () => {
