@@ -268,6 +268,39 @@ export function QueryTableLayout() {
   );
 }
 
+/** Scroll down, then change a filter from the toolbar or the buttons above the table; the table scrolls back to its top. */
+export function ScrollToTopOnFilterChange() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: { filterDefs, storageKey: "grid-table-layout-scroll-to-top" },
+    search: "client",
+  });
+  const { filter, setFilter } = layoutState;
+  const rows = useMemo(
+    () => [
+      simpleHeader,
+      ...makeNestedRows(10).filter((row) => !filter.status?.length || filter.status.includes(row.data!.status)),
+    ],
+    [filter.status],
+  );
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Scroll to top on filter change" />
+      <div css={Css.df.gap1.py2.$}>
+        <Button label="Show Active" variant="secondary" onClick={() => setFilter({ ...filter, status: ["active"] })} />
+        <Button
+          label="Show Inactive"
+          variant="secondary"
+          onClick={() => setFilter({ ...filter, status: ["inactive"] })}
+        />
+      </div>
+      <GridTableLayoutComponent layoutState={layoutState} tableProps={{ columns, rows }} scrollToTopOnFilterChange />
+    </TestProjectLayout>
+  );
+}
+
 export function WithoutHeader() {
   const columns = useMemo(() => getColumns(false), []);
 

@@ -1,8 +1,9 @@
 import { useResizeObserver } from "@react-aria/utils";
-import { type ReactNode, type RefObject, useCallback, useLayoutEffect, useRef } from "react";
+import { type ReactNode, type RefObject, useCallback, useImperativeHandle, useLayoutEffect, useRef } from "react";
 import type { GridTableLayoutHost as GridTableLayoutHostValue } from "src/components/Layout/GridTableLayout/useGridTableLayoutHost";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 import { ScrollableContent, VirtualizedScrollParentProvider } from "src/components/Layout/ScrollableContent";
+import { useScrollableParent } from "src/components/Layout/ScrollableParent";
 import { ModalFullBleed } from "src/components/Modal/ModalFullBleed";
 import { modalBodyPaddingX } from "src/components/Modal/modalStyles";
 import { Css, type Properties, Tokens } from "src/Css";
@@ -24,17 +25,35 @@ type GridTableLayoutHostProps = {
   rightPane?: boolean;
   isVirtualized: boolean;
   testIds: TestIds;
+  /** Filled with a function that scrolls the active host back to the top of the table. */
+  scrollToTopRef?: RefObject<(() => void) | undefined>;
   children: ReactNode;
 };
 
 /** Places a table and its actions in the active modal, document-scroll, or nested-scroll host. */
 export function GridTableLayoutHost(props: GridTableLayoutHostProps) {
-  const { host, actions, rightPane, isVirtualized, testIds, children } = props;
+  const { host, actions, rightPane, isVirtualized, testIds, scrollToTopRef, children } = props;
   const tableWrapperRef = useRef<HTMLDivElement>(null);
   const tableActionsRef = useRef<HTMLDivElement>(null);
   const hasActions = actions !== undefined;
+  const { scrollableEl } = useScrollableParent();
 
   useSetTableActionsHeight(tableWrapperRef, tableActionsRef, host.kind !== "scrollable-parent" && hasActions);
+
+  useImperativeHandle(
+    scrollToTopRef,
+    () => () => {
+      // ScrollableContent portals the table into ScrollableParent's scroller, below the pinned actions.
+      const scroller = host.kind === "scrollable-parent" ? scrollableEl?.parentElement : undefined;
+      if (scroller) {
+        scroller.scrollTo?.({ top: 0, behavior: "smooth" });
+      } else {
+        // The modal body or document scrolls the whole wrapper; its scroll margin clears any pinned chrome.
+        tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+      }
+    },
+    [host.kind, scrollableEl],
+  );
 
   const shared = { actions, tableWrapperRef, tableActionsRef, testIds, children };
   if (host.kind === "modal") return <ModalHost {...shared} host={host} />;
@@ -91,7 +110,8 @@ function DocumentScrollHost(props: HostProps & { rightPane?: boolean }) {
   return (
     <div
       ref={tableWrapperRef}
-      css={Css.df.fdc.wfc.mw100.$}
+      // Lands `scrollIntoView` below the pinned nav and page header, where the actions bar sticks.
+      css={Css.df.fdc.wfc.mw100.add("scrollMarginTop", stickyNavAndHeaderOffset()).$}
       {...(actions !== undefined ? selfTopSpaced : {})}
       {...testIds.tableWrapper}
     >

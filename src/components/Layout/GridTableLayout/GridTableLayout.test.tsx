@@ -1073,6 +1073,92 @@ describe("GridTableLayout", () => {
     });
   });
 
+  describe("scrollToTopOnFilterChange", () => {
+    // jsdom doesn't implement `scrollIntoView`
+    const scrollIntoView = vi.fn();
+    beforeEach(() => {
+      HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    });
+    afterEach(() => {
+      scrollIntoView.mockReset();
+      delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+    });
+
+    it("scrolls to the top of the table when a filter changes, but not on mount", async () => {
+      // Given a document-scroll GridTableLayout that opts into scrolling on filter changes
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={getModalFilterProps("scroll-on-filter-test")}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+            scrollToTopOnFilterChange
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+      // Then mounting does not scroll
+      expect(scrollIntoView).not.toHaveBeenCalled();
+
+      // When a filter changes
+      click(r.filter_needsRevision);
+
+      // Then the table wrapper is scrolled to the top
+      expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({ behavior: "smooth", block: "start" });
+      expect(scrollIntoView.mock.contexts[0]).toBe(r.tableWrapper);
+    });
+
+    it("does not scroll when not opted in", async () => {
+      // Given a GridTableLayout without scrollToTopOnFilterChange
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={getModalFilterProps("no-scroll-on-filter-test")}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // When a filter changes
+      click(r.filter_needsRevision);
+
+      // Then the page does not scroll
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+
+    it("waits for the query to load before scrolling", async () => {
+      // Given a query table whose query refetches when the filter changes
+      let loading = false;
+      function QueryWrapper() {
+        const layoutState = useGridTableLayoutState(getModalFilterProps("scroll-on-query-test"));
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            scrollToTopOnFilterChange
+            tableProps={{
+              columns: getColumns(),
+              query: { data: getRows(), loading },
+              createRows: (data) => [simpleHeader, ...(data ?? [])],
+            }}
+          />
+        );
+      }
+      const r = await render(<QueryWrapper />, withRouter());
+
+      // When a filter changes while the query is loading
+      loading = true;
+      click(r.filter_needsRevision);
+      // Then the page does not scroll yet
+      expect(scrollIntoView).not.toHaveBeenCalled();
+
+      // And when the query finishes loading
+      loading = false;
+      r.rerender(<QueryWrapper />);
+      // Then the table is scrolled to the top
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+    });
+  });
+
   describe("empty state", () => {
     it("shows default empty state when there are no data rows and no emptyFallback", async () => {
       // Given a layout with only a header row and no emptyFallback
