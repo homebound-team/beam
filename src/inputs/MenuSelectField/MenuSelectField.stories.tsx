@@ -47,6 +47,7 @@ export function Examples() {
           children: <Example label="Group by" helperText="Choose how rows are grouped." initial="cc" />,
         },
         { label: "Placeholder", children: <Example label="Group by" placeholder="Select a group" /> },
+        { label: "Unset", children: <Example label="Group by" unsetLabel="None" /> },
       ]}
     />
   );
