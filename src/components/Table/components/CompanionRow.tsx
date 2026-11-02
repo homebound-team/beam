@@ -26,6 +26,8 @@ type CompanionRowProps = {
   rowCss?: Properties;
   /** Owning row's `rowStyles.cellCss` — background color lives here (cells sit over the wrapper). */
   cellCss?: Properties;
+  /** Whether the owning row shows as pinned, so the companion gets the same `pinnedRowCss` fill. */
+  pinned?: boolean;
 };
 
 /** Full-width row rendered beside a data row when `GridDataRow.companion` is set. */
@@ -43,6 +45,7 @@ function CompanionRowImpl(props: CompanionRowProps) {
     levelIndent,
     rowCss,
     cellCss,
+    pinned,
   } = props;
   const RowTag = as === "table" ? "tr" : "div";
   const CellTag = as === "table" ? "td" : "div";
@@ -82,6 +85,8 @@ function CompanionRowImpl(props: CompanionRowProps) {
           ...(isLastBodyRow && style.lastRowFirstCellCss),
           ...(isLastBodyRow && style.lastRowLastCellCss),
           ...cellCss,
+          // Matches the owning row's pinned fill, so the pair reads as one pinned row
+          ...(pinned && style.pinnedRowCss),
           // Companion content is arbitrary — allow wrapping and grow with content.
           ...Css.h("auto")
             .whiteSpace("normal")

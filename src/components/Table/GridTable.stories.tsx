@@ -20,7 +20,6 @@ import {
 import { fieldCell } from "src/components/Table/components/cell";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import type { GridRowCompanion } from "src/components/Table/components/CompanionRow";
-import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
@@ -49,7 +48,15 @@ import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { noop } from "src/utils/helpers";
-import { LabeledExamples, newStory, withBeamDecorator, withRouter, zeroTo, type LabeledExample } from "src/utils/sb";
+import {
+  LabeledExamples,
+  newStory,
+  viewportModes,
+  withBeamDecorator,
+  withRouter,
+  zeroTo,
+  type LabeledExample,
+} from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 
@@ -602,13 +609,11 @@ export function InteractiveRowPinning() {
             // Pre-pin a couple rows so the sticky pinned section (and its separator) shows in the snapshot;
             // any row can be pinned/unpinned via its (hover-revealed) pin.
             ...(i === 3 || i === 8 ? { initPinned: true } : {}),
-            // Row 8: pre-pinned trailing companion (also has a PinToggle in companion content).
-            ...(i === 8
-              ? { companion: createPinningCompanion(`${i}`, "Pre-pinned — companion hoists with parent.") }
-              : {}),
-            // Row 15: leading companion with a PinToggle — pin/unpin from the companion row.
+            // Row 8: pre-pinned trailing companion, which hoists with its parent.
+            ...(i === 8 ? { companion: createPinningCompanion("Pre-pinned — companion hoists with parent.") } : {}),
+            // Row 15: leading companion; pinning row 15 hoists it too.
             ...(i === 15
-              ? { companion: createPinningCompanion(`${i}`, "Pin from companion content.", "leading") }
+              ? { companion: createPinningCompanion("Leading companion — hoists with its row when pinned.", "leading") }
               : {}),
           })),
         ]}
@@ -635,11 +640,9 @@ export function InteractiveRowPinningVirtual() {
             id: `${i}`,
             data: { name: `row ${i}`, value: i },
             ...(i === 3 || i === 8 ? { initPinned: true } : {}),
-            ...(i === 8
-              ? { companion: createPinningCompanion(`${i}`, "Pre-pinned — companion hoists with parent.") }
-              : {}),
+            ...(i === 8 ? { companion: createPinningCompanion("Pre-pinned — companion hoists with parent.") } : {}),
             ...(i === 15
-              ? { companion: createPinningCompanion(`${i}`, "Pin from companion content.", "leading") }
+              ? { companion: createPinningCompanion("Leading companion — hoists with its row when pinned.", "leading") }
               : {}),
           })),
         ]}
@@ -687,13 +690,79 @@ export function InteractiveGroupRowPinning() {
       some other top of page content
       <GridTable
         columns={[collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nameColumn]}
-        rowPinning={{ exclude: ["add"], onPin: (row, pinned) => action("onPin")(row.id, pinned) }}
+        rowPinning={{ exclude: ["add"] }}
         stickyHeader
         rows={rows}
       />
     </div>
   );
 }
+
+/**
+ * `rowActions` in a sticky column on the right (different per row kind), with `rowPinning`'s pin just before the menu.
+ * Up to 3 icons, or only the pin on phone-sized screens. The pin is always an icon; the rest go in the "more" menu.
+ */
+export const RowActions = newStory(
+  () => {
+    const nameColumn: GridColumn<NestedRow> = {
+      header: () => "Name",
+      parent: (data) => data.name,
+      child: (data) => data.name,
+      grandChild: (data) => data.name,
+      add: () => "Add item",
+    };
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      ...zeroTo(6).map((i) => ({
+        kind: "parent" as const,
+        id: `p${i}`,
+        data: { name: `Parent ${i}` },
+        initPinned: i === 1,
+        children: [
+          {
+            kind: "child" as const,
+            id: `p${i}c1`,
+            data: { name: `Child ${i}` },
+            children: [{ kind: "grandChild" as const, id: `p${i}c1g1`, data: { name: `Grandchild ${i}` } }],
+          },
+          { kind: "add" as const, id: `p${i}add`, data: undefined },
+        ],
+      })),
+    ];
+    // Different actions per kind; `add` rows get none
+    const rowActions = (row: GridDataRow<NestedRow>) => {
+      switch (row.kind) {
+        case "parent":
+          return [
+            { icon: "plus" as const, label: "Add child", onClick: () => action("add child")(row.id) },
+            { icon: "pencil" as const, label: "Edit", onClick: () => action("edit")(row.id) },
+          ];
+        case "child":
+          return [
+            { icon: "pencil" as const, label: "Edit", onClick: () => action("edit")(row.id) },
+            { icon: "duplicate" as const, label: "Duplicate", onClick: () => action("duplicate")(row.id) },
+            { icon: "linkExternal" as const, label: "Open", onClick: noop, disabled: "No page yet" },
+            { icon: "trash" as const, label: "Delete", onClick: () => action("delete")(row.id), destructive: true },
+          ];
+        case "grandChild":
+          return [
+            { icon: "trash" as const, label: "Delete", onClick: () => action("delete")(row.id), destructive: true },
+          ];
+        default:
+          return [];
+      }
+    };
+    return (
+      <GridTable
+        columns={[collapseColumn<NestedRow>(), nameColumn]}
+        rows={rows}
+        rowPinning={{ exclude: ["add"] }}
+        rowActions={rowActions}
+      />
+    );
+  },
+  { parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } } },
+);
 
 /** AI-suggestion companions with a `rowStyles` background color that covers the parent and companion. */
 export const CompanionRows = newStory(() => {
@@ -3865,14 +3934,9 @@ function styleOptionCell(value: string, suggestion: "add" | "remove" | undefined
   return value;
 }
 
-/** Companion content with an inline {@link PinToggle} for the InteractiveRowPinning stories. */
-function createPinningCompanion(rowId: string, message: string, position?: "leading" | "trailing"): GridRowCompanion {
-  const content = () => (
-    <div css={Css.df.aic.jcsb.gap2.px1.w100.$}>
-      <span css={Css.xs.$}>{message}</span>
-      <PinToggle rowId={rowId} />
-    </div>
-  );
+/** Companion content for the InteractiveRowPinning stories; the row's own pin (in the actions column) pins both. */
+function createPinningCompanion(message: string, position?: "leading" | "trailing"): GridRowCompanion {
+  const content = () => <div css={Css.xs.px1.$}>{message}</div>;
   return position ? { position, content } : content;
 }
 

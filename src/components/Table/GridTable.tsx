@@ -11,6 +11,7 @@ import React, {
 } from "react";
 import { type Components, type ListRange, Virtuoso, VirtuosoGrid, type VirtuosoHandle } from "react-virtuoso";
 import type { ImageFitType } from "src/components/Card";
+import type { IconProps } from "src/components/Icon";
 import { useScrollViewportWidth, useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -40,6 +41,11 @@ import type {
 import { assignDefaultColumnIds, isContentColumn, withColumnGutters } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
+import {
+  maxRowActionSlots,
+  rowActionsColumnPx,
+  rowActionsVisibleCount as rowActionsVisibleCountFor,
+} from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
@@ -52,6 +58,7 @@ import {
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, type Only } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useComputed } from "src/hooks/useComputed";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
@@ -70,6 +77,7 @@ import { zIndices } from "src/utils/zIndices";
 import { CompanionRow } from "./components/CompanionRow";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
+import { rowActionsColumn } from "./components/RowActionsCell";
 import { RowGroup } from "./components/RowGroup";
 import { TableCard } from "./components/TableCard";
 import { GridTableEmptyState, type GridTableEmptyStateProps } from "./GridTableEmptyState";
@@ -142,8 +150,18 @@ export type OnRowSelect<R extends Kinded> = {
 export type RowPinningConfig<R extends Kinded> = {
   /** Row kinds that don't get a pin toggle. Reserved kinds (header, totals, etc.) never do. Use `row.pinnable` per row. */
   exclude?: R["kind"][];
-  /** Called when a row is pinned/unpinned (via its toggle or the `api`); not for children that move with a pinned parent. */
-  onPin?: (row: GridDataRow<R>, pinned: boolean, api: GridTableApi<R>) => void;
+};
+
+/** An icon action in the `GridTableProps.rowActions` column. */
+export type GridRowAction = {
+  icon: IconProps["icon"];
+  /** The icon's aria label and tooltip, and the item's text once it moves into the "more" menu. */
+  label: string;
+  onClick: VoidFunction | string;
+  /** A ReactNode is shown as the disabled reason. */
+  disabled?: boolean | ReactNode;
+  /** Shows the item in red once it moves into the "more" menu. */
+  destructive?: boolean;
 };
 
 type DragEventType = React.DragEvent<HTMLElement>;
@@ -236,11 +254,19 @@ export type GridTableProps<R extends Kinded, X> = {
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
   /**
-   * Shows a pin toggle (on row hover) at the start of each row's first content cell.
+   * Shows a pin toggle in the row actions column, just before the "more" menu. It's always an icon, ahead of `rowActions`.
    *
    * Pinned rows stick to the top of the table, and a pinned parent brings its children with it.
    */
   rowPinning?: boolean | RowPinningConfig<R>;
+  /**
+   * Icon actions for each body row, in a sticky column on the right. Return `[]` for rows (or kinds) with no actions.
+   * Reserved rows (header, totals, etc.) never get any.
+   *
+   * The first few show as icons and the rest go in a "more" menu, with fewer icons on smaller screens.
+   * Wrap it in `useCallback`: the table calls it for every row to size the column, and a new function redraws each actions cell.
+   */
+  rowActions?: (row: GridDataRow<R>) => GridRowAction[];
   /**
    * Custom prefix rows for any CSV output, i.e. a header like "Report X as of date Y with filter Z".
    *
@@ -306,6 +332,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     infiniteScroll,
     onRowSelect,
     rowPinning,
+    rowActions,
     onRowDrop: droppedCallback,
     csvPrefixRows,
     disableColumnResizing = false,
@@ -324,10 +351,23 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
+  // `rowActions` and `rowPinning` share one sticky-right column, sized so every row's "more" menu lines up
+  const pinConfig = typeof rowPinning === "object" ? rowPinning : undefined;
+  const pinningEnabled = !!rowPinning;
+  const pinExcludedKinds = pinConfig?.exclude;
+  const breakpoints = useBreakpoint();
+  const rowActionsVisibleCount = rowActionsVisibleCountFor(breakpoints);
+  const rowActionsSlots = useMemo(
+    () => maxRowActionSlots(rows, rowActions, pinningEnabled, pinExcludedKinds ?? [], rowActionsVisibleCount),
+    [rows, rowActions, pinningEnabled, pinExcludedKinds, rowActionsVisibleCount],
+  );
+
   const columnsWithIds = useMemo(() => {
-    const columns = withGutters ? withColumnGutters(_columns) : _columns;
+    const withActions =
+      rowActionsSlots > 0 ? [..._columns, rowActionsColumn<R>(rowActionsColumnPx(rowActionsSlots))] : _columns;
+    const columns = withGutters ? withColumnGutters(withActions) : withActions;
     return assignDefaultColumnIds(columns);
-  }, [_columns, withGutters]);
+  }, [_columns, withGutters, rowActionsSlots]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -367,8 +407,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const { tableState } = api;
 
   tableState.onRowSelect = onRowSelect;
-  const pinConfig = typeof rowPinning === "object" ? rowPinning : undefined;
-  tableState.onPin = pinConfig?.onPin;
 
   // Use a single useEffect to push props into the TableState observable, that
   // way we avoid React warnings when the observable mutations cause downstream
@@ -390,11 +428,12 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // Kept out of the effect above so an inline `rowPinning={{ ... }}` doesn't re-run `setRows` each render.
   // `setRowPinning` ignores an `exclude` with the same kinds, so this is cheap when the array is new each render.
-  const pinningEnabled = !!rowPinning;
-  const pinExcludedKinds = pinConfig?.exclude;
   useEffect(() => {
     tableState.setRowPinning(pinningEnabled, pinExcludedKinds ?? []);
   }, [tableState, pinningEnabled, pinExcludedKinds]);
+  useEffect(() => {
+    tableState.setRowActions(rowActions, rowActionsVisibleCount);
+  }, [tableState, rowActions, rowActionsVisibleCount]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
@@ -654,6 +693,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           levelIndent={levelStyle?.rowIndent}
           rowCss={maybeApplyFunction(rs.row as any, rowStyle?.rowCss)}
           cellCss={maybeApplyFunction(rs.row as any, rowStyle?.cellCss)}
+          pinned={rs.showsPinned}
         />
       );
     };

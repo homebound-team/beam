@@ -153,21 +153,13 @@ export const collapseTogglePx = 28;
 const collapseControlPx = collapseTogglePx + 8;
 /** Select checkbox (16px) plus the 8px gap before the label. */
 const selectControlPx = 24;
-/** Width of the `rowPinning` pin button. Rows without a pin reserve this so everything after it stays in column. */
-export const pinTogglePx = 28;
-/** Pin toggle plus the 8px gap before the next item. */
-const pinControlPx = pinTogglePx + 8;
-
-/** Extra width so the pin, chevron, and checkbox don't eat the label. */
-export function firstContentControlPx(columns: readonly { id?: string }[], hasPinControl = false): number {
-  return columns.reduce(
-    (width, column) => {
-      if (column.id === beamCollapseColumnId) return width + collapseControlPx;
-      if (column.id === beamSelectColumnId) return width + selectControlPx;
-      return width;
-    },
-    hasPinControl ? pinControlPx : 0,
-  );
+/** Extra width so the chevron and checkbox don't eat the label. */
+export function firstContentControlPx(columns: readonly { id?: string }[]): number {
+  return columns.reduce((width, column) => {
+    if (column.id === beamCollapseColumnId) return width + collapseControlPx;
+    if (column.id === beamSelectColumnId) return width + selectControlPx;
+    return width;
+  }, 0);
 }
 
 /**

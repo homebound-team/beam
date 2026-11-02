@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { IconButton } from "src/components/IconButton";
+import { tableIconInc } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Palette, Tokens } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
@@ -24,8 +25,7 @@ export function PinToggle({ rowId }: PinToggleProps) {
     <IconButton
       {...tid[rowId]}
       icon={isPinned || isPinnedViaParent ? "pinFilled" : "pin"}
-      // 18x18 glyph, per design
-      inc={2.25}
+      inc={tableIconInc}
       pressedIcon="pinFilled"
       pressedColor={Tokens.Primary}
       color={isPinned || isPinnedViaParent ? Tokens.Primary : undefined}

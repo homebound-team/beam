@@ -51,6 +51,7 @@ import {
   documentScrollContentWidth,
   stickyTableHeaderOffset,
 } from "src/layouts/layoutVars";
+import { setViewport } from "src/tests/viewport";
 import { isDefined, noop } from "src/utils/helpers";
 import {
   cell,
@@ -1306,8 +1307,8 @@ describe("GridTable", () => {
       // Then the header has no pin toggle, but each data row has a row-scoped one
       expect(r.query.pin_header).toBeNull();
       expect(r.query.pin_1).toBeTruthy();
-      // And the pin sits in the first content cell
-      expect(cell(r, 1, 0)).toContainElement(r.pin_1);
+      // And the pin sits in the actions column after the content columns
+      expect(cell(r, 1, 2)).toContainElement(r.pin_1);
 
       // When we click row 1's toggle
       click(r.pin_1);
@@ -1345,24 +1346,6 @@ describe("GridTable", () => {
       expect(r.query.pin_1).toBeNull();
       expect(r.query.pin_2).toBeTruthy();
       expect(r.query.pin_3).toBeNull();
-    });
-
-    it("fires onPin for directly pinned rows, from the toggle or the api", async () => {
-      // Given a table with an onPin callback
-      const onPin = vi.fn();
-      const api = new GridTableApiImpl<Row>();
-      const r = await render(
-        <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} rowPinning={{ onPin }} />,
-      );
-      // When row 1 is pinned via its toggle
-      click(r.pin_1);
-      // Then onPin is called with the row
-      expect(onPin).toHaveBeenCalledWith(expect.objectContaining({ id: "1" }), true, api);
-      // And when row 1 is unpinned via the api
-      act(() => api.unpinRow("1"));
-      // Then onPin is called again
-      expect(onPin).toHaveBeenLastCalledWith(expect.objectContaining({ id: "1" }), false, api);
-      expect(onPin).toHaveBeenCalledTimes(2);
     });
 
     it("stops showing a pinned row once it's dropped from rows", async () => {
@@ -1503,23 +1486,6 @@ describe("GridTable", () => {
         // And isn't also counted as hidden by the search
         expect(r.queryByText(/hidden due to filters/)).toBeNull();
       });
-
-      it("doesn't fire onPin for children that move with a pinned parent", async () => {
-        // Given a nested table with an onPin callback
-        const onPin = vi.fn();
-        const r = await render(
-          <GridTable<NestedRow>
-            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
-            rows={nestedRows}
-            rowPinning={{ onPin }}
-          />,
-        );
-        // When parent 1 is pinned
-        click(r.pin_p1);
-        // Then onPin fires once, for the parent only
-        expect(onPin).toHaveBeenCalledTimes(1);
-        expect(onPin).toHaveBeenCalledWith(expect.objectContaining({ id: "p1" }), true, expect.anything());
-      });
     });
 
     it("does not hoist (or hide) a reserved row when it is pinned", async () => {
@@ -1532,6 +1498,156 @@ describe("GridTable", () => {
       expect(api.getPinnedRowIds()).toEqual([]);
       expect(cell(r, 0, 0)).toHaveTextContent("Name");
       expect(cell(r, 1, 0)).toHaveTextContent("foo");
+    });
+  });
+
+  describe("row actions", () => {
+    // Row ids aren't bare numbers, since `r.rowActions_1_delete` would read "1" as an index
+    const actionRows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "r1", data: { name: "foo", value: 1 } },
+      { kind: "data", id: "r2", data: { name: "bar", value: 2 } },
+    ];
+    const columns = [nameColumn, valueColumn];
+    const edit = { icon: "pencil" as const, label: "Edit", onClick: noop };
+    const duplicate = { icon: "duplicate" as const, label: "Duplicate", onClick: noop };
+    const remove = { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true };
+
+    it("draws rowActions as icons in a column after the content columns", async () => {
+      // Given two actions per row
+      const onEdit = vi.fn();
+      const r = await render(
+        <GridTable<Row>
+          columns={columns}
+          rows={actionRows}
+          rowActions={(row) => [{ ...edit, onClick: () => onEdit(row.id) }, remove]}
+        />,
+      );
+      // Then each row shows both as icons in the actions column, with no "more" menu
+      expect(cell(r, 1, 2)).toContainElement(r.pencil_r1);
+      expect(cell(r, 1, 2)).toContainElement(r.trash_r1);
+      expect(r.query.rowActions_r1).toBeNull();
+      // And the header's actions cell is empty
+      expect(cell(r, 0, 2)).toBeEmptyDOMElement();
+      // When clicking an action
+      click(r.pencil_r2);
+      // Then it's called for that row
+      expect(onEdit).toHaveBeenCalledWith("r2");
+    });
+
+    it("shows the pin as an icon after the actions when there's room", async () => {
+      // Given one action and rowPinning
+      const r = await render(
+        <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} rowPinning />,
+      );
+      // Then the pin shows right after the action
+      expect(cell(r, 1, 2)).toContainElement(r.pencil_r1);
+      expect(cell(r, 1, 2)).toContainElement(r.pin_r1);
+    });
+
+    it("keeps the pin as an icon and moves the overflowing actions into the more menu", async () => {
+      // Given three actions per row and rowPinning
+      const api = new GridTableApiImpl<Row>();
+      const r = await render(
+        <GridTable<Row>
+          api={api}
+          columns={columns}
+          rows={actionRows}
+          rowActions={() => [edit, duplicate, remove]}
+          rowPinning
+        />,
+        withRouter(),
+      );
+      // Then the first two actions and the pin show as icons, and the third action moves into the menu
+      expect(r.pencil_r1).toBeTruthy();
+      expect(r.duplicate_r1).toBeTruthy();
+      expect(r.pin_r1).toBeTruthy();
+      expect(r.query.trash_r1).toBeNull();
+      click(r.rowActions_r1);
+      expect(r.rowActions_r1_delete).toBeTruthy();
+    });
+
+    it("keeps the pin as an icon on phone-sized screens", async () => {
+      // Given an action per row and rowPinning on a phone-sized screen
+      setViewport("sm");
+      const r = await render(
+        <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} rowPinning />,
+        withRouter(),
+      );
+      // Then the action moves into the menu, but the pin stays an icon
+      expect(r.query.pencil_r1).toBeNull();
+      expect(r.pin_r1).toBeTruthy();
+      click(r.rowActions_r1);
+      expect(r.rowActions_r1_edit).toBeTruthy();
+      expect(r.query.rowActions_r1_pinRow).toBeNull();
+    });
+
+    it("keeps showing icons on tablet-sized screens", async () => {
+      // Given three actions per row on a tablet-sized screen
+      setViewport("md");
+      const r = await render(
+        <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit, duplicate, remove]} />,
+      );
+      // Then all three still show as icons, with no "more" menu
+      expect(r.pencil_r1).toBeTruthy();
+      expect(r.trash_r1).toBeTruthy();
+      expect(r.query.rowActions_r1).toBeNull();
+    });
+
+    it("puts every action in the menu on phone-sized screens", async () => {
+      // Given an action per row on a phone-sized screen
+      setViewport("sm");
+      const r = await render(<GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} />);
+      // Then there are no icons, just the menu
+      expect(r.query.pencil_r1).toBeNull();
+      expect(r.rowActions_r1).toBeTruthy();
+    });
+
+    it("gives each kind the actions the function returns for it", async () => {
+      // Given parents that can be edited and children that can be deleted
+      const nestedNameColumn: GridColumn<NestedRow> = {
+        header: "Name",
+        totals: emptyCell,
+        parent: (data) => data.name,
+        child: (data) => data.name,
+        grandChild: (data) => data.name,
+      };
+      const rows: GridDataRow<NestedRow>[] = [
+        simpleHeader,
+        {
+          kind: "parent",
+          id: "p1",
+          data: { name: "parent" },
+          children: [{ kind: "child", id: "c1", data: { name: "child" } }],
+        },
+      ];
+      const r = await render(
+        <GridTable<NestedRow>
+          columns={[nestedNameColumn]}
+          rows={rows}
+          rowActions={(row) => (row.kind === "parent" ? [edit] : row.kind === "child" ? [remove] : [])}
+        />,
+      );
+      // Then each row gets its kind's actions
+      expect(r.pencil_p1).toBeTruthy();
+      expect(r.query.trash_p1).toBeNull();
+      expect(r.trash_c1).toBeTruthy();
+      expect(r.query.pencil_c1).toBeNull();
+    });
+
+    it("doesn't ask for actions on the header", async () => {
+      // Given a rowActions function
+      const rowActions = vi.fn(() => []);
+      await render(<GridTable<Row> columns={columns} rows={actionRows} rowActions={rowActions} />);
+      // Then it's only called for body rows
+      expect(rowActions.mock.calls.map(([row]: any) => row.kind)).not.toContain("header");
+    });
+
+    it("doesn't add an actions column without rowActions or rowPinning", async () => {
+      // Given a table without either
+      const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
+      // Then each row only has its content columns
+      expect(cell(r, 1, 2)).toBeUndefined();
     });
   });
 
