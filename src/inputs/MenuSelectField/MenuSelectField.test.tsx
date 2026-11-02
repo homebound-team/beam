@@ -657,7 +657,7 @@ type HarnessProps = {
   disabled?: boolean;
   readOnly?: boolean;
   disabledOptions?: { value: string; reason: string }[];
-  getOptionMenuLabel?: (color: Color, isUnsetOpt?: boolean) => ReactNode;
+  getOptionMenuLabel?: (color: Color, isUnsetOpt: boolean) => ReactNode;
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
   autoSort?: boolean;

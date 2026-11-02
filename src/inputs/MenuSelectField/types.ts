@@ -13,7 +13,7 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   /** String used in the trigger and the option's accessible name. Defaults to `option.name`. */
   getOptionLabel?: (opt: O) => string;
   /** Custom content for the menu row. Falls back to `getOptionLabel`. `isUnsetOpt` is true for the `unsetLabel` row. */
-  getOptionMenuLabel?: (opt: O, isUnsetOpt?: boolean) => ReactNode;
+  getOptionMenuLabel?: (opt: O, isUnsetOpt: boolean) => ReactNode;
   /** Extra text the menu search matches, in addition to `getOptionLabel`. */
   getOptionSearchText?: (opt: O) => string | readonly string[];
   /** Sort options by `getOptionLabel`. On by default. `MenuTreeSelectField` defaults this to false. */
