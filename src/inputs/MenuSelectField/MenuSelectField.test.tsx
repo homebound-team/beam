@@ -94,6 +94,26 @@ describe("MenuSelectField", () => {
     expect(onSearch).toHaveBeenLastCalledWith("");
   });
 
+  it("keeps the selected label when the next options omit it", async () => {
+    // Given Red selected from a list that includes it
+    function Page() {
+      const [options, setOptions] = useState(colors());
+      const [value, setValue] = useState<string | undefined>("r");
+      return (
+        <>
+          <button data-testid="showBlue" onClick={() => setOptions([{ id: "b", name: "Blue" }])} />
+          <MenuSelectField label="Color" options={options} value={value} onSelect={setValue} />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    expect(r.color).toHaveTextContent("Red");
+    // When the list becomes one that does not include Red
+    click(r.showBlue);
+    // Then the closed field still shows Red
+    expect(r.color).toHaveTextContent("Red");
+  });
+
   it("loads options the first time the menu opens", async () => {
     // Given a selected option whose full list has not been loaded
     const load = vi.fn();

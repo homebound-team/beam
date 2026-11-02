@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
-import { click, render, select, type } from "src/utils/rtl";
+import { click, getOptions, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuMultiSelectField", () => {
@@ -175,6 +175,52 @@ describe("MenuMultiSelectField", () => {
         { id: "b", name: "Blue" },
       ],
     );
+  });
+
+  it("keeps a selected pill when the options list drops it", async () => {
+    // Given a multi select
+    const onSelect = vi.fn();
+    function Page() {
+      const [options, setOptions] = useState(colors());
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <>
+          <button data-testid="showBlue" onClick={() => setOptions([{ id: "b", name: "Blue" }])} />
+          <MenuMultiSelectField
+            label="Color"
+            options={options}
+            values={values}
+            onSelect={(next, opts) => {
+              onSelect(next, opts);
+              setValues(next);
+            }}
+          />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    // When Red is selected and the list is replaced with Blue
+    select(r.color, "Red");
+    click(r.showBlue);
+    // Then the menu lists Blue only, and Red stays a pill
+    expect(getOptions(r.color)).toEqual(["Blue"]);
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.query.color_selections_pill_1).toBeNull();
+    expect(r.color_count).toHaveTextContent("1");
+    // When Blue is selected too
+    select(r.color, "Blue");
+    // Then Red is still part of the selection
+    expect(onSelect).toHaveBeenLastCalledWith(
+      ["r", "b"],
+      [
+        { id: "r", name: "Red" },
+        { id: "b", name: "Blue" },
+      ],
+    );
+    // When the Red pill is clicked
+    click(r.color_selections_pill_0);
+    // Then Red is cleared even though it is no longer in the list
+    expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
   });
 
   it("keeps hidden selections when deselecting while filtered", async () => {

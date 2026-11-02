@@ -28,9 +28,11 @@ In camelCase utility files (e.g. `formatDocumentTitle.ts`), put **types first**,
 
 ## Comments
 
-- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md), [`docs/components.md`](docs/components.md)).
-- **Inline comments:** Use for non-obvious logic near the code. Keep them **short** — one line when possible.
-- **Avoid:** Multi-paragraph JSDoc, restating what the code already says, and duplicating docs that live elsewhere.
+Say what the code does. Name the result, where it comes from, and the case that changes the result (a fallback, a tree, a value that was removed). One or two lines. A second sentence is for that second case, not for a walk through the steps.
+
+- **JSDoc:** Use it on exports, and on a helper whose name does not carry that behavior. Point to `docs/` for a full contract (e.g. [`docs/layouts.md`](docs/layouts.md), [`docs/components.md`](docs/components.md)).
+- **Inline comments:** Use them for non-obvious logic beside the code. One line when the behavior fits in one sentence.
+- **Avoid:** Multi-paragraph JSDoc, a label for the next block ("for the pills", "flat case"), a stand-in for the data ("memory", "written"), restating the next line, and duplicating a contract that already lives in `docs/`.
 
 ## Testing
 

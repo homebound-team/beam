@@ -108,6 +108,36 @@ describe("MenuTreeSelectField", () => {
     });
   });
 
+  it("keeps a selected pill when the next options omit that node", async () => {
+    // Given a tree
+    function Page() {
+      const [options, setOptions] = useState(sports());
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <>
+          <button
+            data-testid="showBaseball"
+            onClick={() => setOptions([{ id: "baseball", name: "Baseball", children: [{ id: "mlb", name: "MLB" }] }])}
+          />
+          <MenuTreeSelectField
+            label="Sports"
+            options={options}
+            values={values}
+            onSelect={(response) => setValues(response.all.values)}
+          />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    // When Golf is selected and the list is replaced with Baseball
+    select(r.sports, "Golf");
+    click(r.showBaseball);
+    // Then the menu lists Baseball only, and Golf stays a pill
+    expect(getOptions(r.sports)).toEqual(["Baseball"]);
+    expect(r.sports_selections_pill_0).toHaveTextContent("Golf");
+    expect(r.sports_count).toHaveTextContent("1");
+  });
+
   it("removes a child and its parent when that child's pill is clicked", async () => {
     // Given a selected parent, listed as pills for the parent and its children
     const onSelect = vi.fn();
