@@ -19,8 +19,9 @@ export function AiPanel(props: AiPanelProps) {
   const { rounded = false, padding = "sm", children, ...others } = props;
   const tid = useTestIds(others, "aiPanel");
   return (
+    // Capped to the visible column so a page widened by an open right pane doesn't stretch it
     <div
-      css={{ ...Css.w100.aiBackground.layoutContainer.if(rounded).br12.$, ...aiBackgroundPaddingCss[padding] }}
+      css={{ ...Css.aiBackground.layoutContainer.if(rounded).br12.$, ...aiBackgroundPaddingCss[padding] }}
       {...others}
       {...tid}
     >
@@ -46,7 +47,8 @@ export function AiCard(props: AiCardProps) {
   const { logoHeight, gapCss } = aiCardChrome[size];
   const tid = useTestIds(others, "aiCard");
   return (
-    <div css={{ ...Css.df.fdc.aifs.w100.layoutContainer.if(!fullWidth).wfc.maxw100.mxa.$, ...gapCss }} {...tid.column}>
+    // Same cap as `AiPanel`, so a wide page does not stretch the card column
+    <div css={{ ...Css.df.fdc.aifs.layoutContainer.if(!fullWidth).wfc.maxw100.mxa.$, ...gapCss }} {...tid.column}>
       <BlueprintAiLogo height={logoHeight} />
       <div css={Css.df.fdc.w100.mw0.br12.bgColor(Tokens.Surface).bshBasic.$} {...others} {...tid.card}>
         {children}
