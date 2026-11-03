@@ -102,6 +102,8 @@ function DocumentScrollHost(props: HostProps & { rightPane?: boolean }) {
             .top(stickyNavAndHeaderOffset())
             .left(documentScrollChromeLeft())
             .w(`min(100%, ${documentScrollChromeWidth()})`)
+            // Keep wide filter rows/pills from sizing the `wfc` wrapper (and stretching card view); they wrap or scroll instead.
+            .add("contain", "inline-size")
             .z(zIndices.tableActions)
             .bgColor(Tokens.Surface).$
         }
