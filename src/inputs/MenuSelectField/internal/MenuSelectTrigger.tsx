@@ -128,7 +128,9 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
       {labelStyle === "inline" && (
         <span
           id={trigger.labelId}
-          css={Css.sm.wsnw.prPx(4).color(trigger.isDisabled && visuallyDisabled ? "currentColor" : Tokens.TextLabel).$}
+          css={
+            Css.smSb.wsnw.prPx(4).color(trigger.isDisabled && visuallyDisabled ? "currentColor" : Tokens.OnSurface).$
+          }
         >
           {label}:
         </span>
