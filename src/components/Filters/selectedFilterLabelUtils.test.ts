@@ -104,7 +104,8 @@ describe("resolveTreeSelectedFilterLabel", () => {
     // Given lazy tree options with only current populated
     const options = {
       current: [{ id: "child", name: "Child Region" }],
-      load: async () => ({ options: [{ id: "child", name: "Child Region" }] }),
+      load: async () => {},
+      options: undefined,
     };
 
     // When resolving the label for a value in current

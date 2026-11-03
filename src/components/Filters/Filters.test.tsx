@@ -1,17 +1,11 @@
-import { wait } from "@homebound/rtl-utils";
-import { fireEvent } from "@testing-library/react";
-import { useState } from "react";
 import { booleanFilter } from "src/components/Filters/BooleanFilter";
 import { Filters } from "src/components/Filters/Filters";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { singleFilter } from "src/components/Filters/SingleFilter";
 import { type ProjectFilter, Stage } from "src/components/Filters/testDomain";
 import type { FilterDefs } from "src/components/Filters/types";
-import type { HasIdAndName } from "src/types";
-import { click, render } from "src/utils/rtl";
-import { zeroTo } from "src/utils/sb";
+import { render, select } from "src/utils/rtl";
 import { vi } from "vitest";
-import type { MultiFilterProps } from "./MultiFilter";
 
 describe("Filters", () => {
   it("can match GQL types of enum arrays", () => {
@@ -56,52 +50,27 @@ describe("Filters", () => {
     expect(f).toBeDefined();
   });
 
-  it("calls onSearch with the debounced value", async () => {
-    const onSearchMock = vi.fn();
-    // Given a stateful component that has initial values set
-    const r = await render(<TestFilterSearch onSearch={onSearchMock} />);
-
-    // When opening the options and typing in the filter input
-    click(r.filter_multi);
-    // Not sure why fireEvent.input is needed, type does not work
-    fireEvent.input(r.filter_multi, { target: { value: "1" } });
-    // Wait for `onSearch/debounce` to be called
-    await wait();
-
-    // Then the only remaining option is one and the onSearch/debounce function was called with the correct value and delay
-    expect(r.queryAllByRole("option")).toHaveLength(1);
-    expect(onSearchMock).toHaveBeenCalledWith("1");
+  it("calls setValue when a group by option is selected", async () => {
+    // Given a group by field
+    const setValue = vi.fn();
+    const r = await render(
+      <Filters
+        filterDefs={{}}
+        filter={{}}
+        onChange={vi.fn()}
+        groupBy={{
+          value: "costCode",
+          setValue,
+          options: [
+            { id: "costCode", name: "Cost Code" },
+            { id: "tradeCategory", name: "Trade Category" },
+          ],
+        }}
+      />,
+    );
+    // When Trade Category is selected
+    select(r.groupBy, "Trade Category");
+    // Then setValue receives the option id
+    expect(setValue).toHaveBeenCalledWith("tradeCategory");
   });
 });
-
-function TestFilterSearch(props: Partial<MultiFilterProps<HasIdAndName, string>>, onSelectMock = vi.fn()) {
-  const [, setSearch] = useState<string | undefined>("");
-  const options: HasIdAndName[] = zeroTo(2).map((i) => ({
-    id: `p:${i}`,
-    name: `Project ${i}`,
-  }));
-  type MultiFilter = { stage?: string[] };
-
-  const defs: FilterDefs<MultiFilter> = {
-    stage: multiFilter({
-      options: options,
-      label: "Multi",
-      getOptionValue: (o) => o.id,
-      getOptionLabel: (o) => o.name,
-      onSearch: (input) => {
-        onSelectMock(input);
-        setSearch(input);
-      },
-      ...props,
-    }),
-  };
-
-  const [filter, setFilter] = useState<MultiFilter>({ stage: props.defaultValue });
-  return (
-    <div>
-      <button data-testid="update" onClick={() => setSearch("baseball")} />
-      <Filters filterDefs={defs} filter={filter} onChange={setFilter} />
-      <div data-testid="value">{JSON.stringify(filter)}</div>
-    </div>
-  );
-}

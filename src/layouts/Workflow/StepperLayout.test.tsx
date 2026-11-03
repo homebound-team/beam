@@ -209,6 +209,32 @@ describe("StepperLayout", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
+  it("renders a non-standard completion label on the last step", async () => {
+    // Given a StepperLayout on its last step with an agreed one-off completion label and a standard label
+    const onComplete = vi.fn();
+    const r = await render(
+      <StepperLayout
+        {...baseProps({
+          completeLabel: "Publish",
+          nonStandardCompleteLabel: "Send to trade",
+          onComplete,
+          defaultStep: "stepTwo",
+        })}
+      />,
+      withRouter(),
+    );
+
+    // Then the one-off label is the completion button
+    expect(r.sendToTrade).toHaveTextContent("Send to trade");
+    expect(r.query.publish).toBeNull();
+
+    // When it is clicked
+    click(r.sendToTrade);
+
+    // Then onComplete is called
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
   it("disables Continue when the active step is primaryDisabled, and enables it once omitted", async () => {
     // Given a StepperLayout whose first (active) step has primaryDisabled
     const r = await render(
@@ -407,7 +433,6 @@ function baseProps(overrides: Partial<StepperLayoutProps> = {}): StepperLayoutPr
   return {
     title: "Test Workflow",
     onCancel: () => {},
-    completeLabel: "Save",
     onComplete: () => {},
     steps,
     ...rest,

@@ -84,6 +84,24 @@ describe("MenuTreeSelectField", () => {
     });
   });
 
+  it("removes a child and its parent when that child's pill is clicked", async () => {
+    // Given a selected parent, listed as pills for the parent and its children
+    const onSelect = vi.fn();
+    const r = await render(<TreeHarness initial={["basketball"]} onSelectSpy={onSelect} />);
+    click(r.sports);
+    // When clicking the NBA pill
+    const nba = r.getAllByTestId("sports_selections_pill").find((pill) => pill.textContent === "NBA");
+    expect(nba).toBeDefined();
+    if (!nba) return;
+    click(nba);
+    // Then the parent comes off with it, and only WNBA remains
+    expect(onSelect).toHaveBeenLastCalledWith({
+      all: { values: ["wnba"], options: [wnba] },
+      leaf: { values: ["wnba"], options: [wnba] },
+      root: { values: ["wnba"], options: [wnba] },
+    });
+  });
+
   it("treats a parent value as its whole subtree", async () => {
     // Given only the parent's value on record
     const r = await render(<TreeHarness initial={["basketball"]} />);

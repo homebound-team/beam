@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { BaseHeaderProps } from "src/components/Headers/BaseHeader";
 import { closeRightPaneThen } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
@@ -25,7 +25,10 @@ export type StepperLayoutStep = Omit<StepperTabsStep, "value" | "disabled"> & {
 };
 
 export type StepperLayoutProps = Pick<BaseHeaderProps, "title" | "documentTitleSuffix" | "breadcrumbs"> &
-  Pick<WorkflowActionsProps, "onCancel" | "completeLabel" | "onComplete" | "onSaveAndExit" | "destructiveAction"> & {
+  Pick<
+    WorkflowActionsProps,
+    "onCancel" | "onComplete" | "onSaveAndExit" | "destructiveAction" | "completeLabel" | "nonStandardCompleteLabel"
+  > & {
     /** The workflow's steps; the active step's `content` is the body, and it drives the header's tab strip. */
     steps: StepperLayoutStep[];
     /** The step shown initially (matched against `defaultTestId(step.label)`); falls back to the first step if omitted or if it doesn't match any step. Uncontrolled — the layout owns step navigation from here. */
@@ -50,7 +53,6 @@ export function StepperLayout(props: StepperLayoutProps) {
     steps,
     defaultStep,
     onCancel,
-    completeLabel,
     onComplete,
     onSaveAndExit,
     destructiveAction,
@@ -58,7 +60,11 @@ export function StepperLayout(props: StepperLayoutProps) {
     allowNavigation,
     aiMode,
     banner,
-    ...headerProps
+    title,
+    documentTitleSuffix,
+    breadcrumbs,
+    completeLabel,
+    nonStandardCompleteLabel,
   } = props;
   const stepTabs = steps.map((step) => ({ ...step, value: defaultTestId(step.label) }));
   const [currentStep, setCurrentStep] = useState(() => getInitialStep(stepTabs, defaultStep));
@@ -77,7 +83,9 @@ export function StepperLayout(props: StepperLayoutProps) {
   return (
     <WorkflowPageLayout
       {...tid}
-      {...headerProps}
+      title={title}
+      documentTitleSuffix={documentTitleSuffix}
+      breadcrumbs={breadcrumbs}
       banner={banner}
       aiMode={aiMode}
       stepperTabs={{ steps: stepTabs, currentStep, onChange: goToStep }}
@@ -93,6 +101,7 @@ export function StepperLayout(props: StepperLayoutProps) {
       onSaveAndExit={onSaveAndExit}
       destructiveAction={destructiveAction}
       completeLabel={completeLabel}
+      nonStandardCompleteLabel={nonStandardCompleteLabel}
       onComplete={onComplete}
       primaryDisabled={activeStep?.primaryDisabled}
       rightPaneTriggers={activeStep?.rightPaneTriggers}

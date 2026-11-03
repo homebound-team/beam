@@ -1,0 +1,104 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as GridTableLayoutActionsStories from "./GridTableLayoutActions.stories";
+
+<Meta of={GridTableLayoutActionsStories} />
+
+# Table Actions
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/yJcdAYy1rqkxTTNhUQnjjU/H2-2026-Beam-WIP?node-id=2632-39368">
+    <img src="FigmaLogo.png" alt="" />
+    Table Controls
+  </a>
+</p>
+
+The controls bar above a `GridTableLayout` table. `GridTableLayout` renders it for you from `layoutState`, `actions`, `selectionSummary`, and its columns; you don't render it directly. A table's title and supporting copy belong in a `ContentHeader` above the layout, not here.
+
+## Left side: Search, Filter, Group By
+
+<table>
+  <thead>
+    <tr>
+      <th>Control</th>
+      <th>Behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Search</td>
+      <td>
+        A 244px search field. Shown when <code>layoutState</code> has <code>search</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>Filter</td>
+      <td>
+        The filters show inline, followed by Clear once one is active. When they won't fit (see below), they condense
+        into a Filter button that opens the filter panel.
+      </td>
+    </tr>
+    <tr>
+      <td>Group By</td>
+      <td>Inline on desktop, to the right of the filters (or the Filter button).</td>
+    </tr>
+  </tbody>
+</table>
+
+At most **two controls** follow search. Group By counts as one, so:
+
+<table>
+  <thead>
+    <tr>
+      <th>Setup</th>
+      <th>Shows after search</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1–2 filters</td>
+      <td>The filters</td>
+    </tr>
+    <tr>
+      <td>3+ filters</td>
+      <td>Filter button</td>
+    </tr>
+    <tr>
+      <td>Group By, no filters</td>
+      <td>Group By</td>
+    </tr>
+    <tr>
+      <td>Group By + 1 filter</td>
+      <td>The filter, Group By</td>
+    </tr>
+    <tr>
+      <td>Group By + 2+ filters</td>
+      <td>Filter button, Group By</td>
+    </tr>
+  </tbody>
+</table>
+
+Inside a modal, everything goes behind the Filter button.
+
+## Right side: View + Actions
+
+Ordered left to right:
+
+1. **Active multi-select**: "N Rows Selected · Clear", when <code>selectionSummary</code> is set and rows are selected.
+2. **View mode toggle**: a button group, passed as <code>viewModeToggle</code>, that switches between the table's views, e.g. Cost / Price. Mark the current view <code>active</code>.
+3. **Column selector**: when any column has <code>canHide</code>.
+4. **View selector**: List / Card, with <code>withCardView</code>.
+5. **Actions**: <code>actions</code>, typically the overflow menu.
+
+## Responsive display
+
+When there is less than **40px** between the left and right sides, the controls switch to their mobile format, even on a desktop-width screen. They always use it below the `sm` breakpoint. With nothing on the right side, there's no gap to measure, so only the `sm` breakpoint applies.
+
+In the mobile format:
+
+- Search and Filter become icon buttons. Search opens a full-width field below the bar.
+- Group By is grouped with the filters, and shows once the filter button is tapped.
+- The selection summary shows just the count and an ×.
+- The column and view selectors become icon buttons.
+- The view mode toggle moves to the top of the column selector's menu. It stays in the bar when it's the only item on the right side.
+
+See the **Responsive Display** story, and drag its corner to watch the switch.

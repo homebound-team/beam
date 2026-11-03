@@ -8,7 +8,7 @@ export const palette = {
   White:  'rgba(255, 255, 255, 1)',
   Transparent:  'rgba(0,0,0,0)',
   Black:  'rgba(0, 0, 0, 1)',
-  Gray50:  'rgba(255, 253, 253, 1)',
+  Gray50:  'rgba(250, 250, 250, 1)',
   Gray100:  'rgba(247, 245, 245, 1)',
   Gray200:  'rgba(236, 235, 235, 1)',
   Gray300:  'rgba(221, 220, 220, 1)',

@@ -19,10 +19,11 @@ export type MenuTreeSelectFieldProps<O, V extends Value> = MenuSelectFieldBasePr
 
 /** Multi select over nested options, with expandable groups and cascading selection. See `MenuTreeSelectField.mdx`. */
 export function MenuTreeSelectField<O, V extends Value>(props: MenuTreeSelectFieldProps<O, V>): JSX.Element {
-  const { onSelect, selectionDisplay = "all", defaultExpanded = false, ...rest } = props;
+  const { onSelect, selectionDisplay = "all", defaultExpanded = false, autoSort = false, ...rest } = props;
   return (
     <BaseMenuSelectField
       {...rest}
+      autoSort={autoSort}
       selectionMode="multiple"
       tree={{ getChildren: getNestedChildren, display: selectionDisplay, defaultExpanded }}
       onCommit={(values, opts) => onSelect(treeSelectResponse(values, opts))}

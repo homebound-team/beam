@@ -15,6 +15,8 @@ export type WorkflowDestructiveAction = {
   confirmMessage?: ReactNode;
 };
 
+export type WorkflowCompleteLabel = "Create" | "Save" | "Publish";
+
 export type WorkflowActionsProps = {
   /** Leaves the workflow without saving. Always shown. */
   onCancel: (e: PressEvent) => void;
@@ -22,10 +24,12 @@ export type WorkflowActionsProps = {
   onSaveAndExit?: (e: PressEvent) => void | Promise<void>;
   /** Destructive action on the workflow, rendered as a `danger` button before Continue/Complete. */
   destructiveAction?: WorkflowDestructiveAction;
-  /** Label for the completion button shown on the last step (or when there is no next step). */
-  completeLabel: "Create" | "Save";
   /** Called when the completion button is clicked. */
   onComplete: (e: PressEvent) => void | Promise<void>;
+  /** `"Create"`, `"Save"`, or `"Publish"`. Defaults to `"Save"`. */
+  completeLabel?: WorkflowCompleteLabel;
+  /** One-off label. Wins over `completeLabel`. Confirm with product and/or design first. */
+  nonStandardCompleteLabel?: string;
   /** Continue/Complete is disabled. A ReactNode is shown in Beam's tooltip. */
   primaryDisabled?: boolean | ReactNode;
   /** When true, Continue/Complete use the `ai` button variant instead of `primary`. */
@@ -43,7 +47,6 @@ export function WorkflowActions(props: WorkflowActionsProps) {
     onCancel,
     onSaveAndExit,
     destructiveAction,
-    completeLabel,
     onComplete,
     primaryDisabled,
     aiMode = false,
@@ -51,9 +54,12 @@ export function WorkflowActions(props: WorkflowActionsProps) {
     isLastStep = true,
     onBack,
     onContinue,
+    completeLabel,
+    nonStandardCompleteLabel,
   } = props;
   const { sm: isMobile } = useBreakpoint();
   const primaryVariant = aiMode ? "ai" : "primary";
+  const completeButtonLabel = nonStandardCompleteLabel ?? completeLabel ?? "Save";
 
   return (
     <div css={Css.df.aic.jcsb.ifSm.w100.$}>
@@ -67,7 +73,12 @@ export function WorkflowActions(props: WorkflowActionsProps) {
           <Button label={destructiveAction.label ?? "Remove"} variant="danger" onClick={destructiveAction.onConfirm} />
         )}
         {isLastStep ? (
-          <Button label={completeLabel} variant={primaryVariant} onClick={onComplete} disabled={primaryDisabled} />
+          <Button
+            label={completeButtonLabel}
+            variant={primaryVariant}
+            onClick={onComplete}
+            disabled={primaryDisabled}
+          />
         ) : (
           <Button
             label="Continue"

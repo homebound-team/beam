@@ -24,12 +24,13 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControl
     tree: _tree,
     ...fieldProps
   } = props;
-  const { triggerRef, trigger, searchRef, search, listRef, menu } = useMenuSelectField(props);
+  const { triggerRef, trigger, searchRef, search, listRef, menu, selections } = useMenuSelectField(props);
   const tid = useTestIds(props, defaultTestId(label));
   const { sm: isMobile } = useBreakpoint();
   const panel = (
     <MenuPanel
       variant={isMobile ? "sheet" : "anchored"}
+      selections={selections}
       header={
         search.show ? (
           <MenuSearchInput

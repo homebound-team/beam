@@ -15,12 +15,14 @@ import * as MenuSelectFieldStories from "./MenuSelectField.stories";
 
 ## Usage
 
-Use `MenuSelectField` when a filter accepts one value. It takes `value` and calls `onSelect(value, option)`. Choosing an option closes the menu, and the selected row shows a check. A menu longer than `searchOptionLimit` includes a search field.
+Use `MenuSelectField` when a filter accepts one value. It takes `value` and calls `onSelect(value, option)`. Choosing an option closes the menu, and the selected row shows a check. A menu longer than `searchOptionLimit` includes a search field. Pass `onSearch` when the list is too large to hold: the search field is always shown, the debounced text is passed to `onSearch`, and the menu lists the `options` the caller returns. Closing the menu calls `onSearch("")`. Keep the current selection in `options` so its label stays.
 
-Options default to `option.id` and `option.name`. Pass an array, or `{ current, load, options }` to load the list the first time the menu opens. `getOptionMenuLabel` customizes the row. The closed field and the option's accessible name still use `getOptionLabel`. Search matches that string, plus any text from `getOptionSearchText`.
+Options default to `option.id` and `option.name`. Pass an array, or `{ current, load, options }` to load the list the first time the menu opens. `getOptionMenuLabel` customizes the row. The closed field and the option's accessible name still use `getOptionLabel`. Search matches that string, plus any text from `getOptionSearchText`, unless `onSearch` is set.
+
+`unsetLabel` adds a row that selects `undefined` and stays first when options are sorted. `getOptionMenuLabel(option, isUnsetOpt)` can replace that row; the closed field still shows `unsetLabel`. `nothingSelectedText` only labels an empty field and does not add a row.
 
 Plug into `@homebound/form-state` with `BoundMenuSelectField`.
 
-On a wide screen the menu is a popover. On a small screen it is a bottom sheet.
+On a wide screen the menu is a popover anchored to the bottom-left of the field. It is as wide as the field, and at least 320px. On a small screen it is a bottom sheet.
 
 See [Select fields (new)](?path=/docs/inputs-select-fields-new--docs) for shared implementation details and remaining work.

@@ -1,9 +1,12 @@
 import type { Meta } from "@storybook/react-vite";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AiBanner } from "src/components/AiBanner";
 import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { PageHeader } from "src/components/Headers/PageHeader";
+import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
+import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { ModalBody, ModalFooter, ModalHeader } from "src/components/Modal/Modal";
 import { useModal } from "src/components/Modal/useModal";
 import {
@@ -21,6 +24,7 @@ import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpe
 import { simpleGroupHeader, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { emptyCell } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
+import { AiTableIllustration } from "src/illustrations/AiTableIllustration";
 import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
 import { noop } from "src/utils/helpers";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
@@ -100,6 +104,43 @@ export function GridTableLayout() {
             ],
           },
         ]}
+      />
+    </TestProjectLayout>
+  );
+}
+
+/** Right pane starts open. `AiBanner` sits above the table, in the page column. */
+export function WithOpenRightPane() {
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => [simpleHeader, ...makeNestedRows(3)], []);
+  const { openRightPane, closeRightPane } = useRightPaneActions();
+  const openPane = useCallback(() => openRightPane({ content: <OpenRightPaneDetail /> }), [openRightPane]);
+
+  useEffect(() => {
+    openPane();
+    return closeRightPane;
+  }, [openPane, closeRightPane]);
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with an open right pane" />
+      <AiBanner
+        title="Review changes to your plan found in your latest document capture."
+        message="Review the changes highlighted below including 4 warnings."
+        secondaryAction={{ label: "Ignore All", onClick: noop }}
+        primaryAction={{ label: "Accept All", onClick: noop }}
+      />
+      <GridTableLayoutComponent
+        withRightPane
+        tableProps={{
+          columns,
+          rows,
+          sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
+          rowStyles: {
+            data: { onClick: openPane },
+            parent: { onClick: openPane },
+          },
+        }}
       />
     </TestProjectLayout>
   );
@@ -437,6 +478,39 @@ export function EmptyStateWithIllustration() {
           rows: [simpleHeader, ...makeNestedRows(3)],
           sorting: { on: "client", initial: [columns[1].id!, "ASC"] },
           emptyState: { title: "No documents found", illustration: <DocumentUploadIllustration /> },
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+export function EmptyStateWithAiIllustration() {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+
+  const layoutState = useGridTableLayoutState({
+    persistedFilter: {
+      filterDefs,
+      storageKey: "grid-table-layout-empty-state-ai-illustration",
+    },
+    search: "client",
+  });
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Takeoffs" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows: [simpleHeader],
+          emptyState: {
+            title: "No takeoff lines yet",
+            illustration: <AiTableIllustration />,
+            description:
+              "Takeoff lines will appear here after you upload construction documents and Blueprint AI generates the results.",
+            actions: <Button label="Go to Overview" variant="secondary" onClick={noop} />,
+          },
         }}
       />
     </TestProjectLayout>
@@ -1598,6 +1672,19 @@ function getGroupedRows(): GridDataRow<GroupedPlanRow>[] {
       },
     },
   ];
+}
+
+function OpenRightPaneDetail() {
+  const { closeRightPane } = useRightPaneActions();
+  return (
+    <RightPanePanel
+      title="parent 1"
+      secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
+      primaryAction={{ label: "Save", onClick: noop }}
+    >
+      <p css={Css.sm.$}>Row detail.</p>
+    </RightPanePanel>
+  );
 }
 
 function ModalGridTable({ virtualized = false }: { virtualized?: boolean }) {

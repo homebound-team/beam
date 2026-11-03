@@ -324,7 +324,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           const canSortColumn =
             (sortOn === "client" && column.clientSideSort !== false) ||
             (sortOn === "server" && !!column.serverSideSortKey);
-          const alignment = isGroupHeader ? "left" : getAlignment(column, maybeContent);
+          const alignment = isGroupHeader ? "center" : getAlignment(column, maybeContent);
           const justificationCss = getJustification(column, maybeContent, as, alignment);
           const isExpandable =
             isFunction(column.expandColumns) ||
@@ -497,7 +497,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
               hierarchyFirstContentCss({
                 level,
                 skipIndent: levelIndent !== undefined || !hasCollapseColumn,
-                maxLevel: tableState.maxNestingLevel,
+                hasChildren: !!row.children?.length,
               })),
             // Apply any declarative column border styling after header/body defaults.
             ...getColumnBorderCss(column.border, style),

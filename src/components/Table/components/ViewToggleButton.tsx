@@ -8,10 +8,13 @@ type ViewToggleButtonProps = {
   view: TableView;
   onChange: (view: TableView) => void;
   defaultOpen?: boolean;
+  /** Renders the icon-only trigger. Defaults to the `sm` breakpoint. */
+  compact?: boolean;
 };
 
-export function ViewToggleButton({ view, onChange, defaultOpen }: ViewToggleButtonProps) {
+export function ViewToggleButton({ view, onChange, defaultOpen, ...props }: ViewToggleButtonProps) {
   const { sm } = useBreakpoint();
+  const { compact = sm } = props;
   const tid = useTestIds({}, "viewToggleButton");
 
   const menuItems: MenuItem[] = [
@@ -23,7 +26,7 @@ export function ViewToggleButton({ view, onChange, defaultOpen }: ViewToggleButt
 
   return (
     <ButtonMenu
-      trigger={sm ? { icon, variant: "outline" } : { icon, label: "", size: "md", variant: "secondaryBlack" }}
+      trigger={compact ? { icon, variant: "outline" } : { icon, label: "", size: "md", variant: "secondaryBlack" }}
       items={menuItems}
       defaultOpen={defaultOpen}
       {...tid}

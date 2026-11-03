@@ -61,7 +61,15 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
     destructiveAction,
     rightPaneTriggers,
     banner: bannerProp,
-    ...actionProps
+    onSaveAndExit,
+    onComplete,
+    primaryDisabled,
+    isFirstStep,
+    isLastStep,
+    onBack,
+    onContinue,
+    completeLabel,
+    nonStandardCompleteLabel,
   } = props;
   const tid = useTestIds(props, "workflowPageLayout");
   const { slot: bannerSlot, height: bannerHeight } = usePageBannerSlot(bannerProp, tid);
@@ -74,7 +82,15 @@ export function WorkflowPageLayout(props: WorkflowPageLayoutProps) {
   });
   const actions = (
     <WorkflowActions
-      {...actionProps}
+      completeLabel={completeLabel}
+      nonStandardCompleteLabel={nonStandardCompleteLabel}
+      onSaveAndExit={onSaveAndExit}
+      onComplete={onComplete}
+      primaryDisabled={primaryDisabled}
+      isFirstStep={isFirstStep}
+      isLastStep={isLastStep}
+      onBack={onBack}
+      onContinue={onContinue}
       aiMode={aiMode}
       onCancel={onCancelClick}
       destructiveAction={destructiveAction && { ...destructiveAction, onConfirm: onDestructiveActionClick! }}

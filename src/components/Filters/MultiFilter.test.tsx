@@ -1,4 +1,6 @@
 import { multiFilter } from "src/components/Filters/MultiFilter";
+import { click, render } from "src/utils/rtl";
+import { useTestIds } from "src/utils/useTestIds";
 
 describe("MultiFilter", () => {
   it("returns the option label for a matching value", () => {
@@ -39,4 +41,28 @@ describe("MultiFilter", () => {
     // Then the label from current is returned
     expect(label).toBe("Jane Smith");
   });
+
+  it("keeps the menu for a short list in a modal when onSearch is set", async () => {
+    // Given a short project list that queries as the user types
+    const r = await render(<ModalSearchFilter />);
+    // When the menu opens
+    click(r.filter_project);
+    // Then it stays a searchable menu instead of switching to chips
+    expect(r.filter_project.tagName).toBe("BUTTON");
+    expect(r.filter_project_search).toBeInTheDocument();
+  });
 });
+
+function ModalSearchFilter() {
+  const filter = multiFilter({
+    label: "Project",
+    options: [
+      { id: "p1", name: "One" },
+      { id: "p2", name: "Two" },
+      { id: "p3", name: "Three" },
+    ],
+    onSearch: () => {},
+  })("project");
+  const tid = useTestIds({}, "filter");
+  return <>{filter.render(undefined, () => {}, tid, true, false)}</>;
+}

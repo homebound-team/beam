@@ -2,7 +2,7 @@ import { useLayoutEffect, type RefObject } from "react";
 import { useOverlayPosition } from "react-aria";
 import { zIndices } from "src/utils/zIndices";
 
-/** Positions `popoverRef` against `triggerRef`. Parent scroll moves it; it does not close. */
+/** Positions the menu under the trigger. The menu matches the field and is at least 320px wide. Parent scroll moves it; it does not close. */
 export function useAnchoredPosition(
   triggerRef: RefObject<HTMLElement | null>,
   popoverRef: RefObject<HTMLElement | null>,
@@ -32,17 +32,27 @@ export function useAnchoredPosition(
     return () => window.removeEventListener("scroll", onScroll, true);
   }, [isOpen, updatePosition, triggerRef]);
 
-  // Runs every render. react-aria rewrites `style.maxHeight` on each reposition, so copy it into `--menu-max-height` and match the trigger width.
+  // Runs every render. react-aria rewrites `style.maxHeight` on each reposition, so copy it into `--menu-max-height`.
   useLayoutEffect(() => {
     if (!isOpen) return;
     applyMenuFrame(popoverRef.current, triggerRef.current);
   });
+
+  // A window resize does not re-render, so the effect above would miss a field that changed width.
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const onResize = () => applyMenuFrame(popoverRef.current, triggerRef.current);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [isOpen, triggerRef, popoverRef]);
 
   return {
     ...overlayProps,
     style: {
       ...overlayProps.style,
       zIndex: zIndices.popover,
+      width: `max(${menuMinWidth}px, var(${menuFieldWidthVar}, 0px))`,
+      minWidth: `${menuMinWidth}px`,
     },
   };
 }
@@ -53,7 +63,12 @@ const overlayOffset = 4;
 const viewportPadding = 8;
 /** Cap shared with `MenuPanel`'s `--menu-max-height` fallback. */
 const menuMaxHeight = 512;
+/** The menu is never narrower than this, even when the field is. */
+const menuMinWidth = 320;
+/** Field width copied onto the overlay so the menu can match it. */
+const menuFieldWidthVar = "--menu-field-width";
 
+/** Copies the menu's max height and the field width the menu matches. */
 function applyMenuFrame(overlay: HTMLElement | null, trigger: HTMLElement | null): void {
   if (!overlay) return;
   const height = overlay.style.maxHeight;
@@ -61,6 +76,8 @@ function applyMenuFrame(overlay: HTMLElement | null, trigger: HTMLElement | null
     overlay.style.setProperty("--menu-max-height", height);
   }
   if (!trigger) return;
-  const width = `${trigger.offsetWidth}px`;
-  if (overlay.style.minWidth !== width) overlay.style.minWidth = width;
+  const fieldWidth = `${trigger.offsetWidth}px`;
+  if (overlay.style.getPropertyValue(menuFieldWidthVar) !== fieldWidth) {
+    overlay.style.setProperty(menuFieldWidthVar, fieldWidth);
+  }
 }

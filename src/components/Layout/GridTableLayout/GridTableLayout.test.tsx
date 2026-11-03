@@ -3,6 +3,7 @@ import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
+import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { ModalProvider } from "src/components/Modal/ModalContext";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
@@ -863,7 +864,7 @@ describe("GridTableLayout", () => {
           <OpenPaneButton />
           <TestWrapper
             hideEditColumns
-            withRightPane={280}
+            withRightPane
             layoutStateProps={{}}
             tableProps={{
               columns: getColumns(),
@@ -885,12 +886,14 @@ describe("GridTableLayout", () => {
 
       // Then the pane renders in flow after the table column
       expect(r.rightPaneContent).toBeInTheDocument();
-      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({ width: documentScrollRightPaneWidthCss(280) });
+      expect(r.documentScrollRightPaneLayout_spacer).toHaveStyle({
+        width: documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
+      });
       expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe(
-        documentScrollRightPaneWidthCss(280),
+        documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
       );
       expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe(
-        documentScrollRightPaneWidthCss(280),
+        documentScrollRightPaneWidthCss(documentScrollRightPaneWidth),
       );
     });
 
@@ -1022,11 +1025,11 @@ describe("GridTableLayout", () => {
 
   describe("filters", () => {
     it("removes the filter value when a pill is clicked", async () => {
-      // Given multiple filters so controls nest behind the Filter toggle (pills show when closed)
+      // Given three filters so controls nest behind the Filter toggle (pills show when closed)
       const storageKey = "pill-click-test";
       sessionStorage.setItem(storageKey, JSON.stringify({ needsRevision: true }));
 
-      type ChipFilter = { needsRevision?: boolean; status?: string[] };
+      type ChipFilter = { needsRevision?: boolean; status?: string[]; archived?: boolean };
       let capturedFilter: ChipFilter = {};
 
       function FilterChipWrapper() {
@@ -1043,6 +1046,7 @@ describe("GridTableLayout", () => {
                 getOptionValue: (o) => o.value,
                 label: "Status",
               }),
+              archived: checkboxFilter({ label: "Archived" }),
             },
             storageKey: storageKey,
           },
@@ -1403,7 +1407,7 @@ describe("GridTableLayout", () => {
     // When the consolidated filter panel is opened
     click(r.gridTableLayoutActions_filterButton);
     // Then group by starts at the first option instead of the page param
-    expect(r.groupBy).toHaveValue("None");
+    expect(r.groupBy).toHaveTextContent("None");
   });
 });
 

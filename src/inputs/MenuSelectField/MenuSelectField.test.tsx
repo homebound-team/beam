@@ -4,7 +4,7 @@ import { OpenModal } from "src/components/Modal/OpenModal";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { setViewport } from "src/tests/viewport";
-import { click, getOptions, getSelected, render, select, type } from "src/utils/rtl";
+import { click, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuSelectField", () => {
@@ -45,7 +45,53 @@ describe("MenuSelectField", () => {
     // When searching
     type(r.color_search, "bl");
     // Then only matching options remain
-    expect(getOptions(r.color)).toEqual(["Blue", "Black"]);
+    expect(getOptions(r.color)).toEqual(["Black", "Blue"]);
+  });
+
+  it("shows search on a short list when the caller handles it", async () => {
+    // Given a short list with onSearch
+    const onSearch = vi.fn();
+    const r = await render(<SearchField onSearch={onSearch} />);
+    // When opening and closing without typing
+    click(r.color);
+    expect(r.color_search).toBeInTheDocument();
+    click(r.color);
+    // Then nothing is queried
+    expect(onSearch).not.toHaveBeenCalled();
+  });
+
+  it("shows the options the caller returns for a search", async () => {
+    // Given a short list whose matches come from the caller
+    const onSearch = vi.fn();
+    const r = await render(<SearchField onSearch={onSearch} />);
+    click(r.color);
+    // When searching for text that is not in the current labels
+    type(r.color_search, "oak");
+    // Then the current page stays until the caller answers
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+    await wait();
+    // Then the caller is asked, and their option is shown even though its label does not contain the text
+    expect(onSearch).toHaveBeenCalledWith("oak");
+    expect(getOptions(r.color)).toEqual(["123 Main"]);
+    // When the search is cleared
+    type(r.color_search, "");
+    await wait();
+    // Then the caller is asked for the unfiltered page
+    expect(onSearch).toHaveBeenLastCalledWith("");
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+  });
+
+  it("asks for the unfiltered page when a search menu closes", async () => {
+    // Given a search that has been sent
+    const onSearch = vi.fn();
+    const r = await render(<SearchField onSearch={onSearch} />);
+    click(r.color);
+    type(r.color_search, "oak");
+    await wait();
+    // When the menu closes
+    click(r.color);
+    // Then the caller is asked for the first page
+    expect(onSearch).toHaveBeenLastCalledWith("");
   });
 
   it("loads options the first time the menu opens", async () => {
@@ -89,7 +135,7 @@ describe("MenuSelectField", () => {
     await act(async () => {
       finishLoad();
     });
-    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
     expect(r.query.loadingDots).toBeNull();
   });
 
@@ -181,6 +227,160 @@ describe("MenuSelectField", () => {
     expect(r.color_option.querySelector("em")).toHaveTextContent("b");
   });
 
+  it("sorts options alphabetically", async () => {
+    // Given options that are not in alphabetical order
+    const r = await render(<TestHarness />);
+    // When the menu opens
+    click(r.color);
+    // Then they are sorted by label
+    expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+  });
+
+  it("keeps the given order when autoSort is false", async () => {
+    // Given autoSort turned off
+    const r = await render(<TestHarness autoSort={false} />);
+    // When the menu opens
+    click(r.color);
+    // Then the caller order is kept
+    expect(getOptions(r.color)).toEqual(["Red", "Blue", "Black", "Green"]);
+  });
+
+  describe("unsetLabel", () => {
+    it("puts the unsetLabel row first and selects it when the value is empty", async () => {
+      // Given unsetLabel and no value
+      const r = await render(<TestHarness unsetLabel="None" />);
+      // Then the trigger shows that label, and the row is first and selected
+      expect(r.color).toHaveTextContent("None");
+      expect(getSelected(r.color)).toBe("None");
+      expect(getOptions(r.color)).toEqual(["None", "Black", "Blue", "Green", "Red"]);
+    });
+
+    it("keeps unsetLabel first when autoSort is off", async () => {
+      // Given caller order and a label that would sort into the list
+      const r = await render(
+        <TestHarness
+          unsetLabel="None"
+          autoSort={false}
+          options={[
+            { id: "z", name: "Zebra" },
+            { id: "a", name: "Aardvark" },
+          ]}
+        />,
+      );
+      // Then None stays first and the rest keep the given order
+      expect(getOptions(r.color)).toEqual(["None", "Zebra", "Aardvark"]);
+    });
+
+    it("commits undefined when the unset row is selected", async () => {
+      // Given a selected color and an unset row
+      const onSelect = vi.fn();
+      const r = await render(<TestHarness initial="b" unsetLabel="None" onSelectSpy={onSelect} />);
+      // When selecting the unset row
+      select(r.color, "None");
+      // Then the field clears
+      expect(onSelect).toHaveBeenCalledWith(undefined, undefined);
+      expect(r.color).toHaveTextContent("None");
+    });
+
+    it("lets getOptionMenuLabel replace the unset row", async () => {
+      // Given a custom menu row for the unset option
+      const r = await render(
+        <TestHarness
+          unsetLabel="None"
+          getOptionMenuLabel={(_color, isUnsetOpt) => (isUnsetOpt ? "Unset Label" : _color.name)}
+        />,
+      );
+      // Then the closed field keeps unsetLabel
+      expect(r.color).toHaveTextContent("None");
+      // When the menu opens
+      click(r.color);
+      // Then the row content is the custom label, and its accessible name stays unsetLabel
+      const row = r.color_listbox.querySelector("[data-label='None']");
+      expect(row).toHaveTextContent("Unset Label");
+    });
+
+    it("shows unsetLabel before lazy options load", async () => {
+      // Given a list that has not loaded
+      let finishLoad = () => {};
+      function LazyField() {
+        const [loaded, setLoaded] = useState<Color[] | undefined>();
+        return (
+          <MenuSelectField
+            label="Color"
+            value={undefined}
+            unsetLabel="None"
+            onSelect={() => {}}
+            options={{
+              current: undefined,
+              load: () =>
+                new Promise<void>((resolve) => {
+                  finishLoad = () => {
+                    setLoaded(colors());
+                    resolve();
+                  };
+                }),
+              options: loaded,
+            }}
+          />
+        );
+      }
+      const r = await render(<LazyField />);
+      expect(r.color).toHaveTextContent("None");
+      // When the menu opens
+      click(r.color);
+      // Then only the unset row is listed until the load finishes
+      expect(getOptions(r.color)).toEqual(["None"]);
+      await act(async () => {
+        finishLoad();
+      });
+      expect(getOptions(r.color)).toEqual(["None", "Black", "Blue", "Green", "Red"]);
+    });
+
+    it("hides unsetLabel when the search does not match it", async () => {
+      // Given a searchable list with an unset row
+      const r = await render(<TestHarness options={manyColors()} unsetLabel="None" />);
+      click(r.color);
+      // When the query matches nothing
+      type(r.color_search, "zzz");
+      // Then the unset row is filtered out with the rest
+      expect(r.color_empty).toHaveTextContent("No results");
+    });
+
+    it("keeps unsetLabel when the search matches it", async () => {
+      // Given a searchable list with an unset row
+      const r = await render(<TestHarness options={manyColors()} unsetLabel="None" />);
+      click(r.color);
+      // When the query matches the unset label
+      type(r.color_search, "non");
+      // Then the unset row remains
+      expect(getOptions(r.color)).toEqual(["None"]);
+    });
+
+    it("keeps the unset row when onSearch replaces the list", async () => {
+      // Given a server-filtered list
+      function Field() {
+        const [options, setOptions] = useState(colors());
+        return (
+          <MenuSelectField
+            label="Color"
+            unsetLabel="All"
+            value={undefined}
+            options={options}
+            onSelect={() => {}}
+            onSearch={(text) => setOptions(text ? [{ id: "addr", name: "123 Main" }] : colors())}
+          />
+        );
+      }
+      const r = await render(<Field />);
+      click(r.color);
+      // When the caller replaces the options
+      type(r.color_search, "oak");
+      await wait();
+      // Then the unsetLabel row stays above the matches
+      expect(getOptions(r.color)).toEqual(["All", "123 Main"]);
+    });
+  });
+
   it("shows an empty row when nothing matches", async () => {
     // Given an open single select with enough options to search
     const r = await render(<TestHarness options={manyColors()} />);
@@ -202,6 +402,15 @@ describe("MenuSelectField", () => {
     expect(r.color).toHaveTextContent("Blue");
     expect(r.query.color_overlay).toBeNull();
     expect(document.activeElement).toBe(r.color);
+  });
+
+  it("does not show selected pills", async () => {
+    // Given a single select with a value
+    const r = await render(<TestHarness initial="b" />);
+    // When opening it
+    click(r.color);
+    // Then the menu has no selected-pill row
+    expect(r.query.color_selections).toBeNull();
   });
 
   it("closes when re-selecting the current value", async () => {
@@ -249,7 +458,7 @@ describe("MenuSelectField", () => {
     expect(menuKeyTarget(r).getAttribute("aria-activedescendant")).toMatch(/-option-0$/);
     fireEvent.keyDown(menuKeyTarget(r), { key: "Enter" });
     // Then the first option is selected
-    expect(onSelect).toHaveBeenCalledWith("r", { id: "r", name: "Red" });
+    expect(onSelect).toHaveBeenCalledWith("k", { id: "k", name: "Black" });
   });
 
   it("opens from the trigger with ArrowDown", async () => {
@@ -282,7 +491,7 @@ describe("MenuSelectField", () => {
     fireEvent.keyDown(menuKeyTarget(r), { key: "ArrowDown" });
     fireEvent.keyDown(menuKeyTarget(r), { key: "Enter" });
     // Then the disabled option is skipped
-    expect(onSelect).toHaveBeenCalledWith("k", { id: "k", name: "Black" });
+    expect(onSelect).toHaveBeenCalledWith("g", { id: "g", name: "Green" });
     // And the disabled option is marked disabled
     click(r.color);
     const blue = r.getAllByTestId("color_option").find((o) => o.dataset.label === "Blue");
@@ -397,6 +606,7 @@ describe("MenuSelectField", () => {
     // Then it renders as a sheet with the list focused
     expect(r.color_sheet).toBeInTheDocument();
     expect(r.query.color_overlay).toBeNull();
+    expect(r.color_sheet.style.width).toBe("");
     expect(document.activeElement).toBe(r.color_listbox);
     // And Done closes it
     click(r.color_sheetDone);
@@ -443,12 +653,14 @@ type Color = { id: string; name: string };
 type HarnessProps = {
   onSelectSpy?: (...args: unknown[]) => void;
   nothingSelectedText?: string;
+  unsetLabel?: string;
   disabled?: boolean;
   readOnly?: boolean;
   disabledOptions?: { value: string; reason: string }[];
-  getOptionMenuLabel?: (color: Color) => ReactNode;
+  getOptionMenuLabel?: (color: Color, isUnsetOpt: boolean) => ReactNode;
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
+  autoSort?: boolean;
 };
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
@@ -506,6 +718,22 @@ function menuKeyTarget(r: { query: { color_search?: HTMLElement | null }; color_
   const target = r.query.color_search ?? r.color_listbox;
   if (!target) throw new Error("Expected a search input or listbox");
   return target;
+}
+
+function SearchField(props: { onSearch: (search: string) => void }) {
+  const [options, setOptions] = useState(colors());
+  return (
+    <MenuSelectField
+      label="Color"
+      value={undefined}
+      options={options}
+      onSelect={() => {}}
+      onSearch={(text) => {
+        props.onSearch(text);
+        setOptions(text ? [{ id: "addr", name: "123 Main" }] : colors());
+      }}
+    />
+  );
 }
 
 function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: string }) {

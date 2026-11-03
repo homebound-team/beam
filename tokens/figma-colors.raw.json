@@ -7,7 +7,7 @@
       "Primitive Colors",
       "Semantic Tokens"
     ],
-    "exportedAt": "2026-09-29T02:30:00.000Z"
+    "exportedAt": "2026-10-29T01:34:57.160Z"
   },
   "primitives": {
     "White": {
@@ -21,7 +21,7 @@
       "alpha": 0
     },
     "Gray50": {
-      "hex": "#fffdfd"
+      "hex": "#fafafa"
     },
     "Gray100": {
       "hex": "#f7f5f5"

@@ -245,6 +245,7 @@ export type { RouteTab, RouteTabWithContent, Tab, TabWithContent } from "./compo
 export { useToast } from "./components/Toast/useToast";
 export type { UseToastProps } from "./components/Toast/useToast";
 // ./layouts
+export * from "./illustrations/AiTableIllustration";
 export * from "./illustrations/DocumentUploadIllustration";
 export * from "./layouts/SideNavLayout/SideNavLayout";
 export * from "./layouts/SideNavLayout/SideNavLayoutContext";

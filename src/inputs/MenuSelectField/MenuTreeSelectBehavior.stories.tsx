@@ -22,7 +22,7 @@ export default {
 export const Menu = newStory(() => <TreeField initial={["spkr-109", "o8", "o9"]} />, { play: open("options") });
 
 /** Every group collapsed when nothing nested is selected. */
-export const Collapsed = newStory(() => <TreeField initial={["o8"]} />, { play: open("options") });
+export const Collapsed = newStory(() => <TreeField initial={["o8", "o9"]} />, { play: open("options") });
 
 /** Every group starts open. */
 export const Expanded = newStory(() => <TreeField defaultExpanded />, { play: open("options") });

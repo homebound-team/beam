@@ -2,6 +2,7 @@ import { Fragment, type ReactNode, useCallback, useMemo, useRef } from "react";
 import { useMenuTrigger } from "react-aria";
 import { useMenuTriggerState } from "react-stately";
 import { Button } from "src/components/Button";
+import { ButtonGroup, type ButtonGroupProps } from "src/components/ButtonGroup";
 import { OverlayTrigger, type OverlayTriggerProps } from "src/components/internal/OverlayTrigger";
 import { ColumnTooltipIcon } from "src/components/Table/components/ColumnTooltipIcon";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
@@ -17,18 +18,26 @@ type EditColumnsButtonProps<R extends Kinded> = {
   api: GridTableApi<R>;
   /** When set, columns that share a name use one Edit Columns switch. */
   shareColumnVisibility?: boolean;
+  /** Renders the icon-only trigger. Defaults to the `sm` breakpoint. */
+  compact?: boolean;
+  /**
+   * A button group pinned full width above the column list, e.g. the table's view mode toggle when it has no room
+   * in the toolbar.
+   */
+  viewToggle?: Omit<ButtonGroupProps, "size" | "fullWidth">;
   // for storybook purposes
   defaultOpen?: boolean;
 } & Pick<OverlayTriggerProps, "placement" | "disabled" | "tooltip">;
 
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
-  const { defaultOpen, disabled, columns, api, shareColumnVisibility = false } = props;
+  const { defaultOpen, disabled, columns, api, shareColumnVisibility = false, viewToggle } = props;
+  const { sm } = useBreakpoint();
+  const { compact = sm } = props;
   const state = useMenuTriggerState({ defaultOpen });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { menuTriggerProps } = useMenuTrigger({ isDisabled: !!disabled }, state, buttonRef);
   const tid = useTestIds(props, "columns");
-  const { sm } = useBreakpoint();
 
   const options = useMemo(() => buildColumnOptions(columns, shareColumnVisibility), [columns, shareColumnVisibility]);
 
@@ -57,7 +66,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
     <OverlayTrigger
       {...props}
       trigger={
-        sm
+        compact
           ? { icon: hasHiddenColumn ? "columnsBadged" : "columns", variant: "outline" }
           : { icon: hasHiddenColumn ? "columnsBadged" : "columns", label: "", size: "md", variant: "secondaryBlack" }
       }
@@ -77,6 +86,11 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
             .maxhPx(512).bshBasic.onHover.bshHover.$
         }
       >
+        {viewToggle && (
+          <div css={Css.p2.pb0.$}>
+            <ButtonGroup {...viewToggle} size="md" fullWidth {...tid.header} />
+          </div>
+        )}
         {/* Scrollable body — mh0 lets the flex child shrink so the option list scrolls internally instead of overflowing the page */}
         <div css={Css.dg.gtc("1fr auto").gap2.p2.fg1.mh0.oya.$}>
           {options.map((option) => (
