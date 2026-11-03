@@ -50,7 +50,15 @@ import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import type { PlainDate } from "src/types";
 import { noop } from "src/utils/helpers";
-import { LabeledExamples, newStory, withBeamDecorator, withRouter, zeroTo, type LabeledExample } from "src/utils/sb";
+import {
+  LabeledExamples,
+  newStory,
+  viewportModes,
+  withBeamDecorator,
+  withRouter,
+  zeroTo,
+  type LabeledExample,
+} from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
 
@@ -3298,6 +3306,43 @@ export function MultipleStickyColumns() {
     </div>
   );
 }
+
+/** On phone-width viewports sticky columns scroll away with the rest of the row. */
+export const StickyColumnsOnMobile = newStory(
+  () => {
+    const columns: GridColumn<MultipleStickyRow>[] = [
+      column<MultipleStickyRow>({ header: "Sticky left", data: (d) => d.colA, w: "120px", sticky: "left" }),
+      column<MultipleStickyRow>({ header: "Column B", data: (d) => d.colB, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Column C", data: (d) => d.colC, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Column D", data: (d) => d.colD, w: "150px" }),
+      column<MultipleStickyRow>({ header: "Sticky right", data: (d) => d.colI, w: "120px", sticky: "right" }),
+    ];
+    const data = {
+      colA: "AAA",
+      colB: "BBB",
+      colC: "CCC",
+      colD: "DDD",
+      colE: "",
+      colF: "",
+      colG: "",
+      colH: "",
+      colI: "III",
+    };
+    const rows: GridDataRow<MultipleStickyRow>[] = [simpleHeader, { kind: "data", id: "1", data }];
+    return (
+      <div data-testid="scroller" css={Css.w100.add("overflow", "auto").$}>
+        <GridTable columns={columns} rows={rows} />
+      </div>
+    );
+  },
+  {
+    parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } },
+    play: async ({ canvasElement }) => {
+      // Scroll mid-row: desktop keeps both sticky columns in view, mobile lets them scroll away.
+      canvasElement.querySelector("[data-testid=scroller]")?.scrollTo({ left: 150 });
+    },
+  },
+);
 
 type PlanData = {
   offeringName: string;
