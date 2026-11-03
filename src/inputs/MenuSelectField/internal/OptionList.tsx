@@ -2,7 +2,7 @@ import { getInteractionModality } from "@react-aria/interactions";
 import { type KeyboardEvent, type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 import { useListBox } from "react-aria";
 import type { ListState } from "react-stately";
-import { type Components, Virtuoso, type VirtuosoHandle } from "react-virtuoso";
+import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 import { Css, Tokens } from "src/Css";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { MixedLegend, mixedLegendHeight } from "src/inputs/MenuSelectField/internal/MixedLegend";
@@ -172,6 +172,7 @@ export function optionDomId(listId: string, index: number): string {
 // Enough rows to fill the tallest anchored panel (512px / 40px).
 const initialRenderCount = 13;
 
+// Virtuoso renders `components.Header` above the rows, outside its virtualization, and passes it `context`.
 type ListContext = { header: ReactNode };
 
 function ListHeader({ context }: { context: ListContext }) {
@@ -179,6 +180,6 @@ function ListHeader({ context }: { context: ListContext }) {
 }
 
 // Module level, so Virtuoso keeps one header across renders.
-const listComponents: Components<unknown, ListContext> = { Header: ListHeader };
+const listComponents = { Header: ListHeader };
 
 const emptyCss = Css.df.aic.px2.hPx(menuRowHeight).sm.color(Tokens.OnSurfaceMuted).$;

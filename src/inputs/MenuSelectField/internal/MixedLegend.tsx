@@ -6,8 +6,8 @@ export function MixedLegend(props: { id: string }) {
   const { id } = props;
   const tid = useTestIds(props, "mixedLegend");
   return (
-    <div id={id} role="presentation" css={legendCss} {...tid}>
-      <div css={Css.df.aic.gap1.sm.fw5.color(Tokens.OnSurfaceActive).$}>
+    <div id={id} role="presentation" css={Css.px2.pyPx(12).bb.bc(Tokens.SurfaceSeparator).$} {...tid}>
+      <div css={Css.df.aic.gap1.sm.color(Tokens.OnSurfaceActive).$}>
         {mixedLabel}
         <MixedDot />
       </div>
@@ -27,5 +27,3 @@ export const mixedLabel = "Mixed";
 
 /** Rendered height of `MixedLegend` (12px padding + 20px title + 14px text + 12px padding + 1px border), for the list's first paint. */
 export const mixedLegendHeight = 59;
-
-const legendCss = Css.px2.pyPx(12).bb.bc(Tokens.SurfaceSeparator).$;

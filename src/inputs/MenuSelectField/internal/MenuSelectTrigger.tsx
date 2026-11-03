@@ -153,9 +153,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
             {!trigger.isMixed && countBadge}
             <span
               css={{
-                // While mixed, the text doesn't grow, so the badge sits right after "Mixed".
-                ...Css.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).if(!trigger.isMixed)
-                  .fg1.$,
+                ...Css.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
                 // A placeholder reads as hint text, so it stays at the field's regular weight.
                 ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
                 ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
