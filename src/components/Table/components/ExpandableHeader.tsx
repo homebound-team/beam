@@ -68,6 +68,9 @@ export function ExpandableHeader<R extends Kinded>(props: ExpandableHeaderProps<
           Css.df.aic.pen
             .if(applyStickyStyles)
             .sticky.left(`calc(var(${beamSideNavLayoutWidthVar}, 0px) + ${minStickyLeftOffset + 12}px)`)
+            // Sticky columns unstick on small screens (see `Row`), so drop their widths from the title's offset.
+            .ifSm.left(`calc(var(${beamSideNavLayoutWidthVar}, 0px) + 12px)`)
+            .end.if(applyStickyStyles)
             .pr2.bgColor(Tokens.Surface)
             .z(zIndices.tableExpandableTitle)
             .if(isHovered)

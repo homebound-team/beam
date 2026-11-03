@@ -399,26 +399,30 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
 
           const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
 
+          const stickyLeft =
+            maybeSticky === "left"
+              ? columnIndex === 0
+                ? `var(${beamSideNavLayoutWidthVar}, 0px)`
+                : `calc(var(${beamSideNavLayoutWidthVar}, 0px) + (${columnSizes.slice(0, columnIndex).join(" + ")}))`
+              : "auto";
+          // Offset by the open right pane so sticky-right cells pin to the clear edge, not under it (0 when closed).
+          const stickyRight =
+            maybeSticky === "right"
+              ? columnIndex + 1 === columnSizes.length
+                ? `var(${beamRightPaneWidthVar}, 0px)`
+                : `calc(var(${beamRightPaneWidthVar}, 0px) + (${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")}))`
+              : "auto";
           const maybeStickyColumnStyles =
             maybeSticky && columnSizes
-              ? {
-                  ...Css.sticky.z(zIndices.tableStickyColumn).bgColor(Tokens.Surface).$,
-                  ...(maybeSticky === "left"
-                    ? Css.left(
-                        columnIndex === 0
-                          ? `var(${beamSideNavLayoutWidthVar}, 0px)`
-                          : `calc(var(${beamSideNavLayoutWidthVar}, 0px) + (${columnSizes.slice(0, columnIndex).join(" + ")}))`,
-                      ).$
-                    : {}),
-                  // Offset by the open right pane so sticky-right cells pin to the clear edge, not under it (0 when closed).
-                  ...(maybeSticky === "right"
-                    ? Css.right(
-                        columnIndex + 1 === columnSizes.length
-                          ? `var(${beamRightPaneWidthVar}, 0px)`
-                          : `calc(var(${beamRightPaneWidthVar}, 0px) + (${columnSizes.slice(columnIndex + 1 - columnSizes.length).join(" + ")}))`,
-                      ).$
-                    : {}),
-                }
+              ? Css.sticky
+                  .z(zIndices.tableStickyColumn)
+                  .bgColor(Tokens.Surface)
+                  .left(stickyLeft)
+                  .right(stickyRight)
+                  // Pinned columns eat too much of a phone-width viewport, so let them scroll with the rest.
+                  // `relative` (not `static`) keeps a positioning context for the resize handle.
+                  .ifSm.relative.left("auto")
+                  .right("auto").$
               : {};
 
           // This relies on our column sizes being defined in pixel values, which is currently true as we calculate to pixel values in the `useSetupColumnSizes` hook
