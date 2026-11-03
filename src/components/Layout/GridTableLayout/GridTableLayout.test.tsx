@@ -4,6 +4,7 @@ import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
+import { ScrollableParent } from "src/components/Layout/ScrollableParent";
 import { ModalProvider } from "src/components/Modal/ModalContext";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
@@ -1074,14 +1075,42 @@ describe("GridTableLayout", () => {
   });
 
   describe("scrollToTopOnFilterChange", () => {
-    // jsdom doesn't implement `scrollIntoView`
+    // jsdom doesn't implement `scrollIntoView` or element `scrollTo`
     const scrollIntoView = vi.fn();
+    const scrollTo = vi.fn();
     beforeEach(() => {
       HTMLElement.prototype.scrollIntoView = scrollIntoView;
+      HTMLElement.prototype.scrollTo = scrollTo;
     });
     afterEach(() => {
       scrollIntoView.mockReset();
+      scrollTo.mockReset();
       delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+      delete (HTMLElement.prototype as Partial<HTMLElement>).scrollTo;
+    });
+
+    it("scrolls the ScrollableParent scroller to the top when a filter changes", async () => {
+      // Given a nested-scroll GridTableLayout that opts into scrolling on filter changes
+      const r = await render(
+        <ScrollableParent>
+          <TestWrapper
+            layoutStateProps={getModalFilterProps("scrollable-parent-scroll-test")}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+            scrollToTopOnFilterChange
+          />
+        </ScrollableParent>,
+        withRouter(),
+      );
+
+      // When a filter changes
+      click(r.filter_needsRevision);
+
+      // Then the scroller holding the portaled table body is scrolled to the top, not the whole wrapper
+      expect(scrollTo).toHaveBeenCalledExactlyOnceWith({ top: 0, behavior: "smooth" });
+      const scroller = scrollTo.mock.contexts[0] as HTMLElement;
+      expect(scroller).toContainElement(r.getByText("Alpha"));
+      expect(scroller).not.toContainElement(r.tableWrapper);
+      expect(scrollIntoView).not.toHaveBeenCalled();
     });
 
     it("scrolls to the top of the table when a filter changes, but not on mount", async () => {
