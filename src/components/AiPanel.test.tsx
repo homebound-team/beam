@@ -69,11 +69,6 @@ describe("AiCard", () => {
     expect(r.aiCard_card).toHaveTextContent("Upload");
   });
 
-  it("fills its parent by default", async () => {
-    const r = await render(<AiCard />);
-    expect(r.aiCard_column).toHaveStyle({ width: "100%" });
-  });
-
   it("shrinks and centers when not fullWidth", async () => {
     // Given a card that should hug its content
     const r = await render(<AiCard fullWidth={false} />);

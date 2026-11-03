@@ -35,7 +35,7 @@ export const Rounded = () => (
 );
 
 /**
- * The background always spans its container. `fullWidth={false}` on {@link AiCard} shrinks the card
+ * The background stays within the visible column. `fullWidth={false}` on {@link AiCard} shrinks the card
  * to its content and centers it. For a page column, nest `AiCard` in `CenteredLayout` instead.
  */
 export const CardWidth = () => (

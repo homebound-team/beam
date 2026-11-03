@@ -40,6 +40,25 @@ export const DisabledOptions = newStory(
   { play: open("groupBy") },
 );
 
+/** `unsetLabel` stays first and is selected when the value is empty. */
+export const UnsetLabel = newStory(
+  () => {
+    const [value, setValue] = useState<string | undefined>();
+    return (
+      <FieldFrame>
+        <MenuSelectField
+          label="Group by"
+          options={groupByOptions()}
+          unsetLabel="None"
+          value={value}
+          onSelect={setValue}
+        />
+      </FieldFrame>
+    );
+  },
+  { play: open("groupBy") },
+);
+
 /** `getOptionMenuLabel` replaces the row. The closed field still shows the option name. */
 export const CustomLabel = newStory(
   () => {
