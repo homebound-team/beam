@@ -1186,6 +1186,40 @@ describe("GridTableLayout", () => {
       // Then the table is scrolled to the top
       expect(scrollIntoView).toHaveBeenCalledOnce();
     });
+
+    it("does not scroll again for a refetch or an equal filter", async () => {
+      // Given a query table that already scrolled for a filter change
+      let loading = false;
+      let layoutState: ReturnType<typeof useGridTableLayoutState<{ needsRevision: boolean }>>;
+      function QueryWrapper() {
+        layoutState = useGridTableLayoutState(getModalFilterProps("no-rescroll-test"));
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            scrollToTopOnFilterChange
+            tableProps={{
+              columns: getColumns(),
+              query: { data: getRows(), loading },
+              createRows: (data) => [simpleHeader, ...(data ?? [])],
+            }}
+          />
+        );
+      }
+      const r = await render(<QueryWrapper />, withRouter());
+      click(r.filter_needsRevision);
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+
+      // When the query refetches with the same filter
+      loading = true;
+      r.rerender(<QueryWrapper />);
+      loading = false;
+      r.rerender(<QueryWrapper />);
+      // And an equal filter is set as a new object
+      act(() => layoutState.setFilter({ ...layoutState.filter }));
+
+      // Then the page does not scroll again
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+    });
   });
 
   describe("empty state", () => {

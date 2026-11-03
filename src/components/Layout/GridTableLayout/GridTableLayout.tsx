@@ -183,8 +183,7 @@ function GridTableLayoutComponent<
   const scrollToTopRef = useRef<(() => void) | undefined>(undefined);
   useScrollToTopOnFilterChange({
     enabled: scrollToTopOnFilterChange,
-    filter: layoutState?.filter,
-    searchString: layoutState?.searchString,
+    layoutState,
     loading: isGridTableProps(tableProps) ? !!tableProps.loading : tableProps.query.loading,
     scrollToTopRef,
   });
@@ -271,23 +270,21 @@ export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof Gr
 /** Scrolls to the top of the table after the filter or search changes, once the new rows are on screen. */
 function useScrollToTopOnFilterChange(opts: {
   enabled: boolean;
-  filter: unknown;
-  searchString: string | undefined;
+  layoutState: Pick<ReturnType<typeof useGridTableLayoutState>, "filter" | "searchString"> | undefined;
   loading: boolean;
   scrollToTopRef: RefObject<(() => void) | undefined>;
 }) {
-  const { enabled, filter, searchString, loading, scrollToTopRef } = opts;
-  const prevRef = useRef({ filter, searchString });
-  const pendingRef = useRef(false);
+  const { enabled, layoutState, loading, scrollToTopRef } = opts;
+  const { filter, searchString } = layoutState ?? {};
+  const scrolledForRef = useRef({ filter, searchString });
   useEffect(() => {
-    const prev = prevRef.current;
-    if (prev.filter !== filter || prev.searchString !== searchString) {
-      prevRef.current = { filter, searchString };
-      pendingRef.current = enabled;
-    }
+    const scrolledFor = scrolledForRef.current;
+    if (scrolledFor.filter === filter && scrolledFor.searchString === searchString) return;
+    // Keep it in sync while disabled, so turning the prop on later doesn't scroll for an old change.
+    if (!enabled) return void (scrolledForRef.current = { filter, searchString });
     // Wait for the refetch, so we don't move the viewport while the old rows are still showing.
-    if (!pendingRef.current || loading) return;
-    pendingRef.current = false;
+    if (loading) return;
+    scrolledForRef.current = { filter, searchString };
     scrollToTopRef.current?.();
   }, [enabled, filter, searchString, loading, scrollToTopRef]);
 }
