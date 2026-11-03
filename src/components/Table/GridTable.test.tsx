@@ -1524,15 +1524,29 @@ describe("GridTable", () => {
         />,
       );
       // Then each row shows both as icons in the actions column, with no "more" menu
-      expect(cell(r, 1, 2)).toContainElement(r.pencil_r1);
-      expect(cell(r, 1, 2)).toContainElement(r.trash_r1);
+      expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
+      expect(cell(r, 1, 2)).toContainElement(r.delete_r1);
       expect(r.query.rowActions_r1).toBeNull();
       // And the header's actions cell is empty
       expect(cell(r, 0, 2)).toBeEmptyDOMElement();
       // When clicking an action
-      click(r.pencil_r2);
+      click(r.edit_r2);
       // Then it's called for that row
       expect(onEdit).toHaveBeenCalledWith("r2");
+    });
+
+    it("gives actions that share an icon their own test ids", async () => {
+      // Given two actions with the same icon
+      const r = await render(
+        <GridTable<Row>
+          columns={columns}
+          rows={actionRows}
+          rowActions={() => [edit, { ...edit, label: "Edit dates" }]}
+        />,
+      );
+      // Then each is found by its label
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.editDates_r1).toBeTruthy();
     });
 
     it("shows the pin as an icon after the actions when there's room", async () => {
@@ -1541,7 +1555,7 @@ describe("GridTable", () => {
         <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} rowPinning />,
       );
       // Then the pin shows right after the action
-      expect(cell(r, 1, 2)).toContainElement(r.pencil_r1);
+      expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
       expect(cell(r, 1, 2)).toContainElement(r.pin_r1);
     });
 
@@ -1559,10 +1573,10 @@ describe("GridTable", () => {
         withRouter(),
       );
       // Then the first two actions and the pin show as icons, and the third action moves into the menu
-      expect(r.pencil_r1).toBeTruthy();
+      expect(r.edit_r1).toBeTruthy();
       expect(r.duplicate_r1).toBeTruthy();
       expect(r.pin_r1).toBeTruthy();
-      expect(r.query.trash_r1).toBeNull();
+      expect(r.query.delete_r1).toBeNull();
       click(r.rowActions_r1);
       expect(r.rowActions_r1_delete).toBeTruthy();
     });
@@ -1575,7 +1589,7 @@ describe("GridTable", () => {
         withRouter(),
       );
       // Then the action moves into the menu, but the pin stays an icon
-      expect(r.query.pencil_r1).toBeNull();
+      expect(r.query.edit_r1).toBeNull();
       expect(r.pin_r1).toBeTruthy();
       click(r.rowActions_r1);
       expect(r.rowActions_r1_edit).toBeTruthy();
@@ -1589,8 +1603,8 @@ describe("GridTable", () => {
         <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit, duplicate, remove]} />,
       );
       // Then all three still show as icons, with no "more" menu
-      expect(r.pencil_r1).toBeTruthy();
-      expect(r.trash_r1).toBeTruthy();
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.delete_r1).toBeTruthy();
       expect(r.query.rowActions_r1).toBeNull();
     });
 
@@ -1599,7 +1613,7 @@ describe("GridTable", () => {
       setViewport("sm");
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} />);
       // Then there are no icons, just the menu
-      expect(r.query.pencil_r1).toBeNull();
+      expect(r.query.edit_r1).toBeNull();
       expect(r.rowActions_r1).toBeTruthy();
     });
 
@@ -1629,10 +1643,10 @@ describe("GridTable", () => {
         />,
       );
       // Then each row gets its kind's actions
-      expect(r.pencil_p1).toBeTruthy();
-      expect(r.query.trash_p1).toBeNull();
-      expect(r.trash_c1).toBeTruthy();
-      expect(r.query.pencil_c1).toBeNull();
+      expect(r.edit_p1).toBeTruthy();
+      expect(r.query.delete_p1).toBeNull();
+      expect(r.delete_c1).toBeTruthy();
+      expect(r.query.edit_c1).toBeNull();
     });
 
     it("doesn't ask for actions on the header", async () => {

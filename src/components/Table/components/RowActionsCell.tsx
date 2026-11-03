@@ -15,7 +15,8 @@ import { TableStateContext } from "src/components/Table/utils/TableState";
 import { emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
-import { newMethodMissingProxy } from "src/utils/useTestIds";
+import { defaultTestId } from "src/utils/defaultTestId";
+import { newMethodMissingProxy, useTestIds } from "src/utils/useTestIds";
 
 /**
  * A body row's `rowActions` and pin: the first few as icons, the rest in a "more" menu.
@@ -33,6 +34,7 @@ export function RowActionsCell({ row }: { row: GridDataRow<any> }) {
     }),
     [tableState, row.id],
   );
+  const tid = useTestIds({});
 
   const { actionIcons } = splitRowActions(actions.length, pinnable, visibleCount);
   const iconActions = actions.slice(0, actionIcons);
@@ -44,7 +46,7 @@ export function RowActionsCell({ row }: { row: GridDataRow<any> }) {
       {iconActions.map((action) => (
         <IconButton
           key={action.label}
-          data-testid={`${action.icon}_${row.id}`}
+          {...tid[`${defaultTestId(action.label)}_${row.id}`]}
           icon={action.icon}
           label={action.label}
           onClick={action.onClick}
@@ -55,7 +57,7 @@ export function RowActionsCell({ row }: { row: GridDataRow<any> }) {
       {pinnable && <PinToggle rowId={row.id} />}
       {menuItems.length > 0 && (
         <ButtonMenu
-          data-testid={`rowActions_${row.id}`}
+          {...tid[`rowActions_${row.id}`]}
           trigger={{ icon: "verticalDots", inc: tableIconInc }}
           items={menuItems}
           placement="right"

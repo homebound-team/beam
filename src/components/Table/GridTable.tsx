@@ -254,7 +254,8 @@ export type GridTableProps<R extends Kinded, X> = {
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
   /**
-   * Shows a pin toggle in the row actions column, just before the "more" menu. It's always an icon, ahead of `rowActions`.
+   * Shows a pin toggle in the row actions column, after any action icons and before the "more" menu.
+   * The pin always stays an icon; `rowActions` move into the menu first.
    *
    * Pinned rows stick to the top of the table, and a pinned parent brings its children with it.
    */
