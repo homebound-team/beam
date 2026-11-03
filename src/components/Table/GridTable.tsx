@@ -820,73 +820,79 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // TableState is updated from props in useEffect; until that runs, noData is stale on the first paint.
   // Keep the table (and width probe) mounted pre-sync; only swap to emptyState once TableState reflects props.
-  if (noData && emptyState && tableStateSyncedFromPropsRef.current) {
-    return <GridTableEmptyState {...emptyState} />;
-  }
+  // The probe stays mounted (as the same element) beside the empty state too: the resize observer only attaches to the
+  // first probe element, so a remounted probe is never measured and `fr` columns get stuck on their calc() fallback.
+  const showEmptyState = noData && emptyState && tableStateSyncedFromPropsRef.current;
 
   return (
-    <TableStateContext.Provider value={rowStateContext}>
-      <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", columnMeasureWidth)} {...tid.probe} />
-        {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
-        {loading && (
-          <div css={loadingOverlayCss} {...tid.loadingOverlay}>
-            <Loader {...tid.loadingSpinner} size="md" />
-          </div>
-        )}
-        {as === "card" ? (
-          <CardView
-            cardRows={visibleDataRows}
-            id={id}
-            virtuosoRangeRef={virtuosoRangeRef}
-            infiniteScroll={infiniteScroll}
-            persistScrollPosition={persistScrollPosition}
-            loading={loading}
-          />
-        ) : _as === "virtual" ? (
-          <VirtualGridTableView
-            // Pass the base style so the virtual list keeps its identity, and the measured width on its own
-            style={style}
-            minWidthPx={tableStyle.minWidthPx}
-            id={id}
-            columns={layoutColumns}
-            visibleDataRows={visibleDataRows}
-            keptSelectedRows={keptSelectedRows}
-            pinnedRows={pinnedRows}
-            firstRowMessage={firstRowMessage}
-            stickyHeader={stickyHeader}
-            xss={xss}
-            virtuosoRef={virtuosoRef}
-            virtuosoRangeRef={virtuosoRangeRef}
-            tableHeadRows={tableHeadRows}
-            stickyOffset={stickyOffset}
-            infiniteScroll={infiniteScroll}
-            persistScrollPosition={persistScrollPosition}
-            loading={loading}
-          />
-        ) : (
-          renders[_as as Exclude<RenderAs, "card" | "virtual">](
-            tableStyle,
-            id,
-            layoutColumns,
-            visibleDataRows,
-            keptSelectedRows,
-            pinnedRows,
-            firstRowMessage,
-            stickyHeader,
-            xss,
-            virtuosoRef,
-            virtuosoRangeRef,
-            tableHeadRows,
-            stickyOffset,
-            loading,
-            infiniteScroll,
-            tableContainerRef,
-            persistScrollPosition,
-          )
-        )}
-      </PresentationProvider>
-    </TableStateContext.Provider>
+    <>
+      <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", columnMeasureWidth)} {...tid.probe} />
+      {showEmptyState ? (
+        <GridTableEmptyState {...emptyState} />
+      ) : (
+        <TableStateContext.Provider value={rowStateContext}>
+          <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
+            {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
+            {loading && (
+              <div css={loadingOverlayCss} {...tid.loadingOverlay}>
+                <Loader {...tid.loadingSpinner} size="md" />
+              </div>
+            )}
+            {as === "card" ? (
+              <CardView
+                cardRows={visibleDataRows}
+                id={id}
+                virtuosoRangeRef={virtuosoRangeRef}
+                infiniteScroll={infiniteScroll}
+                persistScrollPosition={persistScrollPosition}
+                loading={loading}
+              />
+            ) : _as === "virtual" ? (
+              <VirtualGridTableView
+                // Pass the base style so the virtual list keeps its identity, and the measured width on its own
+                style={style}
+                minWidthPx={tableStyle.minWidthPx}
+                id={id}
+                columns={layoutColumns}
+                visibleDataRows={visibleDataRows}
+                keptSelectedRows={keptSelectedRows}
+                pinnedRows={pinnedRows}
+                firstRowMessage={firstRowMessage}
+                stickyHeader={stickyHeader}
+                xss={xss}
+                virtuosoRef={virtuosoRef}
+                virtuosoRangeRef={virtuosoRangeRef}
+                tableHeadRows={tableHeadRows}
+                stickyOffset={stickyOffset}
+                infiniteScroll={infiniteScroll}
+                persistScrollPosition={persistScrollPosition}
+                loading={loading}
+              />
+            ) : (
+              renders[_as as Exclude<RenderAs, "card" | "virtual">](
+                tableStyle,
+                id,
+                layoutColumns,
+                visibleDataRows,
+                keptSelectedRows,
+                pinnedRows,
+                firstRowMessage,
+                stickyHeader,
+                xss,
+                virtuosoRef,
+                virtuosoRangeRef,
+                tableHeadRows,
+                stickyOffset,
+                loading,
+                infiniteScroll,
+                tableContainerRef,
+                persistScrollPosition,
+              )
+            )}
+          </PresentationProvider>
+        </TableStateContext.Provider>
+      )}
+    </>
   );
 }
 

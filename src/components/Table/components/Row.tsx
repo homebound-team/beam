@@ -34,6 +34,7 @@ import {
   beamCollapseColumnId,
   collapseTogglePx,
   isContentColumn,
+  isUnmeasuredFrSize,
   parseWidthToPx,
 } from "src/components/Table/utils/columns";
 import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
@@ -399,7 +400,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             maybeContent,
           );
 
-          const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+          const stickySide = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+          // Hold off pinning until the probe measures. Offsets summed from `fr` calc() fallbacks resolve against
+          // the scroll container instead of the row, so they leave gaps between sticky cells (e.g. with a right pane open).
+          const stickyOffsetSizes =
+            stickySide === "left" ? columnSizes.slice(0, columnIndex + 1) : columnSizes.slice(columnIndex + 1);
+          const maybeSticky = stickySide && !stickyOffsetSizes.some(isUnmeasuredFrSize) ? stickySide : undefined;
 
           const maybeStickyColumnStyles =
             maybeSticky && columnSizes

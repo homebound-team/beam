@@ -2463,6 +2463,41 @@ describe("GridTable", () => {
     expect(cell(r, 1, 0)).toHaveTextContent("foo");
   });
 
+  it("keeps the same width probe while the empty state shows", async () => {
+    // Given a table with an emptyState that starts with data rows
+    const r = await render(<GridTable {...{ columns, rows }} emptyState={{ title: "No product offerings found" }} />);
+    const probe = r.gridTable_probe;
+
+    // When the rows filter down to nothing and come back
+    await r.rerender(
+      <GridTable {...{ columns, rows: [simpleHeader] }} emptyState={{ title: "No product offerings found" }} />,
+    );
+    expect(r.gridTableEmptyState_title).toBeInTheDocument();
+    await r.rerender(<GridTable {...{ columns, rows }} emptyState={{ title: "No product offerings found" }} />);
+
+    // Then the probe is still the element the resize observer is watching
+    expect(r.gridTable_probe).toBe(probe);
+  });
+
+  it("holds off pinning sticky-left fr columns until the table is measured", async () => {
+    // Given two sticky-left fr columns
+    const stickyColumns: GridColumn<Row>[] = [
+      { ...nameColumn, w: "1fr", sticky: "left" },
+      { ...valueColumn, w: "1fr", sticky: "left" },
+    ];
+    const r = await render(<GridTable columns={stickyColumns} rows={rows} />);
+    // Then before measuring, the second column isn't offset by the first column's calc() width
+    expect(cell(r, 1, 1)).not.toHaveStyle({ position: "sticky" });
+
+    // When the probe measures the table
+    Object.defineProperty(r.gridTable_probe, "clientWidth", { configurable: true, value: 400 });
+    act(() => void window.dispatchEvent(new Event("resize")));
+
+    // Then the second column pins flush against the first column's px width
+    expect(cell(r, 1, 1)).toHaveStyle({ position: "sticky" });
+    expect(getComputedStyle(cell(r, 1, 1)).getPropertyValue("--left")).toContain("200px");
+  });
+
   it("displays an info message", async () => {
     const infoMessage = "Too many rows";
     const r = await render(<GridTable {...{ columns, rows, infoMessage }} />);

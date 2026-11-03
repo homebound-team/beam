@@ -289,6 +289,17 @@ function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));
 }
 
+/** Start of the `fr` calc() fallback used until the probe measures the table. */
+const unmeasuredFrBasis = "(100% - ";
+
+/**
+ * Whether a column size is still the `fr` calc() fallback. Its `100%` is the row in a cell's `width`, but the
+ * scroll container in a sticky cell's `left`/`right`, so offsets built from it drift when the two differ.
+ */
+export function isUnmeasuredFrSize(size: string): boolean {
+  return size.includes(unmeasuredFrBasis);
+}
+
 export function parseWidthToPx(widthStr: string | undefined, tableWidth: number | undefined): number | null {
   if (!widthStr) return null;
 
@@ -453,7 +464,7 @@ export function calcColumnSizes<R extends Kinded>(
       return `${Math.max(calcedWidth, mw)}px`;
     }
     // Otherwise return the `calc()` value
-    return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
+    return `(${unmeasuredFrBasis}${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
   const sizes = columns.map(({ id, expandedWidth, w: _w, mw: _mw }) => {
