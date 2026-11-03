@@ -260,7 +260,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               {...tid}
             >
               {labelStyle === "inline" && label && (
-                <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
+                <InlineLabel
+                  multiline={multiline}
+                  labelProps={labelProps}
+                  label={label}
+                  disabled={!!inputProps.disabled}
+                  {...tid.label}
+                />
               )}
               {showProposal ? (
                 // Read-only renders no input at all, so both halves are drawn as text here. Checked
@@ -303,7 +309,13 @@ export function TextFieldBase<X extends Only<TextFieldXss, X>>(props: TextFieldB
               onClick={unfocusedPlaceholder ? handleUnfocusedPlaceholderClick : undefined}
             >
               {labelStyle === "inline" && label && (
-                <InlineLabel multiline={multiline} labelProps={labelProps} label={label} {...tid.label} />
+                <InlineLabel
+                  multiline={multiline}
+                  labelProps={labelProps}
+                  label={label}
+                  disabled={!!inputProps.disabled}
+                  {...tid.label}
+                />
               )}
               {startAdornment && <span css={Css.df.aic.asc.fs0.br4.pr1.$}>{startAdornment}</span>}
               {unfocusedPlaceholder && (
