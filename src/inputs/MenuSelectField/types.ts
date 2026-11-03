@@ -18,9 +18,11 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   getOptionSearchText?: (opt: O) => string | readonly string[];
   /** Sort options by `getOptionLabel`. On by default. `MenuTreeSelectField` defaults this to false. */
   autoSort?: boolean;
-  /** Debounced menu search text. The caller replaces `options` and should keep the current selection in that list. Closing calls this with `""`. */
+  /** Debounced menu search text. The caller replaces `options` and should keep the current selection and `mixedValues` in that list. Closing calls this with `""`. */
   onSearch?: (search: string) => void;
   disabledOptions?: (V | { value: V; reason: string })[];
+  /** Values some, but not all, of the edited records hold. Unselected ones get a dot, and the field reads "Mixed" (a single select only until something is picked). */
+  mixedValues?: V[];
   /** Shown in the field when nothing is selected, e.g. "All". */
   nothingSelectedText?: string;
   placeholder?: string;

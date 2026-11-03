@@ -44,6 +44,37 @@ describe("MenuMultiSelectField", () => {
     expect(r.query.color_selections).toBeNull();
   });
 
+  it("toggles a dotted option like any other checkbox", async () => {
+    // Given some records hold Red, and nothing is selected
+    const onSelect = vi.fn();
+    const r = await render(<MultiHarness mixedValues={["r"]} onSelectSpy={onSelect} />);
+    click(r.color);
+    expect(optionOf(r, "Red")).toHaveAttribute("aria-selected", "false");
+    expect(optionOf(r, "Red")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    // When checking Red
+    select(r.color, "Red");
+    // Then it's selected and loses its dot
+    expect(onSelect).toHaveBeenLastCalledWith(["r"], [{ id: "r", name: "Red" }]);
+    expect(optionOf(r, "Red")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
+    // And when unchecking it, it's dotted again
+    select(r.color, "Red");
+    expect(onSelect).toHaveBeenLastCalledWith([], []);
+    expect(optionOf(r, "Red")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+  });
+
+  it("counts dotted values in the badge but not in the pills", async () => {
+    // Given every record holds Red, and some hold Blue or Green
+    const r = await render(<MultiHarness initial={["r"]} mixedValues={["b", "g"]} />);
+    // Then the field reads Mixed, counting Red plus the dotted Blue and Green
+    expect(r.color).toHaveTextContent(/^Mixed3$/);
+    expect(r.color_count).toHaveTextContent("3");
+    // And when opened, only Red is a pill, since only a selection can be removed
+    click(r.color);
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.query.color_selections_pill_1).toBeNull();
+  });
+
   it("removes a selection when its pill is clicked", async () => {
     // Given Red and Blue selected
     const onSelect = vi.fn();
@@ -196,7 +227,12 @@ type HarnessProps = {
   initial?: string[];
   proposedValues?: string[];
   disabledOptions?: (string | { value: string; reason: string })[];
+  mixedValues?: string[];
 };
+
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);
+}
 
 function MultiHarness(props: HarnessProps) {
   const { onSelectSpy, initial = [], options = colors(), proposedValues, ...others } = props;

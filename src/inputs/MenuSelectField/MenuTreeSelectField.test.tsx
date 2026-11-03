@@ -40,6 +40,30 @@ describe("MenuTreeSelectField", () => {
     expect(checkboxOf(r, "Basketball")).toHaveAttribute("data-checked", "mixed");
   });
 
+  it("expands the groups that hold a dotted value", async () => {
+    // Given some records hold NBA, and nothing is selected
+    const r = await render(<TreeHarness mixedValues={["nba"]} />);
+    // When opening it
+    click(r.sports);
+    // Then NBA's group is open and NBA is dotted
+    expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
+    expect(optionOf(r, "NBA")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    // And the checkboxes ignore the dot: NBA is unchecked, Basketball isn't partial
+    expect(checkboxOf(r, "NBA")).toHaveAttribute("data-checked", "false");
+    expect(checkboxOf(r, "Basketball")).toHaveAttribute("data-checked", "false");
+  });
+
+  it("does not dot a value its selected parent covers", async () => {
+    // Given Basketball selected, and records holding NBA
+    const r = await render(<TreeHarness initial={["basketball"]} mixedValues={["nba"]} />);
+    // When opening it
+    click(r.sports);
+    // Then NBA is checked through its parent, so nothing is dotted
+    expect(optionOf(r, "NBA")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "NBA")).not.toHaveAccessibleDescription();
+    expect(r.query.sports_mixedLegend).toBeNull();
+  });
+
   it("selects every child when a parent is selected", async () => {
     // Given a tree with nothing selected
     const onSelect = vi.fn();
@@ -278,6 +302,7 @@ type TreeHarnessProps = {
   selectionDisplay?: TreeSelectionDisplay;
   proposedValues?: string[];
   defaultExpanded?: boolean;
+  mixedValues?: string[];
 };
 
 function TreeHarness(props: TreeHarnessProps) {
@@ -301,9 +326,12 @@ function activeOption(listbox: HTMLElement): string | null {
   return listbox.getAttribute("aria-activedescendant");
 }
 
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("sports_option").find((o) => o.dataset.label === label);
+}
+
 function checkboxOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): Element | null {
-  const option = r.getAllByTestId("sports_option").find((o) => o.dataset.label === label);
-  return option?.querySelector("[data-checked]") ?? null;
+  return optionOf(r, label)?.querySelector("[data-checked]") ?? null;
 }
 
 const nba: NestedOption<Sport> = { id: "nba", name: "NBA" };

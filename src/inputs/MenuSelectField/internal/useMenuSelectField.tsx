@@ -17,6 +17,7 @@ import {
   selectedTreeOptions,
   toggleTreeSelection,
 } from "src/inputs/MenuSelectField/internal/menuTree";
+import { mixedLabel } from "src/inputs/MenuSelectField/internal/MixedLegend";
 import { bucketTreeSelection, visibleNestedRows } from "src/inputs/MenuSelectField/internal/nestedRows";
 import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
@@ -32,7 +33,7 @@ type MenuSelectFieldApi<O> = {
   search: MenuSearchState;
   listRef: RefObject<HTMLDivElement | null>;
   menu: MenuSelectMenu<O>;
-  /** Pills for the open menu. A tree lists its `selectionDisplay` bucket, the same options as the count badge. Empty for a single select. */
+  /** Pills for the open menu. A tree lists its `selectionDisplay` bucket. Matches the count badge unless the field is mixed. Empty for a single select. */
   selections: { options: MenuSelectedOption[]; onDeselect: (key: string) => void };
 };
 
@@ -48,6 +49,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     autoSort = true,
     onSearch,
     disabledOptions,
+    mixedValues,
     nothingSelectedText = "",
     placeholder,
     disabled,
@@ -74,6 +76,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const labelId = `${fieldId}-label`;
   const valueId = `${fieldId}-value`;
   const errorId = `${fieldId}-error`;
+  const legendId = `${fieldId}-mixed`;
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -167,10 +170,17 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
         : values.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
     [menuTree, selectedKeys, values, optionsByKey],
   );
+  // Mixed values the selection doesn't already cover. These rows get the dot.
+  const dottedKeys = useMemo(
+    () => new Set(mixedValues?.map(valueToKey).filter((key) => optionsByKey.has(key) && !selectedKeys.has(key))),
+    [mixedValues, optionsByKey, selectedKeys],
+  );
+  // Rows the menu opens onto: groups holding one start expanded, and the list starts at the first.
+  const revealKeys = useMemo(() => new Set([...selectedKeys, ...dottedKeys]), [selectedKeys, dottedKeys]);
 
-  // Groups start collapsed, unless `defaultExpanded` or they hold a selection. Searching expands every match.
+  // Groups start collapsed, unless `defaultExpanded` or they hold a revealed row. Searching expands every match.
   const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(() =>
-    menuTree ? initialExpandedKeys(menuTree, selectedKeys, defaultExpanded) : new Set(),
+    menuTree ? initialExpandedKeys(menuTree, revealKeys, defaultExpanded) : new Set(),
   );
   const [searchCollapsedKeys, setSearchCollapsedKeys] = useState<ReadonlySet<string>>(() => new Set());
   const isExpanded = (key: string) => (!serverSearch && search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
@@ -292,7 +302,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     if (isDisabled || isReadOnly) return;
     setSearch("");
     if (menuTree) {
-      setExpandedKeys(initialExpandedKeys(menuTree, selectedKeys, defaultExpanded));
+      setExpandedKeys(initialExpandedKeys(menuTree, revealKeys, defaultExpanded));
       setSearchCollapsedKeys(new Set());
     }
     setIsOpen(true);
@@ -471,15 +481,19 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const initialIndex = Math.max(
     0,
     treeRows
-      ? treeRows.findIndex(({ node }) => selectedKeys.has(node.valueKey))
-      : filteredOptions.findIndex((o) => selectedKeys.has(valueToKey(getOptionValue(o)))),
+      ? treeRows.findIndex(({ node }) => revealKeys.has(node.valueKey))
+      : filteredOptions.findIndex((o) => revealKeys.has(valueToKey(getOptionValue(o)))),
   );
 
   const selectedText = !multiple && selectedOptions[0] !== undefined ? getOptionLabel(selectedOptions[0]) : "";
   const hasSelection = menuTree ? selectedKeys.size > 0 : values.length > 0;
+  // A single select's pick wins over "Mixed"; the other mixed values keep their dots.
+  const isMixed = dottedKeys.size > 0 && (multiple || !hasSelection);
   // Multi with a selection shows only the count badge; an empty field shows nothing-selected text, then the placeholder.
-  const displayText = selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
-  const isPlaceholder = !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
+  const displayText = isMixed
+    ? mixedLabel
+    : selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
+  const isPlaceholder = !isMixed && !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
   const selectedLabels =
     menuTree && tree && getChildren
       ? bucketTreeSelection(selectedOptions, getChildren)[tree.display].map((option) => ({
@@ -489,6 +503,13 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       : multiple
         ? selectedOptions.map((o) => ({ key: valueToKey(getOptionValue(o)), label: getOptionLabel(o) }))
         : [];
+  // While mixed, the badge also counts the dotted values, in menu order. The pills stay selected-only.
+  const badgeKeys = isMixed ? new Set([...selectedLabels.map(({ key }) => key), ...dottedKeys]) : undefined;
+  const badgeLabels = badgeKeys
+    ? [...optionsByKey]
+        .filter(([key]) => badgeKeys.has(key))
+        .map(([key, option]) => ({ key, label: getOptionLabel(option) }))
+    : selectedLabels;
   const partialKeys = useMemo(
     () => (menuTree ? partiallySelectedKeys(menuTree, selectedKeys) : undefined),
     [menuTree, selectedKeys],
@@ -544,7 +565,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     onBlur: onTriggerBlur,
     displayText,
     isPlaceholder,
-    selectedLabels,
+    isMixed,
+    badgeLabels,
     proposalProps,
   };
   const searchProps: MenuSearchState = {
@@ -565,6 +587,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     initialIndex,
     rowVariant: treeRowStates ? "tree" : multiple ? "checkbox" : "check",
     tree: treeRowStates ? { rows: treeRowStates, setExpanded: setTreeExpanded } : undefined,
+    mixed: dottedKeys.size > 0 ? { keys: dottedKeys, legendId } : undefined,
     onKeyDown: onMenuKeyDown,
     activeDescendant,
   };

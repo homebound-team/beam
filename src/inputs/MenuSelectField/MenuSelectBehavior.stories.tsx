@@ -21,6 +21,11 @@ export default {
 /** A check on the selected row. Choosing an option closes the menu. */
 export const Menu = newStory(() => <SingleField initial="cc" />, { play: open("groupBy") });
 
+/** Nothing picked across records holding three values. The legend explains each value's dot. */
+export const Mixed = newStory(() => <SingleField mixedValues={["cc", "level", "room"]} />, {
+  play: open("groupBy"),
+});
+
 /** Disabled rows, including one with a reason. */
 export const DisabledOptions = newStory(
   () => {
@@ -83,11 +88,17 @@ export const CustomLabel = newStory(
   { play: open("groupBy") },
 );
 
-function SingleField(props: { initial?: string }) {
+function SingleField(props: { initial?: string; mixedValues?: string[] }) {
   const [value, setValue] = useState(props.initial);
   return (
     <FieldFrame>
-      <MenuSelectField label="Group by" options={groupByOptions()} value={value} onSelect={setValue} />
+      <MenuSelectField
+        label="Group by"
+        options={groupByOptions()}
+        value={value}
+        onSelect={setValue}
+        mixedValues={props.mixedValues}
+      />
     </FieldFrame>
   );
 }

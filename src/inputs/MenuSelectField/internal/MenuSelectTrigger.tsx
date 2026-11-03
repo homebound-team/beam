@@ -41,8 +41,10 @@ export type MenuSelectTriggerState = {
   onBlur: () => void;
   displayText: string;
   isPlaceholder: boolean;
-  /** Selected option labels for the multi-select count badge. Empty for a single select. */
-  selectedLabels: { key: string; label: string }[];
+  /** The text reads "Mixed", so the count badge follows it. */
+  isMixed: boolean;
+  /** Labels the count badge counts and its tooltip lists. Empty for a single select unless it's mixed. */
+  badgeLabels: { key: string; label: string }[];
   proposalProps: AiProposalProps;
 };
 
@@ -123,6 +125,14 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
   );
   const hasSupporting = !!(originalBelow || (showErrorAndHelper && (errorMsg || helperText)));
 
+  const countBadge = trigger.badgeLabels.length > 0 && (
+    <Tooltip title={<SelectedLabels labels={trigger.badgeLabels} />}>
+      <span css={Css.df.aic.fs0.if(trigger.isMixed).ml1.else.mr1.$}>
+        <CountBadge count={trigger.badgeLabels.length} {...tid.count} />
+      </span>
+    </Tooltip>
+  );
+
   const valueNode = (
     <>
       {labelStyle === "inline" && (
@@ -142,16 +152,10 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
           </span>
         ) : (
           <>
-            {trigger.selectedLabels.length > 0 && (
-              <Tooltip title={<SelectedLabels labels={trigger.selectedLabels} />}>
-                <span css={Css.df.aic.fs0.mr1.$}>
-                  <CountBadge count={trigger.selectedLabels.length} {...tid.count} />
-                </span>
-              </Tooltip>
-            )}
+            {!trigger.isMixed && countBadge}
             <span
               css={{
-                ...Css.fg1.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
+                ...Css.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
                 // A placeholder reads as hint text, so it stays at the field's regular weight.
                 ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
                 ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
@@ -159,6 +163,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
             >
               {trigger.displayText}
             </span>
+            {trigger.isMixed && countBadge}
           </>
         )}
       </span>

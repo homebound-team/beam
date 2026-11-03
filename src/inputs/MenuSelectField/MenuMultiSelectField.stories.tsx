@@ -41,6 +41,7 @@ export function Examples() {
         },
         { label: "Nothing selected", children: <Example label="Options" nothingSelectedText="All" /> },
         { label: "Placeholder", children: <Example label="Options" placeholder="Select options" /> },
+        { label: "Mixed", children: <Example label="Options" initial={["o4"]} mixedValues={["o1", "o7"]} /> },
       ]}
     />
   );
