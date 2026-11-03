@@ -8,7 +8,7 @@ import { rightPaneContentStore } from "src/components/Layout/RightPaneLayout/rig
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import type { PageBannerProps } from "src/components/StatusBanner/StatusBanner";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
-import { column, selectColumn } from "src/components/Table/utils/columns";
+import { actionColumn, collapseColumn, column, selectColumn } from "src/components/Table/utils/columns";
 import { simpleHeader, type SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { TabContent, type TabWithContent } from "src/components/Tabs";
 import { Css, Tokens } from "src/Css";
@@ -149,6 +149,43 @@ export function UnsavedChangesGuard() {
   );
 }
 UnsavedChangesGuard.parameters = { chromatic: { disableSnapshot: true } };
+
+/**
+ * `fr`-width sticky-left columns with the right pane open. The pane narrows the row but not the scroll container,
+ * so sticky offsets must be built from measured px widths; otherwise a strip of row shows between Cost Code and
+ * Item Code, visible on the `aiMode` rows' fill.
+ */
+export function StickyColumnsWithRightPane() {
+  const { openRightPane } = useRightPaneActions();
+  const columns = useMemo(() => createTakeoffColumns(), []);
+  const rows = useMemo(
+    () => [
+      simpleHeader,
+      ...createTakeoffs().map((t) => ({ kind: "data" as const, id: t.id, data: t, aiMode: t.aiGenerated })),
+    ],
+    [],
+  );
+
+  useEffect(() => {
+    openRightPane({
+      content: (
+        <RightPanePanel title="Line item">
+          <p css={Css.sm.color(Tokens.OnSurfaceMuted).$}>Cost Code and Item Code stay flush with the pane open.</p>
+        </RightPanePanel>
+      ),
+    });
+  }, [openRightPane]);
+
+  return (
+    <TablePageChrome title="Takeoffs" withSideNav>
+      <GridTableLayout
+        withRightPane
+        hideEditColumns
+        tableProps={{ columns, rows, as: "virtual", style: { grouped: true, bordered: true } }}
+      />
+    </TablePageChrome>
+  );
+}
 
 function TablePageChrome({
   title = "Projects",
@@ -380,6 +417,46 @@ function createBooks(): Book[] {
       status: "Draft",
     },
   ];
+}
+
+type Takeoff = {
+  id: string;
+  costCode: string;
+  itemCode: string;
+  name: string;
+  quantity: number;
+  location: string;
+  aiGenerated: boolean;
+};
+type TakeoffTableRow = SimpleHeaderAndData<Takeoff>;
+
+function createTakeoffColumns() {
+  return [
+    collapseColumn<TakeoffTableRow>({ sticky: "left" }),
+    selectColumn<TakeoffTableRow>({ sticky: "left" }),
+    column<TakeoffTableRow>({ header: "", data: () => "", w: "40px", sticky: "left" }),
+    column<TakeoffTableRow>({ header: "Cost Code", data: (t) => t.costCode, w: 161, sticky: "left" }),
+    column<TakeoffTableRow>({ header: "Item Code", data: (t) => t.itemCode, w: 106, sticky: "left" }),
+    column<TakeoffTableRow>({ header: "Name", data: (t) => t.name, w: 300 }),
+    column<TakeoffTableRow>({ header: "Qty", data: (t) => t.quantity, w: 80 }),
+    column<TakeoffTableRow>({ header: "Location", data: (t) => t.location, w: 200 }),
+    column<TakeoffTableRow>({ header: "Option", data: () => "Base", w: 200 }),
+    column<TakeoffTableRow>({ header: "Task", data: () => "Framing", w: 200 }),
+    actionColumn<TakeoffTableRow>({ header: "", data: () => "…", w: "48px", sticky: "right" }),
+  ];
+}
+
+function createTakeoffs(): Takeoff[] {
+  const names = ["Drywall", "Baseboard", "Interior door", "Cabinet pull", "Tile backsplash", "Ceiling fan"];
+  return names.map((name, i) => ({
+    id: `t:${i + 1}`,
+    costCode: `0${i + 1}-100 Interior finishes`,
+    itemCode: `IC-${100 + i}`,
+    name,
+    quantity: (i + 1) * 4,
+    location: i % 2 === 0 ? "Kitchen" : "Primary bedroom",
+    aiGenerated: i % 2 === 0,
+  }));
 }
 
 // A const, not a factory: form-state rebuilds the form when its config changes identity
