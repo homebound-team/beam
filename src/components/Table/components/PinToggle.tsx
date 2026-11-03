@@ -26,7 +26,6 @@ export function PinToggle({ rowId }: PinToggleProps) {
       {...tid[rowId]}
       icon={isPinned || isPinnedViaParent ? "pinFilled" : "pin"}
       inc={tableIconInc}
-      pressedColor={Tokens.Primary}
       color={isPinned || isPinnedViaParent ? Tokens.Primary : undefined}
       label={isPinned ? "Unpin row" : "Pin row"}
       disabled={isPinnedViaParent ? "Pinned with parent" : undefined}

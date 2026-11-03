@@ -18,8 +18,6 @@ export type IconButtonProps = {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
   color?: BeamColor;
-  /** The icon color while the button is held down (mouse or keyboard). */
-  pressedColor?: BeamColor;
   bgColor?: BeamColor;
   /** The size of the icon, in increments, defaults to 3 which is 24px. */
   inc?: number;
@@ -62,7 +60,6 @@ export function IconButton(props: IconButtonProps) {
     onClick: onPress,
     disabled,
     color,
-    pressedColor,
     bgColor,
     icon,
     autoFocus,
@@ -138,7 +135,8 @@ export function IconButton(props: IconButtonProps) {
     <Icon
       icon={icon}
       color={
-        (isPressed && pressedColor) ||
+        // Held down (mouse or keyboard), every icon shows primary, even over `color`
+        (isPressed && Tokens.Primary) ||
         color ||
         (isDisabled
           ? Tokens.OnSurfaceDisabled
