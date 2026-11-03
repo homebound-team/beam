@@ -3,37 +3,24 @@ import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { IconButton } from "src/components/IconButton";
 import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import type { GridRowAction } from "src/components/Table/GridTable";
-import { type GridColumn, type Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
-import {
-  beamRowActionsColumnId,
-  rowActionGapPx,
-  splitRowActions,
-  tableIconInc,
-} from "src/components/Table/utils/rowActions";
+import type { GridRowAction, GridRowActionsConfig } from "src/components/Table/types";
+import { rowActionGapPx, splitRowActions, tableIconInc } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { defaultTestId } from "src/utils/defaultTestId";
-import { newMethodMissingProxy, useTestIds } from "src/utils/useTestIds";
+import { useTestIds } from "src/utils/useTestIds";
 
 /**
- * A body row's `rowActions` and pin: the first few as icons, the rest in a "more" menu.
+ * A `rowActionsColumn` cell: the row's actions and pin, the first few as icons and the rest in a "more" menu.
  *
  * The pin takes precedence over the actions: it's always an icon, right before the menu, and never moves into it.
  * The actions fill the icon slots before it, and the rest go in the menu.
  */
-export function RowActionsCell({ row }: { row: GridDataRow<any> }) {
+export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config: GridRowActionsConfig }) {
+  const { actions = [], pinnable = false } = config;
   const { tableState } = useContext(TableStateContext);
-  const { actions, visibleCount, pinnable } = useComputed(
-    () => ({
-      actions: tableState.rowActionsFor(row.id),
-      visibleCount: tableState.rowActionsVisibleCount,
-      pinnable: tableState.isRowPinnable(row.id),
-    }),
-    [tableState, row.id],
-  );
+  const visibleCount = useComputed(() => tableState.rowActionsVisibleCount, [tableState]);
   const tid = useTestIds({});
 
   const { actionIcons } = splitRowActions(actions.length, pinnable, visibleCount);
@@ -65,28 +52,6 @@ export function RowActionsCell({ row }: { row: GridDataRow<any> }) {
       )}
     </div>
   );
-}
-
-/** The sticky-right column the table adds for `rowActions` and `rowPinning`; reserved rows get an empty cell. */
-export function rowActionsColumn<T extends Kinded>(widthPx: number): GridColumn<T> {
-  const base = {
-    ...Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined])),
-    id: beamRowActionsColumnId,
-    clientSideSort: false,
-    align: "right",
-    sticky: "right",
-    w: `${widthPx}px`,
-    wrapAction: false,
-    isAction: true,
-    canHide: false,
-    header: emptyCell,
-    totals: emptyCell,
-    expandableHeader: emptyCell,
-    groupHeader: emptyCell,
-  };
-  return newMethodMissingProxy(base, () => (_data: unknown, { row }: { row: GridDataRow<T> }) => (
-    <RowActionsCell row={row} />
-  )) as GridColumn<T>;
 }
 
 function toMenuItem(action: GridRowAction): MenuItem {

@@ -16,7 +16,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, type OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { type GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { defaultStyle, type RowStyles } from "src/components/Table/TableStyles";
-import type { GridColumn, GridColumnWithId } from "src/components/Table/types";
+import type { GridColumn, GridColumnWithId, GridRowActionsConfig } from "src/components/Table/types";
 import {
   actionColumn,
   assignDefaultColumnIds,
@@ -30,6 +30,7 @@ import {
   groupColumns,
   layoutGutterLeftColumnId,
   layoutGutterRightColumnId,
+  rowActionsColumn,
   selectColumn,
   sumColumnSizesPx,
   toLayoutColumns,
@@ -1297,12 +1298,11 @@ describe("GridTable", () => {
       expect(cell(r, 1, 0)).toHaveTextContent("bar");
     });
 
-    it("renders rowPinning toggles on data rows (not the header) and toggles on click", async () => {
-      // Given a table with rowPinning turned on
+    it("renders rowActionsColumn pins on data rows (not the header) and toggles on click", async () => {
+      // Given a rowActionsColumn that pins data rows
       const api = new GridTableApiImpl<Row>();
-      const r = await render(
-        <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} rowPinning />,
-      );
+      const pins = rowActionsColumn<Row>({ data: { pinnable: true } });
+      const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
 
       // Then the header has no pin toggle, but each data row has a row-scoped one
       expect(r.query.pin_header).toBeNull();
@@ -1321,30 +1321,20 @@ describe("GridTable", () => {
       expect(api.getPinnedRowIds()).toEqual([]);
     });
 
-    it("does not render pin toggles without rowPinning", async () => {
-      // Given a table without rowPinning
+    it("does not render pin toggles without a rowActionsColumn", async () => {
+      // Given a table without a rowActionsColumn
       const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={pinRows} />);
       // Then no row has a pin toggle
       expect(r.query.pin_1).toBeNull();
     });
 
-    it("skips excluded kinds unless the row sets pinnable", async () => {
-      // Given rowPinning excludes the `data` kind, but row 2 opts back in and row 3 is explicitly not pinnable
-      const r = await render(
-        <GridTable<Row>
-          columns={[nameColumn, valueColumn]}
-          rowPinning={{ exclude: ["data"] }}
-          rows={[
-            simpleHeader,
-            { kind: "data", id: "1", data: { name: "foo", value: 1 } },
-            { kind: "data", id: "2", pinnable: true, data: { name: "bar", value: 2 } },
-            { kind: "data", id: "3", pinnable: false, data: { name: "zaz", value: 3 } },
-          ]}
-        />,
-      );
-      // Then only row 2 gets a pin toggle
-      expect(r.query.pin_1).toBeNull();
-      expect(r.query.pin_2).toBeTruthy();
+    it("decides each row's pin from its config", async () => {
+      // Given a config that pins every data row except the one named "zaz"
+      const pins = rowActionsColumn<Row>({ data: (data) => ({ pinnable: data.name !== "zaz" }) });
+      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
+      // Then only the other rows get a pin toggle
+      expect(r.pin_1).toBeTruthy();
+      expect(r.pin_2).toBeTruthy();
       expect(r.query.pin_3).toBeNull();
     });
 
@@ -1388,16 +1378,20 @@ describe("GridTable", () => {
         },
         { kind: "parent", id: "p2", data: { name: "parent 2" } },
       ];
+      const pins = rowActionsColumn<NestedRow>({
+        parent: { pinnable: true },
+        child: { pinnable: true },
+        grandChild: { pinnable: true },
+      });
 
       it("brings a pinned parent's children with it", async () => {
-        // Given a nested table with rowPinning
+        // Given a nested table that pins every kind
         const api = new GridTableApiImpl<NestedRow>();
         const r = await render(
           <GridTable<NestedRow>
             api={api}
-            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn, pins]}
             rows={nestedRows}
-            rowPinning
           />,
         );
         // When parent 1 is pinned
@@ -1429,9 +1423,8 @@ describe("GridTable", () => {
         const r = await render(
           <GridTable<NestedRow>
             api={api}
-            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn, pins]}
             rows={nestedRows}
-            rowPinning
           />,
         );
         click(r.pin_p1);
@@ -1446,19 +1439,14 @@ describe("GridTable", () => {
       it("keeps a pinned parent's children while searching", async () => {
         // Given parent 1 is pinned
         const r = await render(
-          <GridTable<NestedRow>
-            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
-            rows={nestedRows}
-            rowPinning
-          />,
+          <GridTable<NestedRow> columns={[collapseColumn<NestedRow>(), nestedNameColumn, pins]} rows={nestedRows} />,
         );
         click(r.pin_p1);
         // When searching for something only parent 2 matches
         await r.rerender(
           <GridTable<NestedRow>
-            columns={[collapseColumn<NestedRow>(), nestedNameColumn]}
+            columns={[collapseColumn<NestedRow>(), nestedNameColumn, pins]}
             rows={nestedRows}
-            rowPinning
             filter="parent 2"
           />,
         );
@@ -1473,14 +1461,12 @@ describe("GridTable", () => {
       it("doesn't also keep a selected child of a pinned parent while searching", async () => {
         // Given parent 1 is pinned and its grandchild is selected
         const api = new GridTableApiImpl<NestedRow>();
-        const columns = [collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nestedNameColumn];
-        const r = await render(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} rowPinning />);
+        const columns = [collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nestedNameColumn, pins];
+        const r = await render(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} />);
         click(r.pin_p1);
         act(() => api.selectRow("p1c1g1"));
         // When searching for something only parent 2 matches
-        await r.rerender(
-          <GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} rowPinning filter="parent 2" />,
-        );
+        await r.rerender(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} filter="parent 2" />);
         // Then the grandchild shows under its pinned parent
         expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
         // And isn't also counted as hidden by the search
@@ -1508,21 +1494,26 @@ describe("GridTable", () => {
       { kind: "data", id: "r1", data: { name: "foo", value: 1 } },
       { kind: "data", id: "r2", data: { name: "bar", value: 2 } },
     ];
-    const columns = [nameColumn, valueColumn];
     const edit = { icon: "pencil" as const, label: "Edit", onClick: noop };
     const duplicate = { icon: "duplicate" as const, label: "Duplicate", onClick: noop };
     const remove = { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true };
+    const withActions = (config: GridRowActionsConfig, w?: string) => [
+      nameColumn,
+      valueColumn,
+      rowActionsColumn<Row>({ data: config, w }),
+    ];
 
-    it("draws rowActions as icons in a column after the content columns", async () => {
-      // Given two actions per row
+    it("draws a row's actions as icons, from a config computed from the row", async () => {
+      // Given two actions per row, built from the row
       const onEdit = vi.fn();
-      const r = await render(
-        <GridTable<Row>
-          columns={columns}
-          rows={actionRows}
-          rowActions={(row) => [{ ...edit, onClick: () => onEdit(row.id) }, remove]}
-        />,
-      );
+      const columns = [
+        nameColumn,
+        valueColumn,
+        rowActionsColumn<Row>({
+          data: (data, { row }) => ({ actions: [{ ...edit, onClick: () => onEdit(row.id, data.name) }, remove] }),
+        }),
+      ];
+      const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then each row shows both as icons in the actions column, with no "more" menu
       expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
       expect(cell(r, 1, 2)).toContainElement(r.delete_r1);
@@ -1531,28 +1522,23 @@ describe("GridTable", () => {
       expect(cell(r, 0, 2)).toBeEmptyDOMElement();
       // When clicking an action
       click(r.edit_r2);
-      // Then it's called for that row
-      expect(onEdit).toHaveBeenCalledWith("r2");
+      // Then it's called with that row's data
+      expect(onEdit).toHaveBeenCalledWith("r2", "bar");
     });
 
     it("gives actions that share an icon their own test ids", async () => {
       // Given two actions with the same icon
-      const r = await render(
-        <GridTable<Row>
-          columns={columns}
-          rows={actionRows}
-          rowActions={() => [edit, { ...edit, label: "Edit dates" }]}
-        />,
-      );
+      const columns = withActions({ actions: [edit, { ...edit, label: "Edit dates" }] });
+      const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then each is found by its label
       expect(r.edit_r1).toBeTruthy();
       expect(r.editDates_r1).toBeTruthy();
     });
 
     it("shows the pin as an icon after the actions when there's room", async () => {
-      // Given one action and rowPinning
+      // Given one action and a pin
       const r = await render(
-        <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} rowPinning />,
+        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
       );
       // Then the pin shows right after the action
       expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
@@ -1560,15 +1546,11 @@ describe("GridTable", () => {
     });
 
     it("keeps the pin as an icon and moves the overflowing actions into the more menu", async () => {
-      // Given three actions per row and rowPinning
-      const api = new GridTableApiImpl<Row>();
+      // Given three actions per row and a pin
       const r = await render(
         <GridTable<Row>
-          api={api}
-          columns={columns}
+          columns={withActions({ actions: [edit, duplicate, remove], pinnable: true })}
           rows={actionRows}
-          rowActions={() => [edit, duplicate, remove]}
-          rowPinning
         />,
         withRouter(),
       );
@@ -1582,10 +1564,10 @@ describe("GridTable", () => {
     });
 
     it("keeps the pin as an icon on phone-sized screens", async () => {
-      // Given an action per row and rowPinning on a phone-sized screen
+      // Given an action per row and a pin on a phone-sized screen
       setViewport("sm");
       const r = await render(
-        <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} rowPinning />,
+        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
         withRouter(),
       );
       // Then the action moves into the menu, but the pin stays an icon
@@ -1593,14 +1575,13 @@ describe("GridTable", () => {
       expect(r.pin_r1).toBeTruthy();
       click(r.rowActions_r1);
       expect(r.rowActions_r1_edit).toBeTruthy();
-      expect(r.query.rowActions_r1_pinRow).toBeNull();
     });
 
     it("keeps showing icons on tablet-sized screens", async () => {
       // Given three actions per row on a tablet-sized screen
       setViewport("md");
       const r = await render(
-        <GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit, duplicate, remove]} />,
+        <GridTable<Row> columns={withActions({ actions: [edit, duplicate, remove] })} rows={actionRows} />,
       );
       // Then all three still show as icons, with no "more" menu
       expect(r.edit_r1).toBeTruthy();
@@ -1611,14 +1592,14 @@ describe("GridTable", () => {
     it("puts every action in the menu on phone-sized screens", async () => {
       // Given an action per row on a phone-sized screen
       setViewport("sm");
-      const r = await render(<GridTable<Row> columns={columns} rows={actionRows} rowActions={() => [edit]} />);
+      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit] })} rows={actionRows} />);
       // Then there are no icons, just the menu
       expect(r.query.edit_r1).toBeNull();
       expect(r.rowActions_r1).toBeTruthy();
     });
 
-    it("gives each kind the actions the function returns for it", async () => {
-      // Given parents that can be edited and children that can be deleted
+    it("gives each kind its own config, and leaves unlisted kinds empty", async () => {
+      // Given parents that can be edited, children that can be deleted, and grandchildren that aren't listed
       const nestedNameColumn: GridColumn<NestedRow> = {
         header: "Name",
         totals: emptyCell,
@@ -1632,34 +1613,56 @@ describe("GridTable", () => {
           kind: "parent",
           id: "p1",
           data: { name: "parent" },
-          children: [{ kind: "child", id: "c1", data: { name: "child" } }],
+          children: [
+            {
+              kind: "child",
+              id: "c1",
+              data: { name: "child" },
+              children: [{ kind: "grandChild", id: "g1", data: { name: "grandchild" } }],
+            },
+          ],
         },
       ];
-      const r = await render(
-        <GridTable<NestedRow>
-          columns={[nestedNameColumn]}
-          rows={rows}
-          rowActions={(row) => (row.kind === "parent" ? [edit] : row.kind === "child" ? [remove] : [])}
-        />,
-      );
-      // Then each row gets its kind's actions
+      const actions = rowActionsColumn<NestedRow>({ parent: { actions: [edit] }, child: { actions: [remove] } });
+      const r = await render(<GridTable<NestedRow> columns={[nestedNameColumn, actions]} rows={rows} />);
+      // Then each listed kind gets its own actions
       expect(r.edit_p1).toBeTruthy();
       expect(r.query.delete_p1).toBeNull();
       expect(r.delete_c1).toBeTruthy();
       expect(r.query.edit_c1).toBeNull();
+      // And the grandchild's actions cell is empty
+      expect(cell(r, 3, 1)).toBeEmptyDOMElement();
     });
 
-    it("doesn't ask for actions on the header", async () => {
-      // Given a rowActions function
-      const rowActions = vi.fn(() => []);
-      await render(<GridTable<Row> columns={columns} rows={actionRows} rowActions={rowActions} />);
+    it("doesn't ask for the header's config", async () => {
+      // Given a config function
+      const config = vi.fn(() => ({}));
+      const columns = [nameColumn, valueColumn, rowActionsColumn<Row>({ data: config, header: config })];
+      await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then it's only called for body rows
-      expect(rowActions.mock.calls.map(([row]: any) => row.kind)).not.toContain("header");
+      expect(config.mock.calls.map(([, { row }]: any) => row.kind)).not.toContain("header");
     });
 
-    it("doesn't add an actions column without rowActions or rowPinning", async () => {
-      // Given a table without either
-      const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
+    it("sizes the column to the widest row unless it has a w", async () => {
+      // Given two actions per row
+      const api = new GridTableApiImpl<Row>();
+      const width = () => api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w;
+      const r = await render(
+        <GridTable<Row> api={api} columns={withActions({ actions: [edit, remove] })} rows={actionRows} />,
+      );
+      // Then the column fits two buttons, the gap between them and the cell padding
+      expect(width()).toBe("84px");
+      // When the column is given its own w
+      await r.rerender(
+        <GridTable<Row> api={api} columns={withActions({ actions: [edit, remove] }, "200px")} rows={actionRows} />,
+      );
+      // Then the table keeps it
+      expect(width()).toBe("200px");
+    });
+
+    it("doesn't add an actions column without a rowActionsColumn", async () => {
+      // Given a table without one
+      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={actionRows} />);
       // Then each row only has its content columns
       expect(cell(r, 1, 2)).toBeUndefined();
     });

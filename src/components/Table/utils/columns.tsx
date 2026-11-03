@@ -1,9 +1,18 @@
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
+import { RowActionsCell } from "src/components/Table/components/RowActionsCell";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
+import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { type GridColumn, type GridColumnWithId, type Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import {
+  type GridColumn,
+  type GridColumnWithId,
+  type Kinded,
+  nonKindGridColumnKeys,
+  type RowActionsColumnDef,
+} from "src/components/Table/types";
+import { beamRowActionsColumnId, resolveRowActions } from "src/components/Table/utils/rowActions";
 import { type DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
@@ -64,6 +73,65 @@ export function fieldColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCol
 /** Provides default styling for a GridColumn representing an Action. */
 export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { clientSideSort: false, ...columnDef, align: "center", isAction: true, wrapAction: false };
+}
+
+/**
+ * Provides a sticky-right column of row actions and a pin toggle, which ends in a "more" menu.
+ *
+ * Each row `kind` gets a `GridRowActionsConfig`, static or computed from the row, i.e.
+ * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
+ * Kinds that aren't listed (and reserved kinds like the header) get an empty cell.
+ *
+ * Up to 3 icons show, the pin included, and none on phone-sized screens; the rest go in the "more" menu.
+ * The pin is always an icon. Unless `w` is set, the table sizes the column so every row's menu lines up.
+ */
+export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {
+  return buildRowActionsColumn(def, def.w);
+}
+
+// The caller's `rowActionsColumn` defs, so the table can size the column from each row's config
+const rowActionsDefs = new WeakMap<object, RowActionsColumnDef<any>>();
+
+/** The `rowActionsColumn` in `columns`, if any, and its def. */
+export function findRowActionsColumn<T extends Kinded>(
+  columns: readonly GridColumn<T>[],
+): { column: GridColumn<T>; def: RowActionsColumnDef<T> } | undefined {
+  const column = columns.find((c) => rowActionsDefs.has(c));
+  return column && { column, def: rowActionsDefs.get(column) as RowActionsColumnDef<T> };
+}
+
+/** Rebuilds a `rowActionsColumn` at the width the table computed, unless the caller set `w`. */
+export function withRowActionsWidth<T extends Kinded>(def: RowActionsColumnDef<T>, widthPx: number): GridColumn<T> {
+  return buildRowActionsColumn(def, def.w ?? `${widthPx}px`);
+}
+
+function buildRowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>, w: number | string | undefined) {
+  const { id = beamRowActionsColumnId } = def;
+  const base = {
+    ...nonKindDefaults(),
+    id,
+    clientSideSort: false,
+    align: "right",
+    sticky: "right",
+    w,
+    wrapAction: false,
+    isAction: true,
+    canHide: false,
+    header: emptyCell,
+    totals: emptyCell,
+    expandableHeader: emptyCell,
+    groupHeader: emptyCell,
+  };
+  // Listed kinds draw their config; the rest (and reserved kinds) stay empty
+  const column = newMethodMissingProxy(base, (kind) =>
+    kind in def
+      ? (_data: unknown, { row, api }: { row: GridDataRow<T>; api: GridTableApi<T> }) => (
+          <RowActionsCell row={row} config={resolveRowActions(def, row, api)} />
+        )
+      : emptyCell,
+  ) as GridColumn<T>;
+  rowActionsDefs.set(column, def);
+  return column;
 }
 
 /** Stable ids for the select and collapse columns. These aren't layout columns. */

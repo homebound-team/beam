@@ -1,6 +1,6 @@
 import type { GridDataRow } from "src/components/Table/components/Row";
-import type { GridRowAction } from "src/components/Table/GridTable";
-import type { Kinded } from "src/components/Table/types";
+import type { GridTableApi } from "src/components/Table/GridTableApi";
+import type { GridRowActionsConfig, Kinded, RowActionsColumnDef } from "src/components/Table/types";
 import { reservedRowKinds } from "src/components/Table/utils/utils";
 
 export const beamRowActionsColumnId = "beamRowActionsColumn";
@@ -37,32 +37,27 @@ export function rowActionsColumnPx(slots: number): number {
   return rowActionsCellPaddingPx * 2 + slots * rowActionButtonPx + (slots - 1) * rowActionGapPx;
 }
 
-/** Whether the row gets a pin: `row.pinnable` wins over `rowPinning.exclude`. Reserved rows never do. */
-export function isPinnableRow(
-  row: GridDataRow<any>,
-  pinningEnabled: boolean,
-  excludedKinds: readonly string[],
-): boolean {
-  if (!pinningEnabled || reservedRowKinds.includes(row.kind)) return false;
-  return row.pinnable ?? !excludedKinds.includes(row.kind);
+/** Resolves a row's `rowActionsColumn` config: static, or computed from the row. Reserved rows never get one. */
+export function resolveRowActions<R extends Kinded>(
+  def: RowActionsColumnDef<R>,
+  row: GridDataRow<R>,
+  api: GridTableApi<R>,
+): GridRowActionsConfig {
+  if (reservedRowKinds.includes(row.kind)) return {};
+  const config = (def as Record<string, unknown>)[row.kind];
+  return (typeof config === "function" ? config(row.data, { row, api }) : config) ?? {};
 }
 
 /** The most buttons any body row draws, which sizes the actions column. */
 export function maxRowActionSlots<R extends Kinded>(
   rows: GridDataRow<R>[],
-  rowActions: ((row: GridDataRow<R>) => GridRowAction[]) | undefined,
-  pinningEnabled: boolean,
-  excludedKinds: readonly string[],
+  resolve: (row: GridDataRow<R>) => GridRowActionsConfig,
   visibleCount: number,
 ): number {
   return rows.reduce((max, row) => {
-    const own = reservedRowKinds.includes(row.kind)
-      ? 0
-      : splitRowActions(rowActions?.(row).length ?? 0, isPinnableRow(row, pinningEnabled, excludedKinds), visibleCount)
-          .slots;
-    const children = row.children
-      ? maxRowActionSlots(row.children, rowActions, pinningEnabled, excludedKinds, visibleCount)
-      : 0;
+    const { actions = [], pinnable = false } = resolve(row);
+    const own = splitRowActions(actions.length, pinnable, visibleCount).slots;
+    const children = row.children ? maxRowActionSlots(row.children, resolve, visibleCount) : 0;
     return Math.max(max, own, children);
   }, 0);
 }

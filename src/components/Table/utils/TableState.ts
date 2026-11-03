@@ -1,12 +1,11 @@
 import { makeAutoObservable, observableRef, reaction } from "mobx";
 import React from "react";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import type { GridRowAction, GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
+import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
 import { firstContentControlPx, rowControlColumns, toLayoutColumns } from "src/components/Table/utils/columns";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
-import { isPinnableRow } from "src/components/Table/utils/rowActions";
 import type { DraggedOver, RowState } from "src/components/Table/utils/RowState";
 import { RowStates } from "src/components/Table/utils/RowStates";
 import { sortFn } from "src/components/Table/utils/sortRows";
@@ -58,13 +57,7 @@ export class TableState<R extends Kinded> {
   // The server-side `onSort` callback, if any.
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
   onRowSelect: OnRowSelect<any> | undefined = undefined;
-  /** Whether `GridTableProps.rowPinning` is on, so rows draw a pin toggle. */
-  isPinningEnabled = false;
-  // Kinds from `rowPinning.exclude`, only ref-observed so an inline array doesn't re-render every row
-  private pinExcludedKinds: readonly string[] = [];
-  // `GridTableProps.rowActions`, only ref-observed; a new function re-renders the actions cells
-  private rowActions: ((row: GridDataRow<R>) => GridRowAction[]) | undefined = undefined;
-  /** How many actions show as icons before the rest move into the "more" menu. */
+  /** How many `rowActionsColumn` icons show before the rest move into the "more" menu. */
   rowActionsVisibleCount = 3;
 
   /**
@@ -79,8 +72,6 @@ export class TableState<R extends Kinded> {
       rows: observableRef,
       columns: observableRef,
       search: observableRef,
-      pinExcludedKinds: observableRef,
-      rowActions: observableRef,
     } as any);
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
     reaction(
@@ -301,25 +292,8 @@ export class TableState<R extends Kinded> {
     return this.rowStates.pinnedSectionRows;
   }
 
-  setRowPinning(enabled: boolean, excludedKinds: readonly string[]): void {
-    this.isPinningEnabled = enabled;
-    if (excludedKinds.join() !== this.pinExcludedKinds.join()) this.pinExcludedKinds = excludedKinds;
-  }
-
-  setRowActions(rowActions: ((row: GridDataRow<R>) => GridRowAction[]) | undefined, visibleCount: number): void {
-    this.rowActions = rowActions;
+  setRowActionsVisibleCount(visibleCount: number): void {
     this.rowActionsVisibleCount = visibleCount;
-  }
-
-  // Should be called in an Observer/useComputed to trigger re-renders
-  rowActionsFor(id: string): GridRowAction[] {
-    const rs = this.rowStates.get(id);
-    return rs.isReservedKind ? [] : (this.rowActions?.(rs.row) ?? []);
-  }
-
-  /** Whether the row gets a pin toggle: `row.pinnable` wins over `rowPinning.exclude`. Reserved rows never do. */
-  isRowPinnable(id: string): boolean {
-    return isPinnableRow(this.rowStates.get(id).row, this.isPinningEnabled, this.pinExcludedKinds);
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders

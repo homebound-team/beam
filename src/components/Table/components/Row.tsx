@@ -679,7 +679,7 @@ export type GridDataRow<R extends Kinded> = {
    * By default, fixed-sorted rows are always shown/not filtered out; providing the
    * `filter: true` property allows them to be hidden while filtering. This is the
    * in-group ordering override, distinct from the runtime sticky "pin to top" feature
-   * (`api.pinRow` / `GridTableProps.rowPinning`).
+   * (`api.pinRow` / `rowActionsColumn`).
    */
   fixedSort?: "first" | "last" | FixedSort;
   data: unknown;
@@ -689,8 +689,6 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether to pin this row to the top on initial load. Ignored on subsequent re-renders (like `initSelected`). */
   initPinned?: boolean;
-  /** Whether this row gets a `GridTableProps.rowPinning` toggle; overrides `rowPinning.exclude`. Reserved kinds never do. */
-  pinnable?: boolean;
   /** Whether row can be selected */
   selectable?: false;
   /** Whether this row should infer its selected state based on its children's selected state */

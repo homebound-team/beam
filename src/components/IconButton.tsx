@@ -18,8 +18,6 @@ export type IconButtonProps = {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
   color?: BeamColor;
-  /** The icon to show while the button is held down (mouse or keyboard). */
-  pressedIcon?: IconProps["icon"];
   /** The icon color while the button is held down (mouse or keyboard). */
   pressedColor?: BeamColor;
   bgColor?: BeamColor;
@@ -64,7 +62,6 @@ export function IconButton(props: IconButtonProps) {
     onClick: onPress,
     disabled,
     color,
-    pressedIcon,
     pressedColor,
     bgColor,
     icon,
@@ -139,7 +136,7 @@ export function IconButton(props: IconButtonProps) {
   };
   const buttonContent = (
     <Icon
-      icon={(isPressed && pressedIcon) || icon}
+      icon={icon}
       color={
         (isPressed && pressedColor) ||
         color ||

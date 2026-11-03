@@ -34,6 +34,7 @@ import {
   fieldColumn,
   groupColumns,
   numericColumn,
+  rowActionsColumn,
   selectColumn,
 } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
@@ -589,16 +590,16 @@ export function StickyHeader() {
   );
 }
 
-/** Interactive row pinning via `rowPinning`, including companions that hoist with their parent when pinned. */
+/** Interactive row pinning via a `rowActionsColumn` pin, including companions that hoist with their parent when pinned. */
 export function InteractiveRowPinning() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const pinColumn = rowActionsColumn<Row>({ data: { pinnable: true } });
   return (
     <div css={Css.vh100.$}>
       some other top of page content
       <GridTable
-        columns={[nameColumn, valueColumn]}
-        rowPinning
+        columns={[nameColumn, valueColumn, pinColumn]}
         stickyHeader
         rows={[
           simpleHeader,
@@ -626,12 +627,12 @@ export function InteractiveRowPinning() {
 export function InteractiveRowPinningVirtual() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
+  const pinColumn = rowActionsColumn<Row>({ data: { pinnable: true } });
   return (
     <div css={Css.vh100.$}>
       <GridTable
         as="virtual"
-        columns={[nameColumn, valueColumn]}
-        rowPinning
+        columns={[nameColumn, valueColumn, pinColumn]}
         stickyHeader
         rows={[
           simpleHeader,
@@ -652,8 +653,8 @@ export function InteractiveRowPinningVirtual() {
 }
 
 /**
- * `rowPinning` on a nested table: pinning a parent brings its children with it (their pins show pinned and disabled).
- * `exclude` hides the pin on `add` rows, and Group 5 opts out with `pinnable: false`.
+ * Pins on a nested table: pinning a parent brings its children with it (their pins show pinned and disabled).
+ * `add` rows aren't listed, so they get no pin, and Group 5's config turns its pin off.
  */
 export function InteractiveGroupRowPinning() {
   const nameColumn: GridColumn<NestedRow> = {
@@ -672,7 +673,6 @@ export function InteractiveGroupRowPinning() {
       data: { name: i === 5 ? `Group ${i} (not pinnable)` : `Group ${i}` },
       // Pre-pin one whole group so the pinned section shows in the snapshot.
       initPinned: i === 2,
-      ...(i === 5 ? { pinnable: false } : {}),
       children: [
         {
           kind: "child" as const,
@@ -689,8 +689,16 @@ export function InteractiveGroupRowPinning() {
     <div css={Css.vh100.$}>
       some other top of page content
       <GridTable
-        columns={[collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nameColumn]}
-        rowPinning={{ exclude: ["add"] }}
+        columns={[
+          collapseColumn<NestedRow>(),
+          selectColumn<NestedRow>(),
+          nameColumn,
+          rowActionsColumn<NestedRow>({
+            parent: (_data, { row }) => ({ pinnable: row.id !== "g5" }),
+            child: { pinnable: true },
+            grandChild: { pinnable: true },
+          }),
+        ]}
         stickyHeader
         rows={rows}
       />
@@ -699,8 +707,9 @@ export function InteractiveGroupRowPinning() {
 }
 
 /**
- * `rowActions` in a sticky column on the right (different per row kind), with `rowPinning`'s pin just before the menu.
+ * A `rowActionsColumn` with different actions per row kind, and the pin just before the "more" menu.
  * Up to 3 icons, or only the pin on phone-sized screens. The pin is always an icon; the rest go in the "more" menu.
+ * `add` rows aren't listed, so their cell is empty.
  */
 export const RowActions = newStory(
   () => {
@@ -729,37 +738,29 @@ export const RowActions = newStory(
         ],
       })),
     ];
-    // Different actions per kind; `add` rows get none
-    const rowActions = (row: GridDataRow<NestedRow>) => {
-      switch (row.kind) {
-        case "parent":
-          return [
-            { icon: "plus" as const, label: "Add child", onClick: () => action("add child")(row.id) },
-            { icon: "pencil" as const, label: "Edit", onClick: () => action("edit")(row.id) },
-          ];
-        case "child":
-          return [
-            { icon: "pencil" as const, label: "Edit", onClick: () => action("edit")(row.id) },
-            { icon: "duplicate" as const, label: "Duplicate", onClick: () => action("duplicate")(row.id) },
-            { icon: "linkExternal" as const, label: "Open", onClick: noop, disabled: "No page yet" },
-            { icon: "trash" as const, label: "Delete", onClick: () => action("delete")(row.id), destructive: true },
-          ];
-        case "grandChild":
-          return [
-            { icon: "trash" as const, label: "Delete", onClick: () => action("delete")(row.id), destructive: true },
-          ];
-        default:
-          return [];
-      }
-    };
-    return (
-      <GridTable
-        columns={[collapseColumn<NestedRow>(), nameColumn]}
-        rows={rows}
-        rowPinning={{ exclude: ["add"] }}
-        rowActions={rowActions}
-      />
-    );
+    const actionsColumn = rowActionsColumn<NestedRow>({
+      parent: (_data, { row }) => ({
+        pinnable: true,
+        actions: [
+          { icon: "plus", label: "Add child", onClick: () => action("add child")(row.id) },
+          { icon: "pencil", label: "Edit", onClick: () => action("edit")(row.id) },
+        ],
+      }),
+      child: (_data, { row }) => ({
+        pinnable: true,
+        actions: [
+          { icon: "pencil", label: "Edit", onClick: () => action("edit")(row.id) },
+          { icon: "duplicate", label: "Duplicate", onClick: () => action("duplicate")(row.id) },
+          { icon: "linkExternal", label: "Open", onClick: noop, disabled: "No page yet" },
+          { icon: "trash", label: "Delete", onClick: () => action("delete")(row.id), destructive: true },
+        ],
+      }),
+      grandChild: (_data, { row }) => ({
+        pinnable: true,
+        actions: [{ icon: "trash", label: "Delete", onClick: () => action("delete")(row.id), destructive: true }],
+      }),
+    });
+    return <GridTable columns={[collapseColumn<NestedRow>(), nameColumn, actionsColumn]} rows={rows} />;
   },
   { parameters: { chromatic: { modes: viewportModes("desktop", "mobile1") } } },
 );

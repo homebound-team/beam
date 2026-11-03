@@ -11,7 +11,6 @@ import React, {
 } from "react";
 import { type Components, type ListRange, Virtuoso, VirtuosoGrid, type VirtuosoHandle } from "react-virtuoso";
 import type { ImageFitType } from "src/components/Card";
-import type { IconProps } from "src/components/Icon";
 import { useScrollViewportWidth, useVirtualizedScrollParent } from "src/components/Layout/ScrollableContent";
 import { Loader } from "src/components/Loader";
 import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
@@ -38,11 +37,18 @@ import type {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds, isContentColumn, withColumnGutters } from "src/components/Table/utils/columns";
+import {
+  assignDefaultColumnIds,
+  findRowActionsColumn,
+  isContentColumn,
+  withColumnGutters,
+  withRowActionsWidth,
+} from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
 import {
   maxRowActionSlots,
+  resolveRowActions,
   rowActionsColumnPx,
   rowActionsVisibleCount as rowActionsVisibleCountFor,
 } from "src/components/Table/utils/rowActions";
@@ -77,7 +83,6 @@ import { zIndices } from "src/utils/zIndices";
 import { CompanionRow } from "./components/CompanionRow";
 import type { GridDataRow, GridRowKind } from "./components/Row";
 import { Row } from "./components/Row";
-import { rowActionsColumn } from "./components/RowActionsCell";
 import { RowGroup } from "./components/RowGroup";
 import { TableCard } from "./components/TableCard";
 import { GridTableEmptyState, type GridTableEmptyStateProps } from "./GridTableEmptyState";
@@ -144,24 +149,6 @@ export type OnRowSelect<R extends Kinded> = {
   [K in R["kind"]]?: DiscriminateUnion<R, "kind", K> extends { data: infer D }
     ? (data: D, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void
     : (data: undefined, isSelected: boolean, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => void;
-};
-
-/** Options for `GridTableProps.rowPinning`. */
-export type RowPinningConfig<R extends Kinded> = {
-  /** Row kinds that don't get a pin toggle. Reserved kinds (header, totals, etc.) never do. Use `row.pinnable` per row. */
-  exclude?: R["kind"][];
-};
-
-/** An icon action in the `GridTableProps.rowActions` column. */
-export type GridRowAction = {
-  icon: IconProps["icon"];
-  /** The icon's aria label and tooltip, and the item's text once it moves into the "more" menu. */
-  label: string;
-  onClick: VoidFunction | string;
-  /** A ReactNode is shown as the disabled reason. */
-  disabled?: boolean | ReactNode;
-  /** Shows the item in red once it moves into the "more" menu. */
-  destructive?: boolean;
 };
 
 type DragEventType = React.DragEvent<HTMLElement>;
@@ -254,21 +241,6 @@ export type GridTableProps<R extends Kinded, X> = {
   /** Callback for when a row is selected or unselected. */
   onRowSelect?: OnRowSelect<R>;
   /**
-   * Shows a pin toggle in the row actions column, after any action icons and before the "more" menu.
-   * The pin always stays an icon; `rowActions` move into the menu first.
-   *
-   * Pinned rows stick to the top of the table, and a pinned parent brings its children with it.
-   */
-  rowPinning?: boolean | RowPinningConfig<R>;
-  /**
-   * Icon actions for each body row, in a sticky column on the right. Return `[]` for rows (or kinds) with no actions.
-   * Reserved rows (header, totals, etc.) never get any.
-   *
-   * The first few show as icons and the rest go in a "more" menu, with fewer icons on smaller screens.
-   * Wrap it in `useCallback`: the table calls it for every row to size the column, and a new function redraws each actions cell.
-   */
-  rowActions?: (row: GridDataRow<R>) => GridRowAction[];
-  /**
    * Custom prefix rows for any CSV output, i.e. a header like "Report X as of date Y with filter Z".
    *
    * We except the `string[][]` to be an array of cells, and `copyToClipboard` and `downloadToCsv` will drop them into
@@ -332,8 +304,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     visibleColumnsStorageKey,
     infiniteScroll,
     onRowSelect,
-    rowPinning,
-    rowActions,
     onRowDrop: droppedCallback,
     csvPrefixRows,
     disableColumnResizing = false,
@@ -352,20 +322,28 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
-  // `rowActions` and `rowPinning` share one sticky-right column, sized so every row's "more" menu lines up
-  const pinConfig = typeof rowPinning === "object" ? rowPinning : undefined;
-  const pinningEnabled = !!rowPinning;
-  const pinExcludedKinds = pinConfig?.exclude;
+  // Let the user pass in their own api handle, otherwise make our own
+  const api = useMemo(() => (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl<R>(), [props.api]);
+
+  // A `rowActionsColumn` is sized from every row's config, so each row's "more" menu lines up
   const breakpoints = useBreakpoint();
   const rowActionsVisibleCount = rowActionsVisibleCountFor(breakpoints);
+  const rowActionsDef = findRowActionsColumn(_columns)?.def;
   const rowActionsSlots = useMemo(
-    () => maxRowActionSlots(rows, rowActions, pinningEnabled, pinExcludedKinds ?? [], rowActionsVisibleCount),
-    [rows, rowActions, pinningEnabled, pinExcludedKinds, rowActionsVisibleCount],
+    () =>
+      rowActionsDef
+        ? maxRowActionSlots(rows, (row) => resolveRowActions(rowActionsDef, row, api), rowActionsVisibleCount)
+        : 0,
+    [rows, rowActionsDef, api, rowActionsVisibleCount],
   );
 
   const columnsWithIds = useMemo(() => {
-    const withActions =
-      rowActionsSlots > 0 ? [..._columns, rowActionsColumn<R>(rowActionsColumnPx(rowActionsSlots))] : _columns;
+    const rowActions = findRowActionsColumn(_columns);
+    const withActions = rowActions
+      ? _columns.map((c) =>
+          c === rowActions.column ? withRowActionsWidth(rowActions.def, rowActionsColumnPx(rowActionsSlots)) : c,
+        )
+      : _columns;
     const columns = withGutters ? withColumnGutters(withActions) : withActions;
     return assignDefaultColumnIds(columns);
   }, [_columns, withGutters, rowActionsSlots]);
@@ -379,10 +357,8 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Ref to the table container element (for column resize guide line)
   const tableContainerRef = useRef<HTMLElement | null>(null);
 
-  const api = useMemo<GridTableApiImpl<R>>(
+  useMemo(
     () => {
-      // Let the user pass in their own api handle, otherwise make our own
-      const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
       api.init(persistCollapse, virtuosoRef, virtuosoRangeRef);
       api.setActiveRowId(activeRowId);
       api.setActiveCellId(activeCellId);
@@ -390,11 +366,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       // makes the tests pass, but then further updates we'll do through useEffect
       // to avoid "Cannot update component during render" errors.
       api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
-      return api;
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.api],
+    [api],
   );
 
   const [draggedRow, _setDraggedRow] = useState<GridDataRow<R> | undefined>(undefined);
@@ -427,14 +402,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     tableStateSyncedFromPropsRef.current = true;
   }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
 
-  // Kept out of the effect above so an inline `rowPinning={{ ... }}` doesn't re-run `setRows` each render.
-  // `setRowPinning` ignores an `exclude` with the same kinds, so this is cheap when the array is new each render.
   useEffect(() => {
-    tableState.setRowPinning(pinningEnabled, pinExcludedKinds ?? []);
-  }, [tableState, pinningEnabled, pinExcludedKinds]);
-  useEffect(() => {
-    tableState.setRowActions(rowActions, rowActionsVisibleCount);
-  }, [tableState, rowActions, rowActionsVisibleCount]);
+    tableState.setRowActionsVisibleCount(rowActionsVisibleCount);
+  }, [tableState, rowActionsVisibleCount]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
