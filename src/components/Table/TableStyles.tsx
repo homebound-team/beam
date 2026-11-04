@@ -282,13 +282,13 @@ export function hierarchyFirstContentCss(opts: {
   skipIndent: boolean;
   /** True when this row has child rows. */
   hasChildren: boolean;
-  /** True when any row at this level has child rows. */
-  levelHasChildren: boolean;
+  /** True when any top-level row has child rows. */
+  topLevelHasChildren: boolean;
 }): Properties | undefined {
-  const { level, skipIndent, hasChildren, levelHasChildren } = opts;
+  const { level, skipIndent, hasChildren, topLevelHasChildren } = opts;
   // Indent is only the level. A missing chevron is a spacer in the cell, so the checkbox still lines up.
   const paddingLeft = skipIndent ? undefined : hierarchyIndentPaddingPx(level);
-  const typeStyle = hierarchyLevelType(level, hasChildren, levelHasChildren);
+  const typeStyle = hierarchyLevelType(level, hasChildren, topLevelHasChildren);
   if (!typeStyle && paddingLeft === undefined) return undefined;
   return {
     ...(typeStyle ?? {}),
@@ -297,8 +297,8 @@ export function hierarchyFirstContentCss(opts: {
 }
 
 /** Size comes from the level, so siblings match. Semibold only when the row itself has children. */
-function hierarchyLevelType(level: number, hasChildren: boolean, levelHasChildren: boolean): Properties | undefined {
-  if (level === 0) return levelHasChildren ? (hasChildren ? Css.smSb.$ : Css.sm.$) : undefined;
+function hierarchyLevelType(level: number, hasChildren: boolean, topLevelHasChildren: boolean): Properties | undefined {
+  if (level === 0) return topLevelHasChildren ? (hasChildren ? Css.smSb.$ : Css.sm.$) : undefined;
   return hasChildren ? Css.xsSb.$ : Css.xs.$;
 }
 

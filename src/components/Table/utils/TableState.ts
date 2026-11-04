@@ -1,4 +1,4 @@
-import { computedStruct, makeAutoObservable, observableRef, reaction } from "mobx";
+import { makeAutoObservable, observableRef, reaction } from "mobx";
 import React from "react";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
@@ -70,8 +70,6 @@ export class TableState<R extends Kinded> {
       rows: observableRef,
       columns: observableRef,
       search: observableRef,
-      // Compare by value, so new rows only re-render every Row when a level gains or loses its parents
-      parentLevels: computedStruct,
     } as any);
     // If the kept rows went from empty to not empty, then introduce the SELECTED_GROUP row as collapsed
     reaction(
@@ -200,21 +198,9 @@ export class TableState<R extends Kinded> {
     return firstContentControlPx(this.controlColumns);
   }
 
-  /** Levels where at least one data row has children. Every row at such a level shares the parent type size. */
-  get parentLevels(): ReadonlySet<number> {
-    const levels = new Set<number>();
-    function visit(rows: GridDataRow<R>[], level: number): void {
-      for (const row of rows) {
-        if (!row.children?.length) continue;
-        if (!reservedRowKinds.includes(row.kind)) levels.add(level);
-        visit(row.children, level + 1);
-      }
-    }
-    visit(
-      this.rows.filter((row) => row.kind !== HEADER),
-      0,
-    );
-    return levels;
+  /** True when any top-level data row has children. Top-level rows then share the parent type size. */
+  get topLevelHasChildren(): boolean {
+    return this.rows.some((row) => !reservedRowKinds.includes(row.kind) && !!row.children?.length);
   }
 
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
