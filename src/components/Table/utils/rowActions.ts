@@ -13,23 +13,30 @@ const rowActionButtonPx = 28;
 export const rowActionGapPx = 4;
 const rowActionsCellPaddingPx = 12;
 
-/** How many icons (the pin included) show before actions move into the "more" menu; Beam's rule, not a table option. */
+/**
+ * How many icons (the pin included, the "more" menu not) a row shows before actions move into the menu;
+ * Beam's rule, not a table option. Phone-sized screens show no action icons, only the pin and the menu.
+ */
 export function rowActionsVisibleCount(breakpoints: { sm: boolean }): number {
   return breakpoints.sm ? 0 : 3;
 }
 
+/** The fixed number of buttons the actions column is sized for: 3 icons and the menu, or the pin and the menu on phone-sized screens. */
+export function rowActionsSlotsFor(breakpoints: { sm: boolean }): number {
+  return breakpoints.sm ? 2 : 4;
+}
+
 /**
  * How a row's actions split: the first `actionIcons` as icons, then the pin (always an icon, never in the menu),
- * then the "more" menu if any actions are left over. `slots` is the number of buttons that takes.
+ * then the "more" menu if any actions are left over. The icons, pin included, fit in `visibleCount`.
  */
 export function splitRowActions(
   actionCount: number,
   pinnable: boolean,
   visibleCount: number,
-): { actionIcons: number; hasMenu: boolean; slots: number } {
+): { actionIcons: number; hasMenu: boolean } {
   const actionIcons = Math.min(actionCount, Math.max(0, visibleCount - (pinnable ? 1 : 0)));
-  const hasMenu = actionCount > actionIcons;
-  return { actionIcons, hasMenu, slots: actionIcons + (pinnable ? 1 : 0) + (hasMenu ? 1 : 0) };
+  return { actionIcons, hasMenu: actionCount > actionIcons };
 }
 
 /** Width of the actions column for `slots` icon buttons. */
@@ -46,18 +53,4 @@ export function resolveRowActions<R extends Kinded>(
   if (reservedRowKinds.includes(row.kind)) return {};
   const config = (def as Record<string, unknown>)[row.kind];
   return (typeof config === "function" ? config(row.data, { row, api }) : config) ?? {};
-}
-
-/** The most buttons any body row draws, which sizes the actions column. */
-export function maxRowActionSlots<R extends Kinded>(
-  rows: GridDataRow<R>[],
-  resolve: (row: GridDataRow<R>) => GridRowActionsConfig,
-  visibleCount: number,
-): number {
-  return rows.reduce((max, row) => {
-    const { actions = [], pinnable = false } = resolve(row);
-    const own = splitRowActions(actions.length, pinnable, visibleCount).slots;
-    const children = row.children ? maxRowActionSlots(row.children, resolve, visibleCount) : 0;
-    return Math.max(max, own, children);
-  }, 0);
 }

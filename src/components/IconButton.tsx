@@ -135,8 +135,6 @@ export function IconButton(props: IconButtonProps) {
     <Icon
       icon={icon}
       color={
-        // Held down (mouse or keyboard), every icon shows primary, even over `color`
-        (isPressed && Tokens.Primary) ||
         color ||
         (isDisabled
           ? Tokens.OnSurfaceDisabled

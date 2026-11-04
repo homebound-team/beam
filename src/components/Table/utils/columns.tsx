@@ -82,14 +82,14 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
  * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
  * Kinds that aren't listed (and reserved kinds like the header) get an empty cell.
  *
- * Up to 3 icons show, the pin included, and none on phone-sized screens; the rest go in the "more" menu.
- * The pin is always an icon. Unless `w` is set, the table sizes the column so every row's menu lines up.
+ * Up to 3 icons show, the pin included, then the "more" menu; phone-sized screens show only the pin and the menu.
+ * The pin is always an icon. Unless `w` is set, the column is sized for 3 icons and the menu (2 buttons on phone-sized screens).
  */
 export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {
   return buildRowActionsColumn(def, def.w);
 }
 
-// The caller's `rowActionsColumn` defs, so the table can size the column from each row's config
+// The caller's `rowActionsColumn` defs, so the table can find the column and rebuild it at its breakpoint width
 const rowActionsDefs = new WeakMap<object, RowActionsColumnDef<any>>();
 
 /** The `rowActionsColumn` in `columns`, if any, and its def. */
@@ -100,7 +100,7 @@ export function findRowActionsColumn<T extends Kinded>(
   return column && { column, def: rowActionsDefs.get(column) as RowActionsColumnDef<T> };
 }
 
-/** Rebuilds a `rowActionsColumn` at the width the table computed, unless the caller set `w`. */
+/** Rebuilds a `rowActionsColumn` at the table's width for the current breakpoint, unless the caller set `w`. */
 export function withRowActionsWidth<T extends Kinded>(def: RowActionsColumnDef<T>, widthPx: number): GridColumn<T> {
   return buildRowActionsColumn(def, def.w ?? `${widthPx}px`);
 }

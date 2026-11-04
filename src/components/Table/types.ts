@@ -137,7 +137,7 @@ export type GridRowAction = {
 export type GridRowActionsConfig = {
   /** Shows a pin toggle, always as an icon just before the "more" menu. */
   pinnable?: boolean;
-  /** Up to 3 icons (the pin included) show, none on phone-sized screens; the rest go in the "more" menu. */
+  /** Up to 3 icons show (the pin included), then the "more" menu; only the pin and menu on phone-sized screens. */
   actions?: GridRowAction[];
 };
 

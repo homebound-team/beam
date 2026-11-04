@@ -47,9 +47,8 @@ import {
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
 import {
-  maxRowActionSlots,
-  resolveRowActions,
   rowActionsColumnPx,
+  rowActionsSlotsFor,
   rowActionsVisibleCount as rowActionsVisibleCountFor,
 } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -322,31 +321,19 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
-  // Let the user pass in their own api handle, otherwise make our own
-  const api = useMemo(() => (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl<R>(), [props.api]);
-
-  // A `rowActionsColumn` is sized from every row's config, so each row's "more" menu lines up
+  // A `rowActionsColumn` is a fixed width: 3 icons and the "more" menu, or just the pin and the menu on phone-sized screens
   const breakpoints = useBreakpoint();
   const rowActionsVisibleCount = rowActionsVisibleCountFor(breakpoints);
-  const rowActionsDef = findRowActionsColumn(_columns)?.def;
-  const rowActionsSlots = useMemo(
-    () =>
-      rowActionsDef
-        ? maxRowActionSlots(rows, (row) => resolveRowActions(rowActionsDef, row, api), rowActionsVisibleCount)
-        : 0,
-    [rows, rowActionsDef, api, rowActionsVisibleCount],
-  );
+  const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
 
   const columnsWithIds = useMemo(() => {
     const rowActions = findRowActionsColumn(_columns);
     const withActions = rowActions
-      ? _columns.map((c) =>
-          c === rowActions.column ? withRowActionsWidth(rowActions.def, rowActionsColumnPx(rowActionsSlots)) : c,
-        )
+      ? _columns.map((c) => (c === rowActions.column ? withRowActionsWidth(rowActions.def, rowActionsWidthPx) : c))
       : _columns;
     const columns = withGutters ? withColumnGutters(withActions) : withActions;
     return assignDefaultColumnIds(columns);
-  }, [_columns, withGutters, rowActionsSlots]);
+  }, [_columns, withGutters, rowActionsWidthPx]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -357,8 +344,10 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   // Ref to the table container element (for column resize guide line)
   const tableContainerRef = useRef<HTMLElement | null>(null);
 
-  useMemo(
+  const api = useMemo<GridTableApiImpl<R>>(
     () => {
+      // Let the user pass in their own api handle, otherwise make our own
+      const api = (props.api as GridTableApiImpl<R>) ?? new GridTableApiImpl();
       api.init(persistCollapse, virtuosoRef, virtuosoRangeRef);
       api.setActiveRowId(activeRowId);
       api.setActiveCellId(activeCellId);
@@ -366,10 +355,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       // makes the tests pass, but then further updates we'll do through useEffect
       // to avoid "Cannot update component during render" errors.
       api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
+      return api;
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [api],
+    [props.api],
   );
 
   const [draggedRow, _setDraggedRow] = useState<GridDataRow<R> | undefined>(undefined);

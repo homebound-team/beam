@@ -1643,21 +1643,28 @@ describe("GridTable", () => {
       expect(config.mock.calls.map(([, { row }]: any) => row.kind)).not.toContain("header");
     });
 
-    it("sizes the column to the widest row unless it has a w", async () => {
-      // Given two actions per row
+    it("sizes the column for 3 icons and the menu unless it has a w", async () => {
+      // Given one action per row
       const api = new GridTableApiImpl<Row>();
       const width = () => api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w;
-      const r = await render(
-        <GridTable<Row> api={api} columns={withActions({ actions: [edit, remove] })} rows={actionRows} />,
-      );
-      // Then the column fits two buttons, the gap between them and the cell padding
-      expect(width()).toBe("84px");
+      const r = await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      // Then the column still fits 3 icons and the menu, the gaps between them and the cell padding
+      expect(width()).toBe("148px");
       // When the column is given its own w
       await r.rerender(
-        <GridTable<Row> api={api} columns={withActions({ actions: [edit, remove] }, "200px")} rows={actionRows} />,
+        <GridTable<Row> api={api} columns={withActions({ actions: [edit] }, "200px")} rows={actionRows} />,
       );
       // Then the table keeps it
       expect(width()).toBe("200px");
+    });
+
+    it("sizes the column for the pin and the menu on phone-sized screens", async () => {
+      // Given a phone-sized screen
+      setViewport("sm");
+      const api = new GridTableApiImpl<Row>();
+      await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      // Then the column fits 2 buttons
+      expect(api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w).toBe("84px");
     });
 
     it("doesn't add an actions column without a rowActionsColumn", async () => {

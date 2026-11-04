@@ -708,7 +708,7 @@ export function InteractiveGroupRowPinning() {
 
 /**
  * A `rowActionsColumn` with different actions per row kind, and the pin just before the "more" menu.
- * Up to 3 icons, or only the pin on phone-sized screens. The pin is always an icon; the rest go in the "more" menu.
+ * Up to 3 icons (the pin included) then the "more" menu, or just the pin and menu on phone-sized screens.
  * `add` rows aren't listed, so their cell is empty.
  */
 export const RowActions = newStory(
