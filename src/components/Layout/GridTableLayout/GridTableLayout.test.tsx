@@ -24,7 +24,6 @@ import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutCo
 import { selfTopSpacedAttr } from "src/layouts/layoutSpacing";
 import {
   beamFloatingRightOffsetVar,
-  beamNavbarLayoutHeightVar,
   beamRightPaneWidthVar,
   beamTableActionsHeightVar,
   documentScrollRightPaneWidthCss,
@@ -1076,18 +1075,17 @@ describe("GridTableLayout", () => {
   });
 
   describe("scrollToTopOnFilterChange", () => {
-    // jsdom doesn't implement `window.scrollBy` or element `scrollTo`
-    const scrollBy = vi.fn();
+    // jsdom doesn't implement `scrollIntoView` or element `scrollTo`
+    const scrollIntoView = vi.fn();
     const scrollTo = vi.fn();
-    const originalScrollBy = window.scrollBy;
     beforeEach(() => {
-      window.scrollBy = scrollBy;
+      HTMLElement.prototype.scrollIntoView = scrollIntoView;
       HTMLElement.prototype.scrollTo = scrollTo;
     });
     afterEach(() => {
-      scrollBy.mockReset();
+      scrollIntoView.mockReset();
       scrollTo.mockReset();
-      window.scrollBy = originalScrollBy;
+      delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
       delete (HTMLElement.prototype as Partial<HTMLElement>).scrollTo;
     });
 
@@ -1112,7 +1110,7 @@ describe("GridTableLayout", () => {
       const scroller = scrollTo.mock.contexts[0] as HTMLElement;
       expect(scroller).toContainElement(r.getByText("Alpha"));
       expect(scroller).not.toContainElement(r.tableWrapper);
-      expect(scrollBy).not.toHaveBeenCalled();
+      expect(scrollIntoView).not.toHaveBeenCalled();
     });
 
     it("scrolls to the top of the table when a filter changes, but not on mount", async () => {
@@ -1128,16 +1126,14 @@ describe("GridTableLayout", () => {
         withRouter(),
       );
       // Then mounting does not scroll
-      expect(scrollBy).not.toHaveBeenCalled();
+      expect(scrollIntoView).not.toHaveBeenCalled();
 
-      // When a filter changes while the table sits 500px down the viewport, under a 64px pinned navbar
-      // (jsdom doesn't inherit custom properties into getComputedStyle, so set the var on the wrapper itself)
-      r.tableWrapper.style.setProperty(beamNavbarLayoutHeightVar, "64px");
-      vi.spyOn(r.tableWrapper, "getBoundingClientRect").mockReturnValue({ top: 500 } as DOMRect);
+      // When a filter changes
       click(r.filter_needsRevision);
 
-      // Then the page scrolls down to the table wrapper, stopping below the pinned navbar, without moving sideways
-      expect(scrollBy).toHaveBeenCalledExactlyOnceWith({ top: 500 - 64, behavior: "smooth" });
+      // Then the table wrapper is scrolled to the top
+      expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({ behavior: "smooth", block: "start", inline: "start" });
+      expect(scrollIntoView.mock.contexts[0]).toBe(r.tableWrapper);
     });
 
     it("does not scroll when not opted in", async () => {
@@ -1156,7 +1152,7 @@ describe("GridTableLayout", () => {
       click(r.filter_needsRevision);
 
       // Then the page does not scroll
-      expect(scrollBy).not.toHaveBeenCalled();
+      expect(scrollIntoView).not.toHaveBeenCalled();
     });
 
     it("waits for the query to load before scrolling", async () => {
@@ -1182,13 +1178,13 @@ describe("GridTableLayout", () => {
       loading = true;
       click(r.filter_needsRevision);
       // Then the page does not scroll yet
-      expect(scrollBy).not.toHaveBeenCalled();
+      expect(scrollIntoView).not.toHaveBeenCalled();
 
       // And when the query finishes loading
       loading = false;
       r.rerender(<QueryWrapper />);
       // Then the table is scrolled to the top
-      expect(scrollBy).toHaveBeenCalledOnce();
+      expect(scrollIntoView).toHaveBeenCalledOnce();
     });
 
     it("does not scroll again for a refetch or an equal filter", async () => {
@@ -1211,7 +1207,7 @@ describe("GridTableLayout", () => {
       }
       const r = await render(<QueryWrapper />, withRouter());
       click(r.filter_needsRevision);
-      expect(scrollBy).toHaveBeenCalledOnce();
+      expect(scrollIntoView).toHaveBeenCalledOnce();
 
       // When the query refetches with the same filter
       loading = true;
@@ -1222,7 +1218,7 @@ describe("GridTableLayout", () => {
       act(() => layoutState.setFilter({ ...layoutState.filter }));
 
       // Then the page does not scroll again
-      expect(scrollBy).toHaveBeenCalledOnce();
+      expect(scrollIntoView).toHaveBeenCalledOnce();
     });
   });
 

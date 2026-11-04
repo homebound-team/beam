@@ -276,15 +276,15 @@ function useScrollToTopOnFilterChange(opts: {
 }) {
   const { enabled, layoutState, loading, scrollToTopRef } = opts;
   const { filter, searchString } = layoutState ?? {};
-  const scrolledForRef = useRef({ filter, searchString });
+  const currentFiltersRef = useRef({ filter, searchString });
   useEffect(() => {
-    const scrolledFor = scrolledForRef.current;
+    const scrolledFor = currentFiltersRef.current;
     if (scrolledFor.filter === filter && scrolledFor.searchString === searchString) return;
     // Keep it in sync while disabled, so turning the prop on later doesn't scroll for an old change.
-    if (!enabled) return void (scrolledForRef.current = { filter, searchString });
+    if (!enabled) return void (currentFiltersRef.current = { filter, searchString });
     // Wait for the refetch, so we don't move the viewport while the old rows are still showing.
     if (loading) return;
-    scrolledForRef.current = { filter, searchString };
+    currentFiltersRef.current = { filter, searchString };
     scrollToTopRef.current?.();
   }, [enabled, filter, searchString, loading, scrollToTopRef]);
 }
