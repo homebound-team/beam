@@ -71,6 +71,23 @@ describe("IconButton", () => {
     expect(r.trash).toHaveAttribute("rel", "noreferrer noopener");
   });
 
+  it("keeps the resting fill when active", async () => {
+    // Given a resting icon button and one held in the sticky pressed state
+    // When rendered
+    const r = await render(
+      <>
+        <IconButton icon="trash" onClick={noop} />
+        <IconButton icon="comment" active onClick={noop} />
+      </>,
+    );
+
+    // Then the sticky pressed state keeps the resting fill and marks the icon to scale
+    expect(getComputedStyle(r.comment).backgroundColor).toBe(getComputedStyle(r.trash).backgroundColor);
+    expect(r.comment).toHaveAttribute("data-pressed", "");
+    expect(r.trash).not.toHaveAttribute("data-pressed");
+    expect(r.comment_icon).toBeInTheDocument();
+  });
+
   it("renders a 48px circle by default", async () => {
     // Given a circle IconButton
     const r = await render(<IconButton icon="comment" variant="circle" onClick={noop} />);
