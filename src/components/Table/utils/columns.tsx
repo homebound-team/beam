@@ -86,34 +86,13 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
  * The pin is always an icon. Unless `w` is set, the column is sized for 3 icons and the menu (2 buttons on phone-sized screens).
  */
 export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {
-  return buildRowActionsColumn(def, def.w);
-}
-
-// The caller's `rowActionsColumn` defs, so the table can find the column and rebuild it at its breakpoint width
-const rowActionsDefs = new WeakMap<object, RowActionsColumnDef<any>>();
-
-/** The `rowActionsColumn` in `columns`, if any, and its def. */
-export function findRowActionsColumn<T extends Kinded>(
-  columns: readonly GridColumn<T>[],
-): { column: GridColumn<T>; def: RowActionsColumnDef<T> } | undefined {
-  const column = columns.find((c) => rowActionsDefs.has(c));
-  return column && { column, def: rowActionsDefs.get(column) as RowActionsColumnDef<T> };
-}
-
-/** Rebuilds a `rowActionsColumn` at the table's width for the current breakpoint, unless the caller set `w`. */
-export function withRowActionsWidth<T extends Kinded>(def: RowActionsColumnDef<T>, widthPx: number): GridColumn<T> {
-  return buildRowActionsColumn(def, def.w ?? `${widthPx}px`);
-}
-
-function buildRowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>, w: number | string | undefined) {
-  const { id = beamRowActionsColumnId } = def;
   const base = {
     ...nonKindDefaults(),
-    id,
+    id: beamRowActionsColumnId,
     clientSideSort: false,
     align: "right",
     sticky: "right",
-    w,
+    w: def.w,
     wrapAction: false,
     isAction: true,
     canHide: false,
@@ -123,15 +102,26 @@ function buildRowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>, w:
     groupHeader: emptyCell,
   };
   // Listed kinds draw their config; the rest (and reserved kinds) stay empty
-  const column = newMethodMissingProxy(base, (kind) =>
+  return newMethodMissingProxy(base, (kind) =>
     kind in def
       ? (_data: unknown, { row, api }: { row: GridDataRow<T>; api: GridTableApi<T> }) => (
           <RowActionsCell row={row} config={resolveRowActions(def, row, api)} />
         )
       : emptyCell,
   ) as GridColumn<T>;
-  rowActionsDefs.set(column, def);
-  return column;
+}
+
+/**
+ * Gives a `rowActionsColumn` without its own `w` the table's width for the current breakpoint.
+ *
+ * Wraps the column instead of setting `w` on it, so the caller's column is untouched and can be resized again later.
+ */
+export function withRowActionsWidth<T extends Kinded>(columns: GridColumn<T>[], widthPx: number): GridColumn<T>[] {
+  return columns.map((column) =>
+    column.id === beamRowActionsColumnId && column.w === undefined
+      ? new Proxy(column, { get: (target, key) => (key === "w" ? `${widthPx}px` : Reflect.get(target, key)) })
+      : column,
+  );
 }
 
 /** Stable ids for the select and collapse columns. These aren't layout columns. */

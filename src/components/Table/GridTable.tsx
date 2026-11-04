@@ -39,7 +39,6 @@ import type {
 } from "src/components/Table/types";
 import {
   assignDefaultColumnIds,
-  findRowActionsColumn,
   isContentColumn,
   withColumnGutters,
   withRowActionsWidth,
@@ -327,10 +326,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
 
   const columnsWithIds = useMemo(() => {
-    const rowActions = findRowActionsColumn(_columns);
-    const withActions = rowActions
-      ? _columns.map((c) => (c === rowActions.column ? withRowActionsWidth(rowActions.def, rowActionsWidthPx) : c))
-      : _columns;
+    const withActions = withRowActionsWidth(_columns, rowActionsWidthPx);
     const columns = withGutters ? withColumnGutters(withActions) : withActions;
     return assignDefaultColumnIds(columns);
   }, [_columns, withGutters, rowActionsWidthPx]);

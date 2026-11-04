@@ -151,7 +151,7 @@ export type RowActionsColumnDef<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (data: D, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig
         : (data: undefined, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig);
-} & Pick<GridColumn<R>, "id" | "w">;
+} & Pick<GridColumn<R>, "w">;
 
 /**
  * Adds an `id` to `GridColumn`, for use in storage/APIs.
