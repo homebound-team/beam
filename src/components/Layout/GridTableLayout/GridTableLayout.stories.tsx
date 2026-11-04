@@ -19,7 +19,14 @@ import {
 } from "src/components/Table/cardSlots";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { columnWidthKeyVersion } from "src/components/Table/hooks/useSetupColumnSizes";
-import { collapseColumn, column, groupColumns, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import {
+  collapseColumn,
+  column,
+  groupColumns,
+  numericColumn,
+  rowActionsColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleGroupHeader, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { emptyCell } from "src/components/Table/utils/utils";
@@ -162,6 +169,39 @@ export function Loading() {
       <GridTableLayoutComponent
         layoutState={layoutState}
         tableProps={{ columns, rows: [simpleHeader, ...makeNestedRows(3)], loading: true }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+/** Pinned rows (and a pinned parent's children) with client-side search and row actions, to see how pins react to filtered rows. */
+export function WithRowPinning() {
+  const columns = useMemo(() => {
+    const config = {
+      pinnable: true,
+      actions: [
+        { icon: "pencil" as const, label: "Edit", onClick: noop },
+        { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true },
+      ],
+    };
+    return [...getColumns(false), rowActionsColumn<Row>({ parent: config, data: config })];
+  }, []);
+  // Pre-pin one parent so the pinned section shows in the snapshot
+  const rows = useMemo(
+    () => [simpleHeader, ...makeNestedRows(3).map((row) => (row.id === "p1" ? { ...row, initPinned: true } : row))],
+    [],
+  );
+  const layoutState = useGridTableLayoutState({ search: "client" });
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with row pinning" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows,
+        }}
       />
     </TestProjectLayout>
   );
