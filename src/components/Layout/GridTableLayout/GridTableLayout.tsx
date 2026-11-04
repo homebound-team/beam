@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "src/components/Button";
 import type { ButtonGroupButton } from "src/components/ButtonGroup";
 import { getActiveFilterCount } from "src/components/Filters/utils";
@@ -70,6 +70,11 @@ export type GridTableLayoutProps<
    * Only applies inside a document-scroll layout; hosts the pane around the table body only.
    */
   withRightPane?: boolean;
+  /**
+   * Scroll back to the top of the table when the filter or search changes, however it was changed (e.g. a summary
+   * card outside the table calling `layoutState.setFilter`). Waits for a query table to finish loading the new rows.
+   */
+  scrollToTopOnFilterChange?: boolean;
 };
 
 /**
@@ -116,6 +121,7 @@ function GridTableLayoutComponent<
     defaultView = "list",
     emptyFallback: layoutEmptyFallback,
     withRightPane,
+    scrollToTopOnFilterChange = false,
   } = props;
 
   const tid = useTestIds(props);
@@ -173,6 +179,14 @@ function GridTableLayoutComponent<
     layoutState?.clearFilters();
     searchApiRef.current?.clear();
   }, [layoutState]);
+
+  const scrollToTopRef = useRef<(() => void) | undefined>(undefined);
+  useScrollToTopOnFilterChange({
+    enabled: scrollToTopOnFilterChange,
+    layoutState,
+    loading: isGridTableProps(tableProps) ? !!tableProps.loading : tableProps.query.loading,
+    scrollToTopRef,
+  });
 
   const emptyState = useMemo(
     () => composeEmptyState(tableProps, layoutState, layoutEmptyFallback, clearFilters),
@@ -244,6 +258,7 @@ function GridTableLayoutComponent<
       rightPane={withRightPane}
       isVirtualized={isVirtualized}
       testIds={tid}
+      scrollToTopRef={scrollToTopRef}
     >
       {tableBody}
     </GridTableLayoutHost>
@@ -251,6 +266,28 @@ function GridTableLayoutComponent<
 }
 
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
+
+/** Scrolls to the top of the table after the filter or search changes, once the new rows are on screen. */
+function useScrollToTopOnFilterChange(opts: {
+  enabled: boolean;
+  layoutState: Pick<ReturnType<typeof useGridTableLayoutState>, "filter" | "searchString"> | undefined;
+  loading: boolean;
+  scrollToTopRef: RefObject<(() => void) | undefined>;
+}) {
+  const { enabled, layoutState, loading, scrollToTopRef } = opts;
+  const { filter, searchString } = layoutState ?? {};
+  const currentFiltersRef = useRef({ filter, searchString });
+  useEffect(() => {
+    const scrolledFor = currentFiltersRef.current;
+    if (scrolledFor.filter === filter && scrolledFor.searchString === searchString) return;
+    // Keep it in sync while disabled, so turning the prop on later doesn't scroll for an old change.
+    if (!enabled) return void (currentFiltersRef.current = { filter, searchString });
+    // Wait for the refetch, so we don't move the viewport while the old rows are still showing.
+    if (loading) return;
+    currentFiltersRef.current = { filter, searchString };
+    scrollToTopRef.current?.();
+  }, [enabled, filter, searchString, loading, scrollToTopRef]);
+}
 
 /**
  * Layout tables are white with a top border. A full `GridStyle` is left unchanged; a def can still override either.
