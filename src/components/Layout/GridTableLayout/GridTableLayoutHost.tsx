@@ -12,6 +12,7 @@ import {
   beamTableActionsHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
+  documentScrollContentLeft,
   documentScrollRightPaneContentMinCss,
   stickyNavAndHeaderOffset,
 } from "src/layouts/layoutVars";
@@ -48,8 +49,9 @@ export function GridTableLayoutHost(props: GridTableLayoutHostProps) {
       if (scroller) {
         scroller.scrollTo?.({ top: 0, behavior: "smooth" });
       } else {
-        // The modal body or document scrolls the whole wrapper; its scroll margin clears any pinned chrome.
-        tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+        // The modal body or document scrolls the whole wrapper; its scroll margins clear any pinned chrome.
+        // `inline: "start"` returns to the table's left edge; the default "nearest" lands mid-table when it overflows.
+        tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start", inline: "start" });
       }
     },
     [host.kind, scrollableEl],
@@ -110,8 +112,12 @@ function DocumentScrollHost(props: HostProps & { rightPane?: boolean }) {
   return (
     <div
       ref={tableWrapperRef}
-      // Lands `scrollIntoView` below the pinned nav and page header, where the actions bar sticks.
-      css={Css.df.fdc.wfc.mw100.add("scrollMarginTop", stickyNavAndHeaderOffset()).$}
+      // Lands `scrollIntoView` below the pinned nav and page header, where the actions bar sticks, and beside the side nav.
+      css={
+        Css.df.fdc.wfc.mw100
+          .add("scrollMarginTop", stickyNavAndHeaderOffset())
+          .add("scrollMarginLeft", documentScrollContentLeft()).$
+      }
       {...(actions !== undefined ? selfTopSpaced : {})}
       {...testIds.tableWrapper}
     >

@@ -1132,7 +1132,7 @@ describe("GridTableLayout", () => {
       click(r.filter_needsRevision);
 
       // Then the table wrapper is scrolled to the top
-      expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({ behavior: "smooth", block: "start" });
+      expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({ behavior: "smooth", block: "start", inline: "start" });
       expect(scrollIntoView.mock.contexts[0]).toBe(r.tableWrapper);
     });
 
