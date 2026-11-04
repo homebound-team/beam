@@ -564,25 +564,25 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   }
 
   /**
-   * The options `nextKeys` selects in the current tree, then any selected value that tree no longer contains.
-   * `clearedKey` is omitted; it is the value whose pill the user removed.
+   * Commits the options `nextKeys` selects in the current tree, then selected values that tree no longer contains.
+   * `clearedKey`, if set, is the pill the user removed, so that value is not added back. (clearedKey is only passed via `deselect`)
    */
   function commitTree(nextKeys: ReadonlySet<string>, clearedKey?: string) {
     if (!menuTree) return;
-    const fromTree = selectedTreeOptions(menuTree, nextKeys);
-    // Anything still in the tree is committed from `nextKeys` alone, so a deselect there is not added back.
-    const covered = new Set(fromTree.map((option) => valueToKey(getOptionValue(option))));
-    for (const rowKey of menuTree.orderedKeys) covered.add(menuTree.nodes.get(rowKey)!.valueKey);
-    if (clearedKey) covered.add(clearedKey);
-    const extras = values.flatMap((value) => {
+    const selectedInTree = selectedTreeOptions(menuTree, nextKeys);
+    // A value still in the tree follows `nextKeys` only, so a deselect there is not copied from the previous selection.
+    const valueKeysInTree = new Set(menuTree.orderedKeys.map((rowKey) => menuTree.nodes.get(rowKey)!.valueKey));
+    const seen = new Set<string>();
+    const keptSelections = values.flatMap((value) => {
       const key = valueToKey(value);
-      if (covered.has(key)) return [];
+      // Still in the tree, just removed via its pill, or already kept.
+      if (valueKeysInTree.has(key) || key === clearedKey || seen.has(key)) return [];
       const option = optionForKey(key, optionsByKey, rememberedSelectedRef.current);
       if (!option) return [];
-      covered.add(key);
+      seen.add(key);
       return [option];
     });
-    const nextOptions = [...fromTree, ...extras];
+    const nextOptions = [...selectedInTree, ...keptSelections];
     onCommit(
       nextOptions.map((option) => getOptionValue(option)),
       nextOptions,
@@ -700,18 +700,19 @@ function resolveSelectedOptions<O, V extends Value>(
       return option ? [option] : [];
     });
   }
-  const fromTree = selectedTreeOptions(menuTree, selectedKeys);
-  const seen = new Set(fromTree.map((option) => valueToKey(getOptionValue(option))));
-  const extras: O[] = [];
+  const selectedInTree = selectedTreeOptions(menuTree, selectedKeys);
+  const seen = new Set(selectedInTree.map((option) => valueToKey(getOptionValue(option))));
+  // Selected values the current tree no longer contains. The stored copy still has the option.
+  const keptSelections: O[] = [];
   for (const value of values) {
     const key = valueToKey(value);
     if (seen.has(key)) continue;
     const option = optionForKey(key, optionsByKey, remembered);
     if (!option) continue;
     seen.add(key);
-    extras.push(option);
+    keptSelections.push(option);
   }
-  return [...fromTree, ...extras];
+  return [...selectedInTree, ...keptSelections];
 }
 
 /** Labels in option-list order, so a reordered selection still reads as the same value. */
