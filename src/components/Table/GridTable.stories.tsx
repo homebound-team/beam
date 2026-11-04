@@ -2122,6 +2122,28 @@ export function HierarchyTypeStrategy() {
   );
 }
 
+/** Every row at a level shares its size, and only rows with children are semibold. Each label names its expected type. */
+export function HierarchyTypeSameLevelSize() {
+  return (
+    <div css={Css.df.fdc.gap3.p3.$}>
+      <section css={Css.df.fdc.gap1.$}>
+        <h2 css={Css.smSb.$}>Nested</h2>
+        <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>
+          Top-level rows without children match their parent siblings' size, but stay regular weight.
+        </p>
+        <HierarchyTypeRowsTable rows={sameLevelNestedRows} />
+      </section>
+      <section css={Css.df.fdc.gap1.$}>
+        <h2 css={Css.smSb.$}>Flat</h2>
+        <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>
+          No top-level row has children, so the rows keep the table's default cell type.
+        </p>
+        <HierarchyTypeRowsTable rows={sameLevelFlatRows} />
+      </section>
+    </div>
+  );
+}
+
 export function MixedSelectableChildrenRows() {
   type ParentRow = { kind: "parent"; id: string; data: string };
   type ChildRow = { kind: "child"; id: string; data: string };
@@ -4309,3 +4331,49 @@ function createHierarchyTypeRows(levels: 1 | 2 | 3 | 4): GridDataRow<HierarchyTy
   });
   return [leafAt(0), branchAt(0)];
 }
+
+function HierarchyTypeRowsTable({ rows }: { rows: GridDataRow<HierarchyTypeRow>[] }) {
+  const nameColumn: GridColumn<HierarchyTypeRow> = {
+    header: "Name",
+    data: ({ name }) => name,
+    mw: "320px",
+  };
+  return (
+    <GridTable
+      columns={[collapseColumn<HierarchyTypeRow>(), selectColumn<HierarchyTypeRow>(), nameColumn]}
+      rows={[simpleHeader, ...rows]}
+      style={{ allWhite: true, bordered: true, roundedHeader: true }}
+    />
+  );
+}
+
+function hierarchyTypeRow(
+  id: string,
+  name: string,
+  children?: GridDataRow<HierarchyTypeRow>[],
+): GridDataRow<HierarchyTypeRow> {
+  return { kind: "data", id, data: { name }, ...(children ? { children } : {}) };
+}
+
+// Mirrors the Options table: top-level rows with and without children, and level 1 parents under only some top-level rows
+const sameLevelNestedRows: GridDataRow<HierarchyTypeRow>[] = [
+  hierarchyTypeRow("kitchen", "Kitchen package — 14 Semibold", [
+    hierarchyTypeRow("cabinets", "Cabinets — 12 Semibold", [
+      hierarchyTypeRow("uppers", "Upper cabinets — 12 Regular"),
+      hierarchyTypeRow("lowers", "Lower cabinets — 12 Regular"),
+    ]),
+    hierarchyTypeRow("countertops", "Countertops — 12 Regular"),
+  ]),
+  hierarchyTypeRow("paint", "Exterior paint — 14 Regular"),
+  hierarchyTypeRow("flooring", "Flooring package — 14 Semibold", [
+    hierarchyTypeRow("hardwood", "Hardwood — 12 Regular"),
+    hierarchyTypeRow("tile", "Tile — 12 Regular"),
+  ]),
+  hierarchyTypeRow("thermostat", "Smart thermostat — 14 Regular"),
+];
+
+const sameLevelFlatRows: GridDataRow<HierarchyTypeRow>[] = [
+  hierarchyTypeRow("flat-paint", "Exterior paint — 12 Regular"),
+  hierarchyTypeRow("flat-thermostat", "Smart thermostat — 12 Regular"),
+  hierarchyTypeRow("flat-fence", "Fence — 12 Regular"),
+];
