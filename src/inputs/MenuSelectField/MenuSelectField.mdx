@@ -15,7 +15,7 @@ import * as MenuSelectFieldStories from "./MenuSelectField.stories";
 
 ## Usage
 
-Use `MenuSelectField` when a filter accepts one value. It takes `value` and calls `onSelect(value, option)`. Choosing an option closes the menu, and the selected row shows a check. A menu longer than `searchOptionLimit` includes a search field. Pass `onSearch` when the list is too large to hold: the search field is always shown, the debounced text is passed to `onSearch`, and the menu lists the `options` the caller returns. Closing the menu calls `onSearch("")`. Keep the current selection in `options` so its label stays.
+Use `MenuSelectField` when a filter accepts one value. It takes `value` and calls `onSelect(value, option)`. Choosing an option closes the menu, and the selected row shows a check. A menu longer than `searchOptionLimit` includes a search field. Pass `onSearch` when the list is too large to hold: the search field is always shown, the debounced text is passed to `onSearch`, and the menu lists the `options` the caller returns. Closing the menu calls `onSearch("")`. A selection the field has already shown keeps its label when a later list omits it, and the menu lists only the returned options.
 
 Options default to `option.id` and `option.name`. Pass an array, or `{ current, load, options }` to load the list the first time the menu opens. `getOptionMenuLabel` customizes the row. The closed field and the option's accessible name still use `getOptionLabel`. Search matches that string, plus any text from `getOptionSearchText`, unless `onSearch` is set.
 

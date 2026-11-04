@@ -48,6 +48,7 @@ export function Examples() {
         },
         { label: "Placeholder", children: <Example label="Group by" placeholder="Select a group" /> },
         { label: "Unset", children: <Example label="Group by" unsetLabel="None" /> },
+        { label: "Mixed", children: <Example label="Group by" mixedValues={["cc", "level", "room"]} /> },
       ]}
     />
   );

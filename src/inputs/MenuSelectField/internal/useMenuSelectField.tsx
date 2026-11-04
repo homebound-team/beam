@@ -17,6 +17,7 @@ import {
   selectedTreeOptions,
   toggleTreeSelection,
 } from "src/inputs/MenuSelectField/internal/menuTree";
+import { mixedLabel } from "src/inputs/MenuSelectField/internal/MixedLegend";
 import { bucketTreeSelection, visibleNestedRows } from "src/inputs/MenuSelectField/internal/nestedRows";
 import { type MenuSelectMenu, optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { MenuOptionItem, MenuSelectControllerProps } from "src/inputs/MenuSelectField/types";
@@ -32,7 +33,7 @@ type MenuSelectFieldApi<O> = {
   search: MenuSearchState;
   listRef: RefObject<HTMLDivElement | null>;
   menu: MenuSelectMenu<O>;
-  /** Pills for the open menu. A tree lists its `selectionDisplay` bucket, the same options as the count badge. Empty for a single select. */
+  /** Pills for the open menu. A tree lists its `selectionDisplay` bucket. Matches the count badge unless the field is mixed. Empty for a single select. */
   selections: { options: MenuSelectedOption[]; onDeselect: (key: string) => void };
 };
 
@@ -48,6 +49,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     autoSort = true,
     onSearch,
     disabledOptions,
+    mixedValues,
     nothingSelectedText = "",
     placeholder,
     disabled,
@@ -74,6 +76,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const labelId = `${fieldId}-label`;
   const valueId = `${fieldId}-value`;
   const errorId = `${fieldId}-error`;
+  const legendId = `${fieldId}-mixed`;
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -160,17 +163,34 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
         : disabledKeys,
     [menuTree, disabledKeySet, disabledKeys],
   );
+  // Option object for each selected value. This is kept when a later `options` list no longer includes it (for example `onSearch`).
+  const rememberedSelectedRef = useRef(new Map<string, O>());
+  syncRememberedOptions(rememberedSelectedRef.current, values, optionsByKey);
   const selectedOptions = useMemo(
     () =>
-      menuTree
-        ? selectedTreeOptions(menuTree, selectedKeys)
-        : values.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
-    [menuTree, selectedKeys, values, optionsByKey],
+      resolveSelectedOptions(
+        values,
+        menuTree,
+        selectedKeys,
+        optionsByKey,
+        rememberedSelectedRef.current,
+        getOptionValue,
+      ),
+    // getOptionValue is typically an inline lambda
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [values, optionsByKey, menuTree, selectedKeys],
   );
+  // Mixed values the selection doesn't already cover. These rows get the dot.
+  const dottedKeys = useMemo(
+    () => new Set(mixedValues?.map(valueToKey).filter((key) => optionsByKey.has(key) && !selectedKeys.has(key))),
+    [mixedValues, optionsByKey, selectedKeys],
+  );
+  // Rows the menu opens onto: groups holding one start expanded, and the list starts at the first.
+  const revealKeys = useMemo(() => new Set([...selectedKeys, ...dottedKeys]), [selectedKeys, dottedKeys]);
 
-  // Groups start collapsed, unless `defaultExpanded` or they hold a selection. Searching expands every match.
+  // Groups start collapsed, unless `defaultExpanded` or they hold a revealed row. Searching expands every match.
   const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(() =>
-    menuTree ? initialExpandedKeys(menuTree, selectedKeys, defaultExpanded) : new Set(),
+    menuTree ? initialExpandedKeys(menuTree, revealKeys, defaultExpanded) : new Set(),
   );
   const [searchCollapsedKeys, setSearchCollapsedKeys] = useState<ReadonlySet<string>>(() => new Set());
   const isExpanded = (key: string) => (!serverSearch && search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
@@ -219,9 +239,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       const valueKey = key === undefined ? undefined : menuTree.nodes.get(key)?.valueKey;
       if (valueKey === undefined) return;
       const next = toggleTreeSelection(menuTree, selectedKeys, valueKey, added !== undefined, disabledKeySet);
-      const nextOptions = selectedTreeOptions(menuTree, next);
       proposalProps.onUserEdit?.();
-      onCommit(nextOptions.map(getOptionValue), nextOptions);
+      commitTree(next);
       return;
     }
     if (!multiple) {
@@ -237,17 +256,22 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       close({ restoreFocus: true });
       return;
     }
-    // `keys` still holds selections the search hides; react-stately only toggles the pressed key.
-    const next = values.filter((v) => keys.has(valueToKey(v)));
+    // `values` is the current selection, including a value whose option has left `options`.
+    // This click toggled one listed row. A value that is no longer listed is cleared by its pill, in `deselect`.
+    const next = values.filter((value) => {
+      const key = valueToKey(value);
+      // Not in `optionsByKey`, which is only the current `options`. It came from a previous list and was not the pressed row, so keep it.
+      if (!optionsByKey.has(key)) return true;
+      // Still in the current list, so `keys` decides. `keys` is that selection with only the pressed row toggled: an unchecked row drops out, and a search-hidden selection stays.
+      return keys.has(key);
+    });
+    // Add the pressed row. A key already in `values` was kept above, and a key missing from `optionsByKey` has no option to add here.
     for (const k of keys) {
       const opt = optionsByKey.get(String(k));
       if (opt !== undefined && !selectedKeys.has(String(k))) next.push(getOptionValue(opt));
     }
     proposalProps.onUserEdit?.();
-    onCommit(
-      next,
-      next.map((v) => optionsByKey.get(valueToKey(v))).filter((o): o is O => o !== undefined),
-    );
+    onCommit(next, optionsForValues(next));
   }
 
   const collectionItems = useMemo((): MenuOptionItem<O>[] => {
@@ -292,7 +316,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     if (isDisabled || isReadOnly) return;
     setSearch("");
     if (menuTree) {
-      setExpandedKeys(initialExpandedKeys(menuTree, selectedKeys, defaultExpanded));
+      setExpandedKeys(initialExpandedKeys(menuTree, revealKeys, defaultExpanded));
       setSearchCollapsedKeys(new Set());
     }
     setIsOpen(true);
@@ -471,15 +495,19 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const initialIndex = Math.max(
     0,
     treeRows
-      ? treeRows.findIndex(({ node }) => selectedKeys.has(node.valueKey))
-      : filteredOptions.findIndex((o) => selectedKeys.has(valueToKey(getOptionValue(o)))),
+      ? treeRows.findIndex(({ node }) => revealKeys.has(node.valueKey))
+      : filteredOptions.findIndex((o) => revealKeys.has(valueToKey(getOptionValue(o)))),
   );
 
   const selectedText = !multiple && selectedOptions[0] !== undefined ? getOptionLabel(selectedOptions[0]) : "";
   const hasSelection = menuTree ? selectedKeys.size > 0 : values.length > 0;
+  // A single select's pick wins over "Mixed"; the other mixed values keep their dots.
+  const isMixed = dottedKeys.size > 0 && (multiple || !hasSelection);
   // Multi with a selection shows only the count badge; an empty field shows nothing-selected text, then the placeholder.
-  const displayText = selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
-  const isPlaceholder = !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
+  const displayText = isMixed
+    ? mixedLabel
+    : selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
+  const isPlaceholder = !isMixed && !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
   const selectedLabels =
     menuTree && tree && getChildren
       ? bucketTreeSelection(selectedOptions, getChildren)[tree.display].map((option) => ({
@@ -489,6 +517,13 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       : multiple
         ? selectedOptions.map((o) => ({ key: valueToKey(getOptionValue(o)), label: getOptionLabel(o) }))
         : [];
+  // While mixed, the badge also counts the dotted values, in menu order. The pills stay selected-only.
+  const badgeKeys = isMixed ? new Set([...selectedLabels.map(({ key }) => key), ...dottedKeys]) : undefined;
+  const badgeLabels = badgeKeys
+    ? [...optionsByKey]
+        .filter(([key]) => badgeKeys.has(key))
+        .map(([key, option]) => ({ key, label: getOptionLabel(option) }))
+    : selectedLabels;
   const partialKeys = useMemo(
     () => (menuTree ? partiallySelectedKeys(menuTree, selectedKeys) : undefined),
     [menuTree, selectedKeys],
@@ -512,15 +547,45 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     proposalProps.onUserEdit?.();
     if (menuTree) {
       const toggledKeys = toggleTreeSelection(menuTree, selectedKeys, key, false, disabledKeySet);
-      const toggledOptions = selectedTreeOptions(menuTree, toggledKeys);
-      onCommit(toggledOptions.map(getOptionValue), toggledOptions);
+      commitTree(toggledKeys, key);
       return;
     }
-    // Flat multi select. A tree removes the value through `toggleTreeSelection` above.
+    // Remove the clicked value. A tree pill uses `toggleTreeSelection` above, which also clears its parent.
     const next = values.filter((value) => valueToKey(value) !== key);
+    onCommit(next, optionsForValues(next));
+  }
+
+  /** The option for each value in `next`: the one still in the list, or the stored copy if the caller removed it. */
+  function optionsForValues(next: readonly V[]): O[] {
+    return next.flatMap((value) => {
+      const option = optionForKey(valueToKey(value), optionsByKey, rememberedSelectedRef.current);
+      return option ? [option] : [];
+    });
+  }
+
+  /**
+   * Commits the options `nextKeys` selects in the current tree, then selected values that tree no longer contains.
+   * `clearedKey`, if set, is the pill the user removed, so that value is not added back. (clearedKey is only passed via `deselect`)
+   */
+  function commitTree(nextKeys: ReadonlySet<string>, clearedKey?: string) {
+    if (!menuTree) return;
+    const selectedInTree = selectedTreeOptions(menuTree, nextKeys);
+    // A value still in the tree follows `nextKeys` only, so a deselect there is not copied from the previous selection.
+    const valueKeysInTree = new Set(menuTree.orderedKeys.map((rowKey) => menuTree.nodes.get(rowKey)!.valueKey));
+    const seen = new Set<string>();
+    const keptSelections = values.flatMap((value) => {
+      const key = valueToKey(value);
+      // Still in the tree, just removed via its pill, or already kept.
+      if (valueKeysInTree.has(key) || key === clearedKey || seen.has(key)) return [];
+      const option = optionForKey(key, optionsByKey, rememberedSelectedRef.current);
+      if (!option) return [];
+      seen.add(key);
+      return [option];
+    });
+    const nextOptions = [...selectedInTree, ...keptSelections];
     onCommit(
-      next,
-      next.map((value) => optionsByKey.get(valueToKey(value))).filter((option): option is O => option !== undefined),
+      nextOptions.map((option) => getOptionValue(option)),
+      nextOptions,
     );
   }
 
@@ -544,7 +609,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     onBlur: onTriggerBlur,
     displayText,
     isPlaceholder,
-    selectedLabels,
+    isMixed,
+    badgeLabels,
     proposalProps,
   };
   const searchProps: MenuSearchState = {
@@ -565,6 +631,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     initialIndex,
     rowVariant: treeRowStates ? "tree" : multiple ? "checkbox" : "check",
     tree: treeRowStates ? { rows: treeRowStates, setExpanded: setTreeExpanded } : undefined,
+    mixed: dottedKeys.size > 0 ? { keys: dottedKeys, legendId } : undefined,
     onKeyDown: onMenuKeyDown,
     activeDescendant,
   };
@@ -586,6 +653,66 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       onDeselect: deselect,
     },
   };
+}
+
+/** Stores a selected option while the list still has it, and forgets it once it is no longer selected. */
+function syncRememberedOptions<O, V extends Value>(
+  remembered: Map<string, O>,
+  values: readonly V[],
+  optionsByKey: ReadonlyMap<string, O>,
+): void {
+  const selected = new Set<string>();
+  for (const value of values) {
+    const key = valueToKey(value);
+    selected.add(key);
+    const option = optionsByKey.get(key);
+    if (option) remembered.set(key, option);
+  }
+  for (const key of remembered.keys()) {
+    if (!selected.has(key)) remembered.delete(key);
+  }
+}
+
+/** The listed option, or the copy kept after the caller removed it from `options`. */
+function optionForKey<O>(
+  key: string,
+  optionsByKey: ReadonlyMap<string, O>,
+  remembered: ReadonlyMap<string, O>,
+): O | undefined {
+  return optionsByKey.get(key) ?? remembered.get(key);
+}
+
+/**
+ * The option for each selected value, from the current list or the stored copy if that option was removed.
+ * A tree returns its selected nodes first, then any selected value it no longer contains.
+ */
+function resolveSelectedOptions<O, V extends Value>(
+  values: readonly V[],
+  menuTree: MenuTree<O> | undefined,
+  selectedKeys: ReadonlySet<string>,
+  optionsByKey: ReadonlyMap<string, O>,
+  remembered: ReadonlyMap<string, O>,
+  getOptionValue: (opt: O) => V,
+): O[] {
+  if (!menuTree) {
+    return values.flatMap((value) => {
+      const option = optionForKey(valueToKey(value), optionsByKey, remembered);
+      return option ? [option] : [];
+    });
+  }
+  const selectedInTree = selectedTreeOptions(menuTree, selectedKeys);
+  const seen = new Set(selectedInTree.map((option) => valueToKey(getOptionValue(option))));
+  // Selected values the current tree no longer contains. The stored copy still has the option.
+  const keptSelections: O[] = [];
+  for (const value of values) {
+    const key = valueToKey(value);
+    if (seen.has(key)) continue;
+    const option = optionForKey(key, optionsByKey, remembered);
+    if (!option) continue;
+    seen.add(key);
+    keptSelections.push(option);
+  }
+  return [...selectedInTree, ...keptSelections];
 }
 
 /** Labels in option-list order, so a reordered selection still reads as the same value. */

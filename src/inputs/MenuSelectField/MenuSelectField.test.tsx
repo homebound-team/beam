@@ -94,6 +94,26 @@ describe("MenuSelectField", () => {
     expect(onSearch).toHaveBeenLastCalledWith("");
   });
 
+  it("keeps the selected label when the next options omit it", async () => {
+    // Given Red selected from a list that includes it
+    function Page() {
+      const [options, setOptions] = useState(colors());
+      const [value, setValue] = useState<string | undefined>("r");
+      return (
+        <>
+          <button data-testid="showBlue" onClick={() => setOptions([{ id: "b", name: "Blue" }])} />
+          <MenuSelectField label="Color" options={options} value={value} onSelect={setValue} />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    expect(r.color).toHaveTextContent("Red");
+    // When the list becomes one that does not include Red
+    click(r.showBlue);
+    // Then the closed field still shows Red
+    expect(r.color).toHaveTextContent("Red");
+  });
+
   it("loads options the first time the menu opens", async () => {
     // Given a selected option whose full list has not been loaded
     const load = vi.fn();
@@ -413,6 +433,33 @@ describe("MenuSelectField", () => {
     expect(r.query.color_selections).toBeNull();
   });
 
+  it("reads Mixed and dots each mixed value when nothing is selected", async () => {
+    // Given no value, and records holding Blue or Green
+    const r = await render(<TestHarness nothingSelectedText="All" mixedValues={["b", "g"]} />);
+    // Then the field reads Mixed instead of All, counting both values
+    expect(r.color).toHaveTextContent(/^Mixed2$/);
+    expect(r.color_count).toHaveTextContent("2");
+    // And when opened, the legend explains the dotted rows
+    click(r.color);
+    expect(r.color_mixedLegend).toBeInTheDocument();
+    expect(optionOf(r, "Blue")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
+  });
+
+  it("shows the picked value and keeps dots on the other mixed values", async () => {
+    // Given Blue picked, and records holding Blue or Green
+    const r = await render(<TestHarness initial="b" mixedValues={["b", "g"]} />);
+    // Then the field shows Blue without a count
+    expect(r.color).toHaveTextContent("Blue");
+    expect(r.query.color_count).toBeNull();
+    // And when opened, Blue is checked rather than dotted, while Green keeps its dot
+    click(r.color);
+    expect(optionOf(r, "Blue")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "Blue")).not.toHaveAccessibleDescription();
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+  });
+
   it("closes when re-selecting the current value", async () => {
     // Given a single select with a value
     const onSelect = vi.fn();
@@ -661,7 +708,12 @@ type HarnessProps = {
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
   autoSort?: boolean;
+  mixedValues?: string[];
 };
+
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);
+}
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
   const originalInnerHeight = Object.getOwnPropertyDescriptor(window, "innerHeight");
