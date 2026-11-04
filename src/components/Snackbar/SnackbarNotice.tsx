@@ -43,10 +43,14 @@ export function SnackbarNotice(props: SnackbarNoticeProps) {
 
   return (
     <div
-      css={{
-        ...Css.color(Tokens.OnSurface).bgColor(Tokens.SurfaceRaised).br4.md.df.pyPx(12).maxwPx(noticeMaxWidthPx).aifs.$,
-        ...(expanded ? Css.maxw(expandedNoticeMaxWidth).$ : undefined),
-      }}
+      css={
+        // Full-bleed on mobile; the Snackbar wrapper stretches notices to the viewport width.
+        // Kept in one chain since Truss resolves each property once, so a later spread would drop the base maxWidth.
+        Css.color(Tokens.OnSurface)
+          .bgColor(Tokens.SurfaceRaised)
+          .br4.md.df.pyPx(12)
+          .aifs.maxw(expanded ? expandedNoticeMaxWidth : `${noticeMaxWidthPx}px`).ifSm.maxw100.br0.$
+      }
       data-theme={contrastDataTheme}
       {...tid}
       role="alert"

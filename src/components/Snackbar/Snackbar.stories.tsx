@@ -7,7 +7,7 @@ import { type Offset, Snackbar } from "src/components/Snackbar/Snackbar";
 import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { useSnackbar } from "src/components/Snackbar/useSnackbar";
 import { Css } from "src/Css";
-import { newStory, withBeamDecorator, withDimensions } from "src/utils/sb";
+import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
 import { action } from "storybook/actions";
 
 type SnackBarStoryProps = {
@@ -41,6 +41,8 @@ export default {
   },
   parameters: {
     controls: { exclude: "notices" },
+    // Notices go full-width and flush with the bottom edge on mobile
+    chromatic: { modes: viewportModes("desktop", "mobile1") },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36152%3A102047",
