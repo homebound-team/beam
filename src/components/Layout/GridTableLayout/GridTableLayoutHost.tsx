@@ -16,6 +16,7 @@ import {
   documentScrollRightPaneContentMinCss,
   stickyNavAndHeaderOffset,
 } from "src/layouts/layoutVars";
+import { holdAutoHideWhile } from "src/layouts/useAutoHideOnScroll";
 import { noop } from "src/utils/helpers";
 import type { TestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
@@ -51,7 +52,11 @@ export function GridTableLayoutHost(props: GridTableLayoutHostProps) {
       } else {
         // The modal body or document scrolls the whole wrapper; its scroll margins clear any pinned chrome.
         // `inline: "start"` returns to the table's left edge; the default "nearest" lands mid-table when it overflows.
-        tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start", inline: "start" });
+        const scrollToWrapper = () =>
+          tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start", inline: "start" });
+        // A window scroll holds the auto-hide navbar / page header still, so they don't reveal over the table mid-scroll.
+        if (host.kind === "modal") scrollToWrapper();
+        else holdAutoHideWhile(scrollToWrapper);
       }
     },
     [host.kind, scrollableEl],

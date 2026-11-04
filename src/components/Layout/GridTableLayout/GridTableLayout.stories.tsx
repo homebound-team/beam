@@ -270,12 +270,27 @@ export function QueryTableLayout() {
 
 /** Scroll down, then change a filter from the toolbar or the buttons above the table; the table scrolls back to its top. */
 export function ScrollToTopOnFilterChange() {
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Scroll to top on filter change" />
+      <ScrollToTopOnFilterChangeExample storageKey="grid-table-layout-scroll-to-top" />
+    </TestProjectLayout>
+  );
+}
+
+/** Same as above, but the page header auto-hides with the navbar, so both reveal while scrolling back up. */
+export function ScrollToTopOnFilterChangeWithPageHeaderLayout() {
+  return (
+    <TestProjectLayout pageTitle="Scroll to top on filter change">
+      <ScrollToTopOnFilterChangeExample storageKey="grid-table-layout-scroll-to-top-page-header-layout" />
+    </TestProjectLayout>
+  );
+}
+
+function ScrollToTopOnFilterChangeExample({ storageKey }: { storageKey: string }) {
   const filterDefs = useMemo(() => getFilterDefs(), []);
   const columns = useMemo(() => getColumns(false), []);
-  const layoutState = useGridTableLayoutState({
-    persistedFilter: { filterDefs, storageKey: "grid-table-layout-scroll-to-top" },
-    search: "client",
-  });
+  const layoutState = useGridTableLayoutState({ persistedFilter: { filterDefs, storageKey }, search: "client" });
   const { filter, setFilter } = layoutState;
   const rows = useMemo(
     () => [
@@ -286,8 +301,7 @@ export function ScrollToTopOnFilterChange() {
   );
 
   return (
-    <TestProjectLayout>
-      <PageHeader title="Scroll to top on filter change" />
+    <>
       <div css={Css.df.gap1.py2.$}>
         <Button label="Show Active" variant="secondary" onClick={() => setFilter({ ...filter, status: ["active"] })} />
         <Button
@@ -297,7 +311,7 @@ export function ScrollToTopOnFilterChange() {
         />
       </div>
       <GridTableLayoutComponent layoutState={layoutState} tableProps={{ columns, rows }} scrollToTopOnFilterChange />
-    </TestProjectLayout>
+    </>
   );
 }
 
