@@ -1,13 +1,11 @@
-import { useContext } from "react";
 import { ButtonMenu, type MenuItem } from "src/components/ButtonMenu";
 import { IconButton } from "src/components/IconButton";
 import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridRowAction, GridRowActionsConfig } from "src/components/Table/types";
 import { rowActionGapPx, splitRowActions, tableIconInc } from "src/components/Table/utils/rowActions";
-import { TableStateContext } from "src/components/Table/utils/TableState";
 import { Css } from "src/Css";
-import { useComputed } from "src/hooks/useComputed";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -19,8 +17,9 @@ import { useTestIds } from "src/utils/useTestIds";
  */
 export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config: GridRowActionsConfig }) {
   const { actions = [], pinnable = false } = config;
-  const { tableState } = useContext(TableStateContext);
-  const visibleCount = useComputed(() => tableState.rowActionsVisibleCount, [tableState]);
+  const { sm } = useBreakpoint();
+  // Up to 3 icons (the pin included, the menu not); phone-sized screens show only the pin and the menu
+  const visibleCount = sm ? 0 : 3;
   const tid = useTestIds({});
 
   const { actionIcons } = splitRowActions(actions.length, pinnable, visibleCount);

@@ -13,14 +13,6 @@ const rowActionButtonPx = 28;
 export const rowActionGapPx = 4;
 const rowActionsCellPaddingPx = 12;
 
-/**
- * How many icons (the pin included, the "more" menu not) a row shows before actions move into the menu;
- * Beam's rule, not a table option. Phone-sized screens show no action icons, only the pin and the menu.
- */
-export function rowActionsVisibleCount(breakpoints: { sm: boolean }): number {
-  return breakpoints.sm ? 0 : 3;
-}
-
 /** The fixed number of buttons the actions column is sized for: 3 icons and the menu, or the pin and the menu on phone-sized screens. */
 export function rowActionsSlotsFor(breakpoints: { sm: boolean }): number {
   return breakpoints.sm ? 2 : 4;

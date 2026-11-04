@@ -57,8 +57,6 @@ export class TableState<R extends Kinded> {
   // The server-side `onSort` callback, if any.
   private onSort: ((orderBy: any | undefined, direction: Direction | undefined) => void) | undefined;
   onRowSelect: OnRowSelect<any> | undefined = undefined;
-  /** How many `rowActionsColumn` icons show before the rest move into the "more" menu. */
-  rowActionsVisibleCount = 3;
 
   /**
    * Creates the `RowState` for a given `GridTable`.
@@ -290,10 +288,6 @@ export class TableState<R extends Kinded> {
   /** Returns the rows for the pinned section, i.e. pinned rows plus the children that hoist with them. */
   get pinnedSectionRows(): RowState<R>[] {
     return this.rowStates.pinnedSectionRows;
-  }
-
-  setRowActionsVisibleCount(visibleCount: number): void {
-    this.rowActionsVisibleCount = visibleCount;
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders

@@ -45,11 +45,7 @@ import {
 } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
-import {
-  rowActionsColumnPx,
-  rowActionsSlotsFor,
-  rowActionsVisibleCount as rowActionsVisibleCountFor,
-} from "src/components/Table/utils/rowActions";
+import { rowActionsColumnPx, rowActionsSlotsFor } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
@@ -322,7 +318,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // A `rowActionsColumn` is a fixed width: 3 icons and the "more" menu, or just the pin and the menu on phone-sized screens
   const breakpoints = useBreakpoint();
-  const rowActionsVisibleCount = rowActionsVisibleCountFor(breakpoints);
   const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
 
   const columnsWithIds = useMemo(() => {
@@ -387,10 +382,6 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     });
     tableStateSyncedFromPropsRef.current = true;
   }, [tableState, rows, columnsWithIds, visibleColumnsStorageKey, activeRowId, activeCellId, filter, csvPrefixRows]);
-
-  useEffect(() => {
-    tableState.setRowActionsVisibleCount(rowActionsVisibleCount);
-  }, [tableState, rowActionsVisibleCount]);
 
   const columns: GridColumnWithId<R>[] = useComputed(() => {
     return tableState.visibleColumns as GridColumnWithId<R>[];
