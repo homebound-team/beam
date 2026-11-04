@@ -12,9 +12,9 @@ import {
   beamTableActionsHeightVar,
   documentScrollChromeLeft,
   documentScrollChromeWidth,
-  documentScrollContentLeft,
   documentScrollRightPaneContentMinCss,
   stickyNavAndHeaderOffset,
+  stickyNavAndHeaderOffsetPx,
 } from "src/layouts/layoutVars";
 import { noop } from "src/utils/helpers";
 import type { TestIds } from "src/utils/useTestIds";
@@ -38,23 +38,31 @@ export function GridTableLayoutHost(props: GridTableLayoutHostProps) {
   const tableActionsRef = useRef<HTMLDivElement>(null);
   const hasActions = actions !== undefined;
   const { scrollableEl } = useScrollableParent();
+  const modalScrollEl = host.kind === "modal" ? host.scrollEl : undefined;
 
   useSetTableActionsHeight(tableWrapperRef, tableActionsRef, host.kind !== "scrollable-parent" && hasActions);
 
   useImperativeHandle(
     scrollToTopRef,
     () => () => {
+      // Each scroll is vertical-only, so a horizontally-scrolled table keeps its place.
+      const wrapper = tableWrapperRef.current;
+      if (!wrapper) return;
       // ScrollableContent portals the table into ScrollableParent's scroller, below the pinned actions.
       const scroller = host.kind === "scrollable-parent" ? scrollableEl?.parentElement : undefined;
       if (scroller) {
         scroller.scrollTo?.({ top: 0, behavior: "smooth" });
+      } else if (host.kind === "modal") {
+        // The modal body scrolls the whole wrapper, and its actions pin to the body's top edge.
+        const top = wrapper.getBoundingClientRect().top - (modalScrollEl?.getBoundingClientRect().top ?? 0);
+        modalScrollEl?.scrollBy?.({ top, behavior: "smooth" });
       } else {
-        // The modal body or document scrolls the whole wrapper; its scroll margins clear any pinned chrome.
-        // `inline: "start"` returns to the table's left edge; the default "nearest" lands mid-table when it overflows.
-        tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start", inline: "start" });
+        // The document scrolls the whole wrapper; land it below the pinned nav and page header, where the actions stick.
+        const top = wrapper.getBoundingClientRect().top - stickyNavAndHeaderOffsetPx(wrapper);
+        window.scrollBy({ top, behavior: "smooth" });
       }
     },
-    [host.kind, scrollableEl],
+    [host.kind, scrollableEl, modalScrollEl],
   );
 
   const shared = { actions, tableWrapperRef, tableActionsRef, testIds, children };
@@ -112,12 +120,7 @@ function DocumentScrollHost(props: HostProps & { rightPane?: boolean }) {
   return (
     <div
       ref={tableWrapperRef}
-      // Lands `scrollIntoView` below the pinned nav and page header, where the actions bar sticks, and beside the side nav.
-      css={
-        Css.df.fdc.wfc.mw100
-          .add("scrollMarginTop", stickyNavAndHeaderOffset())
-          .add("scrollMarginLeft", documentScrollContentLeft()).$
-      }
+      css={Css.df.fdc.wfc.mw100.$}
       {...(actions !== undefined ? selfTopSpaced : {})}
       {...testIds.tableWrapper}
     >
