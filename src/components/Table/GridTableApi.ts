@@ -3,7 +3,13 @@ import { computedFn } from "mobx-utils";
 import { type MutableRefObject, useMemo } from "react";
 import type { ListRange, VirtuosoHandle } from "react-virtuoso";
 import type { GridDataRow } from "src/components/Table/components/Row";
-import type { DiscriminateUnion, GridTableScrollOptions, Kinded, MaybeFn } from "src/components/Table/types";
+import type {
+  DiscriminateUnion,
+  GridTableScrollOptions,
+  Kinded,
+  MaybeFn,
+  PinnedState,
+} from "src/components/Table/types";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 import { TableState } from "src/components/Table/utils/TableState";
@@ -61,8 +67,11 @@ export type GridTableApi<R extends Kinded> = {
   /** Toggle collapse state of a row by id. */
   toggleCollapsedRow(id: string): void;
 
-  /** Whether a row is currently pinned to the top. */
-  isPinnedRow(id: string): boolean;
+  /**
+   * How a row is pinned to the top: "self" when it's pinned itself, "parent" when it shows with a pinned parent
+   * (and can't be unpinned on its own), or `undefined` when it isn't pinned. Check `=== "self"` before `unpinRow`.
+   */
+  isPinnedRow(id: string): PinnedState | undefined;
   /** Pins a row to the top so it stays visible (sticky) while the body scrolls. */
   pinRow(id: string): void;
   /** Removes a row's runtime pin. */
@@ -217,7 +226,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     return this.tableState.isCollapsed(id);
   }
 
-  public isPinnedRow(id: string): boolean {
+  public isPinnedRow(id: string): PinnedState | undefined {
     return this.tableState.isPinnedRow(id);
   }
 

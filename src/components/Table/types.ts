@@ -121,6 +121,9 @@ export type GridColumn<R extends Kinded> = {
   tooltip?: ReactNode | VoidFunction;
 };
 
+/** How a row is pinned: "self" when it's pinned itself, "parent" when it shows with a pinned parent. */
+export type PinnedState = "self" | "parent";
+
 /** An icon action in a `rowActionsColumn`. */
 export type GridRowAction = {
   icon: IconProps["icon"];
@@ -137,7 +140,7 @@ export type GridRowAction = {
 export type GridRowActionsConfig = {
   /** Shows a pin toggle, always as an icon just before the "more" menu. */
   pinnable?: boolean;
-  /** Up to 3 icons show (the pin included), then the "more" menu; only the pin and menu on phone-sized screens. */
+  /** Up to 3 icons show (the pin included), then the "overflow" menu; only the pin and menu on phone-sized screens. */
   actions?: GridRowAction[];
 };
 

@@ -1233,14 +1233,14 @@ describe("GridTable", () => {
 
       // Nothing pinned initially
       expect(api.getPinnedRowIds()).toEqual([]);
-      expect(api.isPinnedRow("2")).toBe(false);
+      expect(api.isPinnedRow("2")).toBeUndefined();
 
       // When we pin row 2 (bar)
       act(() => api.pinRow("2"));
 
       // Then it's reported as pinned
       expect(api.getPinnedRowIds()).toEqual(["2"]);
-      expect(api.isPinnedRow("2")).toBe(true);
+      expect(api.isPinnedRow("2")).toBe("self");
       // And hoisted to the top (row 1, under the header), with the body now just foo/zaz — i.e.
       // "bar" is not duplicated back into the body (positional layout, like the filter tests above).
       expect(cell(r, 1, 0)).toHaveTextContent("bar");
@@ -1402,8 +1402,12 @@ describe("GridTable", () => {
         expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
         expect(cell(r, 4, 0)).toHaveTextContent("parent 2");
         expect(row(r, 5)).toBeUndefined();
-        // And only the parent is reported as pinned
+        // And only the parent is reported as pinned, with its children pinned through it
         expect(api.getPinnedRowIds()).toEqual(["p1"]);
+        expect(api.isPinnedRow("p1")).toBe("self");
+        expect(api.isPinnedRow("p1c1")).toBe("parent");
+        expect(api.isPinnedRow("p1c1g1")).toBe("parent");
+        expect(api.isPinnedRow("p2")).toBeUndefined();
         // And the children's pins can't be toggled on their own
         expect(r.pin_p1c1).toBeDisabled();
         expect(r.pin_p1c1g1).toBeDisabled();

@@ -3,7 +3,7 @@ import React from "react";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridSortConfig, OnRowSelect } from "src/components/Table/GridTable";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
-import type { Direction, GridColumnWithId, Kinded } from "src/components/Table/types";
+import type { Direction, GridColumnWithId, Kinded, PinnedState } from "src/components/Table/types";
 import { firstContentControlPx, rowControlColumns, toLayoutColumns } from "src/components/Table/utils/columns";
 import { ColumnStates } from "src/components/Table/utils/ColumnStates";
 import type { DraggedOver, RowState } from "src/components/Table/utils/RowState";
@@ -297,13 +297,8 @@ export class TableState<R extends Kinded> {
   }
 
   // Should be called in an Observer/useComputed to trigger re-renders
-  isPinnedRow(id: string): boolean {
-    return this.rowStates.get(id).pinned;
-  }
-
-  // Should be called in an Observer/useComputed to trigger re-renders
-  isPinnedViaParent(id: string): boolean {
-    return this.rowStates.get(id).hasPinnedAncestor;
+  isPinnedRow(id: string): PinnedState | undefined {
+    return this.rowStates.get(id).pinnedState;
   }
 
   pinRow(id: string): void {

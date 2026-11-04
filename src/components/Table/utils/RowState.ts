@@ -2,7 +2,7 @@ import { makeAutoObservable, observableRef, reaction } from "mobx";
 import { resolveCompanion, type GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { maybeApply, type GridRowApi } from "src/components/Table/GridTableApi";
-import type { Kinded, MaybeFn } from "src/components/Table/types";
+import type { Kinded, MaybeFn, PinnedState } from "src/components/Table/types";
 import type { RowStates } from "src/components/Table/utils/RowStates";
 import type { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -260,9 +260,19 @@ export class RowState<R extends Kinded> {
     return !!this.parent && ((this.parent.pinned && !this.parent.isReservedKind) || this.parent.hasPinnedAncestor);
   }
 
+  /**
+   * How the row is pinned, if at all: "parent" when it hoists with a pinned parent (even if it's also pinned itself,
+   * since it can't be unpinned on its own), otherwise "self" when it's pinned. Reserved rows are never pinned.
+   */
+  get pinnedState(): PinnedState | undefined {
+    if (this.hasPinnedAncestor) return "parent";
+    if (this.pinned && !this.isReservedKind) return "self";
+    return undefined;
+  }
+
   /** Whether the row shows as pinned: pinned itself, or hoisted with a pinned parent. */
   get showsPinned(): boolean {
-    return (this.pinned && !this.isReservedKind) || this.hasPinnedAncestor;
+    return !!this.pinnedState;
   }
 
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */
