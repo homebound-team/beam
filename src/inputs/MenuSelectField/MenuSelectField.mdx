@@ -21,7 +21,7 @@ Options default to `option.id` and `option.name`. Pass an array, or `{ current, 
 
 `unsetLabel` adds a row that selects `undefined` and stays first when options are sorted. `getOptionMenuLabel(option, isUnsetOpt)` can replace that row; the closed field still shows `unsetLabel`. `nothingSelectedText` only labels an empty field and does not add a row.
 
-Pass `NestedOption<O>[]` when a row has `children`. A flat `O[]` is unchanged. Each id appears once. The menu lists every node, indented 16px per level, with no chevrons. The top level is semibold; deeper rows are regular. The selected row shows a check. The closed field shows the path to that option, joined with ` > ` — for example, `Bath 207 > Walls > Drench`. A leaf passed as `current` shows its own label until `options` includes its parents, and it is not listed again once they load. Sorting stays off unless `autoSort` is set, so the tree keeps the order it was given.
+Pass `NestedOption<O>[]` when a row has `children`. Each id appears once. The menu lists every node, indented 16px per level, with no chevrons. The top level is semibold; deeper rows are regular. The selected row shows a check. The closed field shows the path to that option, joined with ` > ` — for example, `Bath 207 > Walls > Drench`. A leaf passed as `current` shows its own label until `options` includes its parents, and it is not listed again once they load. Sorting stays off unless `autoSort` is set, so the tree keeps the order it was given.
 
 Plug into `@homebound/form-state` with `BoundMenuSelectField`.
 

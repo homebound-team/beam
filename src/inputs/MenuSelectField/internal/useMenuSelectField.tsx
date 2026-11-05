@@ -104,7 +104,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     unsetLabel && option === unsetOption ? unsetLabel : propGetOptionLabel(option);
   const getOptionValue = (option: O) =>
     unsetLabel && option === unsetOption ? (undefined as V) : propGetOptionValue(option);
-  // `getChildren` is set only for a tree. A flat menu leaves it off, so a nested `current` stays listed and the trigger can show its label.
+  // `getChildren` is set only for a tree. A flat menu leaves it off.
   const options = useMemo(
     () => initializeOptions(optionsProp, getOptionValue, getOptionLabel, unsetLabel, autoSort, getChildren),
     // getOptionValue and getOptionLabel are typically inline lambdas

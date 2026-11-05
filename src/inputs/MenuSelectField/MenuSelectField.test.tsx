@@ -699,7 +699,7 @@ describe("MenuSelectField", () => {
   it("shows a hierarchy as a path, with a check and no chevrons", async () => {
     // Given a single select whose options nest
     const onSelect = vi.fn();
-    const r = await render(<HierarchyField onSelect={onSelect} value="drench" />);
+    const r = await render(<TestHierarchyField onSelect={onSelect} value="drench" />);
 
     // Then the trigger shows the path to the selection
     expect(r.location).toHaveTextContent("Bath 207 > Walls > Drench");
@@ -708,7 +708,25 @@ describe("MenuSelectField", () => {
     click(r.location);
 
     // Then every node is listed, and the leaf has a check
-    expect(getOptions(r.location)).toEqual(locationLabels());
+    expect(getOptions(r.location)).toEqual([
+      "Building",
+      "Bath 207",
+      "Walls",
+      "Drench",
+      "Ceiling",
+      "Color Drench",
+      "Door",
+      "Floor",
+      "Shower Floor",
+      "Kitchen 105",
+      "Perimeter",
+      "Base",
+      "Door",
+      "Drawer",
+      "Floating Shelves",
+      "Refrigerator",
+      "Slab Backsplash",
+    ]);
     const walls = optionByLabel(r, "Walls");
     const drench = optionByLabel(r, "Drench");
     expect(drench.querySelector("[data-icon='check']")).not.toBeNull();
@@ -721,14 +739,18 @@ describe("MenuSelectField", () => {
     select(r.location, "Walls");
 
     // Then that value commits, the menu closes, and the path stops at the parent
-    expect(onSelect).toHaveBeenCalledWith("walls", expect.objectContaining({ id: "walls", name: "Walls" }));
+    expect(onSelect).toHaveBeenCalledWith("walls", {
+      id: "walls",
+      name: "Walls",
+      children: [{ id: "drench", name: "Drench" }],
+    });
     expect(r.location).toHaveAttribute("aria-expanded", "false");
     expect(r.location).toHaveTextContent("Bath 207 > Walls");
   });
 
   it("keeps ancestors visible when a hierarchy search matches a leaf", async () => {
     // Given an open hierarchy long enough to search
-    const r = await render(<HierarchyField value={undefined} />);
+    const r = await render(<TestHierarchyField value={undefined} />);
     click(r.location);
 
     // When searching for a leaf
@@ -741,7 +763,7 @@ describe("MenuSelectField", () => {
   it("keeps a loaded leaf in its path instead of listing it again", async () => {
     // Given the selected leaf as `current`, and the loaded tree that already contains it
     const r = await render(
-      <HierarchyField
+      <TestHierarchyField
         value="drench"
         options={{
           current: { id: "drench", name: "Drench" },
@@ -758,7 +780,25 @@ describe("MenuSelectField", () => {
     click(r.location);
 
     // Then the leaf is listed once, under its parents
-    expect(getOptions(r.location)).toEqual(locationLabels());
+    expect(getOptions(r.location)).toEqual([
+      "Building",
+      "Bath 207",
+      "Walls",
+      "Drench",
+      "Ceiling",
+      "Color Drench",
+      "Door",
+      "Floor",
+      "Shower Floor",
+      "Kitchen 105",
+      "Perimeter",
+      "Base",
+      "Door",
+      "Drawer",
+      "Floating Shelves",
+      "Refrigerator",
+      "Slab Backsplash",
+    ]);
   });
 });
 
@@ -872,7 +912,7 @@ function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: s
   );
 }
 
-function HierarchyField(props: {
+function TestHierarchyField(props: {
   value: string | undefined;
   onSelect?: (value: string | undefined, option: LocationOption | undefined) => void;
   options?: OptionsOrLoad<LocationOption>;
@@ -889,10 +929,6 @@ function HierarchyField(props: {
       }}
     />
   );
-}
-
-function locationLabels(options: readonly LocationOption[] = locationOptions()): string[] {
-  return options.flatMap((option) => [option.name, ...locationLabels(option.children ?? [])]);
 }
 
 function optionByLabel(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement {
