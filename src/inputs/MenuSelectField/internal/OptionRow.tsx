@@ -6,6 +6,7 @@ import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { StyledCheckbox } from "src/inputs/CheckboxBase";
+import { MixedDot } from "src/inputs/MenuSelectField/internal/MixedLegend";
 import type { MenuOptionItem } from "src/inputs/MenuSelectField/types";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -15,6 +16,8 @@ export type OptionRowProps<O> = {
   /** DOM id, referenced by the search input's `aria-activedescendant`. */
   id: string;
   disabledReason?: string;
+  /** Set when the value is dotted. The legend's DOM id, used as the row's `aria-describedby`. */
+  mixedLegendId?: string;
 };
 
 /** Per-row tree state the list passes to `TreeOptionRow`. */
@@ -24,11 +27,6 @@ export type TreeRowState = {
   isExpanded: boolean;
   /** Some, but not all, descendants are selected. */
   isIndeterminate: boolean;
-};
-
-type TreeOptionRowProps<O> = OptionRowProps<O> & {
-  row: TreeRowState;
-  onExpandedChange: (expanded: boolean) => void;
 };
 
 /** Single-select option: label with a trailing check when selected. */
@@ -41,8 +39,10 @@ export function MultiOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="checkbox" />;
 }
 
-function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "checkbox" }) {
-  const { item, state, id, disabledReason, variant } = props;
+function BaseOptionRow<O>(
+  props: OptionRowProps<O> & { variant: "check" | "checkbox"; indent?: number; isPathRoot?: boolean },
+) {
+  const { item, state, id, disabledReason, mixedLegendId, variant, indent, isPathRoot } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -64,21 +64,31 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
         {...mergeProps(optionProps, hoverProps)}
         // Our own id (stable per index) so the search input can point at it.
         id={id}
+        aria-describedby={mixedLegendId}
         data-key={entry.valueKey}
         data-label={item.textValue}
         ref={ref}
         css={{
           ...rowCss,
+          ...(indent !== undefined ? Css.plPx(indent).$ : {}),
           ...(highlighted ? Css.bgColor(Tokens.SurfaceRaisedHover).$ : {}),
           ...(isDisabled ? Css.cursorNotAllowed.color(Tokens.TextDisabled).$ : {}),
         }}
         {...tid.option}
       >
         {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
-        <span css={Css.fg1.mw0.$}>{item.rendered}</span>
+        {variant === "checkbox" && mixedLegendId && <MixedDot />}
+        {/* The root of a hierarchy path is semibold. Deeper rows stay regular. */}
+        <span css={{ ...Css.fg1.mw0.$, ...(isPathRoot ? Css.smSb.$ : {}) }}>{item.rendered}</span>
         {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
+          </span>
+        )}
+        {variant === "check" && mixedLegendId && (
+          // Centered in the check icon's 24px box.
+          <span css={Css.df.aic.jcc.fs0.sqPx(24).$}>
+            <MixedDot />
           </span>
         )}
       </div>
@@ -86,9 +96,34 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
   });
 }
 
-/** Tree option: indented by depth, with a checkbox, a wrapping label, and a chevron that expands its children. */
+type TreeOptionRowProps<O> = OptionRowProps<O> & {
+  row: TreeRowState;
+  selectionMode: "single" | "multiple";
+  onExpandedChange: (expanded: boolean) => void;
+};
+
+/** Nested option. Single selection checks the row. Multiple selection uses a checkbox and a chevron. */
 export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
-  const { item, state, id, disabledReason, row, onExpandedChange } = props;
+  const { selectionMode, onExpandedChange, ...rowProps } = props;
+  if (selectionMode === "single") return <SingleTreeOptionRow {...rowProps} />;
+  return <MultiTreeOptionRow {...rowProps} selectionMode={selectionMode} onExpandedChange={onExpandedChange} />;
+}
+
+/** Single-select tree row: indented by level, semibold at the path root, with a trailing check. */
+function SingleTreeOptionRow<O>({ row, ...rest }: OptionRowProps<O> & { row: TreeRowState }) {
+  return (
+    <BaseOptionRow
+      {...rest}
+      variant="check"
+      indent={rowPaddingX + row.level * singleTreeIndent}
+      isPathRoot={row.level === 0}
+    />
+  );
+}
+
+/** Multiple-select tree row: indented by depth, with a checkbox, a wrapping label, and a chevron. */
+function MultiTreeOptionRow<O>(props: TreeOptionRowProps<O>) {
+  const { item, state, id, disabledReason, mixedLegendId, row, onExpandedChange } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -119,6 +154,7 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
             {...optionProps}
             // Our own id (stable per index) so the search input can point at it.
             id={id}
+            aria-describedby={mixedLegendId}
             data-key={entry.valueKey}
             data-label={item.textValue}
             ref={ref}
@@ -128,6 +164,12 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
             <span css={Css.df.fs0.mtPx(2).$}>
               <StyledCheckbox isSelected={isSelected} isIndeterminate={row.isIndeterminate} isDisabled={isDisabled} />
             </span>
+            {mixedLegendId && (
+              // Centers the 6px dot on the label's 20px first line.
+              <span css={Css.df.fs0.mtPx(7).$}>
+                <MixedDot />
+              </span>
+            )}
             <span css={Css.fg1.mw0.$}>{item.rendered}</span>
           </div>
         ),
@@ -155,6 +197,8 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
 export const menuRowHeight = 40;
 
 const rowPaddingX = 16;
+/** Extra left padding per level for a single-select tree. Level 0 keeps the row padding. */
+const singleTreeIndent = 16;
 /** Puts a child's checkbox roughly under its parent's label. */
 const treeIndent = 28;
 

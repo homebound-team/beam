@@ -148,7 +148,8 @@ export function useSetupColumnSizes<R extends Kinded>(
   const onResize = useCallback(
     () => {
       const target = resizeRef.current;
-      if (target && target.clientWidth !== tableWidth) {
+      // A 0 width is a detached or hidden probe, not a measurement; sizing to it drops `fr` columns back to calc().
+      if (target && target.clientWidth > 0 && target.clientWidth !== tableWidth) {
         if (calculateImmediately.current) {
           calculateImmediately.current = false;
           applyColumnLayout(target.clientWidth);

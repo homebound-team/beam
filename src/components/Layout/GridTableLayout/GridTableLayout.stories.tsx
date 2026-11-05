@@ -19,7 +19,14 @@ import {
 } from "src/components/Table/cardSlots";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { columnWidthKeyVersion } from "src/components/Table/hooks/useSetupColumnSizes";
-import { collapseColumn, column, groupColumns, numericColumn, selectColumn } from "src/components/Table/utils/columns";
+import {
+  collapseColumn,
+  column,
+  groupColumns,
+  numericColumn,
+  rowActionsColumn,
+  selectColumn,
+} from "src/components/Table/utils/columns";
 import type { SimpleHeaderAndData } from "src/components/Table/utils/simpleHelpers";
 import { simpleGroupHeader, simpleHeader } from "src/components/Table/utils/simpleHelpers";
 import { emptyCell } from "src/components/Table/utils/utils";
@@ -167,6 +174,39 @@ export function Loading() {
   );
 }
 
+/** Pinned rows (and a pinned parent's children) with client-side search and row actions, to see how pins react to filtered rows. */
+export function WithRowPinning() {
+  const columns = useMemo(() => {
+    const config = {
+      pinnable: true,
+      actions: [
+        { icon: "pencil" as const, label: "Edit", onClick: noop },
+        { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true },
+      ],
+    };
+    return [...getColumns(false), rowActionsColumn<Row>({ parent: config, data: config })];
+  }, []);
+  // Pre-pin one parent so the pinned section shows in the snapshot
+  const rows = useMemo(
+    () => [simpleHeader, ...makeNestedRows(3).map((row) => (row.id === "p1" ? { ...row, initPinned: true } : row))],
+    [],
+  );
+  const layoutState = useGridTableLayoutState({ search: "client" });
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with row pinning" />
+      <GridTableLayoutComponent
+        layoutState={layoutState}
+        tableProps={{
+          columns,
+          rows,
+        }}
+      />
+    </TestProjectLayout>
+  );
+}
+
 export function WithSelectionSummary() {
   const columns = useMemo(() => getColumns(false), []);
   const rows = useMemo(() => [simpleHeader, ...makeSelectedRows()], []);
@@ -305,6 +345,53 @@ export function QueryTableLayout() {
         }}
       />
     </TestProjectLayout>
+  );
+}
+
+/** Scroll down, then change a filter from the toolbar or the buttons above the table; the table scrolls back to its top. */
+export function ScrollToTopOnFilterChange() {
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Scroll to top on filter change" />
+      <ScrollToTopOnFilterChangeExample storageKey="grid-table-layout-scroll-to-top" />
+    </TestProjectLayout>
+  );
+}
+
+/** Same as above, but the page header auto-hides with the navbar, so both reveal while scrolling back up. */
+export function ScrollToTopOnFilterChangeWithPageHeaderLayout() {
+  return (
+    <TestProjectLayout pageTitle="Scroll to top on filter change">
+      <ScrollToTopOnFilterChangeExample storageKey="grid-table-layout-scroll-to-top-page-header-layout" />
+    </TestProjectLayout>
+  );
+}
+
+function ScrollToTopOnFilterChangeExample({ storageKey }: { storageKey: string }) {
+  const filterDefs = useMemo(() => getFilterDefs(), []);
+  const columns = useMemo(() => getColumns(false), []);
+  const layoutState = useGridTableLayoutState({ persistedFilter: { filterDefs, storageKey }, search: "client" });
+  const { filter, setFilter } = layoutState;
+  const rows = useMemo(
+    () => [
+      simpleHeader,
+      ...makeNestedRows(10).filter((row) => !filter.status?.length || filter.status.includes(row.data!.status)),
+    ],
+    [filter.status],
+  );
+
+  return (
+    <>
+      <div css={Css.df.gap1.py2.$}>
+        <Button label="Show Active" variant="secondary" onClick={() => setFilter({ ...filter, status: ["active"] })} />
+        <Button
+          label="Show Inactive"
+          variant="secondary"
+          onClick={() => setFilter({ ...filter, status: ["inactive"] })}
+        />
+      </div>
+      <GridTableLayoutComponent layoutState={layoutState} tableProps={{ columns, rows }} scrollToTopOnFilterChange />
+    </>
   );
 }
 

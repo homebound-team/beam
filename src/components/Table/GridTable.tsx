@@ -37,9 +37,15 @@ import type {
   Kinded,
   RenderAs,
 } from "src/components/Table/types";
-import { assignDefaultColumnIds, isContentColumn, withColumnGutters } from "src/components/Table/utils/columns";
+import {
+  assignDefaultColumnIds,
+  isContentColumn,
+  withColumnGutters,
+  withRowActionsWidth,
+} from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
+import { rowActionsColumnPx, rowActionsSlotsFor } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
@@ -52,6 +58,7 @@ import {
   TOTALS,
 } from "src/components/Table/utils/utils";
 import { Css, type Only } from "src/Css";
+import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useComputed } from "src/hooks/useComputed";
 import { useRenderCount } from "src/hooks/useRenderCount";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
@@ -309,10 +316,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
+  // A `rowActionsColumn` is a fixed width: 3 icons and the "more" menu, or just the pin and the menu on phone-sized screens
+  const breakpoints = useBreakpoint();
+  const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
+
   const columnsWithIds = useMemo(() => {
-    const columns = withGutters ? withColumnGutters(_columns) : _columns;
+    const withActions = withRowActionsWidth(_columns, rowActionsWidthPx);
+    const columns = withGutters ? withColumnGutters(withActions) : withActions;
     return assignDefaultColumnIds(columns);
-  }, [_columns, withGutters]);
+  }, [_columns, withGutters, rowActionsWidthPx]);
 
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
@@ -555,9 +567,9 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     let visibleDataRows: ReactElement[] = [];
 
     // The pinned section (built below) renders these rows joined to the sticky head block, so exclude
-    // them from their normal body position. Source the exclusion from `pinnedRows` so the body de-dup
-    // and the pinned section can never disagree.
-    const pinnedRowStates = tableState.pinnedRows;
+    // them (and the children that move with a pinned parent) from their normal body position. Source the
+    // exclusion from `pinnedSectionRows` so the body de-dup and the pinned section can never disagree.
+    const pinnedRowStates = tableState.pinnedSectionRows;
     const pinnedIds = new Set(pinnedRowStates.map((rs) => rs.row.id));
     const visibleRows = tableState.visibleRows.filter((rs) => !pinnedIds.has(rs.row.id));
     const hasExpandableHeader = visibleRows.some((rs) => rs.row.id === EXPANDABLE_HEADER);
@@ -629,6 +641,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
           levelIndent={levelStyle?.rowIndent}
           rowCss={maybeApplyFunction(rs.row as any, rowStyle?.rowCss)}
           cellCss={maybeApplyFunction(rs.row as any, rowStyle?.cellCss)}
+          pinned={rs.showsPinned}
         />
       );
     };
@@ -784,73 +797,79 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
 
   // TableState is updated from props in useEffect; until that runs, noData is stale on the first paint.
   // Keep the table (and width probe) mounted pre-sync; only swap to emptyState once TableState reflects props.
-  if (noData && emptyState && tableStateSyncedFromPropsRef.current) {
-    return <GridTableEmptyState {...emptyState} />;
-  }
+  // The probe stays mounted (as the same element) beside the empty state too: the resize observer only attaches to the
+  // first probe element, so a remounted probe is never measured and `fr` columns get stuck on their calc() fallback.
+  const showEmptyState = noData && emptyState && tableStateSyncedFromPropsRef.current;
 
   return (
-    <TableStateContext.Provider value={rowStateContext}>
-      <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
-        <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", columnMeasureWidth)} {...tid.probe} />
-        {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
-        {loading && (
-          <div css={loadingOverlayCss} {...tid.loadingOverlay}>
-            <Loader {...tid.loadingSpinner} size="md" />
-          </div>
-        )}
-        {as === "card" ? (
-          <CardView
-            cardRows={visibleDataRows}
-            id={id}
-            virtuosoRangeRef={virtuosoRangeRef}
-            infiniteScroll={infiniteScroll}
-            persistScrollPosition={persistScrollPosition}
-            loading={loading}
-          />
-        ) : _as === "virtual" ? (
-          <VirtualGridTableView
-            // Pass the base style so the virtual list keeps its identity, and the measured width on its own
-            style={style}
-            minWidthPx={tableStyle.minWidthPx}
-            id={id}
-            columns={layoutColumns}
-            visibleDataRows={visibleDataRows}
-            keptSelectedRows={keptSelectedRows}
-            pinnedRows={pinnedRows}
-            firstRowMessage={firstRowMessage}
-            stickyHeader={stickyHeader}
-            xss={xss}
-            virtuosoRef={virtuosoRef}
-            virtuosoRangeRef={virtuosoRangeRef}
-            tableHeadRows={tableHeadRows}
-            stickyOffset={stickyOffset}
-            infiniteScroll={infiniteScroll}
-            persistScrollPosition={persistScrollPosition}
-            loading={loading}
-          />
-        ) : (
-          renders[_as as Exclude<RenderAs, "card" | "virtual">](
-            tableStyle,
-            id,
-            layoutColumns,
-            visibleDataRows,
-            keptSelectedRows,
-            pinnedRows,
-            firstRowMessage,
-            stickyHeader,
-            xss,
-            virtuosoRef,
-            virtuosoRangeRef,
-            tableHeadRows,
-            stickyOffset,
-            loading,
-            infiniteScroll,
-            tableContainerRef,
-            persistScrollPosition,
-          )
-        )}
-      </PresentationProvider>
-    </TableStateContext.Provider>
+    <>
+      <div ref={resizeRef} css={getTableRefWidthStyles(as === "virtual", columnMeasureWidth)} {...tid.probe} />
+      {showEmptyState ? (
+        <GridTableEmptyState {...emptyState} />
+      ) : (
+        <TableStateContext.Provider value={rowStateContext}>
+          <PresentationProvider fieldProps={fieldProps} wrap={style?.presentationSettings?.wrap}>
+            {/* Sibling of the table so the table's own `opacity` doesn't dim the spinner too. */}
+            {loading && (
+              <div css={loadingOverlayCss} {...tid.loadingOverlay}>
+                <Loader {...tid.loadingSpinner} size="md" />
+              </div>
+            )}
+            {as === "card" ? (
+              <CardView
+                cardRows={visibleDataRows}
+                id={id}
+                virtuosoRangeRef={virtuosoRangeRef}
+                infiniteScroll={infiniteScroll}
+                persistScrollPosition={persistScrollPosition}
+                loading={loading}
+              />
+            ) : _as === "virtual" ? (
+              <VirtualGridTableView
+                // Pass the base style so the virtual list keeps its identity, and the measured width on its own
+                style={style}
+                minWidthPx={tableStyle.minWidthPx}
+                id={id}
+                columns={layoutColumns}
+                visibleDataRows={visibleDataRows}
+                keptSelectedRows={keptSelectedRows}
+                pinnedRows={pinnedRows}
+                firstRowMessage={firstRowMessage}
+                stickyHeader={stickyHeader}
+                xss={xss}
+                virtuosoRef={virtuosoRef}
+                virtuosoRangeRef={virtuosoRangeRef}
+                tableHeadRows={tableHeadRows}
+                stickyOffset={stickyOffset}
+                infiniteScroll={infiniteScroll}
+                persistScrollPosition={persistScrollPosition}
+                loading={loading}
+              />
+            ) : (
+              renders[_as as Exclude<RenderAs, "card" | "virtual">](
+                tableStyle,
+                id,
+                layoutColumns,
+                visibleDataRows,
+                keptSelectedRows,
+                pinnedRows,
+                firstRowMessage,
+                stickyHeader,
+                xss,
+                virtuosoRef,
+                virtuosoRangeRef,
+                tableHeadRows,
+                stickyOffset,
+                loading,
+                infiniteScroll,
+                tableContainerRef,
+                persistScrollPosition,
+              )
+            )}
+          </PresentationProvider>
+        </TableStateContext.Provider>
+      )}
+    </>
   );
 }
 

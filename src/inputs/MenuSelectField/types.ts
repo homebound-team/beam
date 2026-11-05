@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
+import type { NestedOption } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 
 /** Props shared by `MenuSelectField`, `MenuMultiSelectField`, and `MenuTreeSelectField`. */
@@ -16,11 +17,13 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   getOptionMenuLabel?: (opt: O, isUnsetOpt: boolean) => ReactNode;
   /** Extra text the menu search matches, in addition to `getOptionLabel`. */
   getOptionSearchText?: (opt: O) => string | readonly string[];
-  /** Sort options by `getOptionLabel`. On by default. `MenuTreeSelectField` defaults this to false. */
+  /** Sort options by `getOptionLabel`. On by default. `MenuTreeSelectField` defaults this to false, and so does `MenuSelectField` when an option has `children`. */
   autoSort?: boolean;
-  /** Debounced menu search text. The caller replaces `options` and should keep the current selection in that list. Closing calls this with `""`. */
+  /** Debounced menu search text. The caller replaces `options` and should keep `mixedValues` in that list. Closing calls this with `""`. */
   onSearch?: (search: string) => void;
   disabledOptions?: (V | { value: V; reason: string })[];
+  /** Values some, but not all, of the edited records hold. Unselected ones get a dot, and the field reads "Mixed" (a single select only until something is picked). */
+  mixedValues?: V[];
   /** Shown in the field when nothing is selected, e.g. "All". */
   nothingSelectedText?: string;
   placeholder?: string;
@@ -47,7 +50,9 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   | "inputStylePalette"
 >;
 
-export type MenuSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
+export type MenuSelectFieldProps<O, V extends Value> = Omit<MenuSelectFieldBaseProps<O, V>, "options"> & {
+  /** Flat `O[]`, or `NestedOption<O>[]` when a row has `children`. `{ current, load, options }` loads either list. */
+  options: OptionsOrLoad<O> | OptionsOrLoad<NestedOption<O>>;
   value: V | undefined;
   /** Value proposed by an AI model; puts the field in AI mode. */
   proposedValue?: V;
@@ -66,7 +71,7 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
   onCommit: (values: V[], opts: O[]) => void;
   /** Single select only. `unsetLabel` row that commits `undefined`. */
   unsetLabel?: string;
-  /** Makes `options` the roots of a tree, with expandable parents and cascading selection. Multiple selection only. */
+  /** Makes `options` the roots of a tree. Multiple selection expands groups and cascades. Single selection lists every node and shows the path. */
   tree?: MenuSelectTreeConfig<O>;
 };
 
@@ -75,10 +80,10 @@ export type TreeSelectionDisplay = "all" | "leaf" | "root";
 
 export type MenuSelectTreeConfig<O> = {
   getChildren: (opt: O) => readonly O[] | undefined;
-  /** Which selections the closed field counts. */
-  display: TreeSelectionDisplay;
-  /** Groups start open. Otherwise only groups holding a selection start open. */
-  defaultExpanded: boolean;
+  /** Multiple selection only. Which selections the closed field counts. */
+  display?: TreeSelectionDisplay;
+  /** Multiple selection only. Groups start open. Otherwise only groups holding a selection start open. */
+  defaultExpanded?: boolean;
 };
 
 /** A rendered menu row. `key` identifies the row and `valueKey` identifies the option, so one option can show up more than once. */

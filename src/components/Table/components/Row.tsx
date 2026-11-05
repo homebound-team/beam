@@ -34,6 +34,7 @@ import {
   beamCollapseColumnId,
   collapseTogglePx,
   isContentColumn,
+  isUnmeasuredFrSize,
   parseWidthToPx,
 } from "src/components/Table/utils/columns";
 import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
@@ -139,7 +140,9 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   const columns = tableState.layoutColumns;
   const controlColumns = tableState.controlColumns;
   const columnStripeColor = style.columnStripeColor;
-  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, pinned, level, aiMode } = rs;
+  const { row, api: rowApi, isActive, isKept: isKeptRow, isLastKeptRow, level, aiMode } = rs;
+  // Children hoisted with a pinned parent sit in the pinned section too, so they look pinned
+  const { showsPinned } = rs;
 
   // We treat the "header" and "totals" kind as special for "good defaults" styling
   const isHeader = row.kind === HEADER;
@@ -397,7 +400,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             maybeContent,
           );
 
-          const maybeSticky = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+          const stickySide = ((isGridCellContent(maybeContent) && maybeContent.sticky) || column.sticky) ?? undefined;
+          // Hold off pinning until the probe measures. Offsets summed from `fr` calc() fallbacks resolve against
+          // the scroll container instead of the row, so they leave gaps between sticky cells (e.g. with a right pane open).
+          const stickyOffsetSizes =
+            stickySide === "left" ? columnSizes.slice(0, columnIndex + 1) : columnSizes.slice(columnIndex + 1);
+          const maybeSticky = stickySide && !stickyOffsetSizes.some(isUnmeasuredFrSize) ? stickySide : undefined;
 
           const stickyLeft =
             maybeSticky === "left"
@@ -520,8 +528,8 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
             ...(isLastKeptRow && style.keptLastRowCss),
-            // Apply the blue highlight to every runtime-pinned row's cells (wins over `isActive`)
-            ...(pinned && style.pinnedRowCss),
+            // Apply the blue highlight to every pinned row's cells, including a pinned parent's children (wins over `isActive`)
+            ...(showsPinned && style.pinnedRowCss),
             // AI wash wins over pinned/active; reserved kinds never get it.
             ...(aiMode && !reservedRowKinds.includes(row.kind) && Css.bgColor(Tokens.AiFieldBg).$),
             // Apply cell highlight styles to active cell and hover
@@ -681,7 +689,7 @@ export type GridDataRow<R extends Kinded> = {
    * By default, fixed-sorted rows are always shown/not filtered out; providing the
    * `filter: true` property allows them to be hidden while filtering. This is the
    * in-group ordering override, distinct from the runtime sticky "pin to top" feature
-   * (`api.pinRow` / `pinColumn`).
+   * (`api.pinRow` / `rowActionsColumn`).
    */
   fixedSort?: "first" | "last" | FixedSort;
   data: unknown;

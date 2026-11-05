@@ -2,7 +2,7 @@ import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
 import { Css } from "src/Css";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
-import { FieldFrame, groupByOptions, open } from "src/inputs/MenuSelectField/storyHelpers";
+import { FieldFrame, groupByOptions, locationOptions, open } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
 
 export default {
@@ -20,6 +20,11 @@ export default {
 
 /** A check on the selected row. Choosing an option closes the menu. */
 export const Menu = newStory(() => <SingleField initial="cc" />, { play: open("groupBy") });
+
+/** Nothing picked across records holding three values. The legend explains each value's dot. */
+export const Mixed = newStory(() => <SingleField mixedValues={["cc", "level", "room"]} />, {
+  play: open("groupBy"),
+});
 
 /** Disabled rows, including one with a reason. */
 export const DisabledOptions = newStory(
@@ -59,6 +64,19 @@ export const UnsetLabel = newStory(
   { play: open("groupBy") },
 );
 
+/** A nested list with search. The trigger shows the path, and the selected row has a check. */
+export const Hierarchy = newStory(
+  () => {
+    const [value, setValue] = useState<string | undefined>("drench");
+    return (
+      <FieldFrame>
+        <MenuSelectField label="Location" options={locationOptions()} value={value} onSelect={setValue} />
+      </FieldFrame>
+    );
+  },
+  { play: open("location") },
+);
+
 /** `getOptionMenuLabel` replaces the row. The closed field still shows the option name. */
 export const CustomLabel = newStory(
   () => {
@@ -83,11 +101,17 @@ export const CustomLabel = newStory(
   { play: open("groupBy") },
 );
 
-function SingleField(props: { initial?: string }) {
+function SingleField(props: { initial?: string; mixedValues?: string[] }) {
   const [value, setValue] = useState(props.initial);
   return (
     <FieldFrame>
-      <MenuSelectField label="Group by" options={groupByOptions()} value={value} onSelect={setValue} />
+      <MenuSelectField
+        label="Group by"
+        options={groupByOptions()}
+        value={value}
+        onSelect={setValue}
+        mixedValues={props.mixedValues}
+      />
     </FieldFrame>
   );
 }
