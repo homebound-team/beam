@@ -158,6 +158,32 @@ export function ListRadioGroup() {
   );
 }
 
+/** `originalValue` tags the card the field started from, once the value moves off it. */
+export function WithOriginalValue() {
+  const [gridValue, setGridValue] = useState<string>("single");
+  const [listValue, setListValue] = useState<string>("selected");
+
+  return (
+    <div css={Css.wPx(640).df.fdc.gap4.$}>
+      <SelectCardGroup
+        label="Option Type"
+        options={createOptionTypes()}
+        onChange={setGridValue}
+        value={gridValue}
+        originalValue="package"
+      />
+      <SelectCardGroup
+        label="List Radio Group"
+        view="list"
+        options={createRadioListOptions()}
+        onChange={setListValue}
+        value={listValue}
+        originalValue="inactive"
+      />
+    </div>
+  );
+}
+
 /** `tooltip` renders an info icon beside the group's label. */
 export const LabelTooltip = newStory(
   () => (

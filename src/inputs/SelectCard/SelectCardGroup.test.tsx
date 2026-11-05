@@ -281,4 +281,26 @@ describe("SelectCardGroup", () => {
     expect(r.categories_history_value).toBeDisabled();
     expect(r.categories_notApplicable_value).toBeDisabled();
   });
+
+  it("shows the original value tag when the value changes", async () => {
+    function TestGroup() {
+      const [value, setValue] = useState<Category | undefined>(Category.Math);
+      return (
+        <SelectCardGroup
+          label="Categories"
+          options={createGridCategoryOptions()}
+          value={value}
+          onChange={setValue}
+          originalValue={Category.Math}
+        />
+      );
+    }
+    // Given the value is the original, so there's no tag
+    const r = await render(<TestGroup />);
+    expect(r.query.categories_math_tag).not.toBeInTheDocument();
+    // When selecting another card
+    click(r.categories_history);
+    // Then the original card is tagged "Current"
+    expect(r.categories_math_tag).toHaveTextContent("Current");
+  });
 });
