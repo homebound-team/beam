@@ -274,8 +274,8 @@ export function hierarchyIndentPaddingPx(level: number): number | undefined {
 
 /**
  * First-content type and indent for a body row.
- * Rows at the same level share a size: small at level 0, extra-small deeper. Parents are semibold.
- * Top-level rows keep the cell's default type when no top-level row has children.
+ * Top-level rows are small when any top-level row has children, otherwise the cell's default type.
+ * Deeper rows are always extra-small. Parents are semibold.
  */
 export function hierarchyFirstContentCss(opts: {
   level: number;
@@ -296,7 +296,7 @@ export function hierarchyFirstContentCss(opts: {
   };
 }
 
-/** Size comes from the level, so siblings match. Semibold only when the row itself has children. */
+/** Top-level size depends on whether any top-level row has children. Semibold only when the row itself has children. */
 function hierarchyLevelType(level: number, hasChildren: boolean, topLevelHasChildren: boolean): Properties | undefined {
   if (level === 0) return topLevelHasChildren ? (hasChildren ? Css.smSb.$ : Css.sm.$) : undefined;
   return hasChildren ? Css.xsSb.$ : Css.xs.$;

@@ -198,7 +198,7 @@ export class TableState<R extends Kinded> {
     return firstContentControlPx(this.controlColumns);
   }
 
-  /** True when any top-level data row has children. Top-level rows then share the parent type size. */
+  /** True when any top-level data row has children. Every top-level row then uses the small hierarchy type. */
   get topLevelHasChildren(): boolean {
     return this.rows.some((row) => !reservedRowKinds.includes(row.kind) && !!row.children?.length);
   }

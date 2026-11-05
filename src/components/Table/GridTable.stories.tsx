@@ -2122,23 +2122,44 @@ export function HierarchyTypeStrategy() {
   );
 }
 
-/** Every row at a level shares its size, and only rows with children are semibold. Each label names its expected type. */
+/** Top-level rows are 14 when any of them has children, deeper rows are 12, and only parents are semibold. Each label names its expected type. */
 export function HierarchyTypeSameLevelSize() {
+  // Mirrors the Options table: top-level rows with and without children
+  const nestedRows = [
+    hierarchyTypeRow("kitchen", "Kitchen package — 14 Semibold", [
+      hierarchyTypeRow("cabinets", "Cabinets — 12 Semibold", [
+        hierarchyTypeRow("uppers", "Upper cabinets — 12 Regular"),
+        hierarchyTypeRow("lowers", "Lower cabinets — 12 Regular"),
+      ]),
+      hierarchyTypeRow("countertops", "Countertops — 12 Regular"),
+    ]),
+    hierarchyTypeRow("paint", "Exterior paint — 14 Regular"),
+    hierarchyTypeRow("flooring", "Flooring package — 14 Semibold", [
+      hierarchyTypeRow("hardwood", "Hardwood — 12 Regular"),
+      hierarchyTypeRow("tile", "Tile — 12 Regular"),
+    ]),
+    hierarchyTypeRow("thermostat", "Smart thermostat — 14 Regular"),
+  ];
+  const flatRows = [
+    hierarchyTypeRow("flat-paint", "Exterior paint — 12 Regular"),
+    hierarchyTypeRow("flat-thermostat", "Smart thermostat — 12 Regular"),
+    hierarchyTypeRow("flat-fence", "Fence — 12 Regular"),
+  ];
   return (
     <div css={Css.df.fdc.gap3.p3.$}>
       <section css={Css.df.fdc.gap1.$}>
         <h2 css={Css.smSb.$}>Nested</h2>
         <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>
-          Top-level rows without children match their parent siblings' size, but stay regular weight.
+          A top-level row has children, so every top-level row is 14. Only the parents are semibold.
         </p>
-        <HierarchyTypeRowsTable rows={sameLevelNestedRows} />
+        <HierarchyTypeRowsTable rows={nestedRows} />
       </section>
       <section css={Css.df.fdc.gap1.$}>
         <h2 css={Css.smSb.$}>Flat</h2>
         <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>
           No top-level row has children, so the rows keep the table's default cell type.
         </p>
-        <HierarchyTypeRowsTable rows={sameLevelFlatRows} />
+        <HierarchyTypeRowsTable rows={flatRows} />
       </section>
     </div>
   );
@@ -4354,26 +4375,3 @@ function hierarchyTypeRow(
 ): GridDataRow<HierarchyTypeRow> {
   return { kind: "data", id, data: { name }, ...(children ? { children } : {}) };
 }
-
-// Mirrors the Options table: top-level rows with and without children, and level 1 parents under only some top-level rows
-const sameLevelNestedRows: GridDataRow<HierarchyTypeRow>[] = [
-  hierarchyTypeRow("kitchen", "Kitchen package — 14 Semibold", [
-    hierarchyTypeRow("cabinets", "Cabinets — 12 Semibold", [
-      hierarchyTypeRow("uppers", "Upper cabinets — 12 Regular"),
-      hierarchyTypeRow("lowers", "Lower cabinets — 12 Regular"),
-    ]),
-    hierarchyTypeRow("countertops", "Countertops — 12 Regular"),
-  ]),
-  hierarchyTypeRow("paint", "Exterior paint — 14 Regular"),
-  hierarchyTypeRow("flooring", "Flooring package — 14 Semibold", [
-    hierarchyTypeRow("hardwood", "Hardwood — 12 Regular"),
-    hierarchyTypeRow("tile", "Tile — 12 Regular"),
-  ]),
-  hierarchyTypeRow("thermostat", "Smart thermostat — 14 Regular"),
-];
-
-const sameLevelFlatRows: GridDataRow<HierarchyTypeRow>[] = [
-  hierarchyTypeRow("flat-paint", "Exterior paint — 12 Regular"),
-  hierarchyTypeRow("flat-thermostat", "Smart thermostat — 12 Regular"),
-  hierarchyTypeRow("flat-fence", "Fence — 12 Regular"),
-];
