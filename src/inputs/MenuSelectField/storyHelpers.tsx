@@ -36,6 +36,49 @@ export function optionItems() {
   ];
 }
 
+export type LocationOption = { id: string; name: string; children?: LocationOption[] };
+
+/** Locations from the hierarchy menu design. Each id appears once, and the list is long enough to show search. */
+export function locationOptions(): LocationOption[] {
+  return [
+    { id: "building", name: "Building" },
+    {
+      id: "bath-207",
+      name: "Bath 207",
+      children: [
+        {
+          id: "walls",
+          name: "Walls",
+          children: [{ id: "drench", name: "Drench" }],
+        },
+        { id: "ceiling", name: "Ceiling" },
+        { id: "color-drench", name: "Color Drench" },
+        { id: "bath-door", name: "Door" },
+        { id: "floor", name: "Floor" },
+        { id: "shower-floor", name: "Shower Floor" },
+      ],
+    },
+    {
+      id: "kitchen-105",
+      name: "Kitchen 105",
+      children: [
+        {
+          id: "perimeter",
+          name: "Perimeter",
+          children: [
+            { id: "base", name: "Base" },
+            { id: "kitchen-door", name: "Door" },
+            { id: "drawer", name: "Drawer" },
+            { id: "floating-shelves", name: "Floating Shelves" },
+          ],
+        },
+        { id: "refrigerator", name: "Refrigerator" },
+        { id: "slab-backsplash", name: "Slab Backsplash" },
+      ],
+    },
+  ];
+}
+
 export type OptionTreeItem = { id: string; name: string; code?: string };
 
 /** Options grouped by code, as in the tree select design. */

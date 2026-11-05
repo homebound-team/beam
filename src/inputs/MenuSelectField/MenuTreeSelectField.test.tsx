@@ -4,6 +4,7 @@ import { MenuTreeSelectField } from "src/inputs/MenuSelectField/MenuTreeSelectFi
 import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
 import type { NestedOption, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
+import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { click, getOptions, getSelected, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -300,6 +301,26 @@ describe("MenuTreeSelectField", () => {
     expect(r.sports_originalValue).toHaveTextContent(/^Child 1$/);
   });
 
+  it("does not list a nested current value as its own root", async () => {
+    // Given a selected leaf as `current`, and the loaded tree that already contains it
+    const r = await render(
+      <TreeHarness
+        initial={["nba"]}
+        options={{
+          current: { id: "nba", name: "NBA" },
+          load: async () => {},
+          options: sports(),
+        }}
+      />,
+    );
+
+    // When the menu opens
+    click(r.sports);
+
+    // Then NBA stays under Basketball
+    expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
+  });
+
   it("counts every selection by default", async () => {
     // Given a selected parent and a lone leaf
     const r = await render(<TreeHarness initial={["basketball", "golf"]} />);
@@ -327,7 +348,7 @@ type Sport = { id: string; name: string };
 type TreeHarnessProps = {
   onSelectSpy?: (response: TreeSelectResponse<Sport, string>) => void;
   initial?: string[];
-  options?: NestedOption<Sport>[];
+  options?: OptionsOrLoad<NestedOption<Sport>>;
   disabledOptions?: string[];
   selectionDisplay?: TreeSelectionDisplay;
   proposedValues?: string[];

@@ -29,11 +29,6 @@ export type TreeRowState = {
   isIndeterminate: boolean;
 };
 
-type TreeOptionRowProps<O> = OptionRowProps<O> & {
-  row: TreeRowState;
-  onExpandedChange: (expanded: boolean) => void;
-};
-
 /** Single-select option: label with a trailing check when selected. */
 export function SingleOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="check" />;
@@ -44,8 +39,10 @@ export function MultiOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="checkbox" />;
 }
 
-function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "checkbox" }) {
-  const { item, state, id, disabledReason, mixedLegendId, variant } = props;
+function BaseOptionRow<O>(
+  props: OptionRowProps<O> & { variant: "check" | "checkbox"; indent?: number; isPathRoot?: boolean },
+) {
+  const { item, state, id, disabledReason, mixedLegendId, variant, indent, isPathRoot } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -73,6 +70,7 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
         ref={ref}
         css={{
           ...rowCss,
+          ...(indent !== undefined ? Css.plPx(indent).$ : {}),
           ...(highlighted ? Css.bgColor(Tokens.SurfaceRaisedHover).$ : {}),
           ...(isDisabled ? Css.cursorNotAllowed.color(Tokens.TextDisabled).$ : {}),
         }}
@@ -80,7 +78,8 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
       >
         {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
         {variant === "checkbox" && mixedLegendId && <MixedDot />}
-        <span css={Css.fg1.mw0.$}>{item.rendered}</span>
+        {/* The root of a hierarchy path is semibold. Deeper rows stay regular. */}
+        <span css={{ ...Css.fg1.mw0.$, ...(isPathRoot ? Css.smSb.$ : {}) }}>{item.rendered}</span>
         {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />
@@ -97,8 +96,33 @@ function BaseOptionRow<O>(props: OptionRowProps<O> & { variant: "check" | "check
   });
 }
 
-/** Tree option: indented by depth, with a checkbox, a wrapping label, and a chevron that expands its children. */
+type TreeOptionRowProps<O> = OptionRowProps<O> & {
+  row: TreeRowState;
+  selectionMode: "single" | "multiple";
+  onExpandedChange: (expanded: boolean) => void;
+};
+
+/** Nested option. Single selection checks the row. Multiple selection uses a checkbox and a chevron. */
 export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
+  const { selectionMode, onExpandedChange, ...rowProps } = props;
+  if (selectionMode === "single") return <SingleTreeOptionRow {...rowProps} />;
+  return <MultiTreeOptionRow {...rowProps} selectionMode={selectionMode} onExpandedChange={onExpandedChange} />;
+}
+
+/** Single-select tree row: indented by level, semibold at the path root, with a trailing check. */
+function SingleTreeOptionRow<O>({ row, ...rest }: OptionRowProps<O> & { row: TreeRowState }) {
+  return (
+    <BaseOptionRow
+      {...rest}
+      variant="check"
+      indent={rowPaddingX + row.level * singleTreeIndent}
+      isPathRoot={row.level === 0}
+    />
+  );
+}
+
+/** Multiple-select tree row: indented by depth, with a checkbox, a wrapping label, and a chevron. */
+function MultiTreeOptionRow<O>(props: TreeOptionRowProps<O>) {
   const { item, state, id, disabledReason, mixedLegendId, row, onExpandedChange } = props;
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
@@ -173,6 +197,8 @@ export function TreeOptionRow<O>(props: TreeOptionRowProps<O>) {
 export const menuRowHeight = 40;
 
 const rowPaddingX = 16;
+/** Extra left padding per level for a single-select tree. Level 0 keeps the row padding. */
+const singleTreeIndent = 16;
 /** Puts a child's checkbox roughly under its parent's label. */
 const treeIndent = 28;
 

@@ -243,6 +243,26 @@ describe("SelectFieldTest", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 
+  it("keeps a nested current on a flat list", async () => {
+    // Given a leaf as `current`, under a loaded parent this field does not render
+    type Item = { id: string; name: string; children?: Item[] };
+    const r = await render(
+      <SelectField<Item, string>
+        label="Location"
+        value="drench"
+        options={{
+          current: { id: "drench", name: "Drench" },
+          load: async () => {},
+          options: [{ id: "walls", name: "Walls", children: [{ id: "drench", name: "Drench" }] }],
+        }}
+        onSelect={() => {}}
+      />,
+    );
+
+    // Then the closed field still shows the leaf
+    expect(r.location).toHaveValue("Drench");
+  });
+
   it("can load options via options prop callback", async () => {
     // Given a Select Field with options that are loaded via a callback
     function Test() {

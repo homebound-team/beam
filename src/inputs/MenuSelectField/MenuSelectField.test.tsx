@@ -3,6 +3,8 @@ import { act, useState, type ReactNode } from "react";
 import { OpenModal } from "src/components/Modal/OpenModal";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
+import { locationOptions, type LocationOption } from "src/inputs/MenuSelectField/storyHelpers";
+import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { setViewport } from "src/tests/viewport";
 import { click, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
 import { vi } from "vitest";
@@ -693,6 +695,111 @@ describe("MenuSelectField", () => {
       keyboard.restore();
     }
   });
+
+  it("shows a hierarchy as a path, with a check and no chevrons", async () => {
+    // Given a single select whose options nest
+    const onSelect = vi.fn();
+    const r = await render(<TestHierarchyField onSelect={onSelect} value="drench" />);
+
+    // Then the trigger shows the path to the selection
+    expect(r.location).toHaveTextContent("Bath 207 > Walls > Drench");
+
+    // When the menu opens
+    click(r.location);
+
+    // Then every node is listed, and the leaf has a check
+    expect(getOptions(r.location)).toEqual([
+      "Building",
+      "Bath 207",
+      "Walls",
+      "Drench",
+      "Ceiling",
+      "Color Drench",
+      "Door",
+      "Floor",
+      "Shower Floor",
+      "Kitchen 105",
+      "Perimeter",
+      "Base",
+      "Door",
+      "Drawer",
+      "Floating Shelves",
+      "Refrigerator",
+      "Slab Backsplash",
+    ]);
+    const walls = optionByLabel(r, "Walls");
+    const drench = optionByLabel(r, "Drench");
+    expect(drench.querySelector("[data-icon='check']")).not.toBeNull();
+    expect(drench.querySelector("[data-checked]")).toBeNull();
+    expect(r.query.location_expand_drench).toBeNull();
+    expect(walls.querySelector("[data-icon='check']")).toBeNull();
+    expect(r.query.location_expand_walls).toBeNull();
+
+    // When a parent is chosen
+    select(r.location, "Walls");
+
+    // Then that value commits, the menu closes, and the path stops at the parent
+    expect(onSelect).toHaveBeenCalledWith("walls", {
+      id: "walls",
+      name: "Walls",
+      children: [{ id: "drench", name: "Drench" }],
+    });
+    expect(r.location).toHaveAttribute("aria-expanded", "false");
+    expect(r.location).toHaveTextContent("Bath 207 > Walls");
+  });
+
+  it("keeps ancestors visible when a hierarchy search matches a leaf", async () => {
+    // Given an open hierarchy long enough to search
+    const r = await render(<TestHierarchyField value={undefined} />);
+    click(r.location);
+
+    // When searching for a leaf
+    type(r.location_search, "drench");
+
+    // Then each match stays with its ancestors, and an unmatched sibling drops out
+    expect(getOptions(r.location)).toEqual(["Bath 207", "Walls", "Drench", "Color Drench"]);
+  });
+
+  it("keeps a loaded leaf in its path instead of listing it again", async () => {
+    // Given the selected leaf as `current`, and the loaded tree that already contains it
+    const r = await render(
+      <TestHierarchyField
+        value="drench"
+        options={{
+          current: { id: "drench", name: "Drench" },
+          load: async () => {},
+          options: locationOptions(),
+        }}
+      />,
+    );
+
+    // Then the trigger shows the path
+    expect(r.location).toHaveTextContent("Bath 207 > Walls > Drench");
+
+    // When the menu opens
+    click(r.location);
+
+    // Then the leaf is listed once, under its parents
+    expect(getOptions(r.location)).toEqual([
+      "Building",
+      "Bath 207",
+      "Walls",
+      "Drench",
+      "Ceiling",
+      "Color Drench",
+      "Door",
+      "Floor",
+      "Shower Floor",
+      "Kitchen 105",
+      "Perimeter",
+      "Base",
+      "Door",
+      "Drawer",
+      "Floating Shelves",
+      "Refrigerator",
+      "Slab Backsplash",
+    ]);
+  });
 });
 
 type Color = { id: string; name: string };
@@ -803,4 +910,29 @@ function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: s
       {...others}
     />
   );
+}
+
+function TestHierarchyField(props: {
+  value: string | undefined;
+  onSelect?: (value: string | undefined, option: LocationOption | undefined) => void;
+  options?: OptionsOrLoad<LocationOption>;
+}) {
+  const [value, setValue] = useState(props.value);
+  return (
+    <MenuSelectField
+      label="Location"
+      options={props.options ?? locationOptions()}
+      value={value}
+      onSelect={(next, option) => {
+        props.onSelect?.(next, option);
+        setValue(next);
+      }}
+    />
+  );
+}
+
+function optionByLabel(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement {
+  const option = r.getAllByTestId("location_option").find((row) => row.dataset.label === label);
+  if (!option) throw new Error(`Missing option ${label}`);
+  return option;
 }

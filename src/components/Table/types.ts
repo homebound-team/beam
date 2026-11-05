@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import type { BeamColor } from "src/colors";
+import type { IconProps } from "src/components/Icon";
 import type { GridCellContent } from "src/components/Table/components/cell";
 import type { GridRowKind } from "src/components/Table/components/Row";
-import type { GridRowApi } from "src/components/Table/GridTableApi";
+import type { GridRowApi, GridTableApi } from "src/components/Table/GridTableApi";
 import type { Margin, Xss } from "src/Css";
 
 export type Kinded = { kind: string };
@@ -119,6 +120,41 @@ export type GridColumn<R extends Kinded> = {
    */
   tooltip?: ReactNode | VoidFunction;
 };
+
+/** How a row is pinned: "self" when it's pinned itself, "parent" when it shows with a pinned parent. */
+export type PinnedState = "self" | "parent";
+
+/** An icon action in a `rowActionsColumn`. */
+export type GridRowAction = {
+  icon: IconProps["icon"];
+  /** The icon's aria label and tooltip, and the item's text once it moves into the "more" menu. */
+  label: string;
+  onClick: VoidFunction | string;
+  /** A ReactNode is shown as the disabled reason. */
+  disabled?: boolean | ReactNode;
+  /** Shows the item in red once it moves into the "more" menu. */
+  destructive?: boolean;
+};
+
+/** What a `rowActionsColumn` draws for a row. */
+export type GridRowActionsConfig = {
+  /** Shows a pin toggle, always as an icon just before the "more" menu. */
+  pinnable?: boolean;
+  /** Up to 3 icons show (the pin included), then the "overflow" menu; only the pin and menu on phone-sized screens. */
+  actions?: GridRowAction[];
+};
+
+/**
+ * The argument to `rowActionsColumn`: a `GridRowActionsConfig` for each row `kind`, static or computed from the row.
+ * Kinds that aren't listed get an empty cell. Reserved kinds (header, totals, etc.) always do.
+ */
+export type RowActionsColumnDef<R extends Kinded> = {
+  [K in R["kind"]]?:
+    | GridRowActionsConfig
+    | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
+        ? (data: D, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig
+        : (data: undefined, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig);
+} & Pick<GridColumn<R>, "w">;
 
 /**
  * Adds an `id` to `GridColumn`, for use in storage/APIs.
