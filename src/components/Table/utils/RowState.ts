@@ -285,10 +285,22 @@ export class RowState<R extends Kinded> {
       // Headers, totals, etc., do not need keeping
       !this.isReservedKind &&
       !this.isParent &&
-      // Pinned rows (and a pinned parent's children) already show in the pinned section
-      !((this.pinned || this.hasPinnedAncestor) && !this.removed) &&
+      // Already rendered in the pinned section
+      !this.shownInPinnedSection &&
       (!this.isMatched || this.removed === "soft")
     );
+  }
+
+  /**
+   * Whether this row is already in the pinned section.
+   *
+   * A direct pin stays there even after it leaves `props.rows`. A child hoisted with a pinned parent
+   * stays when that parent leaves too (it is still in the parent's children). A child dropped on its
+   * own is detached, so it can still be a kept row.
+   */
+  private get shownInPinnedSection(): boolean {
+    if (this.pinned) return true;
+    return this.hasPinnedAncestor && (!this.removed || !!this.parent?.children?.includes(this));
   }
 
   get isLastKeptRow(): boolean {
