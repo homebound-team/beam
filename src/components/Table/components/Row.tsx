@@ -508,6 +508,7 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
                 level,
                 skipIndent: levelIndent !== undefined || !hasCollapseColumn,
                 hasChildren: !!row.children?.length,
+                topLevelHasChildren: tableState.topLevelHasChildren,
               })),
             // Apply any declarative column border styling after header/body defaults.
             ...getColumnBorderCss(column.border, style),
