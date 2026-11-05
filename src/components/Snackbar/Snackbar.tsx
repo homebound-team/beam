@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import { SnackbarNotice, type SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { Css } from "src/Css";
+import { getFloatingBottomOffset } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 
@@ -19,8 +20,12 @@ export function Snackbar({ notices, offset }: SnackbarProps) {
       css={
         Css.fixed
           .z(zIndices.snackbar)
-          .bottomPx(offset.bottom ?? defaultOffset.bottom)
-          .left3.df.fdc.aifs.gapPx(12).$
+          // Clears bottom-fixed chrome like the workflow mobile action footer
+          .bottom(getFloatingBottomOffset(offset.bottom ?? defaultOffset.bottom))
+          .left3.df.fdc.aifs.gapPx(12)
+          // On mobile, notices span the full viewport width and sit flush with the bottom edge
+          .ifSm.bottom(getFloatingBottomOffset(offset.bottom ?? 0))
+          .left0.right0.aiStretch.gapPx(1).$
       }
     >
       {notices.map((data) => (
