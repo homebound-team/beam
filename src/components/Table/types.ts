@@ -140,7 +140,10 @@ export type GridRowAction = {
 export type GridRowActionsConfig = {
   /** Shows a pin toggle, always as an icon just before the "more" menu. */
   pinnable?: boolean;
-  /** Up to 3 icons show (the pin included), then the "overflow" menu; only the pin and menu on phone-sized screens. */
+  /**
+   * Up to 3 buttons show (the pin and the "overflow" menu included); only the pin and menu on phone-sized screens.
+   * The menu never holds just one action: a lone leftover action shows as an icon in the menu's place.
+   */
   actions?: GridRowAction[];
 };
 

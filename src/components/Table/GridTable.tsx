@@ -316,7 +316,7 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
-  // A `rowActionsColumn` is a fixed width: 3 icons and the "more" menu, or just the pin and the menu on phone-sized screens
+  // A `rowActionsColumn` is a fixed width: 3 buttons (the "more" menu included), or just the pin and the menu on phone-sized screens
   const breakpoints = useBreakpoint();
   const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
 

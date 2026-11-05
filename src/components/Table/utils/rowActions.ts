@@ -13,21 +13,25 @@ const rowActionButtonPx = 28;
 export const rowActionGapPx = 4;
 const rowActionsCellPaddingPx = 12;
 
-/** The fixed number of buttons the actions column is sized for: 3 icons and the menu, or the pin and the menu on phone-sized screens. */
+/** The fixed number of buttons the actions column is sized for, the menu included: 3, or the pin and the menu on phone-sized screens. */
 export function rowActionsSlotsFor(breakpoints: { sm: boolean }): number {
-  return breakpoints.sm ? 2 : 4;
+  return breakpoints.sm ? 2 : 3;
 }
 
 /**
  * How a row's actions split: the first `actionIcons` as icons, then the pin (always an icon, never in the menu),
  * then the "more" menu if any actions are left over. The icons, pin included, fit in `visibleCount`.
+ *
+ * The menu never holds just one action: a lone leftover action takes the menu's slot as an icon instead.
+ * So without the pin on phone-sized screens, a single action is an icon, and two or more all go in the menu.
  */
 export function splitRowActions(
   actionCount: number,
   pinnable: boolean,
   visibleCount: number,
 ): { actionIcons: number; hasMenu: boolean } {
-  const actionIcons = Math.min(actionCount, Math.max(0, visibleCount - (pinnable ? 1 : 0)));
+  const fits = Math.max(0, visibleCount - (pinnable ? 1 : 0));
+  const actionIcons = actionCount - fits <= 1 ? actionCount : fits;
   return { actionIcons, hasMenu: actionCount > actionIcons };
 }
 

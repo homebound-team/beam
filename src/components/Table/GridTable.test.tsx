@@ -1580,27 +1580,42 @@ describe("GridTable", () => {
         />,
         withRouter(),
       );
-      // Then the first two actions and the pin show as icons, and the third action moves into the menu
+      // Then the first action and the pin show as icons, and the last two move into the menu
       expect(r.edit_r1).toBeTruthy();
-      expect(r.duplicate_r1).toBeTruthy();
       expect(r.pin_r1).toBeTruthy();
+      expect(r.query.duplicate_r1).toBeNull();
       expect(r.query.delete_r1).toBeNull();
       click(r.rowActions_r1);
+      expect(r.rowActions_r1_duplicate).toBeTruthy();
       expect(r.rowActions_r1_delete).toBeTruthy();
     });
 
+    it("shows a lone overflowing action as an icon instead of a one-item menu", async () => {
+      // Given two actions per row and a pin, so only one action doesn't fit
+      const r = await render(
+        <GridTable<Row> columns={withActions({ actions: [edit, remove], pinnable: true })} rows={actionRows} />,
+      );
+      // Then both actions and the pin show as icons, with no "more" menu
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.delete_r1).toBeTruthy();
+      expect(r.pin_r1).toBeTruthy();
+      expect(r.query.rowActions_r1).toBeNull();
+    });
+
     it("keeps the pin as an icon on phone-sized screens", async () => {
-      // Given an action per row and a pin on a phone-sized screen
+      // Given two actions per row and a pin on a phone-sized screen
       setViewport("sm");
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row> columns={withActions({ actions: [edit, remove], pinnable: true })} rows={actionRows} />,
         withRouter(),
       );
-      // Then the action moves into the menu, but the pin stays an icon
+      // Then the actions move into the menu, but the pin stays an icon
       expect(r.query.edit_r1).toBeNull();
+      expect(r.query.delete_r1).toBeNull();
       expect(r.pin_r1).toBeTruthy();
       click(r.rowActions_r1);
       expect(r.rowActions_r1_edit).toBeTruthy();
+      expect(r.rowActions_r1_delete).toBeTruthy();
     });
 
     it("keeps showing icons on tablet-sized screens", async () => {
@@ -1615,13 +1630,35 @@ describe("GridTable", () => {
       expect(r.query.rowActions_r1).toBeNull();
     });
 
-    it("puts every action in the menu on phone-sized screens", async () => {
-      // Given an action per row on a phone-sized screen
+    it("puts the actions in the menu on phone-sized screens", async () => {
+      // Given two actions per row on a phone-sized screen
       setViewport("sm");
-      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit, remove] })} rows={actionRows} />);
       // Then there are no icons, just the menu
       expect(r.query.edit_r1).toBeNull();
+      expect(r.query.delete_r1).toBeNull();
       expect(r.rowActions_r1).toBeTruthy();
+    });
+
+    it("shows a lone action as an icon on phone-sized screens without the pin", async () => {
+      // Given one action per row and no pin on a phone-sized screen
+      setViewport("sm");
+      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      // Then the action shows as an icon, rather than a menu with just one action
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.query.rowActions_r1).toBeNull();
+    });
+
+    it("shows a lone action as an icon next to the pin on phone-sized screens", async () => {
+      // Given one action per row and a pin on a phone-sized screen
+      setViewport("sm");
+      const r = await render(
+        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
+      );
+      // Then the action and the pin show as icons, with no "more" menu
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.pin_r1).toBeTruthy();
+      expect(r.query.rowActions_r1).toBeNull();
     });
 
     it("gives each kind its own config, and leaves unlisted kinds empty", async () => {
@@ -1669,13 +1706,13 @@ describe("GridTable", () => {
       expect(config.mock.calls.map(([, { row }]: any) => row.kind)).not.toContain("header");
     });
 
-    it("sizes the column for 3 icons and the menu unless it has a w", async () => {
+    it("sizes the column for 3 buttons unless it has a w", async () => {
       // Given one action per row
       const api = new GridTableApiImpl<Row>();
       const width = () => api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w;
       const r = await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
-      // Then the column still fits 3 icons and the menu, the gaps between them and the cell padding
-      expect(width()).toBe("148px");
+      // Then the column still fits 3 buttons, the gaps between them and the cell padding
+      expect(width()).toBe("116px");
       // When the column is given its own w
       await r.rerender(
         <GridTable<Row> api={api} columns={withActions({ actions: [edit] }, "200px")} rows={actionRows} />,

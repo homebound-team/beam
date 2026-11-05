@@ -82,8 +82,8 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
  * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
  * Kinds that aren't listed (and reserved kinds like the header) get an empty cell.
  *
- * Up to 3 icons show, the pin included, then the "more" menu; phone-sized screens show only the pin and the menu.
- * The pin is always an icon. Unless `w` is set, the column is sized for 3 icons and the menu (2 buttons on phone-sized screens).
+ * Up to 3 buttons show, the pin and the "more" menu included; phone-sized screens show only the pin and the menu.
+ * The pin is always an icon. Unless `w` is set, the column is sized for 3 buttons (2 on phone-sized screens).
  */
 export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {
   const base = {
