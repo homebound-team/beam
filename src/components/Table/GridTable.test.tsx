@@ -1540,7 +1540,7 @@ describe("GridTable", () => {
         }),
       ];
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
-      // Then each row shows both as icons in the actions column, with no "more" menu
+      // Then each row shows both as icons in the actions column, with no "overflow" menu
       expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
       expect(cell(r, 1, 2)).toContainElement(r.delete_r1);
       expect(r.query.rowActions_r1).toBeNull();
@@ -1595,7 +1595,64 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable<Row> columns={withActions({ actions: [edit, remove], pinnable: true })} rows={actionRows} />,
       );
-      // Then both actions and the pin show as icons, with no "more" menu
+      // Then both actions and the pin show as icons, with no "overflow" menu
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.delete_r1).toBeTruthy();
+      expect(r.pin_r1).toBeTruthy();
+      expect(r.query.rowActions_r1).toBeNull();
+    });
+
+    it("puts overflowOnly actions in the menu whatever their order", async () => {
+      // Given an overflowOnly action listed first, then two regular actions, and a pin
+      const r = await render(
+        <GridTable<Row>
+          columns={withActions({ actions: [{ ...remove, overflowOnly: true }, edit, duplicate], pinnable: true })}
+          rows={actionRows}
+        />,
+        withRouter(),
+      );
+      // Then the first regular action and the pin show as icons
+      expect(r.edit_r1).toBeTruthy();
+      expect(r.pin_r1).toBeTruthy();
+      // And the overflowOnly action goes in the menu with the regular action that didn't fit
+      expect(r.query.delete_r1).toBeNull();
+      expect(r.query.duplicate_r1).toBeNull();
+      click(r.rowActions_r1);
+      expect(r.rowActions_r1_delete).toBeTruthy();
+      expect(r.rowActions_r1_duplicate).toBeTruthy();
+    });
+
+    it("keeps overflowOnly actions in the menu even when there's room for icons", async () => {
+      // Given two overflowOnly actions and no pin, with room for both as icons
+      const r = await render(
+        <GridTable<Row>
+          columns={withActions({
+            actions: [
+              { ...edit, overflowOnly: true },
+              { ...remove, overflowOnly: true },
+            ],
+          })}
+          rows={actionRows}
+        />,
+        withRouter(),
+      );
+      // Then both go in the menu
+      expect(r.query.edit_r1).toBeNull();
+      expect(r.query.delete_r1).toBeNull();
+      click(r.rowActions_r1);
+      expect(r.rowActions_r1_edit).toBeTruthy();
+      expect(r.rowActions_r1_delete).toBeTruthy();
+    });
+
+    it("shows a lone overflowOnly action as an icon instead of a one-item menu", async () => {
+      // Given a regular action, an overflowOnly action, and a pin
+      const r = await render(
+        <GridTable<Row>
+          columns={withActions({ actions: [edit, { ...remove, overflowOnly: true }], pinnable: true })}
+          rows={actionRows}
+        />,
+      );
+      // Then the overflowOnly action shows as an icon in the menu's place, with no "overflow" menu
       expect(r.edit_r1).toBeTruthy();
       expect(r.delete_r1).toBeTruthy();
       expect(r.pin_r1).toBeTruthy();
@@ -1624,7 +1681,7 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable<Row> columns={withActions({ actions: [edit, duplicate, remove] })} rows={actionRows} />,
       );
-      // Then all three still show as icons, with no "more" menu
+      // Then all three still show as icons, with no "overflow" menu
       expect(r.edit_r1).toBeTruthy();
       expect(r.delete_r1).toBeTruthy();
       expect(r.query.rowActions_r1).toBeNull();
@@ -1655,7 +1712,7 @@ describe("GridTable", () => {
       const r = await render(
         <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
       );
-      // Then the action and the pin show as icons, with no "more" menu
+      // Then the action and the pin show as icons, with no "overflow" menu
       expect(r.edit_r1).toBeTruthy();
       expect(r.pin_r1).toBeTruthy();
       expect(r.query.rowActions_r1).toBeNull();

@@ -1,6 +1,6 @@
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
-import type { GridRowActionsConfig, Kinded, RowActionsColumnDef } from "src/components/Table/types";
+import type { GridRowAction, GridRowActionsConfig, Kinded, RowActionsColumnDef } from "src/components/Table/types";
 import { reservedRowKinds } from "src/components/Table/utils/utils";
 
 export const beamRowActionsColumnId = "beamRowActionsColumn";
@@ -19,20 +19,22 @@ export function rowActionsSlotsFor(breakpoints: { sm: boolean }): number {
 }
 
 /**
- * How a row's actions split: the first `actionIcons` as icons, then the pin (always an icon, never in the menu),
- * then the "more" menu if any actions are left over. The icons, pin included, fit in `visibleCount`.
+ * How a row's actions split: `icons` before the pin (always an icon, never in the menu), then the "overflow" menu if
+ * any actions are left over. The icons, pin included, fit in `visibleCount`. `overflowOnly` actions skip the icons
+ * and go straight to the menu; the rest fill the icons in order.
  *
- * The menu never holds just one action: a lone leftover action takes the menu's slot as an icon instead.
- * So without the pin on phone-sized screens, a single action is an icon, and two or more all go in the menu.
+ * The menu never holds just one action: a lone leftover action (`overflowOnly` or not) takes the menu's slot as an
+ * icon instead. So without the pin on phone-sized screens, a single action is an icon, and two or more all go in the menu.
  */
-export function splitRowActions(
-  actionCount: number,
+export function splitRowActions<A extends Pick<GridRowAction, "overflowOnly">>(
+  actions: A[],
   pinnable: boolean,
   visibleCount: number,
-): { actionIcons: number; hasMenu: boolean } {
+): { icons: A[]; menu: A[] } {
   const fits = Math.max(0, visibleCount - (pinnable ? 1 : 0));
-  const actionIcons = actionCount - fits <= 1 ? actionCount : fits;
-  return { actionIcons, hasMenu: actionCount > actionIcons };
+  const icons = actions.filter((a) => !a.overflowOnly).slice(0, fits);
+  const menu = actions.filter((a) => !icons.includes(a));
+  return menu.length === 1 ? { icons: actions, menu: [] } : { icons, menu };
 }
 
 /** Width of the actions column for `slots` icon buttons. */

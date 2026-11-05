@@ -707,8 +707,8 @@ export function InteractiveGroupRowPinning() {
 }
 
 /**
- * A `rowActionsColumn` with different actions per row kind, and the pin just before the "more" menu.
- * Up to 3 buttons (the pin and the "more" menu included), or just the pin and menu on phone-sized screens.
+ * A `rowActionsColumn` with different actions per row kind, and the pin just before the "overflow" menu.
+ * Up to 3 buttons (the pin and the "overflow" menu included), or just the pin and menu on phone-sized screens.
  * A lone leftover action shows as an icon in the menu's place, so the menu never holds just one action.
  * `add` rows aren't listed, so their cell is empty.
  */

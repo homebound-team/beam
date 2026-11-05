@@ -76,13 +76,13 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
 }
 
 /**
- * Provides a sticky-right column of row actions and a pin toggle, which ends in a "more" menu.
+ * Provides a sticky-right column of row actions and a pin toggle, which ends in a "overflow" menu.
  *
  * Each row `kind` gets a `GridRowActionsConfig`, static or computed from the row, i.e.
  * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
  * Kinds that aren't listed (and reserved kinds like the header) get an empty cell.
  *
- * Up to 3 buttons show, the pin and the "more" menu included; phone-sized screens show only the pin and the menu.
+ * Up to 3 buttons show, the pin and the "overflow" menu included; phone-sized screens show only the pin and the menu.
  * The pin is always an icon. Unless `w` is set, the column is sized for 3 buttons (2 on phone-sized screens).
  */
 export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {

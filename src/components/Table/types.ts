@@ -127,18 +127,20 @@ export type PinnedState = "self" | "parent";
 /** An icon action in a `rowActionsColumn`. */
 export type GridRowAction = {
   icon: IconProps["icon"];
-  /** The icon's aria label and tooltip, and the item's text once it moves into the "more" menu. */
+  /** The icon's aria label and tooltip, and the item's text once it moves into the "overflow" menu. */
   label: string;
   onClick: VoidFunction | string;
   /** A ReactNode is shown as the disabled reason. */
   disabled?: boolean | ReactNode;
-  /** Shows the item in red once it moves into the "more" menu. */
+  /** Shows the item in red once it moves into the "overflow" menu. */
   destructive?: boolean;
+  /** Always goes in the "overflow" menu, whatever its order, unless it would be the menu's only action. */
+  overflowOnly?: boolean;
 };
 
 /** What a `rowActionsColumn` draws for a row. */
 export type GridRowActionsConfig = {
-  /** Shows a pin toggle, always as an icon just before the "more" menu. */
+  /** Shows a pin toggle, always as an icon just before the "overflow" menu. */
   pinnable?: boolean;
   /**
    * Up to 3 buttons show (the pin and the "overflow" menu included); only the pin and menu on phone-sized screens.
