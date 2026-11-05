@@ -1,6 +1,8 @@
+import { act } from "@testing-library/react";
 import { type RefObject, useRef } from "react";
-import { THRESHOLD, useAutoHideOnScroll } from "src/layouts/useAutoHideOnScroll";
+import { HOLD_QUIET_MS, holdAutoHideWhile, THRESHOLD, useAutoHideOnScroll } from "src/layouts/useAutoHideOnScroll";
 import { render, scrollWindowWithAnchor } from "src/utils/rtl";
+import { vi } from "vitest";
 
 const navHeight = 50;
 
@@ -125,6 +127,76 @@ describe("useAutoHideOnScroll", () => {
 
     // Then it returns to resting (scrollY is still > 0)
     expect(r.state).toHaveTextContent("resting");
+  });
+
+  describe("holdAutoHideWhile", () => {
+    afterEach(() => {
+      // Release any hold a test left behind, since it's module-level state
+      window.dispatchEvent(new Event("scrollend"));
+      vi.useRealTimers();
+    });
+
+    it("keeps hidden chrome hidden while a programmatic scroll moves back up", async () => {
+      // Given the chrome is hidden mid-page
+      const r = await renderHidden();
+
+      // When a programmatic smooth scroll moves back up, frame by frame
+      holdAutoHideWhile(() => scrollWindowWithAnchor(r.spacer, 250));
+      scrollWindowWithAnchor(r.spacer, 200);
+
+      // Then the chrome stays hidden instead of revealing mid-scroll
+      expect(r.state).toHaveTextContent("hidden");
+
+      // And when the scroll ends
+      act(() => {
+        window.dispatchEvent(new Event("scrollend"));
+      });
+      // Then it still doesn't reveal over where the scroll landed
+      expect(r.state).toHaveTextContent("hidden");
+
+      // But the user's own scroll up reveals it as usual
+      scrollWindowWithAnchor(r.spacer, 150);
+      expect(r.state).toHaveTextContent("revealed");
+    });
+
+    it("releases once scrolling goes quiet, for browsers without scrollend", async () => {
+      // Given a hidden chrome held by a programmatic scroll
+      const r = await renderHidden();
+      vi.useFakeTimers();
+      holdAutoHideWhile(() => scrollWindowWithAnchor(r.spacer, 250));
+
+      // When the window stops scrolling for long enough, without a scrollend event
+      act(() => {
+        vi.advanceTimersByTime(HOLD_QUIET_MS);
+      });
+
+      // Then the user's next scroll up reveals the chrome
+      scrollWindowWithAnchor(r.spacer, 200);
+      expect(r.state).toHaveTextContent("revealed");
+    });
+
+    it("releases as soon as the user scrolls with the wheel", async () => {
+      // Given a hidden chrome held by a programmatic scroll
+      const r = await renderHidden();
+      holdAutoHideWhile(() => scrollWindowWithAnchor(r.spacer, 250));
+
+      // When the user takes over with the wheel
+      act(() => {
+        window.dispatchEvent(new Event("wheel"));
+      });
+
+      // Then their scroll up reveals the chrome as usual
+      scrollWindowWithAnchor(r.spacer, 200);
+      expect(r.state).toHaveTextContent("revealed");
+    });
+
+    async function renderHidden() {
+      const r = await render(<Harness />);
+      scrollWindowWithAnchor(r.spacer, 0);
+      scrollWindowWithAnchor(r.spacer, 300);
+      expect(r.state).toHaveTextContent("hidden");
+      return r;
+    }
   });
 });
 

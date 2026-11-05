@@ -3,6 +3,8 @@ import { act, useState, type ReactNode } from "react";
 import { OpenModal } from "src/components/Modal/OpenModal";
 import { PresentationProvider } from "src/components/PresentationContext";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
+import { locationOptions, type LocationOption } from "src/inputs/MenuSelectField/storyHelpers";
+import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { setViewport } from "src/tests/viewport";
 import { click, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
 import { vi } from "vitest";
@@ -92,6 +94,26 @@ describe("MenuSelectField", () => {
     click(r.color);
     // Then the caller is asked for the first page
     expect(onSearch).toHaveBeenLastCalledWith("");
+  });
+
+  it("keeps the selected label when the next options omit it", async () => {
+    // Given Red selected from a list that includes it
+    function Page() {
+      const [options, setOptions] = useState(colors());
+      const [value, setValue] = useState<string | undefined>("r");
+      return (
+        <>
+          <button data-testid="showBlue" onClick={() => setOptions([{ id: "b", name: "Blue" }])} />
+          <MenuSelectField label="Color" options={options} value={value} onSelect={setValue} />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    expect(r.color).toHaveTextContent("Red");
+    // When the list becomes one that does not include Red
+    click(r.showBlue);
+    // Then the closed field still shows Red
+    expect(r.color).toHaveTextContent("Red");
   });
 
   it("loads options the first time the menu opens", async () => {
@@ -413,6 +435,33 @@ describe("MenuSelectField", () => {
     expect(r.query.color_selections).toBeNull();
   });
 
+  it("reads Mixed and dots each mixed value when nothing is selected", async () => {
+    // Given no value, and records holding Blue or Green
+    const r = await render(<TestHarness nothingSelectedText="All" mixedValues={["b", "g"]} />);
+    // Then the field reads Mixed instead of All, counting both values
+    expect(r.color).toHaveTextContent(/^Mixed2$/);
+    expect(r.color_count).toHaveTextContent("2");
+    // And when opened, the legend explains the dotted rows
+    click(r.color);
+    expect(r.color_mixedLegend).toBeInTheDocument();
+    expect(optionOf(r, "Blue")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
+  });
+
+  it("shows the picked value and keeps dots on the other mixed values", async () => {
+    // Given Blue picked, and records holding Blue or Green
+    const r = await render(<TestHarness initial="b" mixedValues={["b", "g"]} />);
+    // Then the field shows Blue without a count
+    expect(r.color).toHaveTextContent("Blue");
+    expect(r.query.color_count).toBeNull();
+    // And when opened, Blue is checked rather than dotted, while Green keeps its dot
+    click(r.color);
+    expect(optionOf(r, "Blue")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "Blue")).not.toHaveAccessibleDescription();
+    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+  });
+
   it("closes when re-selecting the current value", async () => {
     // Given a single select with a value
     const onSelect = vi.fn();
@@ -646,6 +695,111 @@ describe("MenuSelectField", () => {
       keyboard.restore();
     }
   });
+
+  it("shows a hierarchy as a path, with a check and no chevrons", async () => {
+    // Given a single select whose options nest
+    const onSelect = vi.fn();
+    const r = await render(<TestHierarchyField onSelect={onSelect} value="drench" />);
+
+    // Then the trigger shows the path to the selection
+    expect(r.location).toHaveTextContent("Bath 207 > Walls > Drench");
+
+    // When the menu opens
+    click(r.location);
+
+    // Then every node is listed, and the leaf has a check
+    expect(getOptions(r.location)).toEqual([
+      "Building",
+      "Bath 207",
+      "Walls",
+      "Drench",
+      "Ceiling",
+      "Color Drench",
+      "Door",
+      "Floor",
+      "Shower Floor",
+      "Kitchen 105",
+      "Perimeter",
+      "Base",
+      "Door",
+      "Drawer",
+      "Floating Shelves",
+      "Refrigerator",
+      "Slab Backsplash",
+    ]);
+    const walls = optionByLabel(r, "Walls");
+    const drench = optionByLabel(r, "Drench");
+    expect(drench.querySelector("[data-icon='check']")).not.toBeNull();
+    expect(drench.querySelector("[data-checked]")).toBeNull();
+    expect(r.query.location_expand_drench).toBeNull();
+    expect(walls.querySelector("[data-icon='check']")).toBeNull();
+    expect(r.query.location_expand_walls).toBeNull();
+
+    // When a parent is chosen
+    select(r.location, "Walls");
+
+    // Then that value commits, the menu closes, and the path stops at the parent
+    expect(onSelect).toHaveBeenCalledWith("walls", {
+      id: "walls",
+      name: "Walls",
+      children: [{ id: "drench", name: "Drench" }],
+    });
+    expect(r.location).toHaveAttribute("aria-expanded", "false");
+    expect(r.location).toHaveTextContent("Bath 207 > Walls");
+  });
+
+  it("keeps ancestors visible when a hierarchy search matches a leaf", async () => {
+    // Given an open hierarchy long enough to search
+    const r = await render(<TestHierarchyField value={undefined} />);
+    click(r.location);
+
+    // When searching for a leaf
+    type(r.location_search, "drench");
+
+    // Then each match stays with its ancestors, and an unmatched sibling drops out
+    expect(getOptions(r.location)).toEqual(["Bath 207", "Walls", "Drench", "Color Drench"]);
+  });
+
+  it("keeps a loaded leaf in its path instead of listing it again", async () => {
+    // Given the selected leaf as `current`, and the loaded tree that already contains it
+    const r = await render(
+      <TestHierarchyField
+        value="drench"
+        options={{
+          current: { id: "drench", name: "Drench" },
+          load: async () => {},
+          options: locationOptions(),
+        }}
+      />,
+    );
+
+    // Then the trigger shows the path
+    expect(r.location).toHaveTextContent("Bath 207 > Walls > Drench");
+
+    // When the menu opens
+    click(r.location);
+
+    // Then the leaf is listed once, under its parents
+    expect(getOptions(r.location)).toEqual([
+      "Building",
+      "Bath 207",
+      "Walls",
+      "Drench",
+      "Ceiling",
+      "Color Drench",
+      "Door",
+      "Floor",
+      "Shower Floor",
+      "Kitchen 105",
+      "Perimeter",
+      "Base",
+      "Door",
+      "Drawer",
+      "Floating Shelves",
+      "Refrigerator",
+      "Slab Backsplash",
+    ]);
+  });
 });
 
 type Color = { id: string; name: string };
@@ -661,7 +815,12 @@ type HarnessProps = {
   getOptionSearchText?: (color: Color) => string | readonly string[];
   options?: Color[];
   autoSort?: boolean;
+  mixedValues?: string[];
 };
+
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);
+}
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
   const originalInnerHeight = Object.getOwnPropertyDescriptor(window, "innerHeight");
@@ -751,4 +910,29 @@ function TestHarness(props: HarnessProps & { initial?: string; proposedValue?: s
       {...others}
     />
   );
+}
+
+function TestHierarchyField(props: {
+  value: string | undefined;
+  onSelect?: (value: string | undefined, option: LocationOption | undefined) => void;
+  options?: OptionsOrLoad<LocationOption>;
+}) {
+  const [value, setValue] = useState(props.value);
+  return (
+    <MenuSelectField
+      label="Location"
+      options={props.options ?? locationOptions()}
+      value={value}
+      onSelect={(next, option) => {
+        props.onSelect?.(next, option);
+        setValue(next);
+      }}
+    />
+  );
+}
+
+function optionByLabel(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement {
+  const option = r.getAllByTestId("location_option").find((row) => row.dataset.label === label);
+  if (!option) throw new Error(`Missing option ${label}`);
+  return option;
 }

@@ -1,7 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
-import { click, render, select, type } from "src/utils/rtl";
+import { click, getOptions, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuMultiSelectField", () => {
@@ -42,6 +42,37 @@ describe("MenuMultiSelectField", () => {
     click(r.color);
     // Then there is no pill row
     expect(r.query.color_selections).toBeNull();
+  });
+
+  it("toggles a dotted option like any other checkbox", async () => {
+    // Given some records hold Red, and nothing is selected
+    const onSelect = vi.fn();
+    const r = await render(<MultiHarness mixedValues={["r"]} onSelectSpy={onSelect} />);
+    click(r.color);
+    expect(optionOf(r, "Red")).toHaveAttribute("aria-selected", "false");
+    expect(optionOf(r, "Red")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    // When checking Red
+    select(r.color, "Red");
+    // Then it's selected and loses its dot
+    expect(onSelect).toHaveBeenLastCalledWith(["r"], [{ id: "r", name: "Red" }]);
+    expect(optionOf(r, "Red")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
+    // And when unchecking it, it's dotted again
+    select(r.color, "Red");
+    expect(onSelect).toHaveBeenLastCalledWith([], []);
+    expect(optionOf(r, "Red")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+  });
+
+  it("counts dotted values in the badge but not in the pills", async () => {
+    // Given every record holds Red, and some hold Blue or Green
+    const r = await render(<MultiHarness initial={["r"]} mixedValues={["b", "g"]} />);
+    // Then the field reads Mixed, counting Red plus the dotted Blue and Green
+    expect(r.color).toHaveTextContent(/^Mixed3$/);
+    expect(r.color_count).toHaveTextContent("3");
+    // And when opened, only Red is a pill, since only a selection can be removed
+    click(r.color);
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.query.color_selections_pill_1).toBeNull();
   });
 
   it("removes a selection when its pill is clicked", async () => {
@@ -146,6 +177,52 @@ describe("MenuMultiSelectField", () => {
     );
   });
 
+  it("keeps a selected pill when the options list drops it", async () => {
+    // Given a multi select
+    const onSelect = vi.fn();
+    function Page() {
+      const [options, setOptions] = useState(colors());
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <>
+          <button data-testid="showBlue" onClick={() => setOptions([{ id: "b", name: "Blue" }])} />
+          <MenuMultiSelectField
+            label="Color"
+            options={options}
+            values={values}
+            onSelect={(next, opts) => {
+              onSelect(next, opts);
+              setValues(next);
+            }}
+          />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    // When Red is selected and the list is replaced with Blue
+    select(r.color, "Red");
+    click(r.showBlue);
+    // Then the menu lists Blue only, and Red stays a pill
+    expect(getOptions(r.color)).toEqual(["Blue"]);
+    expect(r.color_selections_pill_0).toHaveTextContent("Red");
+    expect(r.query.color_selections_pill_1).toBeNull();
+    expect(r.color_count).toHaveTextContent("1");
+    // When Blue is selected too
+    select(r.color, "Blue");
+    // Then Red is still part of the selection
+    expect(onSelect).toHaveBeenLastCalledWith(
+      ["r", "b"],
+      [
+        { id: "r", name: "Red" },
+        { id: "b", name: "Blue" },
+      ],
+    );
+    // When the Red pill is clicked
+    click(r.color_selections_pill_0);
+    // Then Red is cleared even though it is no longer in the list
+    expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
+  });
+
   it("keeps hidden selections when deselecting while filtered", async () => {
     // Given Red and Blue selected
     const onSelect = vi.fn();
@@ -196,7 +273,12 @@ type HarnessProps = {
   initial?: string[];
   proposedValues?: string[];
   disabledOptions?: (string | { value: string; reason: string })[];
+  mixedValues?: string[];
 };
+
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);
+}
 
 function MultiHarness(props: HarnessProps) {
   const { onSelectSpy, initial = [], options = colors(), proposedValues, ...others } = props;

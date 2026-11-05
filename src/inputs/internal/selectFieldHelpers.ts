@@ -13,13 +13,17 @@ export type OptionsOrLoad<O> =
       options: O[] | undefined;
     };
 
-/** Turns `optionsOrLoad` into a flat option list, with `unsetLabel` prepended when set. */
+/**
+ * Turns `optionsOrLoad` into the list the field renders, with `unsetLabel` first when set.
+ * Pass `getChildren` only when those nodes are rendered. A flat select omits it, so a nested `current` stays on the list and keeps its label.
+ */
 export function initializeOptions<O, V extends Value>(
   optionsOrLoad: OptionsOrLoad<O>,
   getOptionValue: (opt: O) => V,
   getOptionLabel: (opt: O) => string,
   unsetLabel: string | undefined,
   autoSort: boolean,
+  getChildren?: (opt: O) => readonly O[] | undefined,
 ): O[] {
   const result: O[] = [];
   if (unsetLabel) {
@@ -36,13 +40,13 @@ export function initializeOptions<O, V extends Value>(
     if (options) {
       userOptions.push(...options);
     }
-    // Add the `current` to the list of options in the event it is not already there.
+    // Add `current` when the rendered list does not already show it. `getChildren` counts a nested match, so a tree does not also list that leaf as a root.
     if (current) {
       const toCheck = Array.isArray(current) ? current : [current];
       toCheck.forEach((current) => {
         const value = getOptionValue(current);
-        const found = options && options.find((o) => getOptionValue(o) === value);
-        if (!found) {
+        const alreadyListed = options !== undefined && optionsIncludeValue(options, value, getOptionValue, getChildren);
+        if (!alreadyListed) {
           userOptions.push(current);
         }
       });
@@ -57,6 +61,23 @@ export function initializeOptions<O, V extends Value>(
 
 /** A marker option to automatically add an "Unset" option to the start of options. */
 export const unsetOption = {};
+
+/**
+ * Whether `initializeOptions` would already show `value`.
+ * A menu tree passes `getChildren`, so a lazy `current` leaf under a parent is not also added as a root. Flat selects pass nothing, and only the top level counts.
+ */
+function optionsIncludeValue<O, V extends Value>(
+  options: readonly O[],
+  value: V,
+  getOptionValue: (opt: O) => V,
+  getChildren: ((opt: O) => readonly O[] | undefined) | undefined,
+): boolean {
+  return options.some((option) => {
+    if (getOptionValue(option) === value) return true;
+    const children = getChildren?.(option);
+    return children !== undefined && optionsIncludeValue(children, value, getOptionValue, getChildren);
+  });
+}
 
 /** Key and optional reason for a disabled option entry. */
 export function disabledOptionToKeyedTuple(

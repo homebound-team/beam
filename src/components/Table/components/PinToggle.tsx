@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import { IconButton } from "src/components/IconButton";
+import { tableIconInc } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
-import { Tokens } from "src/Css";
+import { Palette, Tokens } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -16,14 +17,20 @@ type PinToggleProps = {
  */
 export function PinToggle({ rowId }: PinToggleProps) {
   const { tableState } = useContext(TableStateContext);
-  const isPinned = useComputed(() => tableState.isPinnedRow(rowId), [tableState, rowId]);
+  const pinnedState = useComputed(() => tableState.isPinnedRow(rowId), [tableState, rowId]);
+  // A child of a pinned parent moves with it, so it can't be unpinned on its own
+  const viaParent = pinnedState === "parent";
   const tid = useTestIds({}, "pin");
   return (
     <IconButton
       {...tid[rowId]}
-      icon="pin"
-      color={isPinned ? Tokens.Primary : undefined}
-      label={isPinned ? "Unpin row" : "Pin row"}
+      icon={pinnedState ? "pinFilled" : "pin"}
+      inc={tableIconInc}
+      color={pinnedState ? Tokens.Primary : undefined}
+      label={pinnedState ? "Unpin row" : "Pin row"}
+      disabled={viaParent ? "Pinned with parent" : undefined}
+      // Show the pinned row fill through, not the default grey disabled background
+      bgColor={viaParent ? Palette.Transparent : undefined}
       onClick={() => tableState.togglePinned(rowId)}
     />
   );

@@ -1,10 +1,18 @@
 import { Icon } from "src/components/Icon";
 import { CollapseToggle } from "src/components/Table/components/CollapseToggle";
-import { PinToggle } from "src/components/Table/components/PinToggle";
 import type { GridDataRow } from "src/components/Table/components/Row";
+import { RowActionsCell } from "src/components/Table/components/RowActionsCell";
 import { SelectToggle } from "src/components/Table/components/SelectToggle";
+import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing";
-import { type GridColumn, type GridColumnWithId, type Kinded, nonKindGridColumnKeys } from "src/components/Table/types";
+import {
+  type GridColumn,
+  type GridColumnWithId,
+  type Kinded,
+  nonKindGridColumnKeys,
+  type RowActionsColumnDef,
+} from "src/components/Table/types";
+import { beamRowActionsColumnId, resolveRowActions } from "src/components/Table/utils/rowActions";
 import { type DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
@@ -65,6 +73,55 @@ export function fieldColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCol
 /** Provides default styling for a GridColumn representing an Action. */
 export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { clientSideSort: false, ...columnDef, align: "center", isAction: true, wrapAction: false };
+}
+
+/**
+ * Provides a sticky-right column of row actions and a pin toggle, which ends in a "more" menu.
+ *
+ * Each row `kind` gets a `GridRowActionsConfig`, static or computed from the row, i.e.
+ * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
+ * Kinds that aren't listed (and reserved kinds like the header) get an empty cell.
+ *
+ * Up to 3 icons show, the pin included, then the "more" menu; phone-sized screens show only the pin and the menu.
+ * The pin is always an icon. Unless `w` is set, the column is sized for 3 icons and the menu (2 buttons on phone-sized screens).
+ */
+export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {
+  const base = {
+    ...nonKindDefaults(),
+    id: beamRowActionsColumnId,
+    clientSideSort: false,
+    align: "right",
+    sticky: "right",
+    w: def.w,
+    wrapAction: false,
+    isAction: true,
+    canHide: false,
+    header: emptyCell,
+    totals: emptyCell,
+    expandableHeader: emptyCell,
+    groupHeader: emptyCell,
+  };
+  // Listed kinds draw their config; the rest (and reserved kinds) stay empty
+  return newMethodMissingProxy(base, (kind) =>
+    kind in def
+      ? (_data: unknown, { row, api }: { row: GridDataRow<T>; api: GridTableApi<T> }) => (
+          <RowActionsCell row={row} config={resolveRowActions(def, row, api)} />
+        )
+      : emptyCell,
+  ) as GridColumn<T>;
+}
+
+/**
+ * Gives a `rowActionsColumn` without its own `w` the table's width for the current breakpoint.
+ *
+ * Wraps the column instead of setting `w` on it, so the caller's column is untouched and can be resized again later.
+ */
+export function withRowActionsWidth<T extends Kinded>(columns: GridColumn<T>[], widthPx: number): GridColumn<T>[] {
+  return columns.map((column) =>
+    column.id === beamRowActionsColumnId && column.w === undefined
+      ? new Proxy(column, { get: (target, key) => (key === "w" ? `${widthPx}px` : Reflect.get(target, key)) })
+      : column,
+  );
 }
 
 /** Stable ids for the select and collapse columns. These aren't layout columns. */
@@ -128,40 +185,6 @@ export function collapseColumn<T extends Kinded>(columnDef?: Partial<GridColumn<
   }) as any;
 }
 
-/**
- * Provides a GridColumn containing a {@link PinToggle} to pin/unpin rows to the top at runtime.
- *
- * Like `selectColumn`/`collapseColumn`, this accepts no `columnDef` or a partial one. The toggle is
- * rendered for data rows by default; header/totals/expandableHeader get an `emptyCell` since there's
- * no "pin all" concept and reserved rows aren't pinnable.
- *
- * Note: pinning a parent row hoists only that row into the sticky pinned section — its children stay in place.
- */
-export function pinColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>>): GridColumn<T> {
-  const base = {
-    ...nonKindDefaults(),
-    id: "beamPinColumn",
-    clientSideSort: false,
-    align: "center",
-    // 40px to accommodate the pin IconButton + padding, matching selectColumn.
-    w: "40px",
-    wrapAction: false,
-    isAction: true,
-    header: emptyCell,
-    expandableHeader: emptyCell,
-    groupHeader: emptyCell,
-    totals: emptyCell,
-    // Use any of the user's per-row kind methods if they have them.
-    ...columnDef,
-  };
-  // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Pin... `
-  return newMethodMissingProxy(base, (key) => {
-    return (data: any, { row }: { row: GridDataRow<any> }) => ({
-      content: <PinToggle rowId={row.id} />,
-    });
-  }) as any;
-}
-
 export const layoutGutterLeftColumnId = "beamLayoutGutterLeft";
 export const layoutGutterRightColumnId = "beamLayoutGutterRight";
 
@@ -188,7 +211,6 @@ export const collapseTogglePx = 28;
 const collapseControlPx = collapseTogglePx + 8;
 /** Select checkbox (16px) plus the 8px gap before the label. */
 const selectControlPx = 24;
-
 /** Extra width so the chevron and checkbox don't eat the label. */
 export function firstContentControlPx(columns: readonly { id?: string }[]): number {
   return columns.reduce((width, column) => {
@@ -255,6 +277,17 @@ export function withColumnGutters<T extends Kinded>(
 // Keep keys like `w` and `mw` from hitting the method missing proxy
 function nonKindDefaults() {
   return Object.fromEntries(nonKindGridColumnKeys.map((key) => [key, undefined]));
+}
+
+/** Start of the `fr` calc() fallback used until the probe measures the table. */
+const unmeasuredFrBasis = "(100% - ";
+
+/**
+ * Whether a column size is still the `fr` calc() fallback. Its `100%` is the row in a cell's `width`, but the
+ * scroll container in a sticky cell's `left`/`right`, so offsets built from it drift when the two differ.
+ */
+export function isUnmeasuredFrSize(size: string): boolean {
+  return size.includes(unmeasuredFrBasis);
 }
 
 export function parseWidthToPx(widthStr: string | undefined, tableWidth: number | undefined): number | null {
@@ -421,7 +454,7 @@ export function calcColumnSizes<R extends Kinded>(
       return `${Math.max(calcedWidth, mw)}px`;
     }
     // Otherwise return the `calc()` value
-    return `((100% - ${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
+    return `(${unmeasuredFrBasis}${claimedPercentages}% - ${claimedPixels}px) * (${myFr} / ${totalFr}))`;
   }
 
   const sizes = columns.map(({ id, expandedWidth, w: _w, mw: _mw }) => {

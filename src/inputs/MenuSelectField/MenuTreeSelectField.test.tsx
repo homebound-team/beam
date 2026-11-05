@@ -4,6 +4,7 @@ import { MenuTreeSelectField } from "src/inputs/MenuSelectField/MenuTreeSelectFi
 import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
 import type { TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
 import type { NestedOption, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
+import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { click, getOptions, getSelected, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -38,6 +39,30 @@ describe("MenuTreeSelectField", () => {
     expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
     expect(getSelected(r.sports)).toBe("NBA");
     expect(checkboxOf(r, "Basketball")).toHaveAttribute("data-checked", "mixed");
+  });
+
+  it("expands the groups that hold a dotted value", async () => {
+    // Given some records hold NBA, and nothing is selected
+    const r = await render(<TreeHarness mixedValues={["nba"]} />);
+    // When opening it
+    click(r.sports);
+    // Then NBA's group is open and NBA is dotted
+    expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
+    expect(optionOf(r, "NBA")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    // And the checkboxes ignore the dot: NBA is unchecked, Basketball isn't partial
+    expect(checkboxOf(r, "NBA")).toHaveAttribute("data-checked", "false");
+    expect(checkboxOf(r, "Basketball")).toHaveAttribute("data-checked", "false");
+  });
+
+  it("does not dot a value its selected parent covers", async () => {
+    // Given Basketball selected, and records holding NBA
+    const r = await render(<TreeHarness initial={["basketball"]} mixedValues={["nba"]} />);
+    // When opening it
+    click(r.sports);
+    // Then NBA is checked through its parent, so nothing is dotted
+    expect(optionOf(r, "NBA")).toHaveAttribute("aria-selected", "true");
+    expect(optionOf(r, "NBA")).not.toHaveAccessibleDescription();
+    expect(r.query.sports_mixedLegend).toBeNull();
   });
 
   it("selects every child when a parent is selected", async () => {
@@ -82,6 +107,36 @@ describe("MenuTreeSelectField", () => {
       leaf: { values: ["wnba"], options: [wnba] },
       root: { values: ["wnba"], options: [wnba] },
     });
+  });
+
+  it("keeps a selected pill when the next options omit that node", async () => {
+    // Given a tree
+    function Page() {
+      const [options, setOptions] = useState(sports());
+      const [values, setValues] = useState<string[]>([]);
+      return (
+        <>
+          <button
+            data-testid="showBaseball"
+            onClick={() => setOptions([{ id: "baseball", name: "Baseball", children: [{ id: "mlb", name: "MLB" }] }])}
+          />
+          <MenuTreeSelectField
+            label="Sports"
+            options={options}
+            values={values}
+            onSelect={(response) => setValues(response.all.values)}
+          />
+        </>
+      );
+    }
+    const r = await render(<Page />);
+    // When Golf is selected and the list is replaced with Baseball
+    select(r.sports, "Golf");
+    click(r.showBaseball);
+    // Then the menu lists Baseball only, and Golf stays a pill
+    expect(getOptions(r.sports)).toEqual(["Baseball"]);
+    expect(r.sports_selections_pill_0).toHaveTextContent("Golf");
+    expect(r.sports_count).toHaveTextContent("1");
   });
 
   it("removes a child and its parent when that child's pill is clicked", async () => {
@@ -246,6 +301,26 @@ describe("MenuTreeSelectField", () => {
     expect(r.sports_originalValue).toHaveTextContent(/^Child 1$/);
   });
 
+  it("does not list a nested current value as its own root", async () => {
+    // Given a selected leaf as `current`, and the loaded tree that already contains it
+    const r = await render(
+      <TreeHarness
+        initial={["nba"]}
+        options={{
+          current: { id: "nba", name: "NBA" },
+          load: async () => {},
+          options: sports(),
+        }}
+      />,
+    );
+
+    // When the menu opens
+    click(r.sports);
+
+    // Then NBA stays under Basketball
+    expect(getOptions(r.sports)).toEqual(["Baseball", "Basketball", "NBA", "WNBA", "Golf"]);
+  });
+
   it("counts every selection by default", async () => {
     // Given a selected parent and a lone leaf
     const r = await render(<TreeHarness initial={["basketball", "golf"]} />);
@@ -273,11 +348,12 @@ type Sport = { id: string; name: string };
 type TreeHarnessProps = {
   onSelectSpy?: (response: TreeSelectResponse<Sport, string>) => void;
   initial?: string[];
-  options?: NestedOption<Sport>[];
+  options?: OptionsOrLoad<NestedOption<Sport>>;
   disabledOptions?: string[];
   selectionDisplay?: TreeSelectionDisplay;
   proposedValues?: string[];
   defaultExpanded?: boolean;
+  mixedValues?: string[];
 };
 
 function TreeHarness(props: TreeHarnessProps) {
@@ -301,9 +377,12 @@ function activeOption(listbox: HTMLElement): string | null {
   return listbox.getAttribute("aria-activedescendant");
 }
 
+function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
+  return r.getAllByTestId("sports_option").find((o) => o.dataset.label === label);
+}
+
 function checkboxOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): Element | null {
-  const option = r.getAllByTestId("sports_option").find((o) => o.dataset.label === label);
-  return option?.querySelector("[data-checked]") ?? null;
+  return optionOf(r, label)?.querySelector("[data-checked]") ?? null;
 }
 
 const nba: NestedOption<Sport> = { id: "nba", name: "NBA" };

@@ -28,9 +28,11 @@ In camelCase utility files (e.g. `formatDocumentTitle.ts`), put **types first**,
 
 ## Comments
 
-- **JSDoc:** Keep exported symbols to **one or two lines**. State purpose, not implementation; point to `docs/` for full contracts (e.g. [`docs/layouts.md`](docs/layouts.md), [`docs/components.md`](docs/components.md)).
-- **Inline comments:** Use for non-obvious logic near the code. Keep them **short** — one line when possible.
-- **Avoid:** Multi-paragraph JSDoc, restating what the code already says, and duplicating docs that live elsewhere.
+Say what the code does. Name the result, where it comes from, and the case that changes the result (a fallback, a tree, a value that was removed). One or two lines. A second sentence is for that second case, not for a walk through the steps. Leave out a sentence that does not change what the reader does ("a flat list is unchanged", "so a nested current stays listed").
+
+- **JSDoc:** The first line is a single sentence. Further sentences go in their own paragraphs. Use it on exports, and on a helper whose name does not carry that behavior. Point to `docs/` for a full contract (e.g. [`docs/layouts.md`](docs/layouts.md), [`docs/components.md`](docs/components.md)).
+- **Inline comments:** Use them for non-obvious logic beside the code. One line when the behavior fits in one sentence.
+- **Avoid:** Multi-paragraph JSDoc, a label for the next block ("for the pills", "flat case"), a stand-in for the data ("memory", "written"), restating the next line, and duplicating a contract that already lives in `docs/`.
 
 ## Testing
 
@@ -56,7 +58,7 @@ Test behavior: what renders, what is omitted, and what happens on interaction. D
 - Use descriptive `it` names.
 - **Inline test data:** Define props, items, and other fixtures **inside the `it` body** when only that test needs them. Extract a shared factory only when **multiple tests** need the same shape and duplicating it would hurt maintainability.
 - **Describe-scoped helpers:** Helpers used only in one `describe` (e.g. a local `withState` wrapper) go **after all `it` / `test` cases** in that block (tests first, helpers last). Example: [`NavGroup.test.tsx`](src/components/NavLinks/NavGroup.test.tsx).
-- **File-scoped helpers:** Harness components and factories shared across the file belong at **module level** (outside `describe`), typically after the `describe` block(s) — e.g. [`useSideNavLinkGroupExpanded.test.tsx`](src/components/SideNav/useSideNavLinkGroupExpanded.test.tsx). Prefer module level over nesting inside `describe`.
+- **File-scoped helpers:** Harness components and factories shared across the file belong at **module level** (outside `describe`), typically after the `describe` block(s) — e.g. [`useSideNavLinkGroupExpanded.test.tsx`](src/components/SideNav/useSideNavLinkGroupExpanded.test.tsx). Prefer module level over nesting inside `describe`. Name a test-only component with a `Test` prefix (`TestHierarchyField`). A `Harness` suffix is the other accepted form; prefer the `Test` prefix.
 - **No module-level fixture values:** Do not declare objects, arrays, or other non-trivial **values** at the top level of a test file. Vitest loads the whole module eagerly, so `const items = [{ … }]` at module scope runs even when this file’s tests do not. Module-level **functions** (factories, harness components) are fine. Inline literals inside an `it` body are preferred for one-off data.
 
 ### Selectors
@@ -131,6 +133,8 @@ Use helpers from `@homebound/rtl-utils` (re-exported via `rtl.tsx`), e.g. `click
 
 - Prefer `toHaveTextContent`, `toBeInTheDocument`, `not.toBeDisabled`, `toHaveValue` as appropriate.
 - Prefer `toBe` / `toBeDefined` / `toBeUndefined` over `toEqual` / `toBeTruthy` / `toBeFalsy`.
+- Assert the whole value. Do not use `expect.objectContaining` or another partial matcher when the call or object is known. Write every field, including nested ones, so the assertion shows what was passed.
+- Hard-code the expected value in the assertion. Write the labels, ids, and objects in the `expect`. A helper that derives the expected list from the fixture hides the value the test is checking.
 
 Example tests: [`DateField.test.tsx`](src/inputs/DateFields/DateField.test.tsx), [`BoundDateField.test.tsx`](src/forms/BoundDateField.test.tsx), [`useTestIds.test.tsx`](src/utils/useTestIds.test.tsx), [`useFilter.test.tsx`](src/hooks/useFilter.test.tsx).
 

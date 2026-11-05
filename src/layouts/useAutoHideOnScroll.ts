@@ -13,6 +13,48 @@ export type AutoHideResult = {
 /** Scroll distance before hiding chrome. Exported for tests. */
 export const THRESHOLD = 80;
 
+/** How long the window must go without scrolling before a hold releases, for browsers without `scrollend`. */
+export const HOLD_QUIET_MS = 150;
+
+/** Cancels the active hold's listeners and timer, if a programmatic scroll is in flight. */
+let cancelActiveHold: (() => void) | undefined;
+const holdReleaseListeners = new Set<() => void>();
+// Not `keydown`, since typing in a table's search box is what triggers some of these scrolls.
+const userScrollEvents = ["wheel", "touchstart"] as const;
+
+/**
+ * Runs a programmatic window scroll while auto-hide chrome (navbar, page header) holds its current state.
+ *
+ * Otherwise a smooth scroll back up reveals the chrome mid-scroll, which pushes pinned content (e.g. table actions)
+ * down over the target that `scroll-margin-top` had already measured. Releases on `scrollend`, once scrolling goes
+ * quiet, or as soon as the user scrolls themselves.
+ */
+export function holdAutoHideWhile(scroll: () => void): void {
+  cancelActiveHold?.();
+  let quietTimer: ReturnType<typeof setTimeout>;
+  const restartQuietTimer = () => {
+    clearTimeout(quietTimer);
+    quietTimer = setTimeout(release, HOLD_QUIET_MS);
+  };
+  const cancel = () => {
+    clearTimeout(quietTimer);
+    window.removeEventListener("scroll", restartQuietTimer);
+    for (const event of userScrollEvents) window.removeEventListener(event, release);
+    window.removeEventListener("scrollend", release);
+    cancelActiveHold = undefined;
+  };
+  function release() {
+    cancel();
+    holdReleaseListeners.forEach((listener) => listener());
+  }
+  window.addEventListener("scroll", restartQuietTimer, { passive: true });
+  for (const event of userScrollEvents) window.addEventListener(event, release, { passive: true });
+  window.addEventListener("scrollend", release);
+  cancelActiveHold = cancel;
+  restartQuietTimer();
+  scroll();
+}
+
 function getInitialAutoHideState(): AutoHideState {
   if (typeof window === "undefined" || window.scrollY <= 0) {
     return "resting";
@@ -85,6 +127,12 @@ export function useAutoHideOnScroll(
       }
 
       const currentY = window.scrollY;
+      // A programmatic scroll is in flight — keep the chrome still, but track the baseline for when it releases.
+      if (cancelActiveHold) {
+        lastScrollY.current = currentY;
+        return;
+      }
+
       const rect = el.getBoundingClientRect();
       const topOffset = getTopOffsetRef.current?.() ?? 0;
 
@@ -113,9 +161,23 @@ export function useAutoHideOnScroll(
       commit(next);
     };
 
+    /** A programmatic scroll finished — resync from geometry only, so the chrome never reveals over its target. */
+    const onHoldRelease = () => {
+      const el = spacerRef.current;
+      if (!el) return;
+      lastScrollY.current = window.scrollY;
+      lastScrollHeight.current = document.documentElement.scrollHeight;
+      if (window.scrollY <= 0) return commit("resting");
+      commit(autoHideStateOnLayoutChange(el.getBoundingClientRect(), getTopOffsetRef.current?.() ?? 0));
+    };
+
     updateAutoHideState();
     window.addEventListener("scroll", updateAutoHideState, { passive: true });
-    return () => window.removeEventListener("scroll", updateAutoHideState);
+    holdReleaseListeners.add(onHoldRelease);
+    return () => {
+      window.removeEventListener("scroll", updateAutoHideState);
+      holdReleaseListeners.delete(onHoldRelease);
+    };
   }, [enabled, spacerRef]);
 
   return { state };

@@ -4,6 +4,7 @@ import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
+import { ScrollableParent } from "src/components/Layout/ScrollableParent";
 import { ModalProvider } from "src/components/Modal/ModalContext";
 import { cardStatusSlot, cardTitleSlot } from "src/components/Table/cardSlots";
 import { setRunningInJest } from "src/components/Table/GridTable";
@@ -1070,6 +1071,154 @@ describe("GridTableLayout", () => {
       // Then the pill is removed and the filter state is cleared
       expect(r.query.filter_pill_needsRevision).toBeNull();
       expect(capturedFilter).toEqual({});
+    });
+  });
+
+  describe("scrollToTopOnFilterChange", () => {
+    // jsdom doesn't implement `scrollIntoView` or element `scrollTo`
+    const scrollIntoView = vi.fn();
+    const scrollTo = vi.fn();
+    beforeEach(() => {
+      HTMLElement.prototype.scrollIntoView = scrollIntoView;
+      HTMLElement.prototype.scrollTo = scrollTo;
+    });
+    afterEach(() => {
+      scrollIntoView.mockReset();
+      scrollTo.mockReset();
+      delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView;
+      delete (HTMLElement.prototype as Partial<HTMLElement>).scrollTo;
+    });
+
+    it("scrolls the ScrollableParent scroller to the top when a filter changes", async () => {
+      // Given a nested-scroll GridTableLayout that opts into scrolling on filter changes
+      const r = await render(
+        <ScrollableParent>
+          <TestWrapper
+            layoutStateProps={getModalFilterProps("scrollable-parent-scroll-test")}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+            scrollToTopOnFilterChange
+          />
+        </ScrollableParent>,
+        withRouter(),
+      );
+
+      // When a filter changes
+      click(r.filter_needsRevision);
+
+      // Then the scroller holding the portaled table body is scrolled to the top, not the whole wrapper
+      expect(scrollTo).toHaveBeenCalledExactlyOnceWith({ top: 0, behavior: "smooth" });
+      const scroller = scrollTo.mock.contexts[0] as HTMLElement;
+      expect(scroller).toContainElement(r.getByText("Alpha"));
+      expect(scroller).not.toContainElement(r.tableWrapper);
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+
+    it("scrolls to the top of the table when a filter changes, but not on mount", async () => {
+      // Given a document-scroll GridTableLayout that opts into scrolling on filter changes
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={getModalFilterProps("scroll-on-filter-test")}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+            scrollToTopOnFilterChange
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+      // Then mounting does not scroll
+      expect(scrollIntoView).not.toHaveBeenCalled();
+
+      // When a filter changes
+      click(r.filter_needsRevision);
+
+      // Then the table wrapper is scrolled to the top
+      expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({ behavior: "smooth", block: "start", inline: "start" });
+      expect(scrollIntoView.mock.contexts[0]).toBe(r.tableWrapper);
+    });
+
+    it("does not scroll when not opted in", async () => {
+      // Given a GridTableLayout without scrollToTopOnFilterChange
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <TestWrapper
+            layoutStateProps={getModalFilterProps("no-scroll-on-filter-test")}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        </DocumentScrollLayoutProvider>,
+        withRouter(),
+      );
+
+      // When a filter changes
+      click(r.filter_needsRevision);
+
+      // Then the page does not scroll
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+
+    it("waits for the query to load before scrolling", async () => {
+      // Given a query table whose query refetches when the filter changes
+      let loading = false;
+      function QueryWrapper() {
+        const layoutState = useGridTableLayoutState(getModalFilterProps("scroll-on-query-test"));
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            scrollToTopOnFilterChange
+            tableProps={{
+              columns: getColumns(),
+              query: { data: getRows(), loading },
+              createRows: (data) => [simpleHeader, ...(data ?? [])],
+            }}
+          />
+        );
+      }
+      const r = await render(<QueryWrapper />, withRouter());
+
+      // When a filter changes while the query is loading
+      loading = true;
+      click(r.filter_needsRevision);
+      // Then the page does not scroll yet
+      expect(scrollIntoView).not.toHaveBeenCalled();
+
+      // And when the query finishes loading
+      loading = false;
+      r.rerender(<QueryWrapper />);
+      // Then the table is scrolled to the top
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+    });
+
+    it("does not scroll again for a refetch or an equal filter", async () => {
+      // Given a query table that already scrolled for a filter change
+      let loading = false;
+      let layoutState: ReturnType<typeof useGridTableLayoutState<{ needsRevision: boolean }>>;
+      function QueryWrapper() {
+        layoutState = useGridTableLayoutState(getModalFilterProps("no-rescroll-test"));
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            scrollToTopOnFilterChange
+            tableProps={{
+              columns: getColumns(),
+              query: { data: getRows(), loading },
+              createRows: (data) => [simpleHeader, ...(data ?? [])],
+            }}
+          />
+        );
+      }
+      const r = await render(<QueryWrapper />, withRouter());
+      click(r.filter_needsRevision);
+      expect(scrollIntoView).toHaveBeenCalledOnce();
+
+      // When the query refetches with the same filter
+      loading = true;
+      r.rerender(<QueryWrapper />);
+      loading = false;
+      r.rerender(<QueryWrapper />);
+      // And an equal filter is set as a new object
+      act(() => layoutState.setFilter({ ...layoutState.filter }));
+
+      // Then the page does not scroll again
+      expect(scrollIntoView).toHaveBeenCalledOnce();
     });
   });
 

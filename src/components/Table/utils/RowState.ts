@@ -2,7 +2,7 @@ import { makeAutoObservable, observableRef, reaction } from "mobx";
 import { resolveCompanion, type GridRowCompanion } from "src/components/Table/components/CompanionRow";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { maybeApply, type GridRowApi } from "src/components/Table/GridTableApi";
-import type { Kinded, MaybeFn } from "src/components/Table/types";
+import type { Kinded, MaybeFn, PinnedState } from "src/components/Table/types";
 import type { RowStates } from "src/components/Table/utils/RowStates";
 import type { SelectedState } from "src/components/Table/utils/TableState";
 import { applyRowFn, HEADER, KEPT_GROUP, matchesFilter, reservedRowKinds } from "src/components/Table/utils/utils";
@@ -254,6 +254,27 @@ export class RowState<R extends Kinded> {
     this.pinned = !this.pinned;
   }
 
+  /** Whether a parent/grandparent is pinned, so this row hoists along with it. */
+  get hasPinnedAncestor(): boolean {
+    // Reserved rows (i.e. the header) are never pinned, even if `api.pinRow("header")` was called.
+    return !!this.parent && ((this.parent.pinned && !this.parent.isReservedKind) || this.parent.hasPinnedAncestor);
+  }
+
+  /**
+   * How the row is pinned, if at all: "parent" when it hoists with a pinned parent (even if it's also pinned itself,
+   * since it can't be unpinned on its own), otherwise "self" when it's pinned. Reserved rows are never pinned.
+   */
+  get pinnedState(): PinnedState | undefined {
+    if (this.hasPinnedAncestor) return "parent";
+    if (this.pinned && !this.isReservedKind) return "self";
+    return undefined;
+  }
+
+  /** Whether the row shows as pinned: pinned itself, or hoisted with a pinned parent. */
+  get showsPinned(): boolean {
+    return !!this.pinnedState;
+  }
+
   /** Whether this is a selected-but-filtered-out row that we should hoist to the top. */
   get isKept(): boolean {
     // this row is "kept" if it is selected, and:
@@ -264,8 +285,22 @@ export class RowState<R extends Kinded> {
       // Headers, totals, etc., do not need keeping
       !this.isReservedKind &&
       !this.isParent &&
+      // Already rendered in the pinned section
+      !this.shownInPinnedSection &&
       (!this.isMatched || this.removed === "soft")
     );
+  }
+
+  /**
+   * Whether this row is already in the pinned section.
+   *
+   * A direct pin stays there even after it leaves `props.rows`. A child hoisted with a pinned parent
+   * stays when that parent leaves too (it is still in the parent's children). A child dropped on its
+   * own is detached, so it can still be a kept row.
+   */
+  private get shownInPinnedSection(): boolean {
+    if (this.pinned) return true;
+    return this.hasPinnedAncestor && (!this.removed || !!this.parent?.children?.includes(this));
   }
 
   get isLastKeptRow(): boolean {
@@ -314,7 +349,11 @@ export class RowState<R extends Kinded> {
           // Reserved rows are always visible, even though they're not considered matched.
           // ...except for the kept group: its `isMatched` will become true whenever it has
           // any kept row children, as they will cause its hasDirectlyMatchedChildren to be true.
-          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) || rs.isMatched || rs.isAlwaysVisible,
+          // A pinned parent shows despite the filter, so its whole subtree does too.
+          (rs.isReservedKind && rs.row.kind !== KEPT_GROUP) ||
+          rs.isMatched ||
+          rs.isAlwaysVisible ||
+          rs.hasPinnedAncestor,
       ) ?? []
     );
   }

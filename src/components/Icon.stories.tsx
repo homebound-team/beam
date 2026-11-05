@@ -57,6 +57,8 @@ export const Icon = (props: IconProps) => {
     "expand",
     "collapse",
     "undoCircle",
+    "undo",
+    "restore",
     "drag",
     "move",
     "merge",
@@ -105,6 +107,7 @@ export const Icon = (props: IconProps) => {
     "triangleUp",
     "triangleDown",
     "subDirectoryRight",
+    "swap",
   ];
   const mediaIcons: IconProps["icon"][] = [
     "camera",
@@ -152,6 +155,7 @@ export const Icon = (props: IconProps) => {
     "faucet",
     "bed",
     "sqFeet",
+    "squareFootage",
     "ruler",
     "palette",
     "bath",
@@ -168,6 +172,7 @@ export const Icon = (props: IconProps) => {
     "updateDesignPackage",
     "exteriorStyle",
     "lockOpen",
+    "lockClosed",
     "map",
     "mapGlobe",
     "history",
