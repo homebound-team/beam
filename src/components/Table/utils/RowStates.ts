@@ -157,12 +157,12 @@ export class RowStates<R extends Kinded> {
   /**
    * Returns rows directly pinned at runtime, i.e. for `api.getPinnedRowIds`.
    *
-   * Sourced from `allStates` and not `visibleRows` so pinned rows stay visible even when the
-   * current filter would otherwise hide them (like`keptRows`). Reserved rows are never pinnable,
-   * and rows dropped from `props.rows` aren't shown (but stay pinned if they come back).
+   * Sourced from `allStates` and not `visibleRows` so a pin stays visible when a filter hides the
+   * row, or when the row leaves `props.rows` (a server-side search). It keeps its last data until
+   * it comes back or is unpinned. Reserved rows are never pinnable.
    */
   get pinnedRows(): RowState<R>[] {
-    return this.allStates.filter((rs) => rs.pinned && !rs.isReservedKind && !rs.removed);
+    return this.allStates.filter((rs) => rs.pinned && !rs.isReservedKind);
   }
 
   /** Returns the rows to render in the pinned section: each pinned row plus its (non-collapsed) children. */

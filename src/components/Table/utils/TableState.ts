@@ -198,6 +198,11 @@ export class TableState<R extends Kinded> {
     return firstContentControlPx(this.controlColumns);
   }
 
+  /** True when any top-level data row has children. Every top-level row then uses the small hierarchy type. */
+  get topLevelHasChildren(): boolean {
+    return this.rows.some((row) => !reservedRowKinds.includes(row.kind) && !!row.children?.length);
+  }
+
   /** Returns visible columns, i.e. those that are visible + any expanded children. */
   get visibleCsvColumns(): GridColumnWithId<R>[] {
     return this.columnStates.allVisibleColumns("csv").map((cs) => cs.column);
