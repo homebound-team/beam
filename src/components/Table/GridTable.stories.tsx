@@ -743,8 +743,8 @@ export const RowActions = newStory(
       parent: (_data, { row }) => ({
         pinnable: true,
         actions: [
-          { icon: "plus", label: "Add child", onClick: () => action("add child")(row.id) },
-          { icon: "pencil", label: "Edit", onClick: () => action("edit")(row.id) },
+          { icon: "plus", label: "Add child", onClick: () => action("add child")(row.id), overflowOnly: true },
+          { icon: "pencil", label: "Edit", onClick: () => action("edit")(row.id), overflowOnly: true },
         ],
       }),
       child: (_data, { row }) => ({
