@@ -1338,7 +1338,7 @@ describe("GridTable", () => {
       expect(r.query.pin_3).toBeNull();
     });
 
-    it("stops showing a pinned row once it's dropped from rows", async () => {
+    it("keeps a pinned row visible after it's dropped from rows", async () => {
       // Given row 2 is pinned
       const api = new GridTableApiImpl<Row>();
       const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
@@ -1347,10 +1347,11 @@ describe("GridTable", () => {
       await r.rerender(
         <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows.filter((r) => r.id !== "2")} />,
       );
-      // Then it's no longer shown or reported as pinned
-      expect(api.getPinnedRowIds()).toEqual([]);
-      expect(cell(r, 1, 0)).toHaveTextContent("foo");
-      expect(cell(r, 2, 0)).toHaveTextContent("zaz");
+      // Then it stays at the top and is still reported as pinned, ahead of the rows that remain
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(cell(r, 3, 0)).toHaveTextContent("zaz");
     });
 
     describe("with nested rows", () => {
@@ -1438,6 +1439,27 @@ describe("GridTable", () => {
         expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
         expect(cell(r, 2, 0)).toHaveTextContent("parent 2");
         expect(row(r, 3)).toBeUndefined();
+      });
+
+      it("keeps a pinned parent's children after the parent is dropped from rows", async () => {
+        // Given parent 1 is pinned, with its child and grandchild
+        const api = new GridTableApiImpl<NestedRow>();
+        const columns = [collapseColumn<NestedRow>(), nestedNameColumn, pins];
+        const r = await render(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} />);
+        click(r.pin_p1);
+        // When the page drops that parent (and its children) from its rows
+        await r.rerender(
+          <GridTable<NestedRow> api={api} columns={columns} rows={nestedRows.filter((row) => row.id !== "p1")} />,
+        );
+        // Then the parent stays pinned and its children stay with it, ahead of parent 2
+        expect(api.getPinnedRowIds()).toEqual(["p1"]);
+        expect(api.isPinnedRow("p1c1")).toBe("parent");
+        expect(api.isPinnedRow("p1c1g1")).toBe("parent");
+        expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
+        expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
+        expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
+        expect(cell(r, 4, 0)).toHaveTextContent("parent 2");
+        expect(row(r, 5)).toBeUndefined();
       });
 
       it("keeps a pinned parent's children while searching", async () => {
