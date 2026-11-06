@@ -17,7 +17,7 @@ import { useTestIds } from "src/utils/useTestIds";
  * there's only one left over, which shows as an icon in the menu's place.
  */
 export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config: GridRowActionsConfig }) {
-  const { actions = [], pinnable = false, overflowIcon = "verticalDots" } = config;
+  const { actions = [], pinnable = false } = config;
   const { sm } = useBreakpoint();
   // Up to 2 icons (the pin included) before the menu, 3 buttons in all; phone-sized screens show only the pin and the menu
   const visibleCount = sm ? 0 : 2;
@@ -44,7 +44,7 @@ export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config:
       {menuItems.length > 0 && (
         <ButtonMenu
           {...tid[`rowActions_${row.id}`]}
-          trigger={{ icon: overflowIcon, inc: tableIconInc }}
+          trigger={{ icon: "verticalDots", inc: tableIconInc }}
           items={menuItems}
           placement="right"
         />

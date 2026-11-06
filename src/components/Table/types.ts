@@ -147,8 +147,6 @@ export type GridRowActionsConfig = {
    * The menu never holds just one action: a lone leftover action shows as an icon in the menu's place.
    */
   actions?: GridRowAction[];
-  /** The "overflow" menu's trigger icon. Defaults to `verticalDots`. */
-  overflowIcon?: IconProps["icon"];
 };
 
 /**
