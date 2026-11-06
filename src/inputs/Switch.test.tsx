@@ -24,6 +24,24 @@ describe("Switch", () => {
     const r = await render(<SwitchTest label="Age" selected />);
     expect(switchCircle(r.age)).toHaveStyle({ left: "calc(100% - 20px - 2px)" });
   });
+
+  it("forwards its test id to inline label tooltips", async () => {
+    // Given an inline switch with an explicit prefix
+    // When rendered with a disabled reason
+    const r = await render(<SwitchTest label="Active" data-testid="productActive" disabled="Archived" />);
+    // Then the label tooltip uses the switch prefix
+    expect(r.productActive_label_tooltip).toHaveAttribute("title", "Archived");
+  });
+
+  it("forwards its test id to form label tooltips", async () => {
+    // Given a form-style switch with an explicit prefix
+    // When rendered with label help
+    const r = await render(
+      <SwitchTest label="Active" labelStyle="form" data-testid="productActive" tooltip="Visible in the catalog" />,
+    );
+    // Then the label tooltip uses the switch prefix
+    expect(r.productActive_label_tooltip).toHaveAttribute("title", "Visible in the catalog");
+  });
 });
 
 function switchCircle(input: HTMLElement): HTMLElement {

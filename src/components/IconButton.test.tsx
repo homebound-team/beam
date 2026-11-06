@@ -6,13 +6,16 @@ import { vi } from "vitest";
 
 describe("IconButton", () => {
   it("can add tooltips", async () => {
+    // Given an icon button whose label supplies the tooltip
+    // When rendered
     const r = await render(<IconButton icon="trash" label="Move to trash" onClick={noop} />);
-    expect(r.tooltip).toHaveAttribute("title", "Move to trash");
+    // Then the tooltip uses the icon-derived prefix, not the label
+    expect(r.trash_tooltip).toHaveAttribute("title", "Move to trash");
   });
 
   it("renders no tooltip when preventTooltip is set", async () => {
     const r = await render(<IconButton icon="trash" label="Move to trash" preventTooltip onClick={noop} />);
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.trash_tooltip).toBeNull();
   });
 
   it("can have a data-testid", async () => {
@@ -85,5 +88,47 @@ describe("IconButton", () => {
 
     // Then it is 32px
     expect(r.comment).toHaveStyle({ width: "32px", height: "32px" });
+  });
+
+  it("scopes an explicit tooltip to the icon-derived test id", async () => {
+    // Given an explicit tooltip with the label fallback suppressed
+    // When rendered
+    const r = await render(
+      <IconButton icon="trash" label="Delete" tooltip="Move to trash" preventTooltip onClick={noop} />,
+    );
+    // Then the explicit tooltip still uses the resolved icon prefix
+    expect(r.trash_tooltip).toHaveAttribute("title", "Move to trash");
+  });
+
+  it("scopes a link tooltip to an explicit test id", async () => {
+    // Given a link icon button with an explicit test id
+    // When rendered with a tooltip
+    const r = await render(
+      <IconButton icon="trash" data-testid="removeProduct" tooltip="Move to trash" onClick="/products" />,
+      withRouter(),
+    );
+    // Then the tooltip uses the explicit button prefix
+    expect(r.removeProduct_tooltip).toHaveAttribute("title", "Move to trash");
+  });
+
+  it("scopes the disabled reason to the icon-derived test id", async () => {
+    // Given a disabled reason with a normal tooltip and the label fallback suppressed
+    // When rendered
+    const r = await render(
+      <IconButton icon="trash" disabled="Archived" tooltip="Move to trash" preventTooltip onClick={noop} />,
+    );
+    // Then the scoped tooltip still exposes the disabled reason instead
+    expect(r.trash_tooltip).toHaveAttribute("title", "Archived");
+  });
+
+  it("scopes a disabled link reason to an explicit test id", async () => {
+    // Given a disabled link icon button with an explicit test id
+    // When rendered
+    const r = await render(
+      <IconButton icon="trash" data-testid="removeProduct" disabled="Archived" onClick="/products" />,
+      withRouter(),
+    );
+    // Then the scoped tooltip exposes the disabled reason
+    expect(r.removeProduct_tooltip).toHaveAttribute("title", "Archived");
   });
 });

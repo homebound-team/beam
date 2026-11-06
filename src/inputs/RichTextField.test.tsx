@@ -13,7 +13,7 @@ describe("RichTextField", () => {
     const r = await render(
       <RichTextField value="<div>test</div>" onChange={noop} label="Notes" tooltip="What this field is for" />,
     );
-    expect(r.tooltip).toHaveAttribute("title", "What this field is for");
+    expect(r.notes_label_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("rehydrates if data populates", async () => {

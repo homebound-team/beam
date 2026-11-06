@@ -9,6 +9,7 @@ import { ListBox } from "src/inputs/internal/ListBox";
 import { disabledOptionToKeyedTuple } from "src/inputs/internal/selectFieldHelpers";
 import { TextFieldBase, type TextFieldBaseProps } from "src/inputs/TextFieldBase";
 import { type Value, valueToKey } from "src/inputs/Value";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type AutocompleteProps<T> = {
   onSelect: (item: T) => void;
@@ -49,6 +50,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
   } = props;
 
   const { effectiveValue, proposalProps } = useAiProposal(value, proposedValue);
+  const tid = useTestIds(props, props.label);
 
   const disabledOptionsWithReasons = Object.fromEntries(disabledOptions?.map(disabledOptionToKeyedTuple) ?? []);
 
@@ -145,6 +147,7 @@ export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
         >
           <ListBox
             {...listBoxProps}
+            {...tid.options}
             positionProps={positionProps}
             state={state}
             listBoxRef={listBoxRef}

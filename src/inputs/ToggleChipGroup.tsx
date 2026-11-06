@@ -23,7 +23,7 @@ type ToggleChipItemProps = {
   readonly?: boolean;
 };
 
-export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labelStyle"> {
+export type ToggleChipGroupProps = {
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
   tooltip?: ReactNode;
@@ -33,7 +33,7 @@ export interface ToggleChipGroupProps extends Pick<PresentationFieldProps, "labe
   required?: boolean;
   onChange: (values: string[]) => void;
   xss?: ToggleChipXss;
-}
+} & Pick<PresentationFieldProps, "labelStyle">;
 
 export function ToggleChipGroup(props: ToggleChipGroupProps) {
   const { fieldProps } = usePresentationContext();
@@ -91,7 +91,7 @@ export function ToggleChipGroup(props: ToggleChipGroupProps) {
   );
 }
 
-interface ToggleChipProps {
+type ToggleChipProps = {
   label: string;
   value: string;
   groupState: CheckboxGroupState;
@@ -105,7 +105,7 @@ interface ToggleChipProps {
   readonly?: boolean;
   startAdornment?: ReactNode;
   xss?: ToggleChipXss;
-}
+};
 
 function ToggleChip(props: ToggleChipProps) {
   const {
@@ -125,6 +125,7 @@ function ToggleChip(props: ToggleChipProps) {
   const { inputProps } = useCheckboxGroupItem({ value, "aria-label": label, isReadOnly, isDisabled }, groupState, ref);
   const { isFocusVisible, focusProps } = useFocusRing();
   const tooltip = resolveTooltip(disabled);
+  const tid = useTestIds(props, label);
   const chipStateCss = isSelected
     ? Css.color(xss?.color ?? Palette.White)
         .bgColor(xss?.backgroundColor ?? Palette.Blue700)
@@ -137,6 +138,7 @@ function ToggleChip(props: ToggleChipProps) {
         : Css.bgGray200.$;
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: tooltip,
     placement: "top",
     children: (

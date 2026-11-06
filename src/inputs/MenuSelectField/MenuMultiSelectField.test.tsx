@@ -263,6 +263,39 @@ describe("MenuMultiSelectField", () => {
       expect(r.color_originalValue).toHaveTextContent("Red");
     });
   });
+
+  it("scopes the selection-count tooltip to an explicit field prefix", async () => {
+    // Given a multi-select with selected values and an explicit prefix
+    // When rendered
+    const r = await render(
+      <MenuMultiSelectField
+        label="Color"
+        options={colors()}
+        values={["r", "b"]}
+        onSelect={() => {}}
+        data-testid="productColors"
+      />,
+    );
+    // Then the count has its own tooltip, separate from field reasons
+    expect(r.productColors_count_tooltip).toBeInTheDocument();
+  });
+
+  it("supports indexed tooltips for multiple disabled checkbox options", async () => {
+    // Given Red and Black enabled, and Blue and Green disabled
+    const r = await render(
+      <MultiHarness
+        disabledOptions={[
+          { value: "b", reason: "Out of stock" },
+          { value: "g", reason: "Discontinued" },
+        ]}
+      />,
+    );
+    // When opening it
+    click(r.color);
+    // Then the suffix indexes tooltip wrappers, not the full option list
+    expect(r.color_option_tooltip_0).toHaveAttribute("title", "Out of stock");
+    expect(r.color_option_tooltip_1).toHaveAttribute("title", "Discontinued");
+  });
 });
 
 type Color = { id: string; name: string };

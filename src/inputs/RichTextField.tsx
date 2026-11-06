@@ -5,6 +5,7 @@ import { type PresentationFieldProps, usePresentationContext } from "src/compone
 import { Css, Tokens } from "src/Css";
 import { RichTextFieldMock } from "src/inputs/RichTextField.mock";
 import { maybeCall, noop } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 import { withTestMock } from "src/utils/withTestMock";
 import Tribute from "tributejs";
 import "tributejs/dist/tribute.css";
@@ -57,6 +58,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
     fullWidth = fieldProps?.fullWidth ?? false,
   } = props;
 
+  const tid = useTestIds(props, label || "richTextField");
   // We get a reference to the Editor instance after trix-init fires
   const [editor, setEditor] = useState<Editor>();
   const editorElement = useRef<HTMLElement | undefined>(undefined);
@@ -157,7 +159,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
     return (
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
         {/* TODO: Not sure what to pass to labelProps. */}
-        {label && <Label labelProps={{}} label={label} tooltip={props.tooltip} />}
+        {label && <Label labelProps={{}} label={label} tooltip={props.tooltip} {...tid.label} />}
         <div className="beam-trix-editor">
           {/* "hidden" input element should to be in the DOM prior to the trix-editor element in order for initialize to fire properly (https://github.com/basecamp/trix/issues/254#issuecomment-321814353) */}
           <input type="hidden" id={`input-${id}`} value={value} />
@@ -174,7 +176,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
   } else {
     return (
       <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
-        {label && <Label label={label} tooltip={props.tooltip} />}
+        {label && <Label label={label} tooltip={props.tooltip} {...tid.label} />}
         <div
           css={
             Css.mh("120px").bgColor(Tokens.Surface).sm.color(Tokens.OnSurface).bn.p1.br4.bc(Tokens.FieldBorderDefault)

@@ -46,22 +46,22 @@ describe(AvatarButton, () => {
     // Given a button with a tooltip and a name defined
     const r = await render(<AvatarButton src="test" name="Test" tooltip="Not the name" onClick={() => {}} />);
     // Then the tooltip is correctly displayed
-    expect(r.test_button.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Not the name");
+    expect(r.test_tooltip).toHaveAttribute("title", "Not the name");
     // And only one tooltip element is rendered (Avatar component does not render its own tooltip)
-    expect(r.getAllByTestId("tooltip")).toHaveLength(1);
+    expect(r.getAllByTestId("test_tooltip")).toHaveLength(1);
   });
 
   it("sets the tooltip to be the user's name if no tooltip is defined", async () => {
     // Given a button with no tooltip, but a name defined
     const r = await render(<AvatarButton src="test" name="Test" onClick={() => {}} />);
     // Then the tooltip is correctly displayed
-    expect(r.tooltip).toHaveAttribute("title", "Test");
+    expect(r.test_tooltip).toHaveAttribute("title", "Test");
   });
 
   it("renders no tooltip when preventTooltip is set", async () => {
     // Given a button with a name but preventTooltip set
     const r = await render(<AvatarButton src="test" name="Test" preventTooltip onClick={() => {}} />);
     // Then no tooltip is rendered in the DOM
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.test_tooltip).toBeNull();
   });
 });

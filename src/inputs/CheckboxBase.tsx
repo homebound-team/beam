@@ -65,6 +65,7 @@ export function CheckboxBase(props: CheckboxBaseProps) {
   const Tag = withLabelElement ? "label" : "div";
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: tooltip,
     placement: "top",
     children: (

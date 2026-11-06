@@ -87,6 +87,7 @@ export function AvatarButton(props: AvatarButtonProps) {
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip.
   // Unless opted out via `preventTooltip`, the avatar's `name` is also surfaced as the tooltip.
   return maybeTooltip({
+    ...tid.tooltip,
     title: resolveTooltip(disabled, tooltip ?? (preventTooltip ? undefined : avatarProps.name)),
     placement: "top",
     // Disable the auto-tooltip in Avatar to prevent nested tooltips which can cause issues with interactions

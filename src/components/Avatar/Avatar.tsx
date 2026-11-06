@@ -47,7 +47,7 @@ export function Avatar({ src, name, size = "md", showName = false, preventToolti
       <span css={Css.typography(sizeToTypeScale[size]).$}>{name}</span>
     </div>
   ) : (
-    maybeTooltip({ title: preventTooltip ? undefined : name, children: img, placement: "top" })
+    maybeTooltip({ ...tid.tooltip, title: preventTooltip ? undefined : name, children: img, placement: "top" })
   );
 }
 

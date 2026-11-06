@@ -6,6 +6,7 @@ import { Icon } from "src/components/Icon";
 import { maybeTooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { isPersistentKey } from "src/inputs/ChipSelectField";
+import { useTestIds } from "src/utils/useTestIds";
 
 type OptionProps<O> = {
   item: Node<O>;
@@ -16,6 +17,7 @@ type OptionProps<O> = {
 /** Represents a single option within a ListBox - used by SelectField and MultiSelectField */
 export function Option<O>(props: OptionProps<O>) {
   const { item, state, scrollToIndex, disabledReason } = props;
+  const tid = useTestIds(props, "option");
   const ref = useRef<HTMLLIElement>(null);
   const { hoverProps, isHovered } = useHover({});
 
@@ -35,6 +37,7 @@ export function Option<O>(props: OptionProps<O>) {
   );
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: disabledReason,
     placement: "right",
     children: (
