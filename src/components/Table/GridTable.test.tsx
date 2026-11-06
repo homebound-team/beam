@@ -1687,6 +1687,17 @@ describe("GridTable", () => {
       expect(r.query.rowActions_r1).toBeNull();
     });
 
+    it("uses the overflowIcon for the menu's trigger", async () => {
+      // Given two actions per row on a phone-sized screen, and a custom overflow icon
+      setViewport("sm");
+      const r = await render(
+        <GridTable<Row> columns={withActions({ actions: [edit, remove], overflowIcon: "cog" })} rows={actionRows} />,
+      );
+      // Then the menu's trigger shows that icon instead of the default dots
+      expect(r.rowActions_r1.querySelector("[data-icon='cog']")).toBeTruthy();
+      expect(r.rowActions_r1.querySelector("[data-icon='verticalDots']")).toBeNull();
+    });
+
     it("puts the actions in the menu on phone-sized screens", async () => {
       // Given two actions per row on a phone-sized screen
       setViewport("sm");
