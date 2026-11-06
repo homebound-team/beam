@@ -4,6 +4,7 @@ import { Button } from "src/components/Button";
 import type { SnackbarNoticeProps } from "src/components/Snackbar/SnackbarNotice";
 import { useSnackbar } from "src/components/Snackbar/useSnackbar";
 import { Css } from "src/Css";
+import { getFloatingBottomOffset } from "src/layouts/layoutVars";
 import { click, render, wait } from "src/utils/rtl";
 
 describe("useSnackbar", () => {
@@ -70,7 +71,7 @@ describe("useSnackbar", () => {
     // When a notification spawns
     click(r.notify);
     // Then it's offset by 200px
-    expect(r.snackbarWrapper).toHaveStyle({ bottom: "200px" });
+    expect(r.snackbarWrapper).toHaveStyle({ bottom: getFloatingBottomOffset(200) });
 
     // When its value changes to undefined
     r.rerender(<TestComponentWithOffset />);
@@ -79,7 +80,7 @@ describe("useSnackbar", () => {
     click(r.notify);
 
     // Then it reverted to a default offset
-    expect(r.snackbarWrapper).toHaveStyle({ bottom: "24px" });
+    expect(r.snackbarWrapper).toHaveStyle({ bottom: getFloatingBottomOffset(24) });
   });
 
   it("reverts offset when dismounting", async () => {
@@ -94,13 +95,13 @@ describe("useSnackbar", () => {
     // When we trigger a notice
     click(r.triggerNotice);
     // Then the offset is 200
-    expect(r.snackbarWrapper).toHaveStyle({ bottom: "200px" });
+    expect(r.snackbarWrapper).toHaveStyle({ bottom: getFloatingBottomOffset(200) });
 
     // When we drop the offset-caller from the DOM
     r.rerender(<TestComponent />);
 
     // Then snackbar reverts to a default offset
-    expect(r.snackbarWrapper).toHaveStyle({ bottom: "24px" });
+    expect(r.snackbarWrapper).toHaveStyle({ bottom: getFloatingBottomOffset(24) });
   });
 });
 

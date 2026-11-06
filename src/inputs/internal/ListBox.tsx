@@ -7,6 +7,7 @@ import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/interna
 import { ListBoxSection } from "src/inputs/internal/ListBoxSection";
 import { ListBoxToggleChip } from "src/inputs/internal/ListBoxToggleChip";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
+import { useTestIds } from "src/utils/useTestIds";
 
 // ListBox uses ListState (collection + selectionManager) as its state type,
 // which is the shared base of both SelectState and ComboBoxState.
@@ -41,6 +42,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
     hideChips = false,
   } = props;
   const { listBoxProps } = useListBox({ disallowEmptySelection: true, ...props }, state, listBoxRef);
+  const tid = useTestIds(props, "listBox");
   const positionMaxHeight = positionProps.style?.maxHeight;
   // The popoverMaxHeight will be based on the value defined by the positionProps returned from `useOverlayPosition` (which will always be a defined as a `number` based on React-Aria's `calculatePosition`).
   // If `maxHeight` is set use that, otherwise use `maxPopoverHeight` as a default, per UX guidelines.
@@ -134,6 +136,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
           [...state.collection].map((section) => (
             <ListBoxSection
               key={section.key}
+              {...tid}
               section={section}
               state={state}
               onListHeightChange={onListHeightChange}
@@ -145,6 +148,7 @@ export function ListBox<O, V extends AriaKey>(props: ListBoxProps<O, V>) {
           ))
         ) : (
           <VirtualizedOptions
+            {...tid}
             state={state}
             items={[...state.collection]}
             onListHeightChange={onListHeightChange}

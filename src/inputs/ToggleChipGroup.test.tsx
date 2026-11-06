@@ -26,7 +26,7 @@ describe("ToggleGroupChip", () => {
         data-testid="market"
       />,
     );
-    expect(r.market_label_0_tooltip).toHaveAttribute("title", "What this field is for");
+    expect(r.market_label_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("supports disabled options with tooltips", async () => {
@@ -42,7 +42,7 @@ describe("ToggleGroupChip", () => {
     expect(r.market_m2).toHaveAttribute("data-disabled", "true");
 
     expect(r.market_m3).toHaveAttribute("data-disabled", "true");
-    expect(r.getByTestId("tooltip")).toHaveAttribute("title", "No data");
+    expect(r.market_m3_tooltip).toHaveAttribute("title", "No data");
   });
 
   it("supports readonly options", async () => {

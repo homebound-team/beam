@@ -28,4 +28,14 @@ describe("Checkbox", () => {
     // Then it becomes true
     expect(onChange).toHaveBeenCalledWith(true);
   });
+
+  it("scopes its disabled reason to an explicit test id", async () => {
+    // Given a disabled checkbox with an explicit prefix
+    // When rendered
+    const r = await render(
+      <Checkbox label="Approve" selected={false} onChange={noop} disabled="Archived" data-testid="approval" />,
+    );
+    // Then its tooltip uses the checkbox prefix
+    expect(r.approval_tooltip).toHaveAttribute("title", "Archived");
+  });
 });

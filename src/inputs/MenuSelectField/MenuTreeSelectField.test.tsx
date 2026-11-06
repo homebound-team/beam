@@ -341,6 +341,25 @@ describe("MenuTreeSelectField", () => {
     // Then the count badge counts every selected leaf
     expect(r.sports_count).toHaveTextContent("3");
   });
+
+  it("scopes a disabled tree option tooltip to the field prefix", async () => {
+    // Given a tree select with a disabled leaf and an explicit prefix
+    const r = await render(
+      <MenuTreeSelectField
+        label="Sports"
+        options={[{ id: "basketball", name: "Basketball", children: [{ id: "nba", name: "NBA" }] }]}
+        values={[]}
+        onSelect={() => {}}
+        disabledOptions={[{ value: "nba", reason: "No access" }]}
+        defaultExpanded
+        data-testid="leagues"
+      />,
+    );
+    // When opening the tree
+    click(r.leagues);
+    // Then the leaf tooltip is directly addressable
+    expect(r.leagues_option_tooltip).toHaveAttribute("title", "No access");
+  });
 });
 
 type Sport = { id: string; name: string };

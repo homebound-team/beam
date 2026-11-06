@@ -19,7 +19,7 @@ import { maybeCall } from "src/utils/helpers";
 import { defaultOptionLabel, defaultOptionValue } from "src/utils/options";
 import { useTestIds } from "src/utils/useTestIds";
 
-export interface ChipSelectFieldProps<O, V extends Value> {
+export type ChipSelectFieldProps<O, V extends Value> = {
   label: string;
   value: V;
   options: O[];
@@ -37,7 +37,7 @@ export interface ChipSelectFieldProps<O, V extends Value> {
   onCreateNew?: (value: string) => Promise<void>;
   // Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
   disabled?: boolean | ReactNode;
-}
+};
 
 export function ChipSelectField<O, V extends Value>(props: ChipSelectFieldProps<O, V>): JSX.Element;
 export function ChipSelectField<O extends HasIdAndName<V>, V extends Value>(
@@ -238,6 +238,7 @@ export function ChipSelectField<O, V extends Value>(
         />
       )}
       {maybeTooltip({
+        ...tid.tooltip,
         title: resolveTooltip(disabled),
         placement: "top",
         children: (
@@ -297,6 +298,7 @@ export function ChipSelectField<O, V extends Value>(
         >
           <ListBox
             {...menuProps}
+            {...tid.options}
             listBoxRef={listBoxRef}
             state={state}
             getOptionLabel={getOptionLabel}
@@ -329,10 +331,10 @@ export function isListBoxSection<O>(obj: O | ListBoxSection<O>): obj is ListBoxS
   return obj && typeof obj === "object" && "options" in obj;
 }
 
-interface CreateNewFieldProps {
+type CreateNewFieldProps = {
   onBlur: VoidFunction;
   onEnter: (value: string) => void;
-}
+};
 
 // Wrapper for the ChipTextField used in the "Create New" flow on ChipSelectField
 function CreateNewField(props: CreateNewFieldProps) {

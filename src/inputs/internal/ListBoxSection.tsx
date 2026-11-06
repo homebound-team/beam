@@ -5,6 +5,7 @@ import { Css, Tokens } from "src/Css";
 import { persistentItemHeight, sectionSeparatorHeight } from "src/inputs/internal/constants";
 import { Option } from "src/inputs/internal/Option";
 import { VirtualizedOptions } from "src/inputs/internal/VirtualizedOptions";
+import { useTestIds } from "src/utils/useTestIds";
 
 type ListBoxSectionProps<O> = {
   section: Node<O>;
@@ -19,6 +20,7 @@ type ListBoxSectionProps<O> = {
 // Currently only expects two possible sections; 1. The list of options, and 2. A persistent action (in that order).
 export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
   const { section, state, onListHeightChange, popoverHeight, scrollOnFocus, disabledOptionsWithReasons } = props;
+  const tid = useTestIds(props, "listBox");
   const { itemProps, groupProps } = useListBoxSection(section);
   const { separatorProps } = useSeparator({ elementType: "li" });
   const isPersistentSection = section.key !== state.collection.getFirstKey();
@@ -37,10 +39,17 @@ export function ListBoxSection<O>(props: ListBoxSectionProps<O>) {
         >
           {isPersistentSection ? (
             childNodes.map((item) => (
-              <Option key={item.key} item={item} state={state} disabledReason={disabledOptionsWithReasons[item.key]} />
+              <Option
+                key={item.key}
+                item={item}
+                state={state}
+                disabledReason={disabledOptionsWithReasons[item.key]}
+                {...tid.option}
+              />
             ))
           ) : (
             <VirtualizedOptions
+              {...tid}
               state={state}
               items={childNodes}
               onListHeightChange={onListHeightChange}

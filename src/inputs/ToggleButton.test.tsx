@@ -68,4 +68,14 @@ describe("ToggleButton", () => {
     const r = await render(<ToggleButton label="Not the test id" data-testid="customTestId" onChange={() => {}} />);
     expect(r.customTestId).toBeInTheDocument();
   });
+
+  it("scopes its disabled reason to the resolved test id", async () => {
+    // Given a disabled toggle with an explicit prefix
+    // When rendered
+    const r = await render(
+      <ToggleButton label="Show archived" disabled="Not permitted" data-testid="archived" onChange={() => {}} />,
+    );
+    // Then its tooltip uses the toggle prefix
+    expect(r.archived_tooltip).toHaveAttribute("title", "Not permitted");
+  });
 });

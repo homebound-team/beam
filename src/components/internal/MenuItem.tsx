@@ -98,6 +98,7 @@ export function MenuItemImpl(props: MenuItemProps) {
       {...itemTid}
     >
       {maybeTooltip({
+        ...itemTid.tooltip,
         title: resolveTooltip(disabled),
         placement: "right",
         children: renderMenuItem(menuItem, isSelected, isDisabled, itemTid),

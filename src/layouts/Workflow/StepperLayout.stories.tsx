@@ -1,7 +1,9 @@
 import type { Meta } from "@storybook/react-vite";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { AiLoadingPanel } from "src/components/AiLoadingPanel";
+import { Button } from "src/components/Button";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
+import { useSnackbar } from "src/components/Snackbar/useSnackbar";
 import { Css } from "src/Css";
 import { StepperLayoutFormApp } from "src/forms/StepperLayoutFormApp";
 import { CenteredLayout } from "src/layouts/CenteredLayout/CenteredLayout";
@@ -220,6 +222,62 @@ export function WithTallSteps() {
         }))}
       />
     </WorkflowChrome>
+  );
+}
+
+/** Snackbar notices stack above the mobile action footer instead of covering it. */
+export function WithSnackbar() {
+  return (
+    <WorkflowChrome>
+      <StepperLayout
+        title="Create Design Package"
+        onCancel={action("cancel clicked")}
+        completeLabel="Create"
+        onComplete={action("complete clicked")}
+        steps={[
+          {
+            label: "Details",
+            content: (
+              <FormSectionLayout
+                title="Link Design Package"
+                description="Connect this package to a market and give it a name."
+                sections={[{ title: "Notices", fields: <SnackbarTrigger /> }, ...createFormSections()]}
+              />
+            ),
+          },
+          {
+            label: "Review",
+            content: (
+              <FormSectionLayout
+                title="Review"
+                description="Confirm before creating."
+                sections={[{ title: "Summary", fields: <PlaceholderFields count={2} /> }]}
+              />
+            ),
+          },
+        ]}
+      />
+    </WorkflowChrome>
+  );
+}
+
+function SnackbarTrigger() {
+  const { triggerNotice } = useSnackbar();
+  // Show notices immediately for Chromatic snapshots
+  useEffect(() => {
+    triggerNotice({ message: "Design package saved as a draft.", icon: "success", persistent: true });
+    triggerNotice({
+      message: "Costs are out of date and need to be refreshed.",
+      action: { label: "Refresh", variant: "text", onClick: action("refresh clicked") },
+      persistent: true,
+    });
+  }, [triggerNotice]);
+  return (
+    <Button
+      label="Trigger notice"
+      variant="secondary"
+      onClick={() => triggerNotice({ message: "Hey there, I am a snackbar notice!" })}
+    />
   );
 }
 

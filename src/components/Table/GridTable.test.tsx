@@ -1,4 +1,4 @@
-import { act, fireEvent } from "@testing-library/react";
+import { act, fireEvent, within } from "@testing-library/react";
 import { observable } from "mobx";
 import { type MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import {
@@ -1305,19 +1305,18 @@ describe("GridTable", () => {
       const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
 
       // Then the header has no pin toggle, but each data row has a row-scoped one
-      expect(r.query.pin_header).toBeNull();
-      expect(r.query.pin_1).toBeTruthy();
+      expect(within(cell(r, 0, 2)).queryByTestId("pinToggle")).toBeNull();
       // And the pin sits in the actions column after the content columns
-      expect(cell(r, 1, 2)).toContainElement(r.pin_1);
+      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
 
       // When we click row 1's toggle
-      click(r.pin_1);
+      click(within(cell(r, 1, 2)).getByTestId("pinToggle"));
       // Then it pins + hoists to the top
       expect(api.getPinnedRowIds()).toEqual(["1"]);
       expect(cell(r, 1, 1)).toHaveTextContent("1");
 
       // And clicking again unpins (the testid is row-scoped, so it stays stable despite the move)
-      click(r.pin_1);
+      click(within(cell(r, 1, 2)).getByTestId("pinToggle"));
       expect(api.getPinnedRowIds()).toEqual([]);
     });
 
@@ -1325,7 +1324,7 @@ describe("GridTable", () => {
       // Given a table without a rowActionsColumn
       const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={pinRows} />);
       // Then no row has a pin toggle
-      expect(r.query.pin_1).toBeNull();
+      expect(r.query.pinToggle).toBeNull();
     });
 
     it("decides each row's pin from its config", async () => {
@@ -1333,12 +1332,12 @@ describe("GridTable", () => {
       const pins = rowActionsColumn<Row>({ data: (data) => ({ pinnable: data.name !== "zaz" }) });
       const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
       // Then only the other rows get a pin toggle
-      expect(r.pin_1).toBeTruthy();
-      expect(r.pin_2).toBeTruthy();
-      expect(r.query.pin_3).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
+      expect(within(cell(r, 2, 2)).getByTestId("pinToggle")).toBeInTheDocument();
+      expect(within(cell(r, 3, 2)).queryByTestId("pinToggle")).toBeNull();
     });
 
-    it("stops showing a pinned row once it's dropped from rows", async () => {
+    it("keeps a pinned row visible after it's dropped from rows", async () => {
       // Given row 2 is pinned
       const api = new GridTableApiImpl<Row>();
       const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows} />);
@@ -1347,10 +1346,11 @@ describe("GridTable", () => {
       await r.rerender(
         <GridTable<Row> api={api} columns={[nameColumn, valueColumn]} rows={pinRows.filter((r) => r.id !== "2")} />,
       );
-      // Then it's no longer shown or reported as pinned
-      expect(api.getPinnedRowIds()).toEqual([]);
-      expect(cell(r, 1, 0)).toHaveTextContent("foo");
-      expect(cell(r, 2, 0)).toHaveTextContent("zaz");
+      // Then it stays at the top and is still reported as pinned, ahead of the rows that remain
+      expect(api.getPinnedRowIds()).toEqual(["2"]);
+      expect(cell(r, 1, 0)).toHaveTextContent("bar");
+      expect(cell(r, 2, 0)).toHaveTextContent("foo");
+      expect(cell(r, 3, 0)).toHaveTextContent("zaz");
     });
 
     describe("with nested rows", () => {
@@ -1395,7 +1395,7 @@ describe("GridTable", () => {
           />,
         );
         // When parent 1 is pinned
-        click(r.pin_p1);
+        click(within(row(r, 1)).getByTestId("pinToggle"));
         // Then its whole subtree shows in the pinned section, and parent 2 stays in the body
         expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
         expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
@@ -1409,16 +1409,16 @@ describe("GridTable", () => {
         expect(api.isPinnedRow("p1c1g1")).toBe("parent");
         expect(api.isPinnedRow("p2")).toBeUndefined();
         // And the children's pins can't be toggled on their own
-        expect(r.pin_p1c1).toBeDisabled();
-        expect(r.pin_p1c1g1).toBeDisabled();
+        expect(within(row(r, 2)).getByTestId("pinToggle")).toBeDisabled();
+        expect(within(row(r, 3)).getByTestId("pinToggle")).toBeDisabled();
 
         // When parent 1 is unpinned
-        click(r.pin_p1);
+        click(within(row(r, 1)).getByTestId("pinToggle"));
         // Then its children go back to the body with it
         expect(api.getPinnedRowIds()).toEqual([]);
         expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
         expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
-        expect(r.pin_p1c1).not.toBeDisabled();
+        expect(within(row(r, 2)).getByTestId("pinToggle")).not.toBeDisabled();
       });
 
       it("collapses a pinned parent's children in the pinned section", async () => {
@@ -1431,7 +1431,7 @@ describe("GridTable", () => {
             rows={nestedRows}
           />,
         );
-        click(r.pin_p1);
+        click(within(row(r, 1)).getByTestId("pinToggle"));
         // When it's collapsed
         act(() => api.toggleCollapsedRow("p1"));
         // Then its children are hidden, and parent 2 follows it in the body
@@ -1440,12 +1440,33 @@ describe("GridTable", () => {
         expect(row(r, 3)).toBeUndefined();
       });
 
+      it("keeps a pinned parent's children after the parent is dropped from rows", async () => {
+        // Given parent 1 is pinned, with its child and grandchild
+        const api = new GridTableApiImpl<NestedRow>();
+        const columns = [collapseColumn<NestedRow>(), nestedNameColumn, pins];
+        const r = await render(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} />);
+        click(within(row(r, 1)).getByTestId("pinToggle"));
+        // When the page drops that parent (and its children) from its rows
+        await r.rerender(
+          <GridTable<NestedRow> api={api} columns={columns} rows={nestedRows.filter((row) => row.id !== "p1")} />,
+        );
+        // Then the parent stays pinned and its children stay with it, ahead of parent 2
+        expect(api.getPinnedRowIds()).toEqual(["p1"]);
+        expect(api.isPinnedRow("p1c1")).toBe("parent");
+        expect(api.isPinnedRow("p1c1g1")).toBe("parent");
+        expect(cell(r, 1, 0)).toHaveTextContent("parent 1");
+        expect(cell(r, 2, 0)).toHaveTextContent("child p1c1");
+        expect(cell(r, 3, 0)).toHaveTextContent("grandchild p1c1g1");
+        expect(cell(r, 4, 0)).toHaveTextContent("parent 2");
+        expect(row(r, 5)).toBeUndefined();
+      });
+
       it("keeps a pinned parent's children while searching", async () => {
         // Given parent 1 is pinned
         const r = await render(
           <GridTable<NestedRow> columns={[collapseColumn<NestedRow>(), nestedNameColumn, pins]} rows={nestedRows} />,
         );
-        click(r.pin_p1);
+        click(within(row(r, 1)).getByTestId("pinToggle"));
         // When searching for something only parent 2 matches
         await r.rerender(
           <GridTable<NestedRow>
@@ -1467,7 +1488,7 @@ describe("GridTable", () => {
         const api = new GridTableApiImpl<NestedRow>();
         const columns = [collapseColumn<NestedRow>(), selectColumn<NestedRow>(), nestedNameColumn, pins];
         const r = await render(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} />);
-        click(r.pin_p1);
+        click(within(row(r, 1)).getByTestId("pinToggle"));
         act(() => api.selectRow("p1c1g1"));
         // When searching for something only parent 2 matches
         await r.rerender(<GridTable<NestedRow> api={api} columns={columns} rows={nestedRows} filter="parent 2" />);
@@ -1492,7 +1513,6 @@ describe("GridTable", () => {
   });
 
   describe("row actions", () => {
-    // Row ids aren't bare numbers, since `r.rowActions_1_delete` would read "1" as an index
     const actionRows: GridDataRow<Row>[] = [
       simpleHeader,
       { kind: "data", id: "r1", data: { name: "foo", value: 1 } },
@@ -1519,13 +1539,13 @@ describe("GridTable", () => {
       ];
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then each row shows both as icons in the actions column, with no "more" menu
-      expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
-      expect(cell(r, 1, 2)).toContainElement(r.delete_r1);
-      expect(r.query.rowActions_r1).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
       // And the header's actions cell is empty
       expect(cell(r, 0, 2)).toBeEmptyDOMElement();
       // When clicking an action
-      click(r.edit_r2);
+      click(within(cell(r, 2, 2)).getByTestId("edit"));
       // Then it's called with that row's data
       expect(onEdit).toHaveBeenCalledWith("r2", "bar");
     });
@@ -1535,8 +1555,8 @@ describe("GridTable", () => {
       const columns = withActions({ actions: [edit, { ...edit, label: "Edit dates" }] });
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then each is found by its label
-      expect(r.edit_r1).toBeTruthy();
-      expect(r.editDates_r1).toBeTruthy();
+      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).getByTestId("editDates")).toBeInTheDocument();
     });
 
     it("shows the pin as an icon after the actions when there's room", async () => {
@@ -1545,8 +1565,8 @@ describe("GridTable", () => {
         <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
       );
       // Then the pin shows right after the action
-      expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
-      expect(cell(r, 1, 2)).toContainElement(r.pin_r1);
+      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
     });
 
     it("keeps the pin as an icon and moves the overflowing actions into the more menu", async () => {
@@ -1559,12 +1579,12 @@ describe("GridTable", () => {
         withRouter(),
       );
       // Then the first two actions and the pin show as icons, and the third action moves into the menu
-      expect(r.edit_r1).toBeTruthy();
-      expect(r.duplicate_r1).toBeTruthy();
-      expect(r.pin_r1).toBeTruthy();
-      expect(r.query.delete_r1).toBeNull();
-      click(r.rowActions_r1);
-      expect(r.rowActions_r1_delete).toBeTruthy();
+      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).getByTestId("duplicate")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
+      click(within(cell(r, 1, 2)).getByTestId("rowActions"));
+      expect(r.rowActions_delete).toBeTruthy();
     });
 
     it("keeps the pin as an icon on phone-sized screens", async () => {
@@ -1575,10 +1595,10 @@ describe("GridTable", () => {
         withRouter(),
       );
       // Then the action moves into the menu, but the pin stays an icon
-      expect(r.query.edit_r1).toBeNull();
-      expect(r.pin_r1).toBeTruthy();
-      click(r.rowActions_r1);
-      expect(r.rowActions_r1_edit).toBeTruthy();
+      expect(within(cell(r, 1, 2)).queryByTestId("edit")).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
+      click(within(cell(r, 1, 2)).getByTestId("rowActions"));
+      expect(r.rowActions_edit).toBeTruthy();
     });
 
     it("keeps showing icons on tablet-sized screens", async () => {
@@ -1588,9 +1608,9 @@ describe("GridTable", () => {
         <GridTable<Row> columns={withActions({ actions: [edit, duplicate, remove] })} rows={actionRows} />,
       );
       // Then all three still show as icons, with no "more" menu
-      expect(r.edit_r1).toBeTruthy();
-      expect(r.delete_r1).toBeTruthy();
-      expect(r.query.rowActions_r1).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
     });
 
     it("puts every action in the menu on phone-sized screens", async () => {
@@ -1598,8 +1618,8 @@ describe("GridTable", () => {
       setViewport("sm");
       const r = await render(<GridTable<Row> columns={withActions({ actions: [edit] })} rows={actionRows} />);
       // Then there are no icons, just the menu
-      expect(r.query.edit_r1).toBeNull();
-      expect(r.rowActions_r1).toBeTruthy();
+      expect(within(cell(r, 1, 2)).queryByTestId("edit")).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("rowActions")).toBeInTheDocument();
     });
 
     it("gives each kind its own config, and leaves unlisted kinds empty", async () => {
@@ -1630,10 +1650,10 @@ describe("GridTable", () => {
       const actions = rowActionsColumn<NestedRow>({ parent: { actions: [edit] }, child: { actions: [remove] } });
       const r = await render(<GridTable<NestedRow> columns={[nestedNameColumn, actions]} rows={rows} />);
       // Then each listed kind gets its own actions
-      expect(r.edit_p1).toBeTruthy();
-      expect(r.query.delete_p1).toBeNull();
-      expect(r.delete_c1).toBeTruthy();
-      expect(r.query.edit_c1).toBeNull();
+      expect(within(cell(r, 1, 1)).getByTestId("edit")).toBeInTheDocument();
+      expect(within(cell(r, 1, 1)).queryByTestId("delete")).toBeNull();
+      expect(within(cell(r, 2, 1)).getByTestId("delete")).toBeInTheDocument();
+      expect(within(cell(r, 2, 1)).queryByTestId("edit")).toBeNull();
       // And the grandchild's actions cell is empty
       expect(cell(r, 3, 1)).toBeEmptyDOMElement();
     });
@@ -6129,7 +6149,7 @@ describe("GridTable", () => {
       />,
     );
     // Then only the header shows the icon
-    expect(r.columnTooltip).toHaveAttribute("title", "What name means");
+    expect(r.columnTooltip_tooltip).toHaveAttribute("title", "What name means");
   });
 
   it("calls the column tooltip on click", async () => {
@@ -6197,7 +6217,7 @@ describe("GridTable", () => {
       />,
     );
     // Then only the cell tooltip is shown
-    expect(r.tooltip).toHaveAttribute("title", "From the cell");
+    expect(r.infoCircle_tooltip).toHaveAttribute("title", "From the cell");
     expect(r.query.columnTooltip).toBeNull();
   });
 

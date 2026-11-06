@@ -1,18 +1,20 @@
 import { useEffect } from "react";
 import { AutoSaveStatus } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { useAutoSaveStatus } from "src/components/AutoSaveStatus/useAutoSaveStatus";
-import type { IconProps } from "src/components/Icon";
+import { Icon, type IconProps } from "src/components/Icon";
 import { Tooltip } from "src/components/Tooltip";
 import { Css, Tokens } from "src/Css";
 import { assertNever } from "src/types";
-import { Icon } from "./Icon";
+import { useTestIds } from "src/utils/useTestIds";
 
 type AutoSaveIndicatorProps = {
   hideOnIdle?: boolean;
   doNotReset?: boolean;
 };
 
-export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorProps) {
+export function AutoSaveIndicator(props: AutoSaveIndicatorProps) {
+  const { hideOnIdle, doNotReset } = props;
+  const tid = useTestIds(props, "autoSave");
   const { status, resetStatus, errors } = useAutoSaveStatus();
 
   useEffect(
@@ -31,11 +33,11 @@ export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorP
 
   switch (status) {
     case AutoSaveStatus.IDLE:
-      return hideOnIdle ? null : <Indicator icon="cloudSave" />;
+      return hideOnIdle ? null : <Indicator icon="cloudSave" {...tid} />;
     case AutoSaveStatus.SAVING:
-      return <Indicator icon="refresh" text="Saving..." />;
+      return <Indicator icon="refresh" text="Saving..." {...tid} />;
     case AutoSaveStatus.DONE:
-      return <Indicator icon="cloudSave" text="Saved" />;
+      return <Indicator icon="cloudSave" text="Saved" {...tid} />;
     case AutoSaveStatus.ERROR:
       return (
         /**
@@ -44,8 +46,8 @@ export function AutoSaveIndicator({ hideOnIdle, doNotReset }: AutoSaveIndicatorP
          * it.
          */
         <div css={Css.dif.$}>
-          <Tooltip title={String(errors)} placement="bottom">
-            <Indicator icon="error" color={Tokens.Danger} text="Error saving" />
+          <Tooltip title={String(errors)} placement="bottom" {...tid.tooltip}>
+            <Indicator icon="error" color={Tokens.Danger} text="Error saving" {...tid} />
           </Tooltip>
         </div>
       );
@@ -59,9 +61,11 @@ type IndicatorProps = {
   color?: IconProps["color"];
   text?: string;
 };
-function Indicator({ text, icon, color }: IndicatorProps) {
+function Indicator(props: IndicatorProps) {
+  const { text, icon, color } = props;
+  const tid = useTestIds(props, "autoSave");
   return (
-    <div data-testid="autoSave" css={Css.df.gap1.aic.color(Tokens.OnSurfaceMuted).smSb.$}>
+    <div {...tid} css={Css.df.gap1.aic.color(Tokens.OnSurfaceMuted).smSb.$}>
       <Icon icon={icon} color={color} />
       {text}
     </div>

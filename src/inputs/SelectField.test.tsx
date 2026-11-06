@@ -20,7 +20,7 @@ describe("SelectFieldTest", () => {
         tooltip="What this field is for"
       />,
     );
-    expect(r.age_label_0_tooltip).toHaveAttribute("title", "What this field is for");
+    expect(r.age_label_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("can set a value", async () => {
@@ -231,11 +231,11 @@ describe("SelectFieldTest", () => {
 
     // When opening the menu
     click(r.age);
-    const optionTwo = r.getByRole("option", { name: "Two" });
+    const optionTwo = r.getAllByRole("option").find((option) => option.dataset.label === "Two")!;
 
     // Then expect the disabled option to be wrapped in the tooltip text
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
-    expect(optionTwo.closest("[data-testid='tooltip']")).toHaveAttribute("title", "Example Tooltip");
+    expect(r.age_options_option_tooltip).toHaveAttribute("title", "Example Tooltip");
 
     // And when clicking on that option
     click(optionTwo);

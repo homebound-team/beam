@@ -22,6 +22,7 @@ import { useTreeSelectFieldProvider } from "src/inputs/TreeSelectField/TreeSelec
 import { isLeveledNode } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 import { maybeCall } from "src/utils/helpers";
+import { useTestIds } from "src/utils/useTestIds";
 
 type ComboBoxInputProps<O, V extends Value> = {
   buttonProps: any;
@@ -82,6 +83,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
   } = props;
 
   const { wrap = false } = usePresentationContext();
+  const tid = useTestIds(props, props.label);
 
   // Allow the field to wrap whether the caller has explicitly set `multiline=true` or the `PresentationContext.wrap=true`
   const allowWrap = wrap || multiline;
@@ -123,7 +125,7 @@ export function ComboBoxInput<O, V extends Value>(props: ComboBoxInputProps<O, V
       xss={selectedValueCss(otherProps.labelStyle, inputProps.readOnly)}
       startAdornment={
         (showNumSelection && (
-          <Tooltip title={<SelectedOptionBullets labels={chipLabels} />}>
+          <Tooltip title={<SelectedOptionBullets labels={chipLabels} />} {...tid.selectedOptionsCount_tooltip}>
             <CountBadge count={selectedChipCount} data-testid="selectedOptionsCount" />
           </Tooltip>
         )) ||

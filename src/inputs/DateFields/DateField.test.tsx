@@ -132,6 +132,23 @@ describe("DateField", () => {
     });
   });
 
+  it("scopes a hidden-label disabled reason to the field prefix", async () => {
+    // Given a disabled date field with an explicit prefix
+    // When rendered without a visible label
+    const r = await render(
+      <DateField
+        value={jan2}
+        label="Date"
+        onChange={noop}
+        disabled="Closed period"
+        labelStyle="hidden"
+        data-testid="invoiceDate"
+      />,
+    );
+    // Then its reason is on the scoped field tooltip
+    expect(r.invoiceDate_tooltip).toHaveAttribute("title", "Closed period");
+  });
+
   function TestDateField(props: { value: PlainDate | undefined; proposedValue?: PlainDate }) {
     const [value, setValue] = useState(props.value);
     return <DateField {...props} value={value} label="Date" onChange={setValue} />;

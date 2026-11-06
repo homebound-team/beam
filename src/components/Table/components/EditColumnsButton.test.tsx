@@ -192,7 +192,7 @@ describe("EditColumnsButton", () => {
     // When the menu is open
     const r = await render(<Test />);
     // Then only the column with a tooltip shows the icon
-    expect(r.columns_tooltip_name).toHaveAttribute("title", "The row name");
+    expect(r.columns_tooltip_name_tooltip).toHaveAttribute("title", "The row name");
     expect(r.query.columns_tooltip_value).toBeNull();
   });
 

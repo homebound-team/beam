@@ -38,7 +38,7 @@ describe("SelectCardGroup", () => {
         onChange={() => {}}
       />,
     );
-    expect(r.subject_label_0_tooltip).toHaveAttribute("title", "What this field is for");
+    expect(r.subject_label_tooltip).toHaveAttribute("title", "What this field is for");
   });
 
   it("reflects value from the parent without internal state", async () => {
@@ -302,5 +302,21 @@ describe("SelectCardGroup", () => {
     click(r.categories_history);
     // Then the original card is tagged "Current"
     expect(r.categories_math_tag).toHaveTextContent("Current");
+  });
+
+  it("scopes option tooltips to an explicit group prefix", async () => {
+    // Given a group with an option tooltip
+    // When rendered with an explicit prefix
+    const r = await render(
+      <SelectCardGroup
+        label="Categories"
+        options={[{ icon: "abacus", label: "Math", value: Category.Math, tooltip: "Not offered" }]}
+        value={undefined}
+        onChange={() => {}}
+        data-testid="subjects"
+      />,
+    );
+    // Then the option tooltip uses the forwarded group prefix
+    expect(r.subjects_math_tooltip).toHaveAttribute("title", "Not offered");
   });
 });

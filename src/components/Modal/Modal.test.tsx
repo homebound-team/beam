@@ -40,7 +40,7 @@ describe("Modal", () => {
     // Given an open modal with a tooltip trigger
     const r = await render(<TestModalApp content={<TestModalComponent withTooltip />} />);
     // And the tooltip is opened by hovering over its trigger
-    const triggerSpan = r.button.closest("[data-testid='tooltip']")!;
+    const triggerSpan = r.tooltip;
     fireEvent.mouseMove(document);
     fireEvent.pointerOver(triggerSpan, { pointerType: "mouse" });
     await wait();

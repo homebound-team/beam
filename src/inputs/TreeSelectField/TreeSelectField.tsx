@@ -36,6 +36,7 @@ import type { Value } from "src/inputs/Value";
 import { keyToValue, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";
 import type { HasIdAndName, Optional } from "src/types";
+import { useTestIds } from "src/utils/useTestIds";
 
 export type TreeSelectFieldProps<O, V extends Value> = {
   /** Renders `opt` in the dropdown menu, defaults to the `getOptionLabel` prop. `isUnsetOpt` is only defined for single SelectField */
@@ -637,6 +638,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
   };
 
   const fieldMaxWidth = getFieldWidth(fullWidth);
+  const tid = useTestIds(props, props.label);
 
   return (
     <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
@@ -674,6 +676,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
         >
           <ListBox
             {...listBoxProps}
+            {...tid.options}
             positionProps={positionProps}
             state={state}
             listBoxRef={listBoxRef}

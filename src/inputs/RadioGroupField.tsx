@@ -187,8 +187,10 @@ function Radio<K extends string>(props: {
   const isSelected = !disabled && state.selectedValue === value;
   const { focusProps, isFocusVisible } = useFocusRing();
   const { hoverProps, isHovered } = useHover({ isDisabled: disabled });
+  const tid = useTestIds(props);
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: resolveTooltip(disabledReason),
     placement: "bottom",
     children: (
@@ -257,7 +259,9 @@ function CustomRadio<K extends string, O extends RadioFieldOption<K>>(props: {
   const isSelected = !isDisabled && state.selectedValue === option.value;
   const { focusProps, isFocusVisible } = useFocusRing();
 
+  const tid = useTestIds(props);
   return maybeTooltip({
+    ...tid.tooltip,
     title: resolveTooltip(option.disabled),
     placement: "bottom",
     children: renderOption(option, {
@@ -307,12 +311,14 @@ function ThumbnailRadio<K extends string>(props: {
   // preventFocusOnPress keeps a mouse click from reading as "virtual" focus and showing the keyboard
   // focus ring; see `SelectCardShell` for the full story. Keyboard focus goes straight to the input.
   const { pressProps, isPressed } = usePress({ isDisabled, preventFocusOnPress: true });
+  const tid = useTestIds(props);
   const reserveCaption = originalValue !== undefined;
   const showCaptions = reserveCaption && state.selectedValue !== originalValue;
   const isOriginal = showCaptions && value === originalValue;
   const isNew = showCaptions && isSelected;
 
   return maybeTooltip({
+    ...tid.tooltip,
     // Thumbnails have no visible text, so their label doubles as the tooltip, unless there's a disabled reason.
     title: resolveTooltip(disabledReason) ?? label,
     placement: "top",
