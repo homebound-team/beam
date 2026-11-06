@@ -1594,101 +1594,6 @@ describe("GridTable", () => {
       expect(r.rowActions_delete).toBeTruthy();
     });
 
-    it("shows a lone overflowing action as an icon instead of a one-item menu", async () => {
-      // The column has 3 button slots on desktop: 2 icons (the pin takes one) and the "overflow" menu.
-      // Edit takes the free icon slot, so Delete overflows. Without this rule the row would draw
-      // Edit, the pin, and a menu holding only Delete; instead Delete uses the menu's slot as an icon.
-      // Given a pin and two actions per row, where only one action fits before the menu
-      const r = await render(
-        <GridTable<Row>
-          columns={[
-            nameColumn,
-            valueColumn,
-            rowActionsColumn<Row>({ data: { actions: [edit, remove], pinnable: true } }),
-          ]}
-          rows={actionRows}
-        />,
-      );
-      // Then the action that didn't fit takes the menu's place as an icon, with no "overflow" menu
-      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
-    });
-
-    it("puts overflowOnly actions in the menu whatever their order", async () => {
-      // Given an overflowOnly action listed first, then two regular actions, and a pin
-      const r = await render(
-        <GridTable<Row>
-          columns={[
-            nameColumn,
-            valueColumn,
-            rowActionsColumn<Row>({
-              data: { actions: [{ ...remove, overflowOnly: true }, edit, duplicate], pinnable: true },
-            }),
-          ]}
-          rows={actionRows}
-        />,
-        withRouter(),
-      );
-      // Then the first regular action and the pin show as icons
-      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      // And the overflowOnly action goes in the menu with the regular action that didn't fit
-      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
-      expect(within(cell(r, 1, 2)).queryByTestId("duplicate")).toBeNull();
-      click(within(cell(r, 1, 2)).getByTestId("rowActions"));
-      expect(r.rowActions_delete).toBeTruthy();
-      expect(r.rowActions_duplicate).toBeTruthy();
-    });
-
-    it("keeps overflowOnly actions in the menu even when there's room for icons", async () => {
-      // Given two overflowOnly actions and no pin, with room for both as icons
-      const r = await render(
-        <GridTable<Row>
-          columns={[
-            nameColumn,
-            valueColumn,
-            rowActionsColumn<Row>({
-              data: {
-                actions: [
-                  { ...edit, overflowOnly: true },
-                  { ...remove, overflowOnly: true },
-                ],
-              },
-            }),
-          ]}
-          rows={actionRows}
-        />,
-        withRouter(),
-      );
-      // Then both go in the menu
-      expect(within(cell(r, 1, 2)).queryByTestId("edit")).toBeNull();
-      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
-      click(within(cell(r, 1, 2)).getByTestId("rowActions"));
-      expect(r.rowActions_edit).toBeTruthy();
-      expect(r.rowActions_delete).toBeTruthy();
-    });
-
-    it("shows a lone overflowOnly action as an icon instead of a one-item menu", async () => {
-      // Given a regular action, an overflowOnly action, and a pin
-      const r = await render(
-        <GridTable<Row>
-          columns={[
-            nameColumn,
-            valueColumn,
-            rowActionsColumn<Row>({ data: { actions: [edit, { ...remove, overflowOnly: true }], pinnable: true } }),
-          ]}
-          rows={actionRows}
-        />,
-      );
-      // Then the overflowOnly action shows as an icon in the menu's place, with no "overflow" menu
-      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
-    });
-
     it("keeps the pin as an icon on phone-sized screens", async () => {
       // Given two actions per row and a pin on a phone-sized screen
       setViewport("sm");
@@ -1712,64 +1617,26 @@ describe("GridTable", () => {
       expect(r.rowActions_delete).toBeTruthy();
     });
 
-    it("shows a lone overflowing action as an icon on tablet-sized screens", async () => {
-      // Given three actions per row and no pin on a tablet-sized screen, where only two fit before the menu
+    it("uses the desktop icon slots on tablet-sized screens", async () => {
+      // Given three actions per row and a pin on a tablet-sized screen
       setViewport("md");
       const r = await render(
         <GridTable<Row>
-          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit, duplicate, remove] } })]}
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ data: { actions: [edit, duplicate, remove], pinnable: true } }),
+          ]}
           rows={actionRows}
         />,
+        withRouter(),
       );
-      // Then the action that didn't fit takes the menu's place as an icon, with no "overflow" menu
-      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("duplicate")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
-    });
-
-    it("puts the actions in the menu on phone-sized screens", async () => {
-      // Given two actions per row on a phone-sized screen
-      setViewport("sm");
-      const r = await render(
-        <GridTable<Row>
-          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit, remove] } })]}
-          rows={actionRows}
-        />,
-      );
-      // Then there are no icons, just the menu
-      expect(within(cell(r, 1, 2)).queryByTestId("edit")).toBeNull();
-      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
-      expect(within(cell(r, 1, 2)).getByTestId("rowActions")).toBeInTheDocument();
-    });
-
-    it("shows a lone action as an icon on phone-sized screens without the pin", async () => {
-      // Given one action per row and no pin on a phone-sized screen
-      setViewport("sm");
-      const r = await render(
-        <GridTable<Row>
-          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
-          rows={actionRows}
-        />,
-      );
-      // Then the action shows as an icon, rather than a menu with just one action
-      expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
-    });
-
-    it("shows a lone action as an icon next to the pin on phone-sized screens", async () => {
-      // Given one action per row and a pin on a phone-sized screen
-      setViewport("sm");
-      const r = await render(
-        <GridTable<Row>
-          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit], pinnable: true } })]}
-          rows={actionRows}
-        />,
-      );
-      // Then the action and the pin show as icons, with no "overflow" menu
+      // Then the first action shows as an icon next to the pin, like on desktop, and the rest go in the menu
       expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
       expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
+      expect(within(cell(r, 1, 2)).queryByTestId("duplicate")).toBeNull();
+      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("rowActions")).toBeInTheDocument();
     });
 
     it("gives each kind its own config, and leaves unlisted kinds empty", async () => {
