@@ -10,21 +10,22 @@ import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 /**
- * A `rowActionsColumn` cell: the row's actions and pin, the first few as icons and the rest in a "more" menu.
+ * A `rowActionsColumn` cell: the row's actions and pin, the first few as icons and the rest in an "overflow" menu.
  *
  * The pin takes precedence over the actions: it's always an icon, right before the menu, and never moves into it.
- * The actions fill the icon slots before it, and the rest go in the menu.
+ * The actions fill the icon slots before it, and the rest (and any `overflowOnly` ones) go in the menu, unless
+ * there's only one left over, which shows as an icon in the menu's place.
  */
-export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config: GridRowActionsConfig }) {
-  const { actions = [], pinnable = false } = config;
+export function RowActionsCell(props: { row: GridDataRow<any>; config: GridRowActionsConfig; pinnable: boolean }) {
+  const { row, config, pinnable } = props;
+  const { actions = [] } = config;
   const { sm } = useBreakpoint();
-  // Up to 3 icons (the pin included, the menu not); phone-sized screens show only the pin and the menu
-  const visibleCount = sm ? 0 : 3;
+  // Up to 2 icons (the pin included) before the menu, 3 buttons in all; phone-sized screens show only the pin and the menu
+  const visibleCount = sm ? 0 : 2;
   const tid = useTestIds({});
 
-  const { actionIcons } = splitRowActions(actions.length, pinnable, visibleCount);
-  const iconActions = actions.slice(0, actionIcons);
-  const menuItems = actions.slice(actionIcons).map(toMenuItem);
+  const { icons: iconActions, menu } = splitRowActions(actions, pinnable, visibleCount);
+  const menuItems = menu.map(toMenuItem);
 
   if (actions.length === 0 && !pinnable) return null;
   return (
