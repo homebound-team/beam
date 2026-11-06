@@ -108,7 +108,7 @@ describe("ButtonMenu", () => {
 
     // Then the menu item should be disabled and have a tooltip
     expect(r.trigger_disabled).toHaveAttribute("aria-disabled", "true");
-    expect(r.tooltip).toHaveAttribute("title", "Tooltip");
+    expect(r.trigger_disabled_tooltip).toHaveAttribute("title", "Tooltip");
   });
 
   it("renders the AI sparkle icon on an ai menu item", async () => {
@@ -131,7 +131,7 @@ describe("ButtonMenu", () => {
       <ButtonMenu trigger={{ src: "test", name: "Test" }} items={[{ label: "Option A", onClick: noop }]} />,
       withRouter(),
     );
-    expect(r.tooltip).toHaveAttribute("title", "Test");
+    expect(r.test_tooltip).toHaveAttribute("title", "Test");
   });
 
   it("renders no tooltip on an avatar trigger when preventTooltip is set", async () => {
@@ -142,7 +142,7 @@ describe("ButtonMenu", () => {
       />,
       withRouter(),
     );
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.test_tooltip).toBeNull();
   });
 
   it("handles selecting button menu items", async () => {

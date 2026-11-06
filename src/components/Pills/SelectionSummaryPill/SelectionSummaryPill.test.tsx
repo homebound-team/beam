@@ -43,7 +43,7 @@ describe("SelectionSummaryPill", () => {
     // Then onClick is not called and there is no tooltip
     expect(r.selectionSummaryPill).toBeDisabled();
     expect(onClick).not.toHaveBeenCalled();
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.selectionSummaryPill_tooltip).toBeNull();
   });
 
   it("shows the disabled reason in a tooltip", async () => {
@@ -54,7 +54,7 @@ describe("SelectionSummaryPill", () => {
     );
     // Then the pill is disabled and the reason is on the tooltip
     expect(r.selectionSummaryPill).toBeDisabled();
-    expect(r.tooltip).toHaveAttribute("title", "Locked");
+    expect(r.selectionSummaryPill_tooltip).toHaveAttribute("title", "Locked");
     // When the pill is clicked
     click(r.selectionSummaryPill);
     // Then onClick is not called

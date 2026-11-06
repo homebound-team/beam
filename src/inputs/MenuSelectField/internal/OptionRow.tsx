@@ -57,6 +57,7 @@ function BaseOptionRow<O>(
   if (!entry) return null;
 
   return maybeTooltip({
+    ...tid.option_tooltip,
     title: disabledReason,
     placement: "top",
     children: (
@@ -147,6 +148,7 @@ function MultiTreeOptionRow<O>(props: TreeOptionRowProps<O>) {
       }}
     >
       {maybeTooltip({
+        ...tid.option_tooltip,
         title: disabledReason,
         placement: "top",
         children: (

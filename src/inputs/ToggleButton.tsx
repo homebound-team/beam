@@ -73,6 +73,7 @@ export function ToggleButton(props: ToggleButtonProps) {
   };
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: tooltip,
     placement: "top",
     children: (

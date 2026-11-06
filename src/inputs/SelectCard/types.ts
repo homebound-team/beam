@@ -65,6 +65,8 @@ export type SelectCardGroupProps<V extends Value> = SelectCardGroupFieldPropsBas
   SelectCardGroupViewProps<V> & {
     value: V | undefined;
     onChange: (value: V) => void;
+    /** Tags the original option as "Current" once the value differs. An option's own `tag` takes precedence. */
+    originalValue?: V;
   };
 
 /** Multi-select checkbox group. */

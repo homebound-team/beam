@@ -134,7 +134,7 @@ describe("Autocomplete", () => {
     expect(r.getAllByRole("option")[0]).toHaveAttribute("aria-disabled", "true");
     const optionTwo = r.getAllByRole("option")[1];
     expect(optionTwo).toHaveAttribute("aria-disabled", "true");
-    expect(optionTwo.closest("[data-testid='tooltip']")).toHaveAttribute("title", "foo");
+    expect(r.search_options_option_tooltip).toHaveAttribute("title", "foo");
   });
 
   it("ends AI mode when an option is selected", async () => {

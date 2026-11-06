@@ -39,6 +39,41 @@ describe("BoundTextField", () => {
     // And the Field State's autoSave should have been called.
     expect(autoSave).toHaveBeenCalledWith("Brandon");
   });
+
+  it("scopes label help to the field key rather than its display label", async () => {
+    // Given a bound field whose display label differs from its key
+    const author = createObjectState(formConfig, {});
+    // When rendered with label help
+    const r = await render(<BoundTextField field={author.firstName} label="Given Name" tooltip="Legal first name" />);
+    // Then the tooltip uses the bound field's resolved prefix
+    expect(r.firstName_label_tooltip).toHaveAttribute("title", "Legal first name");
+  });
+
+  it("scopes a hidden-label disabled reason to an explicit test id", async () => {
+    // Given a bound field with a disabled reason and a normal tooltip
+    const author = createObjectState(formConfig, {});
+    // When rendered without a visible label and with an explicit prefix
+    const r = await render(
+      <BoundTextField
+        field={author.firstName}
+        data-testid="legalName"
+        labelStyle="hidden"
+        disabled="Archived"
+        tooltip="Legal first name"
+      />,
+    );
+    // Then the scoped field tooltip shows the disabled reason
+    expect(r.legalName_tooltip).toHaveAttribute("title", "Archived");
+  });
+
+  it("scopes an inline-label read-only reason to the field key", async () => {
+    // Given a bound field with a read-only reason
+    const author = createObjectState(formConfig, {});
+    // When rendered with an inline label
+    const r = await render(<BoundTextField field={author.firstName} labelStyle="inline" readOnly="Managed by HR" />);
+    // Then the scoped field tooltip shows the read-only reason
+    expect(r.firstName_tooltip).toHaveAttribute("title", "Managed by HR");
+  });
 });
 
 const formConfig: ObjectConfig<AuthorInput> = {

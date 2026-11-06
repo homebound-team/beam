@@ -302,6 +302,7 @@ function TabImpl<V extends string>(props: TabImplProps<V>) {
 
   return isDisabled ? (
     maybeTooltip({
+      ...tid.tooltip,
       title: resolveTooltip(disabled),
       placement: "top",
       children: <div {...tabProps}>{tabLabel}</div>,

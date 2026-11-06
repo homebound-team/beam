@@ -67,6 +67,7 @@ export function SelectCardShell(props: SelectCardShellProps) {
   const tid = useTestIds(props, defaultTestId(label));
 
   return maybeTooltip({
+    ...tid.tooltip,
     title: resolveTooltip(isDisabled, tooltip),
     placement: "top",
     children: (

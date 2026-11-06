@@ -106,8 +106,10 @@ describe("ContentHeader", () => {
     // Given a ContentHeader with a tooltip
     const r = await render(<ContentHeader title="Trade Partners" tooltip="Partners assigned to this project" />);
     // Then the tooltip renders after the title
-    expect(r.tooltip).toHaveAttribute("title", "Partners assigned to this project");
-    expect(r.contentHeader_title.compareDocumentPosition(r.tooltip)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(r.contentHeader_info_tooltip).toHaveAttribute("title", "Partners assigned to this project");
+    expect(r.contentHeader_title.compareDocumentPosition(r.contentHeader_info_tooltip)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 
   it("applies aiBoldText to the title when aiMode is true", async () => {

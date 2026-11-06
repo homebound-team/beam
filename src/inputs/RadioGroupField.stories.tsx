@@ -391,6 +391,7 @@ export function ThumbnailLayout() {
         value={value}
         onChange={setValue}
         options={finishes}
+        originalValue="finish-4"
         onBlur={action("onBlur")}
         onFocus={action("onFocus")}
       />

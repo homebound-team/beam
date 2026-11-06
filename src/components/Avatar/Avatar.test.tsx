@@ -22,12 +22,12 @@ describe(Avatar, () => {
 
   it("shows a tooltip with the name by default", async () => {
     const r = await render(<Avatar src="test" name="Test" />);
-    expect(r.tooltip).toBeInTheDocument();
+    expect(r.avatar_tooltip).toBeInTheDocument();
   });
 
   it("renders no tooltip when preventTooltip is set", async () => {
     const r = await render(<Avatar src="test" name="Test" preventTooltip />);
-    expect(r.query.tooltip).toBeNull();
+    expect(r.query.avatar_tooltip).toBeNull();
   });
 
   // Note: not testing the `onError` case as jsdom does not request external resources.

@@ -21,7 +21,7 @@ describe("Chip", () => {
   it("can render with text different than title", async () => {
     const r = await render(<Chip text="Chip text content" title="title is different" />);
     expect(r.chip.textContent).toBe("Chip text content");
-    expect(r.tooltip).toHaveAttribute("title", "title is different");
+    expect(r.chip_tooltip).toHaveAttribute("title", "title is different");
   });
 
   it("can set background color and color with xss prop", async () => {
