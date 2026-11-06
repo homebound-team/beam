@@ -16,7 +16,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, type OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { type GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { defaultStyle, type RowStyles } from "src/components/Table/TableStyles";
-import type { GridColumn, GridColumnWithId, GridRowActionsConfig } from "src/components/Table/types";
+import type { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
   assignDefaultColumnIds,
@@ -1523,11 +1523,6 @@ describe("GridTable", () => {
     const edit = { icon: "pencil" as const, label: "Edit", onClick: noop };
     const duplicate = { icon: "duplicate" as const, label: "Duplicate", onClick: noop };
     const remove = { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true };
-    const withActions = (config: GridRowActionsConfig, w?: string) => [
-      nameColumn,
-      valueColumn,
-      rowActionsColumn<Row>({ data: config, w }),
-    ];
 
     it("draws a row's actions as icons, from a config computed from the row", async () => {
       // Given two actions per row, built from the row
@@ -1554,7 +1549,11 @@ describe("GridTable", () => {
 
     it("gives actions that share an icon their own test ids", async () => {
       // Given two actions with the same icon
-      const columns = withActions({ actions: [edit, { ...edit, label: "Edit dates" }] });
+      const columns = [
+        nameColumn,
+        valueColumn,
+        rowActionsColumn<Row>({ data: { actions: [edit, { ...edit, label: "Edit dates" }] } }),
+      ];
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then each is found by its label
       expect(r.edit_r1).toBeTruthy();
@@ -1564,7 +1563,10 @@ describe("GridTable", () => {
     it("shows the pin as an icon after the actions when there's room", async () => {
       // Given one action and a pin
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit], pinnable: true } })]}
+          rows={actionRows}
+        />,
       );
       // Then the pin shows right after the action
       expect(cell(r, 1, 2)).toContainElement(r.edit_r1);
@@ -1575,7 +1577,11 @@ describe("GridTable", () => {
       // Given three actions per row and a pin
       const r = await render(
         <GridTable<Row>
-          columns={withActions({ actions: [edit, duplicate, remove], pinnable: true })}
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ data: { actions: [edit, duplicate, remove], pinnable: true } }),
+          ]}
           rows={actionRows}
         />,
         withRouter(),
@@ -1591,11 +1597,21 @@ describe("GridTable", () => {
     });
 
     it("shows a lone overflowing action as an icon instead of a one-item menu", async () => {
-      // Given two actions per row and a pin, so only one action doesn't fit
+      // The column has 3 button slots on desktop: 2 icons (the pin takes one) and the "overflow" menu.
+      // Edit takes the free icon slot, so Delete overflows. Without this rule the row would draw
+      // Edit, the pin, and a menu holding only Delete; instead Delete uses the menu's slot as an icon.
+      // Given a pin and two actions per row, where only one action fits before the menu
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit, remove], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ data: { actions: [edit, remove], pinnable: true } }),
+          ]}
+          rows={actionRows}
+        />,
       );
-      // Then both actions and the pin show as icons, with no "overflow" menu
+      // Then the action that didn't fit takes the menu's place as an icon, with no "overflow" menu
       expect(r.edit_r1).toBeTruthy();
       expect(r.delete_r1).toBeTruthy();
       expect(r.pin_r1).toBeTruthy();
@@ -1606,7 +1622,13 @@ describe("GridTable", () => {
       // Given an overflowOnly action listed first, then two regular actions, and a pin
       const r = await render(
         <GridTable<Row>
-          columns={withActions({ actions: [{ ...remove, overflowOnly: true }, edit, duplicate], pinnable: true })}
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({
+              data: { actions: [{ ...remove, overflowOnly: true }, edit, duplicate], pinnable: true },
+            }),
+          ]}
           rows={actionRows}
         />,
         withRouter(),
@@ -1626,12 +1648,18 @@ describe("GridTable", () => {
       // Given two overflowOnly actions and no pin, with room for both as icons
       const r = await render(
         <GridTable<Row>
-          columns={withActions({
-            actions: [
-              { ...edit, overflowOnly: true },
-              { ...remove, overflowOnly: true },
-            ],
-          })}
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({
+              data: {
+                actions: [
+                  { ...edit, overflowOnly: true },
+                  { ...remove, overflowOnly: true },
+                ],
+              },
+            }),
+          ]}
           rows={actionRows}
         />,
         withRouter(),
@@ -1648,7 +1676,11 @@ describe("GridTable", () => {
       // Given a regular action, an overflowOnly action, and a pin
       const r = await render(
         <GridTable<Row>
-          columns={withActions({ actions: [edit, { ...remove, overflowOnly: true }], pinnable: true })}
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ data: { actions: [edit, { ...remove, overflowOnly: true }], pinnable: true } }),
+          ]}
           rows={actionRows}
         />,
       );
@@ -1663,7 +1695,14 @@ describe("GridTable", () => {
       // Given two actions per row and a pin on a phone-sized screen
       setViewport("sm");
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit, remove], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ data: { actions: [edit, remove], pinnable: true } }),
+          ]}
+          rows={actionRows}
+        />,
         withRouter(),
       );
       // Then the actions move into the menu, but the pin stays an icon
@@ -1675,14 +1714,18 @@ describe("GridTable", () => {
       expect(r.rowActions_r1_delete).toBeTruthy();
     });
 
-    it("keeps showing icons on tablet-sized screens", async () => {
-      // Given three actions per row on a tablet-sized screen
+    it("shows a lone overflowing action as an icon on tablet-sized screens", async () => {
+      // Given three actions per row and no pin on a tablet-sized screen, where only two fit before the menu
       setViewport("md");
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit, duplicate, remove] })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit, duplicate, remove] } })]}
+          rows={actionRows}
+        />,
       );
-      // Then all three still show as icons, with no "overflow" menu
+      // Then the action that didn't fit takes the menu's place as an icon, with no "overflow" menu
       expect(r.edit_r1).toBeTruthy();
+      expect(r.duplicate_r1).toBeTruthy();
       expect(r.delete_r1).toBeTruthy();
       expect(r.query.rowActions_r1).toBeNull();
     });
@@ -1690,7 +1733,12 @@ describe("GridTable", () => {
     it("puts the actions in the menu on phone-sized screens", async () => {
       // Given two actions per row on a phone-sized screen
       setViewport("sm");
-      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit, remove] })} rows={actionRows} />);
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit, remove] } })]}
+          rows={actionRows}
+        />,
+      );
       // Then there are no icons, just the menu
       expect(r.query.edit_r1).toBeNull();
       expect(r.query.delete_r1).toBeNull();
@@ -1700,7 +1748,12 @@ describe("GridTable", () => {
     it("shows a lone action as an icon on phone-sized screens without the pin", async () => {
       // Given one action per row and no pin on a phone-sized screen
       setViewport("sm");
-      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      const r = await render(
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+          rows={actionRows}
+        />,
+      );
       // Then the action shows as an icon, rather than a menu with just one action
       expect(r.edit_r1).toBeTruthy();
       expect(r.query.rowActions_r1).toBeNull();
@@ -1710,7 +1763,10 @@ describe("GridTable", () => {
       // Given one action per row and a pin on a phone-sized screen
       setViewport("sm");
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit], pinnable: true } })]}
+          rows={actionRows}
+        />,
       );
       // Then the action and the pin show as icons, with no "overflow" menu
       expect(r.edit_r1).toBeTruthy();
@@ -1770,7 +1826,13 @@ describe("GridTable", () => {
       it("isn't sticky by default", async () => {
         // Given an actions column without a pin
         const api = new GridTableApiImpl<Row>();
-        await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+        await render(
+          <GridTable<Row>
+            api={api}
+            columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+            rows={actionRows}
+          />,
+        );
         // Then it isn't sticky
         expect(sticky(api)).toBeUndefined();
       });
@@ -1802,12 +1864,22 @@ describe("GridTable", () => {
       // Given one action per row
       const api = new GridTableApiImpl<Row>();
       const width = () => api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w;
-      const r = await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      const r = await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+          rows={actionRows}
+        />,
+      );
       // Then the column still fits 3 buttons, the gaps between them and the cell padding
       expect(width()).toBe("116px");
       // When the column is given its own w
       await r.rerender(
-        <GridTable<Row> api={api} columns={withActions({ actions: [edit] }, "200px")} rows={actionRows} />,
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] }, w: "200px" })]}
+          rows={actionRows}
+        />,
       );
       // Then the table keeps it
       expect(width()).toBe("200px");
@@ -1817,7 +1889,13 @@ describe("GridTable", () => {
       // Given a phone-sized screen
       setViewport("sm");
       const api = new GridTableApiImpl<Row>();
-      await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+          rows={actionRows}
+        />,
+      );
       // Then the column fits 2 buttons
       expect(api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w).toBe("84px");
     });
