@@ -594,7 +594,7 @@ export function StickyHeader() {
 export function InteractiveRowPinning() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const pinColumn = rowActionsColumn<Row>({ data: { pinnable: true } });
+  const pinColumn = rowActionsColumn<Row>({ pinnable: true });
   return (
     <div css={Css.vh100.$}>
       some other top of page content
@@ -627,7 +627,7 @@ export function InteractiveRowPinning() {
 export function InteractiveRowPinningVirtual() {
   const nameColumn: GridColumn<Row> = { header: "Name", data: ({ name }) => name };
   const valueColumn: GridColumn<Row> = { header: "Value", data: ({ value }) => value };
-  const pinColumn = rowActionsColumn<Row>({ data: { pinnable: true } });
+  const pinColumn = rowActionsColumn<Row>({ pinnable: true });
   return (
     <div css={Css.vh100.$}>
       <GridTable
@@ -654,7 +654,7 @@ export function InteractiveRowPinningVirtual() {
 
 /**
  * Pins on a nested table: pinning a parent brings its children with it (their pins show pinned and disabled).
- * `add` rows aren't listed, so they get no pin, and Group 5's config turns its pin off.
+ * `add` rows aren't listed in `pinnable`, so they get no pin.
  */
 export function InteractiveGroupRowPinning() {
   const nameColumn: GridColumn<NestedRow> = {
@@ -670,7 +670,7 @@ export function InteractiveGroupRowPinning() {
     ...zeroTo(40).map((i) => ({
       kind: "parent" as const,
       id: `g${i}`,
-      data: { name: i === 5 ? `Group ${i} (not pinnable)` : `Group ${i}` },
+      data: { name: `Group ${i}` },
       // Pre-pin one whole group so the pinned section shows in the snapshot.
       initPinned: i === 2,
       children: [
@@ -693,11 +693,7 @@ export function InteractiveGroupRowPinning() {
           collapseColumn<NestedRow>(),
           selectColumn<NestedRow>(),
           nameColumn,
-          rowActionsColumn<NestedRow>({
-            parent: (_data, { row }) => ({ pinnable: row.id !== "g5" }),
-            child: { pinnable: true },
-            grandChild: { pinnable: true },
-          }),
+          rowActionsColumn<NestedRow>({ pinnable: ["parent", "child", "grandChild"] }),
         ]}
         stickyHeader
         rows={rows}
@@ -740,15 +736,14 @@ export const RowActions = newStory(
       })),
     ];
     const actionsColumn = rowActionsColumn<NestedRow>({
+      pinnable: ["parent", "child", "grandChild"],
       parent: (_data, { row }) => ({
-        pinnable: true,
         actions: [
           { icon: "plus", label: "Add child", onClick: () => action("add child")(row.id), overflowOnly: true },
           { icon: "pencil", label: "Edit", onClick: () => action("edit")(row.id), overflowOnly: true },
         ],
       }),
       child: (_data, { row }) => ({
-        pinnable: true,
         actions: [
           { icon: "pencil", label: "Edit", onClick: () => action("edit")(row.id) },
           { icon: "duplicate", label: "Duplicate", onClick: () => action("duplicate")(row.id) },
@@ -757,7 +752,6 @@ export const RowActions = newStory(
         ],
       }),
       grandChild: (_data, { row }) => ({
-        pinnable: true,
         actions: [{ icon: "trash", label: "Delete", onClick: () => action("delete")(row.id), destructive: true }],
       }),
     });

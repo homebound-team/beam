@@ -178,13 +178,12 @@ export function Loading() {
 export function WithRowPinning() {
   const columns = useMemo(() => {
     const config = {
-      pinnable: true,
       actions: [
         { icon: "pencil" as const, label: "Edit", onClick: noop },
         { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true },
       ],
     };
-    return [...getColumns(false), rowActionsColumn<Row>({ parent: config, data: config })];
+    return [...getColumns(false), rowActionsColumn<Row>({ pinnable: true, parent: config, data: config })];
   }, []);
   // Pre-pin one parent so the pinned section shows in the snapshot
   const rows = useMemo(

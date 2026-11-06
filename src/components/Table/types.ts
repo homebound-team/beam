@@ -140,8 +140,6 @@ export type GridRowAction = {
 
 /** What a `rowActionsColumn` draws for a row. */
 export type GridRowActionsConfig = {
-  /** Shows a pin toggle, always as an icon just before the "overflow" menu. */
-  pinnable?: boolean;
   /**
    * Up to 3 buttons show (the pin and the "overflow" menu included); only the pin and menu on phone-sized screens.
    * The menu never holds just one action: a lone leftover action shows as an icon in the menu's place.
@@ -160,7 +158,12 @@ export type RowActionsColumnDef<R extends Kinded> = {
         ? (data: D, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig
         : (data: undefined, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig);
 } & Pick<GridColumn<R>, "w"> & {
-    /** Sticks the column to the right. Always on when any row is `pinnable`, so the pin stays in reach. */
+    /**
+     * Shows a pin toggle, always as an icon just before the "overflow" menu: on every row with `true`, or only on
+     * rows of the listed kinds. Makes the column sticky, so the pin stays in reach.
+     */
+    pinnable?: boolean | R["kind"][];
+    /** Sticks the column to the right. Always on when `pinnable` is set. */
     sticky?: boolean;
   };
 

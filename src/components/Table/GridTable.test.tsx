@@ -1301,7 +1301,7 @@ describe("GridTable", () => {
     it("renders rowActionsColumn pins on data rows (not the header) and toggles on click", async () => {
       // Given a rowActionsColumn that pins data rows
       const api = new GridTableApiImpl<Row>();
-      const pins = rowActionsColumn<Row>({ data: { pinnable: true } });
+      const pins = rowActionsColumn<Row>({ pinnable: true });
       const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
 
       // Then the header has no pin toggle, but each data row has a row-scoped one
@@ -1325,16 +1325,6 @@ describe("GridTable", () => {
       const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={pinRows} />);
       // Then no row has a pin toggle
       expect(r.query.pinToggle).toBeNull();
-    });
-
-    it("decides each row's pin from its config", async () => {
-      // Given a config that pins every data row except the one named "zaz"
-      const pins = rowActionsColumn<Row>({ data: (data) => ({ pinnable: data.name !== "zaz" }) });
-      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
-      // Then only the other rows get a pin toggle
-      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 2, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 3, 2)).queryByTestId("pinToggle")).toBeNull();
     });
 
     it("keeps a pinned row visible after it's dropped from rows", async () => {
@@ -1378,10 +1368,18 @@ describe("GridTable", () => {
         },
         { kind: "parent", id: "p2", data: { name: "parent 2" } },
       ];
-      const pins = rowActionsColumn<NestedRow>({
-        parent: { pinnable: true },
-        child: { pinnable: true },
-        grandChild: { pinnable: true },
+      const pins = rowActionsColumn<NestedRow>({ pinnable: true });
+
+      it("pins only the kinds listed in pinnable", async () => {
+        // Given a column that only pins parents
+        const parentPins = rowActionsColumn<NestedRow>({ pinnable: ["parent"] });
+        const r = await render(<GridTable<NestedRow> columns={[nestedNameColumn, parentPins]} rows={nestedRows} />);
+        // Then both parents get a pin toggle
+        expect(within(cell(r, 1, 1)).getByTestId("pinToggle")).toBeInTheDocument();
+        expect(within(cell(r, 4, 1)).getByTestId("pinToggle")).toBeInTheDocument();
+        // And the child and grandchild don't
+        expect(cell(r, 2, 1)).toBeEmptyDOMElement();
+        expect(cell(r, 3, 1)).toBeEmptyDOMElement();
       });
 
       it("brings a pinned parent's children with it", async () => {
@@ -1562,7 +1560,7 @@ describe("GridTable", () => {
       // Given one action and a pin
       const r = await render(
         <GridTable<Row>
-          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit], pinnable: true } })]}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit] } })]}
           rows={actionRows}
         />,
       );
@@ -1578,7 +1576,7 @@ describe("GridTable", () => {
           columns={[
             nameColumn,
             valueColumn,
-            rowActionsColumn<Row>({ data: { actions: [edit, duplicate, remove], pinnable: true } }),
+            rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit, duplicate, remove] } }),
           ]}
           rows={actionRows}
         />,
@@ -1602,7 +1600,7 @@ describe("GridTable", () => {
           columns={[
             nameColumn,
             valueColumn,
-            rowActionsColumn<Row>({ data: { actions: [edit, remove], pinnable: true } }),
+            rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit, remove] } }),
           ]}
           rows={actionRows}
         />,
@@ -1625,7 +1623,7 @@ describe("GridTable", () => {
           columns={[
             nameColumn,
             valueColumn,
-            rowActionsColumn<Row>({ data: { actions: [edit, duplicate, remove], pinnable: true } }),
+            rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit, duplicate, remove] } }),
           ]}
           rows={actionRows}
         />,
@@ -1711,13 +1709,13 @@ describe("GridTable", () => {
         expect(sticky(api)).toBe("right");
       });
 
-      it("sticks to the right when any row is pinnable, even without sticky", async () => {
-        // Given only one row that's pinnable, from a config computed from the row
+      it("sticks to the right when pinnable is set, even without sticky", async () => {
+        // Given an actions column that pins data rows
         const api = new GridTableApiImpl<Row>();
         const columns = [
           nameColumn,
           valueColumn,
-          rowActionsColumn<Row>({ data: (_data, { row }) => ({ actions: [edit], pinnable: row.id === "r2" }) }),
+          rowActionsColumn<Row>({ pinnable: ["data"], data: { actions: [edit] } }),
         ];
         await render(<GridTable<Row> api={api} columns={columns} rows={actionRows} />);
         // Then the column sticks to the right

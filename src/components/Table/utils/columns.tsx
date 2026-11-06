@@ -12,7 +12,7 @@ import {
   nonKindGridColumnKeys,
   type RowActionsColumnDef,
 } from "src/components/Table/types";
-import { beamRowActionsColumnId, resolveRowActions, setRowActionsDef } from "src/components/Table/utils/rowActions";
+import { beamRowActionsColumnId, isKindPinnable, resolveRowActions } from "src/components/Table/utils/rowActions";
 import { type DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
@@ -78,23 +78,25 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
 /**
  * Provides a column of row actions and a pin toggle, which ends in a "overflow" menu.
  *
- * The column isn't sticky unless `sticky` is set, or any row is `pinnable`: then it sticks to the right, so the pin
- * stays in reach.
- *
  * Each row `kind` gets a `GridRowActionsConfig`, static or computed from the row, i.e.
- * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
- * Kinds that aren't listed (and reserved kinds like the header) get an empty cell.
+ * `rowActionsColumn<Row>({ pinnable: true, data: (data, { row }) => ({ actions: [...] }) })`.
+ * Kinds that aren't listed or pinnable (and reserved kinds like the header) get an empty cell.
+ *
+ * `pinnable` gives every row a pin (`true`) or only rows of the listed kinds. The column isn't sticky unless `sticky`
+ * or `pinnable` is set: then it sticks to the right, so the pin stays in reach.
  *
  * Up to 3 buttons show, the pin and the "overflow" menu included; phone-sized screens show only the pin and the menu.
  * The pin is always an icon. Unless `w` is set, the column is sized for 3 buttons (2 on phone-sized screens).
  */
 export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>): GridColumn<T> {
+  const { pinnable } = def;
+  const hasPins = pinnable === true || (Array.isArray(pinnable) && pinnable.length > 0);
   const base = {
     ...nonKindDefaults(),
     id: beamRowActionsColumnId,
     clientSideSort: false,
     align: "right",
-    sticky: def.sticky ? "right" : undefined,
+    sticky: def.sticky || hasPins ? "right" : undefined,
     w: def.w,
     wrapAction: false,
     isAction: true,
@@ -104,16 +106,18 @@ export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>):
     expandableHeader: emptyCell,
     groupHeader: emptyCell,
   };
-  // Listed kinds draw their config; the rest (and reserved kinds) stay empty
-  const column = newMethodMissingProxy(base, (kind) =>
-    kind in def
+  // Listed and pinnable kinds draw their config and pin; the rest (and reserved kinds) stay empty
+  return newMethodMissingProxy(base, (kind) =>
+    kind in def || isKindPinnable(pinnable, kind)
       ? (_data: unknown, { row, api }: { row: GridDataRow<T>; api: GridTableApi<T> }) => (
-          <RowActionsCell row={row} config={resolveRowActions(def, row, api)} />
+          <RowActionsCell
+            row={row}
+            config={resolveRowActions(def, row, api)}
+            pinnable={isKindPinnable(pinnable, row.kind)}
+          />
         )
       : emptyCell,
   ) as GridColumn<T>;
-  setRowActionsDef(column, def);
-  return column;
 }
 
 /**

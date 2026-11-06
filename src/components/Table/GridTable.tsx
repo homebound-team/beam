@@ -45,12 +45,7 @@ import {
 } from "src/components/Table/utils/columns";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
 import { maybeApplyFunction } from "src/components/Table/utils/maybeApplyFunction";
-import {
-  anyRowActionsPinnable,
-  rowActionsColumnPx,
-  rowActionsSlotsFor,
-  withRowActionsSticky,
-} from "src/components/Table/utils/rowActions";
+import { rowActionsColumnPx, rowActionsSlotsFor } from "src/components/Table/utils/rowActions";
 import { TableStateContext } from "src/components/Table/utils/TableState";
 import {
   EXPANDABLE_HEADER,
@@ -321,6 +316,16 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
   const withGutters = columnGutter && !insetHandled;
   const tid = useTestIds({ "data-testid": id }, "gridTable");
 
+  // A `rowActionsColumn` is a fixed width: 3 buttons (the "overflow" menu included), or just the pin and the menu on phone-sized screens
+  const breakpoints = useBreakpoint();
+  const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
+
+  const columnsWithIds = useMemo(() => {
+    const withActions = withRowActionsWidth(_columns, rowActionsWidthPx);
+    const columns = withGutters ? withColumnGutters(withActions) : withActions;
+    return assignDefaultColumnIds(columns);
+  }, [_columns, withGutters, rowActionsWidthPx]);
+
   // We only use this in as=virtual mode, but keep this here for rowLookup to use
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   // Stores the current rendered range of rows from virtuoso (used for determining if we can skip re-scrolling to a row if already in view)
@@ -337,33 +342,16 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
       api.init(persistCollapse, virtuosoRef, virtuosoRangeRef);
       api.setActiveRowId(activeRowId);
       api.setActiveCellId(activeCellId);
+      // Push the initial columns directly into tableState, b/c that is what
+      // makes the tests pass, but then further updates we'll do through useEffect
+      // to avoid "Cannot update component during render" errors.
+      api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
       return api;
     },
     // TODO: validate this eslint-disable. It was automatically ignored as part of https://app.shortcut.com/homebound-team/story/40033/enable-react-hooks-exhaustive-deps-for-react-projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.api],
   );
-
-  // A `rowActionsColumn` is a fixed width: 3 buttons (the "overflow" menu included), or just the pin and the menu on phone-sized screens
-  const breakpoints = useBreakpoint();
-  const rowActionsWidthPx = rowActionsColumnPx(rowActionsSlotsFor(breakpoints));
-  // ...and sticky when it sets `sticky`, or when any row is pinnable, so the pin stays in reach
-  const rowActionsPinnable = useMemo(() => anyRowActionsPinnable(_columns, rows, api), [_columns, rows, api]);
-
-  const columnsWithIds = useMemo(() => {
-    const withActions = withRowActionsWidth(withRowActionsSticky(_columns, rowActionsPinnable), rowActionsWidthPx);
-    const columns = withGutters ? withColumnGutters(withActions) : withActions;
-    return assignDefaultColumnIds(columns);
-  }, [_columns, withGutters, rowActionsWidthPx, rowActionsPinnable]);
-
-  // Push the initial columns directly into tableState (once per api), b/c that is what
-  // makes the tests pass, but then further updates we'll do through useEffect
-  // to avoid "Cannot update component during render" errors.
-  const initialColumnsApiRef = useRef<GridTableApiImpl<R> | undefined>(undefined);
-  if (initialColumnsApiRef.current !== api) {
-    initialColumnsApiRef.current = api;
-    api.tableState.setColumns(columnsWithIds, visibleColumnsStorageKey);
-  }
 
   const [draggedRow, _setDraggedRow] = useState<GridDataRow<R> | undefined>(undefined);
   const draggedRowRef = useRef(draggedRow);

@@ -16,8 +16,9 @@ import { useTestIds } from "src/utils/useTestIds";
  * The actions fill the icon slots before it, and the rest (and any `overflowOnly` ones) go in the menu, unless
  * there's only one left over, which shows as an icon in the menu's place.
  */
-export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config: GridRowActionsConfig }) {
-  const { actions = [], pinnable = false } = config;
+export function RowActionsCell(props: { row: GridDataRow<any>; config: GridRowActionsConfig; pinnable: boolean }) {
+  const { row, config, pinnable } = props;
+  const { actions = [] } = config;
   const { sm } = useBreakpoint();
   // Up to 2 icons (the pin included) before the menu, 3 buttons in all; phone-sized screens show only the pin and the menu
   const visibleCount = sm ? 0 : 2;
