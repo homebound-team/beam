@@ -108,6 +108,7 @@ export const Icon = (props: IconProps) => {
     "triangleDown",
     "subDirectoryRight",
     "swap",
+    "ordering",
   ];
   const mediaIcons: IconProps["icon"][] = [
     "camera",
