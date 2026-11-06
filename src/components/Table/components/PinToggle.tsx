@@ -20,10 +20,10 @@ export function PinToggle({ rowId }: PinToggleProps) {
   const pinnedState = useComputed(() => tableState.isPinnedRow(rowId), [tableState, rowId]);
   // A child of a pinned parent moves with it, so it can't be unpinned on its own
   const viaParent = pinnedState === "parent";
-  const tid = useTestIds({}, "pin");
+  const tid = useTestIds({}, "pinToggle");
   return (
     <IconButton
-      {...tid[rowId]}
+      {...tid}
       icon={pinnedState ? "pinFilled" : "pin"}
       inc={tableIconInc}
       color={pinnedState ? Tokens.Primary : undefined}
