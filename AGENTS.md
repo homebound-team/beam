@@ -101,6 +101,7 @@ return <div {...tid}>…</div>;
 - Prefix comes from `props["data-testid"]` when a parent forwarded it, otherwise `defaultTestId(defaultPrefix)` (e.g. `"myComponent"`).
 - Named parts use the proxy: `tid.trigger` → `{ "data-testid": "myComponent_trigger" }`.
 - Apply with spreads only: `{...tid}` on the root, `{...tid.panel}` on named DOM nodes.
+- **No entity ids in test ids.** Do not build test ids from row, record, or other data ids (`edit_${row.id}`); use the label or a fixed name instead. In tests, scope the lookup to its row or cell (e.g. `within(cell(r, 1, 2)).getByTestId("edit")`), since the same test id repeats across rows.
 - **Nested components:** Parent spreads `tid` into the child (`<NavGroupTrigger {...tid} … />` or `<SideNavLinkGroupView {...tid.linkGroup} … />`); child calls `useTestIds(props, "trigger")` and spreads `{...tid.trigger}`. Do **not** build or pass `data-testid` strings by hand.
 
 **Passing test ids to children** — spread the parent’s `tid` (or a scoped part like `tid.linkGroup`); never `data-testid={someVariable}`:

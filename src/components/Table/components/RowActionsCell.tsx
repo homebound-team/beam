@@ -32,7 +32,7 @@ export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config:
       {iconActions.map((action) => (
         <IconButton
           key={action.label}
-          {...tid[`${defaultTestId(action.label)}_${row.id}`]}
+          {...tid[defaultTestId(action.label)]}
           icon={action.icon}
           label={action.label}
           onClick={action.onClick}
@@ -43,7 +43,7 @@ export function RowActionsCell({ row, config }: { row: GridDataRow<any>; config:
       {pinnable && <PinToggle rowId={row.id} />}
       {menuItems.length > 0 && (
         <ButtonMenu
-          {...tid[`rowActions_${row.id}`]}
+          {...tid.rowActions}
           trigger={{ icon: "verticalDots", inc: tableIconInc }}
           items={menuItems}
           placement="right"
