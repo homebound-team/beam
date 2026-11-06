@@ -1,6 +1,12 @@
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
-import type { GridRowAction, GridRowActionsConfig, Kinded, RowActionsColumnDef } from "src/components/Table/types";
+import type {
+  GridColumn,
+  GridRowAction,
+  GridRowActionsConfig,
+  Kinded,
+  RowActionsColumnDef,
+} from "src/components/Table/types";
 import { reservedRowKinds } from "src/components/Table/utils/utils";
 
 export const beamRowActionsColumnId = "beamRowActionsColumn";
@@ -40,6 +46,40 @@ export function splitRowActions<A extends Pick<GridRowAction, "overflowOnly">>(
 /** Width of the actions column for `slots` icon buttons. */
 export function rowActionsColumnPx(slots: number): number {
   return rowActionsCellPaddingPx * 2 + slots * rowActionButtonPx + (slots - 1) * rowActionGapPx;
+}
+
+/** Each `rowActionsColumn`'s def, so the table can check its rows' configs without another column option. */
+const rowActionsDefs = new WeakMap<object, RowActionsColumnDef<any>>();
+
+export function setRowActionsDef<R extends Kinded>(column: GridColumn<R>, def: RowActionsColumnDef<R>): void {
+  rowActionsDefs.set(column, def);
+}
+
+/** Whether any row (children included) gets a pin from the table's `rowActionsColumn`. */
+export function anyRowActionsPinnable<R extends Kinded>(
+  columns: GridColumn<R>[],
+  rows: GridDataRow<R>[],
+  api: GridTableApi<R>,
+): boolean {
+  const column = columns.find((c) => c.id === beamRowActionsColumnId);
+  const def = column && rowActionsDefs.get(column);
+  if (!def) return false;
+  const anyPinnable = (rows: GridDataRow<R>[]): boolean =>
+    rows.some((row) => !!resolveRowActions(def, row, api).pinnable || anyPinnable(row.children ?? []));
+  return anyPinnable(rows);
+}
+
+/**
+ * Makes the `rowActionsColumn` sticky to the right when `sticky` is set, i.e. when rows are pinnable, whatever the
+ * column's own `sticky` option says. Wraps the column like `withRowActionsWidth`, so the caller's column is untouched.
+ */
+export function withRowActionsSticky<T extends Kinded>(columns: GridColumn<T>[], sticky: boolean): GridColumn<T>[] {
+  if (!sticky) return columns;
+  return columns.map((column) =>
+    column.id === beamRowActionsColumnId
+      ? new Proxy(column, { get: (target, key) => (key === "sticky" ? "right" : Reflect.get(target, key)) })
+      : column,
+  );
 }
 
 /** Resolves a row's `rowActionsColumn` config: static, or computed from the row. Reserved rows never get one. */

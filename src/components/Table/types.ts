@@ -159,7 +159,10 @@ export type RowActionsColumnDef<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (data: D, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig
         : (data: undefined, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig);
-} & Pick<GridColumn<R>, "w">;
+} & Pick<GridColumn<R>, "w"> & {
+    /** Sticks the column to the right. Always on when any row is `pinnable`, so the pin stays in reach. */
+    sticky?: boolean;
+  };
 
 /**
  * Adds an `id` to `GridColumn`, for use in storage/APIs.

@@ -12,7 +12,7 @@ import {
   nonKindGridColumnKeys,
   type RowActionsColumnDef,
 } from "src/components/Table/types";
-import { beamRowActionsColumnId, resolveRowActions } from "src/components/Table/utils/rowActions";
+import { beamRowActionsColumnId, resolveRowActions, setRowActionsDef } from "src/components/Table/utils/rowActions";
 import { type DragData, emptyCell } from "src/components/Table/utils/utils";
 import { Css } from "src/Css";
 import { pageContentGutterPx } from "src/layouts/layoutSpacing";
@@ -76,7 +76,10 @@ export function actionColumn<T extends Kinded>(columnDef: GridColumn<T>): GridCo
 }
 
 /**
- * Provides a sticky-right column of row actions and a pin toggle, which ends in a "overflow" menu.
+ * Provides a column of row actions and a pin toggle, which ends in a "overflow" menu.
+ *
+ * The column isn't sticky unless `sticky` is set, or any row is `pinnable`: then it sticks to the right, so the pin
+ * stays in reach.
  *
  * Each row `kind` gets a `GridRowActionsConfig`, static or computed from the row, i.e.
  * `rowActionsColumn<Row>({ data: (data, { row }) => ({ pinnable: true, actions: [...] }) })`.
@@ -91,7 +94,7 @@ export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>):
     id: beamRowActionsColumnId,
     clientSideSort: false,
     align: "right",
-    sticky: "right",
+    sticky: def.sticky ? "right" : undefined,
     w: def.w,
     wrapAction: false,
     isAction: true,
@@ -102,13 +105,15 @@ export function rowActionsColumn<T extends Kinded>(def: RowActionsColumnDef<T>):
     groupHeader: emptyCell,
   };
   // Listed kinds draw their config; the rest (and reserved kinds) stay empty
-  return newMethodMissingProxy(base, (kind) =>
+  const column = newMethodMissingProxy(base, (kind) =>
     kind in def
       ? (_data: unknown, { row, api }: { row: GridDataRow<T>; api: GridTableApi<T> }) => (
           <RowActionsCell row={row} config={resolveRowActions(def, row, api)} />
         )
       : emptyCell,
   ) as GridColumn<T>;
+  setRowActionsDef(column, def);
+  return column;
 }
 
 /**

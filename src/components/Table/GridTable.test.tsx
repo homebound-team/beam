@@ -1763,6 +1763,41 @@ describe("GridTable", () => {
       expect(config.mock.calls.map(([, { row }]: any) => row.kind)).not.toContain("header");
     });
 
+    describe("sticky", () => {
+      const sticky = (api: GridTableApiImpl<Row>) =>
+        api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.sticky;
+
+      it("isn't sticky by default", async () => {
+        // Given an actions column without a pin
+        const api = new GridTableApiImpl<Row>();
+        await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+        // Then it isn't sticky
+        expect(sticky(api)).toBeUndefined();
+      });
+
+      it("sticks to the right when sticky is set", async () => {
+        // Given an actions column that asks to be sticky
+        const api = new GridTableApiImpl<Row>();
+        const columns = [nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] }, sticky: true })];
+        await render(<GridTable<Row> api={api} columns={columns} rows={actionRows} />);
+        // Then it sticks to the right
+        expect(sticky(api)).toBe("right");
+      });
+
+      it("sticks to the right when any row is pinnable, even without sticky", async () => {
+        // Given only one row that's pinnable, from a config computed from the row
+        const api = new GridTableApiImpl<Row>();
+        const columns = [
+          nameColumn,
+          valueColumn,
+          rowActionsColumn<Row>({ data: (_data, { row }) => ({ actions: [edit], pinnable: row.id === "r2" }) }),
+        ];
+        await render(<GridTable<Row> api={api} columns={columns} rows={actionRows} />);
+        // Then the column sticks to the right
+        expect(sticky(api)).toBe("right");
+      });
+    });
+
     it("sizes the column for 3 buttons unless it has a w", async () => {
       // Given one action per row
       const api = new GridTableApiImpl<Row>();
