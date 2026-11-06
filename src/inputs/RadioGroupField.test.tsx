@@ -248,4 +248,31 @@ describe("RadioGroupField", () => {
       expect(r.getByRole("radio", { name: "Top Load Washer and Dryer" })).toBe(r.washerAndDryer_top);
     });
   });
+
+  it("shows the original and new value labels when the value changes", async () => {
+    function TestThumbnails() {
+      const [value, setValue] = useState<string | undefined>("a");
+      return (
+        <RadioGroupField
+          label="Cheese"
+          layout="thumbnail"
+          value={value}
+          onChange={setValue}
+          originalValue="a"
+          options={[
+            { value: "a", label: "Asiago", imgSrc: "a.png" },
+            { value: "b", label: "Burratta", imgSrc: "b.png" },
+          ]}
+        />
+      );
+    }
+    // Given the value is the original, so there are no captions
+    const r = await render(<TestThumbnails />);
+    expect(r.queryByText("Current")).not.toBeInTheDocument();
+    // When selecting another option
+    click(r.cheese_b);
+    // Then the original option is captioned "Current", and the selected one "New"
+    expect(r.cheese_a.closest("label")).toHaveTextContent("Current");
+    expect(r.cheese_b.closest("label")).toHaveTextContent("New");
+  });
 });

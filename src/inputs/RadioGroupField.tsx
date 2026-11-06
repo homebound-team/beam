@@ -51,6 +51,8 @@ export type RadioGroupFieldProps<K extends string, O extends RadioFieldOption<K>
   onFocus?: () => void;
   /** The options' arrangement. Defaults to "vertical". */
   layout?: RadioGroupFieldLayout;
+  /** Flags the original option and the new selection once they differ. Only used by `layout="thumbnail"`. */
+  originalValue?: K;
   /**
    * Renders each option's whole row, like a title, price and images. Not used by `layout="thumbnail"`.
    *
@@ -83,6 +85,7 @@ export function RadioGroupField<K extends string, O extends RadioFieldOption<K> 
     layout = "vertical",
     tooltip,
     renderOption,
+    originalValue,
     ...otherProps
   } = props;
 
@@ -133,7 +136,7 @@ export function RadioGroupField<K extends string, O extends RadioFieldOption<K> 
             return (
               <Fragment key={option.value}>
                 {isThumbnail ? (
-                  <ThumbnailRadio {...radioProps} />
+                  <ThumbnailRadio {...radioProps} originalValue={originalValue} />
                 ) : renderOption ? (
                   <CustomRadio {...radioProps} renderOption={renderOption} />
                 ) : (
@@ -271,6 +274,10 @@ function CustomRadio<K extends string, O extends RadioFieldOption<K>>(props: {
   });
 }
 
+/** A thumbnail caption sits this far below its swatch, on one `xs2` line. */
+const captionGapPx = 5;
+const captionLineHeightPx = 14;
+
 /**
  * A radio rendered as an image swatch, for `layout="thumbnail"`.
  *
@@ -282,6 +289,8 @@ function ThumbnailRadio<K extends string>(props: {
   state: RadioGroupState;
   // Per-option disabled flag, kept separate from state; see `Radio` for why.
   isOptionDisabled?: boolean;
+  /** Reserves a caption line, and captions the original and selected swatches while the group's value differs from it. */
+  originalValue?: K;
   onBlur?: () => void;
   onFocus?: () => void;
 }) {
@@ -289,6 +298,7 @@ function ThumbnailRadio<K extends string>(props: {
     option: { label, value, imgSrc, disabled: disabledReason },
     state,
     isOptionDisabled,
+    originalValue,
     ...others
   } = props;
 
@@ -302,6 +312,10 @@ function ThumbnailRadio<K extends string>(props: {
   // focus ring; see `SelectCardShell` for the full story. Keyboard focus goes straight to the input.
   const { pressProps, isPressed } = usePress({ isDisabled, preventFocusOnPress: true });
   const tid = useTestIds(props);
+  const reserveCaption = originalValue !== undefined;
+  const showCaptions = reserveCaption && state.selectedValue !== originalValue;
+  const isOriginal = showCaptions && value === originalValue;
+  const isNew = showCaptions && isSelected;
 
   return maybeTooltip({
     ...tid.tooltip,
@@ -314,6 +328,10 @@ function ThumbnailRadio<K extends string>(props: {
           // The padding over the white background is the inner ring between the border and the image.
           ...Css.db.fs0.sqPx(32).pPx(2).br8.ba.bc(Tokens.FieldBorderDefault).bgColor(Tokens.SurfaceRaised).outline(0)
             .cursorPointer.$,
+          // Positions the caption and reserves space for it, so the layout doesn't shift.
+          ...Css.relative.if(reserveCaption).mbPx(captionGapPx + captionLineHeightPx).$,
+          // Like the selected border, but gray
+          ...(isOriginal ? Css.bcGray600.$ : {}),
           // Lets a wrapping `Carousel` snap to each thumbnail.
           ...Css.ssa("start").$,
           ...(isHovered && !isFocusVisible ? Css.bshHover.$ : {}),
@@ -342,6 +360,20 @@ function ThumbnailRadio<K extends string>(props: {
             />
           )}
         </span>
+        {(isOriginal || isNew) && (
+          <span
+            css={{
+              // Under the swatch; `top` is measured inside its 1px border.
+              ...Css.absolute.top("100%").mtPx(captionGapPx + 1).$,
+              // Centered on the swatch; it may overflow the swatch's width.
+              ...Css.left("50%").transform("translateX(-50%)").$,
+              ...Css.xs2.wsnw.color(Tokens.TextHelper).$,
+              ...(isNew ? Css.xs2Sb.color(Tokens.Primary).$ : {}),
+            }}
+          >
+            {isNew ? "New" : "Current"}
+          </span>
+        )}
       </label>
     ),
   });
