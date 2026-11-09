@@ -127,20 +127,23 @@ export type PinnedState = "self" | "parent";
 /** An icon action in a `rowActionsColumn`. */
 export type GridRowAction = {
   icon: IconProps["icon"];
-  /** The icon's aria label and tooltip, and the item's text once it moves into the "more" menu. */
+  /** The icon's aria label and tooltip, and the item's text once it moves into the "overflow" menu. */
   label: string;
   onClick: VoidFunction | string;
   /** A ReactNode is shown as the disabled reason. */
   disabled?: boolean | ReactNode;
-  /** Shows the item in red once it moves into the "more" menu. */
+  /** Shows the item in red once it moves into the "overflow" menu. */
   destructive?: boolean;
+  /** Always goes in the "overflow" menu, whatever its order, unless it would be the menu's only action. */
+  overflowOnly?: boolean;
 };
 
 /** What a `rowActionsColumn` draws for a row. */
 export type GridRowActionsConfig = {
-  /** Shows a pin toggle, always as an icon just before the "more" menu. */
-  pinnable?: boolean;
-  /** Up to 3 icons show (the pin included), then the "overflow" menu; only the pin and menu on phone-sized screens. */
+  /**
+   * Up to 3 buttons show (the pin and the "overflow" menu included); only the pin and menu on phone-sized screens.
+   * The menu never holds just one action: a lone leftover action shows as an icon in the menu's place.
+   */
   actions?: GridRowAction[];
 };
 
@@ -154,7 +157,15 @@ export type RowActionsColumnDef<R extends Kinded> = {
     | (DiscriminateUnion<R, "kind", K> extends { data: infer D }
         ? (data: D, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig
         : (data: undefined, opts: { row: GridRowKind<R, K>; api: GridTableApi<R> }) => GridRowActionsConfig);
-} & Pick<GridColumn<R>, "w">;
+} & Pick<GridColumn<R>, "w"> & {
+    /**
+     * Shows a pin toggle, always as an icon just before the "overflow" menu: on every row with `true`, or only on
+     * rows of the listed kinds. Makes the column sticky, so the pin stays in reach.
+     */
+    pinnable?: boolean | R["kind"][];
+    /** Sticks the column to the right. Always on when `pinnable` is set. */
+    sticky?: boolean;
+  };
 
 /**
  * Adds an `id` to `GridColumn`, for use in storage/APIs.

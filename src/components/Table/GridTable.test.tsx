@@ -16,7 +16,7 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import { GridTable, type OnRowSelect, setRunningInJest } from "src/components/Table/GridTable";
 import { type GridTableApi, GridTableApiImpl, useGridTableApi } from "src/components/Table/GridTableApi";
 import { defaultStyle, type RowStyles } from "src/components/Table/TableStyles";
-import type { GridColumn, GridColumnWithId, GridRowActionsConfig } from "src/components/Table/types";
+import type { GridColumn, GridColumnWithId } from "src/components/Table/types";
 import {
   actionColumn,
   assignDefaultColumnIds,
@@ -1301,7 +1301,7 @@ describe("GridTable", () => {
     it("renders rowActionsColumn pins on data rows (not the header) and toggles on click", async () => {
       // Given a rowActionsColumn that pins data rows
       const api = new GridTableApiImpl<Row>();
-      const pins = rowActionsColumn<Row>({ data: { pinnable: true } });
+      const pins = rowActionsColumn<Row>({ pinnable: true });
       const r = await render(<GridTable<Row> api={api} columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
 
       // Then the header has no pin toggle, but each data row has a row-scoped one
@@ -1325,16 +1325,6 @@ describe("GridTable", () => {
       const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn]} rows={pinRows} />);
       // Then no row has a pin toggle
       expect(r.query.pinToggle).toBeNull();
-    });
-
-    it("decides each row's pin from its config", async () => {
-      // Given a config that pins every data row except the one named "zaz"
-      const pins = rowActionsColumn<Row>({ data: (data) => ({ pinnable: data.name !== "zaz" }) });
-      const r = await render(<GridTable<Row> columns={[nameColumn, valueColumn, pins]} rows={pinRows} />);
-      // Then only the other rows get a pin toggle
-      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 2, 2)).getByTestId("pinToggle")).toBeInTheDocument();
-      expect(within(cell(r, 3, 2)).queryByTestId("pinToggle")).toBeNull();
     });
 
     it("keeps a pinned row visible after it's dropped from rows", async () => {
@@ -1378,10 +1368,18 @@ describe("GridTable", () => {
         },
         { kind: "parent", id: "p2", data: { name: "parent 2" } },
       ];
-      const pins = rowActionsColumn<NestedRow>({
-        parent: { pinnable: true },
-        child: { pinnable: true },
-        grandChild: { pinnable: true },
+      const pins = rowActionsColumn<NestedRow>({ pinnable: true });
+
+      it("pins only the kinds listed in pinnable", async () => {
+        // Given a column that only pins parents
+        const parentPins = rowActionsColumn<NestedRow>({ pinnable: ["parent"] });
+        const r = await render(<GridTable<NestedRow> columns={[nestedNameColumn, parentPins]} rows={nestedRows} />);
+        // Then both parents get a pin toggle
+        expect(within(cell(r, 1, 1)).getByTestId("pinToggle")).toBeInTheDocument();
+        expect(within(cell(r, 4, 1)).getByTestId("pinToggle")).toBeInTheDocument();
+        // And the child and grandchild don't
+        expect(cell(r, 2, 1)).toBeEmptyDOMElement();
+        expect(cell(r, 3, 1)).toBeEmptyDOMElement();
       });
 
       it("brings a pinned parent's children with it", async () => {
@@ -1521,11 +1519,6 @@ describe("GridTable", () => {
     const edit = { icon: "pencil" as const, label: "Edit", onClick: noop };
     const duplicate = { icon: "duplicate" as const, label: "Duplicate", onClick: noop };
     const remove = { icon: "trash" as const, label: "Delete", onClick: noop, destructive: true };
-    const withActions = (config: GridRowActionsConfig, w?: string) => [
-      nameColumn,
-      valueColumn,
-      rowActionsColumn<Row>({ data: config, w }),
-    ];
 
     it("draws a row's actions as icons, from a config computed from the row", async () => {
       // Given two actions per row, built from the row
@@ -1538,7 +1531,7 @@ describe("GridTable", () => {
         }),
       ];
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
-      // Then each row shows both as icons in the actions column, with no "more" menu
+      // Then each row shows both as icons in the actions column, with no "overflow" menu
       expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
       expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
       expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
@@ -1552,7 +1545,11 @@ describe("GridTable", () => {
 
     it("gives actions that share an icon their own test ids", async () => {
       // Given two actions with the same icon
-      const columns = withActions({ actions: [edit, { ...edit, label: "Edit dates" }] });
+      const columns = [
+        nameColumn,
+        valueColumn,
+        rowActionsColumn<Row>({ data: { actions: [edit, { ...edit, label: "Edit dates" }] } }),
+      ];
       const r = await render(<GridTable<Row> columns={columns} rows={actionRows} />);
       // Then each is found by its label
       expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
@@ -1562,7 +1559,10 @@ describe("GridTable", () => {
     it("shows the pin as an icon after the actions when there's room", async () => {
       // Given one action and a pin
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit] } })]}
+          rows={actionRows}
+        />,
       );
       // Then the pin shows right after the action
       expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
@@ -1573,52 +1573,67 @@ describe("GridTable", () => {
       // Given three actions per row and a pin
       const r = await render(
         <GridTable<Row>
-          columns={withActions({ actions: [edit, duplicate, remove], pinnable: true })}
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit, duplicate, remove] } }),
+          ]}
           rows={actionRows}
         />,
         withRouter(),
       );
-      // Then the first two actions and the pin show as icons, and the third action moves into the menu
+      // Then the first action and the pin show as icons, and the last two move into the menu
       expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("duplicate")).toBeInTheDocument();
       expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).queryByTestId("duplicate")).toBeNull();
       expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
       click(within(cell(r, 1, 2)).getByTestId("rowActions"));
+      expect(r.rowActions_duplicate).toBeTruthy();
       expect(r.rowActions_delete).toBeTruthy();
     });
 
     it("keeps the pin as an icon on phone-sized screens", async () => {
-      // Given an action per row and a pin on a phone-sized screen
+      // Given two actions per row and a pin on a phone-sized screen
       setViewport("sm");
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit], pinnable: true })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit, remove] } }),
+          ]}
+          rows={actionRows}
+        />,
         withRouter(),
       );
-      // Then the action moves into the menu, but the pin stays an icon
+      // Then the actions move into the menu, but the pin stays an icon
       expect(within(cell(r, 1, 2)).queryByTestId("edit")).toBeNull();
+      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
       expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
       click(within(cell(r, 1, 2)).getByTestId("rowActions"));
       expect(r.rowActions_edit).toBeTruthy();
+      expect(r.rowActions_delete).toBeTruthy();
     });
 
-    it("keeps showing icons on tablet-sized screens", async () => {
-      // Given three actions per row on a tablet-sized screen
+    it("uses the desktop icon slots on tablet-sized screens", async () => {
+      // Given three actions per row and a pin on a tablet-sized screen
       setViewport("md");
       const r = await render(
-        <GridTable<Row> columns={withActions({ actions: [edit, duplicate, remove] })} rows={actionRows} />,
+        <GridTable<Row>
+          columns={[
+            nameColumn,
+            valueColumn,
+            rowActionsColumn<Row>({ pinnable: true, data: { actions: [edit, duplicate, remove] } }),
+          ]}
+          rows={actionRows}
+        />,
+        withRouter(),
       );
-      // Then all three still show as icons, with no "more" menu
+      // Then the first action shows as an icon next to the pin, like on desktop, and the rest go in the menu
       expect(within(cell(r, 1, 2)).getByTestId("edit")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).getByTestId("delete")).toBeInTheDocument();
-      expect(within(cell(r, 1, 2)).queryByTestId("rowActions")).toBeNull();
-    });
-
-    it("puts every action in the menu on phone-sized screens", async () => {
-      // Given an action per row on a phone-sized screen
-      setViewport("sm");
-      const r = await render(<GridTable<Row> columns={withActions({ actions: [edit] })} rows={actionRows} />);
-      // Then there are no icons, just the menu
-      expect(within(cell(r, 1, 2)).queryByTestId("edit")).toBeNull();
+      expect(within(cell(r, 1, 2)).getByTestId("pinToggle")).toBeInTheDocument();
+      expect(within(cell(r, 1, 2)).queryByTestId("duplicate")).toBeNull();
+      expect(within(cell(r, 1, 2)).queryByTestId("delete")).toBeNull();
       expect(within(cell(r, 1, 2)).getByTestId("rowActions")).toBeInTheDocument();
     });
 
@@ -1667,16 +1682,67 @@ describe("GridTable", () => {
       expect(config.mock.calls.map(([, { row }]: any) => row.kind)).not.toContain("header");
     });
 
-    it("sizes the column for 3 icons and the menu unless it has a w", async () => {
+    describe("sticky", () => {
+      const sticky = (api: GridTableApiImpl<Row>) =>
+        api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.sticky;
+
+      it("isn't sticky by default", async () => {
+        // Given an actions column without a pin
+        const api = new GridTableApiImpl<Row>();
+        await render(
+          <GridTable<Row>
+            api={api}
+            columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+            rows={actionRows}
+          />,
+        );
+        // Then it isn't sticky
+        expect(sticky(api)).toBeUndefined();
+      });
+
+      it("sticks to the right when sticky is set", async () => {
+        // Given an actions column that asks to be sticky
+        const api = new GridTableApiImpl<Row>();
+        const columns = [nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] }, sticky: true })];
+        await render(<GridTable<Row> api={api} columns={columns} rows={actionRows} />);
+        // Then it sticks to the right
+        expect(sticky(api)).toBe("right");
+      });
+
+      it("sticks to the right when pinnable is set, even without sticky", async () => {
+        // Given an actions column that pins data rows
+        const api = new GridTableApiImpl<Row>();
+        const columns = [
+          nameColumn,
+          valueColumn,
+          rowActionsColumn<Row>({ pinnable: ["data"], data: { actions: [edit] } }),
+        ];
+        await render(<GridTable<Row> api={api} columns={columns} rows={actionRows} />);
+        // Then the column sticks to the right
+        expect(sticky(api)).toBe("right");
+      });
+    });
+
+    it("sizes the column for 3 buttons unless it has a w", async () => {
       // Given one action per row
       const api = new GridTableApiImpl<Row>();
       const width = () => api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w;
-      const r = await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
-      // Then the column still fits 3 icons and the menu, the gaps between them and the cell padding
-      expect(width()).toBe("148px");
+      const r = await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+          rows={actionRows}
+        />,
+      );
+      // Then the column still fits 3 buttons, the gaps between them and the cell padding
+      expect(width()).toBe("116px");
       // When the column is given its own w
       await r.rerender(
-        <GridTable<Row> api={api} columns={withActions({ actions: [edit] }, "200px")} rows={actionRows} />,
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] }, w: "200px" })]}
+          rows={actionRows}
+        />,
       );
       // Then the table keeps it
       expect(width()).toBe("200px");
@@ -1686,7 +1752,13 @@ describe("GridTable", () => {
       // Given a phone-sized screen
       setViewport("sm");
       const api = new GridTableApiImpl<Row>();
-      await render(<GridTable<Row> api={api} columns={withActions({ actions: [edit] })} rows={actionRows} />);
+      await render(
+        <GridTable<Row>
+          api={api}
+          columns={[nameColumn, valueColumn, rowActionsColumn<Row>({ data: { actions: [edit] } })]}
+          rows={actionRows}
+        />,
+      );
       // Then the column fits 2 buttons
       expect(api.tableState.columns.find((c) => c.id === "beamRowActionsColumn")?.w).toBe("84px");
     });

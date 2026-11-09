@@ -1,6 +1,6 @@
 import type { GridDataRow } from "src/components/Table/components/Row";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
-import type { GridRowActionsConfig, Kinded, RowActionsColumnDef } from "src/components/Table/types";
+import type { GridRowAction, GridRowActionsConfig, Kinded, RowActionsColumnDef } from "src/components/Table/types";
 import { reservedRowKinds } from "src/components/Table/utils/utils";
 
 export const beamRowActionsColumnId = "beamRowActionsColumn";
@@ -13,27 +13,39 @@ const rowActionButtonPx = 28;
 export const rowActionGapPx = 4;
 const rowActionsCellPaddingPx = 12;
 
-/** The fixed number of buttons the actions column is sized for: 3 icons and the menu, or the pin and the menu on phone-sized screens. */
+/** The fixed number of buttons the actions column is sized for, the menu included: 3, or the pin and the menu on phone-sized screens. */
 export function rowActionsSlotsFor(breakpoints: { sm: boolean }): number {
-  return breakpoints.sm ? 2 : 4;
+  return breakpoints.sm ? 2 : 3;
 }
 
 /**
- * How a row's actions split: the first `actionIcons` as icons, then the pin (always an icon, never in the menu),
- * then the "more" menu if any actions are left over. The icons, pin included, fit in `visibleCount`.
+ * How a row's actions split: `icons` before the pin (always an icon, never in the menu), then the "overflow" menu if
+ * any actions are left over. The icons, pin included, fit in `visibleCount`. `overflowOnly` actions skip the icons
+ * and go straight to the menu; the rest fill the icons in order.
+ *
+ * The menu never holds just one action: a lone leftover action (`overflowOnly` or not) takes the menu's slot as an
+ * icon instead. So without the pin on phone-sized screens, a single action is an icon, and two or more all go in the menu.
  */
-export function splitRowActions(
-  actionCount: number,
+export function splitRowActions<A extends Pick<GridRowAction, "overflowOnly">>(
+  actions: A[],
   pinnable: boolean,
   visibleCount: number,
-): { actionIcons: number; hasMenu: boolean } {
-  const actionIcons = Math.min(actionCount, Math.max(0, visibleCount - (pinnable ? 1 : 0)));
-  return { actionIcons, hasMenu: actionCount > actionIcons };
+): { icons: A[]; menu: A[] } {
+  const fits = Math.max(0, visibleCount - (pinnable ? 1 : 0));
+  const icons = actions.filter((a) => !a.overflowOnly).slice(0, fits);
+  const menu = actions.filter((a) => !icons.includes(a));
+  return menu.length === 1 ? { icons: actions, menu: [] } : { icons, menu };
 }
 
 /** Width of the actions column for `slots` icon buttons. */
 export function rowActionsColumnPx(slots: number): number {
   return rowActionsCellPaddingPx * 2 + slots * rowActionButtonPx + (slots - 1) * rowActionGapPx;
+}
+
+/** Whether rows of `kind` get a pin from `rowActionsColumn`'s `pinnable`. Reserved kinds never do. */
+export function isKindPinnable(pinnable: boolean | readonly string[] | undefined, kind: string): boolean {
+  if (reservedRowKinds.includes(kind)) return false;
+  return pinnable === true || (Array.isArray(pinnable) && pinnable.includes(kind));
 }
 
 /** Resolves a row's `rowActionsColumn` config: static, or computed from the row. Reserved rows never get one. */
