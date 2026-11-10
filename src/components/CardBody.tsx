@@ -1,8 +1,9 @@
-import { type ReactNode, useMemo } from "react";
+import type { ReactNode } from "react";
+import { ProgressBar } from "src/components/ProgressBar";
 import { ProposedValue, type ProposedValueProps } from "src/components/ProposedValue";
 import type { CardBadgeTag } from "src/components/Table/cardSlots";
 import { Tag } from "src/components/Tag";
-import { Css, Palette, Tokens } from "src/Css";
+import { Css, Tokens } from "src/Css";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
@@ -35,7 +36,6 @@ export type CardBodyProps = {
 export function CardBody(props: CardBodyProps) {
   const { title, leftEyebrow, rightEyebrow, badge, badgeTags, data = [], progress, aiMode = false, children } = props;
   const tid = useTestIds(props, "cardBody");
-  const progressValue = useMemo(() => (progress !== undefined ? clampProgress(progress) : 0), [progress]);
   const hasDetails = data.length > 0 || progress !== undefined;
 
   const col1 = data.slice(0, Math.ceil(data.length / 2));
@@ -95,15 +95,8 @@ export function CardBody(props: CardBodyProps) {
             </dl>
           )}
           {progress !== undefined && (
-            <div css={Css.df.aic.gap1.fs("10px").lh("14px").$}>
-              {/* `SurfaceSubtle` is Gray200, which all but vanishes on the AI fill. */}
-              <div
-                css={Css.w25.hPx(8).br4.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$}
-                {...tid.progressTrack}
-              >
-                <div css={Css.h100.br4.bgBlue500.w(`${progressValue}%`).$} {...tid.progressFill} />
-              </div>
-              <span {...tid.progressValue}>{progressValue}%</span>
+            <div css={Css.w50.$}>
+              <ProgressBar value={progress} aiMode={aiMode} {...tid.progress} />
             </div>
           )}
         </div>
@@ -115,11 +108,4 @@ export function CardBody(props: CardBodyProps) {
 
 function renderMaybeProposed(value: string | ProposedValueProps | undefined, tid?: object): ReactNode {
   return typeof value === "string" || value === undefined ? value : <ProposedValue {...value} {...tid} />;
-}
-
-function clampProgress(value: number): number {
-  if (process.env.NODE_ENV !== "production" && (value < 0 || value > 100)) {
-    console.warn(`[CardBody] progress value ${value} is outside the expected range [0, 100] and will be clamped.`);
-  }
-  return Math.min(100, Math.max(0, value));
 }

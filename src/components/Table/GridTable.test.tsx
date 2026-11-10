@@ -6685,7 +6685,7 @@ describe("card view", () => {
     // When rendered as card
     const r = await render(<GridTable as="card" columns={columns} rows={rows} />);
     // Then the progress percentage is displayed
-    expect(r.tableCard_progressValue).toHaveTextContent("65%");
+    expect(r.tableCard_progress_value).toHaveTextContent("65%");
   });
 
   it("renders cardStatusSlot as Tag", async () => {
