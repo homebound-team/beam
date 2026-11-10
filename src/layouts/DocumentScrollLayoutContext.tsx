@@ -63,6 +63,7 @@ function DocumentScrollLayoutViewportRoot({
   useBodyBackgroundColor(bodyBackgroundColor);
 
   const docElementRef = useRef<HTMLElement | null>(typeof document !== "undefined" ? document.documentElement : null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   const syncViewportSize = useCallback(() => {
@@ -75,6 +76,10 @@ function DocumentScrollLayoutViewportRoot({
   }, []);
 
   useResizeObserver({ ref: docElementRef, onResize: syncViewportSize });
+  // A horizontal scrollbar shortens clientHeight without resizing the document element's border box, so that
+  // observer above never runs. The shell grows with the wide content that caused the bar, and this rereads the height.
+  // Basically the docElementRef observer is the outer viewport (window size changes), and the shellRef observer is the inner viewport (content width changes).
+  useResizeObserver({ ref: shellRef, onResize: syncViewportSize });
   useLayoutEffect(() => {
     syncViewportSize();
   }, [syncViewportSize]);
@@ -90,7 +95,11 @@ function DocumentScrollLayoutViewportRoot({
   return (
     // Grow with wide document-scroll content (`wfc`) while staying at least viewport-wide (`mw100`),
     // so sticky chrome ancestors are wide enough for `left` pinning on horizontal scroll.
-    <div css={Css.df.fdc.wfc.mw100.$} style={Object.keys(style).length > 0 ? (style as CSSProperties) : undefined}>
+    <div
+      ref={shellRef}
+      css={Css.df.fdc.wfc.mw100.$}
+      style={Object.keys(style).length > 0 ? (style as CSSProperties) : undefined}
+    >
       {children}
       <DocumentScrollToTopButton viewportHeight={viewportSize.height} />
     </div>

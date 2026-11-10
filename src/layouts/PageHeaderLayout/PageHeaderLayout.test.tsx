@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
 import { AutoSaveStatus, AutoSaveStatusContext } from "src/components/AutoSaveStatus/AutoSaveStatusProvider";
 import { selfTopSpaced } from "src/layouts/layoutSpacing";
-import { beamPageBannerHeightVar, beamPageHeaderLayoutHeightVar } from "src/layouts/layoutVars";
+import {
+  beamNavbarLayoutHeightVar,
+  beamPageBannerHeightVar,
+  beamPageHeaderLayoutHeightVar,
+} from "src/layouts/layoutVars";
+import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
 import { usePageBanner } from "src/layouts/PageBanner/usePageBanner";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
-import { THRESHOLD } from "src/layouts/useAutoHideOnScroll";
 import { noop } from "src/utils/helpers";
-import { render, scrollWindowWithAnchor } from "src/utils/rtl";
+import { render, scrollWindow, scrollWindowWithAnchor } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("PageHeaderLayout", () => {
@@ -51,27 +55,92 @@ describe("PageHeaderLayout", () => {
     }
   });
 
-  it("keeps publishing the header height until the header actually hides", async () => {
+  it("publishes the header height still on screen, then drops it once the header leaves", async () => {
     // Given a header measuring 72px, rendered at the top of the page
     const spy = mockElementHeight(72);
     try {
       const r = await render(<PageHeaderLayout pageHeader={{ title: "Page title" }} />);
-      const spacer = r.pageHeaderLayout_pageHeader.parentElement!;
+      const reserveEl = r.pageHeaderLayout_pageHeader.parentElement!;
       expect(r.pageHeaderLayout.style.getPropertyValue(beamPageHeaderLayoutHeightVar)).toBe("72px");
 
-      // When scrolling less than the auto-hide threshold, so the header is still parked at the viewport top
-      scrollWindowWithAnchor(spacer, 20);
+      // When the header has scrolled partway off
+      scrollWindowWithAnchor(reserveEl, 20, { elementHeight: 72 });
 
-      // Then it still reports its height, so sticky chrome below it (page banner, table headers) stays clear
-      expect(r.pageHeaderLayout.style.getPropertyValue(beamPageHeaderLayoutHeightVar)).toBe("72px");
+      // Then the var is the part still below the pin line, and the header follows the reserve element
+      expect(r.pageHeaderLayout.style.getPropertyValue(beamPageHeaderLayoutHeightVar)).toBe("52px");
+      expect(r.pageHeaderLayout_pageHeader).toHaveStyle({ top: "-20px" });
 
-      // And when scrolling past the threshold, so the header slides away
-      scrollWindowWithAnchor(spacer, THRESHOLD + 200);
+      // When the reserve element leaves the viewport
+      scrollWindowWithAnchor(reserveEl, 72, { elementHeight: 72 });
 
-      // Then the height collapses and that chrome moves up
+      // Then the height collapses and sticky chrome below can move up
       expect(r.pageHeaderLayout.style.getPropertyValue(beamPageHeaderLayoutHeightVar)).toBe("");
     } finally {
       spy.mockRestore();
+    }
+  });
+
+  it("keeps the page header at rest while the navbar is still partly on screen", async () => {
+    // Given a 48px navbar with a 72px page header under it
+    let scrolled = 0;
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const id = this.getAttribute("data-testid") ?? this.firstElementChild?.getAttribute("data-testid") ?? "";
+      if (id === "navbarLayout_navbar") return box(-scrolled, 48);
+      if (id === "pageHeaderLayout_pageHeader") return box(48 - scrolled, 72);
+      return box(0, 0);
+    });
+    try {
+      scrollWindow(0);
+      const r = await render(
+        <NavbarLayout navbar={{ brand: "Brand", items: [{ label: "Dashboard", onClick: () => {}, active: true }] }}>
+          <PageHeaderLayout pageHeader={{ title: "Page title" }} />
+        </NavbarLayout>,
+      );
+
+      // When both have moved up 20px in one scroll
+      scrolled = 20;
+      scrollWindow(20);
+
+      // Then the header still sits under the navbar, using the height the navbar wrote in this scroll
+      expect(r.navbarLayout.style.getPropertyValue(beamNavbarLayoutHeightVar)).toBe("28px");
+      expect(r.pageHeaderLayout.style.getPropertyValue(beamPageHeaderLayoutHeightVar)).toBe("72px");
+      expect(r.pageHeaderLayout_pageHeader).toHaveStyle({
+        top: "calc(var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px))",
+      });
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("reads the navbar's revealed height on a mid-page load", async () => {
+    // Given a reload where the navbar reserve is already off screen and the header reserve is still on screen
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const id = this.getAttribute("data-testid") ?? this.firstElementChild?.getAttribute("data-testid") ?? "";
+      if (id === "navbarLayout_navbar") return box(-80, 48);
+      if (id === "pageHeaderLayout_pageHeader") return box(10, 72);
+      return box(0, 0);
+    });
+    try {
+      scrollWindow(200, { scrollHeight: 5000, clientHeight: 800 });
+
+      // When the layouts mount, with no further scroll
+      const r = await render(
+        <NavbarLayout navbar={{ brand: "Brand", items: [{ label: "Dashboard", onClick: () => {}, active: true }] }}>
+          <PageHeaderLayout pageHeader={{ title: "Page title" }} />
+        </NavbarLayout>,
+      );
+
+      // Then the navbar reveals, and the header follows under that height
+      expect(r.navbarLayout.style.getPropertyValue(beamNavbarLayoutHeightVar)).toBe("48px");
+      expect(r.pageHeaderLayout.style.getPropertyValue(beamPageHeaderLayoutHeightVar)).toBe("34px");
+      expect(r.pageHeaderLayout_pageHeader).toHaveStyle({ top: "10px" });
+    } finally {
+      spy.mockRestore();
+      scrollWindow(0);
     }
   });
 
@@ -277,6 +346,20 @@ function MockAutoSaveProvider({
 function BodyWithBanner({ title }: { title?: string }) {
   usePageBanner(title ? { type: "update", title } : undefined);
   return <span>Body content</span>;
+}
+
+function box(top: number, height: number): DOMRect {
+  return {
+    top,
+    bottom: top + height,
+    left: 0,
+    right: 0,
+    width: 0,
+    height,
+    x: 0,
+    y: top,
+    toJSON() {},
+  } as DOMRect;
 }
 
 function mockElementHeight(height: number) {

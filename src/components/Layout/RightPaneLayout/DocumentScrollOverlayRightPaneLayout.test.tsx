@@ -78,6 +78,35 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
   });
 
+  it("keeps anchor height open and closed so a short page can scroll the pane taller", async () => {
+    // Given a desktop document-scroll right pane layout
+    const floor =
+      "calc(var(--beam-layout-viewport-height, 100vh) - var(--beam-environment-banner-height, 0px) - var(--beam-page-banner-height, 0px) - var(--beam-table-actions-height, 0px) - var(--beam-workflow-layout-footer-height, 0px))";
+    const r = await render(
+      <DocumentScrollLayoutProvider>
+        <DocumentScrollOverlayRightPaneLayout>
+          <div>Main content</div>
+        </DocumentScrollOverlayRightPaneLayout>
+        <OpenCloseButtons />
+      </DocumentScrollLayoutProvider>,
+    );
+
+    // Then the anchor reserves the floor while closed
+    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(floor);
+
+    // When the pane is opened
+    await clickAndWait(r.openPaneBtn);
+
+    // Then the anchor is tall enough to scroll the navbar and page header away
+    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(floor);
+
+    // When the pane is closed
+    await clickAndWait(r.closePaneBtn);
+
+    // Then the floor stays, so closing a scrolled page does not clamp it
+    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(floor);
+  });
+
   it("eases the pane offset while pinned so it moves with the chrome above it", async () => {
     // Given a document-scroll right pane layout whose anchor is already under the sticky chrome
     const r = await render(
@@ -177,6 +206,7 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneWidthVar)).toBe("0px");
     expect(r.documentScrollRightPaneLayout.style.getPropertyValue(beamRightPaneContentMinVar)).toBe("0px");
     expect(document.documentElement.style.getPropertyValue(beamFloatingRightOffsetVar)).toBe("0px");
+    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe("");
   });
 
   it("closes the pane on unmount", async () => {

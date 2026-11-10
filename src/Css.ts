@@ -4579,6 +4579,10 @@ class CssBuilder<T extends Properties, S extends StyleKind = "buildtime"> {
   get transitionTop() {
     return this.add("transition", "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
   }
+  /** Sets `transition: "var(--beam-sticky-top-transition, top 200ms cubic-bezier(0.4, 0, 0.2, 1))"`. */
+  get layoutTransitionTop() {
+    return this.add("transition", "var(--beam-sticky-top-transition, top 200ms cubic-bezier(0.4, 0, 0.2, 1))");
+  }
   /** Sets `transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)"`. */
   get transitionAll() {
     return this.add("transition", "all 200ms cubic-bezier(0.4, 0, 0.2, 1)");
