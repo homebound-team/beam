@@ -277,7 +277,7 @@ describe("EditColumnsButton", () => {
     expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice", "magnoliaCost", "magnoliaPrice"]);
   });
 
-  it("updates filtered-out columns that share a name when shareColumnVisibility is set", async () => {
+  it("updates hidden columns that share a name when shareColumnVisibility is set", async () => {
     // Given two plan groups with shared visibility, where the Magnolia group can be filtered out of the table
     const planColumns = createSharedPlanColumns();
     const sycamoreColumns = planColumns.filter((c) => c.groupId === "sycamore");
@@ -309,7 +309,7 @@ describe("EditColumnsButton", () => {
     expect(r.columns_optionsycamorePrice).toBeChecked();
   });
 
-  it("keeps a filtered-out column's visibility when shareColumnVisibility is not set", async () => {
+  it("keeps a hidden column's visibility when shareColumnVisibility is not set", async () => {
     // Given the same plan groups without shared visibility
     const planColumns = createSharedPlanColumns();
     const sycamoreColumns = planColumns.filter((c) => c.groupId === "sycamore");

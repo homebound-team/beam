@@ -83,15 +83,16 @@ export class ColumnStates<R extends Kinded> {
       cs.setVisible(ids.includes(cs.column.id));
     }
     if (!opts.shareColumnVisibility) return;
-    // Edit Columns only lists the current columns, so a filtered-out column follows its switch by leaf name
+    // Columns not in the table right now should match the shown table columns with the same name
     const visibleByName = new Map<string, boolean>();
     for (const cs of current) {
       if (!cs.column.canHide || !cs.column.name) continue;
       const name = leafColumnName(cs.column);
-      // Hidden wins on a mix, matching the switch, which is on only when every column with its name is visible
+      // Treat a name as hidden if any column with that name is hidden, like the Edit Columns switch does
       visibleByName.set(name, (visibleByName.get(name) ?? true) && cs.isVisible);
     }
     const currentIds = new Set(current.map((cs) => cs.column.id));
+    // Apply that visibility to every column we have seen before that is not in the table right now
     for (const cs of this.map.values()) {
       if (currentIds.has(cs.column.id) || !cs.column.name) continue;
       const visible = visibleByName.get(leafColumnName(cs.column));
