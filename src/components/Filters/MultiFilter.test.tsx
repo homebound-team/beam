@@ -51,6 +51,22 @@ describe("MultiFilter", () => {
     expect(r.filter_project.tagName).toBe("BUTTON");
     expect(r.filter_project_search).toBeInTheDocument();
   });
+
+  it("renders with badgeOnly by default", async () => {
+    // Given a multiFilter with selected values
+    const filter = multiFilter({
+      options: [
+        { id: "p1", name: "One" },
+        { id: "p2", name: "Two" },
+      ],
+      label: "Project",
+    })("project");
+    const tid = useTestIds({}, "filter");
+    const r = await render(<>{filter.render(["p1", "p2"], () => {}, tid, false, false)}</>);
+    // Then the filter shows the count badge and no in-field pills
+    expect(r.filter_project_count).toHaveTextContent("2");
+    expect(r.query.filter_project_pill_0).toBeNull();
+  });
 });
 
 function ModalSearchFilter() {

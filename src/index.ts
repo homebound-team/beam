@@ -357,7 +357,7 @@ export * from "./inputs/ErrorMessage";
 export * from "./inputs/MenuSelectField/MenuMultiSelectField";
 export * from "./inputs/MenuSelectField/MenuSelectField";
 export * from "./inputs/MenuSelectField/MenuTreeSelectField";
-export type { MenuSelectFieldProps } from "./inputs/MenuSelectField/types";
+export type { MenuSelectFieldProps, SelectionView } from "./inputs/MenuSelectField/types";
 export * from "./inputs/MultiLineSelectField";
 export * from "./inputs/MultiSelectField";
 export * from "./inputs/NumberField";

@@ -5,6 +5,8 @@ import { CountBadge } from "src/components/CountBadge";
 import { HelperText } from "src/components/HelperText";
 import { Icon } from "src/components/Icon";
 import { Label } from "src/components/Label";
+import { Pill } from "src/components/Pills/Pill/Pill";
+import { pillMinHeight } from "src/components/Pills/pillBaseStyles";
 import { usePresentationContext } from "src/components/PresentationContext";
 import { OriginalValue, ProposedValue } from "src/components/ProposedValue";
 import { BorderHoverChild } from "src/components/Table/components/Row";
@@ -14,7 +16,7 @@ import { useLabelSuffix } from "src/forms/labelUtils";
 import { ErrorMessage } from "src/inputs/ErrorMessage";
 import { getFieldChrome, selectedValueCss } from "src/inputs/fieldChrome";
 import type { AiProposalProps } from "src/inputs/hooks/useAiProposal";
-import type { MenuSelectFieldBaseProps } from "src/inputs/MenuSelectField/types";
+import type { MenuSelectFieldBaseProps, SelectionView } from "src/inputs/MenuSelectField/types";
 import type { Value } from "src/inputs/Value";
 import type { TextFieldInternalProps } from "src/interfaces";
 import { defaultTestId } from "src/utils/defaultTestId";
@@ -51,6 +53,8 @@ export type MenuSelectTriggerState = {
 type MenuSelectTriggerProps<O, V extends Value> = MenuSelectFieldBaseProps<O, V> & {
   trigger: MenuSelectTriggerState;
   triggerRef: RefObject<HTMLButtonElement | null>;
+  /** Multiple selection only. `inField` puts pills in the field; the other views leave the field text as it is. */
+  selectionView?: SelectionView;
 };
 
 /** Label, value, and field chrome for a menu select. The menu itself is rendered by the parent. */
@@ -66,6 +70,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     inputStylePalette,
     trigger,
     triggerRef,
+    selectionView = "inField",
   } = props;
   const internalProps: TextFieldInternalProps = (props as any).internalProps ?? {};
   const { compound = false, forceFocus = false, forceHover = false } = internalProps;
@@ -88,6 +93,9 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
   const showErrorAndHelper = !compound && !trigger.isDisabled && !trigger.isReadOnly;
   const { proposedValue: proposedText, originalValue: originalText } = trigger.proposalProps;
   const showProposal = proposedText !== undefined;
+  // A mixed or AI-proposed field keeps its text and badge, since its pills would not match what the field counts.
+  const inFieldPills =
+    selectionView === "inField" && !trigger.isMixed && !showProposal && trigger.badgeLabels.length > 0;
   // Read-only draws both halves inline; editable fields strike the original through below.
   const originalBelow = originalText && !trigger.isReadOnly ? originalText : undefined;
   const fieldChrome = getFieldChrome({
@@ -102,6 +110,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     visuallyDisabled,
     isHovered: trigger.isHovered || forceHover,
     showProposal,
+    multiline: inFieldPills,
     inputStylePalette,
   });
   const fieldStateCss = {
@@ -145,28 +154,41 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
           {label}:
         </span>
       )}
-      <span id={trigger.valueId} css={Css.df.aic.fg1.mw0.oh.$}>
-        {trigger.isReadOnly && showProposal ? (
-          <span css={Css.fg1.truncate.$}>
-            <ProposedValue original={originalText} proposed={proposedText} {...tid.proposedValue} />
+      {inFieldPills ? (
+        <span id={trigger.valueId} css={Css.df.aifs.fg1.mw0.$}>
+          {/* A pill is taller than the badge. The box centers the badge, and the top margin matches the scroll container's padding. */}
+          <span css={Css.df.aic.fs0.hPx(pillMinHeight).mt1.$}>{countBadge}</span>
+          {/* Browsers make a scrolling box with no focusable children a Tab stop. The field button already is one. */}
+          <span tabIndex={-1} css={Css.df.fww.aic.gap1.fg1.mw0.py1.oa.maxh(inFieldPillsMaxHeight).$}>
+            {trigger.badgeLabels.map((option) => (
+              <Pill key={option.key} text={option.label} {...tid.pill} />
+            ))}
           </span>
-        ) : (
-          <>
-            {!trigger.isMixed && countBadge}
-            <span
-              css={{
-                ...Css.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
-                // A placeholder reads as hint text, so it stays at the field's regular weight.
-                ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
-                ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
-              }}
-            >
-              {trigger.displayText}
+        </span>
+      ) : (
+        <span id={trigger.valueId} css={Css.df.aic.fg1.mw0.oh.$}>
+          {trigger.isReadOnly && showProposal ? (
+            <span css={Css.fg1.truncate.$}>
+              <ProposedValue original={originalText} proposed={proposedText} {...tid.proposedValue} />
             </span>
-            {trigger.isMixed && countBadge}
-          </>
-        )}
-      </span>
+          ) : (
+            <>
+              {!trigger.isMixed && countBadge}
+              <span
+                css={{
+                  ...Css.truncate.color(trigger.isPlaceholder ? inputPlaceholderColor : undefined).$,
+                  // A placeholder reads as hint text, so it stays at the field's regular weight.
+                  ...(!trigger.isPlaceholder ? selectedValueCss(labelStyle, trigger.isReadOnly) : {}),
+                  ...(showProposal ? Css.fw6.color(Tokens.AiFieldFg).$ : {}),
+                }}
+              >
+                {trigger.displayText}
+              </span>
+              {trigger.isMixed && countBadge}
+            </>
+          )}
+        </span>
+      )}
       {errorInTooltip && errorMsg && showErrorAndHelper && (
         <span css={Css.df.aic.fs0.pl1.$}>
           <Icon icon="error" color={Tokens.Danger} tooltip={errorMsg} {...tid.error} />
@@ -258,6 +280,12 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
  * TODO: Move this to tokens. https://linear.app/homebound-team/issue/DS-395/update-placeholder-text-color-to-use-color-tokens
  */
 const inputPlaceholderColor = "#9ca3af";
+
+/**
+ * Three pill rows, the gaps through the next row, and half of that row.
+ * The last two spacing units are the scroll container's vertical padding, which sits inside this height.
+ */
+const inFieldPillsMaxHeight = `calc(${pillMinHeight}px * 3.5 + var(--t-spacing) * 5)`;
 
 function SelectedLabels({ labels }: { labels: { key: string; label: string }[] }) {
   return (

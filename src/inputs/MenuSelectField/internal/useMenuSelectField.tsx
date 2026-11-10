@@ -2,6 +2,7 @@ import type { Key } from "@react-types/shared";
 import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
+import type { SelectedOptionPillListProps } from "src/components/Pills/SelectedOptionPill/SelectedOptionPillList";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
 import { disabledOptionToKeyedTuple, initializeOptions, unsetOption } from "src/inputs/internal/selectFieldHelpers";
 import type { MenuSearchState } from "src/inputs/MenuSelectField/internal/MenuSearchInput";
@@ -35,6 +36,8 @@ type MenuSelectFieldApi<O> = {
   menu: MenuSelectMenu<O>;
   /** Pills for the open menu. A tree lists its `selectionDisplay` bucket. Matches the count badge unless the field is mixed. Empty for a single select. */
   selections: { options: MenuSelectedOption[]; onDeselect: (key: string) => void };
+  /** Pills for the `selectionList` view below the field. Selected options only, so dotted mixed values are not listed. */
+  selectionList: SelectedOptionPillListProps["options"];
 };
 
 /** Menu select state: options, search, selection, and keyboard behavior. Own hook instead of React Stately's, because the trigger is a button that opens a searchable menu. */
@@ -61,6 +64,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     proposedValues,
     onCommit,
     tree,
+    selectionView = "inField",
   } = props;
   const multiple = selectionMode === "multiple";
   // `onSearch` means the caller fetches matches. The menu lists `options` as given.
@@ -522,19 +526,26 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const hasSelection = menuTree ? selectedKeys.size > 0 : values.length > 0;
   // A single select's pick wins over "Mixed"; the other mixed values keep their dots.
   const isMixed = dottedKeys.size > 0 && (multiple || !hasSelection);
-  // Multi with a selection shows only the count badge; an empty field shows nothing-selected text, then the placeholder.
+  // A selection list keeps its placeholder in the field, because the chosen options render below it.
+  const showListPlaceholder = selectionView === "selectionList" && !!placeholder && !isMixed && !selectedText;
+  // `inField` and `badgeOnly` leave this empty once something is selected; the badge and pills draw the selection.
+  // A selection list with a placeholder keeps that text. An empty field shows nothing-selected text, then the placeholder.
   const displayText = isMixed
     ? mixedLabel
-    : selectedText || (hasSelection ? "" : nothingSelectedText || placeholder || "");
-  const isPlaceholder = !isMixed && !selectedText && !hasSelection && !nothingSelectedText && !!placeholder;
+    : selectedText || (hasSelection && !showListPlaceholder ? "" : nothingSelectedText || placeholder || "");
+  const isPlaceholder =
+    !isMixed && !selectedText && !nothingSelectedText && !!placeholder && (!hasSelection || showListPlaceholder);
+  // `label` is the plain text for the badge and in-field pills. `node` is the menu label, used by the selection list.
+  const toSelectedLabel = (option: O) => ({
+    key: valueToKey(getOptionValue(option)),
+    label: getOptionLabel(option),
+    node: getOptionMenuLabel?.(option, false) ?? getOptionLabel(option),
+  });
   const selectedLabels =
     isMultiSelectTree && getChildren && tree?.display
-      ? bucketTreeSelection(selectedOptions, getChildren)[tree.display].map((option) => ({
-          key: valueToKey(getOptionValue(option)),
-          label: getOptionLabel(option),
-        }))
+      ? bucketTreeSelection(selectedOptions, getChildren)[tree.display].map(toSelectedLabel)
       : multiple
-        ? selectedOptions.map((o) => ({ key: valueToKey(getOptionValue(o)), label: getOptionLabel(o) }))
+        ? selectedOptions.map(toSelectedLabel)
         : [];
   // While mixed, the badge also counts the dotted values, in menu order. The pills stay selected-only.
   const badgeKeys = isMixed ? new Set([...selectedLabels.map(({ key }) => key), ...dottedKeys]) : undefined;
@@ -671,6 +682,12 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       })),
       onDeselect: deselect,
     },
+    selectionList: selectedLabels.map(({ key, node }) => ({
+      id: key,
+      value: node,
+      disabled: isDisabled || isReadOnly || disabledKeys.includes(key),
+      onRemove: () => deselect(key),
+    })),
   };
 }
 

@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuTreeSelectField } from "src/inputs/MenuSelectField/MenuTreeSelectField";
 import { optionDomId } from "src/inputs/MenuSelectField/internal/OptionList";
-import type { TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
+import type { SelectionView, TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
 import type { NestedOption, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { click, getOption, getOptions, getSelected, render, select, type } from "src/utils/rtl";
@@ -342,6 +342,57 @@ describe("MenuTreeSelectField", () => {
     expect(r.sports_count).toHaveTextContent("3");
   });
 
+  it("shows every selection as an in-field pill by default", async () => {
+    // Given a selected parent and a lone leaf, shown in the field
+    const r = await render(<TreeHarness initial={["basketball", "golf"]} />);
+    // Then each option the count includes is a pill, parents and children alike
+    expect(r.sports_pill_0).toHaveTextContent("Basketball");
+    expect(r.sports_pill_1).toHaveTextContent("NBA");
+    expect(r.sports_pill_2).toHaveTextContent("WNBA");
+    expect(r.sports_pill_3).toHaveTextContent("Golf");
+    expect(r.sports_count).toHaveTextContent("4");
+  });
+
+  it("shows only a count badge when selectionView is badgeOnly", async () => {
+    // Given a selected parent and a lone leaf, shown as badge only
+    const r = await render(<TreeHarness initial={["basketball", "golf"]} selectionView="badgeOnly" />);
+    // Then only the count badge is shown, and no in-field pills
+    expect(r.sports_count).toHaveTextContent("4");
+    expect(r.query.sports_pill_0).toBeNull();
+  });
+
+  it("shows only the root selections as in-field pills when selectionDisplay is root", async () => {
+    // Given a selected parent and a lone leaf, shown in the field by root
+    const r = await render(
+      <TreeHarness initial={["basketball", "golf"]} selectionView="inField" selectionDisplay="root" />,
+    );
+    // Then the parent's children are not pills, and the badge counts the two roots
+    expect(r.sports_pill_0).toHaveTextContent("Basketball");
+    expect(r.sports_pill_1).toHaveTextContent("Golf");
+    expect(r.query.sports_pill_2).toBeNull();
+    expect(r.sports_count).toHaveTextContent("2");
+  });
+
+  it("lists the selectionDisplay bucket below the field when selectionList", async () => {
+    // Given a selected parent and a lone leaf, listed below the field by leaf
+    const r = await render(
+      <TreeHarness initial={["basketball", "golf"]} selectionView="selectionList" selectionDisplay="leaf" />,
+    );
+    // Then every selected leaf is a pill below the field
+    expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("NBA");
+    expect(r.selectedOptionPillList_pill_value_1).toHaveTextContent("WNBA");
+    expect(r.selectedOptionPillList_pill_value_2).toHaveTextContent("Golf");
+  });
+
+  it("removes a selection from its list pill", async () => {
+    // Given Golf listed below the field
+    const r = await render(<TreeHarness initial={["golf"]} selectionView="selectionList" />);
+    // When removing the Golf pill
+    click(r.selectedOptionPillList_pill_remove_0);
+    // Then no selection is listed
+    expect(r.query.selectedOptionPillList).toBeNull();
+  });
+
   it("scopes a disabled tree option tooltip to the field prefix", async () => {
     // Given a tree select with a disabled leaf and an explicit prefix
     const r = await render(
@@ -370,6 +421,7 @@ type TreeHarnessProps = {
   options?: OptionsOrLoad<NestedOption<Sport>>;
   disabledOptions?: string[];
   selectionDisplay?: TreeSelectionDisplay;
+  selectionView?: SelectionView;
   proposedValues?: string[];
   defaultExpanded?: boolean;
   mixedValues?: string[];
