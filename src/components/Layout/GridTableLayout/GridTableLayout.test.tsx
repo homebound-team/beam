@@ -713,6 +713,121 @@ describe("GridTableLayout", () => {
     });
   });
 
+  describe("bulkCta", () => {
+    it("counts selected rows before the columns selector, and hides with none selected", async () => {
+      // Given a selectable table with a bulk action
+      const r = await render(
+        <GridTableLayoutComponent
+          bulkCta={{ onClick: noop }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+      // Then nothing shows while nothing is selected
+      expect(r.query.selectionActionButton).toBeNull();
+
+      // When selecting a row
+      click(r.select_1);
+      // Then the action defaults to Edit and counts it
+      expect(r.selectionActionButton_action).toHaveTextContent("Edit 1 Row");
+
+      // And when selecting a second
+      click(r.select_2);
+      // Then it counts both, ahead of the columns selector
+      expect(r.selectionActionButton_action).toHaveTextContent("Edit 2 Rows");
+      expect(r.selectionActionButton.compareDocumentPosition(r.columns)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it("passes the selected rows to onClick", async () => {
+      // Given an Assign action with two selected rows
+      const onClick = vi.fn();
+      const r = await render(
+        <GridTableLayoutComponent
+          bulkCta={{ label: "Assign", onClick }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+      click(r.select_1);
+      click(r.select_2);
+      expect(r.selectionActionButton_action).toHaveTextContent("Assign 2 Rows");
+
+      // When clicking the action
+      click(r.selectionActionButton_action);
+
+      // Then it gets both rows
+      expect(onClick).toHaveBeenCalledWith([
+        expect.objectContaining({ id: "1" }),
+        expect.objectContaining({ id: "2" }),
+      ]);
+    });
+
+    it("deselects every row on Clear, then calls onClear", async () => {
+      // Given two selected rows
+      const onClear = vi.fn();
+      const r = await render(
+        <GridTableLayoutComponent
+          bulkCta={{ onClick: noop, onClear }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+      click(r.select_1);
+      click(r.select_2);
+
+      // When clicking Clear
+      click(r.selectionActionButton_clear);
+
+      // Then nothing is selected, the button is gone, and the consumer is told
+      expect(r.select_1).not.toBeChecked();
+      expect(r.select_2).not.toBeChecked();
+      expect(r.query.selectionActionButton).toBeNull();
+      expect(onClear).toHaveBeenCalledOnce();
+    });
+
+    it("replaces the selection summary pill", async () => {
+      // Given both the selection summary and a bulk action
+      const r = await render(
+        <GridTableLayoutComponent
+          selectionSummary
+          bulkCta={{ onClick: noop }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+
+      // When selecting a row
+      click(r.select_1);
+
+      // Then only the bulk action shows
+      expect(r.selectionActionButton).toBeVisible();
+      expect(r.query.selectionSummaryPill).toBeNull();
+    });
+
+    it("drops the icon and the object and shows Clear as an × on small screens", async () => {
+      // Given a selectable table with a bulk action on a phone
+      setViewport("sm");
+      const r = await render(
+        <GridTableLayoutComponent
+          bulkCta={{ onClick: noop }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+
+      // When selecting two rows
+      click(r.select_1);
+      click(r.select_2);
+
+      // Then the action drops its icon and the object but keeps its full name, and Clear becomes an ×
+      expect(r.selectionActionButton_action.textContent).toBe("Edit 2");
+      expect(r.selectionActionButton_action.querySelector("svg")).toBeNull();
+      expect(r.selectionActionButton_action).toHaveAccessibleName("Edit 2 Rows");
+      expect(r.selectionActionButton_clear.textContent).toBe("");
+      expect(r.selectionActionButton_clear).toHaveAccessibleName("Clear selection");
+    });
+  });
+
   describe("document scroll layout", () => {
     afterEach(() => {
       document.documentElement.style.removeProperty(beamFloatingRightOffsetVar);

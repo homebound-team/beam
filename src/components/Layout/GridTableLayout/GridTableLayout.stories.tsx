@@ -36,6 +36,7 @@ import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllu
 import { noop } from "src/utils/helpers";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
+import { action } from "storybook/actions";
 import { GridTableLayout as GridTableLayoutComponent, useGridTableLayoutState } from "./GridTableLayout";
 
 export default {
@@ -229,6 +230,23 @@ export function WithSelectionSummary() {
 }
 
 WithSelectionSummary.parameters = { chromatic: { modes: viewportModes("desktop", "mobile1") } };
+
+export function WithBulkCta() {
+  const columns = useMemo(() => getColumns(false), []);
+  const rows = useMemo(() => [simpleHeader, ...makeSelectedRows()], []);
+
+  return (
+    <TestProjectLayout>
+      <PageHeader title="Grid Table Layout with bulk action" />
+      <GridTableLayoutComponent
+        bulkCta={{ label: "Assign", onClick: action("onClick"), onClear: action("onClear") }}
+        tableProps={{ columns, rows }}
+      />
+    </TestProjectLayout>
+  );
+}
+
+WithBulkCta.parameters = { chromatic: { modes: viewportModes("desktop", "mobile1") } };
 
 export function ManyFilters() {
   const filterDefs = useMemo(() => getManyFilterDefs(), []);

@@ -96,6 +96,7 @@ export * from "./components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 export * from "./components/ProposedValue";
 export * from "./components/RightSidebar";
 export * from "./components/ScrollShadows";
+export * from "./components/SelectionActionButton/SelectionActionButton";
 export * from "./components/SideNav/SideNav";
 export * from "./components/Stepper";
 export * from "./components/StepperTabs/StepperTab";

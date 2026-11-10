@@ -4,6 +4,7 @@ import type { ButtonGroupButton } from "src/components/ButtonGroup";
 import { getActiveFilterCount } from "src/components/Filters/utils";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
 import {
+  type GridTableBulkCta,
   GridTableLayoutActions,
   type SearchBoxApi,
 } from "src/components/Layout/GridTableLayout/GridTableLayoutActions";
@@ -58,6 +59,11 @@ export type GridTableLayoutProps<
   viewModeToggle?: ButtonGroupButton[];
   /** Shows "N Rows Selected · Clear" before the columns selector; Clear deselects every row. */
   selectionSummary?: boolean;
+  /**
+   * Shows "Edit N Rows · Clear" before the columns selector once rows are selected. The action passes the selected rows
+   * to `onClick`; Clear deselects every row, then calls `onClear`. Replaces `selectionSummary` when both are set.
+   */
+  bulkCta?: GridTableBulkCta<R>;
   hideEditColumns?: boolean;
   /** When set, columns that share a name use one Edit Columns switch. */
   shareColumnVisibility?: boolean;
@@ -115,6 +121,7 @@ function GridTableLayoutComponent<
     actions,
     viewModeToggle,
     selectionSummary = false,
+    bulkCta,
     hideEditColumns = false,
     shareColumnVisibility = false,
     withCardView,
@@ -151,7 +158,8 @@ function GridTableLayoutComponent<
     actions?.length ||
     viewModeToggle?.length ||
     // Rendered before anything's selected, so the pill doesn't shift the table
-    selectionSummary
+    selectionSummary ||
+    bulkCta
   );
   // Card render is driven by `view` alone so `defaultView="card"` works without `withCardView`
   // (which only controls whether the list/card toggle is shown).
@@ -212,6 +220,7 @@ function GridTableLayoutComponent<
       actions={actions}
       viewModeToggle={viewModeToggle}
       selectionSummary={selectionSummary}
+      bulkCta={bulkCta}
     />
   );
 

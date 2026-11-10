@@ -12,7 +12,7 @@ import * as GridTableLayoutActionsStories from "./GridTableLayoutActions.stories
   </a>
 </p>
 
-The controls bar above a `GridTableLayout` table. `GridTableLayout` renders it for you from `layoutState`, `actions`, `selectionSummary`, and its columns; you don't render it directly. A table's title and supporting copy belong in a `ContentHeader` above the layout, not here.
+The controls bar above a `GridTableLayout` table. `GridTableLayout` renders it for you from `layoutState`, `actions`, `selectionSummary`, `bulkCta`, and its columns; you don't render it directly. A table's title and supporting copy belong in a `ContentHeader` above the layout, not here.
 
 ## Left side: Search, Filter, Group By
 
@@ -83,7 +83,7 @@ Inside a modal, everything goes behind the Filter button.
 
 Ordered left to right:
 
-1. **Active multi-select**: "N Rows Selected · Clear", when <code>selectionSummary</code> is set and rows are selected.
+1. **Active multi-select**: "N Rows Selected · Clear", when <code>selectionSummary</code> is set and rows are selected. With <code>bulkCta</code>, the [Selection Action Button](?path=/docs/components-selection-action-button--docs) ("Edit N Rows · Clear") shows instead, and its action passes the selected rows to <code>onClick</code>.
 2. **View mode toggle**: a button group, passed as <code>viewModeToggle</code>, that switches between the table's views, e.g. Cost / Price. Mark the current view <code>active</code>.
 3. **Column selector**: when any column has <code>canHide</code>.
 4. **View selector**: List / Card, with <code>withCardView</code>.
@@ -97,7 +97,7 @@ In the mobile format:
 
 - Search and Filter become icon buttons. Search opens a full-width field below the bar.
 - Group By is grouped with the filters, and shows once the filter button is tapped.
-- The selection summary shows just the count and an ×.
+- The selection summary shows just the count and an ×. The selection action button drops its icon and the object, e.g. "Edit 3", and Clear becomes an ×.
 - The column and view selectors become icon buttons.
 - The view mode toggle moves to the top of the column selector's menu. It stays in the bar when it's the only item on the right side.
 

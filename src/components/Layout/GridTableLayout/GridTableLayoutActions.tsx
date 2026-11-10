@@ -9,7 +9,9 @@ import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { useModalContext } from "src/components/Modal/ModalContext";
 import { SelectionSummaryPill } from "src/components/Pills/SelectionSummaryPill/SelectionSummaryPill";
+import { SelectionActionButton } from "src/components/SelectionActionButton/SelectionActionButton";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
+import type { GridDataRow } from "src/components/Table/components/Row";
 import { type TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn, Kinded } from "src/components/Table/types";
@@ -37,6 +39,14 @@ export type SearchBoxApi = {
   clear: VoidFunction;
 };
 
+export type GridTableBulkCta<R extends Kinded> = {
+  /** The verb, e.g. "Assign" renders "Assign 3 Rows". Defaults to "Edit". */
+  label?: string;
+  onClick: (selectedRows: GridDataRow<R>[]) => void;
+  /** Called after Clear deselects every row, for consumer-side cleanup (e.g. closing a side panel). */
+  onClear?: () => void;
+};
+
 type GridTableLayoutActionsProps<
   F extends Record<string, unknown>,
   G extends Value = string,
@@ -61,6 +71,8 @@ type GridTableLayoutActionsProps<
   viewModeToggle?: ButtonGroupButton[];
   /** Shows the selection summary pill while any rows are selected. */
   selectionSummary?: boolean;
+  /** Shows the selection action button while any rows are selected, in place of the selection summary pill. */
+  bulkCta?: GridTableBulkCta<R>;
 };
 
 function GridTableLayoutActionsComponent<
@@ -86,6 +98,7 @@ function GridTableLayoutActionsComponent<
     actions,
     viewModeToggle,
     selectionSummary = false,
+    bulkCta,
   } = props;
   const testId = useTestIds(props, "gridTableLayoutActions");
   // Separate prefix so inline filter controls match FilterPanel's `filter_*` test ids.
@@ -93,7 +106,7 @@ function GridTableLayoutActionsComponent<
 
   const showEditColumns = !!(hasHideableColumns && view === "list" && columns && api);
   const hasRightItems =
-    (selectionSummary && !!api) ||
+    ((selectionSummary || !!bulkCta) && !!api) ||
     !!viewModeToggle?.length ||
     showEditColumns ||
     (!!withCardView && view !== undefined && !!setView) ||
@@ -175,7 +188,7 @@ function GridTableLayoutActionsComponent<
         ref={rowRef}
         css={{
           // Holds the row at the 40px button height, so a pill alone in it doesn't shift the table when it appears
-          ...Css.df.gap1.jcsb.if(selectionSummary).mhPx(40).$,
+          ...Css.df.gap1.jcsb.if(selectionSummary || !!bulkCta).mhPx(40).$,
           ...(withPagePadding ? pageContentPaddingX : undefined),
         }}
         {...testId.toolbar}
@@ -244,7 +257,12 @@ function GridTableLayoutActionsComponent<
         {/* Order: selection, view mode, columns, view, actions */}
         {hasRightItems && (
           <div ref={rightRef} css={Css.df.fs0.aic.gapPx(12).$}>
-            {selectionSummary && api && <SelectionSummaryAction api={api} numberOnly={sm} />}
+            {api &&
+              (bulkCta ? (
+                <SelectionActionCta api={api} bulkCta={bulkCta} compact={sm} />
+              ) : (
+                selectionSummary && <SelectionSummaryAction api={api} numberOnly={sm} />
+              ))}
             {!!viewModeToggle?.length && !viewModeToggleInColumnsMenu && (
               <ButtonGroup size="md" buttons={viewModeToggle} {...testId.viewModeToggle} />
             )}
@@ -299,6 +317,30 @@ function SelectionSummaryAction<R extends Kinded>(props: { api: GridTableApi<R>;
       count={count}
       onClick={() => api.clearSelections()}
       numberOnly={numberOnly}
+    />
+  );
+}
+
+/** Owns the selected count, so a selection change re-renders just the button. */
+function SelectionActionCta<R extends Kinded>(props: {
+  api: GridTableApi<R>;
+  bulkCta: GridTableBulkCta<R>;
+  compact: boolean;
+}) {
+  const { api, bulkCta, compact } = props;
+  const { label = "Edit", onClick, onClear } = bulkCta;
+  const count = useComputed(() => api.getSelectedLeafRowCount(), [api]);
+  if (count === 0) return null;
+  return (
+    <SelectionActionButton
+      label={label}
+      count={count}
+      onClick={() => onClick(api.getSelectedRows())}
+      onClear={() => {
+        api.clearSelections();
+        onClear?.();
+      }}
+      compact={compact}
     />
   );
 }
