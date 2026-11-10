@@ -6,7 +6,7 @@ import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { locationOptions, type LocationOption } from "src/inputs/MenuSelectField/storyHelpers";
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { setViewport } from "src/tests/viewport";
-import { click, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
+import { click, getOption, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuSelectField", () => {
@@ -444,9 +444,9 @@ describe("MenuSelectField", () => {
     // And when opened, the legend explains the dotted rows
     click(r.color);
     expect(r.color_mixedLegend).toBeInTheDocument();
-    expect(optionOf(r, "Blue")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
-    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
-    expect(optionOf(r, "Red")).not.toHaveAccessibleDescription();
+    expect(getOption(r.color, "Blue")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(getOption(r.color, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(getOption(r.color, "Red")).not.toHaveAccessibleDescription();
   });
 
   it("shows the picked value and keeps dots on the other mixed values", async () => {
@@ -457,9 +457,9 @@ describe("MenuSelectField", () => {
     expect(r.query.color_count).toBeNull();
     // And when opened, Blue is checked rather than dotted, while Green keeps its dot
     click(r.color);
-    expect(optionOf(r, "Blue")).toHaveAttribute("aria-selected", "true");
-    expect(optionOf(r, "Blue")).not.toHaveAccessibleDescription();
-    expect(optionOf(r, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
+    expect(getOption(r.color, "Blue")).toHaveAttribute("aria-selected", "true");
+    expect(getOption(r.color, "Blue")).not.toHaveAccessibleDescription();
+    expect(getOption(r.color, "Green")).toHaveAccessibleDescription("Mixed Selected rows have different values.");
   });
 
   it("closes when re-selecting the current value", async () => {
@@ -866,10 +866,6 @@ type HarnessProps = {
   autoSort?: boolean;
   mixedValues?: string[];
 };
-
-function optionOf(r: { getAllByTestId: (id: string) => HTMLElement[] }, label: string): HTMLElement | undefined {
-  return r.getAllByTestId("color_option").find((option) => option.dataset.label === label);
-}
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
   const originalInnerHeight = Object.getOwnPropertyDescriptor(window, "innerHeight");
