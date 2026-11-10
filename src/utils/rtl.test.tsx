@@ -9,7 +9,7 @@ import { SelectField } from "src/inputs/SelectField";
 import { TreeSelectField } from "src/inputs/TreeSelectField/TreeSelectField";
 import type { NestedOption } from "src/inputs/TreeSelectField/utils";
 import type { HasIdAndName } from "src/types";
-import { getOptions, getSelected, render, select, selectAndWait } from "src/utils/rtl";
+import { getOption, getOptions, getSelected, render, select, selectAndWait } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("rtl", () => {
@@ -522,6 +522,53 @@ describe("rtl", () => {
       // When calling getOptions with the component test-id root
       // Then it finds the group and returns option labels
       expect(getOptions(r.custom)).toEqual(["Math", "History", "Finance"]);
+    });
+  });
+
+  describe("getOption", () => {
+    it("returns the option element with the given label", async () => {
+      // Given a SelectField with a value of "1"
+      function Test() {
+        const [value, setValue] = useState<string | undefined>("1");
+        return (
+          <SelectField
+            label="Number"
+            value={value}
+            onSelect={(value) => setValue(value)}
+            options={[
+              { id: "1", name: "One" },
+              { id: "2", name: "Two" },
+            ]}
+          />
+        );
+      }
+      const r = await render(<Test />);
+      // When calling getOption with a label
+      const option = getOption(r.number, "Two");
+      // Then it returns that option's element
+      expect(option).toHaveAttribute("data-label", "Two");
+    });
+
+    it("throws when no option has the given label", async () => {
+      // Given a SelectField
+      function Test() {
+        const [value, setValue] = useState<string | undefined>("1");
+        return (
+          <SelectField
+            label="Number"
+            value={value}
+            onSelect={(value) => setValue(value)}
+            options={[
+              { id: "1", name: "One" },
+              { id: "2", name: "Two" },
+            ]}
+          />
+        );
+      }
+      const r = await render(<Test />);
+      // When calling getOption with a label that no option has
+      // Then it throws an error naming the missing label
+      expect(() => getOption(r.number, "Four")).toThrow("Could not find option with label Four");
     });
   });
 });

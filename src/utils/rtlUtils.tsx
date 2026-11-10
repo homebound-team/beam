@@ -362,6 +362,20 @@ export function getOptions(element: HTMLElement): string[] {
     .filter((o) => !!o);
 }
 
+/** Returns the listbox option element with the given label, throwing if no option matches. */
+export function getOption(element: HTMLElement, label: string): HTMLElement {
+  assertListBoxInput(element);
+  ensureListBoxOpen(element);
+
+  const listbox = findListBox(element);
+  const options: NodeListOf<HTMLElement> = listbox.querySelectorAll("[role=option]");
+  const option = Array.from(options).find((o: HTMLElement) => o.dataset.label === label);
+  if (!option) {
+    throw new Error(`Could not find option with label ${label}`);
+  }
+  return option;
+}
+
 /** Prefer the element itself when it is a group; otherwise look for a nested group. */
 function resolveOptionGroup(element: HTMLElement): HTMLElement | undefined {
   if (isOptionGroup(element)) return element;
