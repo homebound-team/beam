@@ -4987,6 +4987,35 @@ describe("GridTable", () => {
       expect(api.getVisibleColumnIds()).toEqual(["name", "value"]);
     });
 
+    it("hides an absent column that shares a name when shareColumnVisibility is set", async () => {
+      // Given a hideable id column, two groups whose Cost leaves share a name, and a Notes column only in group B
+      const api = new GridTableApiImpl<Row>();
+      const idColumn = column<Row>({ id: "id", header: () => "Id", data: (data, { row }) => row.id });
+      const aColumns = groupColumns<Row>({
+        id: "a",
+        header: "A",
+        columns: [{ id: "aCost", name: "Cost", header: "Cost", data: ({ name }) => name }],
+      });
+      const bColumns = groupColumns<Row>({
+        id: "b",
+        header: "B",
+        columns: [
+          { id: "bCost", name: "Cost", header: "Cost", data: ({ value }) => value },
+          { id: "bNotes", name: "Notes", header: "Notes", data: ({ name }) => name },
+        ],
+      });
+      const allColumns = [idColumn, ...aColumns, ...bColumns];
+      const r = await render(<GridTable api={api} columns={allColumns} rows={rows} />);
+      expect(api.getVisibleColumnIds()).toEqual(["id", "aCost", "bCost", "bNotes"]);
+      // When group B is removed, and Cost is hidden with shared visibility
+      r.rerender(<GridTable api={api} columns={[idColumn, ...aColumns]} rows={rows} />);
+      act(() => api.setVisibleColumns(["id"], { shareColumnVisibility: true }));
+      // And group B comes back
+      r.rerender(<GridTable api={api} columns={allColumns} rows={rows} />);
+      // Then group B's Cost column is hidden too, and its Notes column, which has no same-name column, is unchanged
+      expect(api.getVisibleColumnIds()).toEqual(["id", "bNotes"]);
+    });
+
     it("shows a hidden column when it changes to a column that can't be hidden", async () => {
       // Given hideable name and value columns, where the value column can't be hidden while editing
       const api = new GridTableApiImpl<Row>();

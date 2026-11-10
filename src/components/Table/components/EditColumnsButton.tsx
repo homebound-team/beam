@@ -7,6 +7,7 @@ import { OverlayTrigger, type OverlayTriggerProps } from "src/components/interna
 import { ColumnTooltipIcon } from "src/components/Table/components/ColumnTooltipIcon";
 import type { GridTableApi } from "src/components/Table/GridTableApi";
 import type { GridColumn, Kinded } from "src/components/Table/types";
+import { leafColumnName } from "src/components/Table/utils/columns";
 import { Css, Tokens } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useComputed } from "src/hooks/useComputed";
@@ -53,9 +54,10 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       // api.setVisibleColumns(ids);
       api.setVisibleColumns(
         columns.filter((column) => (column.canHide ? ids.includes(column.id!) : true)).map((c) => c.id!),
+        { shareColumnVisibility },
       );
     },
-    [columns, api],
+    [columns, api, shareColumnVisibility],
   );
   const hasHiddenColumn = useMemo(
     () => options.some((option) => option.ids.some((id) => !selectedValues.includes(id))),
@@ -181,14 +183,6 @@ function buildColumnOptions<R extends Kinded>(
     }
   }
   return [...byLabel.values()];
-}
-
-/** Drops the `groupColumns` prefix so "The Sycamore: Cost" groups with "Cost". */
-function leafColumnName<R extends Kinded>(column: Pick<GridColumn<R>, "name" | "groupLabel">): string {
-  const { name, groupLabel } = column;
-  const prefix = groupLabel ? `${groupLabel}: ` : undefined;
-  if (name && prefix && name.startsWith(prefix)) return name.slice(prefix.length);
-  return name!;
 }
 
 /** Click tooltips close the menu first. React Aria overlays use z-index 100000, so an open menu paints over the modal. Hover content is returned unchanged. */

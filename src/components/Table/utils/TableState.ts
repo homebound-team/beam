@@ -213,8 +213,8 @@ export class TableState<R extends Kinded> {
     return this.visibleColumns.map((cs) => cs.id);
   }
 
-  setVisibleColumns(ids: string[]) {
-    this.columnStates.setVisibleColumns(ids);
+  setVisibleColumns(ids: string[], opts?: { shareColumnVisibility?: boolean }) {
+    this.columnStates.setVisibleColumns(ids, opts);
   }
 
   get expandedColumnIds(): string[] {

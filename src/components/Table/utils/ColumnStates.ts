@@ -1,7 +1,7 @@
 import { camelCase } from "change-case";
 import { makeAutoObservable } from "mobx";
 import type { GridColumnWithId, Kinded } from "src/components/Table/types";
-import { isContentColumn } from "src/components/Table/utils/columns";
+import { isContentColumn, leafColumnName } from "src/components/Table/utils/columns";
 import { ColumnState } from "src/components/Table/utils/ColumnState";
 import { ColumnStorage } from "src/components/Table/utils/ColumnStorage";
 
@@ -75,10 +75,28 @@ export class ColumnStates<R extends Kinded> {
   /**
    * Shows the current columns in `ids` and hides the others. Columns that can't be hidden, like layout gutters, stay shown.
    * Columns not currently in the table keep their visibility, so a column that's temporarily removed comes back as it was.
+   * With `shareColumnVisibility`, a removed column instead follows the current column with the same leaf name.
    */
-  setVisibleColumns(ids: string[]): void {
-    for (const cs of this.columns.flatMap((c) => c.selfAndChildren)) {
+  setVisibleColumns(ids: string[], opts: { shareColumnVisibility?: boolean } = {}): void {
+    const current = this.columns.flatMap((c) => c.selfAndChildren);
+    for (const cs of current) {
       cs.setVisible(ids.includes(cs.column.id));
+    }
+    if (!opts.shareColumnVisibility) return;
+    // Columns not in the table right now should match the shown table columns with the same name
+    const visibleByName = new Map<string, boolean>();
+    for (const cs of current) {
+      if (!cs.column.canHide || !cs.column.name) continue;
+      const name = leafColumnName(cs.column);
+      // Treat a name as hidden if any column with that name is hidden, like the Edit Columns switch does
+      visibleByName.set(name, (visibleByName.get(name) ?? true) && cs.isVisible);
+    }
+    const currentIds = new Set(current.map((cs) => cs.column.id));
+    // Apply that visibility to every column we have seen before that is not in the table right now
+    for (const cs of this.map.values()) {
+      if (currentIds.has(cs.column.id) || !cs.column.name) continue;
+      const visible = visibleByName.get(leafColumnName(cs.column));
+      if (visible !== undefined) cs.setVisible(visible);
     }
   }
 
