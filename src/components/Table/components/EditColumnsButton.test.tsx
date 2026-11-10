@@ -277,6 +277,63 @@ describe("EditColumnsButton", () => {
     expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice", "magnoliaCost", "magnoliaPrice"]);
   });
 
+  it("updates filtered-out columns that share a name when shareColumnVisibility is set", async () => {
+    // Given two plan groups with shared visibility, where the Magnolia group can be filtered out of the table
+    const planColumns = createSharedPlanColumns();
+    const sycamoreColumns = planColumns.filter((c) => c.groupId === "sycamore");
+    const api: MutableRefObject<GridTableApi<PlanRow> | undefined> = { current: undefined };
+    function Test({ columns }: { columns: GridColumn<PlanRow>[] }) {
+      const _api = useGridTableApi<PlanRow>();
+      api.current = _api;
+      return (
+        <>
+          <EditColumnsButton columns={columns} shareColumnVisibility defaultOpen api={_api} />
+          <GridTable columns={columns} rows={[]} api={_api} />
+        </>
+      );
+    }
+    const r = await render(<Test columns={planColumns} />);
+    // And Price is hidden in both groups
+    click(r.columns_optionsycamorePrice);
+    expect(api.current!.getVisibleColumnIds()).toEqual(["sycamoreCost", "magnoliaCost"]);
+    // When the Magnolia group is filtered out, and Cost is hidden and Price is shown
+    r.rerender(<Test columns={sycamoreColumns} />);
+    click(r.columns_optionsycamoreCost);
+    click(r.columns_optionsycamorePrice);
+    expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice"]);
+    // And the Magnolia group comes back
+    r.rerender(<Test columns={planColumns} />);
+    // Then the Magnolia columns match the switches
+    expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice", "magnoliaPrice"]);
+    expect(r.columns_optionsycamoreCost).not.toBeChecked();
+    expect(r.columns_optionsycamorePrice).toBeChecked();
+  });
+
+  it("keeps a filtered-out column's visibility when shareColumnVisibility is not set", async () => {
+    // Given the same plan groups without shared visibility
+    const planColumns = createSharedPlanColumns();
+    const sycamoreColumns = planColumns.filter((c) => c.groupId === "sycamore");
+    const api: MutableRefObject<GridTableApi<PlanRow> | undefined> = { current: undefined };
+    function Test({ columns }: { columns: GridColumn<PlanRow>[] }) {
+      const _api = useGridTableApi<PlanRow>();
+      api.current = _api;
+      return (
+        <>
+          <EditColumnsButton columns={columns} defaultOpen api={_api} />
+          <GridTable columns={columns} rows={[]} api={_api} />
+        </>
+      );
+    }
+    const r = await render(<Test columns={planColumns} />);
+    // When the Magnolia group is filtered out, and the Sycamore Cost column is hidden
+    r.rerender(<Test columns={sycamoreColumns} />);
+    click(r.columns_optionsycamoreCost);
+    // And the Magnolia group comes back
+    r.rerender(<Test columns={planColumns} />);
+    // Then the Magnolia Cost column is still visible
+    expect(api.current!.getVisibleColumnIds()).toEqual(["sycamorePrice", "magnoliaCost", "magnoliaPrice"]);
+  });
+
   function createSharedPlanColumns(): GridColumn<PlanRow>[] {
     return [
       ...groupColumns<PlanRow>({
