@@ -1558,6 +1558,72 @@ describe("GridTableLayout", () => {
     // Then group by starts at the first option instead of the page param
     expect(r.groupBy).toHaveTextContent("None");
   });
+
+  describe("search query param", () => {
+    it("applies the search query param on mount", async () => {
+      // Given the page already has a search query param
+      const r = await render(
+        <TestWrapper
+          layoutStateProps={{ search: "client" }}
+          tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter("/?search=alpha"),
+      );
+      // Then the search box shows it
+      expect(r.search).toHaveValue("alpha");
+      // And the rows are filtered by it without typing
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        | Name  | Value | Action  |
+        | ----- | ----- | ------- |
+        | Alpha | 10    | Actions |
+        "
+      `);
+    });
+
+    it("returns the search query param as the initial server search string", async () => {
+      // Given the page already has a search query param and a server search
+      const searchStrings: (string | undefined)[] = [];
+      function ServerSearchWrapper() {
+        const layoutState = useGridTableLayoutState({ search: "server" });
+        searchStrings.push(layoutState.searchString);
+        return (
+          <GridTableLayoutComponent
+            layoutState={layoutState}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        );
+      }
+      await render(<ServerSearchWrapper />, withRouter("/?search=alpha"));
+      // Then every render has the restored value, so no query runs with an empty search
+      expect(new Set(searchStrings)).toEqual(new Set(["alpha"]));
+    });
+
+    it("does not apply the page search query param in a modal", async () => {
+      // Given a page search query param but the table is used in a modal
+      // When the table is mounted
+      const r = await render(
+        <ModalProvider>
+          <TestWrapper
+            layoutStateProps={{ search: "client" }}
+            tableProps={{ columns: getColumns(), rows: [simpleHeader, ...getRows()] }}
+          />
+        </ModalProvider>,
+        withRouter("/?search=alpha"),
+      );
+      // Then the search box is empty and all rows are shown in the table
+      expect(r.search).toHaveValue("");
+      expect(tableSnapshot(r)).toMatchInlineSnapshot(`
+        "
+        |  | Name  | Value | Action  |  |
+        |  | ----- | ----- | ------- |  |
+        |  | Alpha | 10    | Actions |  |
+        |  | Beta  | 20    | Actions |  |
+        |  | Gamma | 30    | Actions |  |
+        "
+      `);
+    });
+  });
 });
 
 function getModalFilterProps(storageKey: string) {
