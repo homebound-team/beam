@@ -95,7 +95,7 @@ export function CardBody(props: CardBodyProps) {
             </dl>
           )}
           {progress !== undefined && (
-            <div css={Css.w50.$}>
+            <div css={Css.w("40%").$}>
               <ProgressBar value={progress} aiMode={aiMode} {...tid.progress} />
             </div>
           )}
