@@ -59,7 +59,7 @@ export type GridTableApi<R extends Kinded> = {
   getSelectedLeafRowCount(): number;
   /** Set selected state of a row by id. */
   selectRow(id: string, selected?: boolean): void;
-  /** De-selects all selected rows. */
+  /** De-selects all selected rows, including unselectable rows. */
   clearSelections(): void;
 
   /** Whether a row is currently collapsed. */
@@ -204,7 +204,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   }
 
   public clearSelections(id?: string) {
-    this.tableState.selectRow("header", false);
+    this.tableState.clearSelections();
   }
 
   public setActiveRowId(id: string | undefined) {

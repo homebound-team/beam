@@ -3689,8 +3689,8 @@ describe("GridTable", () => {
     expect(r.selectedNames).toHaveTextContent("Tony Stark,Thor Odinson");
   });
 
-  it("can deselect all rows via 'clearSelections' api method", async () => {
-    // Given a parent with children
+  it("can deselect all rows via 'clearSelections' api method including unselectable rows", async () => {
+    // Given a parent with children, one of which is unselectable
     const rows: GridDataRow<NestedRow>[] = [
       simpleHeader,
       {
@@ -3698,6 +3698,7 @@ describe("GridTable", () => {
         children: [
           { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
           { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
+          { kind: "child", id: "p1c3", data: { name: "child p1c3" }, selectable: false, initSelected: true },
         ],
       },
     ];
@@ -3707,7 +3708,7 @@ describe("GridTable", () => {
     // And selecting the header row
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p1c3"]);
     // When using the api to clear the selected rows
     act(() => api.current!.clearSelections());
     // Then all rows should be deselected
