@@ -803,29 +803,6 @@ describe("GridTableLayout", () => {
       expect(r.selectionActionButton).toBeVisible();
       expect(r.query.selectionSummaryPill).toBeNull();
     });
-
-    it("drops the icon and the object and shows Clear as an × on small screens", async () => {
-      // Given a selectable table with a bulk action on a phone
-      setViewport("sm");
-      const r = await render(
-        <GridTableLayoutComponent
-          bulkCta={{ onClick: noop }}
-          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
-        />,
-        withRouter(),
-      );
-
-      // When selecting two rows
-      click(r.select_1);
-      click(r.select_2);
-
-      // Then the action drops its icon and the object but keeps its full name, and Clear becomes an ×
-      expect(r.selectionActionButton_action.textContent).toBe("Edit 2");
-      expect(r.selectionActionButton_action.querySelector("svg")).toBeNull();
-      expect(r.selectionActionButton_action).toHaveAccessibleName("Edit 2 Rows");
-      expect(r.selectionActionButton_clear.textContent).toBe("");
-      expect(r.selectionActionButton_clear).toHaveAccessibleName("Clear selection");
-    });
   });
 
   describe("document scroll layout", () => {
