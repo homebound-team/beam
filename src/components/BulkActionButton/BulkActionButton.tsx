@@ -27,11 +27,11 @@ export function BulkActionButton(props: BulkActionButtonProps) {
   const fullLabel = `${label} ${count} ${pluralize(count, "Row")}`;
 
   return (
-    <div css={Css.dif.aic.hPx(40).ba.br8.oh.bc(Tokens.SurfaceActiveBorder).bgColor(Tokens.SurfaceActive).$} {...tid}>
+    <div css={Css.dif.aic.hPx(40).$} {...tid}>
       <SegmentButton
         onClick={onClick}
         ariaLabel={compact ? fullLabel : undefined}
-        styles={Css.smSb.gap1.$}
+        styles={Css.smSb.gap1.add("borderRadius", "8px 0 0 8px").$}
         storyHovered={__storyState?.hovered === "action"}
         storyFocused={__storyState?.focused === "action"}
         tid={tid.action}
@@ -42,7 +42,8 @@ export function BulkActionButton(props: BulkActionButtonProps) {
       <SegmentButton
         onClick={onClear}
         ariaLabel="Clear selection"
-        styles={Css.sm.bl.bc(Tokens.SurfaceActiveBorder).$}
+        // Overlaps the action's right border, so the two share a 1px divider
+        styles={Css.sm.mlPx(-1).add("borderRadius", "0 8px 8px 0").$}
         storyHovered={__storyState?.hovered === "clear"}
         storyFocused={__storyState?.focused === "clear"}
         tid={tid.clear}
@@ -53,7 +54,7 @@ export function BulkActionButton(props: BulkActionButtonProps) {
   );
 }
 
-/** Each side is its own target and tab stop, so hover and focus tint only that side. */
+/** Each side is its own target and tab stop, and owns its border and corners so its focus ring follows them. */
 function SegmentButton(props: {
   onClick: () => void;
   ariaLabel: string | undefined;
@@ -72,11 +73,17 @@ function SegmentButton(props: {
       onClick={onClick}
       aria-label={ariaLabel}
       css={{
-        ...Css.df.aic.h100.pxPx(12).wsnw.cursorPointer.color(Tokens.TextLinkDefault).$,
+        ...Css.df.aic.h100
+          .pxPx(12)
+          // outline0 drops the browser's own focus ring in favor of ours below
+          .wsnw.cursorPointer.outline0.ba.bc(Tokens.SurfaceActiveBorder)
+          .bgColor(isHovered || storyHovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
+          .color(Tokens.TextLinkDefault).$,
         ...styles,
-        ...Css.if(isHovered || storyHovered).bgColor(Tokens.SurfaceActiveHover).$,
-        // Figma rings inside the focused side only
-        ...Css.if(isFocusVisible || storyFocused).boxShadow(`inset 0 0 0 2px ${Tokens.FocusRingInset}`).$,
+        // Figma's 2px ring: the border plus a 1px inset, raised over the shared divider
+        ...Css.if(isFocusVisible || storyFocused)
+          .relative.z1.bc(Tokens.FocusRingInset)
+          .boxShadow(`inset 0 0 0 1px ${Tokens.FocusRingInset}`).$,
       }}
       {...hoverProps}
       {...focusProps}
