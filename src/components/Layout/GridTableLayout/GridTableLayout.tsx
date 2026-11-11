@@ -17,6 +17,7 @@ import {
   type GridTablePropsWithRows,
   isGridTableProps,
 } from "src/components/Layout/layoutTypes";
+import { useModalContext } from "src/components/Modal/ModalContext";
 import type { TableView } from "src/components/Table/components/ViewToggleButton";
 import { GridTable } from "src/components/Table/GridTable";
 import { GridTableApiImpl } from "src/components/Table/GridTableApi";
@@ -30,6 +31,7 @@ import { usePersistedFilter, type UsePersistedFilterProps } from "src/hooks/useP
 import { useSessionStorage } from "src/hooks/useSessionStorage";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
 import { useTestIds } from "src/utils/useTestIds";
+import { StringParam, useQueryParams } from "use-query-params";
 
 // GridTableLayout-specific query props extend the shared base with display extras.
 type QueryTablePropsWithQuery<R extends Kinded, X extends Only<GridTableXss, X>, QData> = BaseQueryTableProps<
@@ -337,7 +339,11 @@ export function useGridTableLayoutState<F extends Record<string, unknown>>({
   const { filter, setFilter } = usePersistedFilter<F>(persistedFilter ?? filterFallback);
   const groupBy = useGroupBy(maybeGroupBy ?? { none: "none" });
 
-  const [searchString, setSearchString] = useState<string | undefined>("");
+  const { inModal } = useModalContext();
+  const [{ search: searchParam }] = useQueryParams({ search: StringParam });
+  // The search box restores its text from the `search` query param, so the initial search string must match it.
+  // A modal table does not read the page's `search` query param, so it must be ignored here.
+  const [searchString, setSearchString] = useState<string | undefined>(search && !inModal ? searchParam || "" : "");
 
   const columnsFallback = "unset-columns";
   const [visibleColumnIds, setVisibleColumnIds] = useSessionStorage<string[] | undefined>(

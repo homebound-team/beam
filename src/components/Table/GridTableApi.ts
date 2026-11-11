@@ -90,7 +90,8 @@ export type GridTableApi<R extends Kinded> = {
   deleteRows(ids: string[]): void;
 
   getVisibleColumnIds(): string[];
-  setVisibleColumns(ids: string[]): void;
+  /** Shows the columns in `ids` and hides the others. With `shareColumnVisibility`, a column not in the table takes the visibility of the current column with the same leaf name. */
+  setVisibleColumns(ids: string[], opts?: { shareColumnVisibility?: boolean }): void;
   resetColumnWidths(): void;
 
   /**
@@ -250,8 +251,8 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     return this.tableState.pinnedRows.map((rs) => rs.row.id);
   }
 
-  public setVisibleColumns(ids: string[]) {
-    this.tableState.setVisibleColumns(ids);
+  public setVisibleColumns(ids: string[], opts?: { shareColumnVisibility?: boolean }) {
+    this.tableState.setVisibleColumns(ids, opts);
   }
 
   public getVisibleColumnIds() {

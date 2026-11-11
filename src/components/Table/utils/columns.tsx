@@ -49,6 +49,14 @@ function prefixGroupColumnName(groupLabel: string, name: string | undefined): st
   return `${groupLabel}: ${name}`;
 }
 
+/** Drops the `groupColumns` prefix so "The Sycamore: Cost" groups with "Cost". */
+export function leafColumnName<T extends Kinded>(column: Pick<GridColumn<T>, "name" | "groupLabel">): string {
+  const { name, groupLabel } = column;
+  const prefix = groupLabel ? `${groupLabel}: ` : undefined;
+  if (name && prefix && name.startsWith(prefix)) return name.slice(prefix.length);
+  return name!;
+}
+
 /** Provides default styling for a GridColumn representing a Date. */
 export function column<T extends Kinded>(columnDef: GridColumn<T>): GridColumn<T> {
   return { canHide: true, initHidden: false, ...columnDef };
