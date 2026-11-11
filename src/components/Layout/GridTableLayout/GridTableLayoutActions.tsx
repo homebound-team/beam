@@ -329,7 +329,7 @@ function BulkActionCta<R extends Kinded>(props: {
   compact: boolean;
 }) {
   const { api, bulkCta, compact } = props;
-  const { label = "Edit", onClick, onClear } = bulkCta;
+  const { label, onClick, onClear } = bulkCta;
   const count = useComputed(() => api.getSelectedLeafRowCount(), [api]);
   if (count === 0) return null;
   return (

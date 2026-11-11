@@ -7,8 +7,8 @@ import { useTestIds } from "src/utils/useTestIds";
 type Segment = "action" | "clear";
 
 type BulkActionButtonProps = {
-  /** The verb, e.g. "Edit" renders "Edit 3 Rows". */
-  label: string;
+  /** The verb, e.g. "Assign" renders "Assign 3 Rows". Defaults to "Edit". */
+  label?: string;
   /** How many rows are selected. */
   count: number;
   onClick: () => void;
@@ -21,7 +21,7 @@ type BulkActionButtonProps = {
 
 /** Summarizes a selection and opens its bulk action, e.g. "Edit 3 Rows". Clear deselects everything. */
 export function BulkActionButton(props: BulkActionButtonProps) {
-  const { label, count, onClick, onClear, compact = false, __storyState } = props;
+  const { label = "Edit", count, onClick, onClear, compact = false, __storyState } = props;
   const tid = useTestIds(props, "bulkActionButton");
 
   return (

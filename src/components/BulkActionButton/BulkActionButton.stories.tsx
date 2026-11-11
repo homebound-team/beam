@@ -14,7 +14,7 @@ export default {
   },
 } as Meta;
 
-const props = { label: "Edit", count: 3, onClick: action("onClick"), onClear: action("onClear") };
+const props = { count: 3, onClick: action("onClick"), onClear: action("onClear") };
 
 export const Examples = newStory(
   () => (
