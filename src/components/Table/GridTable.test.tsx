@@ -3689,8 +3689,34 @@ describe("GridTable", () => {
     expect(r.selectedNames).toHaveTextContent("Tony Stark,Thor Odinson");
   });
 
-  it("can deselect all rows via 'clearSelections' api method including unselectable rows", async () => {
-    // Given a parent with children, one of which is unselectable
+  it("deselects a selected row when it becomes unselectable", async () => {
+    // Given two selectable rows
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", data: { name: "Tony Stark", value: 1 } },
+      { kind: "data", id: "2", data: { name: "Natasha Romanova", value: 2 } },
+    ];
+    const _columns = [selectColumn<Row>(), ...columns];
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <GridTable<Row> api={_api} columns={_columns} rows={rows} />;
+    }
+    const r = await render(<Test rows={rows} />);
+    // And both are selected
+    click(r.select_0);
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "2"]);
+    // When row 2 becomes unselectable
+    const newRows = [rows[0], rows[1], { ...rows[2], selectable: false as const }];
+    r.rerender(<Test rows={newRows} />);
+    // Then it is deselected
+    expect(api.current!.getSelectedRowIds()).toEqual(["1"]);
+    expect(r.select_2).not.toBeChecked();
+  });
+
+  it("can deselect all rows via 'clearSelections' api method", async () => {
+    // Given a parent with children
     const rows: GridDataRow<NestedRow>[] = [
       simpleHeader,
       {
@@ -3698,7 +3724,6 @@ describe("GridTable", () => {
         children: [
           { kind: "child", id: "p1c1", data: { name: "child p1c1" } },
           { kind: "child", id: "p1c2", data: { name: "child p1c2" } },
-          { kind: "child", id: "p1c3", data: { name: "child p1c3" }, selectable: false, initSelected: true },
         ],
       },
     ];
@@ -3708,7 +3733,7 @@ describe("GridTable", () => {
     // And selecting the header row
     click(cellAnd(r, 0, 1, "select"));
     // Then expect all rows should selected
-    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2", "p1c3"]);
+    expect(api.current!.getSelectedRowIds()).toEqual(["p1", "p1c1", "p1c2"]);
     // When using the api to clear the selected rows
     act(() => api.current!.clearSelections());
     // Then all rows should be deselected

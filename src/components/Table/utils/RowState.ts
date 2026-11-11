@@ -106,6 +106,8 @@ export class RowState<R extends Kinded> {
     // If `_data` is a stable GraphQL fragment, but row is just a new literal around
     // it, this won't actually cause any reactivity changes. But once _data does change,
     // then anyone watching `.row` will see the new row instance + new data.
+    // Rows that are unselectable should not be selected.
+    if (this._row && this._row.selectable !== false && row.selectable === false) this.selected = false;
     this._row = row;
     this._data = row.data;
     // Same boolean/fn identity across new row literals must not notify every row.
