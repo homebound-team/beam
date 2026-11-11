@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useFocusRing, useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
 import { Css, type Properties, Tokens } from "src/Css";
@@ -24,46 +23,60 @@ type BulkActionButtonProps = {
 export function BulkActionButton(props: BulkActionButtonProps) {
   const { label, count, onClick, onClear, compact = false, __storyState } = props;
   const tid = useTestIds(props, "bulkActionButton");
-  const fullLabel = `${label} ${count} ${pluralize(count, "Row")}`;
 
   return (
     <div css={Css.dif.aic.hPx(40).$} {...tid}>
-      <SegmentButton
+      <BulkActionCtaButton
+        label={label}
+        count={count}
+        compact={compact}
         onClick={onClick}
-        ariaLabel={compact ? fullLabel : undefined}
-        styles={Css.smSb.gap1.add("borderRadius", "8px 0 0 8px").$}
         storyHovered={__storyState?.hovered === "action"}
         storyFocused={__storyState?.focused === "action"}
         {...tid.action}
-      >
-        {!compact && <Icon icon="pencil" inc={2.5} />}
-        {compact ? `${label} ${count}` : fullLabel}
-      </SegmentButton>
-      <SegmentButton
+      />
+      <BulkActionClearButton
+        compact={compact}
         onClick={onClear}
-        ariaLabel="Clear selection"
-        // Overlaps the action's right border, so the two share a 1px divider
-        styles={Css.sm.mlPx(-1).add("borderRadius", "0 8px 8px 0").$}
         storyHovered={__storyState?.hovered === "clear"}
         storyFocused={__storyState?.focused === "clear"}
         {...tid.clear}
-      >
-        {compact ? <Icon icon="x" inc={2.5} /> : "Clear"}
-      </SegmentButton>
+      />
     </div>
   );
 }
 
-/** Each side is its own target and tab stop, and owns its border and corners so its focus ring follows them. */
-function SegmentButton(props: {
-  onClick: () => void;
-  ariaLabel: string | undefined;
-  styles: Properties;
-  storyHovered: boolean;
-  storyFocused: boolean;
-  children: ReactNode;
-}) {
-  const { onClick, ariaLabel, styles, storyHovered, storyFocused, children } = props;
+type SegmentProps = { compact: boolean; onClick: () => void; storyHovered: boolean; storyFocused: boolean };
+
+/** The action side: opens the bulk action. */
+function BulkActionCtaButton(props: SegmentProps & { label: string; count: number }) {
+  const { label, count, compact, onClick, storyHovered, storyFocused } = props;
+  const tid = useTestIds(props);
+  const { hoverProps, isHovered } = useHover({});
+  const { focusProps, isFocusVisible } = useFocusRing();
+  const fullLabel = `${label} ${count} ${pluralize(count, "Row")}`;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={compact ? fullLabel : undefined}
+      css={{
+        ...segmentStyles(isHovered || storyHovered, isFocusVisible || storyFocused),
+        ...Css.smSb.gap1.add("borderRadius", "8px 0 0 8px").$,
+      }}
+      {...hoverProps}
+      {...focusProps}
+      {...tid}
+    >
+      {!compact && <Icon icon="pencil" inc={2.5} />}
+      {compact ? `${label} ${count}` : fullLabel}
+    </button>
+  );
+}
+
+/** The Clear side: deselects every row. */
+function BulkActionClearButton(props: SegmentProps) {
+  const { compact, onClick, storyHovered, storyFocused } = props;
   const tid = useTestIds(props);
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
@@ -71,28 +84,34 @@ function SegmentButton(props: {
     <button
       type="button"
       onClick={onClick}
-      aria-label={ariaLabel}
+      aria-label="Clear selection"
       css={{
-        ...Css.df.aic.h100
-          .pxPx(12)
-          // outline0 drops the browser's own focus ring in favor of ours below
-          .wsnw.cursorPointer.outline0.ba.bc(Tokens.SurfaceActiveBorder)
-          .bgColor(isHovered || storyHovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
-          // Stops the fill at the border, so it doesn't tint the antialiased rounded corners
-          .bgClip("padding-box")
-          .color(Tokens.TextLinkDefault).$,
-        ...styles,
-        // Figma's 2px ring, drawn over the border as one shape so its rounded corners have no seam, and raised over
-        // the shared divider
-        ...Css.if(isFocusVisible || storyFocused)
-          .relative.z1.outline(`2px solid ${Tokens.FocusRingInset}`)
-          .outlineOffset("-2px").$,
+        ...segmentStyles(isHovered || storyHovered, isFocusVisible || storyFocused),
+        // Overlaps the action's right border, so the two share a 1px divider
+        ...Css.sm.mlPx(-1).add("borderRadius", "0 8px 8px 0").$,
       }}
       {...hoverProps}
       {...focusProps}
       {...tid}
     >
-      {children}
+      {compact ? <Icon icon="x" inc={2.5} /> : "Clear"}
     </button>
   );
+}
+
+/** Each side owns its border and corners, so its focus ring follows them. */
+function segmentStyles(hovered: boolean, focused: boolean): Properties {
+  return {
+    ...Css.df.aic.h100
+      .pxPx(12)
+      // outline0 drops the browser's own focus ring in favor of ours below
+      .wsnw.cursorPointer.outline0.ba.bc(Tokens.SurfaceActiveBorder)
+      .bgColor(hovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
+      // Stops the fill at the border, so it doesn't tint the antialiased rounded corners
+      .bgClip("padding-box")
+      .color(Tokens.TextLinkDefault).$,
+    // Figma's 2px ring, drawn over the border as one shape so its rounded corners have no seam, and raised over
+    // the shared divider
+    ...Css.if(focused).relative.z1.outline(`2px solid ${Tokens.FocusRingInset}`).outlineOffset("-2px").$,
+  };
 }
