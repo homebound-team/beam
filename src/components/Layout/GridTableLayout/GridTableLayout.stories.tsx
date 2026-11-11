@@ -33,6 +33,7 @@ import { emptyCell } from "src/components/Table/utils/utils";
 import { Css, Palette } from "src/Css";
 import { AiTableIllustration } from "src/illustrations/AiTableIllustration";
 import { DocumentUploadIllustration } from "src/illustrations/DocumentUploadIllustration";
+import { TextField } from "src/inputs/TextField";
 import { noop } from "src/utils/helpers";
 import { viewportModes, withBeamDecorator, withRouter, zeroTo } from "src/utils/sb";
 import { TestProjectLayout } from "src/utils/sbComponents";
@@ -231,15 +232,29 @@ export function WithSelectionSummary() {
 
 WithSelectionSummary.parameters = { chromatic: { modes: viewportModes("desktop", "mobile1") } };
 
+/** Assign opens a right pane; type in it, then Clear asks before discarding the edit. */
 export function WithBulkCta() {
   const columns = useMemo(() => getColumns(false), []);
   const rows = useMemo(() => [simpleHeader, ...makeSelectedRows()], []);
+  const { openRightPane, closeRightPane } = useRightPaneActions();
+  // Closes the pane when leaving the story
+  useEffect(() => closeRightPane, [closeRightPane]);
 
   return (
     <TestProjectLayout>
       <PageHeader title="Grid Table Layout with bulk action" />
       <GridTableLayoutComponent
-        bulkCta={{ label: "Assign", onClick: action("onClick"), onClear: action("onClear") }}
+        withRightPane
+        bulkCta={{
+          label: "Assign",
+          onClick: (selected) => {
+            action("onClick")(selected);
+            // `selected` includes the checked parent, so count the leaf rows to match the button
+            const count = selected.filter((row) => !row.children?.length).length;
+            openRightPane({ content: <AssignRowsPanel count={count} /> });
+          },
+          onClear: action("onClear"),
+        }}
         tableProps={{ columns, rows }}
       />
     </TestProjectLayout>
@@ -1743,6 +1758,22 @@ function getGroupedRows(): GridDataRow<GroupedPlanRow>[] {
       },
     },
   ];
+}
+
+function AssignRowsPanel(props: { count: number }) {
+  const { count } = props;
+  const { closeRightPane } = useRightPaneActions();
+  const [assignee, setAssignee] = useState<string | undefined>();
+  return (
+    <RightPanePanel
+      title="Assign Rows"
+      isDirty={() => !!assignee}
+      secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
+      primaryAction={{ label: `Assign ${count} Rows`, onClick: noop }}
+    >
+      <TextField label="Assigned To" value={assignee} onChange={setAssignee} />
+    </RightPanePanel>
+  );
 }
 
 function OpenRightPaneDetail() {

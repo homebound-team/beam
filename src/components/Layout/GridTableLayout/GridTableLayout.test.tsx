@@ -1,7 +1,9 @@
+import { waitFor } from "@homebound/rtl-utils";
 import { act } from "@testing-library/react";
 import { Button } from "src/components/Button";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
+import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { documentScrollRightPaneWidth } from "src/components/Layout/RightPaneLayout/withRightPane";
 import { ScrollableParent } from "src/components/Layout/ScrollableParent";
@@ -802,6 +804,51 @@ describe("GridTableLayout", () => {
       // Then only the bulk action shows
       expect(r.bulkActionButton).toBeVisible();
       expect(r.query.selectionSummaryPill).toBeNull();
+    });
+
+    it("closes a clean right pane on Clear without asking", async () => {
+      // Given the bulk edit pane open over two selected rows, without edits
+      const r = await render(<BulkEditTable dirty={false} />, withRouter());
+      click(r.select_1);
+      click(r.select_2);
+      await clickAndWait(r.bulkActionButton_action);
+      expect(r.rightPanePanel_header).toHaveTextContent("Edit Rows");
+
+      // When clicking Clear
+      click(r.bulkActionButton_clear);
+
+      // Then it doesn't ask, the selection clears, and the pane closes
+      expect(r.query.discardChanges).toBeNull();
+      expect(r.select_1).not.toBeChecked();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
+    });
+
+    it("asks before Clear discards a dirty right pane", async () => {
+      // Given the bulk edit pane open over two selected rows, with unsaved edits
+      const onClear = vi.fn();
+      const r = await render(<BulkEditTable dirty onClear={onClear} />, withRouter());
+      click(r.select_1);
+      click(r.select_2);
+      await clickAndWait(r.bulkActionButton_action);
+
+      // When clicking Clear, then choosing to keep editing
+      click(r.bulkActionButton_clear);
+      click(r.continueEditing);
+
+      // Then the rows stay selected and the pane stays open
+      expect(r.select_1).toBeChecked();
+      expect(r.select_2).toBeChecked();
+      expect(r.rightPaneContent).toBeInTheDocument();
+      expect(onClear).not.toHaveBeenCalled();
+
+      // And when clicking Clear again and discarding
+      click(r.bulkActionButton_clear);
+      click(r.discardChanges);
+
+      // Then the selection clears, the consumer is told, and the pane closes
+      expect(r.select_1).not.toBeChecked();
+      expect(onClear).toHaveBeenCalledOnce();
+      await waitFor(() => expect(r.query.rightPaneContent).toBeNull());
     });
   });
 
@@ -1677,6 +1724,31 @@ type TestWrapperProps = Omit<GridTableLayoutProps<any, Row, any, any>, "layoutSt
 function TestWrapper(props: TestWrapperProps) {
   const layoutState = useGridTableLayoutState(props.layoutStateProps);
   return <GridTableLayoutComponent {...props} layoutState={layoutState} />;
+}
+
+/** A bulk action that opens a right pane panel, `dirty` standing in for its unsaved edits. */
+function BulkEditTable(props: { dirty: boolean; onClear?: () => void }) {
+  const { dirty, onClear } = props;
+  const { openRightPane } = useRightPaneActions();
+  return (
+    <DocumentScrollLayoutProvider>
+      <GridTableLayoutComponent
+        withRightPane
+        bulkCta={{
+          onClick: () =>
+            openRightPane({
+              content: (
+                <RightPanePanel title="Edit Rows" isDirty={() => dirty}>
+                  Fields
+                </RightPanePanel>
+              ),
+            }),
+          onClear,
+        }}
+        tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+      />
+    </DocumentScrollLayoutProvider>
+  );
 }
 
 function OpenPaneButton() {

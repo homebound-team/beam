@@ -8,6 +8,7 @@ import { filterTestIdPrefix } from "src/components/Filters/utils";
 import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
+import { closeRightPaneThen } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import { useModalContext } from "src/components/Modal/ModalContext";
 import { SelectionSummaryPill } from "src/components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
@@ -336,10 +337,13 @@ function BulkActionCta<R extends Kinded>(props: {
       label={label}
       count={count}
       onClick={() => onClick(api.getSelectedRows())}
-      onClear={() => {
-        api.clearSelections();
-        onClear?.();
-      }}
+      // Clear closes an open right pane too, asking first if its panel has unsaved edits
+      onClear={() =>
+        closeRightPaneThen(() => {
+          api.clearSelections();
+          onClear?.();
+        })
+      }
       compact={compact}
     />
   );
