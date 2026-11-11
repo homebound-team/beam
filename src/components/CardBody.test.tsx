@@ -44,7 +44,7 @@ describe("CardBody", () => {
     // When rendered
     const r = await render(<CardBody title="123 Main St" progress={65} />);
     // Then it shows as a percentage
-    expect(r.cardBody_progressValue).toHaveTextContent("65%");
+    expect(r.cardBody_progress_value).toHaveTextContent("65%");
   });
 
   it("renders children after the predefined slots", async () => {
