@@ -667,6 +667,7 @@ export type GridRowKind<R extends Kinded, P extends R["kind"]> = DiscriminateUni
   id: string;
   children: GridDataRow<R>[];
   selectable?: false;
+  disableSelection?: boolean;
 };
 
 /**
@@ -700,8 +701,10 @@ export type GridDataRow<R extends Kinded> = {
   initSelected?: boolean;
   /** Whether to pin this row to the top on initial load. Ignored on subsequent re-renders (like `initSelected`). */
   initPinned?: boolean;
-  /** Whether row can be selected */
+  /** Whether the row can be selected. A row with `selectable: false` is never selected, and the `initSelected` value is ignored. */
   selectable?: false;
+  /** Disables the row's select checkbox and keeps its current selected state, i.e. an `initSelected` row stays checked. */
+  disableSelection?: boolean;
   /** Whether this row should infer its selected state based on its children's selected state */
   inferSelectedState?: false;
   /** Total children, e.g. when they load lazily; a checked row counts as this many in `getSelectedLeafRowCount`. */
