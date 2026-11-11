@@ -78,12 +78,15 @@ function SegmentButton(props: {
           // outline0 drops the browser's own focus ring in favor of ours below
           .wsnw.cursorPointer.outline0.ba.bc(Tokens.SurfaceActiveBorder)
           .bgColor(isHovered || storyHovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
+          // Stops the fill at the border, so it doesn't tint the antialiased rounded corners
+          .bgClip("padding-box")
           .color(Tokens.TextLinkDefault).$,
         ...styles,
-        // Figma's 2px ring: the border plus a 1px inset, raised over the shared divider
+        // Figma's 2px ring, drawn over the border as one shape so its rounded corners have no seam, and raised over
+        // the shared divider
         ...Css.if(isFocusVisible || storyFocused)
-          .relative.z1.bc(Tokens.FocusRingInset)
-          .boxShadow(`inset 0 0 0 1px ${Tokens.FocusRingInset}`).$,
+          .relative.z1.outline(`2px solid ${Tokens.FocusRingInset}`)
+          .outlineOffset("-2px").$,
       }}
       {...hoverProps}
       {...focusProps}
