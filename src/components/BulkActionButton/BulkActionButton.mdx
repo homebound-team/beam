@@ -1,18 +1,18 @@
 import { Meta } from "@storybook/addon-docs/blocks";
-import * as SelectionActionButtonStories from "./SelectionActionButton.stories";
+import * as BulkActionButtonStories from "./BulkActionButton.stories";
 
-<Meta of={SelectionActionButtonStories} />
+<Meta of={BulkActionButtonStories} />
 
-# Selection Action Button
+# Bulk Action Button
 
 <p className="sbdocs-figma">
   <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4286-6">
     <img src="FigmaLogo.png" alt="" />
-    Selection Action Button
+    Bulk Action Button
   </a>
 </p>
 
-`SelectionActionButton` summarizes a selection and is the entry point to its bulk action, e.g. "Edit 3 Rows". Clear removes the whole selection. Each side is its own button and tab stop. It is a sibling of the [Selection Summary Pill](?path=/docs/components-pills-selection-summary-pill--docs), which shows a count with no action.
+`BulkActionButton` (the Selection Action Button in Figma) summarizes a selection and is the entry point to its bulk action, e.g. "Edit 3 Rows". Clear removes the whole selection. Each side is its own button and tab stop. It is a sibling of the [Selection Summary Pill](?path=/docs/components-pills-selection-summary-pill--docs), which shows a count with no action.
 
 In a `GridTableLayout`, pass `bulkCta` rather than rendering this directly.
 

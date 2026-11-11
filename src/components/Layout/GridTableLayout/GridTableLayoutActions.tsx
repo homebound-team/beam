@@ -1,4 +1,5 @@
 import { memo, type MutableRefObject, useMemo, useState } from "react";
+import { BulkActionButton } from "src/components/BulkActionButton/BulkActionButton";
 import { Button } from "src/components/Button";
 import { ButtonGroup, type ButtonGroupButton } from "src/components/ButtonGroup";
 import { CountBadge } from "src/components/CountBadge";
@@ -9,7 +10,6 @@ import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
 import { useModalContext } from "src/components/Modal/ModalContext";
 import { SelectionSummaryPill } from "src/components/Pills/SelectionSummaryPill/SelectionSummaryPill";
-import { SelectionActionButton } from "src/components/SelectionActionButton/SelectionActionButton";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { type TableView, ViewToggleButton } from "src/components/Table/components/ViewToggleButton";
@@ -71,7 +71,7 @@ type GridTableLayoutActionsProps<
   viewModeToggle?: ButtonGroupButton[];
   /** Shows the selection summary pill while any rows are selected. */
   selectionSummary?: boolean;
-  /** Shows the selection action button while any rows are selected, in place of the selection summary pill. */
+  /** Shows the bulk action button while any rows are selected, in place of the selection summary pill. */
   bulkCta?: GridTableBulkCta<R>;
 };
 
@@ -259,7 +259,7 @@ function GridTableLayoutActionsComponent<
           <div ref={rightRef} css={Css.df.fs0.aic.gapPx(12).$}>
             {api &&
               (bulkCta ? (
-                <SelectionActionCta api={api} bulkCta={bulkCta} compact={sm} />
+                <BulkActionCta api={api} bulkCta={bulkCta} compact={sm} />
               ) : (
                 selectionSummary && <SelectionSummaryAction api={api} numberOnly={sm} />
               ))}
@@ -322,7 +322,7 @@ function SelectionSummaryAction<R extends Kinded>(props: { api: GridTableApi<R>;
 }
 
 /** Owns the selected count, so a selection change re-renders just the button. */
-function SelectionActionCta<R extends Kinded>(props: {
+function BulkActionCta<R extends Kinded>(props: {
   api: GridTableApi<R>;
   bulkCta: GridTableBulkCta<R>;
   compact: boolean;
@@ -332,7 +332,7 @@ function SelectionActionCta<R extends Kinded>(props: {
   const count = useComputed(() => api.getSelectedLeafRowCount(), [api]);
   if (count === 0) return null;
   return (
-    <SelectionActionButton
+    <BulkActionButton
       label={label}
       count={count}
       onClick={() => onClick(api.getSelectedRows())}

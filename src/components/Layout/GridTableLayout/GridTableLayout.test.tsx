@@ -724,18 +724,18 @@ describe("GridTableLayout", () => {
         withRouter(),
       );
       // Then nothing shows while nothing is selected
-      expect(r.query.selectionActionButton).toBeNull();
+      expect(r.query.bulkActionButton).toBeNull();
 
       // When selecting a row
       click(r.select_1);
       // Then the action defaults to Edit and counts it
-      expect(r.selectionActionButton_action).toHaveTextContent("Edit 1 Row");
+      expect(r.bulkActionButton_action).toHaveTextContent("Edit 1 Row");
 
       // And when selecting a second
       click(r.select_2);
       // Then it counts both, ahead of the columns selector
-      expect(r.selectionActionButton_action).toHaveTextContent("Edit 2 Rows");
-      expect(r.selectionActionButton.compareDocumentPosition(r.columns)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(r.bulkActionButton_action).toHaveTextContent("Edit 2 Rows");
+      expect(r.bulkActionButton.compareDocumentPosition(r.columns)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("passes the selected rows to onClick", async () => {
@@ -750,10 +750,10 @@ describe("GridTableLayout", () => {
       );
       click(r.select_1);
       click(r.select_2);
-      expect(r.selectionActionButton_action).toHaveTextContent("Assign 2 Rows");
+      expect(r.bulkActionButton_action).toHaveTextContent("Assign 2 Rows");
 
       // When clicking the action
-      click(r.selectionActionButton_action);
+      click(r.bulkActionButton_action);
 
       // Then it gets both rows
       expect(onClick).toHaveBeenCalledWith([
@@ -776,12 +776,12 @@ describe("GridTableLayout", () => {
       click(r.select_2);
 
       // When clicking Clear
-      click(r.selectionActionButton_clear);
+      click(r.bulkActionButton_clear);
 
       // Then nothing is selected, the button is gone, and the consumer is told
       expect(r.select_1).not.toBeChecked();
       expect(r.select_2).not.toBeChecked();
-      expect(r.query.selectionActionButton).toBeNull();
+      expect(r.query.bulkActionButton).toBeNull();
       expect(onClear).toHaveBeenCalledOnce();
     });
 
@@ -800,7 +800,7 @@ describe("GridTableLayout", () => {
       click(r.select_1);
 
       // Then only the bulk action shows
-      expect(r.selectionActionButton).toBeVisible();
+      expect(r.bulkActionButton).toBeVisible();
       expect(r.query.selectionSummaryPill).toBeNull();
     });
   });

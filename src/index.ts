@@ -33,6 +33,7 @@ export type {
   StatusBannerProps,
 } from "./components/StatusBanner/StatusBanner";
 export * from "./components/Breadcrumbs";
+export * from "./components/BulkActionButton/BulkActionButton";
 export * from "./components/Button";
 export * from "./components/ButtonDatePicker";
 export * from "./components/ButtonGroup";
@@ -96,7 +97,6 @@ export * from "./components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 export * from "./components/ProposedValue";
 export * from "./components/RightSidebar";
 export * from "./components/ScrollShadows";
-export * from "./components/SelectionActionButton/SelectionActionButton";
 export * from "./components/SideNav/SideNav";
 export * from "./components/Stepper";
 export * from "./components/StepperTabs/StepperTab";
