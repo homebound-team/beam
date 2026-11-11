@@ -76,7 +76,7 @@ export function Default() {
         <InlineFeedbackBanner type="warning" description="Used as a requirement for Extend Backsplash Kitchen 109." />
       </Sample>
 
-      <Sample title="Long copy wraps, tag and actions stay on the first line">
+      <Sample title="Narrow slot stacks the tag, description, and actions">
         <div css={Css.wPx(420).$}>
           <InlineFeedbackBanner
             type="error"
@@ -165,7 +165,7 @@ export function InGridTableCompanionRows() {
         }),
         // A plain row, for contrast against its banner-carrying neighbors.
         { kind: "data", id: "4", data: { name: "Quartz Countertop", status: "Matched" } },
-        // Long copy, to show the tag and actions staying on the first line as the description wraps.
+        // Long copy, so the description wraps beside the tag and actions on a wide row.
         row("5", "Recessed Lighting", "Unmatched", {
           type: "error",
           tagText: "Unmatched",
