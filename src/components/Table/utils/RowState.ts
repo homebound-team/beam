@@ -67,7 +67,7 @@ export class RowState<R extends Kinded> {
     row: GridDataRow<R>,
   ) {
     this.row = row;
-    this.selected = !!row.initSelected;
+    this.selected = !!row.initSelected && row.selectable !== false;
     this.collapsed = states.storage.wasCollapsed(row.id) ?? !!row.initCollapsed;
     this.pinned = !!row.initPinned;
     makeAutoObservable(
@@ -107,7 +107,7 @@ export class RowState<R extends Kinded> {
     // it, this won't actually cause any reactivity changes. But once _data does change,
     // then anyone watching `.row` will see the new row instance + new data.
     // Rows that are unselectable should not be selected.
-    if (this._row && this._row.selectable !== false && row.selectable === false) this.selected = false;
+    if (row.selectable === false) this.selected = false;
     this._row = row;
     this._data = row.data;
     // Same boolean/fn identity across new row literals must not notify every row.
