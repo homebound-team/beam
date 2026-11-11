@@ -34,7 +34,7 @@ export function BulkActionButton(props: BulkActionButtonProps) {
         styles={Css.smSb.gap1.add("borderRadius", "8px 0 0 8px").$}
         storyHovered={__storyState?.hovered === "action"}
         storyFocused={__storyState?.focused === "action"}
-        tid={tid.action}
+        {...tid.action}
       >
         {!compact && <Icon icon="pencil" inc={2.5} />}
         {compact ? `${label} ${count}` : fullLabel}
@@ -46,7 +46,7 @@ export function BulkActionButton(props: BulkActionButtonProps) {
         styles={Css.sm.mlPx(-1).add("borderRadius", "0 8px 8px 0").$}
         storyHovered={__storyState?.hovered === "clear"}
         storyFocused={__storyState?.focused === "clear"}
-        tid={tid.clear}
+        {...tid.clear}
       >
         {compact ? <Icon icon="x" inc={2.5} /> : "Clear"}
       </SegmentButton>
@@ -61,10 +61,10 @@ function SegmentButton(props: {
   styles: Properties;
   storyHovered: boolean;
   storyFocused: boolean;
-  tid: object;
   children: ReactNode;
 }) {
-  const { onClick, ariaLabel, styles, storyHovered, storyFocused, tid, children } = props;
+  const { onClick, ariaLabel, styles, storyHovered, storyFocused, children } = props;
+  const tid = useTestIds(props);
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
   return (
