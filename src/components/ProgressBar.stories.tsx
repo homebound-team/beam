@@ -1,27 +1,38 @@
 import type { Meta } from "@storybook/react-vite";
+import { ProgressBar, type ProgressBarProps } from "src/components/ProgressBar";
 import { Css } from "src/Css";
-import { ProgressBar } from "./ProgressBar";
+import { LabeledExamples } from "src/utils/sb";
 
 export default {
+  title: "Components/Progress Bar",
   component: ProgressBar,
+  parameters: {
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1345-1927",
+    },
+  },
 } as Meta;
 
-export function Values() {
+export function Examples() {
   return (
-    <div css={Css.df.fdc.gap2.wPx(300).$}>
-      {[0, 10, 50, 99, 100].map((value) => (
-        <ProgressBar key={value} value={value} />
-      ))}
-    </div>
+    <LabeledExamples
+      examples={[
+        { label: "Empty", children: <Sized value={0} /> },
+        { label: "Partial", children: <Sized value={50} /> },
+        { label: "Fractional", children: <Sized value={99.6} /> },
+        { label: "Complete", children: <Sized value={100} /> },
+        { label: "AI mode", children: <Sized value={50} aiMode /> },
+      ]}
+    />
   );
 }
 
-export function AiMode() {
+/** Sizes the bar here rather than via `exampleWidth`, which top-aligns the label for taller, field-sized examples. */
+function Sized(props: ProgressBarProps) {
   return (
-    <div css={Css.df.fdc.gap2.p2.wPx(300).bgPurple50.$}>
-      {[0, 50, 100].map((value) => (
-        <ProgressBar key={value} value={value} aiMode />
-      ))}
+    <div css={Css.wPx(300).$}>
+      <ProgressBar {...props} />
     </div>
   );
 }

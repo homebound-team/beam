@@ -26,9 +26,9 @@ export function ProgressBar(props: ProgressBarProps) {
       <div css={Css.fg1.hPx(8).br4.oh.bgColor(aiMode ? Palette.Purple200 : Tokens.SurfaceSubtle).$} {...tid.track}>
         <div css={Css.h100.bgBlue500.w(`${progressValue}%`).$} {...tid.fill} />
       </div>
-      {/* A fixed-width, tabular-digit label keeps every track the same length, so stacked bars line up.
+      {/* A fixed-width label keeps every track the same length, so stacked bars line up.
           `5ch` fits the widest label, "100%". Flooring keeps it there, and avoids showing 100% early. */}
-      <span css={Css.fs0.mw("5ch").tabularNums.$} {...tid.value}>
+      <span css={Css.fs0.mw("5ch").$} {...tid.value}>
         {Math.floor(progressValue)}%
       </span>
     </div>
