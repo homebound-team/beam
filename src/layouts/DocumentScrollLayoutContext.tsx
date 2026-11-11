@@ -17,8 +17,6 @@ import { useBodyBackgroundColor } from "src/hooks/useBodyBackgroundColor";
 import { DocumentScrollToTopButton } from "src/layouts/DocumentScrollToTopButton";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "./layoutVars";
 
-const DocumentScrollLayoutContext = createContext(false);
-
 export type DocumentScrollLayoutProviderProps = {
   children: ReactNode;
   /** Background color applied to `document.body` while this provider is mounted. */
@@ -105,3 +103,5 @@ function DocumentScrollLayoutViewportRoot({
     </div>
   );
 }
+
+const DocumentScrollLayoutContext = createContext(false);

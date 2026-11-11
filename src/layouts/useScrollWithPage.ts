@@ -28,9 +28,6 @@ type UseScrollWithPageOptions = {
   onVisibleHeight?: (visibleHeight: number) => void;
 };
 
-// Same value as `Css.transitionAll`. Only the hide and the pin-back use it.
-const hideRevealSlide = "all 200ms cubic-bezier(0.4, 0, 0.2, 1)";
-
 /** Keeps a fixed navbar or page header on its reserve element until that element leaves the viewport. */
 export function useScrollWithPage(options: UseScrollWithPageOptions): void {
   const { heightElRef, fixedElRef, reserveElRef, height, restingTop, heightVar, getReserveRestTop, onVisibleHeight } =
@@ -104,9 +101,6 @@ function styleForFrame(frame: RevealFrame, height: number, restingTop: string): 
   return { top: restingTop, visibleHeight: height, transition: "" };
 }
 
-/** How many navbars or page headers are still moving with the scroll. */
-let followingCount = 0;
-
 /** Counts this element as following or not. Sticky `top` eases only while the count is zero. */
 function updateFollowingCount(isFollowing: RefObject<boolean>, following: boolean): void {
   if (isFollowing.current === following) return;
@@ -131,3 +125,9 @@ function writeScrollWithPage(
   if (animate) fixedEl.style.transition = scroll.transition;
   fixedEl.style.top = scroll.top;
 }
+
+// Same value as `Css.transitionAll`. Only the hide and the pin-back use it.
+const hideRevealSlide = "all 200ms cubic-bezier(0.4, 0, 0.2, 1)";
+
+/** How many navbars or page headers are still moving with the scroll. */
+let followingCount = 0;

@@ -19,6 +19,11 @@ type UseRevealOnScrollUpOptions = {
   onScroll?: (frame: RevealFrame) => void;
 };
 
+type RevealScrollListener = {
+  el: HTMLElement;
+  onScroll: () => void;
+};
+
 export function useRevealOnScrollUp(
   reserveElRef: RefObject<HTMLElement | null>,
   /** Viewport y where the reserve element rests. Defaults to `0`. Read each scroll. */
@@ -36,6 +41,8 @@ export function useRevealOnScrollUp(
   const lastScrollY = useRef(Number.POSITIVE_INFINITY);
   const lastScrollHeight = useRef(0);
 
+  // After commit, so the reserve element can be measured and the first `top` is written before paint.
+  // The ref is stable, so this runs once; later scrolls come from the listener.
   useLayoutEffect(() => {
     function publish(rect: DOMRect, topOffset: number, next: RevealState) {
       stateRef.current = next;
@@ -110,15 +117,6 @@ export function useRevealOnScrollUp(
     };
   }, [reserveElRef]);
 }
-
-/** How long the window must go without scrolling before a hold releases, for browsers without `scrollend`. */
-export const HOLD_QUIET_MS = 150;
-
-/** Cancels the active hold's listeners and timer, if a programmatic scroll is in flight. */
-let cancelActiveHold: (() => void) | undefined;
-const holdReleaseListeners = new Set<() => void>();
-// Not `keydown`, since typing in a table's search box is what triggers some of these scrolls.
-const userScrollEvents = ["wheel", "touchstart"] as const;
 
 /**
  * Runs a programmatic window scroll while the navbar and page header hold their current reveal state.
@@ -201,15 +199,11 @@ function nextRevealStateOnLayoutChange(rect: DOMRect, topOffset: number, prev: R
   return reserveOut ? "hidden" : "following";
 }
 
-type RevealScrollListener = {
-  el: HTMLElement;
-  onScroll: () => void;
-};
-
-/** One window listener. Fixed elements run top to bottom, so each reads the fixed element above it from this scroll. */
-const revealScrollListeners = new Set<RevealScrollListener>();
-
-/** Re-runs every fixed element, top to bottom. A measurement changes a pin line without a scroll. */
+/**
+ * Re-runs each subscribed navbar and page header, top to bottom.
+ *
+ * `useScrollWithPage` calls this when a measured height changes a pin line without a scroll.
+ */
 export function syncRevealScroll(): void {
   onRevealScroll();
 }
@@ -233,3 +227,15 @@ function subscribeRevealScroll(el: HTMLElement, onScroll: () => void): () => voi
     if (revealScrollListeners.size === 0) window.removeEventListener("scroll", onRevealScroll);
   };
 }
+
+/** How long the window must go without scrolling before a hold releases, for browsers without `scrollend`. */
+export const HOLD_QUIET_MS = 150;
+
+/** Cancels the active hold's listeners and timer, if a programmatic scroll is in flight. */
+let cancelActiveHold: (() => void) | undefined;
+const holdReleaseListeners = new Set<() => void>();
+// Not `keydown`, since typing in a table's search box is what triggers some of these scrolls.
+const userScrollEvents = ["wheel", "touchstart"] as const;
+
+/** One window listener. Fixed elements run top to bottom, so each reads the fixed element above it from this scroll. */
+const revealScrollListeners = new Set<RevealScrollListener>();

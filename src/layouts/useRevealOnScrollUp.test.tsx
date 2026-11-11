@@ -4,8 +4,6 @@ import { HOLD_QUIET_MS, holdRevealWhile, type RevealFrame, useRevealOnScrollUp }
 import { render, scrollWindow, scrollWindowWithAnchor } from "src/utils/rtl";
 import { vi } from "vitest";
 
-const navHeight = 50;
-
 describe("useRevealOnScrollUp", () => {
   it("starts resting at the top", async () => {
     // Given the hook at the top of the page
@@ -34,7 +32,7 @@ describe("useRevealOnScrollUp", () => {
     expect(r.visible).toHaveTextContent("40");
 
     // When the reserve element leaves the viewport
-    scrollWindowWithAnchor(r.reserveEl, navHeight);
+    scrollWindowWithAnchor(r.reserveEl, 50);
 
     // Then the chrome hides
     expect(r.state).toHaveTextContent("hidden");
@@ -68,7 +66,7 @@ describe("useRevealOnScrollUp", () => {
 
     // Then it stays pinned instead of jumping to the reserve element
     expect(r.state).toHaveTextContent("revealed");
-    expect(r.visible).toHaveTextContent(String(navHeight));
+    expect(r.visible).toHaveTextContent("50");
   });
 
   it("returns to resting (not stuck revealed) once scrolled back to the top", async () => {

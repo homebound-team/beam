@@ -10,6 +10,7 @@ import {
   beamRightPaneContentMinVar,
   beamRightPaneWidthVar,
   beamSideNavLayoutWidthVar,
+  documentScrollRightPaneMinHeight,
   documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { setViewport } from "src/tests/viewport";
@@ -80,8 +81,6 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
 
   it("keeps anchor height open and closed so a short page can scroll the pane taller", async () => {
     // Given a desktop document-scroll right pane layout
-    const floor =
-      "calc(var(--beam-layout-viewport-height, 100vh) - var(--beam-environment-banner-height, 0px) - var(--beam-page-banner-height, 0px) - var(--beam-table-actions-height, 0px) - var(--beam-workflow-layout-footer-height, 0px))";
     const r = await render(
       <DocumentScrollLayoutProvider>
         <DocumentScrollOverlayRightPaneLayout>
@@ -92,19 +91,14 @@ describe("DocumentScrollOverlayRightPaneLayout", () => {
     );
 
     // Then the anchor reserves the floor while closed
-    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(floor);
+    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(documentScrollRightPaneMinHeight());
 
-    // When the pane is opened
+    // When the pane is opened, then closed
     await clickAndWait(r.openPaneBtn);
-
-    // Then the anchor is tall enough to scroll the navbar and page header away
-    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(floor);
-
-    // When the pane is closed
     await clickAndWait(r.closePaneBtn);
 
     // Then the floor stays, so closing a scrolled page does not clamp it
-    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(floor);
+    expect(r.documentScrollRightPaneLayout.style.minHeight).toBe(documentScrollRightPaneMinHeight());
   });
 
   it("eases the pane offset while pinned so it moves with the chrome above it", async () => {

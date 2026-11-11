@@ -1,5 +1,6 @@
 import { beamNavbarLayoutHeightVar, beamStickyTopTransitionVar } from "src/layouts/layoutVars";
 import { NavbarLayout } from "src/layouts/NavbarLayout/NavbarLayout";
+import { readNavbarVisibleHeight, setNavbarVisibleHeight } from "src/layouts/NavbarLayout/navbarVisibleHeight";
 import { render, scrollWindowWithAnchor } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -65,6 +66,38 @@ describe("NavbarLayout", () => {
       expect(document.documentElement.style.getPropertyValue(beamStickyTopTransitionVar)).toBe("");
     } finally {
       spy.mockRestore();
+    }
+  });
+
+  it("clears the shared navbar height when the layout unmounts", async () => {
+    // Given a navbar that has published its height for the page header to read
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      height: 48,
+      width: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      x: 0,
+      y: 0,
+      toJSON() {},
+    });
+    try {
+      const r = await render(
+        <NavbarLayout navbar={{ brand: "Brand", items: [{ label: "Dashboard", onClick: () => {}, active: true }] }}>
+          <span>Page content</span>
+        </NavbarLayout>,
+      );
+      expect(readNavbarVisibleHeight()).toBe(48);
+
+      // When the layout unmounts
+      r.unmount();
+
+      // Then the height other layouts read is 0, so a page header does not keep a removed navbar
+      expect(readNavbarVisibleHeight()).toBe(0);
+    } finally {
+      spy.mockRestore();
+      setNavbarVisibleHeight(0);
     }
   });
 });
