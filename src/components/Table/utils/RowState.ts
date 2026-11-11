@@ -183,7 +183,7 @@ export class RowState<R extends Kinded> {
     // If there are no selectable children, we should return "checked" if the parent is selected.
     if (this.isParent && this.hasSelectableChildren) {
       // Use visibleChildren b/c if filters are hiding some of our children, we still want to show fully selected
-      const children = this.visibleChildren.filter((c) => c.row.selectable !== false);
+      const children = this.visibleChildren.filter((c) => c.isSelectionEnabled);
       const allChecked = children.every((child) => child.selectedState === "checked");
       const allUnchecked = children.every((child) => child.selectedState === "unchecked");
       return children.length === 0 ? "unchecked" : allChecked ? "checked" : allUnchecked ? "unchecked" : "partial";
@@ -200,7 +200,7 @@ export class RowState<R extends Kinded> {
   get selectedStateForHeader(): SelectedState {
     // If there are no selectable children, we should return "checked" if the parent is selected.
     if (this.children && this.hasSelectableChildren) {
-      const children = this.visibleChildren.filter((c) => c.row.selectable !== false || c.isParent);
+      const children = this.visibleChildren.filter((c) => c.isSelectionEnabled || c.isParent);
       const allChecked = children.every((child) => child.selectedStateForHeader === "checked");
       const allUnchecked = children.every((child) => child.selectedStateForHeader === "unchecked");
       // For the header purposes, if this is a selectable-row (i.e. not inferSelectedState) make sure
@@ -224,7 +224,7 @@ export class RowState<R extends Kinded> {
    * child of a selected parent row.
    */
   select(selected: boolean): void {
-    if (this.row.selectable !== false) {
+    if (this.isSelectionEnabled) {
       this.selected = selected;
     }
 
@@ -332,6 +332,11 @@ export class RowState<R extends Kinded> {
     return this.row.inferSelectedState !== false;
   }
 
+  /** Whether `select` can change this row; false for `selectable: false` and `disableSelection` rows. */
+  private get isSelectionEnabled(): boolean {
+    return this.row.selectable !== false && !this.row.disableSelection;
+  }
+
   /** Returns this row and, if we're not collapsed, our children. */
   get selfAndMaybeChildren(): RowState<R>[] {
     // The header always returns all children/top rows, even if collapsed
@@ -397,7 +402,7 @@ export class RowState<R extends Kinded> {
   }
 
   private get hasSelectableChildren(): boolean {
-    return this.visibleChildren.some((c) => c.row.selectable !== false);
+    return this.visibleChildren.some((c) => c.isSelectionEnabled);
   }
 
   /**

@@ -3715,6 +3715,40 @@ describe("GridTable", () => {
     expect(r.select_2).not.toBeChecked();
   });
 
+  it("keeps the selected state of rows with disableSelection", async () => {
+    // Given a selected row and an unselected row with selection disabled, and a regular row
+    const rows: GridDataRow<Row>[] = [
+      simpleHeader,
+      { kind: "data", id: "1", disableSelection: true, initSelected: true, data: { name: "Tony Stark", value: 1 } },
+      { kind: "data", id: "2", disableSelection: true, data: { name: "Natasha Romanova", value: 2 } },
+      { kind: "data", id: "3", data: { name: "Thor Odinson", value: 3 } },
+    ];
+    const _columns = [selectColumn<Row>(), ...columns];
+    const api: MutableRefObject<GridTableApi<Row> | undefined> = { current: undefined };
+    function Test({ rows }: { rows: GridDataRow<Row>[] }) {
+      const _api = useGridTableApi<Row>();
+      api.current = _api;
+      return <GridTable<Row> api={_api} columns={_columns} rows={rows} />;
+    }
+    const r = await render(<Test rows={rows} />);
+    // Then both checkboxes are disabled and row 1 is checked
+    expect(r.select_1).toBeDisabled();
+    expect(r.select_1).toBeChecked();
+    expect(r.select_2).toBeDisabled();
+    expect(r.select_2).not.toBeChecked();
+    // When selecting all via the header
+    click(r.select_0);
+    // Then only the regular row's selected state changed
+    expect(api.current!.getSelectedRowIds()).toEqual(["1", "3"]);
+    expect(r.select_0).toBeChecked();
+    // And when the table clears the selections
+    r.rerender(<Test rows={rows.map((row) => ({ ...row }))} />);
+    act(() => api.current!.clearSelections());
+    // Then row 1 is still selected
+    expect(api.current!.getSelectedRowIds()).toEqual(["1"]);
+    expect(r.select_0).not.toBeChecked();
+  });
+
   it("can deselect all rows via 'clearSelections' api method", async () => {
     // Given a parent with children
     const rows: GridDataRow<NestedRow>[] = [
