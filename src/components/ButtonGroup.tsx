@@ -22,10 +22,7 @@ export type ButtonGroupButton = {
   onClick?: VoidFunction;
   /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
   disabled?: boolean | ReactNode;
-  /**
-   * Indicates the selected button, as in a view toggle where exactly one text button is active.
-   * Icon groups are actions and typically leave every button unselected.
-   */
+  /** Indicates the selected button, as in a view toggle where exactly one text button is active. */
   active?: boolean;
   /** Adds tooltip to the button */
   tooltip?: ReactNode;
