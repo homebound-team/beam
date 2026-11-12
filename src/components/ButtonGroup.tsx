@@ -10,7 +10,6 @@ export type ButtonGroupProps = {
   buttons: ButtonGroupButton[];
   /** Disables all buttons in ButtonGroup */
   disabled?: boolean;
-  size?: ButtonGroupSize;
   /** Stretches the group to its container, splitting the width evenly between the buttons. */
   fullWidth?: boolean;
 };
@@ -23,25 +22,27 @@ export type ButtonGroupButton = {
   onClick?: VoidFunction;
   /** Disables the button. Pass a ReactNode to disable the button and show a tooltip */
   disabled?: boolean | ReactNode;
-  /** Indicates the active/selected button, as in a tab or toggle. */
+  /**
+   * Indicates the selected button, as in a view toggle where exactly one text button is active.
+   * Icon groups are actions and typically leave every button unselected.
+   */
   active?: boolean;
   /** Adds tooltip to the button */
   tooltip?: ReactNode;
 };
 
 export function ButtonGroup(props: ButtonGroupProps) {
-  const { buttons, disabled = false, size = "sm", fullWidth = false } = props;
+  const { buttons, disabled = false, fullWidth = false } = props;
   const tid = useTestIds(props, "buttonGroup");
   return (
     // Adding `line-height: 0` prevent inheriting line-heights that might throw off sizing within the button group.
-    <div {...tid} css={{ ...Css.df.lh(0).if(fullWidth).w100.$, ...sizeStyles[size] }}>
+    <div {...tid} css={Css.df.lh(0).hPx(40).if(fullWidth).w100.$}>
       {buttons.map(({ disabled: buttonDisabled, ...buttonProps }, i) => (
         // Disable the button if the ButtonGroup is disabled or if the current button is disabled.
         <GroupButton
           key={i}
           {...buttonProps}
           disabled={disabled || buttonDisabled}
-          size={size}
           isFirst={i === 0}
           isLast={i === buttons.length - 1}
           fullWidth={fullWidth}
@@ -53,7 +54,6 @@ export function ButtonGroup(props: ButtonGroupProps) {
 }
 
 type GroupButtonProps = {
-  size: ButtonGroupSize;
   isFirst: boolean;
   isLast: boolean;
   fullWidth: boolean;
@@ -65,10 +65,9 @@ function GroupButton(props: GroupButtonProps) {
     iconInc,
     iconColor,
     text,
-    active,
+    active = false,
     onClick: onPress,
     disabled,
-    size,
     tooltip,
     isFirst,
     isLast,
@@ -86,7 +85,8 @@ function GroupButton(props: GroupButtonProps) {
   const buttonTid = useTestIds(tid[defaultTestId((typeof text === "string" && text) || icon || "button")]);
 
   return (
-    <span css={{ ...getButtonStyles(isFirst, isLast), ...Css.if(fullWidth).fg1.fb0.$ }}>
+    // Raise the active and focused buttons so their borders paint over the neighboring button's shared border.
+    <span css={Css.relative.if(!isFirst).mlPx(-1).if(active).z1.if(isFocusVisible).z2.if(fullWidth).fg1.fb0.$}>
       {maybeTooltip({
         ...buttonTid.tooltip,
         title: resolveTooltip(disabled, tooltip),
@@ -98,14 +98,11 @@ function GroupButton(props: GroupButtonProps) {
             {...focusProps}
             {...hoverProps}
             css={{
-              ...Css.buttonBase.px2.br0.h100
-                .if(fullWidth)
-                .w100.jcc.end.onDisabled.color(Tokens.TextDisabled)
-                .cursorNotAllowed.bc(Tokens.FieldBorderDefault).$,
+              ...getButtonStyles(isFirst, isLast, !!icon && !text),
+              ...Css.if(fullWidth).w100.jcc.$,
+              ...(active ? activeStyles : isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
+              ...(disabled ? disabledStyles : {}),
               ...(isFocusVisible ? defaultFocusRingStyles : {}),
-              ...(active ? activeStyles : {}),
-              ...(isPressed ? pressedStyles : isHovered ? hoverStyles : {}),
-              ...(icon ? iconStyles[size] : {}),
             }}
             {...buttonTid}
           >
@@ -121,32 +118,27 @@ function GroupButton(props: GroupButtonProps) {
 }
 
 const pressedStyles = Css.bgColor(Tokens.NeutralFillPressed).$;
-const activeStyles = Css.bgColor(Tokens.FieldBorderDefault).$;
-const hoverStyles = Css.bgColor(Tokens.NeutralFillHoverSubtle).$;
-const defaultFocusRingStyles = Css.relative.z2.bshFocus.$;
+const activeStyles = Css.bgColor(Tokens.SurfaceActive).bc(Tokens.Primary).$;
+const hoverStyles = Css.bgColor(Tokens.SurfaceHover).$;
+const disabledStyles = Css.color(Tokens.OnSurfaceDisabled).cursorNotAllowed.$;
+// A 2px ring drawn over the border as one shape, so it stays inside the 40px box and follows the rounded corners.
+// The wrapper's z-index raises it over the neighboring buttons' shared border.
+const defaultFocusRingStyles = Css.outline(`2px solid ${Tokens.FieldBorderFocus}`).outlineOffset("-2px").$;
 
-function getButtonStyles(isFirst: boolean, isLast: boolean) {
+function getButtonStyles(isFirst: boolean, isLast: boolean, iconOnly: boolean): Properties {
   return {
-    ...Css.z1.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).bw1.ba.color(Tokens.OnSurface).br0.oh.$,
+    ...Css.buttonBase.h100.br0.ba.bw1
+      .bc(Tokens.FieldBorderDefault)
+      .bgColor(Tokens.Surface)
+      // Stops the fill at the border, so it doesn't tint the antialiased rounded corners
+      .bgClip("padding-box")
+      .color(Tokens.OnSurface)
+      .if(iconOnly).p1.else.px2.$,
     // Our first button should have a rounded left border.
-    ...(isFirst && Css.add("borderRadius", "4px 0 0 4px").$),
+    ...(isFirst && Css.add("borderRadius", "8px 0 0 8px").$),
     // Our last button should have a rounded right border.
-    ...(isLast && Css.add("borderRadius", "0 4px 4px 0").$),
-    // Nudge buttons one pixel to the left so they visually share a border.
-    ...(!isFirst && Css.mlPx(-1).$),
+    ...(isLast && Css.add("borderRadius", "0 8px 8px 0").$),
+    // A lone button is rounded on both sides.
+    ...(isFirst && isLast && Css.br8.$),
   };
 }
-
-const sizeStyles: Record<ButtonGroupSize, Properties> = {
-  xs: Css.hPx(28).$,
-  sm: Css.hPx(32).$,
-  md: Css.hPx(40).$,
-};
-
-const iconStyles: Record<ButtonGroupSize, Properties> = {
-  xs: Css.pxPx(2).$,
-  sm: Css.pxPx(4).$,
-  md: Css.px1.$,
-};
-
-type ButtonGroupSize = "xs" | "sm" | "md";

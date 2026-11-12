@@ -104,7 +104,6 @@ function ResizableGridItem({ item, sortable }: { item: GridItem; sortable: boole
         <div css={Css.df.aic.gap1.$}>
           <div css={Css.br100.sqPx(12).df.aic.jcc.bgGray200.gray900.p1.xs2Sb.$}>{item.id}</div>
           <ButtonGroup
-            size="xs"
             buttons={[
               {
                 icon: "collapse",

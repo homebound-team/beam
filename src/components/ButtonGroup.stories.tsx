@@ -7,7 +7,7 @@ export default {
   parameters: {
     design: {
       type: "figma",
-      url: "https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31586%3A99872",
+      url: "https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4280-223",
     },
   },
 } as Meta;
@@ -16,35 +16,44 @@ export function ButtonGroups() {
   return (
     <div css={Css.df.fdc.gap2.$}>
       <div>
-        <h2>Icon Only</h2>
-        <ButtonGroup size="xs" buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />
-        <ButtonGroup buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />
-        <ButtonGroup size="md" buttons={[{ icon: "chevronLeft" }, { icon: "plus" }, { icon: "chevronRight" }]} />
+        <h2>Text</h2>
+        <div css={Css.df.gap3.$}>
+          <ButtonGroup buttons={[{ text: "Cost", active: true }, { text: "Price" }]} />
+          <ButtonGroup buttons={[{ text: "Plans", active: true }, { text: "Options" }, { text: "Elevations" }]} />
+          <ButtonGroup buttons={[{ text: "Plans" }, { text: "Options", active: true }, { text: "Elevations" }]} />
+          <ButtonGroup buttons={[{ text: "Plans" }, { text: "Options" }, { text: "Elevations", active: true }]} />
+        </div>
       </div>
       <div>
-        <h2>Basic</h2>
-        <ButtonGroup size="xs" buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
-        <ButtonGroup buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
-        <ButtonGroup size="md" buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
-      </div>
-      <div>
-        <h2>Active</h2>
-
-        <ButtonGroup
-          size="xs"
-          buttons={[{ text: "Leading", active: true }, { text: "Middle" }, { text: "Trailing" }]}
-        />
-        <ButtonGroup buttons={[{ text: "Leading", active: true }, { text: "Middle" }, { text: "Trailing" }]} />
-        <ButtonGroup
-          size="md"
-          buttons={[{ text: "Leading", active: true }, { text: "Middle" }, { text: "Trailing" }]}
-        />
+        <h2>Icon</h2>
+        <div css={Css.df.gap3.$}>
+          <ButtonGroup
+            buttons={[
+              { icon: "chevronLeft", tooltip: "Previous" },
+              { icon: "chevronRight", tooltip: "Next" },
+            ]}
+          />
+          <ButtonGroup
+            buttons={[
+              { icon: "chevronLeft", tooltip: "Previous" },
+              { icon: "plus", tooltip: "Add" },
+              { icon: "chevronRight", tooltip: "Next" },
+            ]}
+          />
+        </div>
       </div>
       <div>
         <h2>Disabled</h2>
-        <ButtonGroup size="xs" disabled buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
-        <ButtonGroup disabled buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
-        <ButtonGroup size="md" disabled buttons={[{ text: "Leading" }, { text: "Middle" }, { text: "Trailing" }]} />
+        <div css={Css.df.gap3.$}>
+          <ButtonGroup disabled buttons={[{ text: "Plans" }, { text: "Options" }, { text: "Elevations" }]} />
+          <ButtonGroup
+            buttons={[
+              { text: "Plans", active: true },
+              { text: "Options", disabled: "Disabled Reason" },
+              { text: "Elevations" },
+            ]}
+          />
+        </div>
       </div>
       <div>
         <h2>With Tooltips</h2>
@@ -55,6 +64,12 @@ export function ButtonGroups() {
             { text: "Trailing", disabled: "Disabled Reason" },
           ]}
         />
+      </div>
+      <div>
+        <h2>Full Width</h2>
+        <div css={Css.wPx(400).$}>
+          <ButtonGroup fullWidth buttons={[{ text: "Cost", active: true }, { text: "Price" }]} />
+        </div>
       </div>
     </div>
   );

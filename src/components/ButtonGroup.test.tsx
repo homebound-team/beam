@@ -1,7 +1,7 @@
 import { ButtonGroup, type ButtonGroupButton } from "src/components/ButtonGroup";
 import { click, render } from "src/utils/rtl";
 import { vi } from "vitest";
-import { Css, Palette } from "..";
+import { Css, Palette, Tokens } from "..";
 
 describe("ButtonGroup", () => {
   it("renders and fires callbacks", async () => {
@@ -58,6 +58,14 @@ describe("ButtonGroup", () => {
     expect(r.buttonGroup_first_tooltip).toHaveAttribute("title", "Tooltip");
     expect(r.buttonGroup_last).not.toBeDisabled();
     expect(r.buttonGroup_last_tooltip).toHaveAttribute("title", "Other Tooltip");
+  });
+
+  it("styles the active button as selected", async () => {
+    // Given a group with the first button active
+    const r = await render(<ButtonGroup buttons={[{ text: "Cost", active: true }, { text: "Price" }]} />);
+    // Then only the active button uses the selected fill
+    expect(r.buttonGroup_cost).toHaveStyle({ backgroundColor: `var(${Tokens.SurfaceActive})` });
+    expect(r.buttonGroup_price).toHaveStyle({ backgroundColor: `var(${Tokens.Surface})` });
   });
 
   it("can render jsx", async () => {
