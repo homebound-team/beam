@@ -89,6 +89,73 @@ Ordered left to right:
 4. **View selector**: List / Card, with <code>withCardView</code>.
 5. **Actions**: <code>actions</code>, typically the overflow menu.
 
+### Bulk action
+
+Pass <code>bulkCta</code> to `GridTableLayout` to show the [Bulk Action Button](?path=/docs/components-bulk-action-button--docs) once rows are selected. It counts the selected rows, and Clear deselects all of them.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>label</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <code>"Edit"</code>
+      </td>
+      <td>The verb, e.g. "Assign" renders "Assign 3 Rows".</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onClick</code>
+      </td>
+      <td>
+        <code>{"(selectedRows: GridDataRow<R>[]) => void"}</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>
+        Called with every selected row, e.g. to open a bulk edit side panel. Group rows are included when selected, so
+        filter to the kinds you act on.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>onBeforeClear</code>
+      </td>
+      <td>
+        <code>{"() => boolean | void | Promise<boolean | void>"}</code>
+      </td>
+      <td></td>
+      <td>
+        Runs before Clear deselects anything. Return or resolve <code>false</code> to keep the selection, e.g. when the
+        user cancels a confirmation. Any other result, including no return value, clears.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>onClear</code>
+      </td>
+      <td>
+        <code>{"() => void"}</code>
+      </td>
+      <td></td>
+      <td>Called after Clear deselects every row, for cleanup such as closing a side panel.</td>
+    </tr>
+  </tbody>
+</table>
+
 ## Responsive display
 
 When there is less than **40px** between the left and right sides, the controls switch to their mobile format, even on a desktop-width screen. They always use it below the `sm` breakpoint. With nothing on the right side, there's no gap to measure, so only the `sm` breakpoint applies.

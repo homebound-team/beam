@@ -804,12 +804,16 @@ describe("GridTableLayout", () => {
       expect(r.query.selectionSummaryPill).toBeNull();
     });
 
-    it("keeps the selection when onBeforeClear returns false", async () => {
+    it.each([
+      ["false", () => false],
+      ["a promise of false", async () => false],
+    ])("keeps the selection when onBeforeClear returns %s", async (_, onBeforeClearResult) => {
       // Given two selected rows, and an onBeforeClear that declines
+      const onBeforeClear = vi.fn(onBeforeClearResult);
       const onClear = vi.fn();
       const r = await render(
         <GridTableLayoutComponent
-          bulkCta={{ onClick: noop, onBeforeClear: () => false, onClear }}
+          bulkCta={{ onClick: noop, onBeforeClear, onClear }}
           tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
         />,
         withRouter(),
@@ -820,10 +824,39 @@ describe("GridTableLayout", () => {
       // When clicking Clear
       await clickAndWait(r.bulkActionButton_clear);
 
-      // Then the rows stay selected and the consumer isn't told
+      // Then it asks once, the rows stay selected, and onClear isn't called
+      expect(onBeforeClear).toHaveBeenCalledOnce();
       expect(r.select_1).toBeChecked();
       expect(r.select_2).toBeChecked();
       expect(onClear).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ["true", () => true],
+      ["nothing", () => {}],
+      ["a promise of nothing", async () => {}],
+    ])("clears when onBeforeClear returns %s, then calls onClear", async (_, onBeforeClearResult) => {
+      // Given two selected rows, and an onBeforeClear that doesn't decline
+      const onBeforeClear = vi.fn(onBeforeClearResult);
+      const onClear = vi.fn();
+      const r = await render(
+        <GridTableLayoutComponent
+          bulkCta={{ onClick: noop, onBeforeClear, onClear }}
+          tableProps={{ columns: [selectColumn<Row>(), ...getColumns()], rows: [simpleHeader, ...getRows()] }}
+        />,
+        withRouter(),
+      );
+      click(r.select_1);
+      click(r.select_2);
+
+      // When clicking Clear
+      await clickAndWait(r.bulkActionButton_clear);
+
+      // Then it asks once, the rows are deselected, and onClear is called
+      expect(onBeforeClear).toHaveBeenCalledOnce();
+      expect(r.select_1).not.toBeChecked();
+      expect(r.select_2).not.toBeChecked();
+      expect(onClear).toHaveBeenCalledOnce();
     });
   });
 

@@ -45,8 +45,8 @@ export type GridTableBulkCta<R extends Kinded> = {
   onClick: (selectedRows: GridDataRow<R>[]) => void;
   /** Called after Clear deselects every row, for consumer-side cleanup (e.g. closing a side panel). */
   onClear?: () => void;
-  /** Runs before Clear deselects anything; return (or resolve) `false` to keep the selection. */
-  onBeforeClear?: () => boolean | Promise<boolean>;
+  /** Runs before Clear deselects anything; return (or resolve) `false` to keep the selection. Anything else clears. */
+  onBeforeClear?: () => boolean | void | Promise<boolean | void>;
 };
 
 type GridTableLayoutActionsProps<
@@ -339,7 +339,8 @@ function BulkActionCta<R extends Kinded>(props: {
       count={count}
       onClick={() => onClick(api.getSelectedRows())}
       onClear={async () => {
-        if (onBeforeClear && !(await onBeforeClear())) return;
+        // Only an explicit `false` cancels, so a handler with no return value still clears
+        if (onBeforeClear && (await onBeforeClear()) === false) return;
         api.clearSelections();
         onClear?.();
       }}
