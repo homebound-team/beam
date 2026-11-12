@@ -8,7 +8,6 @@ import { filterTestIdPrefix } from "src/components/Filters/utils";
 import { type HeaderAction, HeaderActions } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
 import { IconButton } from "src/components/IconButton";
-import { closeRightPaneThen } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import { useModalContext } from "src/components/Modal/ModalContext";
 import { SelectionSummaryPill } from "src/components/Pills/SelectionSummaryPill/SelectionSummaryPill";
 import { EditColumnsButton } from "src/components/Table/components/EditColumnsButton";
@@ -46,6 +45,8 @@ export type GridTableBulkCta<R extends Kinded> = {
   onClick: (selectedRows: GridDataRow<R>[]) => void;
   /** Called after Clear deselects every row, for consumer-side cleanup (e.g. closing a side panel). */
   onClear?: () => void;
+  /** Runs before Clear deselects anything; return (or resolve) `false` to keep the selection. */
+  onBeforeClear?: () => boolean | Promise<boolean>;
 };
 
 type GridTableLayoutActionsProps<
@@ -329,7 +330,7 @@ function BulkActionCta<R extends Kinded>(props: {
   compact: boolean;
 }) {
   const { api, bulkCta, compact } = props;
-  const { label, onClick, onClear } = bulkCta;
+  const { label, onClick, onBeforeClear, onClear } = bulkCta;
   const count = useComputed(() => api.getSelectedLeafRowCount(), [api]);
   if (count === 0) return null;
   return (
@@ -337,13 +338,11 @@ function BulkActionCta<R extends Kinded>(props: {
       label={label}
       count={count}
       onClick={() => onClick(api.getSelectedRows())}
-      // Clear closes an open right pane too, asking first if its panel has unsaved edits
-      onClear={() =>
-        closeRightPaneThen(() => {
-          api.clearSelections();
-          onClear?.();
-        })
-      }
+      onClear={async () => {
+        if (onBeforeClear && !(await onBeforeClear())) return;
+        api.clearSelections();
+        onClear?.();
+      }}
       compact={compact}
     />
   );

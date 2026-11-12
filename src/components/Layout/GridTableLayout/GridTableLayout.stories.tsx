@@ -253,7 +253,11 @@ export function WithBulkCta() {
             const count = selected.filter((row) => !row.children?.length).length;
             openRightPane({ content: <AssignRowsPanel count={count} /> });
           },
-          onClear: action("onClear"),
+          // The pane edits the selection, so close it along with the selection
+          onClear: () => {
+            action("onClear")();
+            closeRightPane();
+          },
         }}
         tableProps={{ columns, rows }}
       />
