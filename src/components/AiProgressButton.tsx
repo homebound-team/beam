@@ -18,7 +18,10 @@ export type AiProgressButtonProps = {
   size?: ButtonSize;
 } & BeamButtonProps;
 
-/** An AI button that rests as its star and slides the label out on hover or keyboard focus. */
+/**
+ * An AI button that rests as its star and slides the label out on hover or keyboard focus.
+ * Below desktop, where there's no hover, the label stays out.
+ */
 export function AiProgressButton(props: AiProgressButtonProps) {
   const { label, inProgress = false, size = "md", onClick, disabled, tooltip, openInNew } = props;
   const asLink = typeof onClick === "string";
@@ -57,7 +60,8 @@ export function AiProgressButton(props: AiProgressButtonProps) {
             .o0.add(
               "transition",
               "grid-template-columns 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)",
-            ).$,
+            )
+            .ifSmOrMd.gtc("1fr").o100.$,
           ...(open && Css.gtc("1fr").o100.$),
         }}
       >

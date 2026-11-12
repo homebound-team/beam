@@ -3,7 +3,7 @@ import { AiProgressButton, type AiProgressButtonProps } from "src/components/AiP
 import { Button } from "src/components/Button";
 import { ButtonMenu } from "src/components/ButtonMenu";
 import { Css } from "src/Css";
-import { LabeledExamples, withRouter } from "src/utils/sb";
+import { LabeledExamples, viewportModes, withRouter } from "src/utils/sb";
 import { action } from "storybook/actions";
 import { userEvent, waitFor, within } from "storybook/test";
 
@@ -27,10 +27,11 @@ export function Default() {
           ]}
         />
       </div>
-      <span css={Css.xs.gray600.$}>Hover or tab to it</span>
+      <span css={Css.xs.gray600.$}>On desktop, hover or tab to it</span>
     </div>
   );
 }
+Default.parameters = { chromatic: { modes: viewportModes("desktop", "tablet") } };
 
 export function Hovered() {
   return <Sample />;
