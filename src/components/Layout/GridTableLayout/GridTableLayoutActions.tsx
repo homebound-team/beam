@@ -246,7 +246,7 @@ function GridTableLayoutActionsComponent<
           <div ref={rightRef} css={Css.df.fs0.aic.gapPx(12).$}>
             {selectionSummary && api && <SelectionSummaryAction api={api} numberOnly={sm} />}
             {!!viewModeToggle?.length && !viewModeToggleInColumnsMenu && (
-              <ButtonGroup size="md" buttons={viewModeToggle} {...testId.viewModeToggle} />
+              <ButtonGroup buttons={viewModeToggle} {...testId.viewModeToggle} />
             )}
             {showEditColumns && columns && api && (
               <EditColumnsButton
