@@ -88,11 +88,11 @@ function CompanionRowImpl(props: CompanionRowProps) {
           // Matches the owning row's pinned fill, so the pair reads as one pinned row
           ...(pinned && style.pinnedRowCss),
           // Companion content is arbitrary — allow wrapping and grow with content.
+          // Flush against the owning row. 16px on the far side separates the pair from the next row.
           ...Css.h("auto")
             .whiteSpace("normal")
-            // Extra space away from the owning row
-            .ptPx(isLeading ? 12 : 8)
-            .pbPx(isLeading ? 8 : 12)
+            .ptPx(isLeading ? 16 : 0)
+            .pbPx(isLeading ? 0 : 16)
             .w(`calc(${columnSizes.join(" + ")}${levelIndent ? ` - ${levelIndent}px` : ""})`).$,
         }}
         {...(as === "table" ? { colSpan } : {})}

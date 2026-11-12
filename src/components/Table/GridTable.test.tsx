@@ -1799,6 +1799,8 @@ describe("GridTable", () => {
       expect(cell(r, 3, 0)).toHaveTextContent("bar");
       // And the companion cell spans all columns
       expect(cell(r, 2, 0).style.getPropertyValue("--width")).toContain("+");
+      // And the companion is flush under the owning row, with 16px before the next row
+      expect(cell(r, 2, 0)).toHaveStyle({ paddingTop: "0px", paddingBottom: "16px" });
     });
 
     it("transfers the row separator from parent to a trailing companion", async () => {
@@ -1938,6 +1940,8 @@ describe("GridTable", () => {
       expect(r.leadingCompanion).toHaveTextContent("Above");
       expect(cell(r, 2, 0)).toHaveTextContent("foo");
       expect(cell(r, 3, 0)).toHaveTextContent("bar");
+      // And the companion is flush against the owning row, with 16px above it
+      expect(cell(r, 1, 0)).toHaveStyle({ paddingTop: "16px", paddingBottom: "0px" });
     });
 
     it("keeps the row separator on the parent when the companion is leading", async () => {
