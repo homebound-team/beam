@@ -1,8 +1,10 @@
 import type { Meta } from "@storybook/react-vite";
 import { Css } from "src/Css";
 import { ButtonGroup } from "src/index";
+import { LabeledExamples } from "src/utils/sb";
 
 export default {
+  title: "Components/Button Group",
   component: ButtonGroup,
   parameters: {
     design: {
@@ -12,65 +14,81 @@ export default {
   },
 } as Meta;
 
-export function ButtonGroups() {
+export function Examples() {
   return (
-    <div css={Css.df.fdc.gap2.$}>
-      <div>
-        <h2>Text</h2>
-        <div css={Css.df.gap3.$}>
-          <ButtonGroup buttons={[{ text: "Cost", active: true }, { text: "Price" }]} />
-          <ButtonGroup buttons={[{ text: "Plans", active: true }, { text: "Options" }, { text: "Elevations" }]} />
-          <ButtonGroup buttons={[{ text: "Plans" }, { text: "Options", active: true }, { text: "Elevations" }]} />
-          <ButtonGroup buttons={[{ text: "Plans" }, { text: "Options" }, { text: "Elevations", active: true }]} />
-        </div>
-      </div>
-      <div>
-        <h2>Icon</h2>
-        <div css={Css.df.gap3.$}>
-          <ButtonGroup
-            buttons={[
-              { icon: "chevronLeft", tooltip: "Previous" },
-              { icon: "chevronRight", tooltip: "Next" },
-            ]}
-          />
-          <ButtonGroup
-            buttons={[
-              { icon: "chevronLeft", tooltip: "Previous" },
-              { icon: "plus", tooltip: "Add" },
-              { icon: "chevronRight", tooltip: "Next" },
-            ]}
-          />
-        </div>
-      </div>
-      <div>
-        <h2>Disabled</h2>
-        <div css={Css.df.gap3.$}>
-          <ButtonGroup disabled buttons={[{ text: "Plans" }, { text: "Options" }, { text: "Elevations" }]} />
-          <ButtonGroup
-            buttons={[
-              { text: "Plans", active: true },
-              { text: "Options", disabled: "Disabled Reason" },
-              { text: "Elevations" },
-            ]}
-          />
-        </div>
-      </div>
-      <div>
-        <h2>With Tooltips</h2>
-        <ButtonGroup
-          buttons={[
-            { text: "Leading", tooltip: "Active Tooltip" },
-            { text: "Middle" },
-            { text: "Trailing", disabled: "Disabled Reason" },
-          ]}
-        />
-      </div>
-      <div>
-        <h2>Full Width</h2>
-        <div css={Css.wPx(400).$}>
-          <ButtonGroup fullWidth buttons={[{ text: "Cost", active: true }, { text: "Price" }]} />
-        </div>
-      </div>
-    </div>
+    <LabeledExamples
+      labelWidth={120}
+      examples={[
+        { label: "Text · 2", children: <ButtonGroup buttons={[{ text: "Cost", active: true }, { text: "Price" }]} /> },
+        {
+          label: "Text · 3",
+          children: (
+            <>
+              <ButtonGroup buttons={[{ text: "Plans", active: true }, { text: "Options" }, { text: "Elevations" }]} />
+              <ButtonGroup buttons={[{ text: "Plans" }, { text: "Options", active: true }, { text: "Elevations" }]} />
+              <ButtonGroup buttons={[{ text: "Plans" }, { text: "Options" }, { text: "Elevations", active: true }]} />
+            </>
+          ),
+        },
+        {
+          label: "Icon · 2",
+          children: (
+            <ButtonGroup
+              buttons={[
+                { icon: "chevronLeft", tooltip: "Previous" },
+                { icon: "chevronRight", tooltip: "Next" },
+              ]}
+            />
+          ),
+        },
+        {
+          label: "Icon · 3",
+          children: (
+            <ButtonGroup
+              buttons={[
+                { icon: "chevronLeft", tooltip: "Previous" },
+                { icon: "plus", tooltip: "Add" },
+                { icon: "chevronRight", tooltip: "Next" },
+              ]}
+            />
+          ),
+        },
+        {
+          label: "Disabled",
+          children: <ButtonGroup disabled buttons={[{ text: "Plans" }, { text: "Options" }, { text: "Elevations" }]} />,
+        },
+        {
+          label: "Disabled button",
+          children: (
+            <ButtonGroup
+              buttons={[
+                { text: "Plans", active: true },
+                { text: "Options", disabled: "Disabled Reason" },
+                { text: "Elevations" },
+              ]}
+            />
+          ),
+        },
+        {
+          label: "Tooltips",
+          children: (
+            <ButtonGroup
+              buttons={[
+                { text: "Cost", tooltip: "Before markup", active: true },
+                { text: "Price", tooltip: "After markup" },
+              ]}
+            />
+          ),
+        },
+        {
+          label: "Full width",
+          children: (
+            <div css={Css.wPx(400).$}>
+              <ButtonGroup fullWidth buttons={[{ text: "Cost", active: true }, { text: "Price" }]} />
+            </div>
+          ),
+        },
+      ]}
+    />
   );
 }
