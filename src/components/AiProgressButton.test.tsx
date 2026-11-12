@@ -11,6 +11,17 @@ describe("AiProgressButton", () => {
     expect(r.viewImportProgress).toHaveTextContent("View import Progress");
   });
 
+  it("spins the star only while in progress", async () => {
+    // Given a button whose work is in progress
+    const r = await render(<AiProgressButton label="View import Progress" inProgress onClick={noop} />);
+    // Then the star spins
+    expect(getComputedStyle(r.viewImportProgress_star).animation).toBe("spin 3s linear infinite");
+    // When the work finishes
+    r.rerender(<AiProgressButton label="View import Progress" onClick={noop} />);
+    // Then the star stops
+    expect(getComputedStyle(r.viewImportProgress_star).animation).toBe("");
+  });
+
   it("fires onClick", async () => {
     // Given a button
     const onClick = vi.fn();

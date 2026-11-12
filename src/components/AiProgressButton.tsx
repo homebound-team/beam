@@ -1,4 +1,4 @@
-import { type RefObject, useRef } from "react";
+import { useRef } from "react";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 import type { ButtonSize } from "src/components/Button";
 import { Icon } from "src/components/Icon";
@@ -20,7 +20,7 @@ export type AiProgressButtonProps = {
 
 /**
  * An AI button that rests as its star and slides the label out on hover or keyboard focus.
- * Below desktop, where there's no hover, the label stays out.
+ * On touch screens and below desktop, the label always shows.
  */
 export function AiProgressButton(props: AiProgressButtonProps) {
   const { label, inProgress = false, size = "md", onClick, disabled, tooltip, openInNew } = props;
@@ -30,11 +30,11 @@ export function AiProgressButton(props: AiProgressButtonProps) {
   const tid = useTestIds(props, label);
   const { buttonProps, isPressed } = useButton(
     {
-      onPress: typeof onClick === "string" ? noop : onClick,
+      onPress: asLink ? noop : onClick,
       isDisabled,
       elementType: asLink ? "a" : "button",
     },
-    ref as RefObject<HTMLElement>,
+    ref,
   );
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { focusProps, isFocusVisible } = useFocusRing();
@@ -43,13 +43,8 @@ export function AiProgressButton(props: AiProgressButtonProps) {
 
   const content = (
     <>
-      <span css={Css.df.aic.jcc.fs0.sqPx(height).$}>
-        {/* aiStar hardcodes its gradient fill, which vanishes on the AI fill; flatten it to white. */}
-        <span
-          css={{ ...Css.df.filter("brightness(0) invert(1)").$, ...(inProgress && Css.spin("3s linear infinite").$) }}
-        >
-          <Icon icon="aiStar" />
-        </span>
+      <span css={Css.df.aic.jcc.fs0.sqPx(height).if(inProgress).spin("3s linear infinite").$} {...tid.star}>
+        <Icon icon="aiStarMono" />
       </span>
       {/* Animating `0fr` → `1fr` grows the label to its own width, which `width: auto` can't transition to. */}
       <span
@@ -61,7 +56,9 @@ export function AiProgressButton(props: AiProgressButtonProps) {
               "transition",
               "grid-template-columns 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)",
             )
-            .ifSmOrMd.gtc("1fr").o100.$,
+            // `ifSmOrMd`, plus touch screens wider than it (i.e. an iPad in landscape).
+            .if("@media screen and (max-width: 1024px), (hover: none)")
+            .gtc("1fr").o100.$,
           ...(open && Css.gtc("1fr").o100.$),
         }}
       >
@@ -73,7 +70,7 @@ export function AiProgressButton(props: AiProgressButtonProps) {
   );
 
   const attrs = {
-    ref: ref as any,
+    ref,
     ...mergeProps(buttonProps, focusProps, hoverProps),
     className: asLink ? navLink : undefined,
     ...Css.props({
