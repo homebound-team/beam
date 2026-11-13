@@ -33,6 +33,8 @@ export type IconButtonProps = {
   variant?: IconButtonVariant;
   /** Indicates that the button is active/selected */
   active?: boolean;
+  /** `content` scales the icon. `button` scales the whole control. */
+  pressScale?: "content" | "button";
   /** Denotes if this button is used to download a resource. Uses the anchor tag with the `download` attribute */
   download?: boolean;
   /** Provides label for screen readers - Will become a required soon */
@@ -69,6 +71,7 @@ export function IconButton(props: IconButtonProps) {
     menuTriggerProps,
     openInNew,
     active = false,
+    pressScale = "content",
     compact = false,
     variant = "default",
     download = false,
@@ -108,17 +111,16 @@ export function IconButton(props: IconButtonProps) {
   const isCircle = variant === "circle";
   const isOutline = variant === "outline";
   const styles = useMemo(() => {
-    const { base, hover, focus, pressed } = variantStyles(variant, { compact });
+    const { base, hover, focus } = variantStyles(variant, { compact });
     return {
       ...iconButtonStylesReset,
       ...base,
       ...(isHovered && hover),
       ...((isFocusVisible || forceFocusStyles) && focus),
-      ...(isPressing && pressed),
       ...(isDisabled && iconButtonStylesDisabled),
       ...(bgColor && Css.bgColor(bgColor).$),
     };
-  }, [isHovered, isFocusVisible, isDisabled, compact, variant, isPressing, bgColor, forceFocusStyles]);
+  }, [isHovered, isFocusVisible, isDisabled, compact, variant, bgColor, forceFocusStyles]);
   const iconColor = isCircle ? circleIconColor : defaultIconColor;
 
   const buttonAttrs = {
@@ -128,27 +130,31 @@ export function IconButton(props: IconButtonProps) {
     ...hoverProps,
     className: typeof onPress === "string" ? navLink : undefined,
     ref: ref as any,
-    ...Css.props(styles),
+    // Sticky pressed state. The momentary press is `:active` in `iconButtonIconCss`.
+    ...(active || __storyState?.pressed ? { "data-pressed": "" } : {}),
+    ...Css.props({ ...styles, ...(pressScale === "button" ? iconButtonSelfPressCss : iconButtonPressMarker) }),
     "aria-label": label,
   };
   const buttonContent = (
-    <Icon
-      icon={icon}
-      color={
-        color ||
-        (isDisabled
-          ? Tokens.OnSurfaceDisabled
-          : isOutline && isPressing
-            ? Tokens.OnSurfaceRaisedPressed
-            : isOutline && isHovered
-              ? Tokens.OnSurfaceRaisedHover
-              : isCircle && (isHovered || active || isFocusVisible)
-                ? defaultIconColor
-                : iconColor)
-      }
-      bgColor={bgColor}
-      inc={compact ? 2 : isCircle ? 2.5 : inc}
-    />
+    <span {...testIds.icon} css={pressScale === "button" ? iconButtonIconLayoutCss : iconButtonIconCss}>
+      <Icon
+        icon={icon}
+        color={
+          color ||
+          (isDisabled
+            ? Tokens.OnSurfaceDisabled
+            : isOutline && isPressing
+              ? Tokens.OnSurfaceRaisedPressed
+              : isOutline && isHovered
+                ? Tokens.OnSurfaceRaisedHover
+                : isCircle && (isHovered || active || isFocusVisible)
+                  ? defaultIconColor
+                  : iconColor)
+        }
+        bgColor={bgColor}
+        inc={compact ? 2 : isCircle ? 2.5 : inc}
+      />
+    </span>
   );
 
   // If we're disabled b/c of a non-boolean ReactNode, or the caller specified tooltip text, then show it in a tooltip.
@@ -160,6 +166,26 @@ export function IconButton(props: IconButtonProps) {
     children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });
 }
+
+// Press scales only the icon. `:active` is the pointer/keyboard press; `[data-pressed]` is the sticky state.
+// 150ms + standard easing match motion tokens `duration.fast` and `easing.standard`.
+// Truss names the marker class from this binding. The value is unused after the build-time transform.
+const iconButtonPress: unique symbol = Symbol.for("iconButtonPress");
+const iconButtonPressMarker = Css.markerOf(iconButtonPress).$;
+const iconButtonIconLayoutCss = Css.dif.aic.jcc.$;
+const iconButtonIconCss = Css.dif.aic.jcc
+  .scale(1)
+  .add("transition", "scale 150ms cubic-bezier(0.4, 0, 0.2, 1)")
+  .when(iconButtonPress, "ancestor", ":active:not(:disabled):not([aria-disabled=true])")
+  .scale(0.9)
+  .end.when(iconButtonPress, "ancestor", "[data-pressed]:not(:disabled):not([aria-disabled=true])")
+  .scale(0.9).$;
+const iconButtonSelfPressCss = Css.scale(1)
+  .add("transition", "scale 150ms cubic-bezier(0.4, 0, 0.2, 1)")
+  .when(":active:not(:disabled):not([aria-disabled=true])")
+  .scale(0.9)
+  .end.when("[data-pressed]:not(:disabled):not([aria-disabled=true])")
+  .scale(0.9).$;
 
 const defaultIconColor = Tokens.OnSurface;
 const circleIconColor = Tokens.OnSurfaceMuted;
@@ -175,7 +201,6 @@ function variantStyles(variant: IconButtonVariant, { compact }: { compact: boole
         .ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
       hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
       focus: Css.bgColor(Tokens.SurfaceRaisedHover).bc(Tokens.FieldBorderFocus).$,
-      pressed: Css.bgColor(Tokens.NeutralFillPressed).bc(Tokens.NeutralFillPressed).$,
     };
   }
   if (variant === "outline") {
@@ -183,13 +208,11 @@ function variantStyles(variant: IconButtonVariant, { compact }: { compact: boole
       base: Css.br8.wPx(42).hPx(40).bcGray300.ba.bw1.df.jcc.aic.bgColor(Tokens.SurfaceRaised).$,
       hover: Css.bgColor(Tokens.SurfaceRaisedHover).$,
       focus: Css.bshFocus.$,
-      pressed: Css.bgColor(Tokens.SurfaceRaisedPressed).$,
     };
   }
   return {
     base: compact ? Css.sqPx(18).br4.bw1.$ : Css.sqPx(28).br8.bw2.$,
     hover: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
     focus: Css.bc(Tokens.FieldBorderFocus).$,
-    pressed: Css.bgColor(Tokens.NeutralFillHoverStrong).$,
   };
 }

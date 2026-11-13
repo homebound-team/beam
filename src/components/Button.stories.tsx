@@ -212,3 +212,30 @@ export function ConstrastAsyncButton() {
 }
 
 ConstrastAsyncButton.globals = { backgrounds: { value: "dark" } };
+
+/** Two rows of the same three buttons: label scale, then whole-button scale. */
+export function PressScale() {
+  return (
+    <div css={Css.df.fdc.gap3.p3.$}>
+      <div>
+        <h2 css={Css.sm.mb1.$}>Label scale only</h2>
+        <ButtonPressScaleRow />
+      </div>
+      <div>
+        <h2 css={Css.sm.mb1.$}>Whole button scale</h2>
+        <ButtonPressScaleRow pressScale="button" />
+      </div>
+    </div>
+  );
+}
+
+function ButtonPressScaleRow(props: { pressScale?: "content" | "button" }) {
+  const { pressScale } = props;
+  return (
+    <div css={Css.df.aic.gap1.$}>
+      <Button variant="tertiary" label="Cancel" pressScale={pressScale} onClick={action("Clicked")} />
+      <Button variant="primary" label="Save" pressScale={pressScale} onClick={action("Clicked")} />
+      <Button variant="danger" label="Delete" pressScale={pressScale} onClick={action("Clicked")} />
+    </div>
+  );
+}

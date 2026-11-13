@@ -30,12 +30,14 @@ export type ButtonProps = {
 
   /** Additional text to further customize button during an async request is in progress. */
   labelInFlight?: string;
-  /** Shows pressed/active styles (useful when a menu is open) */
+  /** Keeps the pressed text scale applied (useful when a menu is open). */
   active?: boolean;
   /** Tint fill + border. Only applied when `variant` is `secondary`; ignored otherwise. */
   colorScheme?: ButtonColorScheme;
   /** Fills the container's width and centers the label. */
   fullWidth?: boolean;
+  /** `content` scales the label. `button` scales the whole control. */
+  pressScale?: "content" | "button";
 } & BeamButtonProps &
   BeamFocusableProps;
 
@@ -53,6 +55,7 @@ export function Button(props: ButtonProps) {
     labelInFlight,
     colorScheme,
     fullWidth = false,
+    pressScale = "content",
     ...otherProps
   } = props;
   const asLink = typeof onPress === "string";
@@ -70,7 +73,7 @@ export function Button(props: ButtonProps) {
   } = ariaProps;
   const ref = useGetRef(buttonRef);
   const tid = useTestIds(props, labelOr(ariaProps, "button"));
-  const { buttonProps, isPressed } = useButton(
+  const { buttonProps } = useButton(
     {
       ...ariaProps,
       onPress: asLink
@@ -89,19 +92,20 @@ export function Button(props: ButtonProps) {
   );
   const { isFocusVisible, focusProps } = useFocusRing(ariaProps);
   const { hoverProps, isHovered } = useHover(ariaProps);
-  const { baseStyles, hoverStyles, disabledStyles, pressedStyles, focusStyles } = useMemo(
+  const { baseStyles, hoverStyles, disabledStyles, focusStyles } = useMemo(
     () => getButtonStyles(variant, size, colorScheme),
     [variant, size, colorScheme],
   );
 
   const buttonContent = (
-    <>
+    // Scales as one cluster so the icon stays aligned with the label. The button box does not scale.
+    <span {...tid.content} css={pressScale === "button" ? buttonContentCss : buttonLabelCss}>
       {icon && <Icon xss={iconStyles[size]} icon={icon} />}
       {labelInFlight && asyncInProgress ? labelInFlight : label}
       {(endAdornment || asyncInProgress) && (
         <span css={Css.ml1.$}>{asyncInProgress ? <Loader size={"xs"} /> : endAdornment}</span>
       )}
-    </>
+    </span>
   );
 
   const buttonAttrs = {
@@ -110,13 +114,15 @@ export function Button(props: ButtonProps) {
     ...focusProps,
     ...hoverProps,
     className: asLink ? navLink : undefined,
+    // Sticky pressed state (open menu). The momentary press is `:active` in `buttonLabelCss`.
+    ...(active ? { "data-pressed": "" } : {}),
     ...Css.props({
       ...Css.buttonBase.tt("inherit").if(fullWidth).w100.jcc.$,
       ...baseStyles,
-      ...(isHovered && !isPressed && !active ? hoverStyles : {}),
-      ...(isPressed || active ? pressedStyles : {}),
+      ...(isHovered ? hoverStyles : {}),
       ...(isDisabled || asyncInProgress ? { ...disabledStyles, ...Css.cursorNotAllowed.$ } : {}),
       ...(isFocusVisible || forceFocusStyles ? focusStyles : {}),
+      ...(pressScale === "button" ? buttonSelfPressCss : buttonPressMarker),
     }),
     ...tid,
   };
@@ -129,6 +135,26 @@ export function Button(props: ButtonProps) {
     children: getButtonOrLink(buttonContent, onPress, buttonAttrs, openInNew, download),
   });
 }
+
+// Press scales the label. `:active` is the pointer/keyboard press; `[data-pressed]` is the sticky `active` prop.
+// 150ms + standard easing match motion tokens `duration.fast` and `easing.standard`.
+// Truss names the marker class from this binding. The value is unused after the build-time transform.
+const buttonPress: unique symbol = Symbol.for("buttonPress");
+const buttonPressMarker = Css.markerOf(buttonPress).$;
+const buttonContentCss = Css.dif.aic.$;
+const buttonLabelCss = Css.dif.aic
+  .scale(1)
+  .add("transition", "scale 150ms cubic-bezier(0.4, 0, 0.2, 1)")
+  .when(buttonPress, "ancestor", ":active:not(:disabled):not([aria-disabled=true])")
+  .scale(0.95)
+  .end.when(buttonPress, "ancestor", "[data-pressed]:not(:disabled):not([aria-disabled=true])")
+  .scale(0.95).$;
+const buttonSelfPressCss = Css.scale(1)
+  .add("transition", "scale 150ms cubic-bezier(0.4, 0, 0.2, 1)")
+  .when(":active:not(:disabled):not([aria-disabled=true])")
+  .scale(0.95)
+  .end.when("[data-pressed]:not(:disabled):not([aria-disabled=true])")
+  .scale(0.95).$;
 
 function getButtonStyles(variant: ButtonVariant, size: ButtonSize, colorScheme?: ButtonColorScheme) {
   const styles = variant === "secondary" && colorScheme ? colorSchemeStyles[colorScheme] : variantStyles[variant];
@@ -148,16 +174,14 @@ const variantStyles: Record<
     baseStyles: Properties;
     hoverStyles: Properties;
     disabledStyles: Properties;
-    pressedStyles: Properties;
     focusStyles: Properties;
   }
 > = {
   // Design applies their "AI Bold" ramp to the existing primary button. They haven't specified
-  // hover/pressed/disabled, so those ramps are extrapolated from it rather than design-sourced.
+  // hover/disabled, so those ramps are extrapolated from it rather than design-sourced.
   ai: {
     baseStyles: Css.aiBoldBg.color(Tokens.OnPrimary).$,
     hoverStyles: Css.add("backgroundImage", `linear-gradient(270deg, ${Palette.Blue800}, ${Palette.Purple800})`).$,
-    pressedStyles: Css.add("backgroundImage", `linear-gradient(270deg, ${Palette.Blue900}, ${Palette.Purple900})`).$,
     disabledStyles: Css.add(
       "backgroundImage",
       `linear-gradient(270deg, ${Palette.Blue200}, ${Palette.Purple200})`,
@@ -168,7 +192,6 @@ const variantStyles: Record<
   primary: {
     baseStyles: Css.bgColor(Tokens.Primary).color(Tokens.OnPrimary).$,
     hoverStyles: Css.bgColor(Tokens.PrimaryHover).$,
-    pressedStyles: Css.bgColor(Tokens.PrimaryPressed).$,
     disabledStyles: Css.bgColor(Tokens.ButtonPrimaryDisabledBg).color(Tokens.ButtonPrimaryDisabledFg).$,
     focusStyles: Css.bshFocus.$,
   },
@@ -176,7 +199,6 @@ const variantStyles: Record<
   secondary: {
     baseStyles: Css.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).bw1.ba.color(Tokens.ButtonSecondaryFg).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralFillPressed).$,
     disabledStyles: Css.bgColor(Tokens.Surface).color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
@@ -184,7 +206,6 @@ const variantStyles: Record<
   secondaryBlack: {
     baseStyles: Css.bgColor(Tokens.Surface).bc(Tokens.FieldBorderDefault).bw1.ba.color(Tokens.OnSurface).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.OnSurface).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
     focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Tokens.FocusRingInset}, 0px 0px 0px 4px ${Tokens.FocusRingMuted}`).$,
   },
@@ -192,7 +213,6 @@ const variantStyles: Record<
   tertiary: {
     baseStyles: Css.bgTransparent.color(Tokens.ButtonTertiaryFg).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.ButtonTertiaryFgPressed).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
     focusStyles: Css.bshFocus.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
   },
@@ -200,7 +220,6 @@ const variantStyles: Record<
   tertiaryDanger: {
     baseStyles: Css.bgTransparent.color(Tokens.Danger).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.DangerPressed).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
     focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Tokens.FocusRingInset}, 0px 0px 0px 4px ${Tokens.Danger}`).$,
   },
@@ -209,7 +228,6 @@ const variantStyles: Record<
     // Fill ramp has no semantic tokens yet — keep palette; disabled/focus use tokens.
     baseStyles: Css.bgRed600.white.$,
     hoverStyles: Css.bgRed700.$,
-    pressedStyles: Css.bgRed800.$,
     disabledStyles: Css.bgColor(Tokens.ButtonDangerDisabledBg).color(Tokens.ButtonDangerDisabledFg).$,
     focusStyles: Css.bshDanger.$,
   },
@@ -217,7 +235,6 @@ const variantStyles: Record<
   quaternary: {
     baseStyles: Css.bgTransparent.color(Tokens.ButtonGhostFg).$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverStrong).color(Tokens.OnSurface).$,
-    pressedStyles: Css.bgColor(Tokens.NeutralSurfacePressed).color(Tokens.OnSurface).$,
     disabledStyles: Css.color(Tokens.ButtonGhostDisabledFg).$,
     focusStyles: Css.boxShadow(`0px 0px 0px 2px ${Tokens.FocusRingInset}, 0px 0px 0px 4px ${Tokens.FocusRingMuted}`).$,
   },
@@ -226,7 +243,6 @@ const variantStyles: Record<
     // Fill ramp has no semantic tokens yet — keep palette; disabled/focus use tokens.
     baseStyles: Css.bgYellow200.gray900.$,
     hoverStyles: Css.bgYellow300.$,
-    pressedStyles: Css.bgYellow400.$,
     disabledStyles: Css.bgColor(Tokens.ButtonCautionDisabledBg).color(Tokens.ButtonCautionDisabledFg).$,
     focusStyles: Css.bshDanger.$,
   },
@@ -234,14 +250,12 @@ const variantStyles: Record<
   text: {
     baseStyles: Css.color(Tokens.TextLinkDefault).add("fontSize", "inherit").$,
     hoverStyles: Css.color(Tokens.TextLinkHover).tdu.$,
-    pressedStyles: Css.color(Tokens.TextLinkPressed).$,
     disabledStyles: Css.color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
   textSecondary: {
     baseStyles: Css.color(Tokens.ButtonSecondaryFg).add("fontSize", "inherit").$,
     hoverStyles: Css.bgColor(Tokens.NeutralFillHoverSubtle).$,
-    pressedStyles: Css.color(Tokens.ButtonSecondaryFg).$,
     disabledStyles: Css.bgColor(Tokens.Surface).color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
@@ -251,21 +265,18 @@ const colorSchemeStyles: Record<ButtonColorScheme, (typeof variantStyles)[Button
   neutral: {
     baseStyles: Css.bgGray100.bcGray600.bw1.ba.color(Tokens.OnSurface).$,
     hoverStyles: Css.bgGray200.bcGray700.$,
-    pressedStyles: Css.bgGray300.bcGray800.$,
     disabledStyles: Css.bgGray100.bcGray400.color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
   info: {
     baseStyles: Css.bgBlue50.bcBlue600.bw1.ba.color(Tokens.OnSurface).$,
     hoverStyles: Css.bgBlue100.bcBlue700.$,
-    pressedStyles: Css.bgBlue200.bcBlue800.$,
     disabledStyles: Css.bgBlue50.bcBlue300.color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },
   success: {
     baseStyles: Css.bgGreen50.bcGreen600.bw1.ba.color(Tokens.OnSurface).$,
     hoverStyles: Css.bgGreen100.bcGreen700.$,
-    pressedStyles: Css.bgGreen200.bcGreen800.$,
     disabledStyles: Css.bgGreen50.bcGreen300.color(Tokens.TextLinkDisabled).$,
     focusStyles: Css.bshFocus.$,
   },

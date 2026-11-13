@@ -153,6 +153,24 @@ describe("Button", () => {
     expect(r.success).toHaveStyle({ backgroundColor: Palette.Green50, borderColor: Palette.Green600 });
   });
 
+  it("keeps the resting fill when active", async () => {
+    // Given a resting button and one held in the sticky pressed state
+    // When rendered
+    const r = await render(
+      <>
+        <Button label="Rest" onClick={noop} />
+        <Button label="Pressed" active onClick={noop} />
+      </>,
+    );
+
+    // Then the sticky pressed state keeps the resting fill and wraps the label cluster
+    expect(getComputedStyle(r.pressed).backgroundColor).toBe(getComputedStyle(r.rest).backgroundColor);
+    expect(r.pressed).toHaveAttribute("data-pressed", "");
+    expect(r.rest).not.toHaveAttribute("data-pressed");
+    expect(r.pressed_content).toBeInTheDocument();
+    expect(r.rest_content).toBeInTheDocument();
+  });
+
   it("ignores colorScheme when variant is not secondary", async () => {
     // Given a primary button with a colorScheme
     // When rendered

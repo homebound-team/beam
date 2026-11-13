@@ -140,6 +140,40 @@ export function IconButtonLink() {
   );
 }
 
+/** Two rows of the same three icons: icon scale, then whole-button scale. */
+export function PressScale() {
+  return (
+    <div css={Css.df.fdc.gap3.p3.$}>
+      <div>
+        <h2 css={Css.sm.mb1.$}>Icon scales only</h2>
+        <IconPressScaleRow />
+      </div>
+      <div>
+        <h2 css={Css.sm.mb1.$}>Whole button scales</h2>
+        <IconPressScaleRow pressScale="button" />
+      </div>
+    </div>
+  );
+}
+
+function IconPressScaleRow(props: { pressScale?: "content" | "button" }) {
+  const { pressScale } = props;
+  return (
+    <div css={Css.df.aic.gap1.$}>
+      <IconButton icon="x" variant="default" label="Close" preventTooltip pressScale={pressScale} onClick={noop} />
+      <IconButton
+        icon="check"
+        variant="outline"
+        label="Confirm"
+        preventTooltip
+        pressScale={pressScale}
+        onClick={noop}
+      />
+      <IconButton icon="trash" variant="circle" label="Delete" preventTooltip pressScale={pressScale} onClick={noop} />
+    </div>
+  );
+}
+
 /** Drives real `useHover` styles via `__storyState` (ContrastScope is applied by Template). */
 function HoveredIconButton({ storyContrast: _storyContrast, ...iconArgs }: IconButtonStoryArgs) {
   return <IconButton {...iconArgs} __storyState={{ hovered: true }} />;
