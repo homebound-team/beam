@@ -33,7 +33,10 @@ export function Examples() {
         { label: "Compact", children: <Example label="Options" compact initial={["o4"]} /> },
         { label: "Disabled", children: <Example label="Options" disabled initial={["o4", "o8"]} /> },
         { label: "Read only", children: <Example label="Options" readOnly initial={["o4", "o8"]} /> },
-        { label: "AI mode", children: <Example label="Options" initial={["o4"]} proposedValues={["o1", "o8"]} /> },
+        {
+          label: "AI mode",
+          children: <Example label="Options" initial={["o1", "o3", "o4"]} proposedValues={["o1", "o8"]} />,
+        },
         { label: "Error", children: <Example label="Options" errorMsg="Required" /> },
         {
           label: "Helper text",

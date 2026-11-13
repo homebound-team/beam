@@ -93,9 +93,12 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
   const showErrorAndHelper = !compound && !trigger.isDisabled && !trigger.isReadOnly;
   const { proposedValue: proposedText, originalValue: originalText } = trigger.proposalProps;
   const showProposal = proposedText !== undefined;
-  // A mixed or AI-proposed field keeps its text and badge, since its pills would not match what the field counts.
+  // Pills list the selection the badge counts. Mixed also counts dotted values, and read-only AI mode draws the original and the proposal as text, so those two keep the badge.
   const inFieldPills =
-    selectionView === "inField" && !trigger.isMixed && !showProposal && trigger.badgeLabels.length > 0;
+    selectionView === "inField" &&
+    !trigger.isMixed &&
+    !(showProposal && trigger.isReadOnly) &&
+    trigger.badgeLabels.length > 0;
   // Read-only draws both halves inline; editable fields strike the original through below.
   const originalBelow = originalText && !trigger.isReadOnly ? originalText : undefined;
   const fieldChrome = getFieldChrome({

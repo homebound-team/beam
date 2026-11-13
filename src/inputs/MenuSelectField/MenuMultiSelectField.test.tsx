@@ -283,12 +283,26 @@ describe("MenuMultiSelectField", () => {
       expect(r.color).toHaveAttribute("aria-expanded", "true");
     });
 
-    it("keeps the count badge instead of pills when AI proposes values", async () => {
+    it("shows the proposed values as in-field pills", async () => {
       // Given Red on record and Blue and Green proposed, shown in the field
       const r = await render(<MultiHarness initial={["r"]} proposedValues={["b", "g"]} selectionView="inField" />);
-      // Then the field keeps its count badge
+      // Then the pills and the count are the proposal, and Red sits below
+      expect(r.color_pill_0).toHaveTextContent("Blue");
+      expect(r.color_pill_1).toHaveTextContent("Green");
       expect(r.color_count).toHaveTextContent("2");
+      expect(r.color).toHaveAttribute("data-ai-mode", "true");
+      expect(r.color_originalValue).toHaveTextContent("Red");
+    });
+
+    it("draws the original and the proposal as text when read-only", async () => {
+      // Given a read-only field with Red on record and Blue and Green proposed
+      const r = await render(
+        <MultiHarness initial={["r"]} proposedValues={["b", "g"]} selectionView="inField" readOnly />,
+      );
+      // Then both halves are text, and there are no pills
+      expect(r.color_proposedValue).toHaveTextContent("Red Blue, Green");
       expect(r.query.color_pill_0).toBeNull();
+      expect(r.query.color_originalValue).toBeNull();
     });
 
     it("keeps the Mixed label instead of pills when some values are dotted", async () => {
@@ -371,6 +385,14 @@ describe("MenuMultiSelectField", () => {
       expect(r.color).toHaveAttribute("data-ai-mode", "true");
       expect(r.color_originalValue).toHaveTextContent("Red");
     });
+
+    it("strikes only the on-record value the proposal drops", async () => {
+      // Given Red, Blue, and Green on record, and a proposal that keeps Red and Green
+      const r = await render(<MultiHarness initial={["r", "b", "g"]} proposedValues={["r", "g"]} />);
+      // Then Red and Green are the proposal, and only Blue is struck
+      expect(r.color_count).toHaveTextContent("2");
+      expect(r.color_originalValue.textContent).toBe("Blue");
+    });
   });
 
   it("scopes the selection-count tooltip to an explicit field prefix", async () => {
@@ -420,6 +442,7 @@ type HarnessProps = {
   getOptionMenuLabel?: (option: Color) => string;
   placeholder?: string;
   disabled?: boolean;
+  readOnly?: boolean;
 };
 
 function MultiHarness(props: HarnessProps) {
