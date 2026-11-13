@@ -37,8 +37,8 @@ describe("TableCardView", () => {
     expect(r.tableCardView).toHaveStyle({ borderWidth: "2px" });
     // And the track tints so it stays visible on the AI background, while the fill stays blue — a progress
     // bar isn't a proposal, so it never reads as AI
-    expect(r.tableCardView_progressTrack).toHaveStyle({ backgroundColor: Palette.Purple200 });
-    expect(r.tableCardView_progressFill).toHaveStyle({ backgroundColor: Palette.Blue500 });
+    expect(r.tableCardView_progress_track).toHaveStyle({ backgroundColor: Palette.Purple200 });
+    expect(r.tableCardView_progress_fill).toHaveStyle({ backgroundColor: Palette.Blue500 });
   });
 
   it("renders a renamed title and a proposed eyebrow as AI proposals", async () => {
@@ -67,8 +67,8 @@ describe("TableCardView", () => {
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} progress={72} />);
     // Then it keeps the default border, background, text, and progress colors
     expect(r.tableCardView).toHaveStyle({ borderWidth: "1px", backgroundColor: maybeCssVar(Tokens.SurfaceRaised) });
-    expect(r.tableCardView_progressTrack).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.SurfaceSubtle) });
-    expect(r.tableCardView_progressFill).toHaveStyle({ backgroundColor: Palette.Blue500 });
+    expect(r.tableCardView_progress_track).toHaveStyle({ backgroundColor: maybeCssVar(Tokens.SurfaceSubtle) });
+    expect(r.tableCardView_progress_fill).toHaveStyle({ backgroundColor: Palette.Blue500 });
   });
 
   it("renders left eyebrow above title", async () => {
@@ -126,7 +126,7 @@ describe("TableCardView", () => {
     // When rendered
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} progress={65} />);
     // Then the progress bar shows 65%
-    expect(r.tableCardView_progressValue).toHaveTextContent("65%");
+    expect(r.tableCardView_progress_value).toHaveTextContent("65%");
   });
 
   it("omits optional sections when props are absent", async () => {
@@ -134,7 +134,7 @@ describe("TableCardView", () => {
     // When rendered
     const r = await render(<TableCardView imgSrc={imgSrc} title="123 Main St" data={[]} />);
     // Then optional sections are not in the document
-    expect(r.query.tableCardView_progressValue).not.toBeInTheDocument();
+    expect(r.query.tableCardView_progress_value).not.toBeInTheDocument();
     expect(r.query.tableCardView_eyebrow).not.toBeInTheDocument();
     expect(r.query.tableCardView_interactiveFooter).not.toBeInTheDocument();
   });
@@ -208,7 +208,7 @@ describe("TableCardView", () => {
       { at: { url: "/" } },
     );
     // Then both footer sections render
-    expect(r.tableCardView_progressValue).toHaveTextContent("40%");
+    expect(r.tableCardView_progress_value).toHaveTextContent("40%");
     expect(r.tableCardView_carouselTitle).toHaveTextContent("1 Color");
     expect(r.tableCardView_carousel_item_0).toHaveAttribute("href", "/mv/1");
   });

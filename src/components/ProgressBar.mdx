@@ -1,0 +1,70 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as ProgressBarStories from "./ProgressBar.stories";
+
+<Meta of={ProgressBarStories} />
+
+# Progress Bar
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1345-1927">
+    <img src="FigmaLogo.png" alt="" />
+    Progress Bar
+  </a>
+</p>
+
+`ProgressBar` shows how far along something is, as a bar with a percentage label beside it. It's read-only.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>number</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>A percentage from 0 to 100. Values outside that range are clamped, with a warning in development.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>aiMode</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Tints the track purple so it stays visible on an AI surface.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Behaviors
+
+- The fill ends in a hard stop. It only gets a rounded end once it reaches 100%.
+- The label is rounded down to a whole number, so it never reads 100% before the bar is full. The fill uses the exact value.
+- The label always takes the same width, so bars stacked in a column line up no matter their values.
+
+## How to use
+
+`ProgressBar` fills its container's width. Wrap it to set the length.
+
+```tsx
+<div css={Css.w("40%").$}>
+  <ProgressBar value={65} />
+</div>
+```
+
+Cards get one by passing `progress` to `CardBody`, or `cardProgressSlot` in a card view. Those set the width for you.

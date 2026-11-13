@@ -266,7 +266,7 @@ function GridTableLayoutActionsComponent<
                 selectionSummary && <SelectionSummaryAction api={api} numberOnly={sm} />
               ))}
             {!!viewModeToggle?.length && !viewModeToggleInColumnsMenu && (
-              <ButtonGroup size="md" buttons={viewModeToggle} {...testId.viewModeToggle} />
+              <ButtonGroup buttons={viewModeToggle} {...testId.viewModeToggle} />
             )}
             {showEditColumns && columns && api && (
               <EditColumnsButton

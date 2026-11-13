@@ -169,7 +169,7 @@ export function selectColumn<T extends Kinded>(columnDef?: Partial<GridColumn<T>
   // Use newMethodMissingProxy so the user can use whatever kinds they want, i.e. `myRowKind: () => ...Toggle... `
   return newMethodMissingProxy(base, (key) => {
     return (data: any, { row }: { row: GridDataRow<any> }) => ({
-      content: <SelectToggle id={row.id} disabled={row.selectable === false} />,
+      content: <SelectToggle id={row.id} disabled={row.selectable === false || row.disableSelection} />,
     });
   }) as any;
 }

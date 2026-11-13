@@ -94,6 +94,7 @@ export * from "./components/Pills/FilterPill/FilterPill";
 export * from "./components/Pills/SelectedOptionPill/SelectedOptionPill";
 export * from "./components/Pills/SelectedOptionPill/SelectedOptionPillList";
 export * from "./components/Pills/SelectionSummaryPill/SelectionSummaryPill";
+export * from "./components/ProgressBar";
 export * from "./components/ProposedValue";
 export * from "./components/RightSidebar";
 export * from "./components/ScrollShadows";

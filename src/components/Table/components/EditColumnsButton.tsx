@@ -25,7 +25,7 @@ type EditColumnsButtonProps<R extends Kinded> = {
    * A button group pinned full width above the column list, e.g. the table's view mode toggle when it has no room
    * in the toolbar.
    */
-  viewToggle?: Omit<ButtonGroupProps, "size" | "fullWidth">;
+  viewToggle?: Omit<ButtonGroupProps, "fullWidth">;
   // for storybook purposes
   defaultOpen?: boolean;
 } & Pick<OverlayTriggerProps, "placement" | "disabled" | "tooltip">;
@@ -90,7 +90,7 @@ export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProp
       >
         {viewToggle && (
           <div css={Css.p2.pb0.$}>
-            <ButtonGroup {...viewToggle} size="md" fullWidth {...tid.header} />
+            <ButtonGroup {...viewToggle} fullWidth {...tid.header} />
           </div>
         )}
         {/* Scrollable body — mh0 lets the flex child shrink so the option list scrolls internally instead of overflowing the page */}
