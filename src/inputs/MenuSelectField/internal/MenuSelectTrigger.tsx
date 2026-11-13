@@ -285,8 +285,7 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
 const inputPlaceholderColor = "#9ca3af";
 
 /**
- * Three pill rows, the gaps through the next row, and half of that row.
- * The last two spacing units are the scroll container's vertical padding, which sits inside this height.
+ * Shows three pill rows and half of a fourth. The five spacing units are three row gaps plus the scroll container's top and bottom padding.
  */
 const inFieldPillsMaxHeight = `calc(${pillMinHeight}px * 3.5 + var(--t-spacing) * 5)`;
 

@@ -12,12 +12,14 @@ export function Pill(props: PillProps) {
   const tid = useTestIds(props, "pill");
   return (
     <span
-      css={{ ...pillBaseStyles(), ...Css.maxw100.color(Tokens.OnSurface).bgColor(Tokens.SurfaceActive).$ }}
+      css={{
+        ...pillBaseStyles(),
+        ...Css.maxw100.dib.truncate.color(Tokens.OnSurface).bgColor(Tokens.SurfaceActive).$,
+      }}
+      title={text}
       {...tid}
     >
-      <span css={Css.tal.lineClamp1.wbba.$} title={text}>
-        {text}
-      </span>
+      {text}
     </span>
   );
 }
