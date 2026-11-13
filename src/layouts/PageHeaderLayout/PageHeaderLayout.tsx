@@ -58,7 +58,6 @@ export function PageHeaderLayout<V extends string, X extends Only<TabsContentXss
 
   // Always `fixed` so horizontal document scroll cannot move the header. `left`/`width` use the
   // chrome var (jumps on nav toggle while resting or following).
-  // `top` is written by the scroll hook, so a re-render does not snap it back.
   const innerCss = Css.fixed
     .left(documentScrollChromeLeft())
     .w(documentScrollChromeWidth())

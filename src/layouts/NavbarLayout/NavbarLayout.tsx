@@ -46,7 +46,6 @@ export function NavbarLayout(props: NavbarLayoutProps) {
 
   const innerWidth = `var(${beamLayoutViewportWidthVar}, 100vw)`;
   // Always `fixed` so horizontal document scroll cannot move the navbar (same as the env banner).
-  // `top` and the height var are written by the scroll hook, so a re-render does not snap them back.
   const innerCss = Css.fixed.left0.z(zIndices.navbar).w(innerWidth).$;
 
   // Memoize so a measured-height update doesn't re-render Navbar.
