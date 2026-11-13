@@ -70,9 +70,10 @@ class MultiFilter<O, V extends Value> extends BaseFilter<V[], MultiFilterProps<O
       );
     }
 
-    const { defaultValue, nothingSelectedText, ...props } = this.props;
+    const { defaultValue, nothingSelectedText, selectionView = "badgeOnly", ...props } = this.props;
     return (
       <MenuMultiSelectField<O, V>
+        selectionView={selectionView}
         {...props}
         label={this.label}
         values={value || []}

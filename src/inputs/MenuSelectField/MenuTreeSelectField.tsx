@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import { BaseMenuSelectField } from "src/inputs/MenuSelectField/internal/BaseMenuSelectField";
 import { bucketTreeSelection } from "src/inputs/MenuSelectField/internal/nestedRows";
-import type { MenuSelectFieldBaseProps, TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
+import type { MenuSelectFieldBaseProps, SelectionView, TreeSelectionDisplay } from "src/inputs/MenuSelectField/types";
 import type { NestedOption, TreeSelectResponse } from "src/inputs/TreeSelectField/utils";
 import type { Value } from "src/inputs/Value";
 
@@ -15,6 +15,8 @@ export type MenuTreeSelectFieldProps<O, V extends Value> = MenuSelectFieldBasePr
   selectionDisplay?: TreeSelectionDisplay;
   /** Start with every group open. Otherwise only groups holding a selection start open. @default false */
   defaultExpanded?: boolean;
+  /** How selections show in the closed field. @default inField */
+  selectionView?: SelectionView;
 };
 
 /** Multi select over nested options, with expandable groups and cascading selection. See `MenuTreeSelectField.mdx`. */

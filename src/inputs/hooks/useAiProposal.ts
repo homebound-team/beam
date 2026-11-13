@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import type { TextFieldBaseProps } from "src/inputs/TextFieldBase";
+import { type Value, valueToKey } from "src/inputs/Value";
 
 /** The display half of AI mode, ready to spread onto `TextFieldBase`. */
 export type AiProposalProps = Pick<
@@ -50,7 +51,9 @@ export function useAiProposal<V>(
   // Compared as display text, so each field's own formatting decides what counts as "the same",
   // i.e. two `PlainDate`s or two option lists that read identically.
   const proposedText = hasProposal ? format(proposedValue as V) : undefined;
-  const originalText = originalValue.current !== undefined ? format(originalValue.current) : undefined;
+  // A list strikes only the values the proposal drops. An empty drop means nothing to strike.
+  const dropped = hasProposal ? droppedValues(originalValue.current, proposedValue as V) : undefined;
+  const originalText = dropped !== undefined && !isEmptyList(dropped) ? format(dropped) : undefined;
   const isUnchanged = originalText === proposedText;
 
   return {
@@ -62,4 +65,15 @@ export function useAiProposal<V>(
       onUserBlur,
     },
   };
+}
+
+/** The part of `original` that `proposed` drops. For lists, that is the values missing from `proposed`; otherwise the whole original. */
+function droppedValues<V>(original: V | undefined, proposed: V): V | undefined {
+  if (!Array.isArray(original) || !Array.isArray(proposed)) return original;
+  const kept = new Set(proposed.map((value) => valueToKey(value as Value)));
+  return original.filter((value) => !kept.has(valueToKey(value as Value))) as V;
+}
+
+function isEmptyList(value: unknown): boolean {
+  return Array.isArray(value) && value.length === 0;
 }

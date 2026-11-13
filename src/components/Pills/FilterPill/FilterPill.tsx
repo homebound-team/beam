@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useHover } from "react-aria";
 import { Icon } from "src/components/Icon";
+import { pillBaseStyles } from "src/components/Pills/pillBaseStyles";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
 import { Css, Palette, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
@@ -48,11 +49,10 @@ export function FilterPill(props: FilterPillProps) {
 }
 
 function pillStyles(disabled: boolean, hovered: boolean) {
-  return Css.xsSb.dif.aic.br16.px1
-    .gapPx(4)
-    .pyPx(4)
-    .mhPx(24)
-    .color(disabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900)
-    .bgColor(hovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
-    .if(disabled).cursorNotAllowed.$;
+  return {
+    ...pillBaseStyles(),
+    ...Css.color(disabled ? Tokens.OnSurfaceActiveDisabled : Palette.Gray900)
+      .bgColor(hovered ? Tokens.SurfaceActiveHover : Tokens.SurfaceActive)
+      .if(disabled).cursorNotAllowed.$,
+  };
 }
