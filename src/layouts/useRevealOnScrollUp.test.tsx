@@ -53,7 +53,7 @@ describe("useRevealOnScrollUp", () => {
     expect(r.state).toHaveTextContent("revealed");
   });
 
-  it("stays revealed while the reserve element comes back, until it is at rest", async () => {
+  it("stays revealed while the reserve element comes back, then returns to resting at the top", async () => {
     // Given the chrome was hidden, then pinned by scrolling up
     const r = await render(<Harness />);
     scrollWindowWithAnchor(r.reserveEl, 0);
@@ -67,15 +67,6 @@ describe("useRevealOnScrollUp", () => {
     // Then it stays pinned instead of jumping to the reserve element
     expect(r.state).toHaveTextContent("revealed");
     expect(r.visible).toHaveTextContent("50");
-  });
-
-  it("returns to resting (not stuck revealed) once scrolled back to the top", async () => {
-    // Given the chrome is revealed mid-page
-    const r = await render(<Harness />);
-    scrollWindowWithAnchor(r.reserveEl, 0);
-    scrollWindowWithAnchor(r.reserveEl, 300);
-    scrollWindowWithAnchor(r.reserveEl, 250);
-    expect(r.state).toHaveTextContent("revealed");
 
     // When scrolling back to the top
     scrollWindowWithAnchor(r.reserveEl, 0);

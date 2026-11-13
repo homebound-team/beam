@@ -162,7 +162,7 @@ function getInitialRevealState(): RevealState {
 /** Height still below the pin line. Full height while resting or revealed; none once hidden. */
 function visibleHeightFor(state: RevealState, rect: DOMRect, topOffset: number): number {
   if (state === "hidden") return 0;
-  const height = Math.max(0, Math.round(rect.height));
+  const height = Math.round(rect.height);
   if (state !== "following") return height;
   return Math.max(0, Math.min(height, Math.round(rect.bottom - topOffset)));
 }
