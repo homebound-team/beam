@@ -33,6 +33,7 @@ export type {
   StatusBannerProps,
 } from "./components/StatusBanner/StatusBanner";
 export * from "./components/Breadcrumbs";
+export * from "./components/BulkActionButton/BulkActionButton";
 export * from "./components/Button";
 export * from "./components/ButtonDatePicker";
 export * from "./components/ButtonGroup";

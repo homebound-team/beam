@@ -1,0 +1,97 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as BulkActionButtonStories from "./BulkActionButton.stories";
+
+<Meta of={BulkActionButtonStories} />
+
+# Bulk Action Button
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4286-6">
+    <img src="FigmaLogo.png" alt="" />
+    Bulk Action Button
+  </a>
+</p>
+
+`BulkActionButton` (the Selection Action Button in Figma) summarizes a selection and is the entry point to its bulk action, e.g. "Edit 3 Rows". Clear removes the whole selection. Each side is its own button and tab stop. It is a sibling of the [Selection Summary Pill](?path=/docs/components-pills-selection-summary-pill--docs), which shows a count with no action.
+
+In a `GridTableLayout`, pass `bulkCta` rather than rendering this directly.
+
+- Write the label as [Verb] [Count] [Object], e.g. "Assign 3 Rows". Don't add "Bulk", and use title case with no punctuation.
+- Use the pencil for edit and assign actions.
+- The active blue fill means a selection is active. Don't reuse it for other toolbar buttons.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>label</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>
+        <code>"Edit"</code>
+      </td>
+      <td>The verb, e.g. "Assign" renders "Assign 3 Rows".</td>
+    </tr>
+    <tr>
+      <td>
+        <code>count</code>
+      </td>
+      <td>
+        <code>number</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>How many rows are selected.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onClick</code>
+      </td>
+      <td>
+        <code>{"() => void"}</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Called when the action is clicked, e.g. to open a bulk edit side panel.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onClear</code>
+      </td>
+      <td>
+        <code>{"() => void"}</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>Called when Clear is clicked. Use it to clear the whole selection.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>compact</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>
+        Drops the icon and the object and shows Clear as an ×, e.g. "Edit 3", for small screens. "Edit 3 Rows" stays the
+        accessible name.
+      </td>
+    </tr>
+  </tbody>
+</table>
