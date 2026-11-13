@@ -933,7 +933,7 @@ function renderDiv<R extends Kinded>(
       <div
         css={
           Css.if(stickyHeader || pinnedRows.length > 0)
-            .sticky.transitionTop.top(stickyTableHeaderOffset(stickyOffset))
+            .sticky.layoutTransitionTop.top(stickyTableHeaderOffset(stickyOffset))
             .z(zIndices.tableStickyHeader).$
         }
       >
@@ -1005,7 +1005,7 @@ function renderTable<R extends Kinded>(
       <thead
         css={
           Css.if(stickyHeader || pinnedRows.length > 0)
-            .sticky.transitionTop.top(stickyTableHeaderOffset(stickyOffset))
+            .sticky.layoutTransitionTop.top(stickyTableHeaderOffset(stickyOffset))
             .z(zIndices.tableStickyHeader).$
         }
       >
@@ -1135,7 +1135,7 @@ function VirtualGridTableView<R extends Kinded>({
         <div
           {...props}
           ref={ref as MutableRefObject<HTMLDivElement>}
-          css={Css.transitionTop.$}
+          css={Css.layoutTransitionTop.$}
           style={{
             ...props.style,
             // Read from a CSS variable so a width change doesn't recreate this component and remount every row

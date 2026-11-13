@@ -1,10 +1,10 @@
 /** Effective environment banner height (px); `0` when hidden. */
 export const beamEnvironmentBannerLayoutHeightVar = "--beam-environment-banner-height";
 
-/** Effective navbar height (px) while pinned; `0` when scrolled away. */
+/** Navbar height still on screen (px). Unset once the navbar has left. */
 export const beamNavbarLayoutHeightVar = "--beam-navbar-layout-height";
 
-/** Effective page header height (px) while pinned; `0` when scrolled away. */
+/** Page header height still on screen (px). Unset once the header has left. */
 export const beamPageHeaderLayoutHeightVar = "--beam-page-header-layout-height";
 
 /** Stay-pinned page banner height (px); `0` when unset. */
@@ -27,6 +27,9 @@ export const beamLayoutContentPaddingXVar = "--beam-layout-content-padding-x";
 
 /** Table actions toolbar height (px) while pinned in document-scroll layouts. */
 export const beamTableActionsHeightVar = "--beam-table-actions-height";
+
+/** `none` while a navbar or page header is still moving with the scroll, and unset once it has left. `layoutTransitionTop` reads it. */
+export const beamStickyTopTransitionVar = "--beam-sticky-top-transition";
 
 /**
  * Open overlay pane width; `0px` when closed. Published on
@@ -87,6 +90,15 @@ export function documentScrollRightPaneHeight(): string {
   return `calc(var(${beamLayoutViewportHeightVar}, 100vh) - ${stickyTableHeaderOffset()})`;
 }
 
+/**
+ * In-flow min-height for the document-scroll right-pane anchor on desktop, kept while the layout is mounted.
+ *
+ * Subtracts the chrome that stays pinned (environment banner, page banner, table actions, workflow footer) and leaves the navbar and page header out, so a short page can scroll that chrome away. The scroll stops when the table pins under what remains.
+ */
+export function documentScrollRightPaneMinHeight(): string {
+  return `calc(var(${beamLayoutViewportHeightVar}, 100vh) - var(${beamEnvironmentBannerLayoutHeightVar}, 0px) - var(${beamPageBannerHeightVar}, 0px) - var(${beamTableActionsHeightVar}, 0px) - var(${beamWorkflowLayoutFooterHeightVar}, 0px))`;
+}
+
 /** `min-height` so a document-scroll step surface fills the first screen below sticky chrome. */
 export function documentScrollBodyMinHeight(): string {
   return `calc(var(${beamLayoutViewportHeightVar}, 100vh) - ${stickyNavAndHeaderOffset()} - var(${beamWorkflowLayoutFooterHeightVar}, 0px))`;
@@ -100,7 +112,7 @@ export function documentScrollRightPaneWidthCss(maxPx: number): string {
   return `min(${maxPx}px, ${documentScrollChromeWidth()})`;
 }
 
-/** CSS `top` offset below the environment banner + auto-hiding navbar. */
+/** CSS `top` below the environment banner and the navbar height still on screen. */
 export function belowNavbarOffset(): string {
   return `calc(var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px))`;
 }
@@ -110,7 +122,7 @@ export function pageBannerOffset(): string {
   return `calc(var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px))`;
 }
 
-/** `top` offset below environment banner + auto-hiding navbar + page header + page banner (each var collapses to `0` when scrolled away, except the stay-pinned page banner). */
+/** `top` below the environment banner, the navbar and page header heights still on screen, and the stay-pinned page banner. */
 export function stickyNavAndHeaderOffset(basePx = 0): string {
   return `calc(${basePx}px + var(${beamEnvironmentBannerLayoutHeightVar}, 0px) + var(${beamNavbarLayoutHeightVar}, 0px) + var(${beamPageHeaderLayoutHeightVar}, 0px) + var(${beamPageBannerHeightVar}, 0px))`;
 }

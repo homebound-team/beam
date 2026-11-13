@@ -5,6 +5,7 @@ import {
   beamFloatingRightOffsetVar,
   beamRightPaneContentMinVar,
   beamRightPaneWidthVar,
+  documentScrollRightPaneMinHeight,
   documentScrollRightPaneWidthCss,
 } from "src/layouts/layoutVars";
 import { useTestIds } from "src/utils/useTestIds";
@@ -34,6 +35,19 @@ export function DocumentScrollOverlayRightPaneLayout({ children }: DocumentScrol
       );
     }
   }, [nestedInLayout]);
+
+  // In-flow on desktop for as long as this layout is mounted, so a short page can scroll the navbar and page header
+  // away while the pane is open. Kept when closed, since removing it would clamp a scrolled page and jump it to the top.
+  // Set here rather than in the host, which runs before the anchor's ref is attached.
+  useLayoutEffect(() => {
+    const layoutRoot = anchorRef.ref.current;
+    if (!layoutRoot || sm) return;
+
+    layoutRoot.style.minHeight = documentScrollRightPaneMinHeight();
+    return () => {
+      layoutRoot.style.removeProperty("min-height");
+    };
+  }, [anchorRef.ref, sm]);
 
   if (nestedInLayout) return <>{children}</>;
 
@@ -74,15 +88,16 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
   const { anchorRef, spacerRef } = props;
   const { isRightPaneOpen } = useRightPaneOpenState();
   const paneWidthCss = documentScrollRightPaneWidthCss(documentScrollRightPaneWidth);
-  const [keepOverlayChrome, setKeepOverlayChrome] = useState(isRightPaneOpen);
+  // Open, or the exit slide is still on screen. Same condition as `paneOpenOrExiting` in `DocumentScrollRightPane`, which keeps the pane's measured top.
+  // This one keeps the width vars, so the page does not jump while the pane is still visible.
+  const [paneOpenOrExiting, setPaneOpenOrExiting] = useState(isRightPaneOpen);
 
-  // Keep width vars until the pane exit animation finishes (shared poll with DocumentScrollRightPane).
   useLayoutEffect(() => {
     if (isRightPaneOpen) {
-      setKeepOverlayChrome(true);
+      setPaneOpenOrExiting(true);
       return;
     }
-    return waitForRightPaneExit(() => setKeepOverlayChrome(false));
+    return waitForRightPaneExit(() => setPaneOpenOrExiting(false));
   }, [isRightPaneOpen]);
 
   // Spacer follows open state so width can CSS-transition with the pane slide.
@@ -97,8 +112,8 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
     const layoutRoot = anchorRef.current;
     if (!layoutRoot) return;
 
-    const openPaneWidth = keepOverlayChrome ? paneWidthCss : "0px";
-    const contentMin = keepOverlayChrome ? `${minDocumentScrollContentWidthPx}px` : "0px";
+    const openPaneWidth = paneOpenOrExiting ? paneWidthCss : "0px";
+    const contentMin = paneOpenOrExiting ? `${minDocumentScrollContentWidthPx}px` : "0px";
     layoutRoot.style.setProperty(beamRightPaneWidthVar, openPaneWidth);
     layoutRoot.style.setProperty(beamRightPaneContentMinVar, contentMin);
     // Floating right offset helps position elements such as the "scroll to top" button properly when the pane is open.
@@ -109,7 +124,7 @@ function DocumentScrollOverlayRightPaneHost(props: DocumentScrollOverlayRightPan
       layoutRoot.style.setProperty(beamRightPaneContentMinVar, "0px");
       document.documentElement.style.setProperty(beamFloatingRightOffsetVar, "0px");
     };
-  }, [anchorRef, keepOverlayChrome, paneWidthCss]);
+  }, [anchorRef, paneOpenOrExiting, paneWidthCss]);
 
   return <DocumentScrollRightPane paneWidth={documentScrollRightPaneWidth} mobile={false} anchorRef={anchorRef} />;
 }

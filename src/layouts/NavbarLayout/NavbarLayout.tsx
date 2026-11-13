@@ -1,20 +1,20 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useMemo, useRef } from "react";
 import { Navbar, type NavbarProps } from "src/components/Navbar/Navbar";
 import { Css } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
 import { DocumentScrollLayoutProvider } from "../DocumentScrollLayoutContext";
+import { useEnvironmentBannerLayoutHeight } from "../EnvironmentBannerLayout/EnvironmentBannerLayoutHeightContext";
 import {
   beamEnvironmentBannerLayoutHeightVar,
   beamLayoutViewportWidthVar,
   beamNavbarLayoutHeightVar,
 } from "../layoutVars";
-import { useAutoHideOnScroll } from "../useAutoHideOnScroll";
 import { useMeasuredHeight } from "../useMeasuredHeight";
-import { useTransitionAfterPaint } from "../useTransitionAfterPaint";
+import { useScrollWithPage } from "../useScrollWithPage";
 import { MobileSubNavProvider } from "./MobileSubNavContext";
-import { NavbarLayoutHeightProvider } from "./NavbarLayoutHeightContext";
+import { setNavbarVisibleHeight } from "./navbarVisibleHeight";
 
 export type NavbarLayoutProps = {
   /** Props for the {@link Navbar} rendered as the top application chrome. */
@@ -23,56 +23,49 @@ export type NavbarLayoutProps = {
   children?: ReactNode;
 };
 
-/** Navbar + body shell with auto-hide chrome. Contract: `docs/layouts.md`. */
+/** Navbar + body shell. The navbar scrolls with the page, then hides and reveals. Contract: `docs/layouts.md`. */
 export function NavbarLayout(props: NavbarLayoutProps) {
   const { navbar, children } = props;
   const tid = useTestIds(props, "navbarLayout");
-  const navMetricsRef = useRef<HTMLDivElement>(null);
-  const spacerRef = useRef<HTMLDivElement>(null);
+  const heightElRef = useRef<HTMLDivElement>(null);
+  const fixedElRef = useRef<HTMLDivElement>(null);
+  const reserveElRef = useRef<HTMLDivElement>(null);
+  const navHeight = useMeasuredHeight(fixedElRef, true);
+  const bannerHeight = useEnvironmentBannerLayoutHeight();
 
-  const navHeight = useMeasuredHeight(navMetricsRef, true);
-  const { state: autoHideState } = useAutoHideOnScroll(spacerRef, true);
-  // The navbar is fixed at the banner offset unless hidden.
-  const navOccupiesViewportTop = autoHideState !== "hidden";
-
-  // Occupying height (else 0) — CSS var + context for PageHeaderLayout.
-  const navbarOffsetPx = navHeight > 0 && navOccupiesViewportTop ? navHeight : 0;
-
-  const cssVars: Record<string, string> | undefined =
-    navbarOffsetPx > 0 ? { [beamNavbarLayoutHeightVar]: `${navbarOffsetPx}px` } : undefined;
+  useScrollWithPage({
+    heightElRef,
+    fixedElRef,
+    reserveElRef,
+    height: navHeight,
+    restingTop: `var(${beamEnvironmentBannerLayoutHeightVar}, 0px)`,
+    heightVar: beamNavbarLayoutHeightVar,
+    getReserveRestTop: () => bannerHeight,
+    onVisibleHeight: setNavbarVisibleHeight,
+  });
 
   const innerWidth = `var(${beamLayoutViewportWidthVar}, 100vw)`;
-
   // Always `fixed` so horizontal document scroll cannot move the navbar (same as the env banner).
-  // The `top` transition is applied after first paint.
   const innerCss = Css.fixed.left0.z(zIndices.navbar).w(innerWidth).$;
-  // Same value as `Css.transitionTop`.
-  useTransitionAfterPaint(navMetricsRef, "top 200ms cubic-bezier(0.4, 0, 0.2, 1)");
-  const bannerTop = `var(${beamEnvironmentBannerLayoutHeightVar}, 0px)`;
-  const innerStyle: CSSProperties = {
-    top: autoHideState === "hidden" ? `calc(${bannerTop} - ${navHeight}px)` : bannerTop,
-  };
 
-  // Memoize so scroll-state re-renders don't re-render Navbar.
+  // Memoize so a measured-height update doesn't re-render Navbar.
   const navbarEl = useMemo(() => <Navbar {...navbar} />, [navbar]);
 
   return (
     <DocumentScrollLayoutProvider>
-      <NavbarLayoutHeightProvider value={navbarOffsetPx}>
-        <MobileSubNavProvider>
-          <div css={Css.df.fdc.wfc.mw100.$} style={cssVars} {...tid}>
-            {/* Spacer reserves height when inner flips to fixed. */}
-            <div ref={spacerRef} css={Css.fs0.w100.$} style={{ height: navHeight }}>
-              <div ref={navMetricsRef} css={innerCss} style={innerStyle} {...tid.navbar}>
-                {navbarEl}
-              </div>
-            </div>
-            <div css={Css.df.fdc.mh0.mw100.w100.$} {...tid.body}>
-              {children}
+      <MobileSubNavProvider>
+        <div ref={heightElRef} css={Css.df.fdc.wfc.mw100.$} {...tid}>
+          {/* Keeps the navbar's space in the flow while the navbar is fixed. */}
+          <div ref={reserveElRef} css={Css.fs0.w100.$} style={{ height: navHeight }}>
+            <div ref={fixedElRef} css={innerCss} {...tid.navbar}>
+              {navbarEl}
             </div>
           </div>
-        </MobileSubNavProvider>
-      </NavbarLayoutHeightProvider>
+          <div css={Css.df.fdc.mh0.mw100.w100.$} {...tid.body}>
+            {children}
+          </div>
+        </div>
+      </MobileSubNavProvider>
     </DocumentScrollLayoutProvider>
   );
 }

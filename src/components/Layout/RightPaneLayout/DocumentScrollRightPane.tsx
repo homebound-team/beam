@@ -25,7 +25,8 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
   const rightPaneContent = useRightPaneContent();
   const tid = useTestIds({}, "rightPaneContent");
   const paneRef = useRef<HTMLDivElement>(null);
-  const [keepPaneLayout, setKeepPaneLayout] = useState(false);
+  // Open, or the exit slide is still on screen. Keeps the measured top so closing does not drop it mid-slide.
+  const [paneOpenOrExiting, setPaneOpenOrExiting] = useState(false);
   const exitReleasedRef = useRef(false);
 
   const bannerHeightPx = useEnvironmentBannerLayoutHeight();
@@ -33,25 +34,23 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
 
   useLayoutEffect(() => {
     if (isRightPaneOpen) {
-      setKeepPaneLayout(true);
+      setPaneOpenOrExiting(true);
       exitReleasedRef.current = false;
     }
   }, [isRightPaneOpen]);
-
-  const paneLayoutActive = isRightPaneOpen || keepPaneLayout;
 
   const releaseAfterExit = useCallback(() => {
     if (exitReleasedRef.current) return;
     exitReleasedRef.current = true;
     clearPane();
-    setKeepPaneLayout(false);
+    setPaneOpenOrExiting(false);
   }, [clearPane]);
 
   // Fallback when exit animations do not run (e.g. jsdom); `onAnimationComplete` handles the normal path.
   useLayoutEffect(() => {
-    if (isRightPaneOpen || !keepPaneLayout) return;
+    if (isRightPaneOpen || !paneOpenOrExiting) return;
     return waitForRightPaneExit(releaseAfterExit);
-  }, [isRightPaneOpen, keepPaneLayout, releaseAfterExit]);
+  }, [isRightPaneOpen, paneOpenOrExiting, releaseAfterExit]);
 
   usePreventScroll({ isDisabled: !mobile || !isRightPaneOpen });
 
@@ -61,7 +60,7 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
   const anchor = anchorRef ?? { current: null };
   const paneBounds = useScrollPinnedViewportBounds(
     isFixedOverlay ? anchor : paneRef,
-    paneLayoutActive && isFixedOverlay,
+    (isRightPaneOpen || paneOpenOrExiting) && isFixedOverlay,
     stickyTableHeaderOffsetPx,
   );
 
@@ -85,9 +84,10 @@ export function DocumentScrollRightPane({ paneWidth, mobile, anchorRef }: Docume
                   .z(zIndices.rightPane)
                   // The top border continues the layout table's, which the pane sits level with
                   .bl.bt.bc(Tokens.SurfaceSeparator)
-                  // Pinned, `top` only moves when the chrome above hides or reveals, so ease with it the
-                  // way sticky chrome does. Unpinned it tracks the anchor every scroll and must not lag.
-                  .if(!!paneBounds?.isPinned).transitionTop.$
+                  // Pinned, `top` eases when the chrome above hides or reveals. While that chrome is still
+                  // on screen the shared transition turns off, so this does not lag the scroll.
+                  // Unpinned it tracks the anchor every scroll and must not lag.
+                  .if(!!paneBounds?.isPinned).layoutTransitionTop.$
           }
           style={paneStyle}
           initial={{ x: slideX }}

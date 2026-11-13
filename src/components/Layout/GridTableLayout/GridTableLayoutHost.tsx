@@ -16,7 +16,7 @@ import {
   documentScrollRightPaneContentMinCss,
   stickyNavAndHeaderOffset,
 } from "src/layouts/layoutVars";
-import { holdAutoHideWhile } from "src/layouts/useAutoHideOnScroll";
+import { holdRevealWhile } from "src/layouts/useRevealOnScrollUp";
 import { noop } from "src/utils/helpers";
 import type { TestIds } from "src/utils/useTestIds";
 import { zIndices } from "src/utils/zIndices";
@@ -54,9 +54,9 @@ export function GridTableLayoutHost(props: GridTableLayoutHostProps) {
         // `inline: "start"` returns to the table's left edge; the default "nearest" lands mid-table when it overflows.
         const scrollToWrapper = () =>
           tableWrapperRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start", inline: "start" });
-        // A window scroll holds the auto-hide navbar / page header still, so they don't reveal over the table mid-scroll.
+        // A window scroll holds the navbar and page header at their current reveal state, so they don't reveal over the table mid-scroll.
         if (host.kind === "modal") scrollToWrapper();
-        else holdAutoHideWhile(scrollToWrapper);
+        else holdRevealWhile(scrollToWrapper);
       }
     },
     [host.kind, scrollableEl],
@@ -129,7 +129,7 @@ function DocumentScrollHost(props: HostProps & { rightPane?: boolean }) {
       <ActionsBar
         actionsRef={tableActionsRef}
         xss={
-          Css.transitionTop.sticky
+          Css.layoutTransitionTop.sticky
             .top(stickyNavAndHeaderOffset())
             .left(documentScrollChromeLeft())
             .w(`min(100%, ${documentScrollChromeWidth()})`)
