@@ -3140,6 +3140,37 @@ describe("GridTable", () => {
     expect(r.collapse_2.textContent).toBe("+");
   });
 
+  it("shows the header as collapsed when all parent rows load collapsed", async () => {
+    // Given two parents with a child each, both initially collapsed
+    const rows: GridDataRow<NestedRow>[] = [
+      simpleHeader,
+      {
+        kind: "parent",
+        id: "p1",
+        data: { name: "parent 1" },
+        initCollapsed: true,
+        children: [{ kind: "child", id: "p1c1", data: { name: "child p1c1" } }],
+      },
+      {
+        kind: "parent",
+        id: "p2",
+        data: { name: "parent 2" },
+        initCollapsed: true,
+        children: [{ kind: "child", id: "p2c1", data: { name: "child p2c1" } }],
+      },
+    ];
+
+    const r = await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} />);
+
+    // Then the header toggle matches the collapsed parents
+    expect(r.collapse_0.textContent).toBe("+");
+    // And a single click on it expands everything
+    click(r.collapse_0);
+    expect(r.collapse_0.textContent).toBe("-");
+    expect(r.collapse_1.textContent).toBe("-");
+    expect(r.collapse_2.textContent).toBe("-");
+  });
+
   it("can select all", async () => {
     // Given a parent with a child and grandchild
     const rows: GridDataRow<NestedRow>[] = [
@@ -4492,8 +4523,8 @@ describe("GridTable", () => {
     expect(cell(r, 1, 0).textContent).toBe("+");
     expect(cell(r, 1, 1).textContent).toBe("parent 1");
 
-    // And the local storage value is initially set with the current state
-    expect(sessionStorage.getItem(tableIdentifier)).toBe('["keptGroup","p1"]');
+    // And the local storage value is initially set with the current state, including the header since every parent is collapsed
+    expect(sessionStorage.getItem(tableIdentifier)).toBe('["header","keptGroup","p1"]');
   });
 
   it("ignores initCollapsed on rows if persistCollapse is set and available in sessionStorage", async () => {
