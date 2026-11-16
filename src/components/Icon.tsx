@@ -231,6 +231,8 @@ export const Icons = {
       <path d={aiStarPath} fill={`url(#${aiStarGradientId})`} />
     </>
   ),
+  // The AI sparkle in one color, for surfaces the gradient disappears on (i.e. the AI Bold fill).
+  aiStarMono: <path d={aiStarPath} />,
   cloudSave: (
     <>
       <path d="M9 19H7C4.243 19 2 16.757 2 14C2 11.82 3.609 9.792 5.757 9.15C6.85 6.611 9.244 5 12 5C15.56 5 18.507 7.67 18.944 11.112C20.695 11.538 22 13.12 22 15C22 17.206 20.206 19 18 19H15H9ZM15 17H18C19.103 17 20 16.103 20 15C20 13.897 19.103 13 18 13H17V12C17 9.243 14.757 7 12 7C9.895 7 8.149 8.274 7.446 10.325L7.254 10.883L6.673 10.985C5.199 11.244 4 12.596 4 14C4 15.654 5.346 17 7 17H9H15Z" />
