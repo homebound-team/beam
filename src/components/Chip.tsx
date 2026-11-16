@@ -50,7 +50,7 @@ export function Chip<X extends Only<Xss<Margin | "color" | "backgroundColor">, X
     placement: "bottom",
     children: (
       <span css={styles} {...tid}>
-        {icon && <Icon icon={icon} inc={2} xss={Css.fs0.$} />}
+        {icon && <Icon icon={icon} inc={2} />}
         <span css={Css.lineClamp1.wbba.$}>{text}</span>
       </span>
     ),

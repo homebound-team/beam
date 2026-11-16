@@ -2,9 +2,10 @@ import type { AriaButtonProps } from "@react-types/button";
 import { type ButtonHTMLAttributes, type ReactNode, type RefObject, useMemo, useState } from "react";
 import { useButton, useFocusRing, useHover } from "react-aria";
 import { Icon, type IconProps } from "src/components/Icon";
+import { aiButtonStyles } from "src/components/internal/aiButtonStyles";
 import { Loader } from "src/components/Loader";
 import { maybeTooltip, resolveTooltip } from "src/components/Tooltip";
-import { Css, Palette, type Properties, Tokens } from "src/Css";
+import { Css, type Properties, Tokens } from "src/Css";
 import { navLink } from "src/css/CssReset";
 import { useGetRef } from "src/hooks/useGetRef";
 import type { BeamButtonProps, BeamFocusableProps } from "src/interfaces";
@@ -152,18 +153,7 @@ const variantStyles: Record<
     focusStyles: Properties;
   }
 > = {
-  // Design applies their "AI Bold" ramp to the existing primary button. They haven't specified
-  // hover/pressed/disabled, so those ramps are extrapolated from it rather than design-sourced.
-  ai: {
-    baseStyles: Css.aiBoldBg.color(Tokens.OnPrimary).$,
-    hoverStyles: Css.add("backgroundImage", `linear-gradient(270deg, ${Palette.Blue800}, ${Palette.Purple800})`).$,
-    pressedStyles: Css.add("backgroundImage", `linear-gradient(270deg, ${Palette.Blue900}, ${Palette.Purple900})`).$,
-    disabledStyles: Css.add(
-      "backgroundImage",
-      `linear-gradient(270deg, ${Palette.Blue200}, ${Palette.Purple200})`,
-    ).color(Tokens.ButtonPrimaryDisabledFg).$,
-    focusStyles: Css.bshFocus.$,
-  },
+  ai: aiButtonStyles,
 
   primary: {
     baseStyles: Css.bgColor(Tokens.Primary).color(Tokens.OnPrimary).$,
