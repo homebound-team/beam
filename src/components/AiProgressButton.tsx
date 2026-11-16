@@ -62,6 +62,7 @@ export function AiProgressButton(props: AiProgressButtonProps) {
           ...(open && Css.gtc("1fr").o100.$),
         }}
       >
+        {/* `oh.mw0` lets the `0fr` track reach 0; the padding sits inside so it doesn't hold the track open. */}
         <span css={Css.oh.mw0.$}>
           <span css={Css.db.prPx(endPadding).$}>{label}</span>
         </span>
