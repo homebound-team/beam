@@ -1343,6 +1343,29 @@ describe("GridTable", () => {
       expect(cell(r, 3, 0)).toHaveTextContent("zaz");
     });
 
+    it("scrolls to a row by kind and id, counting pinned rows and the info message", async () => {
+      setRunningInJest();
+      // Given a virtual table with an info message and row 3 (zaz) pinned
+      const api = new GridTableApiImpl<Row>();
+      await render(
+        <GridTable<Row> api={api} as="virtual" columns={[nameColumn, valueColumn]} rows={pinRows} infoMessage="Hi" />,
+      );
+      act(() => api.pinRow("3"));
+      // And a stand-in for Virtuoso, which doesn't mount under vitest
+      const scrollToIndex = vi.fn();
+      api.virtuosoRef.current = { scrollToIndex } as any;
+
+      // When we scroll to row 2 (bar)
+      api.scrollToRow("data", "2", { align: "center" });
+      // Then its index counts the header, the pinned zaz, the info message, and foo
+      expect(scrollToIndex).toHaveBeenCalledWith({ index: 4, align: "center", behavior: "smooth" });
+
+      // And scrolling to the pinned row is a no-op, since it's always on screen
+      scrollToIndex.mockClear();
+      api.scrollToRow("data", "3");
+      expect(scrollToIndex).not.toHaveBeenCalled();
+    });
+
     describe("with nested rows", () => {
       const nestedNameColumn: GridColumn<NestedRow> = {
         header: () => "Name",
@@ -3917,12 +3940,15 @@ describe("GridTable", () => {
     const r2 = { kind: "data", id: "r:2", data: { name: "two", value: 2 } } as const;
     const r3 = { kind: "data", id: "r:3", data: { name: "thr", value: 3 } } as const;
     const rows: GridDataRow<Row>[] = [r1, r2, r3];
+    const api = new GridTableApiImpl<Row>();
     // A pretend MutableRefObject
     const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
-    await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
-    expect(rowLookup.current!.lookup(r1)).toMatchObject({ next: r2, data: { next: r2 } });
-    expect(rowLookup.current!.lookup(r2)).toMatchObject({ prev: r1, next: r3, data: { prev: r1, next: r3 } });
-    expect(rowLookup.current!.lookup(r3)).toMatchObject({ prev: r2, data: { prev: r2 } });
+    await render(<GridTable<Row> api={api} columns={columns} rows={rows} rowLookup={rowLookup} />);
+    expect(api.getAdjacentRows(r1)).toMatchObject({ next: r2, data: { next: r2 } });
+    expect(api.getAdjacentRows(r2)).toMatchObject({ prev: r1, next: r3, data: { prev: r1, next: r3 } });
+    expect(api.getAdjacentRows(r3)).toMatchObject({ prev: r2, data: { prev: r2 } });
+    // And the deprecated rowLookup still delegates to the api
+    expect(rowLookup.current!.lookup(r2)).toMatchObject({ prev: r1, next: r3 });
   });
 
   it("can look up filtered row locations", async () => {
@@ -3933,11 +3959,10 @@ describe("GridTable", () => {
     const r4 = { kind: "data", id: "r:4", data: { name: "fur", value: 4_000 } } as const;
     const r5 = { kind: "data", id: "r:5", data: { name: "fiv", value: 5 } } as const;
     const rows: GridDataRow<Row>[] = [r1, r2, r3, r4, r5];
-    // A pretend MutableRefObject
-    const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
-    await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
+    const api = new GridTableApiImpl<Row>();
+    await render(<GridTable<Row> api={api} columns={columns} rows={rows} />);
     // When the page does a lookup for only "small value" rows
-    const result = rowLookup.current!.lookup(r3, (r) => r.kind === "data" && !!r.data.value && r.data.value < 10);
+    const result = api.getAdjacentRows(r3, (r) => r.kind === "data" && !!r.data.value && r.data.value < 10);
     // Then we ignored r2 and r4
     expect(result).toMatchObject({ prev: r1, next: r5, data: { prev: r1, next: r5 } });
   });
@@ -3949,26 +3974,25 @@ describe("GridTable", () => {
     const p2c1 = { kind: "child" as const, id: "p2c1", parentIds: ["p2"], data: { name: "child p2c1" } };
     const rows: GridDataRow<NestedRow>[] = [simpleHeader, p1, p1c1, p2, p2c1];
 
-    // A pretend MutableRefObject
-    const rowLookup: MutableRefObject<GridRowLookup<NestedRow> | undefined> = { current: undefined };
-    await render(<GridTable<NestedRow> columns={nestedColumns} rows={rows} rowLookup={rowLookup} />);
-    expect(rowLookup.current!.lookup(p1)).toMatchObject({
+    const api = new GridTableApiImpl<NestedRow>();
+    await render(<GridTable<NestedRow> api={api} columns={nestedColumns} rows={rows} />);
+    expect(api.getAdjacentRows(p1)).toMatchObject({
       next: p1c1,
       child: { next: p1c1 },
       parent: { next: p2 },
     });
-    expect(rowLookup.current!.lookup(p1c1)).toMatchObject({
+    expect(api.getAdjacentRows(p1c1)).toMatchObject({
       next: p2,
       prev: p1,
       child: { next: p2c1 },
       parent: { prev: p1, next: p2 },
     });
-    expect(rowLookup.current!.lookup(p2)).toMatchObject({
+    expect(api.getAdjacentRows(p2)).toMatchObject({
       next: p2c1,
       child: { prev: p1c1 },
       parent: { prev: p1 },
     });
-    expect(rowLookup.current!.lookup(p2c1)).toMatchObject({
+    expect(api.getAdjacentRows(p2c1)).toMatchObject({
       prev: p2,
       child: { prev: p1c1 },
       parent: { prev: p2 },
@@ -3980,10 +4004,10 @@ describe("GridTable", () => {
     const r1 = { kind: "data", id: "r:1", data: { name: "one", value: 1 } } as const;
     const rows: GridDataRow<Row>[] = [r1];
     // When we look it up
-    const rowLookup: MutableRefObject<GridRowLookup<Row> | undefined> = { current: undefined };
-    await render(<GridTable<Row> columns={columns} rows={rows} rowLookup={rowLookup} />);
+    const api = new GridTableApiImpl<Row>();
+    await render(<GridTable<Row> api={api} columns={columns} rows={rows} />);
     // Then we get nothing back
-    expect(rowLookup.current!.lookup(r1)).toMatchObject({ data: {} });
+    expect(api.getAdjacentRows(r1)).toMatchObject({ data: {} });
   });
 
   describe("infinite scroll", () => {

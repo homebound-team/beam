@@ -170,7 +170,10 @@ export type GridTableProps<R extends Kinded, X> = {
   rows: GridDataRow<R>[];
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
   rowStyles?: RowStyles<R>;
-  /** Allow looking up prev/next of a row i.e. for SuperDrawer navigation. */
+  /**
+   * Allow looking up prev/next of a row i.e. for SuperDrawer navigation.
+   * @deprecated Use the `api` prop's `getAdjacentRows`, `getVisibleRows`, and `scrollToRow`.
+   */
   rowLookup?: MutableRefObject<GridRowLookup<R> | undefined>;
   /** Whether the header row should be sticky. */
   stickyHeader?: boolean;
@@ -757,6 +760,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     (noData && !emptyState && fallbackMessage) ||
     (tooManyClientSideRows && "Hiding some rows, use filter...") ||
     infoMessage;
+
+  // Lets `api.scrollToRow` find a row's index in VirtualGridTableView's item order. Head and pinned rows
+  // are always on screen, so they return -1. Row elements are keyed by `RowState.key`.
+  api.virtualIndexOf = (kind, id) => {
+    const index = [...keptSelectedRows, ...(firstRowMessage ? [undefined] : []), ...visibleDataRows].findIndex(
+      (el) => el?.key === `${kind}-${id}`,
+    );
+    return index === -1 ? -1 : tableHeadRows.length + pinnedRows.length + index;
+  };
 
   const borderless = style?.presentationSettings?.borderless;
   const typeScale = style?.presentationSettings?.typeScale;
