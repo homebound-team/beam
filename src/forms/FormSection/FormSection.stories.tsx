@@ -24,6 +24,7 @@ export function WithChildSections() {
   return (
     <FormSection
       title="Sub-Contractors"
+      tag={{ kind: "status", text: "3 open bids", type: "info" }}
       actions={[
         { label: "Add", onClick: () => {}, variant: "tertiary" },
         { kind: "icon", icon: "refresh", label: "Refresh", onClick: () => {} },

@@ -28,6 +28,25 @@ export function TitleOnly() {
   return <ContentHeader title="Trade Partners" tooltip="Trade partners assigned to this project." />;
 }
 
+/** `tag` sits right after the title: a status `Tag` with `kind: "status"`, otherwise a `ContextTag`. */
+export function WithTag() {
+  return (
+    <div css={Css.df.fdc.gap4.$}>
+      <ContentHeader
+        title="Product Changes"
+        description="The following product replacements will be made. Add homeowner price."
+        tag={{ kind: "status", text: "Chargeable to homeowner", type: "info" }}
+        actions={[{ label: "Add", onClick: () => {} }]}
+      />
+      <ContentHeader
+        title="Install Doors & Trim"
+        description="Labor needed to finish the interior."
+        tag={{ icon: "wrench", text: "Labor" }}
+      />
+    </div>
+  );
+}
+
 /** Document-scroll page body (no `CenteredLayout`): padding is the default. */
 export function InDocumentScrollLayout() {
   return (

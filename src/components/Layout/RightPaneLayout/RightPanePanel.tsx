@@ -1,27 +1,23 @@
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "src/components/Button";
-import { ContextTag, type ContextTagProps } from "src/components/ContextTag";
 import { IconButton } from "src/components/IconButton";
+import { ContextOrStatusTag, type ContextOrStatusTagProps } from "src/components/internal/ContextOrStatusTag";
 import type { ActionButtonProps } from "src/components/Layout/layoutTypes";
 import { type DeleteActionProps, MaybeDeleteAction } from "src/components/Layout/RightPaneLayout/internal/DeleteAction";
 import { setRightPaneDiscardPrompt } from "src/components/Layout/RightPaneLayout/rightPaneStore";
 import { ConfirmCloseModal } from "src/components/Modal/ConfirmCloseModal";
 import { useModal } from "src/components/Modal/useModal";
-import { Tag, type TagProps } from "src/components/Tag";
 import { Css, Tokens } from "src/Css";
 import { fail } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 import { useRightPaneActions } from "./useRightPane";
 
-/** A `ContextTag` by default, or a status `Tag` with `kind: "status"`. */
-type RightPaneTag = ({ kind?: "context" } & ContextTagProps) | ({ kind: "status" } & TagProps<undefined>);
-
 export type RightPanePanelProps = {
   title: string;
   children: ReactNode;
   /** Type or status tag on the close-button row; the title moves to its own row below. */
-  tag?: RightPaneTag;
+  tag?: ContextOrStatusTagProps;
   /** When it returns true, closing the pane or opening content with another type or `key` asks to discard changes first. */
   isDirty?: () => boolean;
   /** When false, omit the built-in close control (caller provides their own). Default true. */
@@ -50,7 +46,7 @@ export function RightPanePanel(props: RightPanePanelProps) {
     });
   }, [isDirty, openModal]);
 
-  const tagEl = tag && (tag.kind === "status" ? <Tag {...tag} {...tid.tag} /> : <ContextTag {...tag} {...tid.tag} />);
+  const tagEl = tag && <ContextOrStatusTag {...tag} {...tid.tag} />;
   const titleEl = (
     <div css={Css.mdSb.lineClamp2.$} {...tid.title}>
       {title}
