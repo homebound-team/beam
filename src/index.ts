@@ -17,6 +17,7 @@ export * from "./components/AiLinkCardGroup";
 export * from "./components/AiLoader";
 export * from "./components/AiLoadingPanel";
 export * from "./components/AiPanel";
+export * from "./components/AiProgressButton";
 export * from "./components/AiSlimBanner";
 export * from "./components/BaseCard";
 export * from "./components/CardBody";
