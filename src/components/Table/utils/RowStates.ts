@@ -94,6 +94,9 @@ export class RowStates<R extends Kinded> {
     // Then mark any remaining as removed
     for (const state of maybeKept) (state as any).markRemoved();
 
+    // Rows can load already collapsed (`initCollapsed` or `persistCollapse`), so match the header to them
+    this.syncHeaderCollapsed();
+
     // After the first load of real data, we detach collapse state, to respect
     // any incoming initCollapsed.
     if (this.topRows.some((rs) => !reservedRowKinds.includes(rs.row.kind))) {
@@ -126,15 +129,17 @@ export class RowStates<R extends Kinded> {
       }
     } else {
       rs.toggleCollapsed();
-      // Ignore the kept group
-      const topGroupRows = this.topRows.filter((rs) => !rs.isReservedKind && rs.children);
-      if (topGroupRows.length > 0) {
-        // The header might still be collapsed, even though the user has opened all the top-level rows
-        if (topGroupRows.every((rs) => !rs.collapsed)) this.header.collapsed = false;
-        // Alternatively, if the user has collapsed all top-level rows, then collapse the header as well.
-        if (topGroupRows.every((rs) => rs.collapsed)) this.header.collapsed = true;
-      }
+      this.syncHeaderCollapsed();
     }
+  }
+
+  /** Flips the header once every top-level group row is open, or every one is closed; a mix leaves it alone. */
+  private syncHeaderCollapsed(): void {
+    // Ignore the kept group
+    const topGroupRows = this.topRows.filter((rs) => !rs.isReservedKind && rs.children);
+    if (topGroupRows.length === 0) return;
+    if (topGroupRows.every((rs) => !rs.collapsed)) this.header.collapsed = false;
+    if (topGroupRows.every((rs) => rs.collapsed)) this.header.collapsed = true;
   }
 
   get visibleRows(): RowState<R>[] {
