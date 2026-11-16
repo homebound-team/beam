@@ -1359,10 +1359,21 @@ describe("GridTable", () => {
       api.scrollToRow("data", "2", { align: "center" });
       // Then its index counts the header, the pinned zaz, the info message, and foo
       expect(scrollToIndex).toHaveBeenCalledWith({ index: 4, align: "center", behavior: "smooth" });
+    });
 
-      // And scrolling to the pinned row is a no-op, since it's always on screen
-      scrollToIndex.mockClear();
+    it("does not scroll to a pinned row, since it's always on screen", async () => {
+      setRunningInJest();
+      // Given a virtual table with row 3 (zaz) pinned
+      const api = new GridTableApiImpl<Row>();
+      await render(<GridTable<Row> api={api} as="virtual" columns={[nameColumn, valueColumn]} rows={pinRows} />);
+      act(() => api.pinRow("3"));
+      // And a stand-in for Virtuoso, which doesn't mount under vitest
+      const scrollToIndex = vi.fn();
+      api.virtuosoRef.current = { scrollToIndex } as any;
+
+      // When we scroll to the pinned row
       api.scrollToRow("data", "3");
+      // Then nothing scrolls
       expect(scrollToIndex).not.toHaveBeenCalled();
     });
 

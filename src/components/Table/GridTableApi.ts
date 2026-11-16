@@ -44,7 +44,11 @@ export type GridTableApi<R extends Kinded> = {
    * Prefer `scrollToRow`, which resolves the index for you.
    * */
   scrollToIndex(index: GridTableScrollOptions): void;
-  /** Scrolls the row into view (smooth by default) unless it's already visible; a no-op unless `as=virtual`. */
+  /**
+   * Scrolls the row into view (smooth by default), unless it's already among the rendered rows.
+   *
+   * Does nothing unless `as=virtual`, or for pinned or hidden rows.
+   */
   scrollToRow(kind: R["kind"], id: string, opts?: GridTableScrollToRowOptions): void;
 
   /** Returns the currently-visible rows. */
@@ -52,10 +56,7 @@ export type GridTableApi<R extends Kinded> = {
   /** Returns the currently-visible rows of the given `kind`. */
   getVisibleRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
   /** Returns the visible rows just before/after `row`, overall and per kind, i.e. for SuperDrawer prev/next. */
-  getAdjacentRows(
-    row: GridDataRow<R>,
-    additionalFilter?: (row: GridDataRow<R>) => boolean,
-  ): NextPrev<R> & { [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>> };
+  getAdjacentRows(row: GridDataRow<R>, additionalFilter?: (row: GridDataRow<R>) => boolean): AdjacentRows<R>;
 
   /** Returns the ids of currently-selected rows. */
   getSelectedRowIds(): string[];
@@ -123,6 +124,10 @@ type NextPrev<R extends Kinded> = {
   prev: GridDataRow<R> | undefined;
 };
 
+type AdjacentRows<R extends Kinded> = NextPrev<R> & {
+  [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
+};
+
 /** Adds per-row methods to the `api`, i.e. for getting currently-visible children. */
 export type GridRowApi<R extends Kinded> = GridTableApi<R> & {
   getVisibleChildren(): GridDataRow<R>[];
@@ -184,7 +189,10 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     this.scrollToIndex({ index, behavior: "smooth", ...opts });
   }
 
-  public getAdjacentRows(row: GridDataRow<R>, additionalFilter: (row: GridDataRow<R>) => boolean = () => true): any {
+  public getAdjacentRows(
+    row: GridDataRow<R>,
+    additionalFilter: (row: GridDataRow<R>) => boolean = () => true,
+  ): AdjacentRows<R> {
     const rows = this.tableState.visibleRows.map((rs) => rs.row).filter(additionalFilter);
     // Ensure we have `result.kind = {}` for each kind
     const result: any = Object.fromEntries(getKinds(this.tableState.visibleColumns).map((kind) => [kind, {}]));

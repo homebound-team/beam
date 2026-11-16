@@ -80,7 +80,7 @@ import { Row } from "./components/Row";
 import { RowGroup } from "./components/RowGroup";
 import { TableCard } from "./components/TableCard";
 import { GridTableEmptyState, type GridTableEmptyStateProps } from "./GridTableEmptyState";
-import { DraggedOver, type RowState } from "./utils/RowState";
+import { DraggedOver, rowKey, type RowState } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -761,11 +761,11 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     (tooManyClientSideRows && "Hiding some rows, use filter...") ||
     infoMessage;
 
-  // Lets `api.scrollToRow` find a row's index in VirtualGridTableView's item order. Head and pinned rows
-  // are always on screen, so they return -1. Row elements are keyed by `RowState.key`.
+  // Lets `api.scrollToRow` find a row's index in the item order `VirtualGridTableView.itemContent` renders.
+  // Only kept, message, and body rows resolve; head and pinned rows return -1.
   api.virtualIndexOf = (kind, id) => {
     const index = [...keptSelectedRows, ...(firstRowMessage ? [undefined] : []), ...visibleDataRows].findIndex(
-      (el) => el?.key === `${kind}-${id}`,
+      (el) => el?.key === rowKey(kind, id),
     );
     return index === -1 ? -1 : tableHeadRows.length + pinnedRows.length + index;
   };
@@ -1201,6 +1201,7 @@ function VirtualGridTableView<R extends Kinded>({
       itemContent={(index) => {
         // We render several stacked arrays — head rows, pinned rows, kept rows, an optional
         // first-row message, then the body rows — so map the flat virtuoso index onto each in order.
+        // `api.virtualIndexOf` in GridTable maps rows back to this order, so change both together.
 
         if (index < tableHeadRows.length) {
           return tableHeadRows[index];

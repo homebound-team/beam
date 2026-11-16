@@ -312,7 +312,7 @@ export class RowState<R extends Kinded> {
   }
 
   get key(): string {
-    return `${this.row.kind}-${this.row.id}`;
+    return rowKey(this.row.kind, this.row.id);
   }
 
   get kind(): string {
@@ -496,4 +496,9 @@ export class RowState<R extends Kinded> {
   [Symbol.for("nodejs.util.inspect.custom")](): string {
     return `RowState@${this.row.id}`;
   }
+}
+
+/** The React key of a row's element, i.e. `data-r:1`. */
+export function rowKey(kind: string, id: string): string {
+  return `${kind}-${id}`;
 }
