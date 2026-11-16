@@ -1,8 +1,10 @@
+import { act } from "react";
 import { Tokens } from "src/Css";
 import { DocumentScrollLayoutProvider } from "src/layouts/DocumentScrollLayoutContext";
 import { PageHeaderLayout } from "src/layouts/PageHeaderLayout/PageHeaderLayout";
 import { beamLayoutViewportHeightVar, beamLayoutViewportWidthVar } from "src/layouts/layoutVars";
 import { mockDocumentViewport, render } from "src/utils/rtl";
+import { vi } from "vitest";
 
 describe("DocumentScrollLayoutProvider", () => {
   beforeEach(() => {
@@ -45,6 +47,37 @@ describe("DocumentScrollLayoutProvider", () => {
     const root = findViewportRoot(r.container);
     expect(root?.style.getPropertyValue(beamLayoutViewportWidthVar)).toBe("1024px");
     expect(root?.style.getPropertyValue(beamLayoutViewportHeightVar)).toBe("768px");
+  });
+
+  it("rereads the viewport height when the content shell resizes", async () => {
+    // Given a viewport measurement, and observers split between the document element and the content shell
+    let onShellResize: (() => void) | undefined;
+    const origResizeObserver = window.ResizeObserver;
+    window.ResizeObserver = vi.fn().mockImplementation(function (this: ResizeObserver, cb: ResizeObserverCallback) {
+      this.observe = (el: Element) => {
+        if (el !== document.documentElement) onShellResize = () => cb([{ target: el } as ResizeObserverEntry], this);
+      };
+      this.unobserve = () => {};
+      this.disconnect = () => {};
+    }) as unknown as typeof ResizeObserver;
+    mockDocumentViewport(1024, 768);
+
+    try {
+      // When the shell resizes after a horizontal scrollbar shortens the viewport
+      const r = await render(
+        <DocumentScrollLayoutProvider>
+          <div data-testid="child" />
+        </DocumentScrollLayoutProvider>,
+      );
+      const root = findViewportRoot(r.container);
+      mockDocumentViewport(1024, 753);
+      act(() => onShellResize?.());
+
+      // Then the height var matches the shorter viewport without a window resize
+      expect(root?.style.getPropertyValue(beamLayoutViewportHeightVar)).toBe("753px");
+    } finally {
+      window.ResizeObserver = origResizeObserver;
+    }
   });
 
   it("creates only one measurement root when nested inside another provider", async () => {

@@ -19,7 +19,7 @@ export function PageBannerSlot(props: PageBannerSlotProps) {
     <div
       ref={metricsRef}
       css={
-        Css.fs0.w100.transitionTop.sticky
+        Css.fs0.w100.layoutTransitionTop.sticky
           .top(pageBannerOffset())
           .left(documentScrollChromeLeft())
           .w(`min(100%, ${documentScrollChromeWidth()})`)

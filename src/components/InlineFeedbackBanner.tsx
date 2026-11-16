@@ -27,6 +27,10 @@ export type InlineFeedbackBannerProps = {
  * A tagged error/warning notice that sits inline with the content it's about.
  *
  * Any background behind the banner belongs to whatever is hosting it.
+ *
+ * At 440px wide or narrower the tag, description, and actions stack, including inside a modal on a wide screen.
+ *
+ * The number is repeated because `ifContainer` only accepts a numeric literal, and a container query cannot read a const or a CSS variable.
  */
 export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
   const { type, tagText, tagVariant, description, actions = [] } = props;
@@ -39,30 +43,47 @@ export function InlineFeedbackBanner(props: InlineFeedbackBannerProps) {
     : { type: tagType, variant: tagVariant, icon, text: fallbackTagText, iconOnly: true };
 
   return (
-    <div css={Css.df.ais.w100.p1.br4.xs.bgColor(Tokens.Surface).ba.bc(borderColor).boxShadow(bannerShadow).$} {...tid}>
-      <span css={Css.df.aic.hPx(24).fs0.$}>
-        <Tag {...tagProps} {...tid.tag} />
-      </span>
-      <span css={Css.fg1.mw0.mlPx(4).pyPx(4).color(Tokens.OnSurface).$} {...tid.description}>
-        {description}
-      </span>
-      {actions.length > 0 && (
-        <div css={Css.df.aic.hPx(24).gap2.mlPx(20).fs0.$}>
-          {actions.map((action) =>
-            "kind" in action ? (
-              <ButtonMenu
-                key={action.label}
-                trigger={{ label: action.label, variant: "text" }}
-                items={action.items}
-                disabled={action.disabled}
-                tooltip={action.tooltip}
-              />
-            ) : (
-              <Button key={`${action.label}`} {...action} variant="text" />
-            ),
-          )}
-        </div>
-      )}
+    // Children query this width, so a narrow slot stacks on a wide screen.
+    <div css={Css.w100.mw0.ctis.$} {...tid}>
+      <div
+        css={
+          Css.df.ais.w100.p1.br4.xs
+            .bgColor(Tokens.Surface)
+            .ba.bc(borderColor)
+            .boxShadow(bannerShadow)
+            .ifContainer({
+              lt: 440,
+            })
+            .fdc.gapPx(4).aiStretch.$
+        }
+      >
+        <span css={Css.df.aic.hPx(24).fs0.$}>
+          <Tag {...tagProps} {...tid.tag} />
+        </span>
+        <span
+          css={Css.fg1.mw0.mlPx(4).pyPx(4).color(Tokens.OnSurface).ifContainer({ lt: 440 }).ml0.py0.$}
+          {...tid.description}
+        >
+          {description}
+        </span>
+        {actions.length > 0 && (
+          <div css={Css.df.aic.hPx(24).gap2.mlPx(20).fs0.ifContainer({ lt: 440 }).ha.ml0.w100.jcfe.$}>
+            {actions.map((action) =>
+              "kind" in action ? (
+                <ButtonMenu
+                  key={action.label}
+                  trigger={{ label: action.label, variant: "text" }}
+                  items={action.items}
+                  disabled={action.disabled}
+                  tooltip={action.tooltip}
+                />
+              ) : (
+                <Button key={`${action.label}`} {...action} variant="text" />
+              ),
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

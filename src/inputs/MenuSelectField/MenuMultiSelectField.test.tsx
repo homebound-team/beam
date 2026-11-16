@@ -1,6 +1,7 @@
 import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
+import type { SelectionView } from "src/inputs/MenuSelectField/types";
 import { click, getOption, getOptions, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
@@ -253,6 +254,128 @@ describe("MenuMultiSelectField", () => {
     expect(r.color_listbox).toHaveFocus();
   });
 
+  describe("selectionView", () => {
+    it("shows in-field pills and count badge by default", async () => {
+      // Given a multi select with two values
+      const r = await render(<MultiHarness initial={["r", "b"]} />);
+      // Then each selection is a pill, and the count badge is present
+      expect(r.color_pill_0).toHaveTextContent("Red");
+      expect(r.color_pill_1).toHaveTextContent("Blue");
+      expect(r.color_count).toHaveTextContent("2");
+      expect(r.query.selectedOptionPillList).toBeNull();
+    });
+
+    it("shows only a count badge when badgeOnly", async () => {
+      // Given a multi select with two values, shown as badge only
+      const r = await render(<MultiHarness initial={["r", "b"]} selectionView="badgeOnly" />);
+      // Then the field shows the count and no pills
+      expect(r.color_count).toHaveTextContent("2");
+      expect(r.query.color_pill_0).toBeNull();
+      expect(r.query.selectedOptionPillList).toBeNull();
+    });
+
+    it("opens the menu when an in-field pill is clicked", async () => {
+      // Given a multi select with a value shown as a pill in the field
+      const r = await render(<MultiHarness initial={["r"]} selectionView="inField" />);
+      // When clicking the pill
+      click(r.color_pill_0);
+      // Then the menu opens
+      expect(r.color).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("shows the proposed values as in-field pills", async () => {
+      // Given Red on record and Blue and Green proposed, shown in the field
+      const r = await render(<MultiHarness initial={["r"]} proposedValues={["b", "g"]} selectionView="inField" />);
+      // Then the pills and the count are the proposal, and Red sits below
+      expect(r.color_pill_0).toHaveTextContent("Blue");
+      expect(r.color_pill_1).toHaveTextContent("Green");
+      expect(r.color_count).toHaveTextContent("2");
+      expect(r.color).toHaveAttribute("data-ai-mode", "true");
+      expect(r.color_originalValue).toHaveTextContent("Red");
+    });
+
+    it("draws the original and the proposal as text when read-only", async () => {
+      // Given a read-only field with Red on record and Blue and Green proposed
+      const r = await render(
+        <MultiHarness initial={["r"]} proposedValues={["b", "g"]} selectionView="inField" readOnly />,
+      );
+      // Then both halves are text, and there are no pills
+      expect(r.color_proposedValue).toHaveTextContent("Red Blue, Green");
+      expect(r.query.color_pill_0).toBeNull();
+      expect(r.query.color_originalValue).toBeNull();
+    });
+
+    it("keeps the Mixed label instead of pills when some values are dotted", async () => {
+      // Given Red on every record and Blue on some, shown in the field
+      const r = await render(<MultiHarness initial={["r"]} mixedValues={["b"]} selectionView="inField" />);
+      // Then the field reads Mixed, with no pills
+      expect(r.color).toHaveTextContent(/^Mixed2$/);
+      expect(r.query.color_pill_0).toBeNull();
+    });
+
+    it("shows the placeholder in the field while selections are listed", async () => {
+      // Given a selection list with two values and a field placeholder
+      const r = await render(
+        <MultiHarness initial={["r", "b"]} selectionView="selectionList" placeholder="Add an option" />,
+      );
+      // Then the field reads the placeholder, and the selections stay listed below it
+      expect(r.color).toHaveTextContent("Add an option");
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
+      expect(r.selectedOptionPillList_pill_value_1).toHaveTextContent("Blue");
+    });
+
+    it("lists each selection below the field when selectionList", async () => {
+      // Given a multi select with two values, listed below the field
+      const r = await render(<MultiHarness initial={["r", "b"]} selectionView="selectionList" />);
+      // Then each selection is a pill below the field, and the count badge stays
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
+      expect(r.selectedOptionPillList_pill_value_1).toHaveTextContent("Blue");
+      expect(r.color_count).toHaveTextContent("2");
+      expect(r.query.color_pill_0).toBeNull();
+    });
+
+    it("renders no list when nothing is selected", async () => {
+      // Given a multi select with nothing selected, listed below the field
+      const r = await render(<MultiHarness selectionView="selectionList" />);
+      // Then there is no list
+      expect(r.query.selectedOptionPillList).toBeNull();
+    });
+
+    it("uses the menu label for each list pill", async () => {
+      // Given a menu label that differs from the field label
+      const r = await render(
+        <MultiHarness
+          initial={["r"]}
+          selectionView="selectionList"
+          getOptionMenuLabel={(option) => `Menu ${option.name}`}
+        />,
+      );
+      // Then the list pill shows the menu label
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Menu Red");
+    });
+
+    it("removes a selection from its list pill", async () => {
+      // Given Red and Blue listed below the field
+      const onSelect = vi.fn();
+      const r = await render(
+        <MultiHarness initial={["r", "b"]} selectionView="selectionList" onSelectSpy={onSelect} />,
+      );
+      // When removing the Red pill
+      click(r.selectedOptionPillList_pill_remove_0);
+      // Then Red is cleared
+      expect(onSelect).toHaveBeenLastCalledWith(["b"], [{ id: "b", name: "Blue" }]);
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Blue");
+    });
+
+    it("hides list remove controls when the field is disabled", async () => {
+      // Given a disabled field with Red listed below it
+      const r = await render(<MultiHarness initial={["r"]} selectionView="selectionList" disabled />);
+      // Then Red shows as a pill without a remove control
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
+      expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+    });
+  });
+
   describe("AI mode", () => {
     it("counts the proposed values", async () => {
       // Given Red on record and Blue and Green proposed
@@ -261,6 +384,14 @@ describe("MenuMultiSelectField", () => {
       expect(r.color_count).toHaveTextContent("2");
       expect(r.color).toHaveAttribute("data-ai-mode", "true");
       expect(r.color_originalValue).toHaveTextContent("Red");
+    });
+
+    it("strikes only the on-record value the proposal drops", async () => {
+      // Given Red, Blue, and Green on record, and a proposal that keeps Red and Green
+      const r = await render(<MultiHarness initial={["r", "b", "g"]} proposedValues={["r", "g"]} />);
+      // Then Red and Green are the proposal, and only Blue is struck
+      expect(r.color_count).toHaveTextContent("2");
+      expect(r.color_originalValue.textContent).toBe("Blue");
     });
   });
 
@@ -307,6 +438,11 @@ type HarnessProps = {
   proposedValues?: string[];
   disabledOptions?: (string | { value: string; reason: string })[];
   mixedValues?: string[];
+  selectionView?: SelectionView;
+  getOptionMenuLabel?: (option: Color) => string;
+  placeholder?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
 };
 
 function MultiHarness(props: HarnessProps) {

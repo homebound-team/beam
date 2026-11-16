@@ -1,4 +1,6 @@
 import type { JSX } from "react";
+import { SelectedOptionPillList } from "src/components/Pills/SelectedOptionPill/SelectedOptionPillList";
+import { Css } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { AnchoredOverlay } from "src/inputs/MenuSelectField/internal/AnchoredOverlay";
 import { BottomSheet } from "src/inputs/MenuSelectField/internal/BottomSheet";
@@ -22,9 +24,11 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControl
     proposedValues: _proposedValues,
     onCommit: _onCommit,
     tree: _tree,
+    selectionView = "inField",
     ...fieldProps
   } = props;
-  const { triggerRef, trigger, searchRef, search, listRef, menu, selections } = useMenuSelectField(props);
+  const { triggerRef, trigger, searchRef, search, listRef, menu, selections, selectionList } =
+    useMenuSelectField(props);
   const tid = useTestIds(props, defaultTestId(label));
   const { sm: isMobile } = useBreakpoint();
   const panel = (
@@ -55,9 +59,26 @@ export function BaseMenuSelectField<O, V extends Value>(props: MenuSelectControl
     </MenuPanel>
   );
 
+  const fieldTrigger = (
+    <MenuSelectTrigger
+      {...fieldProps}
+      label={label}
+      trigger={trigger}
+      triggerRef={triggerRef}
+      selectionView={selectionView}
+    />
+  );
+
   return (
     <>
-      <MenuSelectTrigger {...fieldProps} label={label} trigger={trigger} triggerRef={triggerRef} />
+      {selectionView === "selectionList" ? (
+        <div css={Css.df.fdc.gap2.w100.$}>
+          {fieldTrigger}
+          <SelectedOptionPillList options={selectionList} />
+        </div>
+      ) : (
+        fieldTrigger
+      )}
       {isMobile ? (
         <BottomSheet isOpen={menu.isOpen} onClose={() => menu.close({ restoreFocus: true })} label={label} {...tid}>
           {panel}

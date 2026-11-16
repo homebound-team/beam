@@ -18,8 +18,9 @@ describe("TreeFilter", () => {
     expect(r.value).toHaveTextContent("{}");
     // When selecting a parent
     select(r.filter_tree, "Grandparent 0");
-    // Then the badge counts that root, and the filter stores only the root
+    // Then the badge counts that root, the filter stores only the root, and no in-field pills render
     expect(r.filter_tree_count).toHaveTextContent("1");
+    expect(r.query.filter_tree_pill_0).toBeNull();
     expect(r.value).toHaveTextContent('{"tree":["gp:0"]}');
   });
 

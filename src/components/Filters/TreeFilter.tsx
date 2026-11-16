@@ -35,9 +35,17 @@ class TreeFilter<O, V extends Value> extends BaseFilter<V[], TreeFilterProps<O, 
     inModal: boolean,
     vertical: boolean,
   ): JSX.Element {
-    const { defaultValue, nothingSelectedText, filterBy = "root", defaultExpanded, ...props } = this.props;
+    const {
+      defaultValue,
+      nothingSelectedText,
+      filterBy = "root",
+      defaultExpanded,
+      selectionView = "badgeOnly",
+      ...props
+    } = this.props;
     return (
       <MenuTreeSelectField<O, V>
+        selectionView={selectionView}
         {...props}
         label={this.label}
         values={value ?? []}

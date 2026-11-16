@@ -95,4 +95,35 @@ describe("useAiProposal", () => {
     rerender({ value: "down" });
     expect(result.current.proposalProps.proposedValue).toBeUndefined();
   });
+
+  describe("lists", () => {
+    it("strikes only the values the proposal drops", async () => {
+      // Given Red, Blue, and Green on record, and a proposal that keeps Red and Green
+      const { result } = renderHook(() => useAiProposal(["r", "b", "g"], ["r", "g"], (vs) => vs.join(", ")));
+      // Then the proposal is the whole selection, and only Blue is struck
+      expect(result.current.effectiveValue).toEqual(["r", "g"]);
+      expect(result.current.proposalProps).toMatchObject({ proposedValue: "r, g", originalValue: "b" });
+    });
+
+    it("omits the original when the proposal only adds values", async () => {
+      // Given Red on record, and a proposal that keeps Red and adds Green
+      const { result } = renderHook(() => useAiProposal(["r"], ["r", "g"], (vs) => vs.join(", ")));
+      // Then nothing is struck
+      expect(result.current.proposalProps.originalValue).toBeUndefined();
+    });
+
+    it("strikes the whole list when the proposal replaces it", async () => {
+      // Given Red and Blue on record, and a proposal of only Green
+      const { result } = renderHook(() => useAiProposal(["r", "b"], ["g"], (vs) => vs.join(", ")));
+      // Then both on-record values are struck
+      expect(result.current.proposalProps.originalValue).toBe("r, b");
+    });
+
+    it("strikes nothing when a reordered proposal keeps the same values", async () => {
+      // Given Blue and Red on record, and the same two proposed in the other order
+      const { result } = renderHook(() => useAiProposal(["b", "r"], ["r", "b"], (vs) => vs.join(", ")));
+      // Then nothing is struck
+      expect(result.current.proposalProps.originalValue).toBeUndefined();
+    });
+  });
 });

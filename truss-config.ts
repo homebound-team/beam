@@ -1,5 +1,9 @@
 import { defineConfig, type KeyframesConfig, newMethod, newMethodsForProp, Sections } from "@homebound/truss";
-import { documentScrollContentLeft, documentScrollContentWidth } from "./src/layouts/layoutVars";
+import {
+  beamStickyTopTransitionVar,
+  documentScrollContentLeft,
+  documentScrollContentWidth,
+} from "./src/layouts/layoutVars";
 import { motion } from "./truss-motion";
 import { palette } from "./truss-palette";
 import { Tokens } from "./truss-token-vars";
@@ -112,6 +116,11 @@ const sections: Sections = {
     }),
     newMethod("transitionTop", {
       transition: `top ${motion.duration.normal} ${motion.easing.standard}`,
+    }),
+    // Same ease as `transitionTop`, but off while the navbar or page header is still moving with the scroll.
+    // Turning it off is done by setting the `beamStickyTopTransitionVar` to `none`. Otherwise, we can unset it to use the default transition
+    newMethod("layoutTransitionTop", {
+      transition: `var(${beamStickyTopTransitionVar}, top ${motion.duration.normal} ${motion.easing.standard})`,
     }),
     newMethod("transitionAll", {
       transition: `all ${motion.duration.normal} ${motion.easing.standard}`,

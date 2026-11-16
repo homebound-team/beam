@@ -7,6 +7,7 @@ import {
   documentScrollChromeWidth,
   documentScrollContentWidth,
   documentScrollRightPaneHeight,
+  documentScrollRightPaneMinHeight,
   documentScrollRightPaneWidthCss,
   getFloatingBottomOffset,
   getFloatingRightOffset,
@@ -50,6 +51,19 @@ describe("layoutVars", () => {
       // Then it subtracts the sticky table header offset from the layout viewport height
       expect(result).toBe(
         "calc(var(--beam-layout-viewport-height, 100vh) - calc(0px + var(--beam-environment-banner-height, 0px) + var(--beam-navbar-layout-height, 0px) + var(--beam-page-header-layout-height, 0px) + var(--beam-page-banner-height, 0px) + var(--beam-table-actions-height, 0px)))",
+      );
+    });
+  });
+
+  describe("documentScrollRightPaneMinHeight", () => {
+    it("reserves scroll up to the pin line under stay-pinned chrome", () => {
+      // Given the open right-pane anchor min-height
+      // When computing the min-height expression
+      const result = documentScrollRightPaneMinHeight();
+
+      // Then it leaves the navbar and page header out, and does not scroll past the pin line
+      expect(result).toBe(
+        "calc(var(--beam-layout-viewport-height, 100vh) - var(--beam-environment-banner-height, 0px) - var(--beam-page-banner-height, 0px) - var(--beam-table-actions-height, 0px) - var(--beam-workflow-layout-footer-height, 0px))",
       );
     });
   });

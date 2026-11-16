@@ -1,0 +1,178 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonGroupStories from "./ButtonGroup.stories";
+
+<Meta of={ButtonGroupStories} />
+
+# Button Group
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4280-223">
+    <img src="FigmaLogo.png" alt="" />
+    Button Group
+  </a>
+</p>
+
+`ButtonGroup` joins related choices or actions into one control. It comes in two styles:
+
+- **Text**, a view toggle, e.g. switching between Cost and Price. Exactly one button is `active`, and selecting another changes the view immediately.
+- **Icon**, a set of related actions, e.g. previous, add, and next. These are actions, so none of them is `active`. Give each one a `tooltip`.
+
+Use two or three buttons. If you need more, use a select field instead. Write text labels in title case with no punctuation, and keep them to one or two words.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>buttons</code>
+      </td>
+      <td>
+        <code>ButtonGroupButton[]</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>The buttons, in order. See the table below.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>disabled</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Disables every button in the group.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>fullWidth</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>
+        <code>false</code>
+      </td>
+      <td>Stretches the group to its container and splits the width evenly between the buttons.</td>
+    </tr>
+  </tbody>
+</table>
+
+Each entry in `buttons` takes:
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>text</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>The label. Leave it out for an icon-only button.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>icon</code>
+      </td>
+      <td>
+        <code>IconKey</code>
+      </td>
+      <td>An icon, shown before the text if both are set.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>iconColor</code>, <code>iconInc</code>
+      </td>
+      <td>
+        <code>IconProps["color"]</code>, <code>IconProps["inc"]</code>
+      </td>
+      <td>Overrides the icon's color or size. The color is dropped while the button is disabled.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>onClick</code>
+      </td>
+      <td>
+        <code>{"() => void"}</code>
+      </td>
+      <td>Called when the button is clicked.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>active</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>Marks the selected button in a text view toggle.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>disabled</code>
+      </td>
+      <td>
+        <code>boolean | ReactNode</code>
+      </td>
+      <td>Disables the button. Pass a ReactNode to also show it as the tooltip, explaining why.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>tooltip</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>A tooltip shown above the button.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Behaviors
+
+- The group is always 40px tall, matching text fields.
+- The selected button is the only one with the blue fill. It has no hover or pressed state, because clicking it does nothing.
+- Hover and pressed use gray fills, never blue, so they can't be mistaken for a selection.
+- Each button gets a test id from its text, or its icon if it has no text. For example, "Cost" gives `buttonGroup_cost` and its tooltip `buttonGroup_cost_tooltip`. Pass `data-testid` to change the `buttonGroup` prefix.
+
+## How to use
+
+A view toggle:
+
+```tsx
+<ButtonGroup
+  buttons={[
+    { text: "Cost", active: view === "cost", onClick: () => setView("cost") },
+    { text: "Price", active: view === "price", onClick: () => setView("price") },
+  ]}
+/>
+```
+
+A set of actions:
+
+```tsx
+<ButtonGroup
+  buttons={[
+    { icon: "chevronLeft", tooltip: "Previous", onClick: onPrev, disabled: !hasPrev },
+    { icon: "plus", tooltip: "Add", onClick: onAdd },
+    { icon: "chevronRight", tooltip: "Next", onClick: onNext, disabled: !hasNext },
+  ]}
+/>
+```

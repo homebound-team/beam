@@ -405,6 +405,16 @@ describe("MultiSelectFieldTest", () => {
       expect(r.queryAllByTestId("chip").map((c) => c.textContent)).toEqual(["Three", "Two"]);
     });
 
+    it("strikes only the on-record value the proposal drops", async () => {
+      // Given "One" and "Two" on record, and a proposal that keeps "Two" and adds "Three"
+      const r = await render(
+        <TestMultiSelectField values={["1", "2"]} proposedValues={["2", "3"]} options={options} />,
+      );
+      // Then only "One" is struck, and the proposal's chips are unchanged
+      expect(r.age_originalValue.textContent).toBe("One");
+      expect(r.queryAllByTestId("chip").map((c) => c.textContent)).toEqual(["Three", "Two"]);
+    });
+
     it("shows the proposed options as selected in the dropdown", async () => {
       const r = await render(<TestMultiSelectField values={["1"]} proposedValues={["2", "3"]} options={options} />);
       click(r.age);

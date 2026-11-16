@@ -69,6 +69,8 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
   proposedValues?: V[];
   /** For a tree, receives every selected value, including cascaded parents and children. */
   onCommit: (values: V[], opts: O[]) => void;
+  /** How selections show in the closed field. Multiple selection only. @default inField */
+  selectionView?: SelectionView;
   /** Single select only. `unsetLabel` row that commits `undefined`. */
   unsetLabel?: string;
   /** Makes `options` the roots of a tree. Multiple selection expands groups and cascades. Single selection lists every node and shows the path. */
@@ -77,6 +79,15 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
 
 /** Which selected options to surface: every one, only leaves, or only the highest selected ancestors. */
 export type TreeSelectionDisplay = "all" | "leaf" | "root";
+
+/**
+ * How a multi or tree select shows its selections in the closed field.
+ *
+ * - `inField`: the count badge, plus read-only pills inside the field that wrap onto more lines. Use it when option labels are short. (default)
+ * - `badgeOnly`: a count badge. Use it in filters, or anywhere there is no room to list selections inline.
+ * - `selectionList`: a `SelectedOptionPillList` below the field. Use it for long or composite labels, such as a code and a name.
+ */
+export type SelectionView = "badgeOnly" | "inField" | "selectionList";
 
 export type MenuSelectTreeConfig<O> = {
   getChildren: (opt: O) => readonly O[] | undefined;

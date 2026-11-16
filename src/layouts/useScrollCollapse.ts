@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
  * Whether the document has scrolled past `restingOffset`, for chrome that collapses on scroll-down and
  * re-expands on scroll-up (even before reaching the top).
  *
- * Unlike `useAutoHideOnScroll`, this tracks plain `window.scrollY` rather than a spacer's rect, since
+ * Unlike `useRevealOnScrollUp`, this tracks plain `window.scrollY` rather than a reserve element's rect, since
  * callers here rest at a fixed, computable offset rather than needing a measured DOM anchor.
  *
  * Currently **unused** — kept for a future revisit. `StepperLayout` was its only caller (collapsing the

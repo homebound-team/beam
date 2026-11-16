@@ -51,8 +51,8 @@ export function useScrollPinnedViewportBounds(
     syncBounds();
     window.addEventListener("scroll", syncBounds, { passive: true });
     window.addEventListener("resize", syncBounds);
-    // Chrome writes the pin offset's vars onto the anchor's ancestors when it re-renders, which lands after the scroll
-    // that hid or revealed it, so also re-sync on those style changes
+    // The navbar and page header write their height vars from a scroll listener registered at mount, so it usually runs before this one.
+    // A measurement writes them with no scroll at all. Either way, the ancestor style change re-reads the pin.
     const styleObserver = new MutationObserver(syncBounds);
     for (let node = anchorRef.current; node; node = node.parentElement) {
       styleObserver.observe(node, { attributes: true, attributeFilter: ["style"] });
