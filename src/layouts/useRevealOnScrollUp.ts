@@ -151,6 +151,11 @@ export function holdRevealWhile(scroll: () => void): void {
   scroll();
 }
 
+/** Ends any hold between tests, since the hold is module state and its quiet timer never fires under fake timers. */
+export function resetRevealHold(): void {
+  cancelActiveHold?.();
+}
+
 function getInitialRevealState(): RevealState {
   if (typeof window === "undefined" || window.scrollY <= 0) {
     return "resting";
