@@ -35,7 +35,8 @@ export const Icon = React.memo((props: IconProps) => {
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         css={{
-          ...Css.fill(color).$,
+          // An svg flex item has no content-based min width, so without fs0 it shrinks beside long text.
+          ...Css.fill(color).fs0.$,
           ...(bgColor && Css.bgColor(bgColor).$),
           ...xss,
         }}
