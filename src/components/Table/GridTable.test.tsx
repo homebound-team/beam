@@ -1367,7 +1367,7 @@ describe("GridTable", () => {
       const api = new GridTableApiImpl<Row>();
       await render(<GridTable<Row> api={api} as="virtual" columns={[nameColumn, valueColumn]} rows={pinRows} />);
       act(() => api.pinRow("3"));
-      // And a stand-in for Virtuoso, which doesn't mount under vitest
+      // And a stand-in for Virtuoso
       const scrollToIndex = vi.fn();
       api.virtuosoRef.current = { scrollToIndex } as any;
 

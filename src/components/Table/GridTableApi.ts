@@ -47,7 +47,7 @@ export type GridTableApi<R extends Kinded> = {
   /**
    * Scrolls the row into view (smooth by default), unless it's already among the rendered rows.
    *
-   * Does nothing unless `as=virtual`, or for pinned or hidden rows.
+   * Does nothing for pinned or hidden rows, or when the table isn't `as=virtual`.
    */
   scrollToRow(kind: R["kind"], id: string, opts?: GridTableScrollToRowOptions): void;
 

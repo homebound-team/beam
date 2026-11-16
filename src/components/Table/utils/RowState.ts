@@ -498,7 +498,7 @@ export class RowState<R extends Kinded> {
   }
 }
 
-/** The React key of a row's element, i.e. `data-r:1`. */
+/** A row element's React key. */
 export function rowKey(kind: string, id: string): string {
   return `${kind}-${id}`;
 }
