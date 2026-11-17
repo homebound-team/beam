@@ -282,7 +282,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       const opt =
         isSingleSelectTree && menuTree ? menuTree.nodes.get(String(key))?.option : optionsByKey.get(String(key));
       proposalProps.onUserEdit?.();
-      onCommit(opt === undefined ? [] : [getOptionValue(opt)], opt === undefined ? [] : [opt]);
+      commit(opt === undefined ? [] : [getOptionValue(opt)], opt === undefined ? [] : [opt]);
       close({ restoreFocus: true });
       return;
     }
@@ -301,7 +301,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       if (opt !== undefined && !selectedKeys.has(String(k))) next.push(getOptionValue(opt));
     }
     proposalProps.onUserEdit?.();
-    onCommit(next, optionsForValues(next));
+    commit(next, optionsForValues(next));
   }
 
   const collectionItems = useMemo((): MenuOptionItem<O>[] => {
@@ -385,7 +385,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       return;
     }
     // In AI mode `values` is the proposal. Committing it first means the caller adds to the proposal, not to the record.
-    if (proposalProps.proposedValue !== undefined) onCommit(values, optionsForValues(values));
+    if (proposalProps.proposedValue !== undefined) commit(values, optionsForValues(values));
     onAddNew?.(text);
     // The menu stays open. Clearing the search drops the add row, so a second press can't add the same text again.
     onSearchChange("");
@@ -615,7 +615,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     }
     // Remove the clicked value. A tree pill uses `toggleTreeSelection` above, which also clears its parent.
     const next = values.filter((value) => valueToKey(value) !== key);
-    onCommit(next, optionsForValues(next));
+    commit(next, optionsForValues(next));
   }
 
   /** The option for each value in `next`: the one still in the list, or the stored copy if the caller removed it. */
@@ -624,6 +624,15 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       const option = optionForKey(valueToKey(value), optionsByKey, rememberedSelectedRef.current);
       return option ? [option] : [];
     });
+  }
+
+  /**
+   * Stores each option before `onCommit`, so its label survives the caller swapping `options` in the same update.
+   * For example, closing calls `onSearch("")`, and a caller that derives `options` from the search empties them along with the new value.
+   */
+  function commit(nextValues: V[], nextOptions: O[]) {
+    for (const option of nextOptions) rememberedSelectedRef.current.set(valueToKey(getOptionValue(option)), option);
+    onCommit(nextValues, nextOptions);
   }
 
   /**
@@ -646,7 +655,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       return [option];
     });
     const nextOptions = [...selectedInTree, ...keptSelections];
-    onCommit(
+    commit(
       nextOptions.map((option) => getOptionValue(option)),
       nextOptions,
     );

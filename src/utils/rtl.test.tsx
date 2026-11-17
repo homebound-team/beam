@@ -202,6 +202,7 @@ describe("rtl", () => {
     // Then the full label went to onSearch after the debounce, and the match is selected
     expect(onSearch).toHaveBeenCalledWith("Apple Pie");
     expect(onSelect).toHaveBeenCalledWith("1", { id: "1", name: "Apple Pie" });
+    expect(r.food).toHaveTextContent("Apple Pie");
   });
 
   it("can select the add-new row with addNew option", async () => {

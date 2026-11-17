@@ -116,6 +116,24 @@ describe("MenuSelectField", () => {
     expect(r.color).toHaveTextContent("Red");
   });
 
+  it("keeps a picked label when closing empties the options in the same update", async () => {
+    // Given a field that lists options only for a search, so closing's onSearch("") empties the list
+    function Page() {
+      const [value, setValue] = useState<string | undefined>();
+      const [search, setSearch] = useState("");
+      const options = search ? colors().filter((c) => c.name.toLowerCase().includes(search.toLowerCase())) : [];
+      return <MenuSelectField label="Color" options={options} value={value} onSelect={setValue} onSearch={setSearch} />;
+    }
+    const r = await render(<Page />);
+    // When searching and picking a match
+    click(r.color);
+    type(r.color_search, "Blue");
+    await wait();
+    select(r.color, "Blue");
+    // Then the closed field shows the pick, though the list it came from is gone
+    expect(r.color).toHaveTextContent("Blue");
+  });
+
   it("loads options the first time the menu opens", async () => {
     // Given a selected option whose full list has not been loaded
     const load = vi.fn();
