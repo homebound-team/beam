@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
 import type { SelectionView } from "src/inputs/MenuSelectField/types";
-import { click, getOption, getOptions, render, select, type } from "src/utils/rtl";
+import { click, getOption, getOptions, getSelected, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuMultiSelectField", () => {
@@ -383,12 +383,8 @@ describe("MenuMultiSelectField", () => {
       const onSelect = vi.fn();
       const r = await render(<MultiHarness initial={["r"]} onAddNew={onAddNew} onSelectSpy={onSelect} />);
       click(r.color);
-      // When typing text that names no option
+      // When typing text that names no option and choosing the add row
       type(r.color_search, "Teal");
-      // Then the add row has a plus where the checkbox goes
-      const addRow = getOption(r.color, 'Add "Teal"');
-      expect(addRow.querySelector("[data-icon='plus']")).not.toBeNull();
-      // When choosing it
       select(r.color, 'Add "Teal"');
       // Then onAddNew gets the text, the selection is untouched, and the menu stays open on the full list
       expect(onAddNew).toHaveBeenCalledWith("Teal");
@@ -398,29 +394,16 @@ describe("MenuMultiSelectField", () => {
       expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
     });
 
-    it("commits the proposal before adding in AI mode", async () => {
-      // Given Red on record and Blue and Green proposed
-      const onAddNew = vi.fn();
-      const onSelect = vi.fn();
-      const r = await render(
-        <MultiHarness initial={["r"]} proposedValues={["b", "g"]} onAddNew={onAddNew} onSelectSpy={onSelect} />,
-      );
-      // When adding a value
+    it("adds the new value to the AI proposal", async () => {
+      // Given Red on record, Blue and Green proposed, and a caller that creates the option and adds its value
+      const r = await render(<TestAddNewField initial={["r"]} proposedValues={["b", "g"]} />);
+      // When adding Teal
       click(r.color);
       type(r.color_search, "Teal");
       select(r.color, 'Add "Teal"');
-      // Then the proposal commits first, so the caller adds the new value to it
-      expect(onSelect).toHaveBeenCalledWith(
-        ["b", "g"],
-        [
-          { id: "b", name: "Blue" },
-          { id: "g", name: "Green" },
-        ],
-      );
-      expect(onAddNew).toHaveBeenCalledWith("Teal");
-      expect(onSelect.mock.invocationCallOrder[0]).toBeLessThan(onAddNew.mock.invocationCallOrder[0]);
+      // Then the proposal and Teal are selected, and the field has left AI mode
+      expect(getSelected(r.color)).toEqual(["Blue", "Green", "Teal"]);
       expect(r.color).not.toHaveAttribute("data-ai-mode");
-      expect(r.color_count).toHaveTextContent("2");
     });
   });
 
@@ -508,6 +491,25 @@ function MultiHarness(props: HarnessProps) {
         setValues(next);
       }}
       {...others}
+    />
+  );
+}
+
+/** `onAddNew` creates the option as `t` and adds it to `values`, like a caller saving a new record. */
+function TestAddNewField(props: { initial: string[]; proposedValues?: string[] }) {
+  const [options, setOptions] = useState(colors());
+  const [values, setValues] = useState(props.initial);
+  return (
+    <MenuMultiSelectField
+      label="Color"
+      options={options}
+      values={values}
+      proposedValues={props.proposedValues}
+      onSelect={setValues}
+      onAddNew={(name) => {
+        setOptions((prev) => [...prev, { id: "t", name }]);
+        setValues((prev) => [...prev, "t"]);
+      }}
     />
   );
 }

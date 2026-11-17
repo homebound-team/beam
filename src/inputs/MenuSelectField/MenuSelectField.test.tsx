@@ -454,6 +454,16 @@ describe("MenuSelectField", () => {
       expect(r.color).toHaveFocus();
     });
 
+    it("ignores accents when the search names an option, like the filter", async () => {
+      // Given an open single select with a Café option and onAddNew
+      const r = await render(<TestHarness options={[{ id: "c", name: "Café" }]} onAddNew={vi.fn()} />);
+      click(r.color);
+      // When typing the label without its accent
+      type(r.color_search, "cafe");
+      // Then Café is listed with no add row
+      expect(getOptions(r.color)).toEqual(["Café"]);
+    });
+
     it("adds from the keyboard only once the add row is highlighted", async () => {
       // Given an open single select whose search matches nothing
       const onAddNew = vi.fn();

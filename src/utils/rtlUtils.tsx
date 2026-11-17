@@ -277,12 +277,17 @@ async function typeForAddNew(select: HTMLElement, value: string): Promise<void> 
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
 }
 
-/** The element that takes typed text. A MenuSelectField trigger is a button, so its open menu's search input drives the same listbox. */
+/**
+ * The element that takes typed text.
+ *
+ * A Menu select field's trigger is a button, so its open menu's search input drives the same listbox.
+ */
 function searchInputFor(select: HTMLElement): HTMLElement {
   if (select.nodeName !== "BUTTON") return select;
   const listboxId = select.getAttribute("aria-controls");
   return (
-    document.querySelector<HTMLElement>(`input[aria-controls="${listboxId}"]`) ?? fail("menu search input not found")
+    document.querySelector<HTMLElement>(`input[aria-controls="${listboxId}"]`) ??
+    fail("Menu select field has no search input to type into. Search shows with onSearch, onAddNew, or over 8 options.")
   );
 }
 

@@ -27,7 +27,7 @@ describe("BoundMenuSelectField", () => {
   it("sets the option the caller creates from onAddNew", async () => {
     // Given a field whose onAddNew creates an option and sets it
     const formState = createObjectState(formConfig(), {});
-    const r = await render(<AddNewField formState={formState} />);
+    const r = await render(<TestAddNewField formState={formState} />);
     // When adding a value from the search
     await selectAndWait(r.colorId, "Teal", { addNew: true });
     // Then the field holds the new option
@@ -49,7 +49,7 @@ function colors() {
   ];
 }
 
-function AddNewField(props: { formState: ObjectState<FormValue> }) {
+function TestAddNewField(props: { formState: ObjectState<FormValue> }) {
   const { formState } = props;
   const [options, setOptions] = useState(colors());
   return (

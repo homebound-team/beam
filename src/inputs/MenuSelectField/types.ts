@@ -60,8 +60,9 @@ export type MenuSelectFieldProps<O, V extends Value> = Omit<MenuSelectFieldBaseP
   /** `unsetLabel` row that clears the field. Stays first when options are sorted. Unlike `nothingSelectedText`, it is a selectable option. */
   unsetLabel?: string;
   /**
-   * Lists `Add "<search>"` under the matches while the trimmed search matches no option label, ignoring case. Search is always shown.
-   * Choosing that row passes the trimmed text and closes the menu. It does not call `onSelect`: create the option, then set `value`.
+   * Lists `Add "<search>"` under the matches while the trimmed search matches no option label, ignoring case and accents.
+   *
+   * Search is always shown. Choosing that row passes the trimmed text and closes the menu. It does not call `onSelect`: create the option, then set `value`.
    */
   onAddNew?: (value: string) => void;
 };
@@ -113,6 +114,8 @@ export type MenuOptionItem<O> = {
   valueKey: string;
 } & (
   | { option: O }
-  /** The `onAddNew` row, which is not an option. `addNew` is the trimmed search it passes on. */
-  | { addNew: string }
+  | {
+      /** Trimmed search the `onAddNew` row passes on. The row is an action, not an option. */
+      addNew: string;
+    }
 );

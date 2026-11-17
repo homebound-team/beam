@@ -1,6 +1,6 @@
 import type { Key } from "@react-types/shared";
 import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
+import { ListKeyboardDelegate, useCollator, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import type { SelectedOptionPillListProps } from "src/components/Pills/SelectedOptionPill/SelectedOptionPillList";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
@@ -120,6 +120,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
   const { contains } = useFilter({ sensitivity: "base" });
+  // Same sensitivity as `contains`, so a search that lists `Café` also counts "cafe" as naming it.
+  const collator = useCollator({ sensitivity: "base" });
 
   // For a tree, `options` are the roots; `allOptions` is every node in render order.
   const menuTree = useMemo(
@@ -149,7 +151,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
   // A single-select hierarchy labels its one value with the path (`Bath 207 > Walls > Drench`).
   // `", "` joins several proposed values for a multi select. A single select has one value, so the comma is unused.
-  const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
+  const { effectiveValue, isAiMode, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
     labelsFor(vs, allOptions, getOptionValue, (option) =>
       isSingleSelectTree && menuTree
         ? (optionPathLabel(menuTree, valueToKey(getOptionValue(option)), getOptionLabel) ?? getOptionLabel(option))
@@ -247,10 +249,10 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   );
   // Text for the `onAddNew` row. Unset while the search is blank or already names an option.
   const addNewText = useMemo(
-    () => (canAddNew ? newOptionText(search, allOptions, getOptionLabel) : undefined),
+    () => (canAddNew ? newOptionText(search, allOptions, getOptionLabel, collator) : undefined),
     // getOptionLabel is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [canAddNew, search, allOptions],
+    [canAddNew, search, allOptions, collator],
   );
 
   function onSelectionChange(keys: Selection) {
@@ -319,16 +321,23 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   const state = useListState<MenuOptionItem<O>>({
     items: collectionItems,
-    children: (item) =>
-      "addNew" in item ? (
-        <Item key={item.key} textValue={`Add "${item.addNew}"`}>{`Add "${item.addNew}"`}</Item>
-      ) : (
+    children: (item) => {
+      if ("addNew" in item) {
+        const label = `Add "${item.addNew}"`;
+        return (
+          <Item key={item.key} textValue={label}>
+            {label}
+          </Item>
+        );
+      }
+      return (
         <Item key={item.key} textValue={getOptionLabel(item.option)}>
           {getOptionMenuLabel
             ? getOptionMenuLabel(item.option, Boolean(unsetLabel) && item.option === unsetOption)
             : getOptionLabel(item.option)}
         </Item>
-      ),
+      );
+    },
     selectionMode: multiple ? "multiple" : "single",
     selectedKeys: selectedRowKeys,
     disabledKeys: disabledRowKeys,
@@ -385,7 +394,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       return;
     }
     // In AI mode `values` is the proposal. Committing it first means the caller adds to the proposal, not to the record.
-    if (proposalProps.proposedValue !== undefined) commit(values, optionsForValues(values));
+    if (isAiMode) commit(values, optionsForValues(values));
     onAddNew?.(text);
     // The menu stays open. Clearing the search drops the add row, so a second press can't add the same text again.
     onSearchChange("");
@@ -628,6 +637,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   /**
    * Stores each option before `onCommit`, so its label survives the caller swapping `options` in the same update.
+   *
    * For example, closing calls `onSearch("")`, and a caller that derives `options` from the search empties them along with the new value.
    */
   function commit(nextValues: V[], nextOptions: O[]) {
@@ -869,22 +879,26 @@ function matchesSearch<O>(
   return terms?.some((term) => contains(term, query)) ?? false;
 }
 
-/** The trimmed search for the `onAddNew` row, or `undefined` when it is blank or matches an option label, ignoring case. The `unsetLabel` row doesn't count. */
+/**
+ * The trimmed search for the `onAddNew` row, or `undefined` when it is blank or `collator` finds it equal to an option label.
+ *
+ * The `unsetLabel` row doesn't count as a match.
+ */
 function newOptionText<O>(
   search: string,
   options: readonly O[],
   getOptionLabel: (opt: O) => string,
+  collator: Intl.Collator,
 ): string | undefined {
   const text = search.trim();
   if (!text) return undefined;
-  const lower = text.toLowerCase();
   const exists = options.some(
-    (option) => option !== unsetOption && getOptionLabel(option).trim().toLowerCase() === lower,
+    (option) => option !== unsetOption && collator.compare(getOptionLabel(option).trim(), text) === 0,
   );
   return exists ? undefined : text;
 }
 
-/** Row key of the `onAddNew` row. */
+/** Namespaced so it can't collide with an option's `valueKey`. */
 const addNewKey = "beam-menu-add-new";
 
 /** Menus with this many options or fewer omit the search field, unless `onSearch` or `onAddNew` is set. */
