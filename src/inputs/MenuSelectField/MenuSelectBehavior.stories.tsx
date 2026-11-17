@@ -78,7 +78,7 @@ export const Hierarchy = newStory(
   { play: open("location") },
 );
 
-/** `onAddNew` lists `Add "<search>"` under the matches. Choosing it passes the text, and the caller creates the option and selects it. */
+/** `onAddNew` lists `Add "<search>"`; the caller creates and selects the option. */
 export const AddNew = newStory(
   () => {
     const [options, setOptions] = useState(groupByOptions());

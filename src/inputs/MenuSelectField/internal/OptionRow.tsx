@@ -39,11 +39,7 @@ export function MultiOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="checkbox" />;
 }
 
-/**
- * The `onAddNew` row: italic `Add "<search>"`.
- *
- * A multi select puts a plus where the checkbox goes, so the label lines up.
- */
+/** The italic `onAddNew` row, with a plus where a multi select's checkbox goes so the label lines up. */
 export function AddNewOptionRow<O>(props: OptionRowProps<O> & { selectionMode: "single" | "multiple" }) {
   const { selectionMode, ...rowProps } = props;
   return <BaseOptionRow {...rowProps} variant={selectionMode === "multiple" ? "addPlus" : "add"} />;
@@ -51,7 +47,6 @@ export function AddNewOptionRow<O>(props: OptionRowProps<O> & { selectionMode: "
 
 function BaseOptionRow<O>(
   props: OptionRowProps<O> & {
-    /** `check` and `checkbox` show selection. `add` is the italic `onAddNew` row; `addPlus` also puts a plus in the checkbox column. */
     variant: "check" | "checkbox" | "add" | "addPlus";
     indent?: number;
     isPathRoot?: boolean;

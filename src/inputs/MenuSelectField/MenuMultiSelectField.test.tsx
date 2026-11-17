@@ -495,7 +495,7 @@ function MultiHarness(props: HarnessProps) {
   );
 }
 
-/** `onAddNew` creates the option as `t` and adds it to `values`, like a caller saving a new record. */
+/** `onAddNew` creates the option as `t` and adds it to `values`. */
 function TestAddNewField(props: { initial: string[]; proposedValues?: string[] }) {
   const [options, setOptions] = useState(colors());
   const [values, setValues] = useState(props.initial);

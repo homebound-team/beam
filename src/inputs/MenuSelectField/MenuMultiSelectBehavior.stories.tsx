@@ -46,7 +46,7 @@ export const DisabledOptions = newStory(
   { play: open("groupBy") },
 );
 
-/** `onAddNew` lists `Add "<search>"` under the matches, with a plus in the checkbox column. Choosing it passes the text and clears the search; the caller creates the option and adds it to `values`. */
+/** `onAddNew` lists `Add "<search>"` with a plus; the caller creates the option and adds it to `values`. */
 export const AddNew = newStory(
   () => {
     const [options, setOptions] = useState(groupByOptions());

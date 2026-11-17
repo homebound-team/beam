@@ -120,7 +120,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
   const { contains } = useFilter({ sensitivity: "base" });
-  // Same sensitivity as `contains`, so a search that lists `Café` also counts "cafe" as naming it.
+  // Matches like `contains`, so "cafe" names "Café".
   const collator = useCollator({ sensitivity: "base" });
 
   // For a tree, `options` are the roots; `allOptions` is every node in render order.
@@ -247,7 +247,6 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [menuTree, options, search, serverSearch, contains, unsetLabel],
   );
-  // Text for the `onAddNew` row. Unset while the search is blank or already names an option.
   const addNewText = useMemo(
     () => (canAddNew ? newOptionText(search, allOptions, getOptionLabel, collator) : undefined),
     // getOptionLabel is typically an inline lambda
@@ -257,7 +256,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   function onSelectionChange(keys: Selection) {
     if (keys === "all") return;
-    // react-stately selects the add row like any other. It is an action, so it never joins the selection.
+    // The add row is an action, so it never joins the selection.
     if (addNewText !== undefined && keys.has(addNewKey)) {
       addNew(addNewText);
       return;
@@ -313,7 +312,6 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
           const valueKey = valueToKey(getOptionValue(option));
           return { key: valueKey, valueKey, option };
         });
-    // The add row goes last, under the matches.
     return addNewText === undefined ? rows : [...rows, { key: addNewKey, valueKey: addNewKey, addNew: addNewText }];
     // getOptionValue is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
@@ -385,7 +383,6 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     }
   }
 
-  /** Passes the search to `onAddNew`. The caller creates the option and selects it. */
   function addNew(text: string) {
     proposalProps.onUserEdit?.();
     if (!multiple) {
@@ -393,10 +390,10 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       close({ restoreFocus: true });
       return;
     }
-    // In AI mode `values` is the proposal. Committing it first means the caller adds to the proposal, not to the record.
+    // In AI mode `values` is the proposal; commit it so the caller adds to it, not to the record.
     if (isAiMode) commit(values, optionsForValues(values));
     onAddNew?.(text);
-    // The menu stays open. Clearing the search drops the add row, so a second press can't add the same text again.
+    // Clearing the search hides the add row, so a second press can't add the text twice.
     onSearchChange("");
   }
 
@@ -635,11 +632,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     });
   }
 
-  /**
-   * Stores each option before `onCommit`, so its label survives the caller swapping `options` in the same update.
-   *
-   * For example, closing calls `onSearch("")`, and a caller that derives `options` from the search empties them along with the new value.
-   */
+  /** Remembers each option first, so its label survives `options` changing in the same update, i.e. the `onSearch("")` on close. */
   function commit(nextValues: V[], nextOptions: O[]) {
     for (const option of nextOptions) rememberedSelectedRef.current.set(valueToKey(getOptionValue(option)), option);
     onCommit(nextValues, nextOptions);
@@ -879,11 +872,7 @@ function matchesSearch<O>(
   return terms?.some((term) => contains(term, query)) ?? false;
 }
 
-/**
- * The trimmed search for the `onAddNew` row, or `undefined` when it is blank or `collator` finds it equal to an option label.
- *
- * The `unsetLabel` row doesn't count as a match.
- */
+/** The trimmed search for the add row, or `undefined` when it's blank or names an option other than the `unsetLabel` row. */
 function newOptionText<O>(
   search: string,
   options: readonly O[],

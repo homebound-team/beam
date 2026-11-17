@@ -11,11 +11,11 @@ export type MenuMultiSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseP
   /** How selections show in the closed field. @default inField */
   selectionView?: SelectionView;
   /**
-   * Lists `Add "<search>"` under the matches while the trimmed search matches no option label, ignoring case and accents.
+   * Lists `Add "<search>"` when the search matches no option label, ignoring case and accents.
    *
-   * Search is always shown. Choosing that row passes the trimmed text, clears the search, and keeps the menu open. It does not call `onSelect`: create the option, then add its value to `values`.
+   * Choosing it passes the trimmed text without calling `onSelect`, so add the created option's value to `values`.
    *
-   * In AI mode, `onSelect` first commits the proposal, so the new value is added to it.
+   * In AI mode, `onSelect` commits the proposal first.
    */
   onAddNew?: (value: string) => void;
 };

@@ -60,9 +60,9 @@ export type MenuSelectFieldProps<O, V extends Value> = Omit<MenuSelectFieldBaseP
   /** `unsetLabel` row that clears the field. Stays first when options are sorted. Unlike `nothingSelectedText`, it is a selectable option. */
   unsetLabel?: string;
   /**
-   * Lists `Add "<search>"` under the matches while the trimmed search matches no option label, ignoring case and accents.
+   * Lists `Add "<search>"` when the search matches no option label, ignoring case and accents.
    *
-   * Search is always shown. Choosing that row passes the trimmed text and closes the menu. It does not call `onSelect`: create the option, then set `value`.
+   * Choosing it passes the trimmed text without calling `onSelect`, so set `value` to the created option.
    */
   onAddNew?: (value: string) => void;
 };
@@ -79,7 +79,7 @@ export type MenuSelectControllerProps<O, V extends Value> = MenuSelectFieldBaseP
   selectionView?: SelectionView;
   /** Single select only. `unsetLabel` row that commits `undefined`. */
   unsetLabel?: string;
-  /** `Add "<search>"` row. Passed by the single and multi fields, not the tree field. */
+  /** Single and multi select only, not tree. */
   onAddNew?: (value: string) => void;
   /** Makes `options` the roots of a tree. Multiple selection expands groups and cascades. Single selection lists every node and shows the path. */
   tree?: MenuSelectTreeConfig<O>;
@@ -115,7 +115,7 @@ export type MenuOptionItem<O> = {
 } & (
   | { option: O }
   | {
-      /** Trimmed search the `onAddNew` row passes on. The row is an action, not an option. */
+      /** The `onAddNew` row's trimmed search. */
       addNew: string;
     }
 );

@@ -11,7 +11,7 @@ export type AiProposalProps = Pick<
 export type UseAiProposalResult<V> = {
   /** The value the field should render and edit — the proposal until the user types. */
   effectiveValue: V | undefined;
-  /** True while `effectiveValue` is the proposal, i.e. there is one and the user hasn't edited yet. */
+  /** The proposal is showing: there is one and the user hasn't edited yet. */
   isAiMode: boolean;
   /** The props `TextFieldBase` needs, already gated on where the user is in reviewing the proposal. */
   proposalProps: AiProposalProps;

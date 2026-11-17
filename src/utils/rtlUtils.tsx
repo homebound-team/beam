@@ -240,8 +240,7 @@ export type SelectAndWaitOpts = { addNew?: boolean };
  * Selects an option from the Beam SelectField, MultiSelectField, TreeSelectField, and Menu select field components.
  *
  * When `value` is a single string and the listbox opens empty, types the value to trigger async
- * search before selecting. A Menu select field types into its menu's search input.
- * Multi-select (`value` array) assumes options are already loaded.
+ * search before selecting. Multi-select (`value` array) assumes options are already loaded.
  *
  * When `{ addNew: true }`, types the value and selects the `Add "<value>"` creatable row.
  */
@@ -277,11 +276,7 @@ async function typeForAddNew(select: HTMLElement, value: string): Promise<void> 
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
 }
 
-/**
- * The element that takes typed text.
- *
- * A Menu select field's trigger is a button, so its open menu's search input drives the same listbox.
- */
+/** The input to type into: the field itself, or a Menu select's search input since its trigger is a button. */
 function searchInputFor(select: HTMLElement): HTMLElement {
   if (select.nodeName !== "BUTTON") return select;
   const listboxId = select.getAttribute("aria-controls");
