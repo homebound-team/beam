@@ -112,6 +112,20 @@ describe("ContentHeader", () => {
     );
   });
 
+  it("renders a tag after the title, outside the actions slot", async () => {
+    // Given a ContentHeader with a tag and actions
+    const r = await render(
+      <ContentHeader
+        title="Product Changes"
+        tag={{ kind: "status", text: "Chargeable to homeowner", type: "info" }}
+        actions={[{ label: "Add", onClick: () => {} }]}
+      />,
+    );
+    // Then the tag follows the title rather than sitting with the actions
+    expect(r.contentHeader_title.compareDocumentPosition(r.contentHeader_tag)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(r.contentHeader_actions).not.toContainElement(r.contentHeader_tag);
+  });
+
   it("applies aiBoldText to the title when aiMode is true", async () => {
     // Given a ContentHeader with aiMode
     const r = await render(<ContentHeader title="Trade Partners" aiMode />);

@@ -62,6 +62,13 @@ describe("FormSectionLayout", () => {
     expect(r.saveDraft).toBeInTheDocument();
   });
 
+  it("renders its own tag in the form header", async () => {
+    // Given a FormSectionLayout with a tag
+    const r = await render(<FormSectionLayout title="Change Event" tag={{ icon: "wrench", text: "Labor" }} />);
+    // Then the tag renders in the form header
+    expect(r.formSectionLayout_tag).toHaveTextContent("Labor");
+  });
+
   it("prepends AutoSaveIndicator in the actions area when withAutoSave is true", async () => {
     // Given a FormSectionLayout with withAutoSave and actions
     // When rendered

@@ -5,6 +5,7 @@ import { useCheckboxGroupState, useRadioGroupState } from "react-stately";
 import { DnDGrid } from "src/components/DnDGrid/DnDGrid";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { ContextOrStatusTagProps } from "src/components/internal/ContextOrStatusTag";
 import { Css } from "src/Css";
 import { useComputed } from "src/hooks/useComputed";
 import { stickyNavAndHeaderOffset } from "src/layouts/layoutVars";
@@ -42,14 +43,16 @@ type SelectableFormSectionChild = (PlainFormSectionChild | ReorderableFormSectio
   selection?: never;
 };
 
-export type FormSectionProps = FormSectionBaseProps &
-  (
+export type FormSectionProps = FormSectionBaseProps & {
+  /** Rendered right after the title. */
+  tag?: ContextOrStatusTagProps;
+} & (
     | { selection?: never; childSections?: PlainFormSectionChild[] | ReorderableFormSectionChild[] }
     | { selection: FormSectionSelection; childSections: SelectableFormSectionChild[] }
   );
 
 export function FormSection(props: FormSectionProps) {
-  const { title, description, actions, fields, childSections, selection } = props;
+  const { title, description, actions, tag, fields, childSections, selection } = props;
   const tid = useTestIds(props, "formSection");
 
   return (
@@ -58,7 +61,7 @@ export function FormSection(props: FormSectionProps) {
       css={Css.df.fdc.gap2.add("scrollMarginTop", stickyNavAndHeaderOffset()).$}
       {...tid.section}
     >
-      <ContentHeader {...tid} title={title} description={description} actions={actions} level={3} />
+      <ContentHeader {...tid} title={title} description={description} actions={actions} tag={tag} level={3} />
       {fields}
       {childSections &&
         (selection?.mode === "single" ? (

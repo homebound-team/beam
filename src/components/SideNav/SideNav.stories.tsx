@@ -2,13 +2,13 @@ import type { Meta } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import type { AppNavItem } from "src/components/AppNav/appNavTypes";
 import { Avatar } from "src/components/Avatar/Avatar";
-import { Icon } from "src/components/Icon";
 import { PreventBrowserScroll } from "src/components/Layout/PreventBrowserScroll";
 import { SideNav } from "src/components/SideNav/SideNav";
 import { Css, Tokens } from "src/Css";
 import { SideNavLayout } from "src/layouts/SideNavLayout/SideNavLayout";
 import { SideNavLayoutProvider, useSideNavLayoutContext } from "src/layouts/SideNavLayout/SideNavLayoutContext";
 import { withBeamDecorator, withDimensions, withRouter, zeroTo } from "src/utils/sb";
+import { SideNavBrand } from "src/utils/sbComponents";
 
 export default {
   component: SideNav,
@@ -44,7 +44,7 @@ const groupedItems: AppNavItem[] = [
 export function Default() {
   return (
     <Shell>
-      <SideNavLayout sideNav={{ top: <Brand />, items, footer: <Footer /> }}>
+      <SideNavLayout sideNav={{ top: <SideNavBrand />, items, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -54,7 +54,7 @@ export function Default() {
 export function GroupedItems() {
   return (
     <Shell>
-      <SideNavLayout sideNav={{ top: <Brand />, items: groupedItems, footer: <Footer /> }}>
+      <SideNavLayout sideNav={{ top: <SideNavBrand />, items: groupedItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -92,7 +92,7 @@ const collapsibleItems: AppNavItem[] = [
 export function CollapsibleGroups() {
   return (
     <Shell>
-      <SideNavLayout sideNav={{ top: <Brand />, items: collapsibleItems, footer: <Footer /> }}>
+      <SideNavLayout sideNav={{ top: <SideNavBrand />, items: collapsibleItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -102,7 +102,7 @@ export function CollapsibleGroups() {
 export function CollapsibleGroupsContrast() {
   return (
     <Shell>
-      <SideNavLayout contrastRail sideNav={{ top: <Brand />, items: collapsibleItems, footer: <Footer /> }}>
+      <SideNavLayout contrastRail sideNav={{ top: <SideNavBrand />, items: collapsibleItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -122,7 +122,7 @@ export function WithoutTop() {
 export function WithoutFooter() {
   return (
     <Shell>
-      <SideNavLayout sideNav={{ top: <Brand />, items }}>
+      <SideNavLayout sideNav={{ top: <SideNavBrand />, items }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -135,7 +135,7 @@ export function ContrastNav() {
   // internally — chrome + content all resolve under contrast tokens.
   return (
     <Shell>
-      <SideNavLayout contrastRail sideNav={{ top: <Brand />, items: groupedItems, footer: <Footer /> }}>
+      <SideNavLayout contrastRail sideNav={{ top: <SideNavBrand />, items: groupedItems, footer: <Footer /> }}>
         <PageContent />
       </SideNavLayout>
     </Shell>
@@ -147,7 +147,9 @@ export function ShowContentWhenCollapsed() {
   return (
     <Shell>
       <SideNavLayoutProvider defaultNavState="collapse">
-        <SideNavLayout sideNav={{ top: <Brand />, items, footer: <CollapsedFooter />, showContentWhenCollapsed: true }}>
+        <SideNavLayout
+          sideNav={{ top: <SideNavBrand />, items, footer: <CollapsedFooter />, showContentWhenCollapsed: true }}
+        >
           <PageContent />
         </SideNavLayout>
       </SideNavLayoutProvider>
@@ -160,21 +162,6 @@ function Shell({ children }: { children: ReactNode }) {
     <PreventBrowserScroll>
       <div css={Css.df.oh.h100.$}>{children}</div>
     </PreventBrowserScroll>
-  );
-}
-
-function Brand() {
-  return (
-    <div css={Css.df.fdc.gap1.$}>
-      <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
-        <span css={Css.fs0.$}>
-          <Icon icon="houseFilled" inc={3} />
-        </span>
-        <span css={Css.smSb.$}>Structure</span>
-      </div>
-      <h1 css={Css.lg.$}>1092 Beverly Way - Milam</h1>
-      <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>Altadena, CA 91001</p>
-    </div>
   );
 }
 

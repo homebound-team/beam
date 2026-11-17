@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { AiCard } from "src/components/AiPanel";
 import { ContentHeader } from "src/components/Headers/ContentHeader";
 import type { HeaderAction } from "src/components/Headers/HeaderActions";
+import type { ContextOrStatusTagProps } from "src/components/internal/ContextOrStatusTag";
 import { DocumentScrollOverlayRightPaneLayout } from "src/components/Layout/RightPaneLayout/DocumentScrollOverlayRightPaneLayout";
 import { Css } from "src/Css";
 import { FormSection, type FormSectionProps } from "src/forms/FormSection/FormSection";
@@ -22,6 +23,8 @@ export type FormSectionLayoutProps = {
   /** The form's own title — one level up from any `FormSection`'s title. */
   title: string;
   description?: ReactNode;
+  /** Rendered right after the title. */
+  tag?: ContextOrStatusTagProps;
   /** Rendered before form sections. Useful in forms that only need the main form title, or for form fields that shape the context of a form beforehand.  */
   initialFields?: ReactNode;
   /** Rendered top-right of the title row, e.g. an "Add items" Button. */
@@ -53,6 +56,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
   const {
     title,
     description,
+    tag,
     actions,
     withAutoSave,
     initialFields,
@@ -88,6 +92,7 @@ export function FormSectionLayout(props: FormSectionLayoutProps) {
           {...tid}
           title={title}
           description={description}
+          tag={tag}
           actions={actions}
           withAutoSave={withAutoSave}
           level={2}

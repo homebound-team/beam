@@ -2,9 +2,9 @@ import { type ReactNode, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AiSlimBanner } from "src/components/AiSlimBanner";
 import { AppNavItems } from "src/components/AppNav/AppNavItems";
+import { ContextTag } from "src/components/ContextTag";
 import { checkboxFilter } from "src/components/Filters/CheckboxFilter";
 import { multiFilter } from "src/components/Filters/MultiFilter";
-import { Icon } from "src/components/Icon";
 import { GridTableLayout, useGridTableLayoutState } from "src/components/Layout/GridTableLayout/GridTableLayout";
 import { RightPaneBanner, RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
@@ -170,13 +170,8 @@ export function createRightPaneTriggers() {
 /** Project brand block for the `SideNavLayout` top slot. */
 export function SideNavBrand() {
   return (
-    <div css={Css.df.fdc.gap1.$}>
-      <div css={Css.br8.bgColor(Tokens.SurfaceSubtle).py1.px2.df.aic.gap1.color(Tokens.OnSurfaceMuted).mr8.$}>
-        <span css={Css.fs0.$}>
-          <Icon icon="houseFilled" inc={3} />
-        </span>
-        <span css={Css.smSb.$}>Structure</span>
-      </div>
+    <div css={Css.df.fdc.ais.gap1.$}>
+      <ContextTag icon="structure" text="Structure" />
       <h1 css={Css.lg.$}>1092 Beverly Way - Milam</h1>
       <p css={Css.xs.color(Tokens.OnSurfaceMuted).$}>Altadena, CA 91001</p>
     </div>
