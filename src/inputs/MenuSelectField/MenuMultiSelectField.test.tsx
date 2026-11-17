@@ -376,6 +376,54 @@ describe("MenuMultiSelectField", () => {
     });
   });
 
+  describe("onAddNew", () => {
+    it("passes the text, clears the search, and stays open", async () => {
+      // Given an open multi select with Red selected and onAddNew
+      const onAddNew = vi.fn();
+      const onSelect = vi.fn();
+      const r = await render(<MultiHarness initial={["r"]} onAddNew={onAddNew} onSelectSpy={onSelect} />);
+      click(r.color);
+      // When typing text that names no option
+      type(r.color_search, "Teal");
+      // Then the add row has a plus where the checkbox goes
+      const addRow = getOption(r.color, 'Add "Teal"');
+      expect(addRow.querySelector("[data-icon='plus']")).not.toBeNull();
+      // When choosing it
+      select(r.color, 'Add "Teal"');
+      // Then onAddNew gets the text, the selection is untouched, and the menu stays open on the full list
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(r.color_overlay).toBeInTheDocument();
+      expect(r.color_search).toHaveValue("");
+      expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+    });
+
+    it("commits the proposal before adding in AI mode", async () => {
+      // Given Red on record and Blue and Green proposed
+      const onAddNew = vi.fn();
+      const onSelect = vi.fn();
+      const r = await render(
+        <MultiHarness initial={["r"]} proposedValues={["b", "g"]} onAddNew={onAddNew} onSelectSpy={onSelect} />,
+      );
+      // When adding a value
+      click(r.color);
+      type(r.color_search, "Teal");
+      select(r.color, 'Add "Teal"');
+      // Then the proposal commits first, so the caller adds the new value to it
+      expect(onSelect).toHaveBeenCalledWith(
+        ["b", "g"],
+        [
+          { id: "b", name: "Blue" },
+          { id: "g", name: "Green" },
+        ],
+      );
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+      expect(onSelect.mock.invocationCallOrder[0]).toBeLessThan(onAddNew.mock.invocationCallOrder[0]);
+      expect(r.color).not.toHaveAttribute("data-ai-mode");
+      expect(r.color_count).toHaveTextContent("2");
+    });
+  });
+
   describe("AI mode", () => {
     it("counts the proposed values", async () => {
       // Given Red on record and Blue and Green proposed
@@ -440,6 +488,7 @@ type HarnessProps = {
   mixedValues?: string[];
   selectionView?: SelectionView;
   getOptionMenuLabel?: (option: Color) => string;
+  onAddNew?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;

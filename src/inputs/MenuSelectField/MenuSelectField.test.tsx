@@ -403,6 +403,85 @@ describe("MenuSelectField", () => {
     });
   });
 
+  describe("onAddNew", () => {
+    it("lists an add row under the matches and passes the trimmed text", async () => {
+      // Given a short single select with onAddNew
+      const onAddNew = vi.fn();
+      const onSelect = vi.fn();
+      const r = await render(<TestHarness onAddNew={onAddNew} onSelectSpy={onSelect} />);
+      // When opening it
+      click(r.color);
+      // Then the search shows even though the list is short, and there is no add row yet
+      expect(r.color_search).toHaveFocus();
+      expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+
+      // When typing text that only partly matches
+      type(r.color_search, "bl");
+      // Then the matches are followed by the add row
+      expect(getOptions(r.color)).toEqual(["Black", "Blue", 'Add "bl"']);
+
+      // When typing an option's label in another case
+      type(r.color_search, "BLUE");
+      // Then there is no add row
+      expect(getOptions(r.color)).toEqual(["Blue"]);
+
+      // When choosing the add row for padded text
+      type(r.color_search, "  Teal  ");
+      select(r.color, 'Add "Teal"');
+      // Then onAddNew gets the trimmed text, nothing is selected, and the menu closes onto the trigger
+      expect(onAddNew).toHaveBeenCalledOnce();
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(r.color).toHaveAttribute("aria-expanded", "false");
+      expect(r.color).toHaveFocus();
+    });
+
+    it("adds from the keyboard only once the add row is highlighted", async () => {
+      // Given an open single select whose search matches nothing
+      const onAddNew = vi.fn();
+      const r = await render(<TestHarness onAddNew={onAddNew} />);
+      click(r.color);
+      type(r.color_search, "Teal");
+      // When pressing Enter with no row highlighted
+      fireEvent.keyDown(r.color_search, { key: "Enter" });
+      // Then nothing is added
+      expect(onAddNew).not.toHaveBeenCalled();
+      // When highlighting the add row and pressing Enter
+      fireEvent.keyDown(r.color_search, { key: "ArrowDown" });
+      fireEvent.keyDown(r.color_search, { key: "Enter" });
+      // Then the text is added
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+    });
+
+    it("drops the AI treatment when adding a value", async () => {
+      // Given Red on record and Blue proposed
+      const r = await render(<TestHarness initial="r" proposedValue="b" onAddNew={vi.fn()} />);
+      // When adding a value
+      click(r.color);
+      type(r.color_search, "Teal");
+      select(r.color, 'Add "Teal"');
+      // Then the field shows the record until the caller selects the new option
+      expect(r.color).not.toHaveAttribute("data-ai-mode");
+      expect(r.color).toHaveTextContent("Red");
+    });
+
+    it("adds from a hierarchy search", async () => {
+      // Given an open hierarchy with onAddNew
+      const onAddNew = vi.fn();
+      const r = await render(<TestHierarchyField value={undefined} onAddNew={onAddNew} />);
+      click(r.location);
+      // When the search names a nested option
+      type(r.location_search, "drench");
+      // Then the match keeps its ancestors and there is no add row
+      expect(getOptions(r.location)).toEqual(["Bath 207", "Walls", "Drench", "Color Drench"]);
+      // When the search names nothing and the add row is chosen
+      type(r.location_search, "Garage");
+      select(r.location, 'Add "Garage"');
+      // Then onAddNew gets the text
+      expect(onAddNew).toHaveBeenCalledWith("Garage");
+    });
+  });
+
   it("shows an empty row when nothing matches", async () => {
     // Given an open single select with enough options to search
     const r = await render(<TestHarness options={manyColors()} />);
@@ -865,6 +944,7 @@ type HarnessProps = {
   options?: Color[];
   autoSort?: boolean;
   mixedValues?: string[];
+  onAddNew?: (value: string) => void;
 };
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
@@ -961,6 +1041,7 @@ function TestHierarchyField(props: {
   value: string | undefined;
   onSelect?: (value: string | undefined, option: LocationOption | undefined) => void;
   options?: OptionsOrLoad<LocationOption>;
+  onAddNew?: (value: string) => void;
 }) {
   const [value, setValue] = useState(props.value);
   return (
@@ -972,6 +1053,7 @@ function TestHierarchyField(props: {
         props.onSelect?.(next, option);
         setValue(next);
       }}
+      onAddNew={props.onAddNew}
     />
   );
 }

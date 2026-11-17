@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CheckboxGroup } from "src/inputs/CheckboxGroup";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { MultiSelectField } from "src/inputs/MultiSelectField";
 import { RadioGroupField } from "src/inputs/RadioGroupField";
 import { MultiSelectCardGroup } from "src/inputs/SelectCard/MultiSelectCardGroup";
@@ -187,6 +188,27 @@ describe("rtl", () => {
     }
     const r = await render(<Test />);
     await selectAndWait(r.fruit, "Kiwi", { addNew: true });
+    expect(onAddNew).toHaveBeenCalledWith("Kiwi");
+  });
+
+  it("can select the add-new row with addNew option on MenuSelectField", async () => {
+    // Given a MenuSelectField, whose trigger is a button and whose search is inside the menu
+    const onAddNew = vi.fn();
+    const r = await render(
+      <MenuSelectField
+        label="Fruit"
+        value={undefined}
+        onSelect={() => {}}
+        options={[
+          { id: "1", name: "Apple" },
+          { id: "2", name: "Banana" },
+        ]}
+        onAddNew={onAddNew}
+      />,
+    );
+    // When adding a value through the helper
+    await selectAndWait(r.fruit, "Kiwi", { addNew: true });
+    // Then it typed into the menu search and chose the add row
     expect(onAddNew).toHaveBeenCalledWith("Kiwi");
   });
 

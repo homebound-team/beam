@@ -271,9 +271,18 @@ export async function selectAndWait(
 }
 
 async function typeForAddNew(select: HTMLElement, value: string): Promise<void> {
-  fireEvent.input(select, { target: { value } });
+  fireEvent.input(searchInputFor(select), { target: { value } });
   await _wait();
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+}
+
+/** The element that takes typed text. A MenuSelectField trigger is a button, so its open menu's search input drives the same listbox. */
+function searchInputFor(select: HTMLElement): HTMLElement {
+  if (select.nodeName !== "BUTTON") return select;
+  const listboxId = select.getAttribute("aria-controls");
+  return (
+    document.querySelector<HTMLElement>(`input[aria-controls="${listboxId}"]`) ?? fail("menu search input not found")
+  );
 }
 
 /** When a combobox opens with no options, type the target label to trigger async search. */

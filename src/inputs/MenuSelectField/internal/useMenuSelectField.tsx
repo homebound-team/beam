@@ -51,6 +51,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     unsetLabel,
     autoSort = true,
     onSearch,
+    onAddNew,
     disabledOptions,
     mixedValues,
     nothingSelectedText = "",
@@ -69,6 +70,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const multiple = selectionMode === "multiple";
   // `onSearch` means the caller fetches matches. The menu lists `options` as given.
   const serverSearch = onSearch !== undefined;
+  const canAddNew = onAddNew !== undefined;
   const getChildren = tree?.getChildren;
   const defaultExpanded = tree?.defaultExpanded ?? false;
   const isDisabled = !!disabled;
@@ -243,9 +245,21 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [menuTree, options, search, serverSearch, contains, unsetLabel],
   );
+  // Text for the `onAddNew` row. Unset while the search is blank or already names an option.
+  const addNewText = useMemo(
+    () => (canAddNew ? newOptionText(search, allOptions, getOptionLabel) : undefined),
+    // getOptionLabel is typically an inline lambda
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [canAddNew, search, allOptions],
+  );
 
   function onSelectionChange(keys: Selection) {
     if (keys === "all") return;
+    // react-stately selects the add row like any other. It is an action, so it never joins the selection.
+    if (addNewText !== undefined && keys.has(addNewKey)) {
+      addNew(addNewText);
+      return;
+    }
     if (isMultiSelectTree && menuTree) {
       // react-stately toggles one row. That row's value selects or clears every copy.
       const added = [...keys].map(String).find((key) => !selectedRowKeys.has(key));
@@ -291,26 +305,30 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   }
 
   const collectionItems = useMemo((): MenuOptionItem<O>[] => {
-    if (treeRows) {
-      return treeRows.map(({ node }) => ({ key: node.key, valueKey: node.valueKey, option: node.option }));
-    }
-    return filteredOptions.map((option) => {
-      const valueKey = valueToKey(getOptionValue(option));
-      return { key: valueKey, valueKey, option };
-    });
+    const rows: MenuOptionItem<O>[] = treeRows
+      ? treeRows.map(({ node }) => ({ key: node.key, valueKey: node.valueKey, option: node.option }))
+      : filteredOptions.map((option) => {
+          const valueKey = valueToKey(getOptionValue(option));
+          return { key: valueKey, valueKey, option };
+        });
+    // The add row goes last, under the matches.
+    return addNewText === undefined ? rows : [...rows, { key: addNewKey, valueKey: addNewKey, addNew: addNewText }];
     // getOptionValue is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [treeRows, filteredOptions]);
+  }, [treeRows, filteredOptions, addNewText]);
 
   const state = useListState<MenuOptionItem<O>>({
     items: collectionItems,
-    children: (item) => (
-      <Item key={item.key} textValue={getOptionLabel(item.option)}>
-        {getOptionMenuLabel
-          ? getOptionMenuLabel(item.option, Boolean(unsetLabel) && item.option === unsetOption)
-          : getOptionLabel(item.option)}
-      </Item>
-    ),
+    children: (item) =>
+      "addNew" in item ? (
+        <Item key={item.key} textValue={`Add "${item.addNew}"`}>{`Add "${item.addNew}"`}</Item>
+      ) : (
+        <Item key={item.key} textValue={getOptionLabel(item.option)}>
+          {getOptionMenuLabel
+            ? getOptionMenuLabel(item.option, Boolean(unsetLabel) && item.option === unsetOption)
+            : getOptionLabel(item.option)}
+        </Item>
+      ),
     selectionMode: multiple ? "multiple" : "single",
     selectedKeys: selectedRowKeys,
     disabledKeys: disabledRowKeys,
@@ -358,14 +376,29 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     }
   }
 
+  /** Passes the search to `onAddNew`. The caller creates the option and selects it. */
+  function addNew(text: string) {
+    proposalProps.onUserEdit?.();
+    if (!multiple) {
+      onAddNew?.(text);
+      close({ restoreFocus: true });
+      return;
+    }
+    // In AI mode `values` is the proposal. Committing it first means the caller adds to the proposal, not to the record.
+    if (proposalProps.proposedValue !== undefined) onCommit(values, optionsForValues(values));
+    onAddNew?.(text);
+    // The menu stays open. Clearing the search drops the add row, so a second press can't add the same text again.
+    onSearchChange("");
+  }
+
   function settleBlur() {
     hasFocusRef.current = false;
     maybeCall(proposalProps.onUserBlur);
     maybeCall(onBlur);
   }
 
-  // Short menus skip search, unless `onSearch` refetches. The count includes a not-yet-loaded `current`.
-  const showSearch = serverSearch || allOptions.length > searchOptionLimit;
+  // Short menus skip search, unless `onSearch` refetches or `onAddNew` needs the typed text. The count includes a not-yet-loaded `current`.
+  const showSearch = serverSearch || canAddNew || allOptions.length > searchOptionLimit;
 
   // Focus the search, or the list when there is no search. Leave option focus unset until a keyboard move.
   useLayoutEffect(() => {
@@ -827,7 +860,25 @@ function matchesSearch<O>(
   return terms?.some((term) => contains(term, query)) ?? false;
 }
 
-/** Menus with this many options or fewer omit the search field, unless `onSearch` is set. */
+/** The trimmed search for the `onAddNew` row, or `undefined` when it is blank or matches an option label, ignoring case. The `unsetLabel` row doesn't count. */
+function newOptionText<O>(
+  search: string,
+  options: readonly O[],
+  getOptionLabel: (opt: O) => string,
+): string | undefined {
+  const text = search.trim();
+  if (!text) return undefined;
+  const lower = text.toLowerCase();
+  const exists = options.some(
+    (option) => option !== unsetOption && getOptionLabel(option).trim().toLowerCase() === lower,
+  );
+  return exists ? undefined : text;
+}
+
+/** Row key of the `onAddNew` row. */
+const addNewKey = "beam-menu-add-new";
+
+/** Menus with this many options or fewer omit the search field, unless `onSearch` or `onAddNew` is set. */
 export const searchOptionLimit = 8;
 
 /** Wait before calling `onSearch`, matching the old select field. */

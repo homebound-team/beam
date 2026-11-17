@@ -1,6 +1,7 @@
-import { createObjectState, type ObjectConfig, required } from "@homebound/form-state";
+import { createObjectState, type ObjectConfig, type ObjectState, required } from "@homebound/form-state";
+import { useState } from "react";
 import { BoundMenuSelectField } from "src/forms/BoundMenuSelectField";
-import { render, select } from "src/utils/rtl";
+import { render, select, selectAndWait } from "src/utils/rtl";
 
 describe("BoundMenuSelectField", () => {
   it("binds a single value to the field", async () => {
@@ -22,6 +23,17 @@ describe("BoundMenuSelectField", () => {
     // Then the required error renders
     expect(r.colorId_errorMsg).toHaveTextContent("Required");
   });
+
+  it("sets the option the caller creates from onAddNew", async () => {
+    // Given a field whose onAddNew creates an option and sets it
+    const formState = createObjectState(formConfig(), {});
+    const r = await render(<AddNewField formState={formState} />);
+    // When adding a value from the search
+    await selectAndWait(r.colorId, "Teal", { addNew: true });
+    // Then the field holds the new option
+    expect(formState.colorId.value).toBe("t");
+    expect(r.colorId).toHaveTextContent("Teal");
+  });
 });
 
 type FormValue = { colorId?: string | null };
@@ -35,4 +47,19 @@ function colors() {
     { id: "r", name: "Red" },
     { id: "b", name: "Blue" },
   ];
+}
+
+function AddNewField(props: { formState: ObjectState<FormValue> }) {
+  const { formState } = props;
+  const [options, setOptions] = useState(colors());
+  return (
+    <BoundMenuSelectField
+      field={formState.colorId}
+      options={options}
+      onAddNew={(name) => {
+        setOptions([...options, { id: "t", name }]);
+        formState.colorId.set("t");
+      }}
+    />
+  );
 }

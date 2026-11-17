@@ -10,6 +10,12 @@ export type MenuMultiSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseP
   onSelect: (values: V[], opts: O[]) => void;
   /** How selections show in the closed field. @default inField */
   selectionView?: SelectionView;
+  /**
+   * Lists `Add "<search>"` under the matches while the trimmed search matches no option label, ignoring case. Search is always shown.
+   * Choosing that row passes the trimmed text, clears the search, and keeps the menu open. It does not call `onSelect`: create the option, then add its value to `values`.
+   * In AI mode, `onSelect` first commits the proposal, so the new value is added to it.
+   */
+  onAddNew?: (value: string) => void;
 };
 
 /** Menu select that toggles several values and shows in-field pills by default. Search is included when the list is longer than `searchOptionLimit`, or when `onSearch` is set. See `MenuMultiSelectField.mdx`. */

@@ -46,6 +46,35 @@ export const DisabledOptions = newStory(
   { play: open("groupBy") },
 );
 
+/** `onAddNew` lists `Add "<search>"` under the matches, with a plus in the checkbox column. Choosing it passes the text and clears the search; the caller creates the option and adds it to `values`. */
+export const AddNew = newStory(
+  () => {
+    const [options, setOptions] = useState(groupByOptions());
+    const [values, setValues] = useState<string[]>(["cc"]);
+    return (
+      <FieldFrame>
+        <MenuMultiSelectField
+          label="Group by"
+          options={options}
+          values={values}
+          onSelect={setValues}
+          onAddNew={(name) => {
+            const id = `new-${options.length}`;
+            setOptions([...options, { id, name }]);
+            setValues([...values, id]);
+          }}
+        />
+      </FieldFrame>
+    );
+  },
+  {
+    play: async (context) => {
+      open("groupBy")(context);
+      await userEvent.type(await within(document.body).findByTestId("groupBy_search"), "Co");
+    },
+  },
+);
+
 /** `getOptionMenuLabel` replaces the row. The closed field still shows option names. */
 export const CustomLabel = newStory(
   () => {
