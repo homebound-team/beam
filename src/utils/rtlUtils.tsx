@@ -237,10 +237,11 @@ export function select(select: HTMLElement, value: string | string[]) {
 export type SelectAndWaitOpts = { addNew?: boolean };
 
 /**
- * Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components.
+ * Selects an option from the Beam SelectField, MultiSelectField, TreeSelectField, and Menu select field components.
  *
  * When `value` is a single string and the listbox opens empty, types the value to trigger async
- * search before selecting. Multi-select (`value` array) assumes options are already loaded.
+ * search before selecting. A Menu select field types into its menu's search input.
+ * Multi-select (`value` array) assumes options are already loaded.
  *
  * When `{ addNew: true }`, types the value and selects the `Add "<value>"` creatable row.
  */
@@ -294,7 +295,7 @@ async function maybeAutoSearch(select: HTMLElement, searchText: string): Promise
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
   if (!hasZeroOptions(select)) return;
 
-  fireEvent.input(select, { target: { value: searchText } });
+  fireEvent.input(searchInputFor(select), { target: { value: searchText } });
   await _wait();
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
 }

@@ -168,6 +168,42 @@ describe("rtl", () => {
     expect(onSelect).toHaveBeenCalledWith("1", { id: "1", name: "Apple Pie" });
   });
 
+  it("auto-searches through the menu search input on a MenuSelectField", async () => {
+    const onSelect = vi.fn();
+    const onSearch = vi.fn();
+    const allOptions = [
+      { id: "1", name: "Apple Pie" },
+      { id: "2", name: "Banana Bread" },
+    ];
+    // Given a MenuSelectField that only lists options for a search, whose trigger is a button
+    function Test() {
+      const [value, setValue] = useState<string | undefined>();
+      const [search, setSearch] = useState("");
+      const options = search ? allOptions.filter((o) => o.name.toLowerCase().includes(search.toLowerCase())) : [];
+      return (
+        <MenuSelectField
+          label="Food"
+          value={value}
+          onSelect={(nextValue, option) => {
+            setValue(nextValue);
+            onSelect(nextValue, option);
+          }}
+          onSearch={(text) => {
+            onSearch(text);
+            setSearch(text);
+          }}
+          options={options}
+        />
+      );
+    }
+    const r = await render(<Test />);
+    // When selecting on the empty menu
+    await selectAndWait(r.food, "Apple Pie");
+    // Then the full label went to onSearch after the debounce, and the match is selected
+    expect(onSearch).toHaveBeenCalledWith("Apple Pie");
+    expect(onSelect).toHaveBeenCalledWith("1", { id: "1", name: "Apple Pie" });
+  });
+
   it("can select the add-new row with addNew option", async () => {
     const onAddNew = vi.fn();
     function Test() {
