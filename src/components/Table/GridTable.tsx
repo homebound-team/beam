@@ -80,7 +80,7 @@ import { Row } from "./components/Row";
 import { RowGroup } from "./components/RowGroup";
 import { TableCard } from "./components/TableCard";
 import { GridTableEmptyState, type GridTableEmptyStateProps } from "./GridTableEmptyState";
-import { DraggedOver, type RowState } from "./utils/RowState";
+import { DraggedOver, rowKey, type RowState } from "./utils/RowState";
 
 let runningInJest = false;
 
@@ -170,7 +170,10 @@ export type GridTableProps<R extends Kinded, X> = {
   rows: GridDataRow<R>[];
   /** Optional row-kind-level styling / behavior like onClick/rowLinks. */
   rowStyles?: RowStyles<R>;
-  /** Allow looking up prev/next of a row i.e. for SuperDrawer navigation. */
+  /**
+   * Allow looking up prev/next of a row i.e. for SuperDrawer navigation.
+   * @deprecated Use the `api` prop's `getAdjacentRows`, `getVisibleRows`, and `scrollToRow`.
+   */
   rowLookup?: MutableRefObject<GridRowLookup<R> | undefined>;
   /** Whether the header row should be sticky. */
   stickyHeader?: boolean;
@@ -758,6 +761,15 @@ export function GridTable<R extends Kinded, X extends Only<GridTableXss, X> = an
     (tooManyClientSideRows && "Hiding some rows, use filter...") ||
     infoMessage;
 
+  // Maps a row to its index in `VirtualGridTableView.itemContent`, for `api.scrollToRow`.
+  // Head and pinned rows return -1.
+  api.virtualIndexOf = (kind, id) => {
+    const index = [...keptSelectedRows, ...(firstRowMessage ? [undefined] : []), ...visibleDataRows].findIndex(
+      (el) => el?.key === rowKey(kind, id),
+    );
+    return index === -1 ? -1 : tableHeadRows.length + pinnedRows.length + index;
+  };
+
   const borderless = style?.presentationSettings?.borderless;
   const typeScale = style?.presentationSettings?.typeScale;
   const borderOnHover = style?.presentationSettings?.borderOnHover;
@@ -1189,6 +1201,7 @@ function VirtualGridTableView<R extends Kinded>({
       itemContent={(index) => {
         // We render several stacked arrays — head rows, pinned rows, kept rows, an optional
         // first-row message, then the body rows — so map the flat virtuoso index onto each in order.
+        // Keep in sync with `api.virtualIndexOf` in GridTable.
 
         if (index < tableHeadRows.length) {
           return tableHeadRows[index];

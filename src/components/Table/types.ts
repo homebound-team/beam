@@ -15,17 +15,18 @@ export type MaybeFn<T> = T | (() => T);
 export type GridCellAlignment = "left" | "right" | "center";
 export type GridColumnBorder = "left" | "right";
 
+export type GridTableScrollToRowOptions = {
+  behavior?: "auto" | "smooth";
+  /** How to position the row in the viewport */
+  align?: "start" | "center" | "end";
+};
+
 export type GridTableScrollOptions =
   | number
-  | {
+  | ({
       /** The index of the row to scroll to */
       index: number;
-      behavior?: "auto" | "smooth";
-      /**
-       * How to position the row in the viewport
-       */
-      align?: "start" | "center" | "end";
-    };
+    } & GridTableScrollToRowOptions);
 
 /**
  * Given an ADT of type T, performs a look up and returns the type of kind K.
