@@ -237,6 +237,19 @@ describe("MenuTreeSelectField", () => {
     expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 1));
   });
 
+  it("keeps expanded and collapsed groups when reopened", async () => {
+    // Given NBA selected, so Basketball opens expanded
+    const r = await render(<TreeHarness initial={["nba"]} />);
+    click(r.sports);
+    // When expanding Baseball, collapsing Basketball, and closing the menu
+    click(r.sports_expand_baseball);
+    click(r.sports_expand_basketball);
+    fireEvent.keyDown(r.sports_listbox, { key: "Escape" });
+    // Then reopening shows the groups as the user left them, even though Basketball holds a selection
+    click(r.sports);
+    expect(getOptions(r.sports)).toEqual(["Baseball", "MLB", "MiLB", "Basketball", "Golf"]);
+  });
+
   it("shows matches with their ancestors and descendants while searching", async () => {
     // Given a tree long enough to search
     const r = await render(<TreeHarness options={manySports()} />);
