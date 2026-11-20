@@ -221,6 +221,13 @@ export function WithPillList() {
         withPillList
         disabled
       />
+      <TestMultiSelectField
+        label="Read only"
+        values={[options[1].id, options[2].id]}
+        options={options}
+        withPillList
+        readOnly
+      />
     </div>
   );
 }

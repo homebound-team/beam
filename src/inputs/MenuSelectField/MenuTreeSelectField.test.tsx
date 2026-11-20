@@ -406,6 +406,14 @@ describe("MenuTreeSelectField", () => {
     expect(r.query.selectedOptionPillList).toBeNull();
   });
 
+  it("hides list remove controls when the field is readOnly", async () => {
+    // Given a read-only tree with Golf listed below the field
+    const r = await render(<TreeHarness initial={["golf"]} selectionView="selectionList" readOnly />);
+    // Then Golf shows as a pill without a remove control
+    expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Golf");
+    expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+  });
+
   it("scopes a disabled tree option tooltip to the field prefix", async () => {
     // Given a tree select with a disabled leaf and an explicit prefix
     const r = await render(
@@ -435,6 +443,7 @@ type TreeHarnessProps = {
   disabledOptions?: string[];
   selectionDisplay?: TreeSelectionDisplay;
   selectionView?: SelectionView;
+  readOnly?: boolean;
   proposedValues?: string[];
   defaultExpanded?: boolean;
   mixedValues?: string[];
