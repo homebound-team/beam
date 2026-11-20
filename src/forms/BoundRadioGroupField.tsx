@@ -15,7 +15,7 @@ export type BoundRadioGroupFieldProps<K extends string, O extends RadioFieldOpti
   label?: string;
 };
 
-/** Wraps `TextField` and binds it to a form field. */
+/** Wraps `RadioGroupField` and binds it to a form field. */
 export function BoundRadioGroupField<K extends string, O extends RadioFieldOption<K> = RadioFieldOption<K>>(
   props: BoundRadioGroupFieldProps<K, O>,
 ) {
