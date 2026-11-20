@@ -25,6 +25,8 @@ export type StepperProps = {
  * A row of clickable steps above a progress bar.
  *
  * Throws when `steps` is empty.
+ *
+ * @deprecated Use {@link StepperTabs}, or `StepperLayout` for a multi-step workflow.
  */
 export function Stepper(props: StepperProps) {
   const { steps, currentStep, onChange } = props;
