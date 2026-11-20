@@ -1,0 +1,45 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as SnackbarStories from "./Snackbar.stories";
+import { SnackbarNotice } from "./SnackbarNotice";
+
+<Meta of={SnackbarStories} />
+
+# Snackbar
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36152%3A102047">
+    <img src="FigmaLogo.png" alt="" />
+    Snackbar
+  </a>
+</p>
+
+The snackbar shows short, temporary notices in the bottom-left corner, such as "Invoice sent" or "Couldn't save". Trigger them with `useSnackbar().triggerNotice(...)`. `BeamProvider` already renders the snackbar. For status that should stay with the page, use `usePageBanner`. `Toast` is deprecated in favor of these two.
+
+`triggerNotice` takes these props. `id` and `onClose` are optional there; Beam fills them in.
+
+<ArgTypes of={SnackbarNotice} />
+
+## Behaviors
+
+- A notice closes itself after 10 seconds, unless it's `persistent`.
+- `hideCloseButton` hides the close button, but is ignored on a `persistent` notice, so the user can always close it.
+- `icon` picks the type icon: `error`, `warning`, `success`, `info` or `alert`.
+- Messages longer than three lines are clamped, with an Expand button.
+- Notices stack upward. On small screens they span the full width and sit flush with the bottom edge.
+- `triggerNotice` returns `{ close }`. `closeNotice(id)` closes a notice by the `id` you gave it.
+- `useSnackbarOffset({ bottom })` raises the notices above bottom-mounted chrome, such as a footer, while the calling component is mounted.
+
+## How to use
+
+```tsx
+const { triggerNotice } = useSnackbar();
+
+async function send() {
+  await sendInvoice(id);
+  triggerNotice({
+    icon: "success",
+    message: "Invoice sent",
+    action: { label: "View", onClick: `/invoices/${id}`, variant: "text" },
+  });
+}
+```

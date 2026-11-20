@@ -1,0 +1,37 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as TableSummaryStories from "./TableSummary.stories";
+
+<Meta of={TableSummaryStories} />
+
+# Table Summary
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2065-1007">
+    <img src="FigmaLogo.png" alt="" />
+    Table Summary
+  </a>
+</p>
+
+`TableSummary` is a card that summarizes a table: a title, an optional header action, and a row of metric counts the user can click, e.g. to filter the table.
+
+<ArgTypes />
+
+## Behaviors
+
+- Each metric shows its icon in `color`, then its count and label. A metric's `onClick` runs when the user clicks it.
+- Metrics sit in a row, and stack on small screens.
+- `action` adds a text button with an arrow to the header. On small screens it shows `mobileLabel`, which defaults to "Items".
+- `footer` sits below the metrics, with a divider, e.g. for a `StackBarGraph`.
+
+## How to use
+
+```tsx
+<TableSummary
+  title="Bid package coverage"
+  action={{ label: "View items", onClick: showItems }}
+  metrics={[
+    { label: "Missing bids", count: 3, icon: "error", color: Tokens.Danger, onClick: () => setFilter("missing") },
+    { label: "Awarded", count: 12, icon: "checkCircle", color: Palette.Green600, onClick: () => setFilter("awarded") },
+  ]}
+/>
+```

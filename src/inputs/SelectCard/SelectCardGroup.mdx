@@ -1,0 +1,44 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SelectCardGroup.stories";
+
+<Meta of={Stories} />
+
+# Select Card Group
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=315-161">
+    <img src="FigmaLogo.png" alt="" />
+    Select Cards
+  </a>
+</p>
+
+`SelectCardGroup` picks one option from a set of cards, for choices that need an icon, an image or a description to compare. Use `MultiSelectCardGroup` to pick several, and `RadioGroupField` for plain options. In a form, use `BoundSelectCardGroupField`.
+
+<ArgTypes />
+
+## Views
+
+- `view="grid"` (default) shows cards with an `icon` or an `image`. `layout` puts the icon above the text (`vertical`, default) or to its left (`horizontal`). Only image cards take a `tag`.
+- `view="list"` stacks the options as radio rows, with an optional `tag` beside the label. Icons are ignored.
+
+The Grid Select Card and List Select Card stories show each card's states.
+
+## Behaviors
+
+- `originalValue` tags the original option "Current" once the value differs. An option's own `tag` wins.
+- An option's `tooltip` shows on hover, e.g. to explain why it's `disabled`.
+- When any option has a `description`, the cards grow to fit it.
+
+## How to use
+
+```tsx
+<SelectCardGroup
+  label="Plan type"
+  value={planType}
+  onChange={setPlanType}
+  options={[
+    { label: "Single family", value: "sf", icon: "house" },
+    { label: "Townhome", value: "th", icon: "buildings" },
+  ]}
+/>
+```

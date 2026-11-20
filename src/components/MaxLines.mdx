@@ -1,0 +1,21 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as MaxLinesStories from "./MaxLines.stories";
+
+<Meta of={MaxLinesStories} />
+
+# Max Lines
+
+`MaxLines` cuts long content to `maxLines` lines, with a "Show More" / "Show Less" toggle, e.g. for notes or descriptions.
+
+<ArgTypes />
+
+## Behaviors
+
+- The toggle only appears when the content overflows, and the check reruns when the content or its width changes.
+- New `children` collapse it again.
+
+## How to use
+
+```tsx
+<MaxLines maxLines={3}>{project.description}</MaxLines>
+```

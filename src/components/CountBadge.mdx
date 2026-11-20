@@ -1,0 +1,28 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as CountBadgeStories from "./CountBadge.stories";
+
+<Meta of={CountBadgeStories} />
+
+# Count Badge
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=17-162">
+    <img src="FigmaLogo.png" alt="" />
+    Badge
+  </a>
+</p>
+
+`CountBadge` shows a number in a small circle, such as unread comments or active filters.
+
+<ArgTypes />
+
+## Behaviors
+
+- It's 16px, and grows to 18px for counts over 100.
+- It defaults to white text on blue. `hideIfZero` renders nothing for a count of 0.
+
+## How to use
+
+```tsx
+<CountBadge count={unreadCount} hideIfZero />
+```

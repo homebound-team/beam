@@ -1,0 +1,33 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as LinkCardStories from "./LinkCard.stories";
+
+<Meta of={LinkCardStories} />
+
+# Link Card
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1634-2123">
+    <img src="FigmaLogo.png" alt="" />
+    Link Card
+  </a>
+</p>
+
+`LinkCard` is a raised card with a title, an optional message, and a trailing arrow that links to more detail. Use `AiLinkCardGroup` for a set of them from Blueprint AI, and `BaseCard` for a card with an image.
+
+<ArgTypes />
+
+## Behaviors
+
+- Only the arrow is interactive, so `message` can hold its own links.
+- `action.onClick` is a URL or a function, and `action.openInNew` opens a URL in a new tab. The title is the arrow's accessible label.
+- Without a `message`, the arrow centers on the title.
+
+## How to use
+
+```tsx
+<LinkCard
+  title="Review 3 changed options"
+  message="Pricing changed since the last export."
+  action={{ onClick: "/options/changes" }}
+/>
+```

@@ -1,0 +1,39 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./RadioGroupField.stories";
+
+<Meta of={Stories} />
+
+# Radio Group Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36814%3A102223">
+    <img src="FigmaLogo.png" alt="" />
+    Radio Group
+  </a>
+</p>
+
+`RadioGroupField` picks exactly one option from a short list that's all visible at once. For longer lists, use `MenuSelectField`; for options shown as cards, use `SelectCardGroup`. In a form, use `BoundRadioGroupField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Once an option is picked it can't be unselected, only changed.
+- An option's `disabled` can be a reason (any `ReactNode`), shown in a tooltip.
+- `layout` is `vertical` (default), `horizontal`, or `thumbnail`, which shows each option as an image swatch from its `imgSrc`.
+- In the thumbnail layout, `originalValue` flags the original option and the new pick once they differ. Descriptions aren't shown there.
+- `renderOption` draws a whole custom row, e.g. a title, price and image. Wrap the row in a `<label>` with `<StyledRadio {...radioProps} />` inside, so clicking anywhere selects it.
+
+## How to use
+
+```tsx
+<RadioGroupField
+  label="Foundation"
+  value={foundation}
+  onChange={setFoundation}
+  options={[
+    { label: "Slab", value: "slab" },
+    { label: "Crawlspace", value: "crawl", description: "Adds 3 days to the schedule." },
+  ]}
+/>
+```

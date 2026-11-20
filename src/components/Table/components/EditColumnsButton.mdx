@@ -1,0 +1,35 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as EditColumnsButtonStories from "./EditColumnsButton.stories";
+
+<Meta of={EditColumnsButtonStories} />
+
+# Edit Columns Button
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4493-3">
+    <img src="FigmaLogo.png" alt="" />
+    Table Header (Filters + Controls)
+  </a>
+</p>
+
+`EditColumnsButton` opens a menu of switches that show or hide a `GridTable`'s columns, plus a button to reset column widths. `GridTableLayout` already renders it whenever a column has `canHide`, so you only need it directly for a table outside that layout.
+
+<ArgTypes />
+
+## Behaviors
+
+- Only columns with `canHide`, a `name` and an `id` are listed. A `canHide` column missing its `name` or `id` is skipped with a console warning.
+- Toggling a column resets the column widths, so the remaining columns fill the table's width.
+- The trigger icon changes to a badged version while any listed column is hidden.
+- The trigger is icon-only on small screens unless `compact` says otherwise.
+- `shareColumnVisibility` lists columns that share a `name` under one switch, which shows or hides all of them.
+- `viewToggle` pins a full-width `ButtonGroup` above the list, e.g. the table's view toggle when the toolbar has no room for it.
+
+## How to use
+
+```tsx
+const api = useGridTableApi<Row>();
+
+<EditColumnsButton columns={columns} api={api} />
+<GridTable columns={columns} rows={rows} api={api} visibleColumnsStorageKey="projects" />
+```

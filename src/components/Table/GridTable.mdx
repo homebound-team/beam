@@ -1,0 +1,67 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as GridTableStories from "./GridTable.stories";
+
+<Meta of={GridTableStories} />
+
+# Grid Table
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1622-788">
+    <img src="FigmaLogo.png" alt="" />
+    Table Cells
+  </a>
+</p>
+
+`GridTable` renders rows of data through column definitions. It handles sorting, filtering, selection, nested and collapsible rows, sticky headers and columns, virtualization, drag-to-reorder, and a card view. On a page, wrap it in `GridTableLayout`, which adds search, filters and column editing, and pins them with the page header (see `docs/layouts.md`).
+
+<ArgTypes />
+
+## Rows and columns
+
+Rows are data, and columns are rendering. Every row has a `kind`, an `id`, and usually `data`. A column says how to render each kind:
+
+```tsx
+type Row = SimpleHeaderAndData<Project>;
+
+const columns: GridColumn<Row>[] = [
+  column<Row>({ header: "Name", data: ({ name }) => name, w: "2fr" }),
+  numericColumn<Row>({ header: "Budget", data: ({ budget }) => formatCurrency(budget) }),
+  dateColumn<Row>({ header: "Start", data: ({ startDate }) => formatPlainDate(startDate) }),
+];
+
+const rows: GridDataRow<Row>[] = [simpleHeader, ...projects.map((p) => ({ kind: "data" as const, id: p.id, data: p }))];
+
+<GridTable columns={columns} rows={rows} />;
+```
+
+- The header is just another row, with `kind: "header"`. `simpleHeader` and `simpleDataRows` build it and the data rows for a flat table.
+- A table with several kinds, like groups and line items, adds a key per kind to each column. Put child rows in `children` to nest them.
+- A cell returns a value or a `GridCellContent` (`{ content, value, sortValue, … }`) when the displayed content differs from the value used for sorting and filtering.
+- The column helpers set defaults: `column`, `numericColumn` (right-aligned) and `dateColumn` can be hidden by the user, `actionColumn` is centered and unsortable, and `selectColumn`, `collapseColumn`, `rowActionsColumn` and `dragHandleColumn` add the built-in controls.
+
+## Rendering modes
+
+- `as="div"` (default) lays rows out with CSS grid.
+- `as="virtual"` renders only the visible rows. Use it for long lists, and with `infiniteScroll` to load more.
+- `as="table"` renders a real `<table>`, which prints across pages better. Column widths and alignment only support px values.
+- `as="card"` shows each row as a card; see the card view stories.
+
+## Behaviors
+
+- `sorting` is client-side, where the table sorts by each cell's `sortValue` or `value`, or server-side, where it calls `onSort` and expects new rows.
+- `filter` matches text against each cell's value. A matching row keeps its parents visible, and a matching parent shows all its children.
+- `api` (from `useGridTableApi`) reads selected and visible rows, selects, collapses and pins rows, scrolls to a row, and exports to CSV.
+- `style` takes a `GridStyle`, or a `GridStyleDef` for `getTableStyles` (e.g. `{ bordered: true, rowHover: true }`). On a document-scroll page it defaults to `allWhite`.
+- `fallbackMessage` and `emptyState` show when there are no data rows. `emptyState` takes a full empty state, with actions.
+- `visibleColumnsStorageKey` saves which columns are shown, for columns with `canHide`.
+
+## How to use
+
+The stories cover each feature. Good starting points:
+
+- **Sorting and filtering:** Client Side Sorting, Virtual Filtering
+- **Nested rows:** Nested Rows, Collapsible Rows, Selectable Children Rows
+- **Styles:** Style Default, Style Condensed, Style Card, Column Borders
+- **Sticky content:** Sticky Header, Sticky Columns, Sticky Columns And Header
+- **Long lists:** Infinite Scroll, Virtual With Scroll Persistence
+- **Card view:** Card View, Card View Ai States

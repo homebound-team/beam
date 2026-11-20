@@ -1,0 +1,28 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ToggleButton.stories";
+
+<Meta of={Stories} />
+
+# Toggle Button
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31580%3A99845">
+    <img src="FigmaLogo.png" alt="" />
+    Toggle Button
+  </a>
+</p>
+
+`ToggleButton` is a small, borderless button that switches between on and off, with an optional icon. It turns blue while selected. Use it for view toggles in toolbars and headers; use `Switch` for a labeled setting. It has no `Bound*` wrapper.
+
+<ArgTypes />
+
+## Behaviors
+
+- When `onChange` returns a promise, the button is disabled until it settles.
+- `disabled` can be a reason (any `ReactNode`), shown in a tooltip above the button.
+
+## How to use
+
+```tsx
+<ToggleButton label="Show delays" icon="flag" selected={showDelays} onChange={setShowDelays} />
+```

@@ -1,0 +1,31 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as JumpLinkStories from "./JumpLink.stories";
+
+<Meta of={JumpLinkStories} />
+
+# Jump Link
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=439-3">
+    <img src="FigmaLogo.png" alt="" />
+    Jump Links
+  </a>
+</p>
+
+`JumpLink` is a link that smooth-scrolls the page to a section, for "on this page" navigation. `FormSectionLayout` with `withJumpLinks` already renders a rail of jump links for its form sections and tracks which one is active, so use `JumpLink` directly only for your own section list.
+
+<ArgTypes />
+
+## Behaviors
+
+- `href` is the target's `#id`. A plain click scrolls that element into view instead of navigating. Modifier and middle clicks keep the browser's default, like opening in a new tab.
+- `active` is up to the caller: it bolds the label and adds a blue left border.
+- Long labels wrap to two lines, then truncate.
+
+## How to use
+
+```tsx
+{
+  sections.map((s) => <JumpLink key={s.id} label={s.title} href={`#${s.id}`} active={s.id === activeSectionId} />);
+}
+```

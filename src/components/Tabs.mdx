@@ -1,0 +1,58 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as TabsStories from "./Tabs.stories";
+
+<Meta of={TabsStories} />
+
+# Tabs
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=865-677">
+    <img src="FigmaLogo.png" alt="" />
+    Tabs
+  </a>
+</p>
+
+`TabsWithContent` renders a row of tabs and the selected tab's panel. Use `Tabs` and `TabContent` separately when the tab list and the panel live in different places, e.g. tabs in a page header. `PageHeaderLayout`'s `pageHeader` takes `tabs` directly. For sequential steps, use `StepperTabs`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Tabs are controlled: pass `selected` and update it in `onChange`.
+- Route tabs take `href` and `path` instead of `value`. They render as links, and the tab whose `path` matches the current URL is selected. If none matches, the first tab is.
+- With only one enabled tab, the tab list is hidden unless `alwaysShowAllTabs` is set.
+- A `disabled` reason shows in a tooltip. Arrow keys move between enabled tabs.
+- `icon`, `endAdornment` and `aiMode` decorate a tab's label. `aiMode` wins over the other two, and `icon` wins over `endAdornment`.
+- `right` holds content at the far right of the tab list, such as tab-specific actions.
+- The panel is full bleed. It pads its top unless its first child pads its own (e.g. `GridTableLayout`'s actions).
+
+## How to use
+
+```tsx
+const [tab, setTab] = useState("details");
+
+<TabsWithContent
+  selected={tab}
+  onChange={setTab}
+  tabs={[
+    { name: "Details", value: "details", render: () => <ProjectDetails /> },
+    { name: "Budget", value: "budget", render: () => <ProjectBudget /> },
+  ]}
+/>;
+```
+
+Route tabs:
+
+```tsx
+<TabsWithContent
+  tabs={[
+    {
+      name: "Details",
+      href: `/projects/${id}/details`,
+      path: "/projects/:id/details",
+      render: () => <ProjectDetails />,
+    },
+    { name: "Budget", href: `/projects/${id}/budget`, path: "/projects/:id/budget", render: () => <ProjectBudget /> },
+  ]}
+/>
+```

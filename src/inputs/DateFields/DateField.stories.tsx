@@ -1,6 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import { Button } from "src/components/Button";
 import { Css } from "src/Css";
 import { jan1, jan10, jan2 } from "src/forms/formStateDomain";
 import { DateField, type DateFieldProps } from "src/inputs/DateFields/DateField";
@@ -12,7 +11,7 @@ import { action } from "storybook/actions";
 import { Temporal } from "temporal-polyfill";
 
 export default {
-  component: Button,
+  component: DateField,
   parameters: {
     design: {
       type: "figma",

@@ -1,0 +1,44 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonStories from "./Button.stories";
+
+<Meta of={ButtonStories} />
+
+# Button
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4-20">
+    <img src="FigmaLogo.png" alt="" />
+    Buttons
+  </a>
+</p>
+
+`Button` runs an action, or navigates when `onClick` is a URL. Use `IconButton` for an icon with no label, `ButtonMenu` to open a list of actions, and `ButtonGroup` for a row of joined buttons.
+
+<ArgTypes />
+
+## Variants
+
+- `primary` is the main action in an area.
+- `secondary` is for supporting actions. Add `colorScheme` (`neutral`, `info`, `success`) to tint it.
+- `tertiary` and `quaternary` are low-emphasis actions with no fill.
+- `danger` and `tertiaryDanger` are for destructive actions; `caution` is for risky ones.
+- `text` and `textSecondary` look like links and inherit the surrounding font size. They ignore `size`.
+- `ai` is for actions that run Blueprint AI.
+
+## Behaviors
+
+- A string `onClick` renders an anchor. An absolute URL, or `openInNew`, adds an external-link icon. `download` adds a download icon. Pass `icon={null}` to hide either one.
+- When `onClick` returns a promise, the button is disabled and shows a spinner until it settles. `labelInFlight` swaps the label while it runs.
+- `disabled` can be a reason (any `ReactNode`). The button is disabled, and the reason shows in a tooltip.
+- `tooltip` shows below the button on hover.
+
+## How to use
+
+```tsx
+<Button label="Save" onClick={save} />
+<Button variant="secondary" label="Cancel" onClick={close} />
+<Button variant="text" label="View invoice" onClick={`/invoices/${id}`} />
+<Button label="Approve" disabled={!canApprove && "Only the project manager can approve."} onClick={approve} />
+```
+
+For a form's submit, use `SubmitButton`. It stays disabled until the form is dirty and valid, except on a new entity, where the first click is allowed so every field's errors show.

@@ -1,0 +1,40 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as RightPanePanelStories from "./RightPanePanel.stories";
+
+<Meta of={RightPanePanelStories} />
+
+# Right Pane Panel
+
+`RightPanePanel` is the standard chrome for content opened in a right pane: a header with the title and close button, a scrolling body, and an optional footer of actions. Pass it as the content to `openRightPane` from `useRightPane` or `useRightPaneActions`. Where the pane is hosted (`GridTableLayout withRightPane`, `FormSectionLayout withRightPane`, or a workflow's `rightPaneTriggers`) is covered in `docs/layouts.md`.
+
+<ArgTypes />
+
+## Behaviors
+
+- With a `tag`, the tag sits on the close-button row and the title moves to its own row below it.
+- The close button takes focus when the panel opens, so focus isn't left on the control that opened it.
+- The footer shows when any action is set. `deleteAction` is a trash icon on the left, which reads "Delete (n)" when `count` is above 1. `secondaryAction` and `primaryAction` sit on the right.
+- `isDirty` asks the user to discard unsaved changes before the pane closes, or before content of another type or `key` replaces it. Content with the same type and `key` updates the open panel in place without asking.
+- `RightPaneBanner`, rendered anywhere in the children, shows full-bleed under the header.
+
+## How to use
+
+Key the content by item, so switching items asks about unsaved changes, while re-opening the same item keeps its edits:
+
+```tsx
+const { openRightPane, closeRightPane } = useRightPaneActions();
+
+openRightPane({
+  content: (
+    <RightPanePanel
+      key={row.id}
+      title={row.name}
+      isDirty={() => formState.dirty}
+      secondaryAction={{ label: "Cancel", onClick: closeRightPane }}
+      primaryAction={{ label: "Save", onClick: save }}
+    >
+      <BookFields formState={formState} />
+    </RightPanePanel>
+  ),
+});
+```

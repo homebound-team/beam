@@ -1,0 +1,27 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AccordionListStories from "./AccordionList.stories";
+
+<Meta of={AccordionListStories} />
+
+# Accordion List
+
+`AccordionList` stacks `Accordion`s from a list of their props, applying one `size` and `compact` setting to all of them and a bottom border on the last one. Use a single `Accordion` for one section.
+
+<ArgTypes />
+
+## Behaviors
+
+- `allowMultipleExpanded` defaults to `true`. Set it to `false` so opening one accordion closes the others. The first accordion with `defaultExpanded` starts open.
+- `size` and `compact` on the list override the same props on each accordion.
+
+## How to use
+
+```tsx
+<AccordionList
+  allowMultipleExpanded={false}
+  accordions={[
+    { title: "Framing", children: <FramingDetails /> },
+    { title: "Drywall", children: <DrywallDetails /> },
+  ]}
+/>
+```

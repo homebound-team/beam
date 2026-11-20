@@ -1,0 +1,38 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as InlineFeedbackBannerStories from "./InlineFeedbackBanner.stories";
+
+<Meta of={InlineFeedbackBannerStories} />
+
+# Inline Feedback Banner
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1686-10522">
+    <img src="FigmaLogo.png" alt="" />
+    Inline Feedback Banner
+  </a>
+</p>
+
+`InlineFeedbackBanner` is a compact error or warning that sits next to the content it's about, such as in a table's companion row. It shows a status tag, a description, and optional text actions. For a page-level or section-level status, use `StatusBanner`.
+
+<ArgTypes />
+
+## Behaviors
+
+- The tag uses `type`'s icon and color. Without `tagText`, the tag is icon-only, with "Error" or "Warning" as its tooltip and accessible label.
+- `actions` render in order as text buttons. An action with `kind: "menu"` opens a `ButtonMenu` from a text trigger.
+- When the banner is 440px wide or narrower, the tag, description and actions stack. It measures its own width, not the screen's, so it also stacks in a narrow modal or column.
+- The banner has no background of its own around it. Any fill behind it belongs to the host, such as a companion row.
+
+## How to use
+
+```tsx
+<InlineFeedbackBanner
+  type="warning"
+  tagText="Missing cost"
+  description="This line item has no unit cost."
+  actions={[
+    { label: "Add cost", onClick: openCost },
+    { kind: "menu", label: "More", items: [{ label: "Ignore", onClick: ignore }] },
+  ]}
+/>
+```

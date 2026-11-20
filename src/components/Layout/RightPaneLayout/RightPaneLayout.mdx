@@ -1,0 +1,16 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as RightPaneLayoutStories from "./RightPaneLayout.stories";
+
+<Meta of={RightPaneLayoutStories} />
+
+# Right Pane Layout
+
+`RightPaneLayout` is the legacy right pane. It narrows its `children` to make room for content opened with `useRightPane`. Pages built on the document-scroll layouts use `DocumentScrollOverlayRightPaneLayout` instead, usually through `GridTableLayout withRightPane` or `FormSectionLayout withRightPane` (see `docs/layouts.md`). Keep using `RightPaneLayout` only on pages that haven't moved to those layouts yet.
+
+<ArgTypes />
+
+## Behaviors
+
+- The pane is 450px wide by default, with a 24px gap before the content.
+- `defaultPaneContent` keeps the pane open with placeholder content while nothing is opened, and fades out when content opens.
+- The pane closes when the layout unmounts, so the next page doesn't show stale content.

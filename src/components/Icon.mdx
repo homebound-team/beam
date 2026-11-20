@@ -1,0 +1,32 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as IconStories from "./Icon.stories";
+
+<Meta of={IconStories} />
+
+# Icon
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=17-68">
+    <img src="FigmaLogo.png" alt="" />
+    Icons
+  </a>
+</p>
+
+`Icon` draws one of Beam's 24x24 SVG icons by name. The Icon story lists every name. Use `IconButton` for a clickable icon.
+
+<ArgTypes />
+
+## Behaviors
+
+- `inc` sizes the icon in 8px increments and defaults to 3 (24px).
+- `color` defaults to `currentColor`, so the icon matches the surrounding text.
+- The icon is hidden from screen readers. Pair it with visible text, or use `IconButton`, which takes a label.
+- `tooltip` shows above the icon on hover.
+- It doesn't shrink inside a flex row next to long text.
+
+## How to use
+
+```tsx
+<Icon icon="checkCircle" color={Palette.Green600} />
+<Icon icon="infoCircle" inc={2} tooltip="Updated nightly." />
+```

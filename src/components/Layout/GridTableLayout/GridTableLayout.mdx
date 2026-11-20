@@ -1,0 +1,58 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as GridTableLayoutStories from "./GridTableLayout.stories";
+
+<Meta of={GridTableLayoutStories} />
+
+# Grid Table Layout
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4493-3">
+    <img src="FigmaLogo.png" alt="" />
+    Table Header (Filters + Controls)
+  </a>
+</p>
+
+`GridTableLayout` is the standard body for a table page: a `GridTable` with a toolbar of search, filters, group by, actions and column editing above it, plus an empty state and infinite scroll. Its state (filters, search, group by, visible columns) comes from `useGridTableLayoutState`. The toolbar is covered on the Table Actions page. How it pins with the page header and hosts a right pane is in `docs/layouts.md`.
+
+<ArgTypes />
+
+## Table props
+
+`tableProps` takes either kind of table:
+
+- **Rows:** pass `rows` and `columns`, as for `GridTable`, when you have the data or handle loading yourself.
+- **Query:** pass an Apollo `query`, `createRows(data)` and `columns`, and the layout handles the loading and error states.
+
+## Layout state
+
+`useGridTableLayoutState` wires the toolbar to the table:
+
+- `persistedFilter: { filterDefs, storageKey }` keeps the filters with `usePersistedFilter`.
+- `search: "client"` filters the rows in the table. `search: "server"` gives you a debounced `searchString` to send in your query. The search text is restored from the `search` query param, except in a modal.
+- `persistedColumns: { storageKey }` saves which columns are shown, in session storage.
+- `groupBy` adds a "Group by" select from a map of options.
+
+## Behaviors
+
+- With no data rows, it shows an empty state titled from `tableProps`' `emptyState`, or `emptyFallback`. While a filter or search is active, it adds "Try adjusting your search or filters." and a "Clear Filters" button.
+- The table defaults to a white style with a top border. Pass a full `GridStyle` in `tableProps.style` to opt out.
+- `withCardView` adds a list/card toggle and remembers the user's choice for the current path.
+- `withRightPane` hosts the document-scroll detail pane around the table body only. Open it with `useRightPane` or, in row click handlers, `useRightPaneActions`.
+- `scrollToTopOnFilterChange` scrolls back to the top of the table when the filter or search changes, after a query table finishes loading.
+
+## How to use
+
+```tsx
+const layoutState = useGridTableLayoutState({
+  persistedFilter: { filterDefs, storageKey: "projects" },
+  persistedColumns: { storageKey: "projectsColumns" },
+  search: "server",
+});
+
+<GridTableLayout
+  layoutState={layoutState}
+  tableProps={{ query, createRows, columns }}
+  actions={[{ label: "New Project", onClick: openNewProject }]}
+  emptyFallback="No projects found"
+/>;
+```

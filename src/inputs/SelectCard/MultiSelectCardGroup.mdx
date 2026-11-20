@@ -1,0 +1,39 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./MultiSelectCardGroup.stories";
+
+<Meta of={Stories} />
+
+# Multi Select Card Group
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=315-161">
+    <img src="FigmaLogo.png" alt="" />
+    Select Cards
+  </a>
+</p>
+
+`MultiSelectCardGroup` picks several options from a set of cards. It has the same views as `SelectCardGroup`, with checkboxes instead of radios. In a form, use `BoundMultiSelectCardGroupField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `values` is the list of selected option values, and `onChange` receives the full new list.
+- An option with `selectionBehavior: "exclusive"`, like "None of these", clears every other option when picked. Picking any other option clears it.
+- `view="grid"` and `view="list"` work as in `SelectCardGroup`.
+
+## How to use
+
+```tsx
+<MultiSelectCardGroup
+  label="Upgrades"
+  view="list"
+  values={upgrades}
+  onChange={setUpgrades}
+  options={[
+    { label: "Solar", value: "solar" },
+    { label: "EV charger", value: "ev" },
+    { label: "None", value: "none", selectionBehavior: "exclusive" },
+  ]}
+/>
+```

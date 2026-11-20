@@ -1,0 +1,38 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as StepperTabsStories from "./StepperTabs.stories";
+
+<Meta of={StepperTabsStories} />
+
+# Stepper Tabs
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=419-3">
+    <img src="FigmaLogo.png" alt="" />
+    Stepper Tabs
+  </a>
+</p>
+
+`StepperTabs` is a row of step tabs for a multi-step workflow. `StepperLayout` renders it from its `steps`, so use it directly only outside that layout. Each tab is a `StepperTab`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Every step before `currentStep` shows as completed, with a check. Progress is positional, not per step.
+- Clicking a tab calls `onChange` with its `value`. `disabled` tabs can't be clicked.
+- On mobile, or with `collapsed`, the tabs shrink to colored indicator bars with no labels. Collapsed tabs can't be clicked or focused.
+- With three steps or fewer, each tab is capped at 280px wide; more steps share the full width.
+
+## How to use
+
+```tsx
+<StepperTabs
+  steps={[
+    { label: "Scope", value: "scope" },
+    { label: "Pricing", value: "pricing" },
+    { label: "Review", value: "review", disabled: !canReview },
+  ]}
+  currentStep={step}
+  onChange={setStep}
+/>
+```

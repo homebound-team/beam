@@ -6,7 +6,17 @@ const config: StorybookConfig = {
   addons: ["@storybook/addon-docs"],
 
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
-  typescript: { check: false },
+  // react-docgen-typescript follows imported and inherited prop types (e.g. PresentationFieldProps), so
+  // `<ArgTypes>` tables in MDX list every Beam prop with its JSDoc. Props from node_modules (DOM, react-aria) are dropped.
+  typescript: {
+    check: false,
+    reactDocgen: "react-docgen-typescript",
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      shouldRemoveUndefinedFromOptional: true,
+      propFilter: (prop) => !prop.parent || !prop.parent.fileName.includes("node_modules"),
+    },
+  },
 
   async viteFinal(config) {
     return mergeConfig(config, {

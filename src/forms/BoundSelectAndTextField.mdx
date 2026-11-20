@@ -1,0 +1,24 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as BoundSelectAndTextFieldStories from "./BoundSelectAndTextField.stories";
+
+<Meta of={BoundSelectAndTextFieldStories} />
+
+# Bound Select And Text Field
+
+`BoundSelectAndTextField` joins a bound select and a bound text field into one `CompoundField`, e.g. a type picker in front of a name. The select sizes to its content, and the text field takes the rest of the width. For other pairs of fields, build your own with `CompoundField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `selectFieldProps` and `textFieldProps` take the props of `BoundSelectField` and `BoundTextField`, minus `compact`, which is set for both by the top-level `compact` (defaults to `true`).
+- The select is built on `BoundSelectField`, which is deprecated in favor of the Menu\* select fields.
+
+## How to use
+
+```tsx
+<BoundSelectAndTextField
+  selectFieldProps={{ field: formState.type, options: scheduleTypes }}
+  textFieldProps={{ field: formState.name, clearable: true, placeholder: "Add new" }}
+/>
+```

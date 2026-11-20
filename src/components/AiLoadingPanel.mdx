@@ -1,0 +1,30 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AiLoadingPanelStories from "./AiLoadingPanel.stories";
+
+<Meta of={AiLoadingPanelStories} />
+
+# AI Loading Panel
+
+`AiLoadingPanel` tells the user that AI work is running and that they can keep working elsewhere in the meantime. It shows an `AiLoader`, a title and a message on the AI surface. For a small inline indicator, use `AiLoader` on its own.
+
+<ArgTypes />
+
+## Behaviors
+
+- `title` defaults to "Importing Details...".
+- Without a `message`, it explains that the process can take a few minutes and that the user can keep working in another tab. When `progressText` is set, the default message drops the timing sentence, since the footer already gives it.
+- `progressText` is a status line you supply, such as "Usually takes 3 minutes", shown in a footer with a clock icon. The loader itself stays indeterminate.
+- `omitBg` drops the AI background and renders just the card, for a surface that already has one.
+- The card has `role="status"` and `aria-busy`, so screen readers announce it without interrupting.
+
+## How to use
+
+```tsx
+{
+  isImporting ? (
+    <AiLoadingPanel title="Importing plan details..." progressText="Usually takes 3 minutes" />
+  ) : (
+    <PlanDetails />
+  );
+}
+```

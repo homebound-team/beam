@@ -1,0 +1,33 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AiBannerStories from "./AiBanner.stories";
+
+<Meta of={AiBannerStories} />
+
+# AI Banner
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1622-603">
+    <img src="FigmaLogo.png" alt="" />
+    Ai Banners
+  </a>
+</p>
+
+`AiBanner` calls out an AI result or suggestion on a page, with a title, an optional message, and up to two actions. For a one-line notice directly above the content it's about, use `AiSlimBanner`. For a list of AI findings that each link somewhere, use `AiLinkCardGroup`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `primaryAction` renders as an `ai` button. `secondaryAction` renders as a `quaternary` button before it.
+- The copy and the actions share one row. When there isn't room, the actions wrap below the copy instead of squeezing it.
+
+## How to use
+
+```tsx
+<AiBanner
+  title="We found 3 changes in the new plan set"
+  message="Review them before publishing."
+  primaryAction={{ label: "Review changes", onClick: openReview }}
+  secondaryAction={{ label: "Dismiss", onClick: dismiss }}
+/>
+```

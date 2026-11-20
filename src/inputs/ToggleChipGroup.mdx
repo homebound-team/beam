@@ -1,0 +1,38 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ToggleChipGroup.stories";
+
+<Meta of={Stories} />
+
+# Toggle Chip Group
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241">
+    <img src="FigmaLogo.png" alt="" />
+    Chips
+  </a>
+</p>
+
+`ToggleChipGroup` shows options as chips that toggle on and off, for picking several values from a short list. Use `MultiSelectCardGroup` when options need descriptions, and `MenuMultiSelectField` for longer lists. In a form, use `BoundToggleChipGroupField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `values` is the list of selected option values, and `onChange` receives the full new list.
+- `readonly` makes every chip read-only. An option's own `readonly` or `disabled` applies to just that chip, and a `disabled` reason shows in a tooltip.
+- An option's `startAdornment` renders before its label.
+
+## How to use
+
+```tsx
+<ToggleChipGroup
+  label="Days"
+  values={days}
+  onChange={setDays}
+  options={[
+    { label: "Mon", value: "mon" },
+    { label: "Tue", value: "tue" },
+    { label: "Wed", value: "wed" },
+  ]}
+/>
+```

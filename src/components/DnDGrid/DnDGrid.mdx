@@ -1,0 +1,38 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as DnDGridStories from "./DnDGrid.stories";
+
+<Meta of={DnDGridStories} />
+
+# DnD Grid
+
+`DnDGrid` is a CSS grid whose items can be reordered by dragging or with the keyboard. Each draggable item calls `useDnDGridItem` and renders a `DnDGridItemHandle` to drag from. Items without the hook stay in place. To reorder rows in a table, use `GridTable`'s drag support (`dragHandleColumn` and `onRowDrop`) instead. `FormSection` uses `DnDGrid` for its reorderable child sections.
+
+<ArgTypes />
+
+## Behaviors
+
+- `onReorder` gets the new order of item ids, and only fires when the order actually changed.
+- Keyboard: focus a handle and press Space to pick the item up, then use the arrow keys to move it. Enter, Space or Tab drops it. Escape, or clicking elsewhere, puts it back.
+- `lockAxis` limits movement to one direction, for pointer drags and arrow keys alike.
+- `activeItemStyles` styles the item while it's moving, and defaults to a modal shadow.
+
+## How to use
+
+```tsx
+<DnDGrid gridStyles={Css.gtc("repeat(3, 1fr)").gap2.$} onReorder={(ids) => saveOrder(ids)}>
+  {cards.map((card) => (
+    <DraggableCard key={card.id} card={card} />
+  ))}
+</DnDGrid>;
+
+function DraggableCard({ card }: { card: Card }) {
+  const itemRef = useRef(null);
+  const { dragItemProps, dragHandleProps } = useDnDGridItem({ id: card.id, itemRef });
+  return (
+    <div ref={itemRef} {...dragItemProps}>
+      <DnDGridItemHandle dragHandleProps={dragHandleProps} />
+      {card.name}
+    </div>
+  );
+}
+```

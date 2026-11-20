@@ -1,0 +1,33 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AiLinkCardGroupStories from "./AiLinkCardGroup.stories";
+
+<Meta of={AiLinkCardGroupStories} />
+
+# AI Link Card Group
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1634-2123">
+    <img src="FigmaLogo.png" alt="" />
+    AI Link Card Group
+  </a>
+</p>
+
+`AiLinkCardGroup` stacks `LinkCard`s on the AI surface under the Blueprint AI logo, one card per AI finding, each linking to where the user can act on it. For a single callout, use `AiBanner`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Renders nothing when `cards` is empty, so you can pass the list straight through.
+- Only each card's trailing arrow is interactive, so a card's `message` can hold its own links.
+
+## How to use
+
+```tsx
+<AiLinkCardGroup
+  cards={[
+    { title: "Review 2 new options, 1 changed, 1 removed.", action: { onClick: `/plans/${id}/options` } },
+    { title: "Review 1 changed program value.", action: { onClick: `/plans/${id}/program` } },
+  ]}
+/>
+```

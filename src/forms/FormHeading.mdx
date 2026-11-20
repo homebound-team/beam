@@ -1,0 +1,25 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as FormHeadingStories from "./FormHeading.stories";
+
+<Meta of={FormHeadingStories} />
+
+# Form Heading
+
+`FormHeading` is an `h3` that labels a group of fields inside `FormLines`. For a titled block with a description and actions, use `FormSection` instead.
+
+<ArgTypes />
+
+## Behaviors
+
+- It adds space above itself, except when it's the first heading in its `FormLines`. `FormLines` sets `isFirst` for you, so you don't pass it yourself.
+
+## How to use
+
+```tsx
+<FormLines>
+  <FormHeading title="Contact" />
+  <BoundTextField field={formState.email} />
+  <FormHeading title="Address" />
+  <BoundTextField field={formState.street} />
+</FormLines>
+```

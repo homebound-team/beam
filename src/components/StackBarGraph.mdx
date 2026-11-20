@@ -1,0 +1,30 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as StackBarGraphStories from "./StackBarGraph.stories";
+
+<Meta of={StackBarGraphStories} />
+
+# Stack Bar Graph
+
+`StackBarGraph` is a horizontal bar split into colored segments, with a legend, for showing how a total breaks down. Put it in a `TableSummary`'s `footer`, or use it on its own.
+
+<ArgTypes />
+
+## Behaviors
+
+- Each segment's width is its share of the total of all `count`s. Negative counts count as 0.
+- The legend lists each segment as its rounded percentage, label and count, e.g. "58% Awarded (14)".
+- `totalLabel` is display text you provide; the graph doesn't format the total.
+
+## How to use
+
+```tsx
+<StackBarGraph
+  title="Bid coverage"
+  totalLabel="24 trades"
+  segments={[
+    { label: "Awarded", count: 14, color: Palette.Green500 },
+    { label: "Bidding", count: 6, color: Palette.Blue500 },
+    { label: "Not started", count: 4, color: Palette.Gray300 },
+  ]}
+/>
+```

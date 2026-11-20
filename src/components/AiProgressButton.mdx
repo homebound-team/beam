@@ -1,0 +1,23 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AiProgressButtonStories from "./AiProgressButton.stories";
+
+<Meta of={AiProgressButtonStories} />
+
+# AI Progress Button
+
+`AiProgressButton` starts AI work from a compact button. It rests as the AI star, and its label slides out on hover or keyboard focus. While the work runs, `inProgress` spins the star. For a regular labeled AI action, use `Button` with `variant="ai"`.
+
+<ArgTypes />
+
+## Behaviors
+
+- On touch screens, and on screens 1024px wide or narrower, the label always shows.
+- A string `onClick` renders a link, like `Button`.
+- `disabled` can be a reason (any `ReactNode`), shown in a tooltip below the button. `tooltip` shows there too.
+- `size` is `sm` (32px), `md` (40px, the default) or `lg` (48px).
+
+## How to use
+
+```tsx
+<AiProgressButton label="Generate summary" inProgress={isGenerating} onClick={generateSummary} />
+```

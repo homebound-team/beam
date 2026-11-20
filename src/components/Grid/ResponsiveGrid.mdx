@@ -1,0 +1,30 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ResponsiveGridStories from "./ResponsiveGrid.stories";
+
+<Meta of={ResponsiveGridStories} />
+
+# Responsive Grid
+
+`ResponsiveGrid` lays its children out in up to `columns` equal columns, and drops columns as its own width shrinks, so each column stays at least `minColumnWidth` wide. Wrap a child in `ResponsiveGridItem` to span several columns. It responds to the grid's width, not the screen's, so it also works inside side panes. For a fixed grid with drag-to-reorder, use `DnDGrid`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Columns grow to fill the width once all `columns` fit. `minColumnWidth` and `gap` are in pixels.
+- `ResponsiveGridItem` reduces its `colSpan` when fewer columns fit, so a wide item never overflows the grid.
+- When the width is just over a whole number of columns, the grid can leave an empty column at the end.
+
+## How to use
+
+```tsx
+<ResponsiveGrid columns={4} minColumnWidth={276} gap={24}>
+  <ResponsiveGridItem colSpan={2}>
+    <SummaryCard />
+  </ResponsiveGridItem>
+  <MetricCard />
+  <MetricCard />
+</ResponsiveGrid>
+```
+
+To style the grid yourself, e.g. to combine it with `DnDGrid`, call `useResponsiveGrid(config)` for the container styles and `useResponsiveGridItem({ colSpan, gridConfig: config })` for each item, passing the same config to both.

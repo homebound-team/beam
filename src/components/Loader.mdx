@@ -1,0 +1,23 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as LoaderStories from "./Loader.stories";
+
+<Meta of={LoaderStories} />
+
+# Loader
+
+`Loader` is a circular spinner for content that's loading. Use `LoadingSkeleton` when you know the shape of what's coming, so the layout doesn't jump. For AI work, use `AiLoader` or `AiLoadingPanel`. A `Button` whose `onClick` returns a promise shows its own spinner.
+
+<ArgTypes />
+
+## Behaviors
+
+- `size` is `xs` (16px), `sm` (32px), `md` (64px) or `lg` (96px, the default).
+- It has the accessible label "Loading".
+
+## How to use
+
+```tsx
+{
+  loading ? <Loader size="md" /> : <Results />;
+}
+```

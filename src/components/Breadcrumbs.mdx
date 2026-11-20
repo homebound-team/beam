@@ -1,0 +1,27 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as BreadcrumbsStories from "./Breadcrumbs.stories";
+
+<Meta of={BreadcrumbsStories} />
+
+# Breadcrumbs
+
+`Breadcrumbs` shows the pages above the current one as slash-separated links. Page headers render it for you from their `breadcrumbs` prop (e.g. `PageHeaderLayout`'s `pageHeader`), so use it directly only in custom headers.
+
+<ArgTypes />
+
+## Behaviors
+
+- Each crumb is a react-router `Link` to its `href`, so it must render inside a router.
+- A trail of four or more crumbs (three or more on mobile) collapses the middle into a "..." button. The first two crumbs (one on mobile) and the last stay visible. Clicking "..." shows the whole trail.
+- The last crumb truncates when space runs out; its full label shows on hover.
+
+## How to use
+
+```tsx
+<Breadcrumbs
+  breadcrumbs={[
+    { label: "Projects", href: "/projects" },
+    { label: project.name, href: `/projects/${project.id}` },
+  ]}
+/>
+```

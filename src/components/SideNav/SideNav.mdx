@@ -1,0 +1,39 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as SideNavStories from "./SideNav.stories";
+
+<Meta of={SideNavStories} />
+
+# Side Nav
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=763-59">
+    <img src="FigmaLogo.png" alt="" />
+    Navigation- Side
+  </a>
+</p>
+
+`SideNav` is the side navigation panel. `SideNavLayout` renders it from its `sideNav` prop and owns the panel's width and its expanded or collapsed state (see `docs/layouts.md`). For top navigation, use `Navbar`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `items` take `AppNavItem` shapes: a link (`{ label, onClick, icon?, active? }`), a collapsible group (`{ label, items, defaultExpanded? }`), or a static section with an optional heading (`{ section: true, label?, items }`).
+- `top` sits above the items, e.g. a logo or workspace switcher, and `footer` is pinned to the bottom, e.g. a user menu.
+- When the layout collapses the panel, `top`, `items` and `footer` are hidden. With `showContentWhenCollapsed`, they stay, and the items show icon-only if every link has an icon. Otherwise the items are still hidden.
+
+## How to use
+
+```tsx
+<SideNavLayout
+  sideNav={{
+    top: <HomeboundLogo />,
+    items: [
+      { label: "Overview", icon: "house", onClick: "/overview", active: true },
+      { label: "Budget", icon: "dollar", onClick: "/budget" },
+    ],
+  }}
+>
+  {children}
+</SideNavLayout>
+```

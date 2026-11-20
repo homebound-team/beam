@@ -1,0 +1,29 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DateRangeField.stories";
+
+<Meta of={Stories} />
+
+# Date Range Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31699%3A99554">
+    <img src="FigmaLogo.png" alt="" />
+    Date Range Field
+  </a>
+</p>
+
+`DateRangeField` picks a start and end date, typed in or chosen from a calendar popover. Use `DateField` for a single date. In a form, use `BoundDateRangeField`. For a table filter, use `dateRangeFilter` with `Filters`.
+
+<ArgTypes />
+
+## Behaviors
+
+- The value is a `DateRange` (`{ from, to }` of `PlainDate`s), and `onChange` receives `undefined` when the field is cleared.
+- It shares `DateField`'s behavior: `format` display options, reverting text that can't be parsed on blur, `disabledDays`, and `onEnter`.
+- `isRangeFilterField` only reports a complete range or nothing, and adds a clear button while the picker is closed.
+
+## How to use
+
+```tsx
+<DateRangeField label="Schedule window" value={range} onChange={setRange} />
+```

@@ -1,0 +1,27 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as EnvironmentBannerStories from "./EnvironmentBanner.stories";
+
+<Meta of={EnvironmentBannerStories} />
+
+# Environment Banner
+
+`EnvironmentBanner` is the strip across the top of the app that says which environment you're in, and who you're impersonating. Don't render it yourself: pass its props to `EnvironmentBannerLayout` as `environmentBanner`, which pins it above all other chrome (see `docs/layouts.md`).
+
+<ArgTypes />
+
+## Behaviors
+
+- It shows in `dev`, `qa` and `local-prod`. In `prod` it shows only while impersonating, or when `showProdWarning` is set. In `local` it never shows.
+- Each environment has its own color and badge, and an info icon whose tooltip explains whether changes affect live data.
+- `showProdWarning` uses the red production warning, and takes precedence over the impersonation styling. The impersonated user still shows on the right.
+- On small screens the message is hidden while impersonating, to leave room for the user's name.
+
+## How to use
+
+```tsx
+<EnvironmentBannerLayout environmentBanner={{ env: appEnv, impersonating: impersonatedUser }}>
+  <NavbarLayout …>…</NavbarLayout>
+</EnvironmentBannerLayout>
+```
+
+To match the browser tab to the environment, call `setEnvironmentFavicon(env, favicons)` once at startup.

@@ -1,0 +1,35 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as IconButtonStories from "./IconButton.stories";
+
+<Meta of={IconButtonStories} />
+
+# Icon Button
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=57-339">
+    <img src="FigmaLogo.png" alt="" />
+    Icon Button
+  </a>
+</p>
+
+`IconButton` is a button with only an icon, or a link when `onClick` is a URL. Use `Button` when the action needs a visible label, and `ButtonMenu` with an icon trigger to open a list of actions.
+
+<ArgTypes />
+
+## Behaviors
+
+- `label` is the button's accessible name, and it also shows as a tooltip. Set `preventTooltip` to keep the name without the tooltip. An explicit `tooltip`, or a `disabled` reason, still shows.
+- `variant="circle"` adds a round fill, and `variant="outline"` a bordered square. `compact` shrinks `default` and `circle`; `outline` ignores it.
+- `inc` sets the icon size, but `compact` and `circle` pick their own.
+- `color` and `bgColor` apply in every state, including disabled.
+- A string `onClick` renders an anchor; `openInNew` opens it in a new tab, and `download` downloads it.
+
+## How to use
+
+```tsx
+<IconButton icon="trash" label="Delete" onClick={remove} />
+<IconButton icon="x" label="Close" variant="circle" compact onClick={close} />
+<IconButton icon="linkExternal" label="Open in Procore" onClick={procoreUrl} openInNew />
+```
+
+Always pass `label`, so screen readers can name the button.

@@ -1,0 +1,33 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as PaginationStories from "./Pagination.stories";
+
+<Meta of={PaginationStories} />
+
+# Pagination
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=3214%3A10519">
+    <img src="FigmaLogo.png" alt="" />
+    Pagination
+  </a>
+</p>
+
+`Pagination` is a footer for paged results, with a page-size select, a "1 - 100 of 1000" range, and previous and next buttons. For a table that loads more as it scrolls, use `GridTable`'s `infiniteScroll` instead.
+
+<ArgTypes />
+
+## Behaviors
+
+- `page` is a `useState` pair holding either `{ pageNumber, pageSize }` or `{ offset, limit }`. Updates come back in the same shape, so pass `{ offset, limit }` straight to a backend query.
+- Changing the page size returns to the first page.
+- `pageSizes` defaults to 100, 500 and 1000. `defaultPage` is `{ offset: 0, limit: 100 }`.
+- With no results the range reads "0 of 0", and both buttons are disabled.
+
+## How to use
+
+```tsx
+const page = useState(defaultPage);
+const { data } = useProjectsQuery({ variables: { page: page[0] } });
+
+<Pagination page={page} totalCount={data?.projects.totalCount ?? 0} />;
+```

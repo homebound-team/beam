@@ -1,0 +1,48 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AutoSaveIndicatorStories from "./AutoSaveIndicator.stories";
+
+<Meta of={AutoSaveIndicatorStories} />
+
+# Auto Save Indicator
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31572%3A99609">
+    <img src="FigmaLogo.png" alt="" />
+    Auto Save Indicator
+  </a>
+</p>
+
+`AutoSaveIndicator` shows whether the app's auto-saves are idle, saving, saved, or failed. It reads the status from `AutoSaveStatusProvider`, which `BeamProvider` already includes, so you only place the indicator, typically in a page header.
+
+<ArgTypes />
+
+## Behaviors
+
+- It shows a cloud icon when idle, "Saving..." while any save is in flight, "Saved" when they finish, and "Error saving" when one fails. The error messages show in a tooltip.
+- "Saved" returns to idle after 6 seconds. An error stays until the next save starts or the status is reset.
+- `hideOnIdle` renders nothing until a save starts.
+- Unmounting the indicator resets the status to idle, so a stale "Saved" doesn't carry over to the next page. `doNotReset` keeps it.
+
+## How to use
+
+Report saves with `useAutoSaveStatus`. Apps usually do this once in their network layer, so every mutation counts:
+
+```tsx
+const { triggerAutoSave, resolveAutoSave } = useAutoSaveStatus();
+
+async function save(input: SaveInput) {
+  triggerAutoSave();
+  try {
+    await saveMutation({ variables: { input } });
+    resolveAutoSave();
+  } catch (e) {
+    resolveAutoSave(e);
+  }
+}
+```
+
+Then place the indicator:
+
+```tsx
+<AutoSaveIndicator hideOnIdle />
+```

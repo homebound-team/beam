@@ -1,0 +1,61 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Intro" name="Using Beam" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Using Beam
+
+How Beam code should look in an app. Component pages cover each component; this page covers the practices that apply everywhere.
+
+## Rules
+
+- Reach for a Beam component or layout before writing your own markup, and check its docs instead of guessing props.
+- Don't use deprecated exports. Each one's JSDoc names its replacement, e.g. `MenuSelectField` instead of `SelectField`.
+- Style with Truss (`Css.df.gap1.$`) and semantic `Tokens`. Don't use inline `style`, hex values, or palette colors.
+- Adjust a Beam component through its `xss` prop, which accepts only the properties that component allows. Don't wrap it to override its styles.
+- Build forms with `@homebound/form-state` and the `Bound*` fields or `BoundForm`, not hand-wired `value` and `onChange`.
+- Structure pages with Beam layouts. See "Which layout to use" and `docs/layouts.md`.
+- Show page status with `usePageBanner`, and transient confirmations with `useSnackbar`.
+- In tests, find elements by the `data-testid`s Beam components set, and use the helpers from `@homebound/beam/rtl`.
+
+## Setup
+
+Wrap the app once in `BeamProvider`. It supplies presentation defaults, auto-save status, snackbars, and the hosts for `useModal` and `useSuperDrawer`, so those hooks do nothing without it. Render `CssReset` at the top of the app to load Beam's reset styles.
+
+Tests that render Beam components need the provider too, e.g. a wrapper that renders `<BeamProvider>{children}</BeamProvider>`.
+
+## Styling
+
+Beam styles with [Truss](https://github.com/homebound-team/truss): `Css` chains utilities and `.$` returns the style object for the `css` prop.
+
+```tsx
+<div css={Css.df.aic.gap1.p2.bgColor(Tokens.Surface).$}>…</div>
+```
+
+- **Spacing** uses 8px units: `mt1` is 8px, `p2` is 16px. Use `mtPx(5)` and the other `Px` helpers only for an exact pixel value.
+- **Type** is a fixed scale applied with helpers like `Css.sm`, `Css.smSb`, `Css.md` and `Css.xl2`. See Foundations.
+- **Color** comes from semantic tokens, e.g. `Css.color(Tokens.OnSurfaceMuted)`. They swap under contrast, unlike palette colors. Inside a `Css` template string, interpolate the token bare (`${Tokens.Danger}`); wrapping it in `var()` nests it and the style is dropped.
+- **Breakpoints** are modifiers in the chain: `Css.df.fdr.ifSm.fdc.$` stacks the row on small screens.
+- **`xss`** is how a caller adjusts a Beam component. Each component types the properties it accepts: `ToggleChips` takes margins, so `xss={Css.mt1.$}` works, and a property it doesn't list is a type error. A component that needs a different look should get a variant in Beam, not a one-off override.
+
+## Forms
+
+Keep form values in `useFormState` from `@homebound/form-state`, and render them with `Bound*` fields. A bound field reads its label, value, required state and errors from the form field, so there's no `value` or `onChange` to wire.
+
+```tsx
+const formState = useFormState({ config: formConfig, init: { input: data } });
+
+<BoundTextField field={formState.firstName} />
+<BoundMenuSelectField field={formState.roleId} options={roles} />
+```
+
+`BoundForm` lays out rows of bound fields from a config, and `SubmitButton` stays disabled until the form is dirty and valid.
+
+## Pages and feedback
+
+- Page structure comes from layouts, nested in the order `docs/layouts.md` gives. Start with "Which layout to use".
+- Use `useModal` for a focused decision, and a right pane for side-by-side editing (see `docs/layouts.md`).
+- `usePageBanner` shows page status in the layout's banner slot. `useSnackbar` shows a short confirmation that closes after 10 seconds unless it's `persistent`. `Toast` and `useToast` are deprecated.
+
+## Testing
+
+Beam components set `data-testid`s from their label or props, e.g. a `TextField` labeled "First Name" renders `firstName` on its input. Pass `data-testid` to a component to choose the prefix. `@homebound/beam/rtl` exports interaction helpers (`click`, `type`, `clickAndWait`, …) and helpers for Beam components, such as `select` and `getSelected` for select fields, and `row`, `cell` and `tableSnapshot` for `GridTable`.
