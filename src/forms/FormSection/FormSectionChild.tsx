@@ -43,7 +43,7 @@ export type FormSectionChildGroup =
 
 type FormSectionChildProps = (PlainFormSectionChild | ReorderableFormSectionChild) & { group?: FormSectionChildGroup };
 
-/** A single, non-nestable child row within a `FormSection`'s `childSections`. Internal to `FormSection`. */
+/** A single, non-nestable child row within a `FormSection`'s `childSections`. */
 export function FormSectionChild(props: FormSectionChildProps) {
   const { title, description, actions, fields, orderField, tag, value = title, selection, group } = props;
   const tid = useTestIds(props, "formSectionChild");

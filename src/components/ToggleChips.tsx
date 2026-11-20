@@ -11,7 +11,7 @@ export interface ToggleChipsProps<T, X> {
   xss?: X;
 }
 
-/** Renders a list of `Chip`s, with wrapping & appropriate margin between each `Chip`. */
+/** Renders a wrapping list of removable `ToggleChip`s. */
 export function ToggleChips<T, X extends Only<ToggleChipXss, X>>(props: ToggleChipsProps<T, X>) {
   const { values, getLabel, onRemove, xss } = props;
   const tid = useTestIds(props, "toggleChips");
