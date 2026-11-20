@@ -41,10 +41,13 @@ export function MultiSelectField<O, V extends Value>(
     options,
     autoSort = true,
     disabled,
+    readOnly,
     ...otherProps
   } = props;
 
   const isDisabled = !!disabled;
+  // A tooltip reason is a ReactNode, so any truthy readOnly hides the remove control.
+  const isReadOnly = !!readOnly;
   const pillOptions = useMemo(() => {
     if (!withPillList) return [];
     const resolved = initializeOptions(options, getOptionValue, getOptionLabel, undefined, autoSort);
@@ -55,7 +58,7 @@ export function MultiSelectField<O, V extends Value>(
         return {
           id: String(value),
           value: getOptionMenuLabel?.(o) ?? getOptionLabel(o),
-          disabled: isDisabled,
+          disabled: isDisabled || isReadOnly,
           onRemove: () => {
             const nextValues = values.filter((v) => v !== value);
             const nextOpts = resolved.filter((opt) => nextValues.includes(getOptionValue(opt)));
@@ -65,7 +68,7 @@ export function MultiSelectField<O, V extends Value>(
       });
     // getOptionLabel / getOptionValue / getOptionMenuLabel / onSelect are typically lambdas
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withPillList, options, values, autoSort, isDisabled]);
+  }, [withPillList, options, values, autoSort, isDisabled, isReadOnly]);
 
   const field = (
     <ComboBoxBase
@@ -79,6 +82,7 @@ export function MultiSelectField<O, V extends Value>(
       options={options}
       autoSort={autoSort}
       disabled={disabled}
+      readOnly={readOnly}
       {...otherProps}
     />
   );
