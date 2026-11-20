@@ -1,0 +1,29 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AiLoaderStories from "./AiLoader.stories";
+
+<Meta of={AiLoaderStories} />
+
+# AI Loader
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=1617-2067">
+    <img src="FigmaLogo.png" alt="" />
+    Ai Loader
+  </a>
+</p>
+
+`AiLoader` is an indeterminate loading indicator for AI work: three AI stars that pulse in turn. For a whole panel that explains the wait, use `AiLoadingPanel`, which includes this loader. For non-AI loading, use `Loader` or `LoadingSkeleton`.
+
+<ArgTypes />
+
+## Behaviors
+
+- It has `role="img"` with `label` as its accessible name, which defaults to "Loading".
+- `inc` sets each star's size in Beam increments (8px each), and the spacing scales with it.
+- When the OS asks for reduced motion, Beam's `CssReset` stops the animation and the stars rest small.
+
+## How to use
+
+```tsx
+<AiLoader label="Reading the plan set" />
+```

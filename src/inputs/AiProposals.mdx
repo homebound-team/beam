@@ -1,0 +1,28 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import * as AiProposalsStories from "./AiProposals.stories";
+
+<Meta of={AiProposalsStories} />
+
+# AI Proposals
+
+When an AI model suggests a value for a field, pass it as `proposedValue` (or `proposedValues` on a multi select) instead of changing the field's `value`. The field shows the proposal in AI mode, with the value already on record struck through below it, until the user reviews it.
+
+These fields accept proposals: `TextField`, `TextAreaField`, `NumberField`, `DateField`, `DateRangeField`, `Autocomplete`, `MenuSelectField`, `MenuMultiSelectField` and `MenuTreeSelectField`, plus the `Bound*` version of each, except `Autocomplete`, which has none. The **All Fields** story shows each one. The **AI Proposals Form** stories wire them into a real form.
+
+## Behaviors
+
+- The proposal is what the field displays and edits, with the AI styling. The on-record `value` shows struck through below the field.
+- The AI styling drops as soon as the user edits. The struck-through original stays until they leave the field, so it remains a reference while they type. Tabbing through without editing leaves both in place.
+- A proposal that matches the on-record value has nothing to strike through, so only the AI styling shows. This is the usual case when an entity was just created from the AI's own values.
+- On a multi select, only the values the proposal drops are struck through.
+
+## With form state
+
+A proposal is display-only. Form state keeps the on-record value until the user edits, so:
+
+- Saving `formState.changedValue` alone drops every proposal the user agreed with. Merge the proposals into the save yourself, except for fields the user edited, which you can track from each field's `onChange`. The **Bound Form With Proposals** story does this.
+- Auto-save only fires when the form is dirty, so reviewing a proposed form never saves it. A proposal the user leaves as-is never reaches the server unless you save it explicitly. The **Auto Save With Proposals** story shows this.
+
+```tsx
+<BoundTextField field={formState.name} proposedValue={extracted.name} onChange={takeOver("name")} />
+```

@@ -1,0 +1,29 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TextAreaField.stories";
+
+<Meta of={Stories} />
+
+# Text Area Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36923%3A102353">
+    <img src="FigmaLogo.png" alt="" />
+    Text Area
+  </a>
+</p>
+
+`TextAreaField` is a multi-line text input that grows with its content. Use `TextField` for a single line, and `RichTextField` for formatting or mentions. In a form, use `BoundTextAreaField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- The field grows to fit its text. `maxLines` caps the height, after which it scrolls.
+- `preventNewLines` blocks Enter and replaces pasted line breaks with spaces. With it set, Enter runs `onEnter` and blurs the field.
+- It shares `TextField`'s field props: `onChange` receives `undefined` when emptied, and `disabled` and `readOnly` can be reasons shown in a tooltip.
+
+## How to use
+
+```tsx
+<TextAreaField label="Notes" value={notes} onChange={setNotes} maxLines={8} />
+```

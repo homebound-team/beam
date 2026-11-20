@@ -1,0 +1,30 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ChipStories from "./Chip.stories";
+
+<Meta of={ChipStories} />
+
+# Chip
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241">
+    <img src="FigmaLogo.png" alt="" />
+    Chip
+  </a>
+</p>
+
+`Chip` is a small, read-only rounded label, such as a category or a selected value shown in a table cell. Use `Chips` for a list of them, `ToggleChip` when the user can remove it, `Tag` for a status, and `ContextTag` for what something is.
+
+<ArgTypes />
+
+## Behaviors
+
+- `type` sets the fill and defaults to `neutral`.
+- Long text is cut to one line. `title` adds a tooltip below the chip, e.g. with the full text.
+- `compact` defaults to the surrounding `PresentationProvider`'s `compact` setting.
+
+## How to use
+
+```tsx
+<Chip text="Electrical" />
+<Chip text="Over budget" type="warning" icon="error" />
+```

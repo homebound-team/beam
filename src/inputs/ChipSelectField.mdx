@@ -1,0 +1,30 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ChipSelectField.stories";
+
+<Meta of={Stories} />
+
+# Chip Select Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241">
+    <img src="FigmaLogo.png" alt="" />
+    Chips
+  </a>
+</p>
+
+`ChipSelectField` is a single select that looks like a compact chip and opens a menu of options. Its label is visually hidden, so it fits inside dense rows like table cells. For a standard labeled select, use `MenuSelectField`. In a form, use `BoundChipSelectField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `onSelect` receives the chosen value and its option. Clearing (with `clearable`) calls it with `undefined` for both.
+- `onCreateNew` adds a "Create new" action to the menu. Choosing it swaps the chip for a text field, and the typed name is passed to `onCreateNew`.
+- When options have `id` and `name`, `getOptionValue` and `getOptionLabel` can be left out.
+- The chip uses the `sm` type scale unless a `PresentationProvider` sets `typeScale`.
+
+## How to use
+
+```tsx
+<ChipSelectField label="Phase" value={phaseId} options={phases} onSelect={(id) => setPhaseId(id)} clearable />
+```

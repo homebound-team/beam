@@ -1,0 +1,59 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as SuperDrawerStories from "./SuperDrawer.stories";
+import { SuperDrawerContent } from "./SuperDrawerContent";
+
+<Meta of={SuperDrawerStories} />
+
+# Super Drawer
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=35964%3A102029">
+    <img src="FigmaLogo.png" alt="" />
+    Super Drawer
+  </a>
+</p>
+
+The SuperDrawer is a wide panel that slides in from the right over the page, for viewing or editing one record at a time, with prev/next buttons to step through a list. Open it with `useSuperDrawer().openInDrawer(...)`, and build its content from `SuperDrawerHeader` and `SuperDrawerContent`. For a pane that sits beside the page instead of covering it, use a right pane (see `docs/layouts.md`).
+
+`SuperDrawerContent` takes these props:
+
+<ArgTypes of={SuperDrawerContent} />
+
+## Parts
+
+- `SuperDrawerHeader` renders into the drawer's header. Pass `title` with optional `left` and `right` content, or your own `children`. Its prev/next buttons call the drawer's `onPrevClick` and `onNextClick`, are disabled when those are unset, and are hidden while a detail view is open. `hideControls` hides them entirely.
+- `SuperDrawerContent` holds the body, with an optional full-width `banner` above it and a footer of `actions` buttons.
+
+## Behaviors
+
+- `openInDrawer` replaces whatever the drawer shows. `width` is `SuperDrawerWidth.Normal` (1040px, the default) or `SuperDrawerWidth.Small` (560px).
+- `openDrawerDetail` slides a detail view in on top of the current content, with a "Back" button. `closeDrawerDetail` goes back, or closes the drawer when no detail is open.
+- Clicking the overlay or the close button calls `closeDrawer`. `onClose` runs after the drawer has closed.
+- `addCanCloseDrawerCheck` and `addCanCloseDrawerDetailCheck` register checks for unsaved changes. When a check fails, a confirmation modal asks before closing; its button labels can be set with `discardText` and `continueText`.
+
+## How to use
+
+```tsx
+function ProjectRow({ project, prev, next }: Props) {
+  const { openInDrawer } = useSuperDrawer();
+  const open = (p: Project) =>
+    openInDrawer({
+      content: <ProjectDrawer project={p} />,
+      onPrevClick: prev && (() => open(prev)),
+      onNextClick: next && (() => open(next)),
+    });
+  return <Button variant="text" label={project.name} onClick={() => open(project)} />;
+}
+
+function ProjectDrawer({ project }: { project: Project }) {
+  const { closeDrawer } = useSuperDrawer();
+  return (
+    <>
+      <SuperDrawerHeader title={project.name} />
+      <SuperDrawerContent actions={[{ label: "Close", variant: "tertiary", onClick: closeDrawer }]}>
+        <ProjectDetails project={project} />
+      </SuperDrawerContent>
+    </>
+  );
+}
+```

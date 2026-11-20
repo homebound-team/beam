@@ -1,0 +1,40 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as TooltipStories from "./Tooltip.stories";
+
+<Meta of={TooltipStories} />
+
+# Tooltip
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36259%3A103869">
+    <img src="FigmaLogo.png" alt="" />
+    Tooltip
+  </a>
+</p>
+
+`Tooltip` shows a short hint in a floating bubble while its children are hovered or focused. Use it for extra context that isn't needed to finish a task. Anything the user must read belongs on the page.
+
+<ArgTypes />
+
+## Behaviors
+
+- Only one tooltip shows at a time. If one is already open, the next opens immediately and skips its `delay`.
+- `placement` defaults to `auto`, which picks the side with the most room and flips near the viewport edge.
+- Moving the pointer from the trigger onto the bubble keeps it open, so its content can be selected.
+
+## How to use
+
+Most Beam components already take a `tooltip` prop, and a `disabled` reason shows as a tooltip, so you rarely need `Tooltip` directly:
+
+```tsx
+<Button label="Delete" disabled="Only drafts can be deleted." onClick={remove} />
+<TextField label="Name" value={name} onChange={setName} tooltip="Shown to homeowners." />
+```
+
+Wrap your own content when no prop fits:
+
+```tsx
+<Tooltip title="Last synced 5 minutes ago">
+  <Icon icon="refresh" />
+</Tooltip>
+```

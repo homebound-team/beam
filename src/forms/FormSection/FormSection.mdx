@@ -1,0 +1,45 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as FormSectionStories from "./FormSection.stories";
+
+<Meta of={FormSectionStories} />
+
+# Form Section
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=948-599">
+    <img src="FigmaLogo.png" alt="" />
+    Form Sections
+  </a>
+</p>
+
+`FormSection` is a titled block of form fields, with an optional description, header actions and a tag. It can also hold a list of child sections, which can be selectable or drag-reorderable. Put sections in a `FormSectionLayout`, which adds jump links to each one (see `docs/layouts.md`).
+
+<ArgTypes />
+
+## Child sections
+
+`childSections` renders a list of smaller titled blocks under the section's own `fields`. Each child takes the same `title`, `description`, `actions` and `fields`, plus a status `tag`.
+
+- **Plain:** with no `selection`, children are a simple list. A child can set its own `selection: { mode: "toggle", field }` to get an independent checkbox.
+- **Single:** `selection: { mode: "single", field }` gives each child a radio button. The field stores the picked child's `value`, which defaults to its `title`.
+- **Multiple:** `selection: { mode: "multiple", field }` gives each child a checkbox. The field stores the checked children's `value`s.
+- **Reorderable:** when every child has an `id` and an `orderField`, children sort by `orderField` and get a drag handle. Dragging, or using the keyboard, swaps the existing order values between children, so the set of values doesn't change.
+
+## Behaviors
+
+- The section's `id` comes from its `title`, and is what `FormSectionLayout`'s jump links scroll to. It stops below the sticky page chrome.
+- A `single` or `multiple` group is read-only when its field is read-only, and it triggers the field's auto-save on change.
+
+## How to use
+
+```tsx
+<FormSection
+  title="Electrical"
+  description="Choose a panel upgrade."
+  selection={{ mode: "single", field: formState.panelOption }}
+  childSections={[
+    { title: "100 amp", value: "100" },
+    { title: "200 amp", value: "200", fields: <BoundTextField field={formState.panelNotes} /> },
+  ]}
+/>
+```

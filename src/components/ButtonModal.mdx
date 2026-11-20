@@ -1,0 +1,23 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonModalStories from "./ButtonModal.stories";
+
+<Meta of={ButtonModalStories} />
+
+# Button Modal
+
+`ButtonModal` is a button that opens a small popup anchored to it. Use it for a short form or a few details that don't need a full `Modal`. Use `ButtonMenu` for a list of actions.
+
+<ArgTypes />
+
+## Behaviors
+
+- `content` can be a function. It receives `close`, so the popup can dismiss itself, e.g. after saving.
+- `title` adds a centered heading above the content.
+- `trigger` takes the same shapes as `ButtonMenu`: `{ label }`, `{ icon }`, `{ src, name }` or `{ navLabel }`. A text trigger defaults to the `secondary` variant.
+- Clicking outside or pressing Escape closes the popup.
+
+## How to use
+
+```tsx
+<ButtonModal trigger={{ label: "Add note" }} title="Add note" content={(close) => <NoteForm onSaved={close} />} />
+```

@@ -1,0 +1,26 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as CarouselStories from "./Carousel.stories";
+
+<Meta of={CarouselStories} />
+
+# Carousel
+
+`Carousel` is a horizontally scrolling strip of items, such as cards or thumbnails.
+
+<ArgTypes />
+
+## Behaviors
+
+- The back and forward chevrons only appear when there's more to scroll that way, and the items fade out under them.
+- A chevron scrolls by the strip's visible width, and items snap into place, so none is left half-shown.
+- Each child is one item, and keeps its own width.
+
+## How to use
+
+```tsx
+<Carousel gap={16}>
+  {photos.map((p) => (
+    <img key={p.id} src={p.url} alt={p.caption} width={240} />
+  ))}
+</Carousel>
+```

@@ -1,0 +1,40 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Checkbox.stories";
+
+<Meta of={Stories} />
+
+# Checkbox
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2701-8969">
+    <img src="FigmaLogo.png" alt="" />
+    Checkbox
+  </a>
+</p>
+
+`Checkbox` is a single on/off choice with a label and optional description. Use `CheckboxGroup` for several related choices whose selection is a list of values, and `Switch` for a setting that takes effect immediately. In a form, use `BoundCheckboxField` and `BoundCheckboxGroupField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `selected="indeterminate"` shows a dash, e.g. for a parent whose children are partly selected. Clicking it selects the checkbox.
+- `disabled` can be a reason (any `ReactNode`), shown in a tooltip.
+- `checkboxOnly` renders just the box, using `label` as its accessible name, and hides the description, helper text and error.
+
+## Checkbox group
+
+`CheckboxGroup` takes `options` (`{ label, value, description?, disabled? }`) and `values`, the selected option values. `onChange` receives the full new list. `columns` lays the checkboxes out in a grid. See the Checkbox Groups story.
+
+## How to use
+
+```tsx
+<Checkbox label="Send a copy to the homeowner" selected={sendCopy} onChange={setSendCopy} />
+
+<CheckboxGroup
+  label="Trades"
+  options={[{ label: "Framing", value: "framing" }, { label: "Drywall", value: "drywall" }]}
+  values={trades}
+  onChange={setTrades}
+/>
+```

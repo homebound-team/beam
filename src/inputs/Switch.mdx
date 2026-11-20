@@ -1,0 +1,29 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Switch.stories";
+
+<Meta of={Stories} />
+
+# Switch
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36943%3A102525">
+    <img src="FigmaLogo.png" alt="" />
+    Switch
+  </a>
+</p>
+
+`Switch` turns a setting on or off, usually taking effect right away. For a choice that's submitted with a form, a `Checkbox` is often clearer. In a form, use `BoundSwitchField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `disabled` can be a reason (any `ReactNode`), shown in a tooltip.
+- `withIcon` shows a check in the knob while it's on, and an `x` while it's off.
+- `compact` renders a smaller switch.
+
+## How to use
+
+```tsx
+<Switch label="Show archived" selected={showArchived} onChange={setShowArchived} />
+```

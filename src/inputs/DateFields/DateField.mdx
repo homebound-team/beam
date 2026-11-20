@@ -1,0 +1,33 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import { DateField } from "./DateField";
+import * as Stories from "./DateField.stories";
+
+<Meta of={Stories} />
+
+# Date Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31699%3A99566">
+    <img src="FigmaLogo.png" alt="" />
+    Date Field
+  </a>
+</p>
+
+`DateField` picks a single date, typed in or chosen from a calendar popover. Use `DateRangeField` for a start and end date. In a form, use `BoundDateField`.
+
+<ArgTypes of={DateField} />
+
+## Behaviors
+
+- Values are `PlainDate`s (Temporal), and `onChange` receives `undefined` when the field is cleared.
+- `format` sets how the date displays: `short` (01/01/20), `medium` (Wed, Nov 23) or `long`. Focusing the field switches it to `short` so it's easy to edit.
+- A typed date that can't be parsed is reverted to the last value when the field loses focus.
+- Clicking the field or the calendar button opens the picker. The field doesn't bring up the on-screen keyboard on touch devices.
+- `disabledDays` takes dates, lists, ranges or a function, to block days in the picker.
+- `onEnter` runs on Enter and then blurs the field.
+
+## How to use
+
+```tsx
+<DateField label="Start date" value={startDate} onChange={setStartDate} format="medium" />
+```

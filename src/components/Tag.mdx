@@ -1,0 +1,32 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as TagStories from "./Tag.stories";
+
+<Meta of={TagStories} />
+
+# Tag
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=181-1668">
+    <img src="FigmaLogo.png" alt="" />
+    Tags
+  </a>
+</p>
+
+`Tag` shows a status, such as Draft, Approved or Overdue. Use `ContextTag` to say what something is, `TagGroup` for a list of labels, and `Chip` for a neutral label.
+
+<ArgTypes />
+
+## Behaviors
+
+- `type` sets the color and defaults to `neutral`. `strikethrough` dims the tag and strikes through its text.
+- `variant` defaults to `primary`, a tinted uppercase tag. `bold` is a darker fill with white text. `secondary` is outlined, and is what `TagGroup` uses.
+- Text is cut to one line. When it's cut, the full text shows in a tooltip, unless `preventTooltip` is set.
+- `iconOnly` shows just the `icon`. `text` is still required: screen readers read it, and it shows in the tooltip.
+
+## How to use
+
+```tsx
+<Tag text="Approved" type="success" />
+<Tag text="Overdue" type="error" icon="error" />
+<Tag text="Suggested by Blueprint AI" type="ai" icon="aiStar" iconOnly />
+```

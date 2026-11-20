@@ -1,0 +1,43 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as BoundFormStories from "./BoundForm.stories";
+
+<Meta of={BoundFormStories} />
+
+# Bound Form
+
+`BoundForm` lays out a form-state's fields from a config of rows, so a standard form doesn't need hand-written markup. Each row is an object keyed by form-state field, and each key maps to a `bound*Field()` helper that renders the matching Bound component. For a form with sections and jump links, put `BoundForm`s inside `FormSection`s in a `FormSectionLayout`. For a fully custom layout, use the Bound components directly inside `FormLines`.
+
+<ArgTypes />
+
+## Rows
+
+- A field key, like `firstName`, takes a helper such as `boundTextField()`, `boundMenuSelectField({ options })` or `boundDateField()`. The helper wires the field for you, so its props leave out `field`.
+- A key starting with `reactNode`, like `reactNodeSummary`, renders any JSX as-is. It can also be a function of the form state, e.g. to bind a custom component to a list row.
+- A key starting with `listField`, like `listFieldBooks`, renders a repeating group for an array of objects. Its config takes a `name`, its own `rows`, `onNew` to add a row, and optional `onDelete` and `filterDeleted`.
+
+## Behaviors
+
+- The fields in a row share the width evenly. A row wraps when it gets narrower than each field's minimum width (150px for text fields, 200px for selects).
+- While `formState.loading` is true, each field shows a loading skeleton in its place.
+- A list field's "Add" button stays disabled until every existing row in the list is valid. Each row gets a "Delete" menu item only when `onDelete` is set.
+
+## How to use
+
+```tsx
+<BoundForm
+  formState={formState}
+  rows={[
+    { firstName: boundTextField(), lastName: boundTextField() },
+    { role: boundMenuSelectField({ label: "Role", options: roles }) },
+    {
+      listFieldBooks: {
+        name: "Book",
+        rows: [{ title: boundTextField() }, { isPublished: boundSwitchField() }],
+        onNew: (books) => books.add({ title: undefined, isPublished: false }),
+        onDelete: (books, book) => books.remove(book.value),
+      },
+    },
+    { reactNodeHint: <span>Books show on the author's public page.</span> },
+  ]}
+/>
+```

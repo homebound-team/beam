@@ -1,0 +1,24 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonDatePickerStories from "./ButtonDatePicker.stories";
+
+<Meta of={ButtonDatePickerStories} />
+
+# Button Date Picker
+
+`ButtonDatePicker` is a button that opens a calendar and closes it once a date is picked. Use it when picking a date is an action, like rescheduling. In a form, use `DateField`, which shows the value in an input.
+
+<ArgTypes />
+
+## Behaviors
+
+- `onSelect` receives the picked `PlainDate`, and the calendar closes.
+- `value` marks the selected date, and the calendar opens on its month (today's when unset).
+- `disabledDays` blocks dates from being picked; `dottedDays` marks dates with a dot.
+- `useYearPicker` adds controls to skip a year at a time.
+- `trigger` takes the same shapes as `ButtonMenu`: `{ label }`, `{ icon }`, `{ src, name }` or `{ navLabel }`.
+
+## How to use
+
+```tsx
+<ButtonDatePicker trigger={{ icon: "calendar" }} value={dueDate} onSelect={setDueDate} />
+```

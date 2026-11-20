@@ -1,0 +1,45 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./NumberField.stories";
+
+<Meta of={Stories} />
+
+# Number Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=1291%3A0">
+    <img src="FigmaLogo.png" alt="" />
+    Number Field
+  </a>
+</p>
+
+`NumberField` is a numeric input that can format its value as currency, a percentage, or days. In a form, use `BoundNumberField`.
+
+<ArgTypes />
+
+## Types and units
+
+`type` sets both the display and the unit of `value`. The value is always a whole number of that unit:
+
+- `cents`: 1234 shows $12.34.
+- `dollars`: shows dollars with 2 decimals.
+- `mills`: thousandths of a dollar, shown with 3 decimals.
+- `percent`: 50 shows 50%.
+- `basisPoints`: 125 shows 1.25%.
+- `days`: 3 shows "3 days".
+
+With no `type`, it's a plain number, grouped with commas unless `useGrouping` is `false`.
+
+## Behaviors
+
+- Without `numFractionDigits`, `value` is rounded to a whole number of its unit. Set it to keep decimals; `dollars` defaults to 2.
+- `onChange` receives `undefined` when the field is emptied.
+- `positiveOnly` turns negative input positive, and `displayDirection` prefixes positive values with "+".
+- `numberFormatOptions` replaces the formatting from `type` and the digit props.
+- Inside a `GridTable`, numbers align right.
+
+## How to use
+
+```tsx
+<NumberField label="Budget" type="cents" value={budgetInCents} onChange={setBudgetInCents} />
+<NumberField label="Markup" type="percent" value={markup} onChange={setMarkup} numFractionDigits={1} />
+```

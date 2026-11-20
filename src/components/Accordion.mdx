@@ -1,0 +1,26 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AccordionStories from "./Accordion.stories";
+
+<Meta of={AccordionStories} />
+
+# Accordion
+
+`Accordion` is a titled section that expands and collapses its content. Use `AccordionList` for a stack of them that share a size and style.
+
+<ArgTypes />
+
+## Behaviors
+
+- It starts collapsed unless `defaultExpanded` is set. A `disabled` accordion mutes its header and stays collapsed.
+- `titleOnClick` turns the title into its own button, so only the chevron expands and collapses.
+- `size` sets a fixed width: `xs` 240px, `sm` 360px, `md` 480px, `lg` 600px. Without it, the accordion fills its container.
+- `compact` uses smaller type and a filled header, and drops the default top border.
+- `onToggle` runs after each expand or collapse.
+
+## How to use
+
+```tsx
+<Accordion title="Scope of work" defaultExpanded>
+  <ScopeDetails />
+</Accordion>
+```

@@ -1,0 +1,47 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ButtonMenuStories from "./ButtonMenu.stories";
+
+<Meta of={ButtonMenuStories} />
+
+# Button Menu
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=3718-3">
+    <img src="FigmaLogo.png" alt="" />
+    Menus
+  </a>
+</p>
+
+`ButtonMenu` is a button that opens a menu of actions or links. Use `Button` for a single action. To pick a value inside a form, use a select field like `MenuSelectField`.
+
+<ArgTypes />
+
+## Triggers
+
+`trigger` picks the button the menu hangs from:
+
+- `{ label }` renders a `Button`, with a chevron unless `hideEndAdornment` is set.
+- `{ icon }` renders an `IconButton`, e.g. `{ icon: "verticalDots" }` for an overflow menu.
+- `{ src, name }` renders an `AvatarButton`, as in the `Navbar` user menu.
+- `{ navLabel }` renders a `NavLink`.
+
+## Behaviors
+
+- An item with a string `onClick` is a link; a function runs the action. A `disabled` reason shows in a tooltip.
+- `destructive` colors an item as a danger action, `hasDivider` draws a separator below it, and `icon` or `src` adds an icon or image before the label.
+- `searchable` adds a search field that filters items by label. `persistentItems` sit in their own section below and are never filtered out.
+- Passing `selectedItem` and `onChange` turns it into a single-select menu that marks the chosen item.
+- `placement` aligns the menu to the trigger's `left` (default) or `right` edge. Clicking outside or pressing Escape closes it.
+
+## How to use
+
+```tsx
+<ButtonMenu
+  trigger={{ icon: "verticalDots" }}
+  items={[
+    { label: "Edit", onClick: edit },
+    { label: "View history", onClick: `/projects/${id}/history` },
+    { label: "Delete", onClick: remove, destructive: true },
+  ]}
+/>
+```

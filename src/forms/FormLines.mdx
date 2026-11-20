@@ -1,0 +1,33 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as FormLinesStories from "./FormLines.stories";
+
+<Meta of={FormLinesStories} />
+
+# Form Lines
+
+`FormLines` stacks form fields with standard width and spacing. Use `FieldGroup` inside it to put fields side by side, `FormHeading` to label a group, and `FormDivider` to draw a line between lines. To build a form from a config instead of markup, use `BoundForm`, which renders `FormLines` for you.
+
+<ArgTypes />
+
+## Behaviors
+
+- `width` sets the form's width: `sm` (320px), `md` (480px), `lg` (550px) or `full` (100%). It defaults to `lg`, or `full` inside a modal.
+- `labelStyle`, `labelSuffix` and `compact` apply to every field inside, through `PresentationProvider`. Only the props you pass are overridden.
+- `full` also makes each field grow to the container's width.
+- `gap` is the space between lines, in 8px increments, and defaults to 2 (16px).
+
+## Field groups
+
+`FieldGroup` lays its children out in a grid row. `widths` sets each child's width: a number is a share of the row (`fr` units), and a string is any CSS width.
+
+```tsx
+<FormLines width="full">
+  <BoundTextField field={formState.name} />
+  <FieldGroup widths={[2, 1]}>
+    <BoundTextField field={formState.street} />
+    <BoundTextField field={formState.zip} />
+  </FieldGroup>
+  <FormDivider />
+  <BoundTextAreaField field={formState.notes} />
+</FormLines>
+```

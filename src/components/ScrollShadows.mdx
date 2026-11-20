@@ -1,0 +1,25 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ScrollShadowsStories from "./ScrollShadows.stories";
+
+<Meta of={ScrollShadowsStories} />
+
+# Scroll Shadows
+
+`ScrollShadows` is a scroll container that fades its edges while more content is hidden past them, so users can tell the list continues.
+
+<ArgTypes />
+
+## Behaviors
+
+- A fade shows at the start once the content has scrolled, and at the end while there's more to scroll. It updates on scroll and when the content resizes.
+- It scrolls vertically by default; set `horizontal` for a row. The scrollbar is hidden.
+- Set the size through `xss`, e.g. `Css.h("300px").$`, since the container otherwise grows with its content.
+- `bgColor` must match the background behind it, and must be a `Palette` color in `rgba(…,1)` form. Other values, including `Tokens`, throw. It defaults to white.
+
+## How to use
+
+```tsx
+<ScrollShadows xss={Css.h("300px").$}>
+  <ActivityList />
+</ScrollShadows>
+```

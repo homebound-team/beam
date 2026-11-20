@@ -1,0 +1,50 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as NavbarStories from "./Navbar.stories";
+
+<Meta of={NavbarStories} />
+
+# Navbar
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=3740-238">
+    <img src="FigmaLogo.png" alt="" />
+    Navigation- Top
+  </a>
+</p>
+
+`Navbar` is the app's top navigation bar, in the dark contrast theme. `NavbarLayout` renders it from its `navbar` prop and handles how it scrolls with the page (see `docs/layouts.md`). For a side panel of links, use `SideNav` in `SideNavLayout`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `items` take the same `AppNavItem` shapes as `SideNav`: links, groups, and sections. A group renders as a menu.
+- Below the `sm` breakpoint, or whenever the items don't fit, they move into a mobile menu behind a menu button. `hideBrandOnMobile` hides `brand` while that menu shows.
+- `rightSlot` sits at the right edge, before the user menu, and stays visible on mobile.
+- `user` adds an avatar menu with `menuItems`, plus `persistentItems` in their own section (e.g. Sign out). Without a `picture`, the avatar shows the user's initials.
+
+## How to use
+
+```tsx
+<NavbarLayout
+  navbar={{
+    brand: (
+      <Link to="/">
+        <HomeboundLogo />
+      </Link>
+    ),
+    items: [
+      { label: "Projects", onClick: "/projects", active: true },
+      { label: "Libraries", items: [{ label: "Materials", onClick: "/libraries/materials" }] },
+    ],
+    user: {
+      name: user.name,
+      picture: user.picture,
+      menuItems: [],
+      persistentItems: [{ label: "Sign out", onClick: signOut }],
+    },
+  }}
+>
+  {children}
+</NavbarLayout>
+```

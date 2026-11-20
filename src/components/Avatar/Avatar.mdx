@@ -1,0 +1,45 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import { AvatarButton } from "src/components/Avatar/AvatarButton";
+import { AvatarGroup } from "src/components/Avatar/AvatarGroup";
+import * as AvatarStories from "./Avatar.stories";
+
+<Meta of={AvatarStories} />
+
+# Avatar
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=31578%3A99812">
+    <img src="FigmaLogo.png" alt="" />
+    Avatar
+  </a>
+</p>
+
+`Avatar` is a round user photo. Use `AvatarButton` when clicking it should do something, such as opening a profile menu, and `AvatarGroup` for a row of people, like a project's team.
+
+<ArgTypes />
+
+## Behaviors
+
+- Without `src`, or when the image fails to load, it shows the name's initials, or a user icon when there's no name.
+- `name` is the image's alt text and shows in a tooltip on hover. `showName` shows it beside the image instead (below it at `lg` and `xl`), and `preventTooltip` hides the tooltip.
+- `size` is `sm` 24px, `md` 36px (default), `lg` 48px or `xl` 72px.
+
+## Avatar Button
+
+`AvatarButton` is an `Avatar` that acts as a button, or a link when `onClick` is a URL. The name shows as its tooltip unless `tooltip` or a `disabled` reason replaces it. Pass `menuTriggerProps` when it opens a menu.
+
+<ArgTypes of={AvatarButton} />
+
+## Avatar Group
+
+`AvatarGroup` overlaps the avatars in a row. Up to eight show in full. Past eight, it shows the first seven and a "+ N more" button that opens a list of the rest by name.
+
+<ArgTypes of={AvatarGroup} />
+
+## How to use
+
+```tsx
+<Avatar src={user.photoUrl} name={user.name} />
+<AvatarButton src={user.photoUrl} name={user.name} onClick={`/users/${user.id}`} />
+<AvatarGroup avatars={team.map((u) => ({ src: u.photoUrl, name: u.name }))} size="sm" />
+```

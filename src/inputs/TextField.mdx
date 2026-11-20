@@ -1,0 +1,39 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as TextFieldStories from "./TextField.stories";
+
+<Meta of={TextFieldStories} />
+
+# Text Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=144-5246">
+    <img src="FigmaLogo.png" alt="" />
+    Text Field
+  </a>
+</p>
+
+`TextField` is a single-line text input. Use `TextAreaField` for multiple lines, `NumberField` for numbers, and `BoundTextField` when the value lives in a form state.
+
+<ArgTypes />
+
+## Behaviors
+
+- `onChange` receives `undefined` when the field is emptied, never `""`.
+- `errorMsg` puts the field in its error state, with the message below it. With `errorInTooltip`, the message shows in a tooltip instead.
+- `disabled` and `readOnly` can be a reason (any `ReactNode`), shown in a tooltip.
+- `onEnter` runs on Enter and then blurs the field. Escape doesn't bubble out of the field, so a surrounding modal stays open; set `onEscapeBubble` to let it through.
+- `clearable` shows a clear button while the field is focused and has a value.
+- Presentation props like `compact`, `borderless` and `labelStyle` can be set for a whole subtree with `PresentationProvider`, e.g. inside a table.
+
+## How to use
+
+```tsx
+<TextField label="Project name" value={name} onChange={setName} required />
+<TextField label="Search" labelStyle="hidden" value={query} onChange={setQuery} clearable startAdornment={<Icon icon="search" />} />
+```
+
+In a form, bind the field to its form-state field instead:
+
+```tsx
+<BoundTextField field={formState.name} />
+```

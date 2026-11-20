@@ -1,0 +1,25 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as AiSlimBannerStories from "./AiSlimBanner.stories";
+
+<Meta of={AiSlimBannerStories} />
+
+# AI Slim Banner
+
+`AiSlimBanner` is a one-line AI notice that sits inline, directly above the content it's about, such as a table or form section. It shows the AI star, a title, and an optional text action. For a callout with a message and buttons, use `AiBanner`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `action` renders as a `text` button at the end of the row.
+- A long title wraps, and the star stays aligned with its first line.
+- Inside a modal, put it in `ModalBanner` so it spans the modal's full width under the header.
+
+## How to use
+
+```tsx
+<AiSlimBanner
+  title="Quantities were filled in from the uploaded takeoff."
+  action={{ label: "View source", onClick: openSource }}
+/>
+```

@@ -1,0 +1,28 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as TagGroupStories from "./TagGroup.stories";
+
+<Meta of={TagGroupStories} />
+
+# Tag Group
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=238-2165">
+    <img src="FigmaLogo.png" alt="" />
+    Tag Group
+  </a>
+</p>
+
+`TagGroup` shows a wrapping list of outlined (`secondary`) tags, such as the labels on an item, with an optional Edit control. Use `Tag` for a single status.
+
+<ArgTypes />
+
+## Behaviors
+
+- `onEdit` adds a trailing "Edit" text button. A function makes it a button; a string makes it a link.
+- Each tag's `text` is its key, so the texts should be unique.
+
+## How to use
+
+```tsx
+<TagGroup tags={item.labels.map((l) => ({ text: l.name }))} onEdit={() => openLabelEditor(item)} />
+```

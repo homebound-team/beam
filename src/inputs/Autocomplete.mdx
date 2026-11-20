@@ -1,0 +1,38 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Autocomplete.stories";
+
+<Meta of={Stories} />
+
+# Autocomplete
+
+`Autocomplete` is a free-text input with a menu of suggested options. You own the filtering: update `options` from `onInputChange`. When the value must be one of the options, use `MenuSelectField` instead.
+
+<ArgTypes />
+
+## Behaviors
+
+- The typed text is the value, so it can be anything, not just an option. Clicking away keeps it.
+- Focusing the field opens the menu when there are options.
+- Picking an option sets the input text to its label, then calls `onSelect` with the option.
+- `disabledOptions` takes values, or `{ value, reason }` to explain why an option is disabled.
+- Autocomplete has no `Bound*` wrapper; connect `value` and `onInputChange` to the form state yourself.
+
+## How to use
+
+```tsx
+const [query, setQuery] = useState<string>();
+const options = useMemo(
+  () => allTrades.filter((t) => t.name.toLowerCase().includes(query?.toLowerCase() ?? "")),
+  [query],
+);
+
+<Autocomplete
+  label="Trade"
+  value={query}
+  onInputChange={setQuery}
+  options={options}
+  getOptionLabel={(t) => t.name}
+  getOptionValue={(t) => t.id}
+  onSelect={(t) => setTradeId(t.id)}
+/>;
+```

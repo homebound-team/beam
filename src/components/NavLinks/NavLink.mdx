@@ -1,0 +1,25 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as NavLinkStories from "./NavLink.stories";
+
+<Meta of={NavLinkStories} />
+
+# Nav Link
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=36081%3A105832">
+    <img src="FigmaLogo.png" alt="" />
+    Nav Link
+  </a>
+</p>
+
+`NavLink` is a navigation link, or a button when `onClick` is a function, styled for the app's navigation. `SideNav` and `Navbar` render these from their `items`, so use `NavLink` directly only for custom navigation, such as a brand link in the `Navbar`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `variant="side"` styles it as a `SideNav` row, and `variant="global"` for the dark `Navbar`.
+- A string `onClick` renders an anchor; `openInNew` opens it in a new tab.
+- `active` marks the current page.
+- `iconOnly` with an `icon` hides the label visually but keeps it for screen readers, as in the collapsed `SideNav` rail.
+- `nested` indents the link for use inside a group.

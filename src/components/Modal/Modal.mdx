@@ -1,0 +1,73 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ModalStories from "./Modal.stories";
+
+<Meta of={ModalStories} />
+
+# Modal
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=2070-2">
+    <img src="FigmaLogo.png" alt="" />
+    Modals
+  </a>
+</p>
+
+A modal asks for a focused decision or a short task on top of the page, and blocks the page until it's closed. Open one with `useModal().openModal(...)`. Its content is built from `ModalHeader`, `ModalBody` and `ModalFooter`. For longer or side-by-side work, such as editing a row while keeping the table visible, use a right pane instead (see `docs/layouts.md`).
+
+`openModal` takes these props:
+
+<ArgTypes />
+
+## Parts
+
+- `ModalHeader` is the title. It renders into the modal's header, beside the close button.
+- `ModalBanner` is an optional full-bleed slot under the header, e.g. for an `AiSlimBanner`.
+- `ModalBody` holds the content and scrolls when it's taller than the modal.
+- `ModalFooter` holds the actions, aligned right by default.
+
+## Behaviors
+
+- `size` is `sm` through `3xl` and defaults to `md`. Pass `{ width, height }` for a fixed height; `setSize` changes it while open.
+- Clicking outside or on the close button closes the modal. Set `allowClosing: false` to hide the close button and ignore outside clicks, so the user has to pick one of your actions.
+- `addCanClose` registers a check that runs before every close. Return `false` to keep the modal open, e.g. to confirm discarding unsaved changes with `ConfirmCloseModal`.
+- `onClose` runs after the modal has closed.
+- The page under the modal doesn't scroll while it's open.
+- `aiMode` adds the Blueprint AI logo and gradient title.
+
+## How to use
+
+```tsx
+function DeleteProjectButton({ project }: { project: Project }) {
+  const { openModal } = useModal();
+  return (
+    <Button
+      variant="danger"
+      label="Delete"
+      onClick={() => openModal({ size: "sm", content: <DeleteProjectModal project={project} /> })}
+    />
+  );
+}
+
+function DeleteProjectModal({ project }: { project: Project }) {
+  const { closeModal } = useModal();
+  return (
+    <>
+      <ModalHeader>Delete {project.name}?</ModalHeader>
+      <ModalBody>This can't be undone.</ModalBody>
+      <ModalFooter>
+        <Button variant="tertiary" label="Cancel" onClick={closeModal} />
+        <Button
+          variant="danger"
+          label="Delete"
+          onClick={async () => {
+            await deleteProject(project.id);
+            closeModal();
+          }}
+        />
+      </ModalFooter>
+    </>
+  );
+}
+```
+
+In tests and stories, wrap the content in `OpenModal` to render it already open.

@@ -1,0 +1,26 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as PresentationContextStories from "./PresentationContext.stories";
+
+<Meta of={PresentationContextStories} />
+
+# Presentation Provider
+
+`PresentationProvider` sets default presentation props, like `compact`, `borderless` or `labelStyle`, for every field below it, so you don't repeat them on each field. `GridTable` and `FormLines` already set it up for their contents, from the table's style and the form's props.
+
+<ArgTypes />
+
+## Behaviors
+
+- A field's own prop wins over the provider's value.
+- Nested providers merge their `fieldProps` over the outer provider's, so an inner provider only needs the values it changes.
+- By default, required fields get a `*` label suffix.
+- `wrap: false` keeps chips and table cell content on one line.
+
+## How to use
+
+```tsx
+<PresentationProvider fieldProps={{ compact: true, labelStyle: "hidden" }}>
+  <TextField label="Quantity" value={qty} onChange={setQty} />
+  <MenuSelectField label="Unit" value={unit} onSelect={setUnit} options={units} />
+</PresentationProvider>
+```

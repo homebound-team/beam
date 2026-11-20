@@ -1,0 +1,35 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as HbLoadingSpinnerStories from "./HbLoadingSpinner.stories";
+
+<Meta of={HbLoadingSpinnerStories} />
+
+# Hb Loading Spinner
+
+`HbLoadingSpinner` is the animated Homebound logo with a random quip below it, for full-page or large-area loading in Homebound apps. For a neutral spinner, use `Loader`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Quips come from `HbSpinnerProvider`. Without quips, or with an empty list, it shows "Loading...".
+- `extraQuips` adds page-specific quips to the pool, and turns quips back on even when the provider has none. `extraQuipsOnly` picks from `extraQuips` alone.
+- `noQuips` always shows "Loading...". `iconOnly` hides the text.
+- The gif and quip are ignored by Chromatic, so their randomness doesn't fail visual tests.
+
+## How to use
+
+Set the app's quips once, near the root:
+
+```tsx
+<HbSpinnerProvider quips={[...HB_QUIPS_MISSION, ...HB_QUIPS_FLAVOR]}>
+  <App />
+</HbSpinnerProvider>
+```
+
+Then show the spinner where the page loads:
+
+```tsx
+{
+  loading ? <HbLoadingSpinner extraQuips={["Where did I put that invoice?"]} /> : <InvoicePage />;
+}
+```

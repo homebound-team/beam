@@ -1,0 +1,30 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import { BeamLogo } from "src/components/Logos/BeamLogo";
+import * as LogosStories from "./Logos.stories";
+
+<Meta of={LogosStories} />
+
+# Logos
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=55-157">
+    <img src="FigmaLogo.png" alt="" />
+    Logos
+  </a>
+</p>
+
+Beam has three logo components: `HomeboundLogo` (the roofline mark), `BeamLogo`, and `BlueprintAiLogo`.
+
+<ArgTypes of={BeamLogo} />
+
+## Behaviors
+
+- Set either `width` or `height`, in 8px increments, and the other follows the logo's aspect ratio. Passing both is a type error.
+- `HomeboundLogo` and `BeamLogo` take a `fill` that defaults to `currentColor`. `BlueprintAiLogo` is always drawn in the brand gradient and has no `fill`.
+
+## How to use
+
+```tsx
+<HomeboundLogo height={4} />
+<BlueprintAiLogo width={10} />
+```

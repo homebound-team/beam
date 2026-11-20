@@ -1,0 +1,64 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as FiltersStories from "./Filters.stories";
+
+<Meta of={FiltersStories} />
+
+# Filters
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=835-1135">
+    <img src="FigmaLogo.png" alt="" />
+    Filters
+  </a>
+</p>
+
+`Filters` renders a row of filter fields from a `filterDefs` object, with "More Filters" and "Clear" buttons. Each key of `filterDefs` is a key of your filter type, and its value comes from a filter factory such as `singleFilter` or `multiFilter`. On a table page, pass the same `filterDefs` to `useGridTableLayoutState` and let `GridTableLayout` render the filters for you.
+
+<ArgTypes />
+
+## Filter factories
+
+| Factory             | Renders                                               | Value                                                          |
+| ------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
+| `singleFilter`      | `MenuSelectField`                                     | One option value                                               |
+| `multiFilter`       | `MenuMultiSelectField`                                | An array of option values                                      |
+| `treeFilter`        | `MenuTreeSelectField`                                 | An array of option values                                      |
+| `dateFilter`        | An operation select and a `DateField`                 | `{ op, value }`                                                |
+| `dateRangeFilter`   | `DateRangeField`                                      | `{ op, value }`, where `value` is a date range                 |
+| `numberRangeFilter` | Min and max `NumberField`s                            | `{ min, max }`                                                 |
+| `booleanFilter`     | A select of Any, Yes and No (override with `options`) | `true`, `false`, or unset                                      |
+| `checkboxFilter`    | `Checkbox`                                            | `onValue` when checked, `offValue` (unset by default) when not |
+| `toggleFilter`      | `Switch`                                              | Same as `checkboxFilter`                                       |
+
+Each factory takes a `label`, which defaults to one derived from the filter's key, and a `defaultValue` for `usePersistedFilter` to start from.
+
+## Behaviors
+
+- In the default horizontal layout, `numberOfInlineFilters` slots show inline (4, or 3 with `groupBy`). When there are more filters, the last slot becomes "More Filters", which opens a modal with the rest. Its badge counts how many of those are set.
+- The modal (`FilterModal`) edits a copy of the filter and only calls `onChange` when the user clicks Apply. Its Clear button only clears the filters inside the modal.
+- The "Clear" button shows whenever any filter is set, and resets the filter to `{}`.
+- `vertical` stacks every filter in a column and never uses the modal.
+- `groupBy` adds a "Group by" select before the filters.
+
+## How to use
+
+Keep the filter in `usePersistedFilter`, which saves it in session storage, and in the query string outside a modal:
+
+```tsx
+const filterDefs: FilterDefs<ProjectFilter> = useMemo(
+  () => ({
+    marketId: multiFilter({ options: markets, getOptionValue: (m) => m.code, getOptionLabel: (m) => m.name }),
+    managerId: singleFilter({
+      label: "Project Manager",
+      options: users,
+      getOptionValue: (u) => u.id,
+      getOptionLabel: (u) => u.name,
+    }),
+    favorite: booleanFilter({ label: "Favorite" }),
+  }),
+  [markets, users],
+);
+const { filter, setFilter } = usePersistedFilter<ProjectFilter>({ storageKey: "projectsFilter", filterDefs });
+
+<Filters<ProjectFilter> filterDefs={filterDefs} filter={filter} onChange={setFilter} />;
+```

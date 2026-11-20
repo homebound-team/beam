@@ -1,0 +1,26 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as LoadingSkeletonStories from "./LoadingSkeleton.stories";
+
+<Meta of={LoadingSkeletonStories} />
+
+# Loading Skeleton
+
+`LoadingSkeleton` holds the space of content that's still loading, with pulsing gray bars. Match `rows` and `columns` to the shape of the real content so the page doesn't jump when it arrives. For a plain spinner, use `Loader`.
+
+<ArgTypes />
+
+## Behaviors
+
+- Each row has `columns` equal-width cells. `size` sets the row height: `sm` (16px), `md` (24px, the default) or `lg` (32px).
+- `randomizeWidths` varies each row's width so the rows read like lines of text. The widths follow a fixed pattern, so they're the same on every render.
+- It has the accessible label "Loading".
+
+## How to use
+
+```tsx
+{
+  loading ? <LoadingSkeleton rows={4} randomizeWidths /> : <Notes />;
+}
+```
+
+`BoundForm` already shows a skeleton in place of each field while its form state is loading.

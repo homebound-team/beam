@@ -1,0 +1,40 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ContentHeaderStories from "./ContentHeader.stories";
+
+<Meta of={ContentHeaderStories} />
+
+# Content Header
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=751-3">
+    <img src="FigmaLogo.png" alt="" />
+    Headers & Footers
+  </a>
+</p>
+
+`ContentHeader` is the title, description and actions for a section of content within a page, such as above a table or a group of cards. For the page's own header, use `PageHeaderLayout`, and for a form section, `FormSection`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `level` picks the heading: `2` (default) renders an `h2`, `3` an `h3`, and `4` an `h4`. It never renders an `h1`.
+- `actions` take `HeaderAction`s: a `Button` by default, `kind: "icon"` for an outlined `IconButton`, or `kind: "menu"` for a `ButtonMenu`. On mobile, actions with `keepVisible` move below the title.
+- `withAutoSave` adds an `AutoSaveIndicator` before the actions. It reads the status from `AutoSaveStatusProvider`.
+- `tag` shows a `ContextTag` or status `Tag` after the title, and `tooltip` an info icon.
+- It renders nothing without a `title`, `description`, `actions` or `withAutoSave`.
+- In a document-scroll page it adds the page's side padding, unless it's already inside an inset shell like `CenteredLayout` (see `docs/layouts.md`).
+- It stays in view when the page scrolls sideways. Above content that overflows horizontally, wrap both in a container with `min-width: fit-content` so it has room to stick.
+
+## How to use
+
+```tsx
+<ContentHeader
+  title="Trade partners"
+  description="Assign and manage trade partners for this project."
+  actions={[
+    { label: "Add trade partner", onClick: openAdd },
+    { kind: "menu", trigger: { icon: "verticalDots" }, items: [{ label: "Export", onClick: exportCsv }] },
+  ]}
+/>
+```

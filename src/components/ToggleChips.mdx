@@ -1,0 +1,31 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as ToggleChipsStories from "./ToggleChips.stories";
+
+<Meta of={ToggleChipsStories} />
+
+# Toggle Chips
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=34522%3A101241">
+    <img src="FigmaLogo.png" alt="" />
+    Toggle Chips
+  </a>
+</p>
+
+`ToggleChips` renders a wrapping list of `ToggleChip`s, one per value, and calls `onRemove` with the value whose chip was clicked. Use `Chips` for read-only values.
+
+<ArgTypes />
+
+## Behaviors
+
+- `getLabel` provides each chip's text, which also serves as its key, so labels should be unique.
+
+## How to use
+
+```tsx
+<ToggleChips
+  values={selectedTrades}
+  getLabel={(t) => t.name}
+  onRemove={(t) => setSelectedTrades((ts) => ts.filter((x) => x !== t))}
+/>
+```

@@ -1,0 +1,34 @@
+import { ArgTypes, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./RichTextField.stories";
+
+<Meta of={Stories} />
+
+# Rich Text Field
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/file/aWUE4pPeUTgrYZ4vaTYZQU/%E2%9C%A8Beam-Design-System?node-id=6449%3A8821">
+    <img src="FigmaLogo.png" alt="" />
+    Rich Text Field
+  </a>
+</p>
+
+`RichTextField` is a rich text editor for notes and comments, with `@` mentions. For plain multi-line text, use `TextAreaField`. In a form, use `BoundRichTextField`.
+
+<ArgTypes />
+
+## Behaviors
+
+- `value` is HTML. `onChange` receives the HTML, its plain text, and the mentions it contains. Content that's only whitespace is reported as `undefined`.
+- Typing `@` shows `mergeTags` in a popup. `mergeTags` is read once; later changes aren't picked up.
+- `readOnly` renders the HTML as formatted text, with no editor.
+
+## How to use
+
+```tsx
+<RichTextField
+  label="Comment"
+  value={comment}
+  onChange={(html) => setComment(html)}
+  mergeTags={teamMembers.map((m) => m.name)}
+/>
+```
