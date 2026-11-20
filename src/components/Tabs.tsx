@@ -28,7 +28,8 @@ export type Tab<V extends string = string> = {
   disabled?: boolean | ReactNode;
 };
 
-export type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
+/** `height` and `flexGrow` let the panel fill its parent, e.g. so a virtual table in a tab gets a bounded height. */
+export type TabsContentXss = Xss<Margin | Padding | "backgroundColor" | "height" | "flexGrow">;
 
 export type TabsProps<V extends string, X> = {
   ariaLabel?: string;
