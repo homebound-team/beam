@@ -13,7 +13,11 @@ export interface BannerProps {
   showIcon?: boolean;
 }
 
-/** A full-width alert row tinted and iconed by `type`, with an optional close button. */
+/**
+ * A full-width alert row tinted and iconed by `type`, with an optional close button.
+ *
+ * @deprecated Use {@link StatusBanner}.
+ */
 export function Banner(props: BannerProps) {
   const { type, message, onClose = false, showIcon = true, ...others } = props;
   const tid = useTestIds(others, "banner");

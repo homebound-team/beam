@@ -53,7 +53,11 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
   rightPaneWidth?: number;
 };
 
-/** A full-screen overlay for reviewing a table: title, description and Close button above the table, with an optional side panel. */
+/**
+ * A full-screen overlay for reviewing a table: title, description and Close button above the table, with an optional side panel.
+ *
+ * @deprecated Use a page layout from `docs/layouts.md`.
+ */
 export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss, X>, QData>(
   props: TableReviewLayoutProps<R, X, QData>,
 ) {

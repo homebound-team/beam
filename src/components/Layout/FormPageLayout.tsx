@@ -102,6 +102,8 @@ function FormPageLayoutComponent<F>(props: FormPageLayoutProps<F>) {
  * A full-screen overlay form page: sticky header with actions, a left nav of section titles, `BoundForm` sections, and an optional right sidebar.
  *
  * Content underneath stays mounted, so a list page keeps its scroll position and filters.
+ *
+ * @deprecated Use {@link FocusedFormLayout}, or another page layout from `docs/layouts.md`.
  */
 export const FormPageLayout = React.memo(FormPageLayoutComponent) as typeof FormPageLayoutComponent;
 
