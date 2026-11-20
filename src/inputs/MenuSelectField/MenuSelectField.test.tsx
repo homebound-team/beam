@@ -116,6 +116,24 @@ describe("MenuSelectField", () => {
     expect(r.color).toHaveTextContent("Red");
   });
 
+  it("keeps a picked label when closing empties the options in the same update", async () => {
+    // Given a field that lists options only for a search, so closing's onSearch("") empties the list
+    function Page() {
+      const [value, setValue] = useState<string | undefined>();
+      const [search, setSearch] = useState("");
+      const options = search ? colors().filter((c) => c.name.toLowerCase().includes(search.toLowerCase())) : [];
+      return <MenuSelectField label="Color" options={options} value={value} onSelect={setValue} onSearch={setSearch} />;
+    }
+    const r = await render(<Page />);
+    // When searching and picking a match
+    click(r.color);
+    type(r.color_search, "Blue");
+    await wait();
+    select(r.color, "Blue");
+    // Then the closed field shows the pick, though the list it came from is gone
+    expect(r.color).toHaveTextContent("Blue");
+  });
+
   it("loads options the first time the menu opens", async () => {
     // Given a selected option whose full list has not been loaded
     const load = vi.fn();
@@ -400,6 +418,95 @@ describe("MenuSelectField", () => {
       await wait();
       // Then the unsetLabel row stays above the matches
       expect(getOptions(r.color)).toEqual(["All", "123 Main"]);
+    });
+  });
+
+  describe("onAddNew", () => {
+    it("lists an add row under the matches and passes the trimmed text", async () => {
+      // Given a short single select with onAddNew
+      const onAddNew = vi.fn();
+      const onSelect = vi.fn();
+      const r = await render(<TestHarness onAddNew={onAddNew} onSelectSpy={onSelect} />);
+      // When opening it
+      click(r.color);
+      // Then the search shows even though the list is short, and there is no add row yet
+      expect(r.color_search).toHaveFocus();
+      expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+
+      // When typing text that only partly matches
+      type(r.color_search, "bl");
+      // Then the matches are followed by the add row
+      expect(getOptions(r.color)).toEqual(["Black", "Blue", 'Add "bl"']);
+
+      // When typing an option's label in another case
+      type(r.color_search, "BLUE");
+      // Then there is no add row
+      expect(getOptions(r.color)).toEqual(["Blue"]);
+
+      // When choosing the add row for padded text
+      type(r.color_search, "  Teal  ");
+      select(r.color, 'Add "Teal"');
+      // Then onAddNew gets the trimmed text, nothing is selected, and the menu closes onto the trigger
+      expect(onAddNew).toHaveBeenCalledOnce();
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(r.color).toHaveAttribute("aria-expanded", "false");
+      expect(r.color).toHaveFocus();
+    });
+
+    it("ignores accents when the search names an option, like the filter", async () => {
+      // Given an open single select with a Café option and onAddNew
+      const r = await render(<TestHarness options={[{ id: "c", name: "Café" }]} onAddNew={vi.fn()} />);
+      click(r.color);
+      // When typing the label without its accent
+      type(r.color_search, "cafe");
+      // Then Café is listed with no add row
+      expect(getOptions(r.color)).toEqual(["Café"]);
+    });
+
+    it("adds from the keyboard only once the add row is highlighted", async () => {
+      // Given an open single select whose search matches nothing
+      const onAddNew = vi.fn();
+      const r = await render(<TestHarness onAddNew={onAddNew} />);
+      click(r.color);
+      type(r.color_search, "Teal");
+      // When pressing Enter with no row highlighted
+      fireEvent.keyDown(r.color_search, { key: "Enter" });
+      // Then nothing is added
+      expect(onAddNew).not.toHaveBeenCalled();
+      // When highlighting the add row and pressing Enter
+      fireEvent.keyDown(r.color_search, { key: "ArrowDown" });
+      fireEvent.keyDown(r.color_search, { key: "Enter" });
+      // Then the text is added
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+    });
+
+    it("drops the AI treatment when adding a value", async () => {
+      // Given Red on record and Blue proposed
+      const r = await render(<TestHarness initial="r" proposedValue="b" onAddNew={vi.fn()} />);
+      // When adding a value
+      click(r.color);
+      type(r.color_search, "Teal");
+      select(r.color, 'Add "Teal"');
+      // Then the field shows the record until the caller selects the new option
+      expect(r.color).not.toHaveAttribute("data-ai-mode");
+      expect(r.color).toHaveTextContent("Red");
+    });
+
+    it("adds from a hierarchy search", async () => {
+      // Given an open hierarchy with onAddNew
+      const onAddNew = vi.fn();
+      const r = await render(<TestHierarchyField value={undefined} onAddNew={onAddNew} />);
+      click(r.location);
+      // When the search names a nested option
+      type(r.location_search, "drench");
+      // Then the match keeps its ancestors and there is no add row
+      expect(getOptions(r.location)).toEqual(["Bath 207", "Walls", "Drench", "Color Drench"]);
+      // When the search names nothing and the add row is chosen
+      type(r.location_search, "Garage");
+      select(r.location, 'Add "Garage"');
+      // Then onAddNew gets the text
+      expect(onAddNew).toHaveBeenCalledWith("Garage");
     });
   });
 
@@ -865,6 +972,7 @@ type HarnessProps = {
   options?: Color[];
   autoSort?: boolean;
   mixedValues?: string[];
+  onAddNew?: (value: string) => void;
 };
 
 function installKeyboardViewport(initial: { height: number; offsetTop: number }) {
@@ -961,6 +1069,7 @@ function TestHierarchyField(props: {
   value: string | undefined;
   onSelect?: (value: string | undefined, option: LocationOption | undefined) => void;
   options?: OptionsOrLoad<LocationOption>;
+  onAddNew?: (value: string) => void;
 }) {
   const [value, setValue] = useState(props.value);
   return (
@@ -972,6 +1081,7 @@ function TestHierarchyField(props: {
         props.onSelect?.(next, option);
         setValue(next);
       }}
+      onAddNew={props.onAddNew}
     />
   );
 }
