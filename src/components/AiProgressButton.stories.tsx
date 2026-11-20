@@ -1,4 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
+import { useState } from "react";
 import { AiProgressButton, type AiProgressButtonProps } from "src/components/AiProgressButton";
 import { Button } from "src/components/Button";
 import { ButtonMenu } from "src/components/ButtonMenu";
@@ -52,9 +53,25 @@ export function States() {
       examples={[
         { label: "In progress", children: <Sample /> },
         { label: "Idle", children: <Sample inProgress={false} /> },
+        { label: "Expand on complete", children: <Sample inProgress={false} expandOnComplete /> },
         { label: "Disabled", children: <Sample inProgress={false} disabled="No import is running" /> },
       ]}
     />
+  );
+}
+
+/** Finish the work to watch the label slide out on its own. */
+export function ExpandOnComplete() {
+  const [inProgress, setInProgress] = useState(true);
+  return (
+    <div css={Css.df.aic.gap1.$}>
+      <Sample inProgress={inProgress} expandOnComplete />
+      <Button
+        variant="secondary"
+        label={inProgress ? "Finish" : "Restart"}
+        onClick={() => setInProgress(!inProgress)}
+      />
+    </div>
   );
 }
 
