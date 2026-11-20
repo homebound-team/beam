@@ -23,16 +23,21 @@ export type SelectFieldProps<O, V extends Value> = {
  *
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
+ *
+ * @deprecated Use {@link MenuSelectField}.
  */
 export function SelectField<O extends HasIdIsh<V> & HasNameIsh, V extends Value>(
   props: Optional<SelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
+/** @deprecated Use {@link MenuSelectField}. */
 export function SelectField<O extends HasIdIsh<V>, V extends Value>(
   props: Optional<SelectFieldProps<O, V>, "getOptionValue">,
 ): JSX.Element;
+/** @deprecated Use {@link MenuSelectField}. */
 export function SelectField<O extends HasNameIsh, V extends Value>(
   props: Optional<SelectFieldProps<O, V>, "getOptionLabel">,
 ): JSX.Element;
+/** @deprecated Use {@link MenuSelectField}. */
 export function SelectField<O, V extends Value>(props: SelectFieldProps<O, V>): JSX.Element;
 export function SelectField<O, V extends Value>(
   props: Optional<SelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,

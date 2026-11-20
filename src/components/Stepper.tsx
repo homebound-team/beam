@@ -7,6 +7,7 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type Step = {
   label: string;
+  /** Sets the icon and color; the progress bar fills through the last `complete` step. */
   state: "incomplete" | "complete" | "error";
   disabled?: boolean;
   value: string;
@@ -14,11 +15,19 @@ export type Step = {
 
 export type StepperProps = {
   steps: Step[];
-  // The 'value' of the Step that should be displayed
+  /** The `value` of the step being shown. */
   currentStep: Step["value"];
+  /** Called with a step's `value` when it's clicked. */
   onChange: (stepValue: string) => void;
 };
 
+/**
+ * A row of clickable steps above a progress bar.
+ *
+ * Throws when `steps` is empty.
+ *
+ * @deprecated Use {@link StepperTabs}, or `StepperLayout` for a multi-step workflow.
+ */
 export function Stepper(props: StepperProps) {
   const { steps, currentStep, onChange } = props;
   if (steps.length === 0) {

@@ -36,19 +36,25 @@ type DateFieldCommonProps = Pick<
   onFocus?: () => void;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
+  /** Shows the field in its error state with this message. */
   errorMsg?: string;
   required?: boolean;
   /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
   readOnly?: boolean | ReactNode;
+  /** Guidance shown below the field. */
   helperText?: string | ReactNode;
   placeholder?: string;
+  /** Display format: `short` (01/01/20), `medium` (Wed, Nov 23), or `long`. Focus switches to `short` for typing. Defaults to `short`. */
   format?: keyof typeof dateFormats;
+  /** Puts the calendar button at the start of the field instead of the end. */
   iconLeft?: boolean;
+  /** Hides the calendar button; clicking the field still opens the picker. */
   hideCalendarIcon?: boolean;
   /**
    * Set custom logic for individual dates or date ranges to be disabled in the picker
    */
   disabledDays?: DateMatcher | DateMatcher[];
+  /** Called when the user presses Enter in the field, which also blurs it. */
   onEnter?: VoidFunction;
   /** for storybook */
   defaultOpen?: boolean;

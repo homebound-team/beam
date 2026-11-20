@@ -25,7 +25,9 @@ export type FormSectionAction = HeaderAction;
 export type FormSectionBaseProps = {
   title: string;
   description?: ReactNode;
+  /** Buttons in the header, beside the title. */
   actions?: HeaderAction[];
+  /** Form fields rendered below the header. */
   fields?: ReactNode;
 };
 
@@ -43,6 +45,7 @@ type SelectableFormSectionChild = (PlainFormSectionChild | ReorderableFormSectio
   selection?: never;
 };
 
+/** Props for `FormSection`; `childSections` are a plain list unless a `selection` binds them to a radio or checkbox group. */
 export type FormSectionProps = FormSectionBaseProps & {
   /** Rendered right after the title. */
   tag?: ContextOrStatusTagProps;
@@ -51,6 +54,11 @@ export type FormSectionProps = FormSectionBaseProps & {
     | { selection: FormSectionSelection; childSections: SelectableFormSectionChild[] }
   );
 
+/**
+ * A titled block of form fields, with optional child sections that are selectable or drag-reorderable.
+ *
+ * Its id comes from `title`, which is what `FormSectionLayout`'s jump links target.
+ */
 export function FormSection(props: FormSectionProps) {
   const { title, description, actions, tag, fields, childSections, selection } = props;
   const tid = useTestIds(props, "formSection");

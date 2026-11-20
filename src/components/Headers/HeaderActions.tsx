@@ -17,7 +17,7 @@ import { useTestIds } from "src/utils/useTestIds";
  * Icon actions always render with the `outline` `IconButton` variant, so `variant` is omitted here.
  */
 type HeaderActionKeepVisible = {
-  /** At `sm`, render this action below the title instead of collapsing it into the overflow menu. */
+  /** At `sm`, render this action below the title instead of collapsing it into `PageHeader`'s overflow menu. */
   keepVisible?: boolean;
 };
 

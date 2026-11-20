@@ -15,10 +15,12 @@ import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
 type ButtonDatePickerProps = {
+  /** Opens the calendar on mount, for stories. */
   defaultOpen?: boolean;
 } & DatePickerProps &
   Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip">;
 
+/** A button that opens a calendar and closes it once a date is picked. */
 export function ButtonDatePicker(props: ButtonDatePickerProps) {
   const { defaultOpen, disabled, trigger, onSelect, ...datePickerProps } = props;
   const state = useMenuTriggerState({ isOpen: defaultOpen });

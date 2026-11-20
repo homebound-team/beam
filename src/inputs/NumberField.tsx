@@ -16,13 +16,19 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
   tooltip?: ReactNode;
-  /** If set, the label will be defined as 'aria-label` on the input element */
+  /**
+   * Formats the field as currency, percent, or days, with `value` kept in the type's whole unit.
+   *
+   * E.g. `cents` 1234 shows $12.34, `percent` 50 shows 50%, and `basisPoints` 125 shows 1.25%.
+   */
   type?: NumberFieldType;
   value: number | undefined;
   /** Value proposed by an AI model; puts the field in AI mode. */
   proposedValue?: number;
   onChange: (value: number | undefined) => void;
+  /** Shrinks the field from 40px to 32px tall. */
   compact?: boolean;
+  /** Shows a clear button while the field is focused and has a value. */
   clearable?: boolean;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
@@ -31,34 +37,45 @@ export interface NumberFieldProps extends Pick<PresentationFieldProps, "labelSty
   helperText?: string | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
-  /* Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
+  /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
   readOnly?: boolean | ReactNode;
   /** Styles overrides */
   xss?: Xss<"textAlign" | "justifyContent">;
-  // If set, all positive values will be prefixed with "+". (Zero will not show +/-)
+  /** Prefixes positive values with "+"; zero shows no sign. */
   displayDirection?: boolean;
+  /**
+   * Decimal places kept on `value` and shown in the field; defaults to 2 for `dollars`.
+   *
+   * Unset, `value` rounds to a whole number of the type's unit.
+   */
   numFractionDigits?: number;
+  /** Pads the integer part with leading zeros to this many digits and drops higher digits (1234 becomes 34 for 2). */
   numIntegerDigits?: number;
-  // Override for default formatting based on `type`.
+  /** Replaces the formatting derived from `type` and the digit props. */
   numberFormatOptions?: Intl.NumberFormatOptions;
+  /** Shows up to `numFractionDigits` decimals instead of always padding to that many. */
   truncate?: boolean;
+  /** Called on Enter, after which the input blurs. */
   onEnter?: VoidFunction;
   placeholder?: string;
-  // If set error messages will be rendered as tooltips rather than below the field
+  /** Shows the error message in a tooltip instead of below the field. */
   errorInTooltip?: true;
   /** Whether to show comma separation for group numbers.
    * @default true */
   useGrouping?: boolean;
+  /** Keeps `errorMsg` for screen readers but hides it visually. */
   hideErrorMessage?: boolean;
-  // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
+  /** Removes the border and shows focus with a box-shadow; typically for compact fields in a table. */
   borderless?: boolean;
+  /** Sizes the input to the width of its value. */
   sizeToContent?: boolean;
-  // If set, the helper text will always be shown (usually we hide the helper text if read only)
+  /** Shows helper text even when the field is read-only or disabled, where it's normally hidden. */
   alwaysShowHelperText?: boolean;
-  // If set, the component will only accept positive values
+  /** Converts negative input to its absolute value. */
   positiveOnly?: boolean;
 }
 
+/** A numeric input that formats as currency, percent, or days per `type`, reporting values in that type's unit. */
 export function NumberField(props: NumberFieldProps) {
   // Determine default alignment based on presentation context
   const { fieldProps } = usePresentationContext();

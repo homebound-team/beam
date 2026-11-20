@@ -15,13 +15,19 @@ import type { ButtonVariant } from "./Button";
 import { ContextualModal } from "./internal/ContextualModal";
 
 export type ButtonModalProps = {
+  /** A function receives `close`, so the content can dismiss the popup itself. */
   content: ReactNode | ((close: () => void) => ReactNode);
+  /** Centered heading above the content. */
   title?: string;
+  /** Variant for a text-button trigger when `trigger` does not set one. Defaults to `secondary`. */
   variant?: ButtonVariant;
+  /** Opens the popup on mount, for stories. */
   storybookDefaultOpen?: boolean;
+  /** Hides the open/closed chevron on a text-button trigger. */
   hideEndAdornment?: boolean;
 } & Pick<OverlayTriggerProps, "trigger" | "placement" | "disabled" | "tooltip" | "showActiveBorder">;
 
+/** A button that opens a small popup anchored to it, for short forms or details that don't need a full `Modal`. */
 export function ButtonModal(props: ButtonModalProps) {
   const { storybookDefaultOpen, trigger, disabled, content, title } = props;
   const state = useMenuTriggerState({ isOpen: storybookDefaultOpen });

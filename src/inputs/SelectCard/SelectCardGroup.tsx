@@ -10,6 +10,7 @@ import { type Value, keyToValue, valueToKey } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
+/** A single-select group of cards, laid out as a grid or a list per `view`. */
 export function SelectCardGroup<V extends Value>(props: SelectCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();
   const {

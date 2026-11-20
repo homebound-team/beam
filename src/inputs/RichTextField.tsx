@@ -16,6 +16,7 @@ import "./trix.css";
 export type RichTextFieldProps = {
   /** The initial html value to show in the trix editor. */
   value: string | undefined;
+  /** Called with the editor's HTML, its plain text, and the `@` mentions it contains; whitespace-only content reports `undefined`. */
   onChange: (html: string | undefined, text: string | undefined, mergeTags: string[]) => void;
   /**
    * A list of tags/names to show in a popup when the user `@`-s.
@@ -36,6 +37,7 @@ export type RichTextFieldProps = {
   readOnly?: boolean;
 } & Pick<PresentationFieldProps, "fullWidth">;
 
+/** A rich text editor with `@` mentions from `mergeTags`; `readOnly` renders the HTML as formatted text. */
 export const RichTextField = withTestMock(RichTextFieldImpl, RichTextFieldMock);
 
 /**

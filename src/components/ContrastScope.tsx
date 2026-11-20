@@ -14,8 +14,12 @@ export function useContrastScope(): boolean {
   return useContext(ContrastScopeContext);
 }
 
-type ContrastScopeProps = PropsWithChildren<{ contrast?: boolean }>;
+type ContrastScopeProps = PropsWithChildren<{
+  /** Defaults to true; false renders the children with the default theme. */
+  contrast?: boolean;
+}>;
 
+/** Applies the contrast (dark) token theme to its children without adding a layout box. */
 export function ContrastScope({ children, contrast = true }: ContrastScopeProps) {
   return (
     <ContrastScopeContext.Provider value={contrast}>

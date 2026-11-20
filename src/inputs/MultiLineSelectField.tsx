@@ -15,6 +15,7 @@ export interface MultiLineSelectFieldProps<O, V extends Value> extends Exclude<C
   onSelect: (values: V[], opts: O[]) => void;
 }
 
+/** A multi-select that lists each chosen value on its own row with a remove button, plus an "Add Another" select. */
 export function MultiLineSelectField<O, V extends Value>(
   props: Optional<MultiLineSelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element {

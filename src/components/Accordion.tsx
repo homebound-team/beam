@@ -10,19 +10,20 @@ type AccordionXss = Xss<Padding>;
 export type AccordionProps<X = AccordionXss> = {
   title: ReactNode;
   children: ReactNode;
+  /** Mutes the header and stays collapsed. */
   disabled?: boolean;
   defaultExpanded?: boolean;
+  /** Fixed width; defaults to the container's width. */
   size?: AccordionSize;
   /** Adds a top border (enabled by default) */
   topBorder?: boolean;
   /** Adds a bottom border (disabled by default) */
   bottomBorder?: boolean;
-  /**
-   * Used by AccordionList
-   * Allows multiple accordions to be expanded simultaneously (enabled by default)
-   */
+  /** Position in an `AccordionList`, reported through `setExpandedIndex` on toggle. */
   index?: number;
+  /** Called after each expand or collapse. */
   onToggle?: VoidFunction;
+  /** Set by `AccordionList` to track the open accordion when only one may be expanded. */
   setExpandedIndex?: Dispatch<SetStateAction<number | undefined>>;
   /** Turns the title into a button. If provided, disables expand/collapse on title text */
   titleOnClick?: VoidFunction;
@@ -34,6 +35,7 @@ export type AccordionProps<X = AccordionXss> = {
   compact?: boolean;
 };
 
+/** A titled section that expands and collapses its content. */
 export function Accordion<X extends Only<AccordionXss, X>>(props: AccordionProps<X>) {
   const {
     title,

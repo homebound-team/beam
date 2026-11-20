@@ -18,11 +18,18 @@ export type OffsetAndLimit = { offset: number; limit: number };
 export const defaultPage: OffsetAndLimit = { offset: 0, limit: 100 };
 
 type PaginationProps = {
+  /** A `useState` pair; updates come back in the same shape (page number or offset) that was passed in. */
   page: readonly [PageNumberAndSize, Dispatch<PageNumberAndSize>] | readonly [OffsetAndLimit, Dispatch<OffsetAndLimit>];
   totalCount: number;
+  /** Options for the page-size select. Defaults to 100, 500, 1000. */
   pageSizes?: number[];
 };
 
+/**
+ * A footer with a page-size select, a "1 - 100 of 1000" range, and previous/next buttons.
+ *
+ * Changing the page size returns to the first page.
+ */
 export function Pagination(props: PaginationProps) {
   const { totalCount, pageSizes = [100, 500, 1000] } = props;
   const [page, setPage] = props.page;

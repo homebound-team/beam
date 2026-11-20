@@ -9,9 +9,13 @@ import { maybeCall } from "src/utils/helpers";
 
 // exported for testing purposes
 export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
+  /** Shrinks the field from 40px to 32px tall. */
   compact?: boolean;
+  /** Shows a clear button while the field is focused and has a value; clearing calls `onChange(undefined)`. */
   clearable?: boolean;
+  /** Filled with a {@link TextFieldApi} for focusing the input imperatively. */
   api?: MutableRefObject<TextFieldApi | undefined>;
+  /** Called on Enter, after which the input blurs. */
   onEnter?: VoidFunction;
   /**
    * Allows a TextField to opt-in to bubbling up the escape key event to its parent.
@@ -23,13 +27,17 @@ export interface TextFieldProps<X> extends BeamTextFieldProps<X> {
    * https://github.com/adobe/react-spectrum/issues/5480
    */
   onEscapeBubble?: boolean;
+  /** Content rendered inside the field after the input, e.g. a unit or icon. */
   endAdornment?: ReactNode;
+  /** Content rendered inside the field before the input, e.g. a unit or icon. */
   startAdornment?: ReactNode;
+  /** Keeps `errorMsg` for screen readers but hides it visually. */
   hideErrorMessage?: boolean;
   /** Allow focusing without selecting, i.e. to let the user keep typing after we've pre-filled text + called focus, like the Add New component. */
   selectOnFocus?: boolean;
 }
 
+/** A single-line text input. */
 export function TextField<X extends Only<TextFieldXss, X>>(props: TextFieldProps<X>) {
   const {
     disabled = false,

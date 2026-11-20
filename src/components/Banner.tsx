@@ -7,10 +7,17 @@ import { useTestIds } from "src/utils/useTestIds";
 export interface BannerProps {
   type: BannerTypes;
   message: ReactNode;
+  /** Shows a close button that calls this. */
   onClose?: VoidFunction;
+  /** Shows the type's icon before the message. Defaults to true. */
   showIcon?: boolean;
 }
 
+/**
+ * A full-width alert row tinted and iconed by `type`, with an optional close button.
+ *
+ * @deprecated Use {@link StatusBanner}.
+ */
 export function Banner(props: BannerProps) {
   const { type, message, onClose = false, showIcon = true, ...others } = props;
   const tid = useTestIds(others, "banner");

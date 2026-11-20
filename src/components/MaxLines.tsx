@@ -6,6 +6,11 @@ export type MaxLinesProps = PropsWithChildren<{
   maxLines: number;
 }>;
 
+/**
+ * Clamps its children to `maxLines` lines, with a "Show More" / "Show Less" toggle when they overflow.
+ *
+ * New children collapse it again.
+ */
 export function MaxLines({ maxLines, children }: MaxLinesProps) {
   const elRef = useRef<HTMLDivElement>(null);
   const [hasMore, setHasMore] = useState(false);

@@ -13,8 +13,10 @@ import { useTestIds } from "src/utils/useTestIds";
 
 export type NavbarUser = {
   name: string;
+  /** Avatar image URL; falls back to the name's initials. */
   picture?: string;
   menuItems: MenuItem[];
+  /** A separate section after `menuItems` (e.g. Sign out). */
   persistentItems?: MenuItem[];
 };
 
@@ -24,6 +26,7 @@ export type NavbarProps = {
    * should navigate (e.g. react-router `Link`, plain `<a href>`, or `NavLink`).
    */
   brand: ReactNode;
+  /** Hides `brand` whenever the mobile menu shows. */
   hideBrandOnMobile?: boolean;
   /** Primary nav entries — same shape as {@link SideNav} `items`. */
   items: AppNavItem[];
@@ -33,9 +36,15 @@ export type NavbarProps = {
    * not collapse into the mobile drawer.
    */
   rightSlot?: ReactNode;
+  /** Shows an avatar menu at the trailing edge. */
   user?: NavbarUser;
 };
 
+/**
+ * The app's top navigation bar, in the contrast theme.
+ *
+ * Collapses `items` into a mobile menu below the `sm` breakpoint, or whenever they don't fit.
+ */
 export function Navbar(props: NavbarProps) {
   const { brand, hideBrandOnMobile = false, items, rightSlot, user } = props;
   const { sm } = useBreakpoint();

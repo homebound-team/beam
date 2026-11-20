@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Css, Tokens } from "src/Css";
 import "./Copy.css";
 
+/** Muted body text capped at 480px wide, with vertical spacing between `<p>` children. */
 export function Copy(props: { children: string | ReactNode }) {
   return (
     <div

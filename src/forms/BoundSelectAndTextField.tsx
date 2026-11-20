@@ -12,9 +12,11 @@ import { useTestIds } from "src/utils/useTestIds";
 type BoundSelectAndTextFieldProps<O, V extends Value, X> = {
   selectFieldProps: CompoundSelectFieldProps<O, V>;
   textFieldProps: CompoundTextFieldProps<X>;
+  /** Applies to both fields. Defaults to `true`. */
   compact?: boolean;
 };
 
+/** A bound select and text field joined in one `CompoundField`; the select sizes to its content. */
 export function BoundSelectAndTextField<O, V extends Value, X extends Only<TextFieldXss, X>>(
   props: BoundSelectAndTextFieldProps<O, V, X>,
 ): JSX.Element;

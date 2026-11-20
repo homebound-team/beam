@@ -9,9 +9,9 @@ type ErrorMessageProps = {
   hidden?: boolean;
 };
 /**
- * A helper component for consistently showing error messages across form fields.
+ * The error line, with its icon, that Beam fields show under the input.
  *
- * Not currently exported as part of our public API.
+ * Use it standalone for an error that no single field owns, such as a missing comment in a custom form.
  */
 export function ErrorMessage(props: ErrorMessageProps) {
   const { id, errorMsg, hidden = false, ...others } = props;

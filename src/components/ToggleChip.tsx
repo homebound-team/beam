@@ -9,12 +9,20 @@ type ToggleChipXss = Xss<Margin>;
 
 export interface ToggleChipProps<X> {
   text: string;
+  /** Fires on a click anywhere on the chip, typically to remove it. */
   onClick: () => void;
   xss?: X;
+  /** Hides the `x` and blocks clicks. */
   disabled?: boolean;
+  /** Leading icon before the text. */
   icon?: IconKey;
 }
 
+/**
+ * A removable chip: text with a trailing `x` button, as used for selected values.
+ *
+ * Uses the smaller type scale inside a compact `PresentationProvider`.
+ */
 export function ToggleChip<X extends Only<ToggleChipXss, X>>(props: ToggleChipProps<X>) {
   const { text, onClick, xss = {}, disabled = false, icon } = props;
   const { fieldProps } = usePresentationContext();

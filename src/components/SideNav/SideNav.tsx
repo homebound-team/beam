@@ -17,6 +17,11 @@ export type SideNavProps = {
   showContentWhenCollapsed?: boolean;
 };
 
+/**
+ * The side navigation panel for `SideNavLayout`.
+ *
+ * When the layout collapses it, items render icon-only if every item has an icon, and are hidden otherwise.
+ */
 export function SideNav(props: SideNavProps) {
   const { top, items, footer, showContentWhenCollapsed = false } = props;
   const { navState } = useSideNavLayoutContext();

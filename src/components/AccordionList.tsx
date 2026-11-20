@@ -6,11 +6,13 @@ interface AccordionListProps {
   accordions: AccordionProps[];
   /** Allows multiple accordions to be expanded simultaneously (enabled by default) */
   allowMultipleExpanded?: boolean;
+  /** Fixed width for every accordion; defaults to the container's width. */
   size?: AccordionSize;
   /** Modifies the typography, padding, icon size and background color of the accordion header */
   compact?: boolean;
 }
 
+/** A stack of `Accordion`s sharing size and style, with a bottom border on the last one. */
 export function AccordionList(props: AccordionListProps) {
   const { accordions, size, allowMultipleExpanded = true, compact = false } = props;
   const [expandedIndex, setExpandedIndex] = useState<number | undefined>(

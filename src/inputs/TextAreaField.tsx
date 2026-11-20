@@ -10,11 +10,11 @@ import { maybeCall } from "src/utils/helpers";
 
 // Exported for test purposes
 export type TextAreaFieldProps<X> = {
-  // Does not allow the user to enter new line characters and removes minimum height for textarea.
+  /** Blocks new lines, including pasted ones, and drops the textarea's minimum height. */
   preventNewLines?: boolean;
-  // `onEnter` is only triggered when `preventNewLines` is set to `true`
+  /** Called on Enter; only fires when `preventNewLines` is set. */
   onEnter?: VoidFunction;
-  // Maximum number of lines before scrolling is enabled, must be >= 5 to take effect; If not provided, the textarea will grow indefinitely.
+  /** Lines to grow to before the textarea scrolls. Without it, the textarea grows with its content. */
   maxLines?: number;
 } & BeamTextFieldProps<X>;
 

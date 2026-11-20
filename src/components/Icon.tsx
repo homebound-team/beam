@@ -19,6 +19,11 @@ export type IconProps = {
 } & AriaAttributes &
   DOMProps;
 
+/**
+ * A 24x24 SVG icon from {@link Icons}, sized by `inc` and filled with the current text color by default.
+ *
+ * It is `aria-hidden`, so pair it with visible text or use `IconButton` for an accessible name.
+ */
 export const Icon = React.memo((props: IconProps) => {
   const { icon, inc = 3, color = "currentColor", bgColor, xss, tooltip, ...other } = props;
   const tid = useTestIds(props, icon);

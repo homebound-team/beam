@@ -15,7 +15,7 @@ export type BoundDateRangeFieldProps = Omit<DateRangeFieldProps, "label" | "valu
   onChange?: (value: DateRange | undefined) => void;
 };
 
-/** Wraps `TextField` and binds it to a form field. */
+/** Wraps `DateRangeField` and binds it to a form field. */
 export function BoundDateRangeField(props: BoundDateRangeFieldProps) {
   const {
     field,

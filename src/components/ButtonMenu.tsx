@@ -16,7 +16,9 @@ import { useTestIds } from "src/utils/useTestIds";
 
 type ButtonMenuBaseProps = {
   items: MenuItem[];
+  /** Items pinned in their own section below `items`; search never filters them out. */
   persistentItems?: MenuItem[];
+  /** Adds a search field above the items that filters them by label. */
   searchable?: boolean;
   /** Static, non-selectable content above the items — not a menu item. Min 240px so narrow menus don't hug. */
   header?: ReactNode;
@@ -35,6 +37,11 @@ type SelectionButtonMenuProps = {
 
 export type ButtonMenuProps = ButtonMenuBaseProps | SelectionButtonMenuProps;
 
+/**
+ * A button that opens a menu of actions or links.
+ *
+ * Passing `selectedItem` and `onChange` makes it a single-select menu that marks the chosen item.
+ */
 export function ButtonMenu(props: ButtonMenuProps) {
   const { defaultOpen, disabled, items, persistentItems, trigger, searchable, header } = props;
 
@@ -81,7 +88,9 @@ type MenuItemBase = {
   onClick: string | VoidFunction;
   /** Whether the interactive element is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
+  /** Colors the label as a danger action. */
   destructive?: boolean;
+  /** Draws a separator below this item. */
   hasDivider?: boolean;
   /** Shows AiStar and styling on label. This ai icon and styling trumps all other subtypes. */
   ai?: boolean;
@@ -95,7 +104,9 @@ export type IconMenuItemType = MenuItemBase & {
 
 export type ImageMenuItemType = MenuItemBase & {
   src: string;
+  /** Image size in px. Defaults to 24. */
   size?: 24 | 48;
+  /** Renders `src` as a round `Avatar` instead of a square image. */
   isAvatar?: boolean;
 };
 

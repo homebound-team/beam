@@ -18,6 +18,7 @@ type FilterProps<F extends Record<string, unknown>, G extends Value = string> = 
   filter: F;
   /** Called when the filters have changed. */
   onChange: (filter: F) => void;
+  /** Renders a "Group by" select before the filters. */
   groupBy?: {
     /** The current group by value. */
     value: G;
@@ -28,7 +29,11 @@ type FilterProps<F extends Record<string, unknown>, G extends Value = string> = 
   };
   /** Specifies the layout of the filters. If not supplied it will use the default (horizontal) layout. Using the 'vertical' layout will also remove the "More Filters" button/modal */
   vertical?: boolean;
-  /** Specifies the number of in line filters before more filters modal  */
+  /**
+   * Inline slots before the rest move into a "More Filters" modal, which takes the last slot.
+   *
+   * Defaults to 3 with `groupBy`, otherwise 4.
+   */
   numberOfInlineFilters?: number;
 };
 
@@ -109,5 +114,6 @@ function Filters<F extends Record<string, unknown>, G extends Value = string>(pr
 
 // memo doesn't support generic parameters, so cast the result to the correct type
 // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-849543638
+/** A row (or column, with `vertical`) of filter fields built from `filterDefs`, with "More Filters" and "Clear" buttons. */
 const _Filters = memo(Filters) as typeof Filters;
 export { _Filters as Filters };

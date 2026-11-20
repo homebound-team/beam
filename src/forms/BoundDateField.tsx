@@ -15,7 +15,7 @@ export type BoundDateFieldProps = Omit<DateFieldProps, "label" | "value" | "onCh
   onChange?: (value: PlainDate | undefined) => void;
 };
 
-/** Wraps `TextField` and binds it to a form field. */
+/** Wraps `DateField` and binds it to a form field. */
 export function BoundDateField(props: BoundDateFieldProps) {
   const {
     field,

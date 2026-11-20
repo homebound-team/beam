@@ -26,10 +26,15 @@ type EditColumnsButtonProps<R extends Kinded> = {
    * in the toolbar.
    */
   viewToggle?: Omit<ButtonGroupProps, "fullWidth">;
-  // for storybook purposes
+  /** Opens the menu on mount, for stories. */
   defaultOpen?: boolean;
 } & Pick<OverlayTriggerProps, "placement" | "disabled" | "tooltip">;
 
+/**
+ * A menu of switches that show or hide the table's `canHide` columns through `api`, plus a Reset Column Widths button.
+ *
+ * Columns need a `name` and `id` to be listed. Toggling a column resets column widths.
+ */
 export function EditColumnsButton<R extends Kinded>(props: EditColumnsButtonProps<R>) {
   const { defaultOpen, disabled, columns, api, shareColumnVisibility = false, viewToggle } = props;
   const { sm } = useBreakpoint();

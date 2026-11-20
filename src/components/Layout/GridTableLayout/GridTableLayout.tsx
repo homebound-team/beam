@@ -49,6 +49,7 @@ export type GridTableLayoutProps<
   QData,
 > = {
   tableProps: GridTablePropsWithRows<R, X> | QueryTablePropsWithQuery<R, X, QData>;
+  /** From `useGridTableLayoutState`; drives the filters, group by, search, and persisted columns in the toolbar. */
   layoutState?: ReturnType<typeof useGridTableLayoutState<F>>;
   /** Title for the empty state when the table has no data rows. */
   emptyFallback?: string;
@@ -66,12 +67,18 @@ export type GridTableLayoutProps<
    * to `onClick`; Clear deselects every row, then calls `onClear`. Replaces `selectionSummary` when both are set.
    */
   bulkCta?: GridTableBulkCta<R>;
+  /** Hides the Edit Columns button even when columns have `canHide`. */
   hideEditColumns?: boolean;
   /** When set, columns that share a name use one Edit Columns switch. */
   shareColumnVisibility?: boolean;
   totalCount?: number;
   /** When true, shows a view toggle button and renders the table with `as="card"` when in card view. */
   withCardView?: boolean;
+  /**
+   * The view before the user picks one; with `withCardView`, their last pick for this path wins. Defaults to `"list"`.
+   *
+   * `"card"` renders card view even without `withCardView`.
+   */
   defaultView?: TableView;
   /**
    * Opt into the document-scroll detail pane (`useRightPane`). Width is fixed at 448px.
@@ -85,32 +92,6 @@ export type GridTableLayoutProps<
   scrollToTopOnFilterChange?: boolean;
 };
 
-/**
- * A layout component that combines a table with a header, actions buttons, filters, and infinite scroll.
- *
- * This component can render either a `GridTable` or wrapped `QueryTable` based on the provided props:
- *
- * - For static data or custom handled loading states, use `rows` to pass in the data directly:
- * ```tsx
- * <GridTableLayout
- *   tableProps={{
- *     rows: [...],
- *     columns: [...],
- *   }}
- * />
- * ```
- *
- * - To take advantage of data/loading/error states directly from an Apollo query, use `query` and `createRows`:
- * ```tsx
- * <GridTableLayout
- *   tableProps={{
- *     query,
- *     createRows: (data) => [...],
- *     columns: [...],
- *   }}
- * />
- * ```
- */
 function GridTableLayoutComponent<
   F extends Record<string, unknown>,
   R extends Kinded,
@@ -276,6 +257,32 @@ function GridTableLayoutComponent<
   );
 }
 
+/**
+ * A layout component that combines a table with a header, actions buttons, filters, and infinite scroll.
+ *
+ * This component can render either a `GridTable` or wrapped `QueryTable` based on the provided props:
+ *
+ * - For static data or custom handled loading states, use `rows` to pass in the data directly:
+ * ```tsx
+ * <GridTableLayout
+ *   tableProps={{
+ *     rows: [...],
+ *     columns: [...],
+ *   }}
+ * />
+ * ```
+ *
+ * - To take advantage of data/loading/error states directly from an Apollo query, use `query` and `createRows`:
+ * ```tsx
+ * <GridTableLayout
+ *   tableProps={{
+ *     query,
+ *     createRows: (data) => [...],
+ *     columns: [...],
+ *   }}
+ * />
+ * ```
+ */
 export const GridTableLayout = React.memo(GridTableLayoutComponent) as typeof GridTableLayoutComponent;
 
 /** Scrolls to the top of the table after the filter or search changes, once the new rows are on screen. */

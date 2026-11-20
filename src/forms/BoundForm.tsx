@@ -109,6 +109,7 @@ export function BoundForm<F>(props: BoundFormProps<F>) {
   );
 }
 
+/** One `BoundForm` row: its fields share the width evenly, wrap below each field's min width, and show skeletons while `formState` loads. */
 export function FormRow<F>({ row, formState }: { row: BoundFormRowInputs<F>; formState: ObjectState<F> }) {
   const tid = useTestIds({}, "boundFormRow");
 

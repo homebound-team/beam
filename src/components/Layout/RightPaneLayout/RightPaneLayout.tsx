@@ -5,10 +5,18 @@ import { Css, Tokens } from "src/Css";
 import { hideRightPane } from "./rightPaneStore";
 import { useRightPaneContent, useRightPaneOpenState } from "./useRightPane";
 
+/**
+ * The legacy right pane: shrinks `children` to make room for content opened with `useRightPane`, and closes on unmount.
+ *
+ * Document-scroll layouts use `DocumentScrollOverlayRightPaneLayout` instead; see `docs/layouts.md`.
+ */
 export function RightPaneLayout(props: {
   children: ReactElement;
+  /** Defaults to `Tokens.Surface`. */
   paneBgColor?: BeamColor;
+  /** Defaults to 450px. */
   paneWidth?: number;
+  /** Shown in the pane while nothing is open, which keeps `children` narrowed; fades out when content opens. */
   defaultPaneContent?: ReactElement;
 }) {
   const { children, paneBgColor = Tokens.Surface, paneWidth = 450, defaultPaneContent } = props;

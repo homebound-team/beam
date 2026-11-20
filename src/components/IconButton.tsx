@@ -17,9 +17,11 @@ export type IconButtonVariant = "default" | "circle" | "outline";
 export type IconButtonProps = {
   /** The icon to use within the button. */
   icon: IconProps["icon"];
+  /** Overrides the icon color for every state, including disabled. */
   color?: BeamColor;
+  /** Overrides the button fill for every state. */
   bgColor?: BeamColor;
-  /** The size of the icon, in increments, defaults to 3 which is 24px. */
+  /** The size of the icon, in increments, defaults to 3 which is 24px. Ignored when `compact` or `circle`. */
   inc?: number;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
@@ -55,6 +57,11 @@ export type IconButtonProps = {
 } & BeamButtonProps &
   BeamFocusableProps;
 
+/**
+ * An icon-only button, or a link when `onClick` is a URL.
+ *
+ * The `label` is the accessible name and also shows as a tooltip unless `preventTooltip` is set.
+ */
 export function IconButton(props: IconButtonProps) {
   const {
     onClick: onPress,

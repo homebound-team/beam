@@ -14,6 +14,7 @@ import { type Value, keyToValue, valueToKey } from "src/inputs/Value";
 import { defaultTestId } from "src/utils/defaultTestId";
 import { useTestIds } from "src/utils/useTestIds";
 
+/** A multi-select group of cards, laid out as a grid or a list per `view`; picking an exclusive option clears the rest. */
 export function MultiSelectCardGroup<V extends Value>(props: MultiSelectCardGroupProps<V>) {
   const { fieldProps } = usePresentationContext();
   const {

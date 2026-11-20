@@ -8,4 +8,5 @@ export function DateFieldImpl(props: DateFieldProps) {
   return <DateFieldBase {...props} mode="single" />;
 }
 
+/** A date input that accepts typed dates or picks from a calendar popover. */
 export const DateField = withTestMock(DateFieldImpl, DateFieldMock);

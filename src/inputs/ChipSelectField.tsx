@@ -24,21 +24,23 @@ export type ChipSelectFieldProps<O, V extends Value> = {
   value: V;
   options: O[];
   placeholder?: string;
+  /** Called with the chosen value and option; clearing calls it with `undefined` for both. */
   onSelect: (value: V, opt: O | undefined) => void;
   getOptionValue: (opt: O) => V;
   getOptionLabel: (opt: O) => string;
-  // Callback fired when focus removes from the input
+  /** Callback fired when focus removes from the input. */
   onBlur?: () => void;
-  // Callback fired when focus is set to the input
+  /** Callback fired when focus is set to the input. */
   onFocus?: () => void;
-  // Whether to show the "X"/clear button on the Chip
+  /** Shows an "X" button on the chip that clears the value. */
   clearable?: boolean;
-  // If set, appends "Create new" option to list. When "Create new" is chosen, then the SelectField is replaced with the ChipTextField for creating a new option.
+  /** Appends a "Create new" option that swaps the chip for a text field; called with the typed name. */
   onCreateNew?: (value: string) => Promise<void>;
-  // Whether the Button is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip.
+  /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
 };
 
+/** A single-select rendered as a compact chip that opens a menu; `label` is visually hidden. */
 export function ChipSelectField<O, V extends Value>(props: ChipSelectFieldProps<O, V>): JSX.Element;
 export function ChipSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<ChipSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,

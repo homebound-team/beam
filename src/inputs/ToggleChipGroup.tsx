@@ -29,12 +29,15 @@ export type ToggleChipGroupProps = {
   tooltip?: ReactNode;
   options: ToggleChipItemProps[];
   values: string[];
+  /** Makes every chip read-only; an option's own `readonly` applies to just that chip. */
   readonly?: boolean;
   required?: boolean;
   onChange: (values: string[]) => void;
+  /** Style overrides applied to each chip. */
   xss?: ToggleChipXss;
 } & Pick<PresentationFieldProps, "labelStyle">;
 
+/** A labeled group of toggle chips whose selection is a list of option values. */
 export function ToggleChipGroup(props: ToggleChipGroupProps) {
   const { fieldProps } = usePresentationContext();
   const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};

@@ -2,9 +2,11 @@ import { Css, Tokens } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 type LoaderProps = {
+  /** 16, 32, 64, or 96px. Defaults to `lg` (96px). */
   size?: "xs" | "sm" | "md" | "lg";
 };
 
+/** A circular loading spinner. */
 export function Loader(props: LoaderProps) {
   const { size = "lg" } = props;
   const [dimensions, borderSize] = sizeToPixels[size];

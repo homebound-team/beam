@@ -17,7 +17,9 @@ import { labelOr } from "./internal/OverlayTrigger";
 export type ButtonProps = {
   label: ReactNode;
   variant?: ButtonVariant;
+  /** Ignored by the `text` variant. */
   size?: ButtonSize;
+  /** Defaults to a download or external-link icon when those apply; `null` hides that default. */
   icon?: IconProps["icon"] | null;
   /** Displays contents after the Button's label. Will be ignored for Buttons rendered as a link with an absolute URL */
   endAdornment?: ReactNode;
@@ -40,6 +42,11 @@ export type ButtonProps = {
 } & BeamButtonProps &
   BeamFocusableProps;
 
+/**
+ * A labeled button, or a link when `onClick` is a URL.
+ *
+ * A promise returned from `onClick` disables the button and shows a spinner until it settles.
+ */
 export function Button(props: ButtonProps) {
   const {
     onClick: onPress,

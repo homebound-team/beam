@@ -13,6 +13,11 @@ export type BreadcrumbsProps = {
   breadcrumbs: Breadcrumb | Breadcrumb[];
 };
 
+/**
+ * Slash-separated router links to the pages above the current one.
+ *
+ * Long trails collapse the middle into a "..." button, keeping the first two crumbs (one on mobile) and the last.
+ */
 export function Breadcrumbs({ breadcrumbs }: BreadcrumbsProps) {
   const tid = useTestIds({}, "breadcrumb");
   const items = Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs];
