@@ -52,7 +52,9 @@
     "copy:truss": "cp \"./src/Css.json\" \"./dist/Css.json\"",
     "copy-to-internal-frontend": "cp -r dist/* ~/homebound/internal-frontend/node_modules/@homebound/beam/dist/",
     "format": "prettier --loglevel warn --write \"**/*.{ts,tsx,css,md,mdx}\" \"tokens/**/*.json\"",
-    "type-check": "yarn tsc"
+    "type-check": "yarn tsc",
+    "mcp": "tsx scripts/mcp/server.ts",
+    "mcp:manifest": "tsx scripts/mcp/generateManifest.ts --coverage"
   },
   "dependencies": {
     "@homebound/form-state": "^3.1.0",
@@ -106,6 +108,7 @@
     "@homebound/rtl-utils": "^3.0.2",
     "@homebound/truss": "2.33.5",
     "@homebound/tsconfig": "^1.2.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^11.0.1",
     "@storybook/addon-docs": "^10.6.0",
@@ -130,6 +133,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-organize-imports": "^4.3.0",
     "react": "^19.2.8",
+    "react-docgen-typescript": "^2.4.0",
     "react-dom": "^19.2.8",
     "semantic-release": "^25.0.9",
     "storybook": "^10.6.0",
@@ -138,7 +142,8 @@
     "typescript": "^6.0.0",
     "vite": "^8.2.2",
     "vitest": "^5.0.0",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "zod": "^4.6.7"
   },
   "resolutions": {
     "react-router": "6.30.6",
