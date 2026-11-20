@@ -9,12 +9,14 @@ import { maybeCall } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
 type BoundChipSelectFieldProps<O, V extends Value> = {
-  // Allow `onSelect` to be overridden to do more than just `field.set`.
+  /** Replaces the default `field.set`; auto-save still runs after it. */
   onSelect?: (option: V | undefined) => void;
   field: FieldState<V | null | undefined>;
+  /** Defaults to a label derived from `field.key`. */
   label?: string;
 } & Omit<ChipSelectFieldProps<O, V>, "onSelect" | "label" | "value">;
 
+/** A `ChipSelectField` bound to a form-state field; `getOptionValue`/`getOptionLabel` default to `id`/`name`. */
 export function BoundChipSelectField<O, V extends Value>(props: BoundChipSelectFieldProps<O, V>): JSX.Element;
 export function BoundChipSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<BoundChipSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,

@@ -6,12 +6,14 @@ import type { IconKey } from "./Icon";
 import { IconButton } from "./IconButton";
 
 export type SidebarContentProps = {
+  /** The panel's toggle button icon; also identifies the panel, so keep it unique. */
   icon: IconKey;
   render: () => ReactNode;
 };
 
 export type RightSidebarProps = {
   content: SidebarContentProps[];
+  /** Height of the page header above, subtracted from the viewport to size the open panel. */
   headerHeightPx: number;
 };
 
@@ -19,6 +21,7 @@ export type RightSidebarProps = {
  * while avoiding layout shift when the sidebar is opened */
 export const RIGHT_SIDEBAR_MIN_WIDTH = "250px";
 
+/** A column of icon buttons that each slide open a panel of content. */
 export function RightSidebar({ content, headerHeightPx }: RightSidebarProps) {
   const [selectedIcon, setSelectedIcon] = useState<IconKey | undefined>(undefined);
   const tid = useTestIds({}, "rightSidebar");

@@ -11,7 +11,9 @@ export interface CheckboxProps {
    * @default true
    */
   withLabelElement?: boolean;
+  /** Renders just the box, with `label` as its `aria-label`; hides description, helper text, and error. */
   checkboxOnly?: boolean;
+  /** `"indeterminate"` shows a dash; clicking it selects the checkbox. */
   selected: boolean | "indeterminate";
   /** Additional text displayed below label */
   description?: string;
@@ -33,6 +35,7 @@ export interface CheckboxProps {
   onFocus?: () => void;
 }
 
+/** A single checkbox with an optional description, helper text, and error. */
 export function Checkbox(props: CheckboxProps) {
   const { label, disabled = false, selected, ...otherProps } = props;
   // Treat indeterminate as false so that clicking on indeterminate always goes --> true.

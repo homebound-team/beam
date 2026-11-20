@@ -45,6 +45,7 @@ export type TreeSelectFieldProps<O, V extends Value> = {
   getOptionLabel: (opt: O) => string;
   /** The current value; it can be `undefined`, even if `V` cannot be. */
   values: V[] | undefined;
+  /** Called with the selection as `all`, `leaf` (no children), and `root` (topmost fully-selected) options and values. */
   onSelect: (options: TreeSelectResponse<O, V>) => void;
   options: NestedOptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
@@ -58,10 +59,11 @@ export type TreeSelectFieldProps<O, V extends Value> = {
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
   tooltip?: ReactNode;
-  // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
+  /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
   readOnly?: boolean | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
+  /** Sizes the input to its text, up to 20 characters wide. */
   sizeToContent?: boolean;
   /** The text to show when nothing is selected, i.e. could be "All" for filters. */
   nothingSelectedText?: string;
@@ -81,11 +83,18 @@ export type TreeSelectFieldProps<O, V extends Value> = {
    * `reason` is shown as a tooltip when the user hovers the disabled option.
    */
   disabledOptions?: (V | { value: V; reason: string })[];
+  /** Values of parent options that only group their children: they have no checkbox, can't be selected, and clicking them toggles collapse. */
   groupOptions?: V[];
 } & BeamFocusableProps &
   PresentationFieldProps;
 
+/**
+ * A multi-select dropdown over nested options, where selecting a parent selects all of its children.
+ *
+ * @deprecated Use {@link MenuTreeSelectField}.
+ */
 export function TreeSelectField<O, V extends Value>(props: TreeSelectFieldProps<O, V>): JSX.Element;
+/** @deprecated Use {@link MenuTreeSelectField}. */
 export function TreeSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<TreeSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;

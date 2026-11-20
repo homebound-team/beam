@@ -8,11 +8,13 @@ interface HbLoadingSpinnerProps {
   noQuips?: boolean;
   /** Contextually relevant quips, like "Where did I put that invoice?" on some invoice page. Will override global noQuips if non-empty. */
   extraQuips?: ReadonlyArray<string>;
+  /** Picks only from `extraQuips`, ignoring the provider's quips, when `extraQuips` is non-empty. */
   extraQuipsOnly?: boolean;
   /** No text at all */
   iconOnly?: boolean;
 }
 
+/** The animated Homebound loading gif with a random quip from {@link HbSpinnerProvider} below it. */
 export function HbLoadingSpinner({ noQuips, extraQuips = [], extraQuipsOnly, iconOnly }: HbLoadingSpinnerProps) {
   const ctx = useContext(HbLoadingSpinnerContext);
   const tid = useTestIds({}, "hbSpinner");
@@ -79,13 +81,14 @@ const HbLoadingSpinnerContext = React.createContext<HbLoadingSpinnerContextType>
 interface HbSpinnerProviderProps {
   /**
    * Quips the loading spinner will use for your app. Suggest importing and using HB_QUIPS_MISSION and
-   * HB_QUIPS_EXTRA for internal apps. Can also add fun app-specific quips like "Loading the blue into
+   * HB_QUIPS_FLAVOR for internal apps. Can also add fun app-specific quips like "Loading the blue into
    * BluePrint" or "Overriding the Underwriting"
    */
   quips?: string[];
   children: ReactNode;
 }
 
+/** Sets the quips every `HbLoadingSpinner` picks from; an empty list shows `Loading...`. */
 export function HbSpinnerProvider({ quips = [], children }: HbSpinnerProviderProps) {
   const state = useMemo<HbLoadingSpinnerContextType>(() => ({ quips, noQuips: quips.length === 0 }), [quips]);
   return <HbLoadingSpinnerContext.Provider value={state}>{children}</HbLoadingSpinnerContext.Provider>;

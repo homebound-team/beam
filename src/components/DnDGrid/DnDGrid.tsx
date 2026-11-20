@@ -24,6 +24,11 @@ export type DnDGridProps = {
   onReorder: (items: string[]) => void;
 };
 
+/**
+ * A CSS grid whose items reorder by pointer drag or keyboard; `onReorder` fires only when the order changed.
+ *
+ * Mark each item with {@link useDnDGridItem}, and give it a {@link DnDGridItemHandle} to drag from.
+ */
 export function DnDGrid(props: DnDGridProps) {
   const { children, gridStyles, onReorder, activeItemStyles, lockAxis } = props;
   const gridEl = useRef<HTMLDivElement>(null);

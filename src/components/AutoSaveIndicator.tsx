@@ -8,10 +8,13 @@ import { assertNever } from "src/types";
 import { useTestIds } from "src/utils/useTestIds";
 
 type AutoSaveIndicatorProps = {
+  /** Renders nothing until a save starts, instead of the idle cloud icon. */
   hideOnIdle?: boolean;
+  /** Keeps the status when this indicator unmounts; by default unmounting resets it to idle. */
   doNotReset?: boolean;
 };
 
+/** Shows the {@link AutoSaveStatusProvider} status: saving, saved, or an error with the messages in a tooltip. */
 export function AutoSaveIndicator(props: AutoSaveIndicatorProps) {
   const { hideOnIdle, doNotReset } = props;
   const tid = useTestIds(props, "autoSave");

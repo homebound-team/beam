@@ -11,6 +11,7 @@ export type ToggleButtonProps = {
   /** Input label */
   label: string;
   selected?: boolean;
+  /** Returning a promise disables the button until it settles. */
   onChange: ((selected: boolean) => void) | ((selected: boolean) => Promise<void>);
   autoFocus?: boolean;
   icon?: IconKey;
@@ -25,6 +26,7 @@ export type ToggleButtonProps = {
   };
 };
 
+/** A button that toggles between selected and unselected, with an optional icon. */
 export function ToggleButton(props: ToggleButtonProps) {
   const { selected: isSelected = false, disabled = false, label, onChange, icon, __storyState, ...otherProps } = props;
   const [asyncInProgress, setAsyncInProgress] = useState(false);

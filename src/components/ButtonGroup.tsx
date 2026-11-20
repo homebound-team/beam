@@ -28,6 +28,7 @@ export type ButtonGroupButton = {
   tooltip?: ReactNode;
 };
 
+/** A row of joined 40px buttons, each showing an icon, text, or both, for related actions or a view toggle. */
 export function ButtonGroup(props: ButtonGroupProps) {
   const { buttons, disabled = false, fullWidth = false } = props;
   const tid = useTestIds(props, "buttonGroup");

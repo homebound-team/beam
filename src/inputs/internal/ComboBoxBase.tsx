@@ -33,13 +33,17 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   /** Values proposed by an AI model; puts the field in AI mode. */
   proposedValues?: V[];
   onSelect: (values: V[], opts: O[]) => void;
+  /** Allows selecting more than one option. */
   multiselect?: boolean;
+  /** Options shown but not selectable; an object's `reason` shows as a tooltip on the option. */
   disabledOptions?: (V | { value: V; reason: string })[];
   options: OptionsOrLoad<O>;
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
   required?: boolean;
+  /** Shows the field in its error state with this message. */
   errorMsg?: string;
+  /** Guidance shown below the field. */
   helperText?: string | ReactNode;
   /** Allow placing an icon/decoration within the input field. */
   fieldDecoration?: (opt: O) => ReactNode;
@@ -47,10 +51,11 @@ export type ComboBoxBaseProps<O, V extends Value> = {
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
   tooltip?: ReactNode;
-  // Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip.
+  /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
   readOnly?: boolean | ReactNode;
   onBlur?: () => void;
   onFocus?: () => void;
+  /** Sizes the input to its text (the value, a single selected label, or `nothingSelectedText`), up to 20 characters. */
   sizeToContent?: boolean;
   /**
    * The text to show when nothing is selected, i.e. could be "All" for filters.
@@ -70,10 +75,11 @@ export type ComboBoxBaseProps<O, V extends Value> = {
    * Only available for Single Select Fields.
    */
   unsetLabel?: string;
+  /** Keeps `errorMsg` for screen readers but hides it visually. */
   hideErrorMessage?: boolean;
-  /* Allows input to wrap to multiple lines */
+  /** Allows the input text to wrap to multiple lines. */
   multiline?: boolean;
-  /* Callback for user searches */
+  /** Called with the search text, debounced by 300ms, so callers can load matching options. */
   onSearch?: (search: string) => void;
   /**
    * Called when the user explicitly selects the synthetic add-new row from the dropdown.

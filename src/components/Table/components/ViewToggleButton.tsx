@@ -7,11 +7,13 @@ export type TableView = "list" | "card";
 type ViewToggleButtonProps = {
   view: TableView;
   onChange: (view: TableView) => void;
+  /** Opens the menu on mount. */
   defaultOpen?: boolean;
   /** Renders the icon-only trigger. Defaults to the `sm` breakpoint. */
   compact?: boolean;
 };
 
+/** A menu button that switches a table between list and card views; its icon shows the current `view`. */
 export function ViewToggleButton({ view, onChange, defaultOpen, ...props }: ViewToggleButtonProps) {
   const { sm } = useBreakpoint();
   const { compact = sm } = props;

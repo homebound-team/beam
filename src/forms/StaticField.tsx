@@ -8,11 +8,13 @@ import { useTestIds } from "src/utils/useTestIds";
 type StaticFieldProps = {
   label: ReactNode;
   value?: string;
+  /** Rendered when `value` is empty. */
   children?: ReactNode;
-  // Does not currently support "inline" or "hidden".
+  /** Only `"above"` and the deprecated `"left"` apply; `"inline"` and `"hidden"` render as `"above"`. Defaults to the presentation context. */
   labelStyle?: PresentationFieldProps["labelStyle"];
 };
 
+/** A read-only label and value laid out like a form field. */
 export function StaticField(props: StaticFieldProps) {
   const { fieldProps } = usePresentationContext();
   const { label, labelStyle = fieldProps?.labelStyle ?? "above", value, children } = props;

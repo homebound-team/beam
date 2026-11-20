@@ -32,18 +32,19 @@ export type TabsContentXss = Xss<Margin | Padding | "backgroundColor">;
 
 export type TabsProps<V extends string, X> = {
   ariaLabel?: string;
-  // the selected tab is connected to the contents displayed
+  /** The `value` of the tab whose content is shown. */
   selected: V;
   tabs: Tab<V>[];
   onChange: (value: V) => void;
+  /** Styles for the `TabContent` panel. */
   contentXss?: X;
   /** If you want to set your own padding in `contentXss`, you can disable the default FullBleed padding here. */
   omitFullBleedPadding?: boolean;
-  // Allow for showing the tabs even if there is only one enabled tab
+  /** Shows the tab list even when only one tab is enabled; by default it's hidden then. */
   alwaysShowAllTabs?: boolean;
-  // Adds a bottom border to the Tabs container
+  /** Adds a bottom border to the Tabs container. */
   includeBottomBorder?: boolean;
-  // Content to be placed to the far right of the tabs
+  /** Content at the far right of the tab list, such as tab-specific actions. */
   right?: ReactNode;
 };
 
@@ -99,6 +100,11 @@ export function TabsWithContent<V extends string, X extends Only<TabsContentXss,
   );
 }
 
+/**
+ * The panel for the selected tab, rendered full bleed.
+ *
+ * Route tabs pick the tab whose `path` matches the URL; otherwise `selected` picks it. Both fall back to the first tab.
+ */
 export function TabContent<V extends string, X extends Only<TabsContentXss, X>>(
   props: (Omit<RequiredRenderTabs<V, X>, "onChange"> | RequiredRenderRouteTabs<V, X>) & {
     /** Skip the default top gap. `TabsWithContent` sets this when the tab list is hidden. */

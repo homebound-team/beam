@@ -3,10 +3,11 @@ import { Css, type Margin, type Xss } from "src/Css";
 export interface FormHeadingProps {
   title: string;
   xss?: Xss<Margin>;
-  // This is passed automatically by FormLines
+  /** Drops the top margin; `FormLines` sets it on its first heading. */
   isFirst?: boolean;
 }
 
+/** An `h3` heading that groups fields inside `FormLines`, with space above unless it's the first. */
 export function FormHeading(props: FormHeadingProps) {
   const { title, xss, isFirst = false, ...others } = props;
   return (

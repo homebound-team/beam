@@ -22,8 +22,11 @@ export type MultiSelectFieldProps<O, V extends Value> = {
  *
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
+ *
+ * @deprecated Use {@link MenuMultiSelectField}.
  */
 export function MultiSelectField<O, V extends Value>(props: MultiSelectFieldProps<O, V>): JSX.Element;
+/** @deprecated Use {@link MenuMultiSelectField}. */
 export function MultiSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<MultiSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;

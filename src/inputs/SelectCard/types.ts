@@ -36,11 +36,14 @@ export type SelectCardListGroupItemOption<V extends Value> = SelectCardGroupItem
 export type SelectCardGroupItemOption<V extends Value> =
   SelectCardGridGroupItemOption<V> | SelectCardListGroupItemOption<V>;
 
+/** Field props shared by `SelectCardGroup` and `MultiSelectCardGroup`. */
 type SelectCardGroupFieldPropsBase = {
   label: string;
   /** Adds tooltip for the field, shown via an info icon beside the label. */
   tooltip?: ReactNode;
+  /** Shows the group in its error state with this message. */
   errorMsg?: string;
+  /** Guidance shown below the group. */
   helperText?: string | ReactNode;
   disabled?: boolean;
 } & Pick<PresentationFieldProps, "labelStyle">;

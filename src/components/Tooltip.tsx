@@ -18,15 +18,17 @@ type TooltipProps = {
   /** The content that shows up when hovered */
   title: ReactNode;
   children: ReactNode;
+  /** Defaults to `auto`, which picks the side with the most room. */
   placement?: Placement;
   /**
    * The delay for the tooltip to appear.
    *
    * Note: If tooltip `A` is still showing when tooltip `B` is triggered, tooltip `B`'s `delay` property will be ignored and it will render immediately.
-   * @default 0
+   * @default 150
    */
   delay?: number;
   disabled?: boolean;
+  /** Defaults to the `OnSurface` token. */
   bgColor?: BeamColor;
   xss?: TooltipXss;
 };
@@ -34,6 +36,11 @@ type TooltipProps = {
 // Small delay to allow mouse to cross the gap between trigger and tooltip
 const gapCrossingDelay = 100;
 
+/**
+ * Shows `title` in a floating bubble while its children are hovered or focused.
+ *
+ * Only one tooltip shows at a time.
+ */
 export function Tooltip(props: TooltipProps) {
   const { placement, children, title, disabled, delay = 150, bgColor, xss } = props;
 

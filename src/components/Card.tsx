@@ -16,10 +16,12 @@ export type CardTag = {
 export type CardProps = {
   title: string;
   subtitle: string;
+  /** Content below the title. */
   detailContent?: ReactNode;
   imgSrc: string;
   // contain displays entire image, cover fills the space
   imageFit?: ImageFitType;
+  /** `card` stacks the image above the text; `list` places a 96px image beside it. Defaults to `card`. */
   type?: CardType;
   /**
    * Makes the card fill its container instead of using the default fixed width (256px card / 520px list),
@@ -28,11 +30,16 @@ export type CardProps = {
   fullWidth?: boolean;
   bordered?: boolean;
   disabled?: boolean;
+  /** Shows a vertical-dots menu with these items while the card is hovered. */
   buttonMenuItems?: MenuItem[];
   tag?: CardTag;
 };
 
-/** @deprecated Prefer {@link BaseCard} if a card is needed. */
+/**
+ * A product-style card with an image, subtitle, title, and optional tag and hover menu.
+ *
+ * @deprecated Prefer {@link BaseCard} if a card is needed.
+ */
 export function Card(props: CardProps) {
   const {
     title,

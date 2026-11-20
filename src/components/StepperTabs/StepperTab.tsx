@@ -12,6 +12,7 @@ export type StepperTabProps = {
   active: boolean;
   /** Whether this step's content has been completed. */
   completed: boolean;
+  /** Called with this tab's `value`. */
   onClick: (value: string) => void;
   /** Tab isn't clickable. */
   disabled?: boolean;
@@ -24,6 +25,7 @@ export type StepperTabProps = {
   };
 };
 
+/** One step in `StepperTabs`: a label with a check when completed, over a colored indicator border. */
 export function StepperTab(props: StepperTabProps) {
   const { label, value, active, completed, onClick, disabled = false, collapsed = false, __storyState } = props;
   // Collapsed tabs are a passive indicator bar, not an actionable control — same as `disabled`, they shouldn't be clickable or focusable.

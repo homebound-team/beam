@@ -8,16 +8,25 @@ import { useTestIds } from "src/utils/useTestIds";
 
 interface SuperDrawerHeaderProps {
   children: ReactNode;
+  /** Hides the prev/next buttons. */
   hideControls?: boolean;
 }
 
 interface SuperDrawerHeaderStructuredProps {
   title: string | ReactNode;
+  /** Rendered after the title. */
   left?: ReactNode;
+  /** Rendered at the trailing edge, before the prev/next buttons. */
   right?: ReactNode;
+  /** Hides the prev/next buttons. */
   hideControls?: boolean;
 }
 
+/**
+ * Portals a header into the open SuperDrawer, laid out from `title`/`left`/`right` or taken as-is from `children`.
+ *
+ * Prev/next buttons call the root content's `onPrevClick`/`onNextClick`, and are hidden while detail content is open.
+ */
 export function SuperDrawerHeader(props: SuperDrawerHeaderProps | SuperDrawerHeaderStructuredProps): JSX.Element {
   const { hideControls } = props;
   const { sdHeaderDiv, drawerContentStack: contentStack } = useBeamContext();

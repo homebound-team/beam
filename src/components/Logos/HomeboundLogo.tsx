@@ -2,8 +2,12 @@ import type { BeamColor } from "src/colors";
 import type { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css } from "src/Css";
 
-type HomeboundLogoProps = { fill?: BeamColor } & LogoSizeProps;
+type HomeboundLogoProps = {
+  /** Defaults to `currentColor`. */
+  fill?: BeamColor;
+} & LogoSizeProps;
 
+/** The Homebound roofline logomark, sized by `width` or `height`. */
 export function HomeboundLogo(props: HomeboundLogoProps) {
   const { fill = "currentColor", width = "auto", height = "auto" } = props;
   return (

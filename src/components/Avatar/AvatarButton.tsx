@@ -12,6 +12,7 @@ import { noop } from "src/utils/helpers";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type AvatarButtonProps = {
+  /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
   buttonRef?: RefObject<HTMLButtonElement | null>;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
@@ -24,6 +25,7 @@ export type AvatarButtonProps = {
   BeamButtonProps &
   BeamFocusableProps;
 
+/** An `Avatar` that acts as a button, or a link when `onClick` is a URL, with the name as its tooltip. */
 export function AvatarButton(props: AvatarButtonProps) {
   const {
     onClick: onPress,

@@ -4,24 +4,27 @@ import type { Typography } from "src/Css";
 
 export type InputStylePalette = "success" | "warning" | "caution" | "info";
 
+/** Field presentation settings, set per field or for a subtree via {@link PresentationProvider}. */
 export interface PresentationFieldProps {
+  /** Aligns `NumberField` text; GridTable sets `"right"`. Defaults to `"left"`. */
   numberAlignment?: "left" | "right";
   /** Sets the label position or visibility. Defaults to "above"; "left" is deprecated. */
   labelStyle?: "inline" | "hidden" | "above" | /** @deprecated Use "above"; left labels are being retired. */ "left";
   /** @deprecated Defines the width property of the input field wrapper when using the deprecated `labelStyle="left"`. */
   labelLeftFieldWidth?: number | string;
+  /** Text appended to the label of required and explicitly optional fields. Defaults to `"*"` on required fields. */
   labelSuffix?: LabelSuffixStyle;
-  // Typically used for compact fields in a table. Removes border and uses an box-shadow for focus behavior
+  /** Removes the border and shows focus with a box-shadow; typically for compact fields in a table. */
   borderless?: boolean;
-  // Typically used for highlighting editable fields in a table. Adds a border on hover.
+  /** Adds a border on hover, to highlight editable fields in a table. */
   borderOnHover?: boolean;
-  // Defines height of the field
+  /** Uses the shorter field height. */
   compact?: boolean;
-  // Changes default font styles for input fields and Chips
+  /** Overrides the font styles of fields and Chips. */
   typeScale?: Typography;
-  // If set to `false` then fields will not appear disabled, but will still be disabled.
+  /** `false` keeps a disabled field's normal look while it stays disabled. */
   visuallyDisabled?: false;
-  // If set error messages will be rendered as tooltips rather than below the field
+  /** Shows the error message in a tooltip instead of below the field. */
   errorInTooltip?: true;
   /** Allow the fields to grow to the width of its container. By default, fields will extend up to 550px */
   fullWidth?: boolean;
@@ -33,7 +36,7 @@ export type PresentationContextProps = {
   /** `inputStylePalette` omitted because it is too dependent on the individual field use case to be controlled at this level  */
   fieldProps?: Omit<PresentationFieldProps, "inputStylePalette">;
   gridTableStyle?: GridStyle;
-  // Defines whether content should be allowed to wrap or not. `undefined` is treated as true.
+  /** `false` keeps Chips and table cell content on one line. Defaults to wrapping. */
   wrap?: boolean;
 };
 
@@ -42,6 +45,11 @@ export const PresentationContext = createContext<PresentationContextProps>({
   fieldProps: { labelSuffix: { required: "*" } },
 });
 
+/**
+ * Sets default presentation props for every field and table below it.
+ *
+ * Nested providers merge `fieldProps` over the outer provider's values.
+ */
 export function PresentationProvider(props: PropsWithChildren<PresentationContextProps>) {
   const { children, ...presentationProps } = props;
 

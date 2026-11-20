@@ -12,6 +12,7 @@ import { type Value, valueToKey } from "src/inputs/Value";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type AutocompleteProps<T> = {
+  /** Called with the chosen option, after the input text is set to its label. */
   onSelect: (item: T) => void;
   /** A function that returns how to render the an option in the menu. If not set, `getOptionLabel` will be used */
   getOptionMenuLabel?: (o: T) => ReactNode;
@@ -34,6 +35,7 @@ export type AutocompleteProps<T> = {
 } & Pick<PresentationFieldProps, "labelStyle"> &
   Pick<TextFieldBaseProps<any>, "label" | "clearable" | "startAdornment" | "fullWidth" | "proposedValue">;
 
+/** A free-text input with a menu of suggested options; the caller filters `options` from `onInputChange`. */
 export function Autocomplete<T extends object>(props: AutocompleteProps<T>) {
   const {
     onSelect,

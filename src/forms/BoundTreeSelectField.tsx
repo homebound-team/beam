@@ -28,8 +28,11 @@ export type BoundTreeSelectFieldProps<O, V extends Value> = Omit<
  *
  * The caller has to tell us how to turn `T` into `V`, which is usually a
  * lambda like `t => t.id`.
+ *
+ * @deprecated Use {@link BoundMenuTreeSelectField}.
  */
 export function BoundTreeSelectField<T, V extends Value>(props: BoundTreeSelectFieldProps<T, V>): JSX.Element;
+/** @deprecated Use {@link BoundMenuTreeSelectField}. */
 export function BoundTreeSelectField<T extends HasIdAndName<V>, V extends Value>(
   props: Optional<BoundTreeSelectFieldProps<T, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element;

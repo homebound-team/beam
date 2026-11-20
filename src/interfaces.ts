@@ -3,13 +3,15 @@ import type { ReactNode } from "react";
 import type { PresentationFieldProps } from "src/components/PresentationContext";
 import type { Xss } from "src/Css";
 
-/** Base Interfaced */
+/** Focus props shared by Beam's buttons and fields. */
 export interface BeamFocusableProps {
   /** Whether the element should receive focus on render. */
   autoFocus?: boolean;
+  /** Shows focus styles without focus, for stories and visual tests. */
   forceFocusStyles?: boolean;
 }
 
+/** Press, link, and disabled-reason props shared by Beam's buttons. */
 export interface BeamButtonProps {
   /**
    * Whether the interactive element is disabled.
@@ -27,10 +29,13 @@ export interface BeamButtonProps {
 
 export type TextFieldXss = Xss<"textAlign" | "justifyContent" | "fontWeight" | "fontSize" | "lineHeight">;
 
+/** Props shared by Beam's text-entry fields. */
 export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationFieldProps {
   /** Whether the field is disabled. If a ReactNode, it's treated as a "disabled reason" that's shown in a tooltip. */
   disabled?: boolean | ReactNode;
+  /** Shows the field in its error state with this message below it, or in a tooltip when `errorInTooltip` is set. */
   errorMsg?: string;
+  /** Guidance shown below the field. */
   helperText?: string | ReactNode;
   /** Input label */
   label: string;
@@ -46,6 +51,7 @@ export interface BeamTextFieldProps<X> extends BeamFocusableProps, PresentationF
   /** Called when the component loses focus, mostly for BoundTextField to use. */
   onBlur?: VoidFunction;
   onFocus?: VoidFunction;
+  /** Called when the user presses Enter in the field. */
   onEnter?: VoidFunction;
   /** Whether the field is readOnly. If a ReactNode, it's treated as a "readOnly reason" that's shown in a tooltip. */
   readOnly?: boolean | ReactNode;

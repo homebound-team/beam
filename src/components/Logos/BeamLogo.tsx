@@ -2,8 +2,12 @@ import type { BeamColor } from "src/colors";
 import type { LogoSizeProps } from "src/components/Logos/logoTypes";
 import { Css } from "src/Css";
 
-type BeamLogoProps = { fill?: BeamColor } & LogoSizeProps;
+type BeamLogoProps = {
+  /** Defaults to `currentColor`. */
+  fill?: BeamColor;
+} & LogoSizeProps;
 
+/** The Beam logomark, sized by `width` or `height`. */
 export function BeamLogo(props: BeamLogoProps) {
   const { fill = "currentColor", width = "auto", height = "auto" } = props;
   return (

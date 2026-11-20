@@ -32,7 +32,9 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
   breadCrumb?: HeaderBreadcrumb | HeaderBreadcrumb[];
   /** Instructional text rendered below the title, above the table. */
   description: ReactNode;
+  /** Called by the header's Close button. */
   closeAction: VoidFunction;
+  /** Rows for a `GridTable`, or a query for a `QueryTable`; both render bordered with a sticky header. */
   tableProps: GridTablePropsWithRows<R, X> | BaseQueryTableProps<R, X, QData>;
   /**
    * Replaces the table region with centered content.
@@ -45,11 +47,13 @@ export type TableReviewLayoutProps<R extends Kinded, X extends Only<GridTableXss
    * When set, slides open the panel column and renders a `SidePanel` with the given props.
    */
   panelContent?: SidePanelProps;
+  /** Called when the user closes the panel; clear `panelContent` here to keep it closed. */
   onPanelClose?: VoidFunction;
   /** Defaults to 450. */
   rightPaneWidth?: number;
 };
 
+/** A full-screen overlay for reviewing a table: title, description and Close button above the table, with an optional side panel. */
 export function TableReviewLayout<R extends Kinded, X extends Only<GridTableXss, X>, QData>(
   props: TableReviewLayoutProps<R, X, QData>,
 ) {

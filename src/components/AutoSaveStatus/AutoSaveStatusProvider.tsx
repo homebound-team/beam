@@ -11,6 +11,7 @@ export interface AutoSaveStatusContextType {
   status: AutoSaveStatus;
   /** Resets status to IDLE, particularly useful if "Error" or "Done" is stale */
   resetStatus: VoidFunction;
+  /** Errors from the requests since the last `triggerAutoSave`. */
   errors: unknown[];
   /** Notifies AutoSaveContext that a request is in-flight */
   triggerAutoSave: VoidFunction;
@@ -18,6 +19,7 @@ export interface AutoSaveStatusContextType {
   resolveAutoSave: (error?: unknown) => void;
 }
 
+/** Auto-save status for the app; read it with {@link useAutoSaveStatus}. */
 export const AutoSaveStatusContext = React.createContext<AutoSaveStatusContextType>({
   status: AutoSaveStatus.IDLE,
   resetStatus() {},
@@ -31,6 +33,11 @@ type AutoSaveStatusProviderProps = PropsWithChildren<{
   resetToIdleTimeout?: number;
 }>;
 
+/**
+ * Tracks in-flight save requests as one status: saving while any are pending, then done or error.
+ *
+ * `BeamProvider` already includes one.
+ */
 export function AutoSaveStatusProvider({ children, resetToIdleTimeout = 6_000 }: AutoSaveStatusProviderProps) {
   const [status, setStatus] = useState(AutoSaveStatus.IDLE);
   const [errors, setErrors] = useState<unknown[]>([]);

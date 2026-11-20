@@ -36,6 +36,7 @@ export type SwitchProps = {
   };
 };
 
+/** An on/off toggle with a label. */
 export function Switch(props: SwitchProps) {
   const { fieldProps } = usePresentationContext();
   const { labelLeftFieldWidth = "50%" } = fieldProps ?? {};

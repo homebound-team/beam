@@ -9,12 +9,15 @@ export type StepperTabsStep = Pick<StepperTabProps, "label" | "value" | "disable
 
 export type StepperTabsProps = {
   steps: StepperTabsStep[];
+  /** The `value` of the current step; steps before it show as completed. */
   currentStep: StepperTabsStep["value"];
+  /** Called with a step's `value` when its tab is clicked. */
   onChange: (stepValue: string) => void;
   /** Forces the condensed look regardless of viewport width. OR'd with the mobile-breakpoint collapse. */
   collapsed?: boolean;
 };
 
+/** A row of step tabs where every step before `currentStep` shows as completed; collapses to indicator bars on mobile. */
 export function StepperTabs(props: StepperTabsProps) {
   const { steps, currentStep, onChange, collapsed: forceCollapsed } = props;
   const tid = useTestIds(props, "stepperTabs");

@@ -10,9 +10,11 @@ type ScrollShadowsProps = {
   xss?: Properties;
   /** Set to true if the container scrolls horizontally */
   horizontal?: boolean;
-  /** Defines the background color for the shadows */
+  /** Defines the background color for the shadows. Must be an `rgba(…,1)` palette color; defaults to white. */
   bgColor?: Palette;
 };
+
+/** A scroll container that fades its edges while more content is hidden past the start or end. */
 export function ScrollShadows(props: ScrollShadowsProps) {
   const { children, xss, horizontal = false, bgColor = Palette.White } = props;
   const tid = useTestIds(props);

@@ -230,6 +230,7 @@ export function Modal(props: ModalProps) {
   );
 }
 
+/** Portals its children into the open modal's title `h1`. */
 export function ModalHeader({ children }: { children: ReactNode }): JSX.Element {
   const { modalHeaderDiv } = useBeamContext();
   return createPortal(<>{children}</>, modalHeaderDiv);

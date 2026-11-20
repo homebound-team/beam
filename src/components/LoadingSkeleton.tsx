@@ -4,11 +4,15 @@ type Sizes = "sm" | "md" | "lg";
 
 export type LoadingSkeletonProps = {
   rows?: number;
+  /** Equal-width cells per row. */
   columns?: number;
+  /** Row height: 16, 24, or 32px. Defaults to `md` (24px). */
   size?: Sizes;
+  /** Varies each row's cell widths so the rows read like lines of text. */
   randomizeWidths?: boolean;
 };
 
+/** Pulsing placeholder bars that hold the space of content that's still loading. */
 export function LoadingSkeleton({ rows = 1, columns = 1, size = "md", randomizeWidths = false }: LoadingSkeletonProps) {
   const cellArray = [...Array(columns)];
   const rowArray = [...Array(rows)];

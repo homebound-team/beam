@@ -50,7 +50,16 @@ function resolveInitialNavState(defaultNavState?: SideNavLayoutState): SideNavLa
 
 const SideNavLayoutContext = createContext<SideNavLayoutContextProps | undefined>(undefined);
 
-export function SideNavLayoutProvider(props: { children: ReactNode; defaultNavState?: SideNavLayoutState }) {
+/**
+ * Holds the side nav's expanded/collapse/hidden state, persisting expanded/collapse to localStorage.
+ *
+ * `SideNavLayout` adds one when none is above it; render your own to read or seed the state outside the layout.
+ */
+export function SideNavLayoutProvider(props: {
+  children: ReactNode;
+  /** Used when nothing is stored, and always below `md`; `"hidden"` always wins. */
+  defaultNavState?: SideNavLayoutState;
+}) {
   const [navState, setNavStateInternal] = useState<SideNavLayoutState>(() =>
     resolveInitialNavState(props.defaultNavState),
   );

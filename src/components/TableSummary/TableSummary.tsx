@@ -12,6 +12,7 @@ export type TableSummaryMetric = {
   label: string;
   count: number;
   icon: IconKey;
+  /** The icon's color. */
   color: BeamColor;
   onClick?: VoidFunction;
 };
@@ -26,11 +27,14 @@ export type TableSummaryAction = {
 
 export type TableSummaryProps = {
   title: ReactNode;
+  /** Clickable counts in a row, stacked below the `sm` breakpoint. */
   metrics?: readonly TableSummaryMetric[];
   action?: TableSummaryAction;
+  /** Content below the metrics, divided from them by a border. */
   footer?: ReactNode;
 };
 
+/** A card summarizing a table: a title, an optional header action, and clickable metric counts. */
 export function TableSummary(props: TableSummaryProps) {
   const { title, metrics = [], action, footer } = props;
   const { sm: isMobile } = useBreakpoint();

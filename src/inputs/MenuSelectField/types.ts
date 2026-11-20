@@ -21,6 +21,7 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   autoSort?: boolean;
   /** Debounced menu search text. The caller replaces `options` and should keep `mixedValues` in that list. Closing calls this with `""`. */
   onSearch?: (search: string) => void;
+  /** Options shown but not selectable; an object's `reason` shows as a tooltip on the row. */
   disabledOptions?: (V | { value: V; reason: string })[];
   /** Values some, but not all, of the edited records hold. Unselected ones get a dot, and the field reads "Mixed" (a single select only until something is picked). */
   mixedValues?: V[];
@@ -34,7 +35,9 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   /** Whether the field is read-only. If a ReactNode, it's shown as the read-only reason in a tooltip. */
   readOnly?: boolean | ReactNode;
   required?: boolean;
+  /** Shows the field in its error state with this message. */
   errorMsg?: string;
+  /** Guidance shown below the field. */
   helperText?: string | ReactNode;
   onFocus?: VoidFunction;
   onBlur?: VoidFunction;
@@ -50,6 +53,7 @@ export type MenuSelectFieldBaseProps<O, V extends Value> = {
   | "inputStylePalette"
 >;
 
+/** Props for `MenuSelectField`, the single-select menu field. */
 export type MenuSelectFieldProps<O, V extends Value> = Omit<MenuSelectFieldBaseProps<O, V>, "options"> & {
   /** Flat `O[]`, or `NestedOption<O>[]` when a row has `children`. `{ current, load, options }` loads either list. */
   options: OptionsOrLoad<O> | OptionsOrLoad<NestedOption<O>>;

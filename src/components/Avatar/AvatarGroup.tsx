@@ -7,6 +7,11 @@ export interface AvatarGroupProps {
   size?: AvatarSize;
 }
 
+/**
+ * A row of overlapping avatars.
+ *
+ * Past eight, it shows the first seven and a "+ N more" popup listing the rest by name.
+ */
 export function AvatarGroup(props: AvatarGroupProps) {
   const { avatars, size = "md" } = props;
 

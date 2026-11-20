@@ -56,9 +56,15 @@ export const BeamContext = createContext<BeamContextState>({
 });
 
 type BeamProviderProps = {
+  /** Enables {@link useDocumentTitle} with this environment prefix and app suffix. */
   documentTitleConfig?: DocumentTitleConfig;
 } & PropsWithChildren<PresentationContextProps>;
 
+/**
+ * Beam's root provider; wrap the app in it once.
+ *
+ * Supplies presentation defaults, auto-save status, snackbars, and the host for `useModal` and `useSuperDrawer`.
+ */
 export function BeamProvider({ children, documentTitleConfig, ...presentationProps }: BeamProviderProps) {
   // We want the identity of these to be stable, b/c they end up being used as dependencies
   // in both useModal's and useSuperDrawer's return values, which means the end-application's

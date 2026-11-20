@@ -10,10 +10,13 @@ import { useTestIds } from "src/utils/useTestIds";
 
 interface FilterModalProps<F> {
   filter: F;
+  /** The filters to render in the modal; other keys of `filter` are kept as-is. */
   filters: FilterImpls<F>;
+  /** Called with the full filter when the user clicks Apply. */
   onApply: (f: F) => void;
 }
 
+/** The "More Filters" modal content: edits a local copy of `filter` and only reports it on Apply. */
 export function FilterModal<F>(props: FilterModalProps<F>) {
   const { filter, filters, onApply } = props;
   const testId = useTestIds(props, filterTestIdPrefix);
@@ -66,7 +69,7 @@ export function FilterModal<F>(props: FilterModalProps<F>) {
   );
 }
 
-// Wraps a filter component to be displayed in the Filter Modal
+/** Wraps one filter in `FilterModal` under an `h2` label, or a top divider when there's no label. */
 export function ModalFilterItem({ label, children }: { label?: string; children: ReactNode }) {
   return (
     <div css={Css.mb4.if(!label).bt.bcGray200.$}>

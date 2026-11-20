@@ -27,8 +27,11 @@ export type BoundMultiSelectFieldProps<O, V extends Value> = Omit<
  *
  * The caller has to tell us how to turn `T` into `V`, which is usually a
  * lambda like `t => t.id`.
+ *
+ * @deprecated Use {@link BoundMenuMultiSelectField}.
  */
 export function BoundMultiSelectField<O, V extends Value>(props: BoundMultiSelectFieldProps<O, V>): JSX.Element;
+/** @deprecated Use {@link BoundMenuMultiSelectField}. */
 export function BoundMultiSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<BoundMultiSelectFieldProps<O, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element;

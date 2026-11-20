@@ -5,13 +5,19 @@ import { Css, Tokens, type Typography } from "src/Css";
 import { useTestIds } from "src/utils/useTestIds";
 
 export type AvatarProps = {
+  /** When missing or the image fails to load, shows the name's initials, or a user icon without a name. */
   src: string | undefined;
+  /** Alt text, initials fallback, and hover tooltip. */
   name?: string;
+  /** 24, 36, 48, or 72px. Defaults to `md` (36px). */
   size?: AvatarSize;
+  /** Shows the name beside the image (below it at `lg`/`xl`) instead of in a tooltip. */
   showName?: boolean;
+  /** Hides the name tooltip. */
   preventTooltip?: boolean;
 };
 
+/** A round user photo that falls back to initials or a user icon. */
 export function Avatar({ src, name, size = "md", showName = false, preventTooltip = false, ...others }: AvatarProps) {
   const tid = useTestIds(others, "avatar");
   const px = sizeToPixel[size];

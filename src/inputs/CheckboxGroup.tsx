@@ -39,6 +39,7 @@ export type CheckboxGroupProps = {
   columns?: number;
 } & Pick<PresentationFieldProps, "labelStyle">;
 
+/** A labeled group of checkboxes whose selection is a list of option values. */
 export function CheckboxGroup(props: CheckboxGroupProps) {
   const { fieldProps } = usePresentationContext();
   const {

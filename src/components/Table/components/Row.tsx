@@ -649,17 +649,21 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
   );
 }
 
-/**
- * Memoizes rows so that re-rendering the table doesn't re-render every single row.
- *
- * We used to have a custom `propsAreEqual` method that would only compare `props.rows`
- * on the `data` attribute, b/c our `createRows` methods do not create stable row identities;
- * i.e. if one row changes, they all change.
- *
- * However, now RowState.row synthesizes a `row` that only reactively changes when
- * that row's `data` explicitly changes, so we no longer need a custom `propsAreEqual` here.
- */
+// Memoizes rows so that re-rendering the table doesn't re-render every single row.
+//
+// We used to have a custom `propsAreEqual` method that would only compare `props.rows`
+// on the `data` attribute, b/c our `createRows` methods do not create stable row identities;
+// i.e. if one row changes, they all change.
+//
+// However, now RowState.row synthesizes a `row` that only reactively changes when
+// that row's `data` explicitly changes, so we no longer need a custom `propsAreEqual` here.
+//
 // Declared as a const + `as typeof RowImpl` to work with generics, see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37087#issuecomment-656596623
+/**
+ * One `GridTable` row, re-rendered only when that row's state changes.
+ *
+ * `GridTable` renders it from internal row state; build rows with `GridDataRow` instead of rendering this directly.
+ */
 export const Row = observer(RowImpl) as typeof RowImpl;
 
 /** A specific kind of row, including the GridDataRow props. */

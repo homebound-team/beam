@@ -8,10 +8,13 @@ import { useTestIds } from "src/utils/useTestIds";
 export type AiBannerProps = {
   title: string;
   message?: ReactNode;
+  /** Rendered as an `ai` button. */
   primaryAction?: ActionButtonProps;
+  /** Rendered as a `quaternary` button before the primary action. */
   secondaryAction?: ActionButtonProps;
 };
 
+/** An AI-styled callout with a title, optional message, and up to two actions that wrap below the copy when space runs out. */
 export function AiBanner(props: AiBannerProps) {
   const { title, message, primaryAction, secondaryAction } = props;
   const tid = useTestIds(props, "aiBanner");

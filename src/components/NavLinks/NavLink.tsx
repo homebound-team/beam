@@ -17,8 +17,11 @@ export type NavLinkProps = {
   active?: boolean;
   disabled?: boolean;
   label: ReactNode;
+  /** Rendered after the label. */
   icon?: IconKey;
+  /** `side` for SideNav rows, `global` for the dark Navbar. */
   variant: NavLinkVariant;
+  /** Opens a URL `onClick` in a new tab. */
   openInNew?: boolean;
   /** HTML attributes to apply to the button element when it is being used to trigger a menu. */
   menuTriggerProps?: AriaButtonProps;
@@ -29,6 +32,7 @@ export type NavLinkProps = {
    */
   iconOnly?: boolean;
   onClick?: BeamButtonProps["onClick"];
+  /** Indents the link and drops the semibold weight, for links inside a group. */
   nested?: boolean;
   /** Storybook-only visual state overrides for snapshotting pseudo-interactions. */
   __storyState?: {
@@ -38,6 +42,7 @@ export type NavLinkProps = {
   };
 } & BeamFocusableProps;
 
+/** A navigation link, or a button when `onClick` is a function, styled for the SideNav or Navbar. */
 export function NavLink(props: NavLinkProps) {
   const {
     disabled: isDisabled,
@@ -122,6 +127,7 @@ export function NavLink(props: NavLinkProps) {
   );
 }
 
+/** The per-state styles `NavLink` uses, for custom elements that should match it. */
 export function getNavLinkStyles(variant: NavLinkVariant, nested?: boolean) {
   const styles = navLinkVariantStyles[variant];
 
