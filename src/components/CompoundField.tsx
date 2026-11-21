@@ -15,7 +15,7 @@ export function CompoundField(props: CompoundFieldProps) {
   if (children?.length !== 2) {
     throw new Error("CompoundField requires two children components");
   }
-  const commonStyles = Css.df.aic.fs1.maxwPx(550).bt.bb.bc(Tokens.FieldBorderDefault).$;
+  const commonStyles = Css.df.aic.fs1.bt.bb.bc(Tokens.FieldBorderDefault).$;
   const internalProps: TextFieldInternalProps = { compound: true };
 
   function onFocusCapture() {

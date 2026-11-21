@@ -15,7 +15,6 @@ import {
   type OptionsOrLoad,
   unsetOption,
 } from "src/inputs/internal/selectFieldHelpers";
-import { getFieldWidth } from "src/inputs/utils";
 import { keyToValue, type Value, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";
 import { useTestIds } from "src/utils/useTestIds";
@@ -129,7 +128,7 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     getOptionLabel: propOptionLabel,
     getOptionValue: propOptionValue,
     getOptionMenuLabel: propOptionMenuLabel,
-    fullWidth = fieldProps?.fullWidth ?? false,
+    fullWidth: _fullWidth,
     onSearch,
     onAddNew,
     autoSort = true,
@@ -446,15 +445,13 @@ export function ComboBoxBase<O, V extends Value>(props: ComboBoxBaseProps<O, V>)
     minWidth: 200,
   };
 
-  const fieldMaxWidth = getFieldWidth(fullWidth);
   const tid = useTestIds(props, props.label);
 
   return (
-    <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
         inputStylePalette={inputStylePalette}
-        fullWidth={fullWidth}
         buttonProps={buttonProps}
         buttonRef={triggerRef}
         inputProps={inputProps}
