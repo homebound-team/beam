@@ -22,6 +22,12 @@ Match the existing conventions when adding files:
 
 File order and placement for `*.tsx` component modules: **[`docs/components.md`](docs/components.md)**.
 
+## Selects
+
+Use `MenuSelectField`, `MenuMultiSelectField`, and `MenuTreeSelectField` for a new select. With form state, use `BoundMenuSelectField`, `BoundMenuMultiSelectField`, and `BoundMenuTreeSelectField`.
+
+`SelectField`, `MultiSelectField`, and `TreeSelectField`, and their `Bound*` wrappers, are deprecated. The contract is [`SelectFields.mdx`](src/inputs/MenuSelectField/SelectFields.mdx).
+
 ## Utility modules
 
 In camelCase utility files (e.g. `formatDocumentTitle.ts`), put **types first**, then the **primary exported function** the file exists for, then other exports and private helpers. Do not bury the main export below unrelated helpers.

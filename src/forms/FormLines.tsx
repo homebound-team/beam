@@ -46,7 +46,6 @@ export function FormLines(props: FormLinesProps) {
     ...("labelStyle" in props ? { labelStyle } : {}),
     ...("compact" in props ? { compact } : {}),
     ...("labelLeftFieldWidth" in props ? { labelLeftFieldWidth } : {}),
-    ...(width === "full" ? { fullWidth: true } : {}),
   };
 
   return (
@@ -71,7 +70,10 @@ export function FormDivider() {
   return <div css={Css.hPx(1).bgColor(Tokens.SurfaceSeparator).$} />;
 }
 
-/** Groups multiple fields side-by-side. */
+/** Groups multiple fields side-by-side.
+ *
+ * @deprecated Use `FieldRow` and `FieldRowItem`, which line up columns across rows and follow the container's width.
+ */
 export function FieldGroup(props: {
   /** The legend/title for this group. */
   title?: string;

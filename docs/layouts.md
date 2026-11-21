@@ -280,6 +280,16 @@ The layouts handle the gaps between chrome and page content, so page bodies rare
 
 Start the body with your content, and let the layout own those edges.
 
+### Field rows (informative)
+
+`FieldRow` lays out fields side by side in equal columns. It reads its own width, not the window's, so a 720px form column fits 4 columns and a pane under 520px stacks:
+
+- 640px and wider: up to `columns` (2 to 4).
+- 520px to 639px: 2 columns.
+- Under 520px: 1 column.
+
+The gap is 16px, and 24px from the `md` viewport up. Rows in the same container resolve to the same width, so rows with the same `columns` line up without a parent grid. Rows with different `columns` do not share column edges. `FieldRowItem` spans columns. Keep `span` within the row's `columns`. The row's width reduces the span the same way it reduces the column count. Use `FieldRow` instead of the deprecated `FieldGroup`.
+
 ### Scroll coordination (informative)
 
 The layouts share a **document-scroll** model: the environment banner, navbar, and page header pin via

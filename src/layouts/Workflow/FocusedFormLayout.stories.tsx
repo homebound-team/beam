@@ -2,9 +2,14 @@ import type { Meta } from "@storybook/react-vite";
 import { RightPanePanel } from "src/components/Layout/RightPaneLayout/RightPanePanel";
 import { useRightPaneActions } from "src/components/Layout/RightPaneLayout/useRightPane";
 import { Css, Tokens } from "src/Css";
+import { FieldRow, FieldRowItem } from "src/forms/FieldRow";
+import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
+import { TextAreaField } from "src/inputs/TextAreaField";
+import { TextField } from "src/inputs/TextField";
 import { EnvironmentBannerLayout } from "src/layouts/EnvironmentBannerLayout/EnvironmentBannerLayout";
 import { FormSectionLayout } from "src/layouts/FormSectionLayout/FormSectionLayout";
 import { FocusedFormLayout, type FocusedFormLayoutProps } from "src/layouts/Workflow/FocusedFormLayout";
+import { noop } from "src/utils/helpers";
 import { viewportModes, withBeamDecorator, withRouter } from "src/utils/sb";
 import { createFormSections, createRightPaneTriggers } from "src/utils/sbComponents";
 import { action } from "storybook/actions";
@@ -93,6 +98,24 @@ export function AiMode() {
 }
 AiMode.storyName = "AI Mode";
 
+/** Trade partner contact: paired fields, then a note that stays the full row. */
+export function FieldRows() {
+  return (
+    <WorkflowChrome title="Create Contact">
+      <FormSectionLayout
+        withJumpLinks
+        title="Contact"
+        description="For billing signatories, include their business address."
+        sections={[
+          { title: "Contact", fields: <ContactFields /> },
+          { title: "Address", fields: <AddressFields /> },
+          { title: "Margins", fields: <MarginFields /> },
+        ]}
+      />
+    </WorkflowChrome>
+  );
+}
+
 function WorkflowChrome({ children, ...props }: Partial<FocusedFormLayoutProps>) {
   return (
     <EnvironmentBannerLayout environmentBanner={{ env: "qa" }}>
@@ -134,5 +157,78 @@ function FocusedFormBody() {
       ]}
       sections={createFormSections()}
     />
+  );
+}
+
+function ContactFields() {
+  return (
+    <div css={Css.df.fdc.gap3.$}>
+      <FieldRow>
+        <TextField label="Name" value="Alex Morgan" onChange={noop} />
+        <TextField label="Title" value="Project Manager" onChange={noop} />
+      </FieldRow>
+      <FieldRow>
+        <TextField label="Email" value="alex.morgan@example.com" onChange={noop} />
+      </FieldRow>
+      <FieldRow>
+        <TextField label="Office Phone" value="512-555-0148" onChange={noop} />
+        <TextField label="Mobile Phone" value="512-555-0192" onChange={noop} />
+      </FieldRow>
+      {/* Span 4 fills the row at four columns, and clamps to the row when it wraps to two or one. */}
+      <FieldRow columns={4}>
+        <FieldRowItem span={4}>
+          <TextAreaField
+            label="Notes"
+            value="Billing signatory. Send purchase orders to this contact."
+            onChange={noop}
+          />
+        </FieldRowItem>
+      </FieldRow>
+    </div>
+  );
+}
+
+function AddressFields() {
+  const states = [
+    { id: "TX", name: "Texas" },
+    { id: "CO", name: "Colorado" },
+    { id: "GA", name: "Georgia" },
+  ];
+  const countries = [
+    { id: "US", name: "United States" },
+    { id: "CA", name: "Canada" },
+  ];
+  return (
+    <div css={Css.df.fdc.gap3.$}>
+      <FieldRow>
+        <TextField label="Street" value="1200 S Lamar Blvd" onChange={noop} />
+      </FieldRow>
+      <FieldRow>
+        <TextField label="City" value="Austin" onChange={noop} />
+        <MenuSelectField label="State" value="TX" options={states} onSelect={noop} />
+      </FieldRow>
+      <FieldRow>
+        <TextField label="Postal Code" value="78704" onChange={noop} />
+        <MenuSelectField label="Country" value="US" options={countries} onSelect={noop} />
+      </FieldRow>
+    </div>
+  );
+}
+
+function MarginFields() {
+  return (
+    <div css={Css.df.fdc.gap3.$}>
+      <FieldRow columns={4}>
+        <TextField label="Pre-Cutoff Margin" value="40%" onChange={noop} />
+        <TextField label="Post-Cutoff Margin" value="" onChange={noop} />
+        <TextField label="Selection Fee" value="" onChange={noop} />
+        <TextField label="Minimum Price" value="" onChange={noop} />
+      </FieldRow>
+      <FieldRow columns={4}>
+        <FieldRowItem span={4}>
+          <TextAreaField label="Update Note" value="" onChange={noop} />
+        </FieldRowItem>
+      </FieldRow>
+    </div>
   );
 }
