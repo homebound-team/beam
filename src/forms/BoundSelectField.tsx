@@ -31,16 +31,21 @@ export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O,
  *
  * Note: there are four overloads here to handle each combination of "HasIdIsh and HasNameId",
  * "only has HasIdIsh", "only has HasNameIsh", and "neither".
+ *
+ * @deprecated Use `BoundMenuSelectField`.
  */
 export function BoundSelectField<T extends HasIdIsh<V> & HasNameIsh, V extends Value>(
   props: Optional<BoundSelectFieldProps<T, V>, "getOptionLabel" | "getOptionValue">,
 ): JSX.Element;
+/** @deprecated Use `BoundMenuSelectField`. */
 export function BoundSelectField<T extends HasIdIsh<V>, V extends Value>(
   props: Optional<BoundSelectFieldProps<T, V>, "getOptionValue">,
 ): JSX.Element;
+/** @deprecated Use `BoundMenuSelectField`. */
 export function BoundSelectField<T extends HasNameIsh, V extends Value>(
   props: Optional<BoundSelectFieldProps<T, V>, "getOptionLabel">,
 ): JSX.Element;
+/** @deprecated Use `BoundMenuSelectField`. */
 export function BoundSelectField<T, V extends Value>(props: BoundSelectFieldProps<T, V>): JSX.Element;
 export function BoundSelectField<T extends object, V extends Value>(
   props: Optional<BoundSelectFieldProps<T, V>, "getOptionValue" | "getOptionLabel">,

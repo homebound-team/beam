@@ -1,7 +1,7 @@
 import DOMPurify from "dompurify";
 import { type ChangeEvent, createElement, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "src/components/Label";
-import { type PresentationFieldProps, usePresentationContext } from "src/components/PresentationContext";
+import type { PresentationFieldProps } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { RichTextFieldMock } from "src/inputs/RichTextField.mock";
 import { maybeCall, noop } from "src/utils/helpers";
@@ -46,7 +46,6 @@ export const RichTextField = withTestMock(RichTextFieldImpl, RichTextFieldMock);
  * We also integrate [tributejs]{@link https://github.com/zurb/tribute} for @ mentions.
  */
 export function RichTextFieldImpl(props: RichTextFieldProps) {
-  const { fieldProps } = usePresentationContext();
   const {
     mergeTags,
     label,
@@ -55,7 +54,6 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
     onBlur = noop,
     onFocus = noop,
     readOnly,
-    fullWidth = fieldProps?.fullWidth ?? false,
   } = props;
 
   const tid = useTestIds(props, label || "richTextField");
@@ -157,7 +155,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
 
   if (!readOnly) {
     return (
-      <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
+      <div css={Css.w100.$}>
         {/* TODO: Not sure what to pass to labelProps. */}
         {label && <Label labelProps={{}} label={label} tooltip={props.tooltip} {...tid.label} />}
         <div className="beam-trix-editor">
@@ -175,7 +173,7 @@ export function RichTextFieldImpl(props: RichTextFieldProps) {
     );
   } else {
     return (
-      <div css={Css.w100.if(!fullWidth).maxw("550px").$}>
+      <div css={Css.w100.$}>
         {label && <Label label={label} tooltip={props.tooltip} {...tid.label} />}
         <div
           css={
