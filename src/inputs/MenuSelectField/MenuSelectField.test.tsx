@@ -6,7 +6,7 @@ import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { locationOptions, type LocationOption } from "src/inputs/MenuSelectField/storyHelpers";
 import type { OptionsOrLoad } from "src/inputs/internal/selectFieldHelpers";
 import { setViewport } from "src/tests/viewport";
-import { click, getOption, getOptions, getSelected, render, select, type, wait } from "src/utils/rtl";
+import { click, getOption, getOptions, getSelected, render, select, type, typeAndWait, wait } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuSelectField", () => {
@@ -127,8 +127,7 @@ describe("MenuSelectField", () => {
     const r = await render(<Page />);
     // When searching and picking a match
     click(r.color);
-    type(r.color_search, "Blue");
-    await wait();
+    await typeAndWait(r.color_search, "Blue");
     select(r.color, "Blue");
     // Then the closed field shows the pick, though the list it came from is gone
     expect(r.color).toHaveTextContent("Blue");

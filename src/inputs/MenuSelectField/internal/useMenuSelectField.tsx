@@ -248,7 +248,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     [menuTree, options, search, serverSearch, contains, unsetLabel],
   );
   const addNewText = useMemo(
-    () => (canAddNew ? newOptionText(search, allOptions, getOptionLabel, collator) : undefined),
+    () => (canAddNew ? maybeNewOptionText(search, allOptions, getOptionLabel, collator) : undefined),
     // getOptionLabel is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [canAddNew, search, allOptions, collator],
@@ -873,7 +873,7 @@ function matchesSearch<O>(
 }
 
 /** The trimmed search for the add row, or `undefined` when it's blank or names an option other than the `unsetLabel` row. */
-function newOptionText<O>(
+function maybeNewOptionText<O>(
   search: string,
   options: readonly O[],
   getOptionLabel: (opt: O) => string,
