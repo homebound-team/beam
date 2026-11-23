@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { MenuMultiSelectField } from "src/inputs/MenuSelectField/MenuMultiSelectField";
 import type { SelectionView } from "src/inputs/MenuSelectField/types";
-import { click, getOption, getOptions, render, select, type } from "src/utils/rtl";
+import { click, getOption, getOptions, getSelected, render, select, type } from "src/utils/rtl";
 import { vi } from "vitest";
 
 describe("MenuMultiSelectField", () => {
@@ -374,6 +374,45 @@ describe("MenuMultiSelectField", () => {
       expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
       expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
     });
+
+    it("hides list remove controls when the field is readOnly", async () => {
+      // Given a read-only field with Red listed below it
+      const r = await render(<MultiHarness initial={["r"]} selectionView="selectionList" readOnly />);
+      // Then Red shows as a pill without a remove control
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
+      expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+    });
+  });
+
+  describe("onAddNew", () => {
+    it("passes the text, clears the search, and stays open", async () => {
+      // Given an open multi select with Red selected and onAddNew
+      const onAddNew = vi.fn();
+      const onSelect = vi.fn();
+      const r = await render(<MultiHarness initial={["r"]} onAddNew={onAddNew} onSelectSpy={onSelect} />);
+      click(r.color);
+      // When typing text that names no option and choosing the add row
+      type(r.color_search, "Teal");
+      select(r.color, 'Add "Teal"');
+      // Then onAddNew gets the text, the selection is untouched, and the menu stays open on the full list
+      expect(onAddNew).toHaveBeenCalledWith("Teal");
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(r.color_overlay).toBeInTheDocument();
+      expect(r.color_search).toHaveValue("");
+      expect(getOptions(r.color)).toEqual(["Black", "Blue", "Green", "Red"]);
+    });
+
+    it("adds the new value to the AI proposal", async () => {
+      // Given Red on record, Blue and Green proposed, and a caller that creates the option and adds its value
+      const r = await render(<TestAddNewField initial={["r"]} proposedValues={["b", "g"]} />);
+      // When adding Teal
+      click(r.color);
+      type(r.color_search, "Teal");
+      select(r.color, 'Add "Teal"');
+      // Then the proposal and Teal are selected, and the field has left AI mode
+      expect(getSelected(r.color)).toEqual(["Blue", "Green", "Teal"]);
+      expect(r.color).not.toHaveAttribute("data-ai-mode");
+    });
   });
 
   describe("AI mode", () => {
@@ -440,6 +479,7 @@ type HarnessProps = {
   mixedValues?: string[];
   selectionView?: SelectionView;
   getOptionMenuLabel?: (option: Color) => string;
+  onAddNew?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -459,6 +499,25 @@ function MultiHarness(props: HarnessProps) {
         setValues(next);
       }}
       {...others}
+    />
+  );
+}
+
+/** `onAddNew` creates the option as `t` and adds it to `values`. */
+function TestAddNewField(props: { initial: string[]; proposedValues?: string[] }) {
+  const [options, setOptions] = useState(colors());
+  const [values, setValues] = useState(props.initial);
+  return (
+    <MenuMultiSelectField
+      label="Color"
+      options={options}
+      values={values}
+      proposedValues={props.proposedValues}
+      onSelect={setValues}
+      onAddNew={(name) => {
+        setOptions((prev) => [...prev, { id: "t", name }]);
+        setValues((prev) => [...prev, "t"]);
+      }}
     />
   );
 }

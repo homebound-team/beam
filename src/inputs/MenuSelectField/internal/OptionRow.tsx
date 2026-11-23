@@ -39,10 +39,21 @@ export function MultiOptionRow<O>(props: OptionRowProps<O>) {
   return <BaseOptionRow {...props} variant="checkbox" />;
 }
 
+/** The italic `onAddNew` row, with a plus where a multi select's checkbox goes so the label lines up. */
+export function AddNewOptionRow<O>(props: OptionRowProps<O> & { selectionMode: "single" | "multiple" }) {
+  const { selectionMode, ...rowProps } = props;
+  return <BaseOptionRow {...rowProps} variant={selectionMode === "multiple" ? "addPlus" : "add"} />;
+}
+
 function BaseOptionRow<O>(
-  props: OptionRowProps<O> & { variant: "check" | "checkbox"; indent?: number; isPathRoot?: boolean },
+  props: OptionRowProps<O> & {
+    variant: "check" | "checkbox" | "add" | "addPlus";
+    indent?: number;
+    isPathRoot?: boolean;
+  },
 ) {
   const { item, state, id, disabledReason, mixedLegendId, variant, indent, isPathRoot } = props;
+  const isAddNew = variant === "add" || variant === "addPlus";
   const entry = item.value;
   const ref = useRef<HTMLDivElement>(null);
   const tid = useTestIds(props, "option");
@@ -78,9 +89,16 @@ function BaseOptionRow<O>(
         {...tid.option}
       >
         {variant === "checkbox" && <StyledCheckbox isSelected={isSelected} isDisabled={isDisabled} />}
+        {variant === "addPlus" && (
+          <span css={Css.df.aic.fs0.$}>
+            <Icon icon="plus" inc={2} />
+          </span>
+        )}
         {variant === "checkbox" && mixedLegendId && <MixedDot />}
         {/* The root of a hierarchy path is semibold. Deeper rows stay regular. */}
-        <span css={{ ...Css.fg1.mw0.$, ...(isPathRoot ? Css.smSb.$ : {}) }}>{item.rendered}</span>
+        <span css={{ ...Css.fg1.mw0.$, ...(isPathRoot ? Css.smSb.$ : {}), ...(isAddNew ? Css.fsyi.$ : {}) }}>
+          {item.rendered}
+        </span>
         {variant === "check" && isSelected && (
           <span css={Css.df.aic.fs0.$}>
             <Icon icon="check" color={isDisabled ? Tokens.TextDisabled : Tokens.SelectionIndicator} />

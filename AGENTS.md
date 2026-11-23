@@ -18,6 +18,21 @@ Match the existing conventions when adding files:
 - **Utility / constant modules** — camelCase: `zIndices.ts`, `layoutVars.ts`.
 - Co-locate `*.test.tsx` and `*.stories.tsx` beside the file they cover.
 
+## Form fields
+
+- **Selects:** Use the menu-based fields in new code. `SelectField`, `MultiSelectField`, `TreeSelectField` and their `Bound*` wrappers are `@deprecated`. Do not add new usages or extend them.
+
+| Deprecated | Use |
+| ------------------------ | ----------------------------- |
+| `SelectField` | `MenuSelectField` |
+| `MultiSelectField` | `MenuMultiSelectField` |
+| `TreeSelectField` | `MenuTreeSelectField` |
+| `BoundSelectField` | `BoundMenuSelectField` |
+| `BoundMultiSelectField` | `BoundMenuMultiSelectField` |
+| `BoundTreeSelectField` | `BoundMenuTreeSelectField` |
+
+- **Width:** Fields have no max width and fill their container. Constrain width with the parent (e.g. `FormLines` `width`, a grid, or a wrapper). The `fullWidth` field prop is `@deprecated`, has no effect, and should not be passed. (`fullWidth` on `Button`, `ButtonGroup`, `Card`, `AiPanel` and `Checkbox` is a separate prop and unchanged.)
+
 ## Component files
 
 File order and placement for `*.tsx` component modules: **[`docs/components.md`](docs/components.md)**.
