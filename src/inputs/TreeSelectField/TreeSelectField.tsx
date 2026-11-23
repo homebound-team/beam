@@ -31,7 +31,6 @@ import {
   type TreeFieldState,
   type TreeSelectResponse,
 } from "src/inputs/TreeSelectField/utils";
-import { getFieldWidth } from "src/inputs/utils";
 import type { Value } from "src/inputs/Value";
 import { keyToValue, valueToKey } from "src/inputs/Value";
 import type { BeamFocusableProps } from "src/interfaces";
@@ -85,7 +84,9 @@ export type TreeSelectFieldProps<O, V extends Value> = {
 } & BeamFocusableProps &
   PresentationFieldProps;
 
+/** @deprecated Use `MenuTreeSelectField`. */
 export function TreeSelectField<O, V extends Value>(props: TreeSelectFieldProps<O, V>): JSX.Element;
+/** @deprecated Use `MenuTreeSelectField`. */
 export function TreeSelectField<O extends HasIdAndName<V>, V extends Value>(
   props: Optional<TreeSelectFieldProps<O, V>, "getOptionValue" | "getOptionLabel">,
 ): JSX.Element;
@@ -177,7 +178,7 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     onSelect,
     defaultCollapsed: _defaultCollapsed = false,
     placeholder,
-    fullWidth = fieldProps?.fullWidth ?? false,
+    fullWidth: _fullWidth,
     chipDisplay = "root",
     disabledOptions,
     groupOptions: _groupOptions,
@@ -637,14 +638,12 @@ function TreeSelectFieldBase<O, V extends Value>(props: TreeSelectFieldProps<O, 
     minWidth: 320,
   };
 
-  const fieldMaxWidth = getFieldWidth(fullWidth);
   const tid = useTestIds(props, props.label);
 
   return (
-    <div css={Css.df.fdc.w100.maxw(fieldMaxWidth).if(labelStyle === "left").maxw100.$} ref={comboBoxRef}>
+    <div css={Css.df.fdc.w100.$} ref={comboBoxRef}>
       <ComboBoxInput
         {...otherProps}
-        fullWidth={fullWidth}
         labelStyle={labelStyle}
         buttonProps={buttonProps}
         buttonRef={triggerRef}

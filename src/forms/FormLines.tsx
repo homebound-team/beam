@@ -46,7 +46,6 @@ export function FormLines(props: FormLinesProps) {
     ...("labelStyle" in props ? { labelStyle } : {}),
     ...("compact" in props ? { compact } : {}),
     ...("labelLeftFieldWidth" in props ? { labelLeftFieldWidth } : {}),
-    ...(width === "full" ? { fullWidth: true } : {}),
   };
 
   return (
