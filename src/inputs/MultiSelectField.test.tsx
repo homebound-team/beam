@@ -282,6 +282,16 @@ describe("MultiSelectFieldTest", () => {
     expect(r.query.selectedOptionPillList_pill_remove_1).toBeNull();
   });
 
+  it("hides pill remove buttons when the field is readOnly", async () => {
+    // Given a read-only MultiSelectField with withPillList
+    const r = await render(<TestMultiSelectField values={["1", "2"]} options={options} withPillList readOnly />);
+    // Then selections still render as pills, but cannot be removed
+    expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("One");
+    expect(r.selectedOptionPillList_pill_value_1).toHaveTextContent("Two");
+    expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+    expect(r.query.selectedOptionPillList_pill_remove_1).toBeNull();
+  });
+
   it("hides field and listbox chips when hideChips is true", async () => {
     // Given a MultiSelectField that only hides chips
     const r = await render(<TestMultiSelectField values={["1", "2"]} options={options} hideChips />);
