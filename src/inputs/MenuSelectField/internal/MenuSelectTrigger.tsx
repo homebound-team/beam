@@ -80,7 +80,6 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
   const compact = props.compact ?? fieldProps?.compact ?? false;
   const borderless = props.borderless ?? fieldProps?.borderless ?? false;
   const borderOnHover = props.borderOnHover ?? fieldProps?.borderOnHover ?? false;
-  const fullWidth = props.fullWidth ?? fieldProps?.fullWidth ?? false;
   const visuallyDisabled = props.visuallyDisabled ?? fieldProps?.visuallyDisabled ?? true;
   const errorInTooltip = props.errorInTooltip ?? fieldProps?.errorInTooltip ?? false;
   const typeScale = fieldProps?.typeScale ?? "sm";
@@ -108,7 +107,6 @@ export function MenuSelectTrigger<O, V extends Value>(props: MenuSelectTriggerPr
     compact,
     borderless,
     borderOnHover,
-    fullWidth,
     compound,
     visuallyDisabled,
     isHovered: trigger.isHovered || forceHover,

@@ -237,6 +237,19 @@ describe("MenuTreeSelectField", () => {
     expect(activeOption(r.sports_listbox)).toBe(optionDomId(r.sports_listbox.id, 1));
   });
 
+  it("keeps expanded and collapsed groups when reopened", async () => {
+    // Given NBA selected, so Basketball opens expanded
+    const r = await render(<TreeHarness initial={["nba"]} />);
+    click(r.sports);
+    // When expanding Baseball, collapsing Basketball, and closing the menu
+    click(r.sports_expand_baseball);
+    click(r.sports_expand_basketball);
+    fireEvent.keyDown(r.sports_listbox, { key: "Escape" });
+    // Then reopening shows the groups as the user left them, even though Basketball holds a selection
+    click(r.sports);
+    expect(getOptions(r.sports)).toEqual(["Baseball", "MLB", "MiLB", "Basketball", "Golf"]);
+  });
+
   it("shows matches with their ancestors and descendants while searching", async () => {
     // Given a tree long enough to search
     const r = await render(<TreeHarness options={manySports()} />);
@@ -393,6 +406,14 @@ describe("MenuTreeSelectField", () => {
     expect(r.query.selectedOptionPillList).toBeNull();
   });
 
+  it("hides list remove controls when the field is readOnly", async () => {
+    // Given a read-only tree with Golf listed below the field
+    const r = await render(<TreeHarness initial={["golf"]} selectionView="selectionList" readOnly />);
+    // Then Golf shows as a pill without a remove control
+    expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Golf");
+    expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+  });
+
   it("scopes a disabled tree option tooltip to the field prefix", async () => {
     // Given a tree select with a disabled leaf and an explicit prefix
     const r = await render(
@@ -422,6 +443,7 @@ type TreeHarnessProps = {
   disabledOptions?: string[];
   selectionDisplay?: TreeSelectionDisplay;
   selectionView?: SelectionView;
+  readOnly?: boolean;
   proposedValues?: string[];
   defaultExpanded?: boolean;
   mixedValues?: string[];

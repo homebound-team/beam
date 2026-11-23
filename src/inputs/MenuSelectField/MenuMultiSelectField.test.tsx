@@ -374,6 +374,14 @@ describe("MenuMultiSelectField", () => {
       expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
       expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
     });
+
+    it("hides list remove controls when the field is readOnly", async () => {
+      // Given a read-only field with Red listed below it
+      const r = await render(<MultiHarness initial={["r"]} selectionView="selectionList" readOnly />);
+      // Then Red shows as a pill without a remove control
+      expect(r.selectedOptionPillList_pill_value_0).toHaveTextContent("Red");
+      expect(r.query.selectedOptionPillList_pill_remove_0).toBeNull();
+    });
   });
 
   describe("onAddNew", () => {

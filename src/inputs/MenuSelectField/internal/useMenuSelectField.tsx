@@ -206,12 +206,12 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   // Rows the menu opens onto: groups holding one start expanded, and the list starts at the first.
   const revealKeys = useMemo(() => new Set([...selectedKeys, ...dottedKeys]), [selectedKeys, dottedKeys]);
 
-  // Groups start collapsed, unless `defaultExpanded` or they hold a revealed row. Searching expands every match.
-  const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(() =>
-    menuTree ? initialExpandedKeys(menuTree, revealKeys, defaultExpanded) : new Set(),
-  );
+  // Set on the first open: groups start collapsed, unless `defaultExpanded` or they hold a revealed row.
+  // Later open actions keep what the user expanded or collapsed, until unmount. Searching expands every match.
+  const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>();
   const [searchCollapsedKeys, setSearchCollapsedKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const isExpanded = (key: string) => (!serverSearch && search ? !searchCollapsedKeys.has(key) : expandedKeys.has(key));
+  const isExpanded = (key: string) =>
+    !serverSearch && search ? !searchCollapsedKeys.has(key) : (expandedKeys?.has(key) ?? false);
 
   const treeRows = useMemo(() => {
     if (!menuTree) return undefined;
@@ -357,7 +357,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     if (isDisabled || isReadOnly) return;
     setSearch("");
     if (menuTree) {
-      setExpandedKeys(initialExpandedKeys(menuTree, revealKeys, defaultExpanded));
+      setExpandedKeys((prev) => prev ?? initialExpandedKeys(menuTree, revealKeys, defaultExpanded));
       setSearchCollapsedKeys(new Set());
     }
     setIsOpen(true);
@@ -435,7 +435,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
 
   function setTreeExpanded(key: string, expand: boolean) {
     if (search) setSearchCollapsedKeys((prev) => withKey(prev, key, !expand));
-    else setExpandedKeys((prev) => withKey(prev, key, expand));
+    else setExpandedKeys((prev) => withKey(prev ?? new Set(), key, expand));
     // Collapsing would hide a focused descendant, so focus moves up to the group.
     const focused = selectionManager.focusedKey;
     if (!expand && menuTree && focused != null && isDescendant(menuTree, String(focused), key)) focusKey(key);

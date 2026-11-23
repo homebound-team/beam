@@ -15,6 +15,8 @@ export type AiProgressButtonProps = {
   label: string;
   /** Spins the star while the AI work runs. */
   inProgress?: boolean;
+  /** Opens the label whenever `inProgress` is false, so it slides out on its own when the work finishes. */
+  expandOnComplete?: boolean;
   size?: ButtonSize;
 } & BeamButtonProps;
 
@@ -23,7 +25,16 @@ export type AiProgressButtonProps = {
  * On touch screens and below desktop, the label always shows.
  */
 export function AiProgressButton(props: AiProgressButtonProps) {
-  const { label, inProgress = false, size = "md", onClick, disabled, tooltip, openInNew } = props;
+  const {
+    label,
+    inProgress = false,
+    expandOnComplete = false,
+    size = "md",
+    onClick,
+    disabled,
+    tooltip,
+    openInNew,
+  } = props;
   const asLink = typeof onClick === "string";
   const isDisabled = !!disabled;
   const ref = useRef<HTMLElement>(null);
@@ -38,7 +49,7 @@ export function AiProgressButton(props: AiProgressButtonProps) {
   );
   const { hoverProps, isHovered } = useHover({ isDisabled });
   const { focusProps, isFocusVisible } = useFocusRing();
-  const open = isHovered || isFocusVisible;
+  const open = isHovered || isFocusVisible || (expandOnComplete && !inProgress);
   const { height, endPadding } = sizes[size];
 
   const content = (
@@ -61,6 +72,7 @@ export function AiProgressButton(props: AiProgressButtonProps) {
             .gtc("1fr").o100.$,
           ...(open && Css.gtc("1fr").o100.$),
         }}
+        {...tid.label}
       >
         {/* `oh.mw0` lets the `0fr` track reach 0; the padding sits inside so it doesn't hold the track open. */}
         <span css={Css.oh.mw0.$}>
