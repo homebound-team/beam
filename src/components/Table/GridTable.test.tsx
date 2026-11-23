@@ -2511,6 +2511,56 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1).tagName).toBe("A");
   });
 
+  it("leaves a cell with its own onClick out of the rowLink", async () => {
+    // Given a rowLink on every data row
+    const rowStyles: RowStyles<Row> = { header: {}, data: { rowLink: () => "/row" } };
+    // And a name column whose cells link somewhere else
+    const linkColumn: GridColumn<Row> = { ...nameColumn, data: ({ name }) => ({ content: name, onClick: "/cell" }) };
+    // When rendered
+    const r = await render(<GridTable {...{ columns: [linkColumn, valueColumn], rows, rowStyles }} />, withRouter());
+    // Then the linked cell isn't wrapped in the row link, so the links don't nest
+    expect(cell(r, 1, 0).tagName).toBe("DIV");
+    expect(r.getByText("foo")).toHaveAttribute("href", "/cell");
+    // And the other cells still link to the row
+    expect(cell(r, 1, 1).tagName).toBe("A");
+  });
+
+  it("leaves a cell with its own onClick out of the row onClick", async () => {
+    // Given an onClick on every data row
+    const rowOnClick = vi.fn();
+    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick: rowOnClick } };
+    // And a name column whose cells have their own onClick
+    const cellOnClick = vi.fn();
+    const buttonColumn: GridColumn<Row> = {
+      ...nameColumn,
+      data: ({ name }) => ({ content: name, onClick: cellOnClick }),
+    };
+    const r = await render(<GridTable {...{ columns: [buttonColumn, valueColumn], rows, rowStyles }} />);
+    // When clicking the cell's button
+    click(r.getByText("foo"));
+    // Then only the cell's onClick fires
+    expect(cellOnClick).toHaveBeenCalledTimes(1);
+    expect(rowOnClick).not.toHaveBeenCalled();
+  });
+
+  it("passes openInNew and download through to a GridCellContent link", async () => {
+    // Given one cell that opens in a new tab and one that downloads
+    const linkColumn: GridColumn<Row> = {
+      ...nameColumn,
+      data: ({ name }) => ({
+        content: name,
+        onClick: `/${name}`,
+        ...(name === "foo" ? { openInNew: true } : { download: true }),
+      }),
+    };
+    // When rendered
+    const r = await render(<GridTable {...{ columns: [linkColumn], rows }} />, withRouter());
+    // Then the first opens in a new tab
+    expect(r.getByText("foo")).toHaveAttribute("target", "_blank");
+    // And the second downloads
+    expect(r.getByText("bar")).toHaveAttribute("download");
+  });
+
   it("can handle onClick for GridCellContent", async () => {
     const onClick = vi.fn();
     // Given a table with an onClick specified GridCellContent

@@ -220,6 +220,8 @@ export {
   rowLinkRenderFn,
 } from "./components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "./components/Table/components/cell";
+export { textCell } from "./components/Table/components/cells/textCell";
+export type { StatusType, TextCellOpts } from "./components/Table/components/cells/textCell";
 export type {
   CompanionConfig,
   CompanionContent,
