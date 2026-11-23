@@ -1,6 +1,5 @@
 import type { InputStylePalette, PresentationFieldProps } from "src/components/PresentationContext";
 import { Css, increment, Palette, Tokens, type Typography } from "src/Css";
-import { getFieldWidth } from "src/inputs/utils";
 
 type FieldLabelStyle = NonNullable<PresentationFieldProps["labelStyle"]>;
 
@@ -12,7 +11,6 @@ export type FieldChromeOptions = {
   compact: boolean;
   borderless: boolean;
   borderOnHover: boolean;
-  fullWidth: boolean;
   visuallyDisabled: boolean;
   isHovered: boolean;
   /** No border of its own; a compound field draws the box. Text fields only. */
@@ -36,7 +34,6 @@ export function getFieldChrome(options: FieldChromeOptions) {
     compact,
     borderless,
     borderOnHover,
-    fullWidth,
     visuallyDisabled,
     isHovered,
     compound = false,
@@ -62,8 +59,7 @@ export function getFieldChrome(options: FieldChromeOptions) {
     .mhPx(compactFieldHeight - maybeSmaller).$;
 
   return {
-    container: Css.df.fdc.w100.maxw(getFieldWidth(fullWidth)).relative.if(labelStyle === "left").maxw100.fdr.gap2.jcsb
-      .aic.$,
+    container: Css.df.fdc.w100.relative.if(labelStyle === "left").fdr.gap2.jcsb.aic.$,
     control: {
       ...Css.typography(typeScale)
         .df.aic.br8.pxPx(textFieldBasePadding)
