@@ -6,12 +6,13 @@ import type { GridDataRow } from "src/components/Table/components/Row";
 import type {
   DiscriminateUnion,
   GridTableScrollOptions,
+  GridTableScrollToRowOptions,
   Kinded,
   MaybeFn,
   PinnedState,
 } from "src/components/Table/types";
 import type { GridRowLookup } from "src/components/Table/utils/GridRowLookup";
-import { createRowLookup, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
+import { createRowLookup, getKinds, shouldSkipScrollTo } from "src/components/Table/utils/GridRowLookup";
 import { TableState } from "src/components/Table/utils/TableState";
 import { applyRowFn, isGridCellContent, isJSX } from "src/components/Table/utils/utils";
 import { isDefined } from "src/utils/helpers";
@@ -40,13 +41,22 @@ export type GridTableApi<R extends Kinded> = {
   /** Scrolls row `index` into view;  only supported with `as=virtual` and after a `useEffect`.
    *
    * Defaults "smooth" behavior; Use {index, behavior: "auto"} for instant scroll in cases where grid table has many, many records and the scroll effect is undesirable.
+   * Prefer `scrollToRow`, which resolves the index for you.
    * */
   scrollToIndex(index: GridTableScrollOptions): void;
+  /**
+   * Scrolls the row into view (smooth by default), unless it's already among the rendered rows.
+   *
+   * Does nothing for pinned or hidden rows, or when the table isn't `as=virtual`.
+   */
+  scrollToRow(kind: R["kind"], id: string, opts?: GridTableScrollToRowOptions): void;
 
   /** Returns the currently-visible rows. */
   getVisibleRows(): GridDataRow<R>[];
   /** Returns the currently-visible rows of the given `kind`. */
   getVisibleRows<K extends R["kind"]>(kind: K): GridDataRow<DiscriminateUnion<R, "kind", K>>[];
+  /** Returns the visible rows just before/after `row`, overall and per kind, i.e. for SuperDrawer prev/next. */
+  getAdjacentRows(row: GridDataRow<R>, additionalFilter?: (row: GridDataRow<R>) => boolean): AdjacentRows<R>;
 
   /** Returns the ids of currently-selected rows. */
   getSelectedRowIds(): string[];
@@ -109,6 +119,15 @@ export type GridTableApi<R extends Kinded> = {
   copyToClipboard(): Promise<void>;
 };
 
+type NextPrev<R extends Kinded> = {
+  next: GridDataRow<R> | undefined;
+  prev: GridDataRow<R> | undefined;
+};
+
+type AdjacentRows<R extends Kinded> = NextPrev<R> & {
+  [P in R["kind"]]: NextPrev<DiscriminateUnion<R, "kind", P>>;
+};
+
 /** Adds per-row methods to the `api`, i.e. for getting currently-visible children. */
 export type GridRowApi<R extends Kinded> = GridTableApi<R> & {
   getVisibleChildren(): GridDataRow<R>[];
@@ -125,6 +144,8 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
   virtuosoRangeRef: MutableRefObject<ListRange | null> = { current: null };
   lookup!: GridRowLookup<R>;
   resetColumnWidthsFn?: () => void;
+  // Set by GridTable, which knows the order of the virtual list's items
+  virtualIndexOf?: (kind: string, id: string) => number;
 
   constructor() {
     // This instance gets spread into each row's GridRowApi, so bind the methods up-front
@@ -148,7 +169,7 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     if (persistCollapse) this.tableState.loadCollapse(persistCollapse);
     this.virtuosoRef = virtuosoRef;
     this.virtuosoRangeRef = virtuosoRangeRef;
-    this.lookup = createRowLookup(this, virtuosoRef, virtuosoRangeRef);
+    this.lookup = createRowLookup(this);
   }
 
   public scrollToIndex(indexOrOptions: GridTableScrollOptions): void {
@@ -160,6 +181,42 @@ export class GridTableApiImpl<R extends Kinded> implements GridTableApi<R> {
     if (shouldSkipScrollTo(scrollToOpts.index, this.virtuosoRangeRef)) return;
 
     this.virtuosoRef.current.scrollToIndex(scrollToOpts);
+  }
+
+  public scrollToRow(kind: R["kind"], id: string, opts?: GridTableScrollToRowOptions): void {
+    const index = this.virtualIndexOf?.(kind, id) ?? -1;
+    if (index === -1) return;
+    this.scrollToIndex({ index, behavior: "smooth", ...opts });
+  }
+
+  public getAdjacentRows(
+    row: GridDataRow<R>,
+    additionalFilter: (row: GridDataRow<R>) => boolean = () => true,
+  ): AdjacentRows<R> {
+    const rows = this.tableState.visibleRows.map((rs) => rs.row).filter(additionalFilter);
+    // Ensure we have `result.kind = {}` for each kind
+    const result: any = Object.fromEntries(getKinds(this.tableState.visibleColumns).map((kind) => [kind, {}]));
+    // This is an admittedly cute/fancy scan, instead of just `rows.findIndex`, but
+    // we do it this way so that we can do kind-aware prev/next detection.
+    let key: "prev" | "next" = "prev";
+    for (let i = 0; i < rows.length; i++) {
+      const each = rows[i];
+      // Flip from prev to next when we find it
+      if (each.kind === row.kind && each.id === row.id) {
+        key = "next";
+      } else {
+        if (key === "prev") {
+          // prev always overwrites what was there before
+          result[key] = each;
+          result[each.kind][key] = each;
+        } else {
+          // next only writes first seen
+          result[key] ??= each;
+          result[each.kind][key] ??= each;
+        }
+      }
+    }
+    return result;
   }
 
   public getSelectedRowIds(kind?: string): string[] {

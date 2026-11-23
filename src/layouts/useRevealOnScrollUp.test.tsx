@@ -166,12 +166,6 @@ describe("useRevealOnScrollUp", () => {
   });
 
   describe("holdRevealWhile", () => {
-    afterEach(() => {
-      // Release any hold a test left behind, since it's module-level state
-      window.dispatchEvent(new Event("scrollend"));
-      vi.useRealTimers();
-    });
-
     it("keeps hidden chrome hidden while a programmatic scroll moves back up", async () => {
       // Given the chrome is hidden mid-page
       const r = await renderHidden();

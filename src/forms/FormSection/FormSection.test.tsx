@@ -97,6 +97,15 @@ describe("FormSection", () => {
     });
   });
 
+  it("renders the section's tag in its header", async () => {
+    // Given a FormSection with a tag
+    const r = await render(
+      <FormSection title="Product Changes" tag={{ kind: "status", text: "Chargeable to homeowner", type: "info" }} />,
+    );
+    // Then the tag renders in the section header
+    expect(r.formSection_tag).toHaveTextContent("Chargeable to homeowner");
+  });
+
   it("renders a childSection's tag in the header's right slot", async () => {
     // Given a childSection with a tag
     const r = await render(

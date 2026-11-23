@@ -28,10 +28,22 @@ export function Examples() {
           ),
         },
         {
+          label: "Project types",
+          children: (
+            <>
+              <ContextTag icon="region" text="Region" />
+              <ContextTag icon="market" text="Market" />
+              <ContextTag icon="community" text="Community" />
+              <ContextTag icon="subdivision" text="Subdivision" />
+              <ContextTag icon="lot" text="Lot" />
+              <ContextTag icon="structure" text="Structure" />
+            </>
+          ),
+        },
+        {
           label: "Other icons",
           children: (
             <>
-              <ContextTag icon="lot" text="Lot" />
               <ContextTag icon="task" text="Task" />
               <ContextTag icon="bill" text="Bill" />
               <ContextTag icon="hardHat" text="Trade" />

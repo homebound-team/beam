@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { AutoSaveIndicator } from "src/components/AutoSaveIndicator";
 import { type HeaderAction, HeaderActions, splitHeaderActionsOnSm } from "src/components/Headers/HeaderActions";
 import { Icon } from "src/components/Icon";
+import { ContextOrStatusTag, type ContextOrStatusTagProps } from "src/components/internal/ContextOrStatusTag";
 import { Css, type Only, type Padding, Tokens, type Xss } from "src/Css";
 import { useBreakpoint } from "src/hooks/useBreakpoint";
 import { useContentInsetHandled } from "src/layouts/ContentInsetContext";
@@ -30,6 +31,8 @@ export type ContentHeaderProps<X = ContentHeaderXss> = {
   rightSlotLead?: ReactNode;
   /** Shows an info icon after the title with this tooltip content. */
   tooltip?: ReactNode;
+  /** Rendered right after the title. */
+  tag?: ContextOrStatusTagProps;
   /** Style overrides for padding. */
   xss?: X;
 };
@@ -59,6 +62,7 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
     startAdornment,
     rightSlotLead,
     tooltip,
+    tag,
     xss,
   } = props;
   const inDocumentScrollLayout = useDocumentScrollLayout();
@@ -92,12 +96,16 @@ export function ContentHeader<X extends Only<ContentHeaderXss, X>>(props: Conten
     >
       <div css={Css.df.aic.jcsb.mw0.$}>
         {title ? (
-          <div css={Css.df.aic.gap1.mw0.$}>
-            {startAdornment}
-            <Heading css={titleCss} {...tid.title}>
-              {title}
-            </Heading>
-            {tooltip && <Icon icon="infoCircle" tooltip={tooltip} inc={2} {...tid.info} />}
+          // DS-298 Figma's 20px title-to-tag gap
+          <div css={Css.df.aic.gapPx(20).mw0.$}>
+            <div css={Css.df.aic.gap1.mw0.$}>
+              {startAdornment}
+              <Heading css={titleCss} {...tid.title}>
+                {title}
+              </Heading>
+              {tooltip && <Icon icon="infoCircle" tooltip={tooltip} inc={2} {...tid.info} />}
+            </div>
+            {tag && <ContextOrStatusTag {...tag} {...tid.tag} />}
           </div>
         ) : (
           descriptionEl
