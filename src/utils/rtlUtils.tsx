@@ -237,7 +237,7 @@ export function select(select: HTMLElement, value: string | string[]) {
 export type SelectAndWaitOpts = { addNew?: boolean };
 
 /**
- * Selects an option from the Beam SelectField, MultiSelectField, and TreeSelectField components.
+ * Selects an option from the Beam SelectField, MultiSelectField, TreeSelectField, and Menu select field components.
  *
  * When `value` is a single string and the listbox opens empty, types the value to trigger async
  * search before selecting. Multi-select (`value` array) assumes options are already loaded.
@@ -271,9 +271,19 @@ export async function selectAndWait(
 }
 
 async function typeForAddNew(select: HTMLElement, value: string): Promise<void> {
-  fireEvent.input(select, { target: { value } });
+  fireEvent.input(searchInputFor(select), { target: { value } });
   await _wait();
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
+}
+
+/** The input to type into: the field itself, or a Menu select's search input since its trigger is a button. */
+function searchInputFor(select: HTMLElement): HTMLElement {
+  if (select.nodeName !== "BUTTON") return select;
+  const listboxId = select.getAttribute("aria-controls");
+  return (
+    document.querySelector<HTMLElement>(`input[aria-controls="${listboxId}"]`) ??
+    fail("Menu select field has no search input to type into. Search shows with onSearch, onAddNew, or over 8 options.")
+  );
 }
 
 /** When a combobox opens with no options, type the target label to trigger async search. */
@@ -285,7 +295,7 @@ async function maybeAutoSearch(select: HTMLElement, searchText: string): Promise
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
   if (!hasZeroOptions(select)) return;
 
-  fireEvent.input(select, { target: { value: searchText } });
+  fireEvent.input(searchInputFor(select), { target: { value: searchText } });
   await _wait();
   await allowAndWaitForAsyncBehavior(() => ensureListBoxOpen(select));
 }

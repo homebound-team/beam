@@ -1,6 +1,6 @@
 import type { Key } from "@react-types/shared";
 import { type KeyboardEvent, type RefObject, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ListKeyboardDelegate, useFilter, useFocusRing, useHover } from "react-aria";
+import { ListKeyboardDelegate, useCollator, useFilter, useFocusRing, useHover } from "react-aria";
 import { Item, type Selection, useListState } from "react-stately";
 import type { SelectedOptionPillListProps } from "src/components/Pills/SelectedOptionPill/SelectedOptionPillList";
 import { useAiProposal } from "src/inputs/hooks/useAiProposal";
@@ -51,6 +51,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     unsetLabel,
     autoSort = true,
     onSearch,
+    onAddNew,
     disabledOptions,
     mixedValues,
     nothingSelectedText = "",
@@ -69,6 +70,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const multiple = selectionMode === "multiple";
   // `onSearch` means the caller fetches matches. The menu lists `options` as given.
   const serverSearch = onSearch !== undefined;
+  const canAddNew = onAddNew !== undefined;
   const getChildren = tree?.getChildren;
   const defaultExpanded = tree?.defaultExpanded ?? false;
   const isDisabled = !!disabled;
@@ -118,6 +120,8 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing();
   const { contains } = useFilter({ sensitivity: "base" });
+  // Matches like `contains`, so "cafe" names "Café".
+  const collator = useCollator({ sensitivity: "base" });
 
   // For a tree, `options` are the roots; `allOptions` is every node in render order.
   const menuTree = useMemo(
@@ -147,7 +151,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
   // Selection, trigger text, and the menu's checks all follow the proposal until the user picks something.
   // A single-select hierarchy labels its one value with the path (`Bath 207 > Walls > Drench`).
   // `", "` joins several proposed values for a multi select. A single select has one value, so the comma is unused.
-  const { effectiveValue, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
+  const { effectiveValue, isAiMode, proposalProps } = useAiProposal(propValues, proposedValues, (vs) =>
     labelsFor(vs, allOptions, getOptionValue, (option) =>
       isSingleSelectTree && menuTree
         ? (optionPathLabel(menuTree, valueToKey(getOptionValue(option)), getOptionLabel) ?? getOptionLabel(option))
@@ -243,9 +247,20 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     // oxlint-disable-next-line react-hooks/exhaustive-deps
     [menuTree, options, search, serverSearch, contains, unsetLabel],
   );
+  const addNewText = useMemo(
+    () => (canAddNew ? maybeNewOptionText(search, allOptions, getOptionLabel, collator) : undefined),
+    // getOptionLabel is typically an inline lambda
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+    [canAddNew, search, allOptions, collator],
+  );
 
   function onSelectionChange(keys: Selection) {
     if (keys === "all") return;
+    // The add row is an action, so it never joins the selection.
+    if (addNewText !== undefined && keys.has(addNewKey)) {
+      addNew(addNewText);
+      return;
+    }
     if (isMultiSelectTree && menuTree) {
       // react-stately toggles one row. That row's value selects or clears every copy.
       const added = [...keys].map(String).find((key) => !selectedRowKeys.has(key));
@@ -268,7 +283,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       const opt =
         isSingleSelectTree && menuTree ? menuTree.nodes.get(String(key))?.option : optionsByKey.get(String(key));
       proposalProps.onUserEdit?.();
-      onCommit(opt === undefined ? [] : [getOptionValue(opt)], opt === undefined ? [] : [opt]);
+      commit(opt === undefined ? [] : [getOptionValue(opt)], opt === undefined ? [] : [opt]);
       close({ restoreFocus: true });
       return;
     }
@@ -287,30 +302,40 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       if (opt !== undefined && !selectedKeys.has(String(k))) next.push(getOptionValue(opt));
     }
     proposalProps.onUserEdit?.();
-    onCommit(next, optionsForValues(next));
+    commit(next, optionsForValues(next));
   }
 
   const collectionItems = useMemo((): MenuOptionItem<O>[] => {
-    if (treeRows) {
-      return treeRows.map(({ node }) => ({ key: node.key, valueKey: node.valueKey, option: node.option }));
-    }
-    return filteredOptions.map((option) => {
-      const valueKey = valueToKey(getOptionValue(option));
-      return { key: valueKey, valueKey, option };
-    });
+    const rows: MenuOptionItem<O>[] = treeRows
+      ? treeRows.map(({ node }) => ({ key: node.key, valueKey: node.valueKey, option: node.option }))
+      : filteredOptions.map((option) => {
+          const valueKey = valueToKey(getOptionValue(option));
+          return { key: valueKey, valueKey, option };
+        });
+    return addNewText === undefined ? rows : [...rows, { key: addNewKey, valueKey: addNewKey, addNew: addNewText }];
     // getOptionValue is typically an inline lambda
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [treeRows, filteredOptions]);
+  }, [treeRows, filteredOptions, addNewText]);
 
   const state = useListState<MenuOptionItem<O>>({
     items: collectionItems,
-    children: (item) => (
-      <Item key={item.key} textValue={getOptionLabel(item.option)}>
-        {getOptionMenuLabel
-          ? getOptionMenuLabel(item.option, Boolean(unsetLabel) && item.option === unsetOption)
-          : getOptionLabel(item.option)}
-      </Item>
-    ),
+    children: (item) => {
+      if ("addNew" in item) {
+        const label = `Add "${item.addNew}"`;
+        return (
+          <Item key={item.key} textValue={label}>
+            {label}
+          </Item>
+        );
+      }
+      return (
+        <Item key={item.key} textValue={getOptionLabel(item.option)}>
+          {getOptionMenuLabel
+            ? getOptionMenuLabel(item.option, Boolean(unsetLabel) && item.option === unsetOption)
+            : getOptionLabel(item.option)}
+        </Item>
+      );
+    },
     selectionMode: multiple ? "multiple" : "single",
     selectedKeys: selectedRowKeys,
     disabledKeys: disabledRowKeys,
@@ -358,14 +383,28 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     }
   }
 
+  function addNew(text: string) {
+    proposalProps.onUserEdit?.();
+    if (!multiple) {
+      onAddNew?.(text);
+      close({ restoreFocus: true });
+      return;
+    }
+    // In AI mode `values` is the proposal; commit it so the caller adds to it, not to the record.
+    if (isAiMode) commit(values, optionsForValues(values));
+    onAddNew?.(text);
+    // Clearing the search hides the add row, so a second press can't add the text twice.
+    onSearchChange("");
+  }
+
   function settleBlur() {
     hasFocusRef.current = false;
     maybeCall(proposalProps.onUserBlur);
     maybeCall(onBlur);
   }
 
-  // Short menus skip search, unless `onSearch` refetches. The count includes a not-yet-loaded `current`.
-  const showSearch = serverSearch || allOptions.length > searchOptionLimit;
+  // Short menus skip search, unless `onSearch` refetches or `onAddNew` needs the typed text. The count includes a not-yet-loaded `current`.
+  const showSearch = serverSearch || canAddNew || allOptions.length > searchOptionLimit;
 
   // Focus the search, or the list when there is no search. Leave option focus unset until a keyboard move.
   useLayoutEffect(() => {
@@ -582,7 +621,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
     }
     // Remove the clicked value. A tree pill uses `toggleTreeSelection` above, which also clears its parent.
     const next = values.filter((value) => valueToKey(value) !== key);
-    onCommit(next, optionsForValues(next));
+    commit(next, optionsForValues(next));
   }
 
   /** The option for each value in `next`: the one still in the list, or the stored copy if the caller removed it. */
@@ -591,6 +630,12 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       const option = optionForKey(valueToKey(value), optionsByKey, rememberedSelectedRef.current);
       return option ? [option] : [];
     });
+  }
+
+  /** Remembers each option first, so its label survives `options` changing in the same update, i.e. the `onSearch("")` on close. */
+  function commit(nextValues: V[], nextOptions: O[]) {
+    for (const option of nextOptions) rememberedSelectedRef.current.set(valueToKey(getOptionValue(option)), option);
+    onCommit(nextValues, nextOptions);
   }
 
   /**
@@ -613,7 +658,7 @@ export function useMenuSelectField<O, V extends Value>(props: MenuSelectControll
       return [option];
     });
     const nextOptions = [...selectedInTree, ...keptSelections];
-    onCommit(
+    commit(
       nextOptions.map((option) => getOptionValue(option)),
       nextOptions,
     );
@@ -827,7 +872,25 @@ function matchesSearch<O>(
   return terms?.some((term) => contains(term, query)) ?? false;
 }
 
-/** Menus with this many options or fewer omit the search field, unless `onSearch` is set. */
+/** The trimmed search for the add row, or `undefined` when it's blank or names an option other than the `unsetLabel` row. */
+function maybeNewOptionText<O>(
+  search: string,
+  options: readonly O[],
+  getOptionLabel: (opt: O) => string,
+  collator: Intl.Collator,
+): string | undefined {
+  const text = search.trim();
+  if (!text) return undefined;
+  const exists = options.some(
+    (option) => option !== unsetOption && collator.compare(getOptionLabel(option).trim(), text) === 0,
+  );
+  return exists ? undefined : text;
+}
+
+/** Namespaced so it can't collide with an option's `valueKey`. */
+const addNewKey = "beam-menu-add-new";
+
+/** Menus with this many options or fewer omit the search field, unless `onSearch` or `onAddNew` is set. */
 export const searchOptionLimit = 8;
 
 /** Wait before calling `onSearch`, matching the old select field. */

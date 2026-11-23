@@ -279,6 +279,17 @@ describe("TabsWithContent", () => {
     expect(r.tab_panel).toHaveStyle({ paddingLeft: "calc(var(--t-spacing) * 2)" });
   });
 
+  it("lets contentXss size the panel to fill its parent", async () => {
+    // Given TabContent sized via `contentXss`
+    const r = await render(
+      <TabContent tabs={testTabs} selected={testTabs[0].value} contentXss={Css.h100.fg1.$} />,
+      withRouter(),
+    );
+
+    // Then the panel takes the height and flex-grow
+    expect(r.tab_panel).toHaveStyle({ height: "100%", flexGrow: "1" });
+  });
+
   it("spaces tab content itself so a page header does not add a second gap", async () => {
     // Given tab content whose body does not pad its own top edge
     const r = await render(<TabContent tabs={testTabs} selected="tab1" />, withRouter());
