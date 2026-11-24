@@ -302,6 +302,20 @@ function hierarchyLevelType(level: number, hasChildren: boolean, topLevelHasChil
   return hasChildren ? Css.xsSb.$ : Css.xs.$;
 }
 
+/**
+ * Vertical padding that centers a 28px row action button on the first line of text.
+ * 6px for `xs` text, or 8px for the top level parent rows which use the 'sm' type.
+ * Only for flexible row height.
+ */
+export function hierarchyRowActionsCellCss(opts: {
+  level: number;
+  /** True when any top-level row has child rows. */
+  topLevelHasChildren: boolean;
+}): Properties {
+  const { level, topLevelHasChildren } = opts;
+  return Css.pyPx(level === 0 && topLevelHasChildren ? 8 : 6).$;
+}
+
 /** Dims the table still on screen, and blocks clicks on it, while `GridTable.loading` waits on the next query. */
 export const loadingTableCss = Css.o50.pen.$;
 
