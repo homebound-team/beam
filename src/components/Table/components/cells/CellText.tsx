@@ -33,7 +33,7 @@ export function CellText(props: CellTextProps) {
   const fixed = wrap === false;
 
   const textEl = (
-    <span css={Css.if(fixed).lineClamp1.wbba.$} title={fixed ? text : undefined}>
+    <span css={Css.if(fixed).lineClamp1.wbba.else.wbbw.$} title={fixed ? text : undefined}>
       {text}
     </span>
   );
