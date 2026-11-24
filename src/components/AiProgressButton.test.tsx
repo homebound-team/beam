@@ -22,6 +22,19 @@ describe("AiProgressButton", () => {
     expect(getComputedStyle(r.viewImportProgress_star).animation).toBe("");
   });
 
+  it("opens the label when the work finishes with expandOnComplete", async () => {
+    // Given an expandOnComplete button whose work is in progress
+    const r = await render(
+      <AiProgressButton label="View import Progress" inProgress expandOnComplete onClick={noop} />,
+    );
+    // Then the label rests collapsed
+    expect(getComputedStyle(r.viewImportProgress_label).gridTemplateColumns).toBe("0fr");
+    // When the work finishes
+    r.rerender(<AiProgressButton label="View import Progress" expandOnComplete onClick={noop} />);
+    // Then the label opens on its own
+    expect(getComputedStyle(r.viewImportProgress_label).gridTemplateColumns).toBe("1fr");
+  });
+
   it("fires onClick", async () => {
     // Given a button
     const onClick = vi.fn();

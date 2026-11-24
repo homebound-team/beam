@@ -4,6 +4,7 @@ import { Css } from "src/Css";
 import { MenuSelectField } from "src/inputs/MenuSelectField/MenuSelectField";
 import { FieldFrame, groupByOptions, locationOptions, open } from "src/inputs/MenuSelectField/storyHelpers";
 import { newStory, viewportModes, withBeamDecorator, withDimensions } from "src/utils/sb";
+import { userEvent, within } from "storybook/test";
 
 export default {
   title: "Inputs/Select Fields (new)/Menu Behavior/Single Selection",
@@ -75,6 +76,35 @@ export const Hierarchy = newStory(
     );
   },
   { play: open("location") },
+);
+
+/** `onAddNew` lists `Add "<search>"`; the caller creates and selects the option. */
+export const AddNew = newStory(
+  () => {
+    const [options, setOptions] = useState(groupByOptions());
+    const [value, setValue] = useState<string | undefined>();
+    return (
+      <FieldFrame>
+        <MenuSelectField
+          label="Group by"
+          options={options}
+          value={value}
+          onSelect={setValue}
+          onAddNew={(name) => {
+            const id = `new-${options.length}`;
+            setOptions([...options, { id, name }]);
+            setValue(id);
+          }}
+        />
+      </FieldFrame>
+    );
+  },
+  {
+    play: async (context) => {
+      open("groupBy")(context);
+      await userEvent.type(await within(document.body).findByTestId("groupBy_search"), "Co");
+    },
+  },
 );
 
 /** `getOptionMenuLabel` replaces the row. The closed field still shows the option name. */

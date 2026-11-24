@@ -10,9 +10,17 @@ export type MenuMultiSelectFieldProps<O, V extends Value> = MenuSelectFieldBaseP
   onSelect: (values: V[], opts: O[]) => void;
   /** How selections show in the closed field. @default inField */
   selectionView?: SelectionView;
+  /**
+   * Lists `Add "<search>"` when the search matches no option label, ignoring case and accents.
+   *
+   * Choosing it passes the trimmed text without calling `onSelect`, so add the created option's value to `values`.
+   *
+   * In AI mode, `onSelect` commits the proposal first.
+   */
+  onAddNew?: (value: string) => void;
 };
 
-/** Menu select that toggles several values and shows in-field pills by default. Search is included when the list is longer than `searchOptionLimit`, or when `onSearch` is set. See `MenuMultiSelectField.mdx`. */
+/** Menu select that toggles several values and shows in-field pills by default. Search is included when the list is longer than `searchOptionLimit`, or when `onSearch` or `onAddNew` is set. See `MenuMultiSelectField.mdx`. */
 export function MenuMultiSelectField<O, V extends Value>(props: MenuMultiSelectFieldProps<O, V>): JSX.Element {
   const { onSelect, ...rest } = props;
   return <BaseMenuSelectField {...rest} selectionMode="multiple" onCommit={onSelect} />;

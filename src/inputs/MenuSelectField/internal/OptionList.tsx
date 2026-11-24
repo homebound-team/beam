@@ -7,6 +7,7 @@ import { Css, Tokens } from "src/Css";
 import { LoadingDots } from "src/inputs/internal/LoadingDots";
 import { MixedLegend, mixedLegendHeight } from "src/inputs/MenuSelectField/internal/MixedLegend";
 import {
+  AddNewOptionRow,
   menuRowHeight,
   MultiOptionRow,
   SingleOptionRow,
@@ -126,6 +127,17 @@ export function OptionList<O>(props: OptionListProps<O>) {
                 const item = items[index];
                 const entry = item?.value;
                 if (!item || !entry) return null;
+                if ("addNew" in entry) {
+                  return (
+                    <AddNewOptionRow
+                      item={item}
+                      state={state}
+                      id={optionDomId(id, index)}
+                      selectionMode={selectionMode}
+                      {...tid}
+                    />
+                  );
+                }
                 const treeRow = tree?.rows.get(String(item.key));
                 const mixedLegendId = mixed?.keys.has(entry.valueKey) ? mixed.legendId : undefined;
                 if (treeRow && tree) {

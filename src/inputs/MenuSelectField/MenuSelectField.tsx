@@ -7,7 +7,7 @@ import type { Value } from "src/inputs/Value";
 
 /** Select whose trigger shows the value and opens a menu.
  *
- * Options with `children` are a tree: every node stays visible, and the trigger shows the path. Search is included when the list is longer than `searchOptionLimit`, or when `onSearch` is set. See `MenuSelectField.mdx`. */
+ * Options with `children` are a tree: every node stays visible, and the trigger shows the path. Search is included when the list is longer than `searchOptionLimit`, or when `onSearch` or `onAddNew` is set. See `MenuSelectField.mdx`. */
 export function MenuSelectField<O, V extends Value>(props: MenuSelectFieldProps<O, V>): JSX.Element {
   const { value, proposedValue, onSelect, unsetLabel, options, autoSort, ...rest } = props;
   const nested = optionsHaveChildren(options);
