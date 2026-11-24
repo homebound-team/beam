@@ -42,7 +42,10 @@ workflows:
       - chromatic:
           context:
             - npm-readonly
+            - github
             - dockerhub
+          requires:
+            - build
 
 commands:
   bootstrap:
@@ -106,6 +109,29 @@ jobs:
       - <<: *node-image
     working_directory: ~/project
     steps:
+      # Off main, only run for open, non-draft pull requests. CircleCI has no native "draft PR" signal, so ask GitHub.
+      # A branch with no open PR is skipped. If the draft lookup itself fails, Chromatic still runs.
+      - when:
+          condition:
+            not:
+              equal: [main, <<pipeline.git.branch>>]
+          steps:
+            - run:
+                name: Skip Chromatic for draft pull requests and branches without a PR
+                command: |
+                  if [ -z "$CIRCLE_PULL_REQUEST" ]; then
+                    echo "No open pull request for this branch, skipping Chromatic"
+                    circleci-agent step halt
+                    exit 0
+                  fi
+                  draft=$(curl -fsS ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} \
+                    "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/${CIRCLE_PULL_REQUEST##*/}" \
+                    | jq -r .draft) || draft=""
+                  if [ "$draft" = "true" ]; then
+                    echo "Draft pull request, skipping Chromatic"
+                    circleci-agent step halt
+                    exit 0
+                  fi
       - bootstrap
       - when:
           condition:
