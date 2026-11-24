@@ -962,7 +962,9 @@ const textCellRows: GridDataRow<TextCellRows>[] = [
     [
       { variant: "Plain", value: "Kitchen remodel" },
       { variant: "Long", value: longText },
-      { variant: "Long, no spaces", value: "https://www.homebound.com/a/very/long/path/without/any/spaces/in/it" },
+      { variant: "Long URL", value: "https://www.homebound.com/a/very/long/path/without/any/spaces/in/it" },
+      { variant: "Long, no break points", value: "purchase.orders.notifications.homebound.construction@example.com" },
+      { variant: "Long ID", value: "PO-0000000000000000000000000000000000000000000000" },
       { variant: "Empty", value: null, opts: { onClick: "/x", status: "success", endIcon: { icon: "error" } } },
       { variant: "Link", value: "Kitchen remodel", opts: { onClick: "/projects/1" } },
       { variant: "Link (long)", value: longText, opts: { onClick: "/projects/1" } },
