@@ -3,7 +3,7 @@ import { usePresentationContext } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
-export type CellTextLink = {
+export type CellTextAction = {
   /** A string renders a link, a function renders a button styled as a link. */
   onClick: string | VoidFunction;
   openInNew?: boolean;
@@ -13,7 +13,7 @@ export type CellTextLink = {
 type CellTextProps = {
   text: string;
   /** Wraps only the text, never the start/end slots. */
-  link?: CellTextLink;
+  action?: CellTextAction;
   /** Sits before the text, centered on its first line. */
   start?: ReactNode;
   /** Sits after the text, centered on its first line. */
@@ -28,26 +28,26 @@ type CellTextProps = {
  * The empty state isn't handled here: builders return empty content so the table's `emptyCell` shows.
  */
 export function CellText(props: CellTextProps) {
-  const { text, link, start, end } = props;
+  const { text, action, start, end } = props;
   const { wrap } = usePresentationContext();
   const fixed = wrap === false;
 
   const textEl = (
-    <span css={Css.if(fixed).lineClamp1.wbba.else.wbbw.$} title={fixed ? text : undefined}>
+    <span css={Css.if(fixed).lineClamp1.wbba.$} title={fixed ? text : undefined}>
       {text}
     </span>
   );
 
   return (
-    <span css={Css.df.aifs.gap1.mw0.maxw100.$}>
+    <span css={Css.df.gap1.mw0.maxw100.$}>
       {start && <Slot>{start}</Slot>}
-      {link ? (
+      {action ? (
         getButtonOrLink(
           textEl,
-          link.onClick,
+          action.onClick,
           Css.props(Css.mw0.color(Tokens.TextLinkDefault).ta("inherit").$),
-          link.openInNew,
-          link.download,
+          action.openInNew,
+          action.download,
         )
       ) : (
         <span css={Css.mw0.$}>{textEl}</span>

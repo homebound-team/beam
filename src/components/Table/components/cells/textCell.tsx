@@ -43,7 +43,7 @@ export function textCell(value: string | null | undefined, opts: TextCellOpts = 
     content: () => (
       <CellText
         text={value}
-        link={onClick ? { onClick, openInNew, download } : undefined}
+        action={onClick ? { onClick, openInNew, download } : undefined}
         start={status && <StatusDot status={status} />}
         end={endIcon && <Icon icon={endIcon.icon} tooltip={endIcon.tooltip} inc={2} color={Tokens.OnSurfaceMuted} />}
       />
