@@ -16,9 +16,17 @@ only-run-on-release-branches: &only-run-on-release-branches
       - alpha
       - next-major
 
+parameters:
+  # Set by .github/workflows/chromatic-on-ready.yml when a draft PR is marked ready for review.
+  chromatic-pr:
+    type: string
+    default: ""
+
 workflows:
   version: 2
   workflow:
+    when:
+      equal: ["", << pipeline.parameters.chromatic-pr >>]
     jobs:
       - build:
           context:
@@ -46,6 +54,18 @@ workflows:
             - dockerhub
           requires:
             - build
+
+  # Runs only Chromatic, for a PR that was just marked ready for review.
+  chromatic-on-ready:
+    when:
+      not:
+        equal: ["", << pipeline.parameters.chromatic-pr >>]
+    jobs:
+      - chromatic:
+          context:
+            - npm-readonly
+            - github
+            - dockerhub
 
 commands:
   bootstrap:
@@ -119,13 +139,15 @@ jobs:
             - run:
                 name: Skip Chromatic for draft pull requests and branches without a PR
                 command: |
-                  if [ -z "$CIRCLE_PULL_REQUEST" ]; then
+                  pr="<< pipeline.parameters.chromatic-pr >>"
+                  pr="${pr:-${CIRCLE_PULL_REQUEST##*/}}"
+                  if [ -z "$pr" ]; then
                     echo "No open pull request for this branch, skipping Chromatic"
                     circleci-agent step halt
                     exit 0
                   fi
                   draft=$(curl -fsS ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} \
-                    "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/${CIRCLE_PULL_REQUEST##*/}" \
+                    "https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$pr" \
                     | jq -r .draft) || draft=""
                   if [ "$draft" = "true" ]; then
                     echo "Draft pull request, skipping Chromatic"
