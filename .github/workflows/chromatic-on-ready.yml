@@ -1,0 +1,52 @@
+name: Chromatic on ready for review
+
+# CircleCI only runs on push, and its chromatic job skips draft PRs.
+# When a draft PR is marked ready, trigger a Chromatic-only CircleCI pipeline for the branch,
+# but only if the CircleCI build for the PR's head commit passed.
+on:
+  pull_request:
+    types:
+      - ready_for_review
+
+permissions:
+  statuses: read
+
+jobs:
+  trigger_chromatic:
+    # Fork PRs have no access to CIRCLECI_API_TOKEN.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for CircleCI build to pass
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Poll the build status for up to 30 minutes; it may still be running when the PR is marked ready.
+          for _ in $(seq 1 60); do
+            state=$(gh api "repos/$REPO/commits/$SHA/status" \
+              --jq '.statuses[] | select(.context == "ci/circleci: build") | .state')
+            case "$state" in
+              success) echo "CircleCI build passed for $SHA"; exit 0 ;;
+              failure|error) echo "::error::CircleCI build is $state for $SHA, not running Chromatic"; exit 1 ;;
+              *) echo "CircleCI build is '${state:-missing}', waiting..."; sleep 30 ;;
+            esac
+          done
+          echo "::error::Timed out waiting for the CircleCI build for $SHA"
+          exit 1
+
+      - name: Trigger CircleCI Chromatic pipeline
+        env:
+          CIRCLECI_API_TOKEN: ${{ secrets.CIRCLECI_API_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          body=$(jq -n --arg branch "$BRANCH" --arg pr "$PR_NUMBER" \
+            '{branch: $branch, parameters: {"chromatic-pr": $pr}}')
+          curl -fsS -X POST \
+            -H "Circle-Token: $CIRCLECI_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$body" \
+            "https://circleci.com/api/v2/project/gh/$REPO/pipeline"
