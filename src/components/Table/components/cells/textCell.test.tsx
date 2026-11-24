@@ -37,10 +37,15 @@ describe("textCell", () => {
     // Then the empty row shows "-" with no link or icon
     expect(cell(r, 2, 0)).toHaveTextContent(/^-$/);
     expect(cell(r, 2, 0).querySelector("a, svg")).toBeNull();
-    // And has no value or card slot
-    const empty = textCell(null, { status: "success" });
-    expect(empty.value).toBeUndefined();
-    expect(empty.cardSlot).toBeUndefined();
+  });
+
+  it("leaves out the value and default card slot for empty values", () => {
+    // When building an empty cell with a status
+    const content = textCell(null, { status: "success" });
+    // Then it has no value to sort or filter on
+    expect(content.value).toBeUndefined();
+    // And no status card slot
+    expect(content.cardSlot).toBeUndefined();
   });
 
   it("links only the text, not the decorations", async () => {
