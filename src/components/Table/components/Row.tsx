@@ -309,8 +309,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isGroupHeader && column.groupId
               ? column.groupLabel
               : applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
-          // A cell with its own `onClick` stays out of the row's `rowLink` / `onClick`, so links don't nest.
-          const wrapAction = column.wrapAction ?? !(isGridCellContent(maybeContent) && !!maybeContent.onClick);
+          // A cell opts out of the row's `rowLink` / `onClick` with its own `wrapAction`, and a cell `onClick` always does, so links don't nest.
+          const cellOptsOut =
+            isGridCellContent(maybeContent) && (maybeContent.wrapAction === false || !!maybeContent.onClick);
+          const wrapAction = column.wrapAction !== false && !cellOptsOut;
 
           // Group spans follow the visible leaves. Expandable headers span their expanded children.
           const groupSpan = isGroupHeader && column.groupId ? consecutiveGroupSpan(columns, columnIndex) : 1;

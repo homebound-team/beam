@@ -2543,22 +2543,38 @@ describe("GridTable", () => {
     expect(rowOnClick).not.toHaveBeenCalled();
   });
 
-  it("passes openInNew and download through to a GridCellContent link", async () => {
-    // Given one cell that opens in a new tab and one that downloads
-    const linkColumn: GridColumn<Row> = {
+  it("can omit rowLink for a single cell", async () => {
+    // Given a rowLink on every data row
+    const rowStyles: RowStyles<Row> = { header: {}, data: { rowLink: () => "/row" } };
+    // And a name column where only foo's cell opts out
+    const mixedColumn: GridColumn<Row> = {
       ...nameColumn,
-      data: ({ name }) => ({
-        content: name,
-        onClick: `/${name}`,
-        ...(name === "foo" ? { openInNew: true } : { download: true }),
-      }),
+      data: ({ name }) => (name === "foo" ? { content: name, wrapAction: false } : name),
     };
     // When rendered
-    const r = await render(<GridTable {...{ columns: [linkColumn], rows }} />, withRouter());
-    // Then the first opens in a new tab
-    expect(r.getByText("foo")).toHaveAttribute("target", "_blank");
-    // And the second downloads
-    expect(r.getByText("bar")).toHaveAttribute("download");
+    const r = await render(<GridTable {...{ columns: [mixedColumn], rows, rowStyles }} />, withRouter());
+    // Then foo's cell isn't wrapped in the row link
+    expect(cell(r, 1, 0).tagName).toBe("DIV");
+    // And bar's cell, in the same column, still is
+    expect(cell(r, 2, 0).tagName).toBe("A");
+  });
+
+  it("can omit onClick for a single cell", async () => {
+    // Given an onClick on every data row
+    const onClick = vi.fn();
+    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
+    // And a name column where only foo's cell opts out
+    const mixedColumn: GridColumn<Row> = {
+      ...nameColumn,
+      data: ({ name }) => (name === "foo" ? { content: name, wrapAction: false } : name),
+    };
+    const r = await render(<GridTable {...{ columns: [mixedColumn], rows, rowStyles }} />);
+    // When clicking both cells in the column
+    click(cell(r, 1, 0));
+    click(cell(r, 2, 0));
+    // Then only bar's row fires
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0].data.name).toEqual("bar");
   });
 
   it("can handle onClick for GridCellContent", async () => {

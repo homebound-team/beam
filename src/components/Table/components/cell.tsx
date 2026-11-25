@@ -39,12 +39,12 @@ export type GridCellContent = {
    * The cell is then left out of the row's `rowLink` / `onClick` wrapper, so links don't nest.
    */
   onClick?: VoidFunction | string;
-  /** When `onClick` is a string, opens the link in a new tab. */
-  openInNew?: boolean;
-  /** When `onClick` is a string, downloads the linked file instead of navigating. */
-  download?: boolean;
-  /** Set by `textCell`. Its content already wraps just the text in the `onClick` link, so the whole cell isn't wrapped again. */
-  linkInContent?: true;
+  /**
+   * Leaves this cell out of the row's `rowLink` / `onClick`, while the column's other cells keep it.
+   *
+   * Use it for a cell with its own controls (i.e. a field) in an otherwise clickable column.
+   */
+  wrapAction?: false;
   /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
   css?: Properties;
   /** Tooltip to add to a cell */

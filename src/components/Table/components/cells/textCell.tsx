@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
 import { Icon, type IconKey } from "src/components/Icon";
+import { usePresentationContext } from "src/components/PresentationContext";
 import { cardStatusSlot } from "src/components/Table/cardSlots";
 import type { GridCellContent } from "src/components/Table/components/cell";
-import { CellText } from "src/components/Table/components/cells/CellText";
 import { Css, Palette, Tokens } from "src/Css";
+import { getButtonOrLink } from "src/utils/getInteractiveElement";
 
 /** Colors for the status dot. A subset of `TagType`, so a status maps onto a card's status tag. */
 export type StatusType = "success" | "warning" | "error" | "info" | "neutral";
@@ -40,22 +42,60 @@ export function textCell(value: string | null | undefined, opts: TextCellOpts = 
 
   return {
     ...common,
-    content: () => (
-      <CellText
-        text={value}
-        action={onClick ? { onClick, openInNew, download } : undefined}
-        start={status && <StatusDot status={status} />}
-        end={endIcon && <Icon icon={endIcon.icon} tooltip={endIcon.tooltip} inc={2} color={Tokens.OnSurfaceMuted} />}
-      />
-    ),
+    content: () => <TextCellContent text={value} {...{ onClick, openInNew, download, status, endIcon }} />,
     value,
-    ...(onClick && { onClick, openInNew, download, linkInContent: true }),
+    // The link is rendered in the content, around just the text, so the cell sets `wrapAction` rather than `onClick`.
+    ...(onClick && { wrapAction: false }),
     cardSlot: cardSlot ?? (status ? cardStatusSlot({ text: value, type: status }) : undefined),
   };
 }
 
-function StatusDot({ status }: { status: StatusType }) {
-  return <span aria-hidden css={Css.wPx(8).hPx(8).br100.fs0.bgColor(statusColors[status]).$} />;
+type TextCellContentProps = Pick<TextCellOpts, "onClick" | "openInNew" | "download" | "status" | "endIcon"> & {
+  text: string;
+};
+
+/** Flexible rows wrap the text (breaking long words), fixed rows clamp it to one line; the dot and icon never shrink. */
+function TextCellContent(props: TextCellContentProps) {
+  const { text, onClick, openInNew, download, status, endIcon } = props;
+  const { wrap } = usePresentationContext();
+  const fixed = wrap === false;
+
+  const textEl = (
+    <span css={Css.if(fixed).lineClamp1.wbba.else.wbbw.$} title={fixed ? text : undefined}>
+      {text}
+    </span>
+  );
+
+  return (
+    <span css={Css.df.gap1.mw0.maxw100.$}>
+      {status && (
+        <Slot>
+          <span aria-hidden css={Css.wPx(8).hPx(8).br100.bgColor(statusColors[status]).$} />
+        </Slot>
+      )}
+      {onClick ? (
+        getButtonOrLink(
+          textEl,
+          onClick,
+          Css.props(Css.mw0.color(Tokens.TextLinkDefault).ta("inherit").$),
+          openInNew,
+          download,
+        )
+      ) : (
+        <span css={Css.mw0.$}>{textEl}</span>
+      )}
+      {endIcon && (
+        <Slot>
+          <Icon icon={endIcon.icon} tooltip={endIcon.tooltip} inc={2} color={Tokens.OnSurfaceMuted} />
+        </Slot>
+      )}
+    </span>
+  );
+}
+
+/** One line tall (`1lh`) at whatever typography the cell uses, so its content centers on the first line of text. */
+function Slot({ children }: { children: ReactNode }) {
+  return <span css={Css.df.aic.fs0.h("1lh").$}>{children}</span>;
 }
 
 const statusColors: Record<StatusType, Palette> = {

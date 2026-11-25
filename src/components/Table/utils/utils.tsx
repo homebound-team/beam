@@ -68,7 +68,7 @@ export function toContent<R extends Kinded>(
   ) : null;
 
   content =
-    isGridCellContent(maybeContent) && !!maybeContent.onClick && !maybeContent.linkInContent
+    isGridCellContent(maybeContent) && !!maybeContent.onClick
       ? getButtonOrLink(
           content,
           maybeContent.onClick,
@@ -78,8 +78,6 @@ export function toContent<R extends Kinded>(
               .ta("inherit")
               .if(style?.presentationSettings?.wrap === false).truncate.$,
           ),
-          maybeContent.openInNew,
-          maybeContent.download,
         )
       : content;
 
