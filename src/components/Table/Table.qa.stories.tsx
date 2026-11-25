@@ -5,6 +5,7 @@ import { type ReactNode, useMemo, useState } from "react";
 import { Button } from "src";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
+import { numberCell, type NumberCellOpts } from "src/components/Table/components/cells/numberCell";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { type GridSortConfig, GridTable, type GridTableProps } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
@@ -916,6 +917,66 @@ const flatRows: GridDataRow<BeamRow>[] = [
       location: idx % 2 ? "l:1" : "l:2",
     },
   })),
+];
+
+/* Number Cell Story and data */
+type NumberCellVariant = {
+  id: string;
+  variant: string;
+  value: number | null | undefined;
+  opts?: NumberCellOpts;
+};
+type NumberCellRows = SimpleHeaderAndData<NumberCellVariant>;
+
+/** Every `numberCell` value and option, in fixed and flexible rows, next to text for first-line alignment. */
+export function NumberCells() {
+  return (
+    <>
+      <h2 css={Css.mb1.$}>Fixed Table Styles</h2>
+      <GridTable<NumberCellRows>
+        style={getTableStyles({ rowHeight: "fixed" })}
+        columns={numberCellColumns}
+        rows={numberCellRows}
+      />
+      <h2 css={Css.mt5.mb1.$}>Flexible Table Styles</h2>
+      <GridTable<NumberCellRows> style={getTableStyles({})} columns={numberCellColumns} rows={numberCellRows} />
+    </>
+  );
+}
+
+const numberCellColumns: GridColumn<NumberCellRows>[] = [
+  column<NumberCellRows>({ header: "Variant", data: ({ variant }) => variant, w: "200px" }),
+  column<NumberCellRows>({ header: "numberCell", data: ({ value, opts }) => numberCell(value, opts), w: "160px" }),
+  column<NumberCellRows>({
+    header: "Neighbor",
+    data: () => "Plain text that wraps onto more lines in flexible rows, for first-line alignment",
+  }),
+];
+
+const numberCellRows: GridDataRow<NumberCellRows>[] = [
+  simpleHeader,
+  ...(
+    [
+      { variant: "Zero", value: 0 },
+      { variant: "Integer", value: 42 },
+      { variant: "Thousands", value: 1234567 },
+      { variant: "Decimals", value: 1234.567 },
+      { variant: "Negative", value: -9876.5 },
+      { variant: "Very long", value: 123456789012345 },
+      { variant: "Null", value: null },
+      { variant: "Undefined", value: undefined },
+      { variant: "Delta: up, good", value: 1234, opts: { delta: { value: 56 } } },
+      { variant: "Delta: down, good", value: 1234, opts: { delta: { value: -56 } } },
+      { variant: "Delta: up, bad", value: 1234, opts: { delta: { value: 56, increaseIs: "bad" } } },
+      { variant: "Delta: down, bad", value: 1234, opts: { delta: { value: -56, increaseIs: "bad" } } },
+      { variant: "Delta: zero (hidden)", value: 1234, opts: { delta: { value: 0 } } },
+      { variant: "Delta: empty value (hidden)", value: null, opts: { delta: { value: 56 } } },
+      { variant: "Delta: wraps below", value: 12345678, opts: { delta: { value: 1234567 } } },
+      { variant: "Delta: very long", value: 123456789012345, opts: { delta: { value: 9876543.21 } } },
+      { variant: "AI mode", value: 1234, opts: { aiMode: true } },
+      { variant: "Tooltip", value: 12, opts: { tooltip: "12 units on order" } },
+    ] satisfies Omit<NumberCellVariant, "id">[]
+  ).map((v, i) => ({ kind: "data" as const, id: `n:${i}`, data: { id: `n:${i}`, ...v } })),
 ];
 
 /* Input Field Story and data */

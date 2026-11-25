@@ -95,41 +95,22 @@ export function NumberField(props: NumberFieldProps) {
   const factor =
     type === "percent" ? 100 : type === "cents" ? 100 : type === "mills" ? 1_000 : type === "basisPoints" ? 10_000 : 1;
 
-  const signDisplay = displayDirection ? "always" : "auto";
-  const defaultFormatOptions: Intl.NumberFormatOptions = useMemo(
-    () => ({
-      [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits,
-      ...(numIntegerDigits !== undefined && { minimumIntegerDigits: numIntegerDigits }),
-      useGrouping,
-      signDisplay,
-    }),
-    [truncate, numIntegerDigits, useGrouping, signDisplay, numFractionDigits],
-  );
   const { locale } = useLocale();
   // If formatOptions isn't memo'd, a useEffect in useNumberStateField will cause jank,
   // see: https://github.com/adobe/react-spectrum/issues/1893.
-  const formatOptions: Intl.NumberFormatOptions | undefined = useMemo(() => {
-    if (numberFormatOptions !== undefined) {
-      return numberFormatOptions;
-    }
-
-    const typeFormat =
-      type === "percent"
-        ? { style: "percent" }
-        : type === "basisPoints"
-          ? { style: "percent", minimumFractionDigits: 2 }
-          : type === "cents"
-            ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
-            : type === "mills"
-              ? { style: "currency", currency: "USD", minimumFractionDigits: 3 }
-              : type === "dollars"
-                ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
-                : type === "days"
-                  ? { style: "unit", unit: "day", unitDisplay: "long" as const, maximumFractionDigits: 0 }
-                  : {};
-
-    return { ...defaultFormatOptions, ...typeFormat } as any;
-  }, [type, numberFormatOptions, defaultFormatOptions, numFractionDigits]);
+  const formatOptions = useMemo(
+    () =>
+      getNumberFormatOptions({
+        type,
+        numberFormatOptions,
+        truncate,
+        numFractionDigits,
+        numIntegerDigits,
+        useGrouping,
+        displayDirection,
+      }),
+    [type, numberFormatOptions, truncate, numFractionDigits, numIntegerDigits, useGrouping, displayDirection],
+  );
   const numberParser = useMemo(() => new NumberParser(locale, formatOptions), [locale, formatOptions]);
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale, formatOptions), [locale, formatOptions]);
@@ -253,6 +234,56 @@ export function NumberField(props: NumberFieldProps) {
       {...otherProps}
     />
   );
+}
+
+type NumberFormatProps = Pick<
+  NumberFieldProps,
+  | "type"
+  | "numberFormatOptions"
+  | "truncate"
+  | "numFractionDigits"
+  | "numIntegerDigits"
+  | "useGrouping"
+  | "displayDirection"
+>;
+
+/** The `Intl.NumberFormatOptions` `NumberField` displays its value with. Shared with `numberCell`, so tables format numbers the same way. */
+export function getNumberFormatOptions(props: NumberFormatProps): Intl.NumberFormatOptions {
+  const {
+    type,
+    numberFormatOptions,
+    truncate = false,
+    numFractionDigits = type === "dollars" ? 2 : undefined,
+    numIntegerDigits,
+    useGrouping = true,
+    displayDirection = false,
+  } = props;
+  if (numberFormatOptions !== undefined) {
+    return numberFormatOptions;
+  }
+
+  const defaultFormatOptions: Intl.NumberFormatOptions = {
+    [truncate ? "maximumFractionDigits" : "minimumFractionDigits"]: numFractionDigits,
+    ...(numIntegerDigits !== undefined && { minimumIntegerDigits: numIntegerDigits }),
+    useGrouping,
+    signDisplay: displayDirection ? "always" : "auto",
+  };
+  const typeFormat =
+    type === "percent"
+      ? { style: "percent" }
+      : type === "basisPoints"
+        ? { style: "percent", minimumFractionDigits: 2 }
+        : type === "cents"
+          ? { style: "currency", currency: "USD", minimumFractionDigits: 2 }
+          : type === "mills"
+            ? { style: "currency", currency: "USD", minimumFractionDigits: 3 }
+            : type === "dollars"
+              ? { style: "currency", currency: "USD", minimumFractionDigits: numFractionDigits ?? 2 }
+              : type === "days"
+                ? { style: "unit", unit: "day", unitDisplay: "long" as const, maximumFractionDigits: 0 }
+                : {};
+
+  return { ...defaultFormatOptions, ...typeFormat } as any;
 }
 
 export function formatValue(

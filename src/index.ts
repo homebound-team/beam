@@ -220,6 +220,8 @@ export {
   rowLinkRenderFn,
 } from "./components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "./components/Table/components/cell";
+export { numberCell } from "./components/Table/components/cells/numberCell";
+export type { CellDelta, NumberCellOpts } from "./components/Table/components/cells/numberCell";
 export type {
   CompanionConfig,
   CompanionContent,
