@@ -5,11 +5,12 @@ import { type ReactNode, useMemo, useState } from "react";
 import { Button } from "src";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
+import { textCell, type TextCellOpts } from "src/components/Table/components/cells/textCell";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { type GridSortConfig, GridTable, type GridTableProps } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
 import { TableActions } from "src/components/Table/TableActions";
-import { getTableStyles, type GridStyleDef } from "src/components/Table/TableStyles";
+import { getTableStyles, type GridStyleDef, type RowStyles } from "src/components/Table/TableStyles";
 import type { GridColumn } from "src/components/Table/types";
 import {
   collapseColumn,
@@ -38,7 +39,7 @@ import { SelectField } from "src/inputs/SelectField";
 import { TextField } from "src/inputs/TextField";
 import type { HasIdAndName } from "src/types";
 import { noop } from "src/utils/helpers";
-import { zeroTo } from "src/utils/sb";
+import { withRouter, zeroTo } from "src/utils/sb";
 
 type TableStoryProps = {
   nestingDepth?: number;
@@ -916,6 +917,78 @@ const flatRows: GridDataRow<BeamRow>[] = [
       location: idx % 2 ? "l:1" : "l:2",
     },
   })),
+];
+
+/* Text Cell Story and data */
+type TextCellVariant = {
+  id: string;
+  variant: string;
+  value: string | null;
+  opts?: TextCellOpts;
+};
+type TextCellRows = SimpleHeaderAndData<TextCellVariant>;
+
+/** Every `textCell` option, in fixed and flexible rows. Rows link to `/row`, so cells with `onClick` show they stay out of it. */
+export function TextCells() {
+  const styleFixed = getTableStyles({ rowHeight: "fixed" });
+  const styleFlexible = getTableStyles({});
+  const rowStyles: RowStyles<TextCellRows> = { data: { rowLink: () => "/row" } };
+  return (
+    <>
+      <h2 css={Css.mb1.$}>Fixed Table Styles</h2>
+      <GridTable<TextCellRows> style={styleFixed} columns={textCellColumns} rows={textCellRows} rowStyles={rowStyles} />
+      <h2 css={Css.mt5.mb1.$}>Flexible Table Styles</h2>
+      <GridTable<TextCellRows>
+        style={styleFlexible}
+        columns={textCellColumns}
+        rows={textCellRows}
+        rowStyles={rowStyles}
+      />
+    </>
+  );
+}
+TextCells.decorators = [withRouter()];
+
+const textCellColumns: GridColumn<TextCellRows>[] = [
+  column<TextCellRows>({ header: "Variant", data: ({ variant }) => variant, w: "200px" }),
+  column<TextCellRows>({ header: "textCell", data: ({ value, opts }) => textCell(value, opts), w: "240px" }),
+  column<TextCellRows>({ header: "Neighbor", data: () => "Plain text, for first-line alignment" }),
+];
+
+const longText = "A longer value that wraps onto more lines in flexible rows and clamps to one in fixed rows";
+const textCellRows: GridDataRow<TextCellRows>[] = [
+  simpleHeader,
+  ...(
+    [
+      { variant: "Plain", value: "Kitchen remodel" },
+      { variant: "Long", value: longText },
+      { variant: "Long URL", value: "https://www.homebound.com/a/very/long/path/without/any/spaces/in/it" },
+      { variant: "Long, no break points", value: "purchase.orders.notifications.homebound.construction@example.com" },
+      { variant: "Long ID", value: "PO-0000000000000000000000000000000000000000000000" },
+      { variant: "Empty", value: null, opts: { onClick: "/x", status: "success", endIcon: { icon: "error" } } },
+      { variant: "Link", value: "Kitchen remodel", opts: { onClick: "/projects/1" } },
+      { variant: "Link (long)", value: longText, opts: { onClick: "/projects/1" } },
+      { variant: "Button", value: "Kitchen remodel", opts: { onClick: () => alert("Clicked") } },
+      {
+        variant: "Open in new tab",
+        value: "Homebound",
+        opts: { onClick: "https://www.homebound.com", openInNew: true },
+      },
+      { variant: "Download", value: "plans.pdf", opts: { onClick: "/plans.pdf", download: true } },
+      { variant: "Status: success", value: "Active", opts: { status: "success" } },
+      { variant: "Status: warning", value: "On hold", opts: { status: "warning" } },
+      { variant: "Status: error", value: "Delayed", opts: { status: "error" } },
+      { variant: "Status: info", value: "Submitted", opts: { status: "info" } },
+      { variant: "Status: neutral", value: "Draft", opts: { status: "neutral" } },
+      { variant: "Status (long)", value: longText, opts: { status: "success" } },
+      { variant: "End icon", value: "Over budget", opts: { endIcon: { icon: "error", tooltip: "Exceeds by $1,200" } } },
+      {
+        variant: "Link + status + end icon",
+        value: longText,
+        opts: { onClick: "/projects/1", status: "warning", endIcon: { icon: "error", tooltip: "Needs review" } },
+      },
+    ] satisfies Omit<TextCellVariant, "id">[]
+  ).map((v, i) => ({ kind: "data" as const, id: `t:${i}`, data: { id: `t:${i}`, ...v } })),
 ];
 
 /* Input Field Story and data */

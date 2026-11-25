@@ -2511,6 +2511,72 @@ describe("GridTable", () => {
     expect(cell(r, 1, 1).tagName).toBe("A");
   });
 
+  it("leaves a cell with its own onClick out of the rowLink", async () => {
+    // Given a rowLink on every data row
+    const rowStyles: RowStyles<Row> = { header: {}, data: { rowLink: () => "/row" } };
+    // And a name column whose cells link somewhere else
+    const linkColumn: GridColumn<Row> = { ...nameColumn, data: ({ name }) => ({ content: name, onClick: "/cell" }) };
+    // When rendered
+    const r = await render(<GridTable {...{ columns: [linkColumn, valueColumn], rows, rowStyles }} />, withRouter());
+    // Then the linked cell isn't wrapped in the row link, so the links don't nest
+    expect(cell(r, 1, 0).tagName).toBe("DIV");
+    expect(r.getByText("foo")).toHaveAttribute("href", "/cell");
+    // And the other cells still link to the row
+    expect(cell(r, 1, 1).tagName).toBe("A");
+  });
+
+  it("leaves a cell with its own onClick out of the row onClick", async () => {
+    // Given an onClick on every data row
+    const rowOnClick = vi.fn();
+    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick: rowOnClick } };
+    // And a name column whose cells have their own onClick
+    const cellOnClick = vi.fn();
+    const buttonColumn: GridColumn<Row> = {
+      ...nameColumn,
+      data: ({ name }) => ({ content: name, onClick: cellOnClick }),
+    };
+    const r = await render(<GridTable {...{ columns: [buttonColumn, valueColumn], rows, rowStyles }} />);
+    // When clicking the cell's button
+    click(r.getByText("foo"));
+    // Then only the cell's onClick fires
+    expect(cellOnClick).toHaveBeenCalledTimes(1);
+    expect(rowOnClick).not.toHaveBeenCalled();
+  });
+
+  it("can omit rowLink for a single cell", async () => {
+    // Given a rowLink on every data row
+    const rowStyles: RowStyles<Row> = { header: {}, data: { rowLink: () => "/row" } };
+    // And a name column where only foo's cell opts out
+    const mixedColumn: GridColumn<Row> = {
+      ...nameColumn,
+      data: ({ name }) => (name === "foo" ? { content: name, wrapAction: false } : name),
+    };
+    // When rendered
+    const r = await render(<GridTable {...{ columns: [mixedColumn], rows, rowStyles }} />, withRouter());
+    // Then foo's cell isn't wrapped in the row link
+    expect(cell(r, 1, 0).tagName).toBe("DIV");
+    // And bar's cell, in the same column, still is
+    expect(cell(r, 2, 0).tagName).toBe("A");
+  });
+
+  it("can omit onClick for a single cell", async () => {
+    // Given an onClick on every data row
+    const onClick = vi.fn();
+    const rowStyles: RowStyles<Row> = { header: {}, data: { onClick } };
+    // And a name column where only foo's cell opts out
+    const mixedColumn: GridColumn<Row> = {
+      ...nameColumn,
+      data: ({ name }) => (name === "foo" ? { content: name, wrapAction: false } : name),
+    };
+    const r = await render(<GridTable {...{ columns: [mixedColumn], rows, rowStyles }} />);
+    // When clicking both cells in the column
+    click(cell(r, 1, 0));
+    click(cell(r, 2, 0));
+    // Then only bar's row fires
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0].data.name).toEqual("bar");
+  });
+
   it("can handle onClick for GridCellContent", async () => {
     const onClick = vi.fn();
     // Given a table with an onClick specified GridCellContent

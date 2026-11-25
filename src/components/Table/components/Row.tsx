@@ -270,8 +270,6 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
           // If we're rendering the Expandable Header row, then we might need to render the previous column's `expandHeader` property in the case where the column is hidden on expand.
           column = isExpandableHeader ? maybeExpandedColumn : column;
 
-          const { wrapAction = true } = column;
-
           const isFirstContentColumn = isContentColumn(column) && !foundFirstContentColumn;
           // Flag the column itself. Headers don't apply the first-content styles, so if we flagged those we'd mark every header cell.
           foundFirstContentColumn ||= isFirstContentColumn;
@@ -313,6 +311,10 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             isGroupHeader && column.groupId
               ? column.groupLabel
               : applyRowFn(column as GridColumnWithId<R>, row, rowApi, level, isExpanded, dragData);
+          // A cell opts out of the row's `rowLink` / `onClick` with its own `wrapAction`, and a cell `onClick` always does, so links don't nest.
+          const cellOptsOut =
+            isGridCellContent(maybeContent) && (maybeContent.wrapAction === false || !!maybeContent.onClick);
+          const wrapAction = column.wrapAction !== false && !cellOptsOut;
 
           // Group spans follow the visible leaves. Expandable headers span their expanded children.
           const groupSpan = isGroupHeader && column.groupId ? consecutiveGroupSpan(columns, columnIndex) : 1;

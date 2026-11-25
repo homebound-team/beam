@@ -33,8 +33,18 @@ export type GridCellContent = {
   typeScale?: Typography;
   /** Allows the cell to stay in place when the user scrolls horizontally, i.e. frozen columns. */
   sticky?: "left" | "right";
-  /** If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string. */
+  /**
+   * If provided, content of the cell will be wrapped within a <button /> or <a /> tag depending on if the value is a function or a string.
+   *
+   * The cell is then left out of the row's `rowLink` / `onClick` wrapper, so links don't nest.
+   */
   onClick?: VoidFunction | string;
+  /**
+   * Leaves this cell out of the row's `rowLink` / `onClick`, while the column's other cells keep it.
+   *
+   * Use it for a cell with its own controls (i.e. a field) in an otherwise clickable column.
+   */
+  wrapAction?: false;
   /** Custom css to apply directly to this cell, i.e. cell-specific borders. */
   css?: Properties;
   /** Tooltip to add to a cell */
