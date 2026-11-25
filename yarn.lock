@@ -986,7 +986,7 @@ __metadata:
     "@types/react-dom": "npm:^19.2.7"
     array-move: "npm:^4.0.0"
     change-case: "npm:^5.4.4"
-    chromatic: "npm:^18.7.2"
+    chromatic: "npm:^18.15.0"
     conventional-changelog-conventionalcommits: "npm:^9.3.1"
     date-fns: "npm:^4.4.0"
     dompurify: "npm:^3.4.15"
@@ -3788,9 +3788,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromatic@npm:^18.7.2":
-  version: 18.7.2
-  resolution: "chromatic@npm:18.7.2"
+"chromatic@npm:^18.15.0":
+  version: 18.15.2
+  resolution: "chromatic@npm:18.15.2"
   dependencies:
     semver: "npm:^7.3.5"
   peerDependencies:
@@ -3813,7 +3813,7 @@ __metadata:
     chroma: dist/bin.cjs
     chromatic: dist/bin.cjs
     chromatic-cli: dist/bin.cjs
-  checksum: 10/12651bbab1ab68fb97ae31d8b55ca046241e9d2d37b9020dfca980912a24830067f0d215964fcde57f7035867d6336fb312b564b8fa7ea1270cfcd160c56557b
+  checksum: 10/a0c31b3b69486221dd5fe1bf8bbf18fd995dd30120836c4ee76a180dd8fd4b223a87af7c82599e1eea72499bf50850e215dad378a3555de748195f60162944fd
   languageName: node
   linkType: hard
 
