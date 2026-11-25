@@ -18,6 +18,7 @@ import type { ResizedWidths } from "src/components/Table/hooks/useColumnResizing
 import {
   type GridStyle,
   hierarchyFirstContentCss,
+  hierarchyRowActionsCellCss,
   type RowStyles,
   tableRowPrintBreakCss,
 } from "src/components/Table/TableStyles";
@@ -37,6 +38,7 @@ import {
   isUnmeasuredFrSize,
   parseWidthToPx,
 } from "src/components/Table/utils/columns";
+import { beamRowActionsColumnId } from "src/components/Table/utils/rowActions";
 import { DraggedOver, type RowState } from "src/components/Table/utils/RowState";
 import { ensureClientSideSortValueIsSortable } from "src/components/Table/utils/sortRows";
 import { TableStateContext } from "src/components/Table/utils/TableState";
@@ -525,6 +527,12 @@ function RowImpl<R extends Kinded, S>(props: RowProps<R>): ReactElement {
             ...(isBodyRow &&
               (column.isField || (isGridCellContent(maybeContent) && maybeContent.field)) &&
               style.fieldCellCss),
+            // Row action buttons are 28px, so pad them to center on the first line of text. Only body rows in flexible tables:
+            // header and totals cells would grow, and fixed rows already center the buttons.
+            ...(isBodyRow &&
+              style.presentationSettings?.wrap &&
+              column.id === beamRowActionsColumnId &&
+              hierarchyRowActionsCellCss({ level, topLevelHasChildren: tableState.topLevelHasChildren })),
             // And any cell specific css
             ...(isGridCellContent(maybeContent) && maybeContent.css ? maybeContent.css : {}),
             // Apply kept last row styling per-cell
