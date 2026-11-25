@@ -1,10 +1,9 @@
 import { ProgressBar } from "src/components/ProgressBar";
 import { cardProgressSlot } from "src/components/Table/cardSlots";
 import type { GridCellContent } from "src/components/Table/components/cell";
-import type { CommonCellOpts } from "src/components/Table/components/cells/textCell";
 import { Css } from "src/Css";
 
-export type ProgressCellOpts = CommonCellOpts;
+export type ProgressCellOpts = Pick<GridCellContent, "tooltip" | "sticky" | "colspan" | "css" | "aiMode" | "cardSlot">;
 
 /**
  * Builds a body cell showing a `ProgressBar` with its % label.
