@@ -1925,49 +1925,6 @@ export function TruncatingCells() {
   );
 }
 
-type QtyRow = SimpleHeaderAndData<{ name: string; qty: number | undefined; editable: boolean }>;
-
-/** The Qty column keeps the row click, except on its editable cells, which use a per-cell `wrapAction: false`. */
-export function PerCellWrapAction() {
-  const [qtys, setQtys] = useState<Record<string, number | undefined>>({ "1": 4, "3": 12 });
-  const rows: GridDataRow<QtyRow>[] = [
-    simpleHeader,
-    { kind: "data", id: "1", data: { name: "Framing lumber", qty: qtys["1"], editable: true } },
-    { kind: "data", id: "2", data: { name: "Permit fee (N/A)", qty: undefined, editable: false } },
-    { kind: "data", id: "3", data: { name: "Drywall sheets", qty: qtys["3"], editable: true } },
-    { kind: "data", id: "4", data: { name: "Inspection (read-only)", qty: 1, editable: false } },
-  ];
-  const columns: GridColumn<QtyRow>[] = [
-    column<QtyRow>({ header: "Name", data: ({ name }) => name }),
-    column<QtyRow>({
-      header: "Qty",
-      data: ({ qty, editable }, { row }) =>
-        editable
-          ? {
-              ...fieldCell(
-                <NumberField
-                  label="Qty"
-                  labelStyle="hidden"
-                  value={qty}
-                  onChange={(v) => setQtys((prev) => ({ ...prev, [row.id]: v }))}
-                />,
-              ),
-              wrapAction: false,
-            }
-          : qty === undefined
-            ? "N/A"
-            : String(qty),
-    }),
-  ];
-  return (
-    <GridTable<QtyRow>
-      columns={columns}
-      rows={rows}
-      rowStyles={{ data: { onClick: (row) => action("row clicked")(row.data.name) } }}
-    />
-  );
-}
-
 export function InteractiveCellAlignment() {
   const textCol: GridColumn<AlignmentRow> = {
     header: "As Text",
