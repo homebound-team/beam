@@ -1,5 +1,4 @@
 import { Children, cloneElement, type JSX, type ReactElement, type ReactNode } from "react";
-import { useModal } from "src/components/Modal/useModal";
 import { type PresentationFieldProps, PresentationProvider } from "src/components/PresentationContext";
 import { Css, Tokens } from "src/Css";
 
@@ -8,7 +7,7 @@ export type FormWidth =
   | "sm"
   /** 480px, works well in a small, single-stack form. */
   | "md"
-  /** 550px, works well for showing side-by-side/double-stack fields. */
+  /** @deprecated Use `full`, which is the same width. */
   | "lg"
   /** 100%, works well for showing full width fields, or deferring to the parent width. */
   | "full";
@@ -25,19 +24,12 @@ export type FormLinesProps = {
  * Applies standard Form layout/size/spacing between lines.
  *
  * Lines can either be individual form fields, or a group of form fields
- * (see the `FieldGroup` component), where they will be laid out side-by-side.
+ * (see `FieldRow`), where they will be laid out side-by-side.
+ *
+ * @deprecated Use `FieldLayout` for stacked fields, and `FieldRow` for side-by-side fields.
  */
 export function FormLines(props: FormLinesProps) {
-  const { inModal } = useModal();
-  const {
-    children,
-    width = inModal ? "full" : "lg",
-    labelSuffix,
-    labelStyle,
-    compact,
-    gap = 2,
-    labelLeftFieldWidth,
-  } = props;
+  const { children, width = "full", labelSuffix, labelStyle, compact, gap = 2, labelLeftFieldWidth } = props;
   let firstFormHeading = true;
 
   // Only overwrite `fieldProps` if new values are explicitly set. Ensures we only set to `undefined` if explicitly set.
@@ -70,7 +62,10 @@ export function FormDivider() {
   return <div css={Css.hPx(1).bgColor(Tokens.SurfaceSeparator).$} />;
 }
 
-/** Groups multiple fields side-by-side. */
+/** Groups multiple fields side-by-side.
+ *
+ * @deprecated Use `FieldRow` and `FieldRowItem`, which line up columns across rows and follow the container's width.
+ */
 export function FieldGroup(props: {
   /** The legend/title for this group. */
   title?: string;
@@ -91,7 +86,7 @@ export function FieldGroup(props: {
 
 const sizes: Record<FormWidth, string> = {
   full: "100%",
-  lg: "550px",
+  lg: "100%",
   md: "480px",
   sm: "320px",
 };

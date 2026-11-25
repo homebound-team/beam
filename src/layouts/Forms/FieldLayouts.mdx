@@ -1,0 +1,226 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Layouts/Forms" name="Docs" parameters={{ chromatic: { disableSnapshot: true } }} />
+
+# Field layouts
+
+<p className="sbdocs-figma">
+  <a href="https://www.figma.com/design/62R8KiDklvgBBSH0mQGWHo/BEAM_27_LIBRARY?node-id=4699-3171">
+    <img src="FigmaLogo.png" alt="" />
+    Field layouts
+  </a>
+</p>
+
+`FieldLayout`, `FieldRow`, and `FieldRowItem` arrange the fields inside a form section. `FieldLayout` stacks fields. `FieldRow` puts fields side by side. `FieldRowItem` gives one field more than one column. Headings and dividers belong to `FormSection` and `FormSectionChild`, not to this layer.
+
+## Where it goes
+
+Pass a `FieldLayout` as a section's `fields`. The width comes from where the form sits, so the same layout works in each of these:
+
+- **A page body.** `FormSectionLayout` wraps `CenteredLayout` at `sm`, a 720px form column. Rows show up to 4 across. See the Form Page story.
+- **A workflow.** `FocusedFormLayout`, or a `StepperLayout` step, holds a `FormSectionLayout` in the same 720px column. See the Workflow story.
+- **A right pane.** The pane is 448px wide and pads its body 24px on each side, so a row is 400px and shows 2 columns. See the Right Pane story.
+
+Which layout holds the form is in [Which layout to use](?path=/docs/layouts--which-layout-to-use).
+
+## How to use
+
+A bare field is full width. `FieldRow` groups fields that share a row. `FieldRowItem` is only for weighted widths.
+
+```tsx
+<FieldLayout>
+  <TextField label="Email" ... />
+  <FieldRow>
+    <TextField label="First" ... />
+    <TextField label="Last" ... />
+  </FieldRow>
+  <FieldRow columns={4}>
+    <FieldRowItem span={2}>
+      <TextField label="Street" ... />
+    </FieldRowItem>
+    <TextField label="City" ... />
+    <TextField label="State" ... />
+  </FieldRow>
+  <TextAreaField label="Notes" ... />
+</FieldLayout>
+```
+
+In a form section:
+
+```tsx
+<FormSectionLayout
+  title="Create Contact"
+  sections={[
+    {
+      title: "Address",
+      fields: (
+        <FieldLayout>
+          <TextField label="Street" ... />
+          <FieldRow>
+            <TextField label="City" ... />
+            <TextField label="Postal Code" ... />
+          </FieldRow>
+        </FieldLayout>
+      ),
+    },
+  ]}
+/>
+```
+
+## FieldLayout
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>children</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>
+        Fields, <code>FieldRow</code>s, or both. Each child is its own line.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>labelStyle</code>
+      </td>
+      <td>
+        <code>"above" | "inline" | "hidden"</code>
+      </td>
+      <td>
+        <code>"above"</code>
+      </td>
+      <td>Sets the label position or visibility for every field inside.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>labelSuffix</code>
+      </td>
+      <td>
+        <code>LabelSuffixStyle</code>
+      </td>
+      <td>Inherited</td>
+      <td>Sets the required and optional suffixes for every field inside.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>compact</code>
+      </td>
+      <td>
+        <code>boolean</code>
+      </td>
+      <td>Inherited</td>
+      <td>Shortens every field inside.</td>
+    </tr>
+  </tbody>
+</table>
+
+## FieldRow
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>children</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>
+        The fields that share a row. Wrap one in a <code>FieldRowItem</code> to give it more width.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>columns</code>
+      </td>
+      <td>
+        <code>1 | 2 | 3 | 4</code>
+      </td>
+      <td>Child count, up to 4</td>
+      <td>
+        The most columns the row shows at 640px and wider. Set it when you use <code>FieldRowItem</code>, since three
+        children can mean four columns.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## FieldRowItem
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>children</code>
+      </td>
+      <td>
+        <code>ReactNode</code>
+      </td>
+      <td>
+        <span className="sbdocs-required">required</span>
+      </td>
+      <td>The field to widen.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>span</code>
+      </td>
+      <td>
+        <code>1 | 2 | 3 | 4</code>
+      </td>
+      <td>
+        <code>1</code>
+      </td>
+      <td>
+        How many columns the item spans at 640px and wider. Keep it within the row's <code>columns</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Behaviors
+
+- A row uses container queries to determine how many columns it can support:
+  - 640px and up: up to `columns`, which is at most 4.
+  - 376px to 639px: 2 columns.
+  - Under 376px: 1 column.
+
+## Replacing FormLines and FieldGroup
+
+`FormLines` and `FieldGroup` are deprecated.
+
+- `FormLines` becomes `FieldLayout`. It has no `width`, so the parent sets it, as `width="full"` did. `lg` was the same as `full`.
+- `FieldGroup` becomes `FieldRow`. Use `FieldRowItem` where a `FieldGroup` gave a field a different `widths` entry.

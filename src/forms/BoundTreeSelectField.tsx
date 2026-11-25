@@ -22,6 +22,8 @@ export type BoundTreeSelectFieldProps<O, V extends Value> = Omit<
 /**
  * Wraps `TreeSelectField` and binds it to a form field.
  *
+ * @deprecated Use `BoundMenuTreeSelectField`.
+ *
  * To ease integration with "select this fooId" inputs, we can take a list
  * of objects, `T` (i.e. `TradePartner[]`), but accept a field of type `V`
  * (i.e. `string`).
