@@ -31,11 +31,17 @@ Match the existing conventions when adding files:
 | `BoundMultiSelectField` | `BoundMenuMultiSelectField` |
 | `BoundTreeSelectField` | `BoundMenuTreeSelectField` |
 
-- **Width:** Fields have no max width and fill their container. Constrain width with the parent (e.g. `FormLines` `width`, a grid, or a wrapper). The `fullWidth` field prop is `@deprecated`, has no effect, and should not be passed. (`fullWidth` on `Button`, `ButtonGroup`, `Card`, `AiPanel` and `Checkbox` is a separate prop and unchanged.)
+- **Width:** Fields have no max width and fill their container. Constrain width with the parent (e.g. a grid, `FieldRow`, or a wrapper). The `fullWidth` field prop is `@deprecated`, has no effect, and should not be passed. (`fullWidth` on `Button`, `ButtonGroup`, `Card`, `AiPanel` and `Checkbox` is a separate prop and unchanged.)
 
 ## Component files
 
 File order and placement for `*.tsx` component modules: **[`docs/components.md`](docs/components.md)**.
+
+## Selects
+
+Use `MenuSelectField`, `MenuMultiSelectField`, and `MenuTreeSelectField` for a new select. With form state, use `BoundMenuSelectField`, `BoundMenuMultiSelectField`, and `BoundMenuTreeSelectField`.
+
+`SelectField`, `MultiSelectField`, and `TreeSelectField`, and their `Bound*` wrappers, are deprecated. The contract is [`SelectFields.mdx`](src/inputs/MenuSelectField/SelectFields.mdx).
 
 ## Utility modules
 
@@ -159,9 +165,9 @@ Example tests: [`DateField.test.tsx`](src/inputs/DateFields/DateField.test.tsx),
 - Primary development surface for components; Storybook **helpers** (decorators, viewport modes) in [`src/utils/sb.tsx`](src/utils/sb.tsx); shared story **fixtures** in [`src/utils/sbComponents.tsx`](src/utils/sbComponents.tsx) — do not export reusable fixtures from `*.stories.tsx` or Storybook will register them as stories.
 - Every feature should have at least one story; use `PlayFunction` for interaction states (hover, focus, etc.).
 - Chromatic snapshots stories for visual regression. When a Chromatic mode name matches a Storybook viewport key, use [`viewportModes()`](src/utils/sb.tsx) (e.g. `modes: viewportModes("desktop", "mobile1")`). Keys are type-checked against Storybook's [`MINIMAL_VIEWPORTS`](https://storybook.js.org/docs/essentials/viewport#use-a-detailed-set-of-devices) (`mobile1` Small mobile, `mobile2` Large mobile, `tablet`, `desktop`) via the `StorybookViewportKey` type.
-- **Helper placement:** Local helpers in `*.stories.tsx` go **at the bottom of the file**, after meta, story exports, and play functions.
+- **Helper placement:** Local helpers in `*.stories.tsx` go **at the bottom of the file**, after meta, story exports, and play functions. A helper used by only one story file stays in that file, however long it is; move it to `sbComponents.tsx` only when a second file needs it, and do not create a separate `sb*` file for it.
 - **No module-level fixture values:** Do not declare objects, arrays, or other non-trivial values at the **top level** of a story file — Storybook loads modules eagerly. Use **factory functions** at the bottom (`function createItems() { return […]; }`) or inline values inside a story export.
-- **Docs pages** are opt-in MDX (no repo-wide autodocs). The welcome page is [`src/intro/Welcome.mdx`](src/intro/Welcome.mdx) (sidebar **Intro**). Foundations overview: [`src/foundations/Foundations.mdx`](src/foundations/Foundations.mdx). Co-locate `Component.mdx` next to `Component.stories.tsx`. Layouts are a sidebar **section**: docs in [`src/layouts/WhichLayout.mdx`](src/layouts/WhichLayout.mdx) (**Which layout to use**) and [`src/layouts/Routing.mdx`](src/layouts/Routing.mdx) (**Routing**), then one story file per page shape — `Layouts/Table Page`, `Layouts/Form Page`, `Layouts/Overview Page`, and `Layouts/Workflows/*`. Every layout story shows a complete app-page or workflow composition; do not add isolated stories for layout wrappers. Shared layout fixtures (`PlaceholderFields`, `createFormSections`, `createRightPaneTriggers`, `SideNavBrand`) live in [`src/utils/sbComponents.tsx`](src/utils/sbComponents.tsx).
+- **Docs pages** are opt-in MDX (no repo-wide autodocs). The welcome page is [`src/intro/Welcome.mdx`](src/intro/Welcome.mdx) (sidebar **Intro**). Foundations overview: [`src/foundations/Foundations.mdx`](src/foundations/Foundations.mdx). Co-locate `Component.mdx` next to `Component.stories.tsx`. Layouts are a sidebar **section**: docs in [`src/layouts/WhichLayout.mdx`](src/layouts/WhichLayout.mdx) (**Which layout to use**) and [`src/layouts/Routing.mdx`](src/layouts/Routing.mdx) (**Routing**), then one story file per page shape — `Layouts/Table Page`, `Layouts/Overview Page`, and `Layouts/Workflows/*`. `Layouts/Forms` also holds [`src/layouts/Forms/FieldLayouts.mdx`](src/layouts/Forms/FieldLayouts.mdx) (**Docs**, a standalone page for `FieldLayout`, `FieldRow`, and `FieldRowItem`), `Field Layout` (page, workflow, and right-pane compositions), and `Field Row`, the width reference. Every layout story shows a complete app-page or workflow composition; do not add isolated stories for layout wrappers. Shared layout fixtures (`PlaceholderFields`, `createFormSections`, `createRightPaneTriggers`, `SideNavBrand`) live in [`src/utils/sbComponents.tsx`](src/utils/sbComponents.tsx).
 
 ## Design tokens
 

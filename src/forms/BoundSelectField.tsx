@@ -21,6 +21,8 @@ export type BoundSelectFieldProps<O, V extends Value> = Omit<SelectFieldProps<O,
 /**
  * Wraps `SelectField` and binds it to a form field.
  *
+ * @deprecated Use `BoundMenuSelectField`.
+ *
  * To ease integration with GraphQL inputs that want to put `{ authorId: "a:1" }` on
  * the wire, we generally expect the FieldState type to be a string/tagged id, but the
  * `options` prop to be the full list of id+name options like `AuthorFragment[]`.

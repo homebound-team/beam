@@ -280,6 +280,16 @@ The layouts handle the gaps between chrome and page content, so page bodies rare
 
 Start the body with your content, and let the layout own those edges.
 
+### Field layouts (informative)
+
+`FieldLayout` stacks fields, and `FieldRow` lays out fields side by side in equal columns. A row reads its own width, not the window's, so a 720px form column fits 4 columns, a right pane's form fits 2, and a row under 400px stacks:
+
+- 640px and wider: `columns` (1 to 4).
+- 376px to 639px: 2 columns.
+- Under 376px: 1 column.
+
+The gap is 16px. Bare fields in `FieldLayout` are full width. Rows in the same container resolve to the same width, so rows with the same `columns` line up without a parent grid. Rows of 3 do not share column edges with rows of 2 or 4. `FieldRowItem` spans columns. Keep `span` within `columns`; the row's width reduces it like the column count. Use `FieldLayout` and `FieldRow` instead of the deprecated `FormLines` and `FieldGroup`. Usage is on the Storybook page `Layouts/Forms/Docs`.
+
 ### Scroll coordination (informative)
 
 The layouts share a **document-scroll** model: the environment banner, navbar, and page header pin via

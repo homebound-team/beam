@@ -4,7 +4,7 @@ import type { Typography } from "src/Css";
 
 export type InputStylePalette = "success" | "warning" | "caution" | "info";
 
-export interface PresentationFieldProps {
+export type PresentationFieldProps = {
   numberAlignment?: "left" | "right";
   /** Sets the label position or visibility. Defaults to "above"; "left" is deprecated. */
   labelStyle?: "inline" | "hidden" | "above" | /** @deprecated Use "above"; left labels are being retired. */ "left";
@@ -27,7 +27,7 @@ export interface PresentationFieldProps {
   fullWidth?: boolean;
   /** Changes bg and hoverBg; useful when showing many fields w/in a table that require user attention; in no way should be used as a replacement for error/focus state */
   inputStylePalette?: InputStylePalette;
-}
+};
 
 export type PresentationContextProps = {
   /** `inputStylePalette` omitted because it is too dependent on the individual field use case to be controlled at this level  */

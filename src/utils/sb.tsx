@@ -73,11 +73,12 @@ export function LabeledExamples(props: {
   direction?: "row" | "column";
   labelWidth?: number;
   exampleWidth?: number;
+  gap?: number;
 }) {
-  const { examples, direction = "row", labelWidth = 72, exampleWidth } = props;
+  const { examples, direction = "row", labelWidth = 72, exampleWidth, gap = 2 } = props;
   const stacked = direction === "column";
   return (
-    <div css={Css.bgWhite.p2.df.fdc.gap2.if(!stacked).aifs.if(stacked).w100.$}>
+    <div css={Css.bgWhite.p2.df.fdc.gap(gap).if(!stacked).aifs.if(stacked).w100.$}>
       {examples.map((example) => (
         <div
           key={example.label}

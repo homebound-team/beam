@@ -20,6 +20,8 @@ export type MultiSelectFieldProps<O, V extends Value> = {
 /**
  * Provides a non-native multiselect/dropdown widget.
  *
+ * @deprecated Use `MenuMultiSelectField`.
+ *
  * The `O` type is a list of options to show, the `V` is the primitive value of a
  * given `O` (i.e. it's id) that you want to use as the current/selected value.
  *
