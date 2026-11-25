@@ -61,7 +61,7 @@ function TextCellContent(props: TextCellContentProps) {
   const fixed = wrap === false;
 
   const textEl = (
-    <span css={Css.if(fixed).lineClamp1.wbba.else.wbbw.$} title={fixed ? text : undefined}>
+    <span css={Css.if(fixed).lineClamp1.wbba.else.add("overflowWrap", "anywhere").$} title={fixed ? text : undefined}>
       {text}
     </span>
   );
