@@ -5,6 +5,7 @@ import { type ReactNode, useMemo, useState } from "react";
 import { Button } from "src";
 import { Chips } from "src/components/Chips";
 import { Icon } from "src/components/Icon";
+import { progressCell, type ProgressCellOpts } from "src/components/Table/components/cells/progressCell";
 import type { GridDataRow } from "src/components/Table/components/Row";
 import { type GridSortConfig, GridTable, type GridTableProps } from "src/components/Table/GridTable";
 import { useGridTableApi } from "src/components/Table/GridTableApi";
@@ -916,6 +917,62 @@ const flatRows: GridDataRow<BeamRow>[] = [
       location: idx % 2 ? "l:1" : "l:2",
     },
   })),
+];
+
+/* Progress Cell Story and data */
+type ProgressCellVariant = {
+  id: string;
+  variant: string;
+  value: number | null | undefined;
+  opts?: ProgressCellOpts;
+};
+type ProgressCellRows = SimpleHeaderAndData<ProgressCellVariant>;
+
+/** Every `progressCell` value and option, in fixed and flexible rows, next to text for first-line alignment. */
+export function ProgressCells() {
+  return (
+    <>
+      <h2 css={Css.mb1.$}>Fixed Table Styles</h2>
+      <GridTable<ProgressCellRows>
+        style={getTableStyles({ rowHeight: "fixed" })}
+        columns={progressCellColumns}
+        rows={progressCellRows}
+      />
+      <h2 css={Css.mt5.mb1.$}>Flexible Table Styles</h2>
+      <GridTable<ProgressCellRows> style={getTableStyles({})} columns={progressCellColumns} rows={progressCellRows} />
+    </>
+  );
+}
+
+const progressCellColumns: GridColumn<ProgressCellRows>[] = [
+  column<ProgressCellRows>({ header: "Variant", data: ({ variant }) => variant, w: "200px" }),
+  column<ProgressCellRows>({
+    header: "progressCell",
+    data: ({ value, opts }) => progressCell(value, opts),
+    w: "200px",
+  }),
+  column<ProgressCellRows>({
+    header: "Neighbor",
+    data: () => "Plain text that wraps onto more lines in flexible rows, for first-line alignment",
+  }),
+];
+
+const progressCellRows: GridDataRow<ProgressCellRows>[] = [
+  simpleHeader,
+  ...(
+    [
+      { variant: "0%", value: 0 },
+      { variant: "33.3% (floors)", value: 33.3 },
+      { variant: "50%", value: 50 },
+      { variant: "99.9% (floors)", value: 99.9 },
+      { variant: "100%", value: 100 },
+      { variant: "Out of range (clamps)", value: 140 },
+      { variant: "Null", value: null },
+      { variant: "Undefined", value: undefined },
+      { variant: "AI mode", value: 60, opts: { aiMode: true } },
+      { variant: "Tooltip", value: 75, opts: { tooltip: "3 of 4 tasks done" } },
+    ] satisfies Omit<ProgressCellVariant, "id">[]
+  ).map((v, i) => ({ kind: "data" as const, id: `p:${i}`, data: { id: `p:${i}`, ...v } })),
 ];
 
 /* Input Field Story and data */

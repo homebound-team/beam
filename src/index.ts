@@ -220,6 +220,8 @@ export {
   rowLinkRenderFn,
 } from "./components/Table/components/cell";
 export type { GridCellContent, RenderCellFn } from "./components/Table/components/cell";
+export { progressCell } from "./components/Table/components/cells/progressCell";
+export type { ProgressCellOpts } from "./components/Table/components/cells/progressCell";
 export type {
   CompanionConfig,
   CompanionContent,
